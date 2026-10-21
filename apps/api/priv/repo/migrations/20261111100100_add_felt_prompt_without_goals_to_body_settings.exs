@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddFeltPromptWithoutGoalsToBodySettings do
+defmodule Palee.Repo.Migrations.AddFeltPromptWithoutGoalsToBodySettings do
   @moduledoc """
   ADR-163: a member can switch off the «Τι ένιωσες;» step for workouts
   without goals (on by default). It lives with the member's other journal

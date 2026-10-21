@@ -1,7 +1,7 @@
-defmodule MilosTraining.Repo.Migrations.AllowNullOrganizationOnNotificationClickEvents do
+defmodule Palee.Repo.Migrations.AllowNullOrganizationOnNotificationClickEvents do
   use Ecto.Migration
 
-  # MilosTraining.Application.MarkNotificationClicked reads the notification's
+  # Palee.Application.MarkNotificationClicked reads the notification's
   # own organization_id explicitly (F-28: the notification inbox spans every
   # org a member belongs to, so a click on a cross-org/organization-less
   # notification is a legitimate, expected case - not an error). Before the

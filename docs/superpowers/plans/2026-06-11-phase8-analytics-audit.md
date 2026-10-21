@@ -178,22 +178,22 @@ Persisted event/fact tables needed:
 - `communication_threads` and `communication_messages` for response latency and unresolved communication.
 
 Telemetry events to emit:
-- `[:milos, :workout, :started]`
-- `[:milos, :workout, :completed]`
-- `[:milos, :workout, :abandoned]`
-- `[:milos, :booking, :submitted]`
-- `[:milos, :booking, :resolved]`
-- `[:milos, :class, :attendance_marked]`
-- `[:milos, :notification, :read]`
-- `[:milos, :notification, :clicked]`
-- `[:milos, :push, :dispatch_result]`
-- `[:milos, :message, :sent]`
-- `[:milos, :review, :submitted]`
-- `[:milos, :injury, :reported]`
-- `[:milos, :injury, :healed]`
-- `[:milos, :membership, :renewed]`
-- `[:milos, :payment, :recorded]`
-- `[:milos, :referral, :status_changed]`
+- `[:palee, :workout, :started]`
+- `[:palee, :workout, :completed]`
+- `[:palee, :workout, :abandoned]`
+- `[:palee, :booking, :submitted]`
+- `[:palee, :booking, :resolved]`
+- `[:palee, :class, :attendance_marked]`
+- `[:palee, :notification, :read]`
+- `[:palee, :notification, :clicked]`
+- `[:palee, :push, :dispatch_result]`
+- `[:palee, :message, :sent]`
+- `[:palee, :review, :submitted]`
+- `[:palee, :injury, :reported]`
+- `[:palee, :injury, :healed]`
+- `[:palee, :membership, :renewed]`
+- `[:palee, :payment, :recorded]`
+- `[:palee, :referral, :status_changed]`
 
 The practical Phase 8 approach is: store domain facts in their owning contexts, emit telemetry at write boundaries, and build `finance_aggregates`, `coaching_aggregates`, and probably `engagement_aggregates` from those facts. Telemetry alone is not enough for analytics unless it is also persisted or exported to a metrics store; for this self-hosted app, persisted event facts plus materialized views are the safer default.
 

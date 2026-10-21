@@ -100,7 +100,7 @@ P0 items below is a prerequisite for the gamification and coaching features to h
   modifications feed leaderboards and coaching analytics. Today, rounds in AMRAP/for-time depend
   on the athlete tapping every single exercise, so the data is sparse or wrong.
 - **Differentiation:** dedicated WOD timers (SmartWOD Timer: 54K ratings at 4.9★) win on
-  glanceability, audio, and a tap-anywhere round counter. Milos's advantage is that the timer is
+  glanceability, audio, and a tap-anywhere round counter. Palee's advantage is that the timer is
   *already loaded with the coach's workout*. That advantage only counts if the timer itself is
   as good as a dedicated one.
 

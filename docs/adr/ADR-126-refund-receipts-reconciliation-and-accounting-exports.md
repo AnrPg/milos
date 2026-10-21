@@ -98,7 +98,7 @@ ADR-117's prefix-pinned inventory, purge and signed-link machinery.
   waiver reversals). The Finance store's reversal return value is unchanged.
 - New tenant tables are declared in Finance's `TenantDataPolicy` (10-year
   retention, deleted before reversals/payments) and classified ready in
-  `mix milos.tenancy.audit`.
+  `mix palee.tenancy.audit`.
 - Receipts are immutable; a wrong receipt is corrected by a new reversal fact
   (and its own receipt), never by editing. Receipts of soft-deleted reversals
   (ADR-084) leave normal views but their rows remain.
@@ -108,10 +108,10 @@ ADR-117's prefix-pinned inventory, purge and signed-link machinery.
 
 ## Implementation Notes
 - Migrations `20261014150000` (counters + receipts, immutability trigger
-  `milos_finance_refund_receipts_immutable`, which still allows FK
+  `palee_finance_refund_receipts_immutable`, which still allows FK
   `SET NULL` on `finance_invoice_id`/`issued_by_id`), `20261014150100`
   (reconciliation records) and `20261014150200` (export runs) are additive and
-  mirror sibling finance tables: `milos_apply_tenant_context()` trigger,
+  mirror sibling finance tables: `palee_apply_tenant_context()` trigger,
   bare-equality `<table>_tenant_policy`, ENABLE + FORCE RLS, `organization_id`
   cascading from `organizations`. The range moved from `20261012150000` to
   `20261014150000` to avoid a parallel branch's version.
@@ -136,7 +136,7 @@ ADR-117's prefix-pinned inventory, purge and signed-link machinery.
   inside the Ecto SQL sandbox; the row lock is the mechanism.
 - Verification: `mix precommit` (gettext catalogs incl. `receipts`, compile
   with warnings as errors, architecture, Credo, Dialyzer, unused deps, format,
-  1018 tests, 0 failures), `MIX_ENV=test mix milos.tenancy.audit`, and web
+  1018 tests, 0 failures), `MIX_ENV=test mix palee.tenancy.audit`, and web
   lint, type-check, 272 vitest tests, `i18n:check`, contract regeneration and
   production build. The full ExUnit run needed `ELIXIR_ERL_OPTIONS="+fnu
   +MIscs 4096"` on this machine: with the default literal super carrier the

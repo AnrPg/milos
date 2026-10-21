@@ -33,7 +33,7 @@ blocking. P1–P3 remain open.
 ### P1.1 — Remove RLS COALESCE-to-legacy-org fallback (F-04) — **FIXED 2026-08-06**, see `04-findings.md`. Column DEFAULTs intentionally left in place, gated on P2.3/P2.4.
 - **Dependency:** must land before P1.2 (Finance predicates) is meaningful, and before any Phase 7 constraint-tightening in the retirement plan.
 - **Affected modules:** every enforce-stage migration across Finance, Messaging, Notifications, Gamification, Analytics, Wellbeing, Feedback, Attendance.
-- **Approach:** New migration replacing `COALESCE(session_var, milos_legacy_organization_id())` with bare `session_var` equality in every affected policy; drop the `DEFAULT milos_legacy_organization_id()` column defaults once no write path depends on them (verify via P2.3/P2.4's job fixes first, or sequence this after them).
+- **Approach:** New migration replacing `COALESCE(session_var, palee_legacy_organization_id())` with bare `session_var` equality in every affected policy; drop the `DEFAULT palee_legacy_organization_id()` column defaults once no write path depends on them (verify via P2.3/P2.4's job fixes first, or sequence this after them).
 - **Tests required before merge:** test-gap-plan #12, plus a full re-run of every existing `tenant_isolation_test.exs` (should still pass — they don't currently depend on the fallback for correctness, only for accidental leniency).
 - **Deployment considerations:** This is a behavior change for any code path that was silently relying on the fallback — audit Phase 4 (backfill/repair) in `06-legacy-data-and-code-retirement-plan.md` should run first in a staging environment to surface any such dependency before production deploy.
 
@@ -155,7 +155,7 @@ blocking. P1–P3 remain open.
 ### P2.2 — Add membership suspend/revoke commands (F-11) and platform-owner revoke task (F-12)
 - **STATUS: FIXED** (2026-08-07). `Commands.SetMembershipStatus` (owner/admin
   gated, F-06 role ceiling, refuses self-change to prevent owner lockout) and
-  `Organizations.revoke_vendor/1` + `mix milos.platform.revoke_vendor`.
+  `Organizations.revoke_vendor/1` + `mix palee.platform.revoke_vendor`.
 - **Naming note:** the task is `revoke_vendor`, not `revoke_owner` as written
   below — `platform_owners` was renamed to `vendors` (ADR-089) after this
   roadmap was drafted, because "platform owner" collided with the
@@ -199,7 +199,7 @@ blocking. P1–P3 remain open.
 - **Dependency:** none.
 - **Approach:** Mirror the PR index's `filter: "organization_id = ..."` pattern instead of relying solely on the application post-filter.
 
-### P2.7 — Extend `mix milos.tenancy.audit` and `mix milos.architecture` coverage (F-13)
+### P2.7 — Extend `mix palee.tenancy.audit` and `mix palee.architecture` coverage (F-13)
 - **Dependency:** valuable to land early since it would have caught several of the above findings automatically, but not blocking for any of them.
 - **Approach:** Add root tenant tables, `users`, materialized views to the audit's table list (with an explicit "platform-administered" classification where RLS isn't applicable); add COALESCE-fallback detection to the RLS policy check; extend the architecture task's tenant-scope check beyond Scheduling to every T4 context.
 
@@ -253,7 +253,7 @@ blocking. P1–P3 remain open.
   created without ever enabling RLS on the table, so it had never done anything;
   and it was also wrong (`id = app.user_id` would break login, tenant
   resolution, and the admin directory). `users` is application-layer-only by
-  design, and `mix milos.tenancy.audit` now states that exemption explicitly.
+  design, and `mix palee.tenancy.audit` now states that exemption explicitly.
 - P3.4 — **FIXED 2026-08-07 for real** (F-16). The circularity — resolving a
   tenant requires reading `organizations` and `organization_memberships`
   *before* any session GUC exists — is solved rather than documented around:
@@ -266,7 +266,7 @@ blocking. P1–P3 remain open.
   genuine `platform_administered` exemption (F-08 — login/token verification
   must work before any session context exists). Proven under real non-superuser
   RLS in `root_tables_rls_test.exs`: isolation holds cross-organization AND
-  tenant resolution/login continues to function. `mix milos.tenancy.audit`
+  tenant resolution/login continues to function. `mix palee.tenancy.audit`
   distinguishes "enforced" from "exempt by design" accordingly, and
   `unclassified_tables/0` still fails the audit if a new tenant table appears
   unclassified.

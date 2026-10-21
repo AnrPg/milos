@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PtSquads do
+defmodule Palee.Repo.Migrations.PtSquads do
   @moduledoc """
   PT squads (ADR-168): a coach's small invite-only channel with their own
   clients, inside the gym's club.

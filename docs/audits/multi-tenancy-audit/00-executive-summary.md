@@ -18,7 +18,7 @@ suite and read-only diagnostic queries against a schema copy. **A follow-up
 pass later the same day gained read-only access to the live production
 deployment** (Kubernetes namespace `tenant-m4`, app at
 `https://milos.4kq.net/`, GitOps config at
-`/home/rodochrousbisbiki/MyApps/deployed-milos/gitops`) with explicit user
+`/home/rodochrousbisbiki/MyApps/deployed-palee/gitops`) with explicit user
 approval before every `kubectl exec`; only `SELECT`-only queries were run,
 executed through the running application's own database connection, and no
 secret values were ever read or displayed. See `10-production-verification.md`
@@ -42,7 +42,7 @@ as documented), one confirmed within-tenant privilege-escalation bug, and a
 verification-integrity gap that means the test suite has never actually
 exercised the database-level enforcement mechanism (Row-Level Security) it
 was written to validate. Several of the codebase's own internal claims of
-completion (`docs/technical_debt.md` TD-038, and `mix milos.tenancy.audit`
+completion (`docs/technical_debt.md` TD-038, and `mix palee.tenancy.audit`
 passing) are materially overstated relative to what those checks actually
 verify.
 
@@ -182,7 +182,7 @@ list.
    (F-21/F-22) or can already be exploited cross-user today (F-23).
 2. Remove the **F-04 legacy-org RLS fallback properly** rather than relying
    on its current accidental inertness — a routine, documented-as-safe
-   `mix milos.organizations.ensure_legacy` re-run, or any future org named/
+   `mix palee.organizations.ensure_legacy` re-run, or any future org named/
    slugged `legacy-milos-training`, would silently reactivate it in
    production.
 3. Add the **non-superuser RLS-enforcing CI lane** (F-07/P1.5) so dev/test/CI

@@ -7,10 +7,10 @@ import type { components, operations } from "@/api/generated/schema";
 
 type Json<T> = T extends { content: { "application/json": infer Body } } ? Body : never;
 
-type QueueResponse = Json<operations["MilosTrainingWeb.StaffScalingController.index"]["responses"][200]>;
-type SuggestionResponse = Json<operations["MilosTrainingWeb.StaffScalingController.approve"]["responses"][200]>;
-type MemberResponse = Json<operations["MilosTrainingWeb.MyScalingController.show"]["responses"][200]>;
-type SettingsResponse = Json<operations["MilosTrainingWeb.AdminAiSettingsController.show"]["responses"][200]>;
+type QueueResponse = Json<operations["PaleeWeb.StaffScalingController.index"]["responses"][200]>;
+type SuggestionResponse = Json<operations["PaleeWeb.StaffScalingController.approve"]["responses"][200]>;
+type MemberResponse = Json<operations["PaleeWeb.MyScalingController.show"]["responses"][200]>;
+type SettingsResponse = Json<operations["PaleeWeb.AdminAiSettingsController.show"]["responses"][200]>;
 
 export type ScalingSuggestion = components["schemas"]["ScalingSuggestion"];
 export type ScalingSuggestionItem = components["schemas"]["ScalingSuggestionItem"];

@@ -394,7 +394,7 @@ test.describe("member app shell", () => {
     await expect(flow.getByText("Park run")).toBeVisible();
     await expect(flow.getByText("Love the new journal")).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Body", "Wellbeing", "Progress"]);
-    await expect(flow.getByRole("button", { name: /Share in Milos: Fran/ })).toBeVisible();
+    await expect(flow.getByRole("button", { name: /Share in Palee: Fran/ })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
 
     await page.goto("/journal/progress");

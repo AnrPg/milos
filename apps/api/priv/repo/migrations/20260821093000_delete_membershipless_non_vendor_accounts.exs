@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.DeleteMembershiplessNonVendorAccounts do
+defmodule Palee.Repo.Migrations.DeleteMembershiplessNonVendorAccounts do
   use Ecto.Migration
 
   def up do

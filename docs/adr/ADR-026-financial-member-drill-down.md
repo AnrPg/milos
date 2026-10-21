@@ -60,7 +60,7 @@ where practical so `/admin` surfaces stay consistent.
 
 ## Implementation Notes
 Implemented Phase 1 by adding a pure Finance domain composer,
-`MilosTraining.Finance.Domain.MemberDrillDown`, and wiring the existing admin
+`Palee.Finance.Domain.MemberDrillDown`, and wiring the existing admin
 member finance profile application service to include a `drill_down` section.
 
 The response keeps the existing source-fact fields intact and adds:
@@ -83,8 +83,8 @@ properties for compatibility with existing finance screens.
 
 Validation performed:
 
-- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/milos_phase1_drilldown_build mix test test/milos_training/finance/domain/member_drill_down_test.exs test/milos_training_web/controllers/phase8_finance_controller_test.exs`
-- `MIX_BUILD_PATH=/tmp/milos_phase1_drilldown_build mix milos.export_openapi ../web/src/api/generated/openapi.json`
+- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/palee_phase1_drilldown_build mix test test/palee/finance/domain/member_drill_down_test.exs test/palee_web/controllers/phase8_finance_controller_test.exs`
+- `MIX_BUILD_PATH=/tmp/palee_phase1_drilldown_build mix palee.export_openapi ../web/src/api/generated/openapi.json`
 - `npx openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts`
 
 No new technical debt was deferred by this slice. Existing warnings from

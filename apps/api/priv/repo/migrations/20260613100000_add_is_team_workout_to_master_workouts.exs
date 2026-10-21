@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddIsTeamWorkoutToMasterWorkouts do
+defmodule Palee.Repo.Migrations.AddIsTeamWorkoutToMasterWorkouts do
   use Ecto.Migration
 
   def change do

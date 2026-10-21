@@ -1,15 +1,15 @@
-defmodule MilosTraining.Repo.Migrations.RemoveRlsLegacyOrgCoalesceFallback do
+defmodule Palee.Repo.Migrations.RemoveRlsLegacyOrgCoalesceFallback do
   use Ecto.Migration
 
   @moduledoc """
-  F-04: removes the `COALESCE(session_var, milos_legacy_organization_id())`
+  F-04: removes the `COALESCE(session_var, palee_legacy_organization_id())`
   fallback from every RLS policy that still has it, replacing it with a bare
   `organization_id = session_var` equality - matching the pattern Scheduling
   already uses correctly (bookings, class_types, class_series,
   scheduled_classes, class_attendance_records, scheduling_settings never had
   the fallback in their policies).
 
-  This does NOT touch the `DEFAULT milos_legacy_organization_id()` column
+  This does NOT touch the `DEFAULT palee_legacy_organization_id()` column
   defaults on the same tables - those are a write-path convenience for code
   that inserts without an active tenant session (see F-24/F-25/F-26) and are
   deliberately left alone until that write-path work lands, per the
@@ -55,13 +55,13 @@ defmodule MilosTraining.Repo.Migrations.RemoveRlsLegacyOrgCoalesceFallback do
       USING (
         organization_id = COALESCE(
           NULLIF(current_setting('app.organization_id', true), '')::uuid,
-          milos_legacy_organization_id()
+          palee_legacy_organization_id()
         )
       )
       WITH CHECK (
         organization_id = COALESCE(
           NULLIF(current_setting('app.organization_id', true), '')::uuid,
-          milos_legacy_organization_id()
+          palee_legacy_organization_id()
         )
       )
       """)

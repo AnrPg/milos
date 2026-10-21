@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateNativePushTokens do
+defmodule Palee.Repo.Migrations.CreateNativePushTokens do
   @moduledoc """
   ADR-171 (P3-M9, native wrapper): push tokens of the store apps, next to the
   browser's `push_subscriptions`.
@@ -7,7 +7,7 @@ defmodule MilosTraining.Repo.Migrations.CreateNativePushTokens do
   Messaging) or `apns` (iOS), the device token, the platform, the app id it
   was issued for and, for APNs, the environment (`production` or `sandbox`).
   A token belongs to whoever signed in on that install last: registering it
-  again under another account moves it (`milos_claim_native_push_token`),
+  again under another account moves it (`palee_claim_native_push_token`),
   since the person who signed in is the one holding the phone.
 
   The person's own rows (personal-session RLS, like `push_subscriptions`).
@@ -56,7 +56,7 @@ defmodule MilosTraining.Repo.Migrations.CreateNativePushTokens do
     # The install's token moves to the account that registers it now. Only the
     # session person can claim, and only for themselves; nothing is returned.
     execute("""
-    CREATE FUNCTION milos_claim_native_push_token(p_provider text, p_token text)
+    CREATE FUNCTION palee_claim_native_push_token(p_provider text, p_token text)
     RETURNS integer
     LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -74,7 +74,7 @@ defmodule MilosTraining.Repo.Migrations.CreateNativePushTokens do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_claim_native_push_token(text, text)")
+    execute("DROP FUNCTION IF EXISTS palee_claim_native_push_token(text, text)")
     drop table(:native_push_tokens)
   end
 end

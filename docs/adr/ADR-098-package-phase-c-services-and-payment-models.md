@@ -246,6 +246,6 @@ recorded in the technical debt ledger when the phase is complete.
   `pr_timeline` (each time a PR was beaten, with the score it replaced), which
   the web opens in the Pantheon's PR history overlay.
 - **API**: every new denial has a stable code in `FallbackController`. The
-  OpenAPI spec is now cached once per spec module (`MilosTrainingWeb.ApiSpecCache`)
+  OpenAPI spec is now cached once per spec module (`PaleeWeb.ApiSpecCache`)
   because the default cache copied the whole spec into persistent terms for
   every controller action and exhausted the literal area in the full test run.

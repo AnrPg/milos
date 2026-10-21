@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateMessagingThreads do
+defmodule Palee.Repo.Migrations.CreateMessagingThreads do
   use Ecto.Migration
 
   def change do

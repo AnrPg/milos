@@ -1,11 +1,11 @@
-defmodule MilosTraining.TestSupport.MemoryObjectStore do
+defmodule Palee.TestSupport.MemoryObjectStore do
   @moduledoc """
   In-memory `TenantObjectStore` for tests (ADR-117). Objects are keyed by
   `{bucket, key}` in a globally named Agent; tests only touch keys under their
   own freshly generated organization/user ids, so async tests do not collide.
   """
 
-  @behaviour MilosTraining.Application.Ports.TenantObjectStore
+  @behaviour Palee.Application.Ports.TenantObjectStore
 
   def start do
     case Agent.start(fn -> %{} end, name: __MODULE__) do

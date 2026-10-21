@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.HardenFinanceDiscountAggregates do
+defmodule Palee.Repo.Migrations.HardenFinanceDiscountAggregates do
   use Ecto.Migration
 
   def up do

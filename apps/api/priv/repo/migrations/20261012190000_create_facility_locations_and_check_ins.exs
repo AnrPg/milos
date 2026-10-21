@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFacilityLocationsAndCheckIns do
+defmodule Palee.Repo.Migrations.CreateFacilityLocationsAndCheckIns do
   use Ecto.Migration
 
   # ADR-097: the Facility context — gym locations, location-scoped classes and
@@ -105,7 +105,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFacilityLocationsAndCheckIns do
     execute("""
     CREATE TRIGGER #{table}_apply_tenant_context
     BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

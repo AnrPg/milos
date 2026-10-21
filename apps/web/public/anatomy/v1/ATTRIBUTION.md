@@ -17,7 +17,7 @@ in `credits.json`. Anyone may reuse these files under the same licence.
 - NIH 3D (3d.nih.gov), 'Human Skeleton' series by My Segmenter, CC BY 4.0. Meshes registered and modified.
 - Sketchfab models under CC BY 4.0 by ebauer4 (Elon University), usf-idex-access3d (University of South Florida) and OSU.Multimedia (The Ohio State University). Meshes registered and modified.
 
-## Changes made for Milos Training
+## Changes made for Palee
 
 - `muscles.glb`: the two middle-ear muscles derived from the Open Anatomy
   Project inner ear atlas (nodes `ta2-2102.l/.r` and `ta2-2103.l/.r`,

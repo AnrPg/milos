@@ -1,0 +1,9 @@
+defmodule Palee.Scheduling.Commands.WithdrawBooking do
+  alias Palee.Scheduling.SchedulingStore
+
+  def call(%{organization_id: _} = context, id),
+    do: SchedulingStore.withdraw_booking(context, id)
+
+  def call(context, id, reconciliation),
+    do: SchedulingStore.withdraw_booking_with_reconciliation(context, id, reconciliation)
+end

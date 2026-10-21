@@ -27,13 +27,13 @@
 
 | Piece | Where | Notes |
 |---|---|---|
-| Port | `apps/api/lib/milos_training/workouts/ports/workout_text_analyzer.ex` | `outline/2`, `parse/2`, `proofread/2`, each `(text, options)`. Errors: `:analyzer_not_configured \| :analyzer_unavailable \| :analyzer_invalid_response`. |
-| Adapter | `apps/api/lib/milos_training/infrastructure/workouts/gemini_workout_text_analyzer.ex` | `run/4` reads `Application.get_env(:milos_training, :gemini)`; blank `api_key` → `{:error, :analyzer_not_configured}`; key sent as `x-goog-api-key`. The whole config keyword list flows through `loop/6`, so overriding `api_key` there is the only adapter change needed. |
+| Port | `apps/api/lib/palee/workouts/ports/workout_text_analyzer.ex` | `outline/2`, `parse/2`, `proofread/2`, each `(text, options)`. Errors: `:analyzer_not_configured \| :analyzer_unavailable \| :analyzer_invalid_response`. |
+| Adapter | `apps/api/lib/palee/infrastructure/workouts/gemini_workout_text_analyzer.ex` | `run/4` reads `Application.get_env(:palee, :gemini)`; blank `api_key` → `{:error, :analyzer_not_configured}`; key sent as `x-goog-api-key`. The whole config keyword list flows through `loop/6`, so overriding `api_key` there is the only adapter change needed. |
 | Env config | `apps/api/config/runtime.exs:11-18` | `api_key: GEMINI_API_KEY`, `model`, `thinking_level`, `parser_thinking_level`, `icon_model`. **This is the "hardcoded" key** — one key for the whole instance. |
-| Query | `apps/api/lib/milos_training/workouts/queries/analyze_free_text.ex` | Runs proofread (async), outline, parse + ≤2 repairs. `options` (a plain map) reaches every adapter call → per-gym credentials can ride along. Adapter resolved via `config :milos_training, :workout_text_analyzer` (`config.exs:131`; `FakeWorkoutTextAnalyzer` in test). |
-| Use case | `apps/api/lib/milos_training/application/analyze_free_text_workout.ex:10` | Receives `tenant_context` but **ignores it**. |
-| Controller | `MilosTrainingWeb.AdminWorkoutFreeTextController.analyze/2` (`…/admin_workout_free_text_controller.ex:144`), route `router.ex:524` | `:analyzer_not_configured` → 503 `analyzer_not_configured`; other errors → 502. |
-| Icon suggester | `MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester` (ADR-136), called by `Application.SuggestWorkoutIcon` from an Oban job whose args already carry `organization_id` | Uses the **same** env key. Must follow the same per-gym resolution. |
+| Query | `apps/api/lib/palee/workouts/queries/analyze_free_text.ex` | Runs proofread (async), outline, parse + ≤2 repairs. `options` (a plain map) reaches every adapter call → per-gym credentials can ride along. Adapter resolved via `config :palee, :workout_text_analyzer` (`config.exs:131`; `FakeWorkoutTextAnalyzer` in test). |
+| Use case | `apps/api/lib/palee/application/analyze_free_text_workout.ex:10` | Receives `tenant_context` but **ignores it**. |
+| Controller | `PaleeWeb.AdminWorkoutFreeTextController.analyze/2` (`…/admin_workout_free_text_controller.ex:144`), route `router.ex:524` | `:analyzer_not_configured` → 503 `analyzer_not_configured`; other errors → 502. |
+| Icon suggester | `Palee.Infrastructure.Ai.GeminiWorkoutIconSuggester` (ADR-136), called by `Application.SuggestWorkoutIcon` from an Oban job whose args already carry `organization_id` | Uses the **same** env key. Must follow the same per-gym resolution. |
 | Web | `apps/web/src/components/workouts/creation/FreeTextWorkoutEditor.tsx` (`analyze()` :228, `publish()` :320, `buildPayload` ~:880), `FreeTextAnalysisPanel.tsx` (button :67, `errors.notConfigured` :502) | **No capability flag.** The web learns that the assistant is missing only from the 503. |
 
 ### 1.2 Gym settings and secrets
@@ -141,7 +141,7 @@ A dedicated table (not a key inside `organization_settings.settings`) keeps the 
 |---|---|---|
 | false | any | `{:error, :assistant_disabled}` |
 | true | present | `{:ok, %{api_key: decrypted, source: :gym}}` |
-| true | absent | env fallback **only if** `config :milos_training, :assistant_env_fallback` allows this org → `{:ok, %{api_key: env, source: :platform}}`; else `{:error, :assistant_key_missing}` |
+| true | absent | env fallback **only if** `config :palee, :assistant_env_fallback` allows this org → `{:ok, %{api_key: env, source: :platform}}`; else `{:error, :assistant_key_missing}` |
 
 `assistant_env_fallback` = `:all` in `dev`/`test`, and in `prod` an allowlist from env `ASSISTANT_ENV_FALLBACK_ORG_IDS` (default empty). That keeps the current key for dev experiments and for gyms the platform owner chooses to sponsor, without spending it silently on everyone. **No fallback when a gym key is rejected** (fail closed, show "key rejected").
 
@@ -249,7 +249,7 @@ Existing rows stay `not_required` (no backfill nagging). On completion: `report_
 
 ## 5. Implementation plan (phases — each independently shippable, TDD)
 
-Commit order inside each phase follows AGENTS.md (migration → schema → domain → commands → queries → context API → application service → OpenAPI → controller/router → generated client → frontend). Run `mix milos.architecture` and `mix precommit` (API) and `npm run lint`, `npm run test`, `npm run i18n:check` (web) before every push.
+Commit order inside each phase follows AGENTS.md (migration → schema → domain → commands → queries → context API → application service → OpenAPI → controller/router → generated client → frontend). Run `mix palee.architecture` and `mix precommit` (API) and `npm run lint`, `npm run test`, `npm run i18n:check` (web) before every push.
 
 **Phase 0 — ADRs and safety net.** Write ADR-138/139/140 (decisions in §4, open questions in §6) and update `docs/adr/README.md`. Add Playwright safety tests: (a) free-text publish with stubbed analysis, (b) guided execution start→finish, (c) free-text execution start→finish. These stay green throughout.
 
@@ -311,7 +311,7 @@ Commit order inside each phase follows AGENTS.md (migration → schema → domai
 7. A guided WOD with a scale variation and two mid-WOD patches (one before reload, one after) logs effective values with both patches applied; an after-WOD edit changes the journal values without changing the prescription.
 8. A timers-only WOD's report accepts canonical, alias and custom exercise names; chips list exercises named in the WOD text; values are numeric with a unit from `Units`.
 9. Finishing any WOD leaves it `pending` until reported; Skip is gone; the 3rd snooze stores it as `not_journaled`, no more reminders fire, and the Journal shows the "Not in journal" badge; reporting later turns it into a late `reported` entry.
-10. All new copy in 12 locales; `npm run i18n:check`, `mix precommit`, `mix milos.architecture`, Playwright and axe pass.
+10. All new copy in 12 locales; `npm run i18n:check`, `mix precommit`, `mix palee.architecture`, Playwright and axe pass.
 
 ### Project rules the implementer must follow
 - Hexagonal + bounded contexts: credentials resolution is an **Application** service; Workouts never reads Organizations tables; Notifications reacts to Execution events via PubSub.

@@ -158,7 +158,7 @@ Preset date chips (This week, This month, Last month) also become muted/disabled
 
 ## 5. PR Creation Bug Fix
 
-**File:** `apps/api/lib/milos_training/application/create_pr.ex`
+**File:** `apps/api/lib/palee/application/create_pr.ex`
 
 **Line 8:** `Map.put(params, :user_id, user_id)` uses an atom key `:user_id` on a string-keyed map.
 

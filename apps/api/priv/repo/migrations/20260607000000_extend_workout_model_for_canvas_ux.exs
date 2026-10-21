@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ExtendWorkoutModelForCanvasUx do
+defmodule Palee.Repo.Migrations.ExtendWorkoutModelForCanvasUx do
   use Ecto.Migration
 
   def up do

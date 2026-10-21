@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ExpandThemeSlugPaletteChoices do
+defmodule Palee.Repo.Migrations.ExpandThemeSlugPaletteChoices do
   use Ecto.Migration
 
   @constraint_name :gamification_settings_theme_slug_check

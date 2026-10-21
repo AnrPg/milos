@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateAiUsageRecords do
+defmodule Palee.Repo.Migrations.CreateAiUsageRecords do
   use Ecto.Migration
 
   # ADR-152: one row per billed model call (Gemini today). Calls that serve one
@@ -45,7 +45,7 @@ defmodule MilosTraining.Repo.Migrations.CreateAiUsageRecords do
     execute("""
     CREATE TRIGGER ai_usage_records_apply_tenant_context
     BEFORE INSERT OR UPDATE ON ai_usage_records
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

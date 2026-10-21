@@ -7,21 +7,21 @@ import type { operations, paths } from "@/api/generated/schema";
 type Json<T> = T extends { content: { "application/json": infer Body } } ? Body : never;
 
 type FormReviewQueueResponse = Json<
-  operations["MilosTrainingWeb.CoachingExtrasController.form_review_queue"]["responses"][200]
+  operations["PaleeWeb.CoachingExtrasController.form_review_queue"]["responses"][200]
 >;
 type CompleteFormReviewResponse = Json<
-  operations["MilosTrainingWeb.CoachingExtrasController.complete_form_review"]["responses"][200]
+  operations["PaleeWeb.CoachingExtrasController.complete_form_review"]["responses"][200]
 >;
 type ReplyQueueResponse = Json<
-  operations["MilosTrainingWeb.CoachingExtrasController.reply_queue"]["responses"][200]
+  operations["PaleeWeb.CoachingExtrasController.reply_queue"]["responses"][200]
 >;
 type NutritionPlanResponse = Json<
-  operations["MilosTrainingWeb.CoachingExtrasController.nutrition_plan"]["responses"][200]
+  operations["PaleeWeb.CoachingExtrasController.nutrition_plan"]["responses"][200]
 >;
-type SlotsResponse = Json<operations["MilosTrainingWeb.AppointmentsController.slots"]["responses"][200]>;
-type SlotResponse = Json<operations["MilosTrainingWeb.AppointmentsController.create_slot"]["responses"][201]>;
+type SlotsResponse = Json<operations["PaleeWeb.AppointmentsController.slots"]["responses"][200]>;
+type SlotResponse = Json<operations["PaleeWeb.AppointmentsController.create_slot"]["responses"][201]>;
 type BookingResponse = Json<
-  operations["MilosTrainingWeb.AppointmentsController.book_for_client"]["responses"][201]
+  operations["PaleeWeb.AppointmentsController.book_for_client"]["responses"][201]
 >;
 type StaffCancelResponse = Json<
   paths["/api/org/{organization_slug}/staff/appointments/{id}/cancel"]["post"]["responses"][200]
@@ -32,12 +32,12 @@ export type FormReviewStatus = FormReview["status"];
 export type ReplyQueueItem = ReplyQueueResponse["replies"][number];
 export type NutritionPlan = NonNullable<NutritionPlanResponse["nutrition_plan"]>;
 export type NutritionPlanInput = NonNullable<
-  operations["MilosTrainingWeb.CoachingExtrasController.save_nutrition_plan"]["requestBody"]
+  operations["PaleeWeb.CoachingExtrasController.save_nutrition_plan"]["requestBody"]
 >["content"]["application/json"];
 export type AppointmentSlot = SlotsResponse["slots"][number];
 export type AppointmentBooking = NonNullable<AppointmentSlot["bookings"]>[number];
 export type AppointmentSlotInput = NonNullable<
-  operations["MilosTrainingWeb.AppointmentsController.create_slot"]["requestBody"]
+  operations["PaleeWeb.AppointmentsController.create_slot"]["requestBody"]
 >["content"]["application/json"];
 export type AttendanceStatus = "attended" | "no_show";
 
@@ -131,7 +131,7 @@ export async function cancelAppointmentBooking(token: string, bookingId: string)
   return response.appointment;
 }
 
-type GymStaffResponse = Json<operations["MilosTrainingWeb.StaffController.index"]["responses"][200]>;
+type GymStaffResponse = Json<operations["PaleeWeb.StaffController.index"]["responses"][200]>;
 
 /** One owner, admin or coach of this gym, with their role in this gym. */
 export type StaffMember = GymStaffResponse["staff"][number];

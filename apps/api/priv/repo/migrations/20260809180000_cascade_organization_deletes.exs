@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CascadeOrganizationDeletes do
+defmodule Palee.Repo.Migrations.CascadeOrganizationDeletes do
   use Ecto.Migration
 
   # "Permanently delete organization" (platform_organization_controller#delete)

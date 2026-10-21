@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.RemoveAutoProvisionedVendorMemberships do
+defmodule Palee.Repo.Migrations.RemoveAutoProvisionedVendorMemberships do
   use Ecto.Migration
 
   def up do

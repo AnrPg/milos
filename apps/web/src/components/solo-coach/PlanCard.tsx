@@ -26,7 +26,7 @@ export function useAdminPlan(token: string | undefined) {
 }
 
 /**
- * The organization's Milos plan (ADR-170), for owners and admins: name,
+ * The organization's Palee plan (ADR-170), for owners and admins: name,
  * status, seats used against the limits and the price once it is confirmed.
  */
 export function PlanCard({ token }: { token: string }) {

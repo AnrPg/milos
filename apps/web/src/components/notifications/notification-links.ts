@@ -87,7 +87,7 @@ function fallbackUrl(notification: LinkableNotification) {
 }
 
 function localTarget(rawUrl: string) {
-  const origin = "http://milos.local";
+  const origin = "http://palee.local";
 
   try {
     // Payloads stored before the redesign still name the old member pages.

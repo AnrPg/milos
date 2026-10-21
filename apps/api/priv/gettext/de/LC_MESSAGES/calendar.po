@@ -25,11 +25,11 @@ msgstr "Zugewiesenes Training"
 msgid "Workout: %{title}"
 msgstr "Training: %{title}"
 
-msgid "Assigned workout in TrainingJournal."
-msgstr "Zugewiesenes Training im TrainingJournal."
+msgid "Assigned workout in Palee."
+msgstr "Zugewiesenes Training im Palee."
 
-msgid "Scheduled %{name} class in TrainingJournal."
-msgstr "Geplanter %{name} Kurs im TrainingJournal."
+msgid "Scheduled %{name} class in Palee."
+msgstr "Geplanter %{name} Kurs im Palee."
 
 msgid "Pending"
 msgstr "Ausstehend"
@@ -40,8 +40,8 @@ msgstr "Genehmigt"
 msgid "Scheduled"
 msgstr "Geplant"
 
-msgid "TrainingJournal class booking status: %{status}."
-msgstr "Buchungsstatus des Milos-Schulungskurses: %{status}."
+msgid "Palee class booking status: %{status}."
+msgstr "Buchungsstatus des Palee-Schulungskurses: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Probetraining bei %{box}: %{name}"

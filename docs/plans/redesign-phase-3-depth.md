@@ -2,8 +2,8 @@
 
 Date: 2026-10-21
 Branch: milestone PRs into `redesign/social-centered`, one branch and one PR per milestone.
-Source of truth: `docs/product/2026-10-15-milos-product-vision-and-ia.md` (brief §9 v3 row, §7.3,
-§7.6, §7.7 analytics catalog, §7.10, §8.4, §8.6) and `docs/product/mockups/milos-ia-mockup.html`
+Source of truth: `docs/product/2026-10-15-palee-product-vision-and-ia.md` (brief §9 v3 row, §7.3,
+§7.6, §7.7 analytics catalog, §7.10, §8.4, §8.6) and `docs/product/mockups/palee-ia-mockup.html`
 (§ "Στόχοι WOD" atlas prototype, Πρόοδος screens).
 Phase 2 plan: `docs/plans/redesign-phase-2-open-up.md` (what exists; its non-goals are this scope).
 
@@ -185,8 +185,8 @@ before the second market; the native shell before the native features; AI last.
 ### P3-M11 · Widgets, geofence and NFC (A + mobile)
 - Three widgets, geofenced check-in reminder, NFC door tags in the check-in desk settings.
 - Done (ADR-173): widget token API and snapshot, `/api/me/check-in/geofences`, NFC tag per location
-  next to the poster; NFC and the reminder check in bookings only; plugins MilosWidgets, MilosGeofence,
-  MilosNfc; reminder opt-in per phone in Box › Check-in.
+  next to the poster; NFC and the reminder check in bookings only; plugins PaleeWidgets, PaleeGeofence,
+  PaleeNfc; reminder opt-in per phone in Box › Check-in.
 
 ### P3-M12 · AI scaling suggestions (A + W)
 - ScalingAdvisor port and adapter, coach approval queue, approved suggestions as modifications,
@@ -274,8 +274,8 @@ No board; decided for least clutter (owner's standing instruction), full list in
    every profile, and the blocked list with «Άρση».
 
 ### Native wrapper (2026-10-21, ADR-171, no board: owner's standing instruction)
-1. **Shell:** Capacitor 8 in `apps/mobile`, app id `app.milos.member`, «Milos»; the app loads the deployed web app
-   (production `https://milos.4kq.net`, or `MILOS_APP_URL`), so web and apps ship together. Other hosts open in the
+1. **Shell:** Capacitor 8 in `apps/mobile`, app id `app.milos.member`, «Palee»; the app loads the deployed web app
+   (production `https://milos.4kq.net`, or `PALEE_APP_URL`), so web and apps ship together. Other hosts open in the
    system browser (allow-list: the app host and `connect.garmin.com`). A local «Χωρίς σύνδεση» page covers a cold start
    offline; after that the outbox and service worker behave as on the web.
 2. **Share links open the app:** `/c/`, `/join/`, `/b/`, `/r/`, `/events/`, `/trials/`, `/buddy/` through universal
@@ -304,7 +304,7 @@ No board; decided for least clutter (owner's standing instruction), full list in
 2. **Start a practice:** a row in Εγώ («Coach your own clients») opens one screen: practice name, Team club name
    (prefilled «Team <first name>»), what is included, the trial. Hidden once the account owns a practice.
 3. **Prices:** placeholder prices are never shown; «pricing to be announced» until the platform confirms them.
-4. **Plan in the console:** a collapsed «Milos plan» section in settings (status, trial days, seats used) and one
+4. **Plan in the console:** a collapsed «Palee plan» section in settings (status, trial days, seats used) and one
    notice line above settings only when something needs attention.
 5. **Online sessions:** a «Where» select (in person / online) and a call link on the slot form; the link appears
    only to the booked client.

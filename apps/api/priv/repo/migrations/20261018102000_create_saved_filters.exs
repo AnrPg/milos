@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateSavedFilters do
+defmodule Palee.Repo.Migrations.CreateSavedFilters do
   @moduledoc """
   ADR-151: a person's filter choices per list surface, so they follow them
   across devices: the last-used filter of each surface and named

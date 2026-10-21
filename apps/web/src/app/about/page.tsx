@@ -10,8 +10,8 @@ import Link from "next/link";
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
   return {
-    title: i18n("aboutMilosTrainingac8164e"),
-    description: i18n("howMilosTrainingSupportsMembersAthletesAndCoaches7fc09dd"),
+    title: i18n("aboutPalee"),
+    description: i18n("howPaleeSupportsMembersAthletesAndCoaches"),
   };
 }
 
@@ -22,7 +22,7 @@ export default function AboutPage() {
       <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>
         {i18n("trainWithIntent94cee47")}
       </p>
-      <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-6xl">{i18n("milosTraining5b1a1c1")}</h1>
+      <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-6xl">{i18n("brandName")}</h1>
       <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: "var(--muted)" }}>
         {i18n("onePrivateSelfHostedHomeForGroupClasses89e3bcd")}
       </p>

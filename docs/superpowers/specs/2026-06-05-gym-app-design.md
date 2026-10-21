@@ -1,7 +1,7 @@
 # Gym App — Product Requirements Document
 **Date:** 2026-06-05  
 **Status:** Approved  
-**App Name:** Milos Training
+**App Name:** Palee
 
 > **Approved cross-feature constraint (2026-07-19):** Multi-tenancy must preserve
 > global personal ownership and the future Journal-first experience described in
@@ -69,34 +69,34 @@ The backend is organized in exactly four layers. **No layer may depend on a laye
 The backend is divided into the following contexts. **No context may call another context's internal modules (schemas, private queries, Repo calls). Cross-context communication is ONLY via the context's public API functions or via PubSub events.**
 
 ```
-MilosTraining.Identity       → users, auth, registration, role management
-MilosTraining.Scheduling     → scheduled_classes, bookings, approval flow
-MilosTraining.Workouts       → master_workouts, sections, exercises, variations,
+Palee.Identity       → users, auth, registration, role management
+Palee.Scheduling     → scheduled_classes, bookings, approval flow
+Palee.Workouts       → master_workouts, sections, exercises, variations,
                         materialization logic, assigned_workouts
-MilosTraining.Execution      → workout_executions, scores, exercise_notes
-MilosTraining.Gamification   → user_stats, achievements, streaks, PRs,
+Palee.Execution      → workout_executions, scores, exercise_notes
+Palee.Gamification   → user_stats, achievements, streaks, PRs,
                         seasonal_challenges, leaderboard
-MilosTraining.Coaching       → admin_athlete_notes, analytics aggregates
-MilosTraining.Notifications  → push_subscriptions, notification records,
+Palee.Coaching       → admin_athlete_notes, analytics aggregates
+Palee.Notifications  → push_subscriptions, notification records,
                         push dispatch
-MilosTraining.Finance        → packages, memberships, invoices, credits,
+Palee.Finance        → packages, memberships, invoices, credits,
                         entitlements, referrals
-MilosTraining.Analytics      → durable product events and operational projections
-MilosTraining.Feedback       → reviews, questionnaires, moderation lifecycle
-MilosTraining.Wellbeing      → injury reports, healing history, training limitations
-MilosTraining.Messaging      → direct/contextual threads, participants, messages
-MilosTraining.Pantheon       → personal records and score history
-MilosTraining.Organizations  → tenants, memberships, domains, settings,
+Palee.Analytics      → durable product events and operational projections
+Palee.Feedback       → reviews, questionnaires, moderation lifecycle
+Palee.Wellbeing      → injury reports, healing history, training limitations
+Palee.Messaging      → direct/contextual threads, participants, messages
+Palee.Pantheon       → personal records and score history
+Palee.Organizations  → tenants, memberships, domains, settings,
                         and one-time registration invitations
 ```
 
 These post-MVP contexts are authoritative, not auxiliary folders. They follow the
 same public-API-only cross-context rule as the original seven contexts. The
-`MilosTraining.Application.*` namespace is an orchestration layer and is not itself
+`Palee.Application.*` namespace is an orchestration layer and is not itself
 a bounded context.
 
 **Enforcement rules:**
-- `Scheduling` must NOT call `MilosTraining.Gamification.Repo` or any Gamification schema directly.
+- `Scheduling` must NOT call `Palee.Gamification.Repo` or any Gamification schema directly.
 - `Execution` completing a workout → broadcasts a PubSub event → `Gamification` and `Notifications` subscribe and react independently.
 - Shared data structures that cross contexts are plain maps or dedicated structs — never Ecto schemas from another context.
 - If a feature requires data from two contexts, an **Application Service** (§2.4) orchestrates the calls.
@@ -108,19 +108,19 @@ a bounded context.
 Within each context, reads and writes live in separate sub-modules:
 
 ```
-MilosTraining.Workouts.Commands   → CreateWorkout, UpdateWorkout, AssignWorkout,
+Palee.Workouts.Commands   → CreateWorkout, UpdateWorkout, AssignWorkout,
                              DeleteWorkout
-MilosTraining.Workouts.Queries    → GetWorkoutForDate, MaterializeWorkout,
+Palee.Workouts.Queries    → GetWorkoutForDate, MaterializeWorkout,
                              GetWeekView, GetScaleInstances
 
-MilosTraining.Scheduling.Commands → CreateSlot, UpdateSlot, DeleteSlot,
+Palee.Scheduling.Commands → CreateSlot, UpdateSlot, DeleteSlot,
                              SubmitBooking, ApproveBooking, RejectBooking
-MilosTraining.Scheduling.Queries  → GetCalendarWeek, GetSlotPreview,
+Palee.Scheduling.Queries  → GetCalendarWeek, GetSlotPreview,
                              GetPendingBookings
 
-MilosTraining.Gamification.Commands → RecordWorkoutCompletion, AwardBadge,
+Palee.Gamification.Commands → RecordWorkoutCompletion, AwardBadge,
                                UpdateStreak, RecordPR
-MilosTraining.Gamification.Queries  → GetUserStats, GetLeaderboard,
+Palee.Gamification.Queries  → GetUserStats, GetLeaderboard,
                                GetActiveChallenges, GetBadges
 ```
 
@@ -133,27 +133,27 @@ MilosTraining.Gamification.Queries  → GetUserStats, GetLeaderboard,
 
 ### 2.4 Application Services for Cross-Context Operations
 
-Any operation touching more than one bounded context MUST be implemented as an Application Service in `MilosTraining.Application.*`. Controllers call Application Services — never orchestrate cross-context logic themselves.
+Any operation touching more than one bounded context MUST be implemented as an Application Service in `Palee.Application.*`. Controllers call Application Services — never orchestrate cross-context logic themselves.
 
 **Canonical Application Services:**
 
 ```elixir
-MilosTraining.Application.CompleteWorkout
+Palee.Application.CompleteWorkout
   # Execution.record → Gamification.update_stats →
   # Gamification.detect_prs → Notifications.dispatch_if_notes
 
-MilosTraining.Application.ApproveBooking
+Palee.Application.ApproveBooking
   # Scheduling.approve → Notifications.notify_member →
   # Oban.cancel_timeout_job
 
-MilosTraining.Application.SubmitBooking
+Palee.Application.SubmitBooking
   # Scheduling.create_booking → Notifications.notify_admin →
   # Oban.schedule_timeout_job
 
-MilosTraining.Application.RegisterUser
+Palee.Application.RegisterUser
   # Identity.create_user → Notifications.create_push_subscription_stub
 
-MilosTraining.Application.WriteAthleteNote
+Palee.Application.WriteAthleteNote
   # Coaching.create_note → Notifications.notify_athlete
 ```
 
@@ -163,7 +163,7 @@ MilosTraining.Application.WriteAthleteNote
 - It does NOT contain business logic — that lives in Domain modules.
 - It does NOT contain DB queries — those live in Query modules.
 - Failure in a non-critical step (e.g., push notification) must NOT roll back the primary transaction.
-- Application and Domain compile dependencies are checked by `mix milos.architecture`;
+- Application and Domain compile dependencies are checked by `mix palee.architecture`;
   the same gate rejects controller imports of context internals and infrastructure.
 - Durable cross-context effects use a transactional Oban handoff owned by the
   context write adapter. Application services pass plain delivery data, never an
@@ -223,7 +223,7 @@ Cross-context side effects (gamification updates, push notifications) are trigge
 
 ```elixir
 # After workout completion, Execution broadcasts:
-Phoenix.PubSub.broadcast(MilosTraining.PubSub, "workout:completed",
+Phoenix.PubSub.broadcast(Palee.PubSub, "workout:completed",
   {:workout_completed, %{user_id: ..., execution_id: ..., scale_level: ...}})
 
 # Gamification.EventHandler subscribes and reacts independently
@@ -245,10 +245,10 @@ Channel payloads must be plain maps and must never embed foreign Ecto schemas.
 `user_stats`, `recent_executions`, and `active_challenges` are cached in Redis with TTL 60 seconds. Cache is invalidated on `workout_execution` insert or gamification update. The Landing Page API endpoint reads from cache first; DB only on miss.
 
 #### Oban Job Chaining for Booking Timeouts
-Every pending booking schedules a `MilosTraining.Workers.BookingTimeoutJob` via Oban at `inserted_at + booking_timeout_minutes`. The job checks current status: if still `:pending` → push alert to Admin. If already resolved → no-op. Jobs are cancelled via `Oban.cancel_job/1` on approval/rejection.
+Every pending booking schedules a `Palee.Workers.BookingTimeoutJob` via Oban at `inserted_at + booking_timeout_minutes`. The job checks current status: if still `:pending` → push alert to Admin. If already resolved → no-op. Jobs are cancelled via `Oban.cancel_job/1` on approval/rejection.
 
 #### PostgreSQL Materialized Views for Leaderboard & Analytics
-`weekly_leaderboard` and `coaching_aggregates` are PostgreSQL materialized views refreshed every 15 minutes via a dedicated `MilosTraining.Workers.RefreshLeaderboardJob`. Refresh uses `CONCURRENTLY` to avoid table locks. Query modules read from views directly.
+`weekly_leaderboard` and `coaching_aggregates` are PostgreSQL materialized views refreshed every 15 minutes via a dedicated `Palee.Workers.RefreshLeaderboardJob`. Refresh uses `CONCURRENTLY` to avoid table locks. Query modules read from views directly.
 
 #### Optimistic UI for Execution Mode
 Workout step check-offs in the Execution Mode update Zustand local state immediately (no await). The API call persists asynchronously. On error: Zustand rolls back the check, a toast error is shown. This pattern applies ONLY to Execution Mode check-offs — all other mutations are synchronous.
@@ -853,7 +853,7 @@ Docker Compose services:
 
 ## 12. Open Items
 
-- App name / branding: Milos Training
+- App name / branding: Palee
 - Canonical scale level labels: "Beginner / Intermediate / Advanced" vs "Scaled / Rx / Rx+" — to be confirmed before DB migration
 - Color palette for difficulty coding: TBD (design phase)
 - Admin always sees the leaderboard regardless of `leaderboard_enabled` or user opt-in. ✅ Resolved in §8 `/admin/settings`.

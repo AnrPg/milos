@@ -210,7 +210,7 @@ Recommended endpoints:
 
 Implementation boundaries:
 
-- Compose cross-context reads in `MilosTraining.Application.*`.
+- Compose cross-context reads in `Palee.Application.*`.
 - Use public APIs from Identity, Finance, Scheduling, Workouts, Execution, Gamification, Wellbeing, Coaching, and Messaging.
 - Do not import foreign Ecto schemas across contexts.
 - Do not put business logic or cross-context stitching in controllers.

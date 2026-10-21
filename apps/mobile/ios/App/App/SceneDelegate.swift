@@ -11,7 +11,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // ADR-172/173: the app's own controller, which registers its plugins
         // (the scene builds the window itself, so Main.storyboard's class alone
         // is not enough).
-        window?.rootViewController = MilosBridgeViewController()
+        window?.rootViewController = PaleeBridgeViewController()
         window?.makeKeyAndVisible()
 
         SceneDelegateProxy.shared.scene(scene, willConnectTo: session, options: connectionOptions)

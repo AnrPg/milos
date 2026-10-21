@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateOrganizationPurges do
+defmodule Palee.Repo.Migrations.CreateOrganizationPurges do
   use Ecto.Migration
 
   # ADR-117: the reviewed tenant export/purge workflow keeps one platform-level
@@ -57,8 +57,8 @@ defmodule MilosTraining.Repo.Migrations.CreateOrganizationPurges do
     # read or write purge records. WITH CHECK keeps system sessions workable.
     execute("""
     CREATE POLICY organization_purges_vendor_policy ON organization_purges
-    USING (milos_acting_user_is_vendor())
-    WITH CHECK (#{@acting_user} IS NULL OR milos_acting_user_is_vendor())
+    USING (palee_acting_user_is_vendor())
+    WITH CHECK (#{@acting_user} IS NULL OR palee_acting_user_is_vendor())
     """)
 
     execute("ALTER TABLE organization_purges ENABLE ROW LEVEL SECURITY")

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddMessagingUserForeignKeys do
+defmodule Palee.Repo.Migrations.AddMessagingUserForeignKeys do
   use Ecto.Migration
 
   def change do

@@ -54,6 +54,6 @@ migrations remain coupled to their unfinished T4 ownership loops.
 On 2026-08-04 the remaining T4-T6 runtime loops were closed for Finance,
 Messaging, Notifications, Gamification, Analytics, Wellbeing, and Execution
 authorization reads. Legacy object migration is handled by
-`mix milos.storage.migrate_legacy_objects`, which dry-runs by default and, when
+`mix palee.storage.migrate_legacy_objects`, which dry-runs by default and, when
 applied, copies legacy invoice/avatar objects into canonical tenant/user prefixes,
 verifies destination bytes, and only then updates persisted PostgreSQL references.

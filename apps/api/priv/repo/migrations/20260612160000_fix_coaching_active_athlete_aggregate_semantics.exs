@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.FixCoachingActiveAthleteAggregateSemantics do
+defmodule Palee.Repo.Migrations.FixCoachingActiveAthleteAggregateSemantics do
   use Ecto.Migration
 
   def up do

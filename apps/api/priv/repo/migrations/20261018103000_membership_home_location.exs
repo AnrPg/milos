@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MembershipHomeLocation do
+defmodule Palee.Repo.Migrations.MembershipHomeLocation do
   @moduledoc """
   Phase 2 (UX decision, 2026-10-17): members, coaches and admins experience
   their gym as one home location; only the owner oversees all of them. The
@@ -29,10 +29,10 @@ defmodule MilosTraining.Repo.Migrations.MembershipHomeLocation do
            )
 
     # The member-roles lookup (TD-092) also answers each member's home location.
-    execute("DROP FUNCTION milos_organization_member_roles(uuid, text[], uuid)")
+    execute("DROP FUNCTION palee_organization_member_roles(uuid, text[], uuid)")
 
     execute("""
-    CREATE FUNCTION milos_organization_member_roles(
+    CREATE FUNCTION palee_organization_member_roles(
       org_id uuid,
       member_roles text[],
       member_user_id uuid
@@ -76,10 +76,10 @@ defmodule MilosTraining.Repo.Migrations.MembershipHomeLocation do
   end
 
   def down do
-    execute("DROP FUNCTION milos_organization_member_roles(uuid, text[], uuid)")
+    execute("DROP FUNCTION palee_organization_member_roles(uuid, text[], uuid)")
 
     execute("""
-    CREATE FUNCTION milos_organization_member_roles(
+    CREATE FUNCTION palee_organization_member_roles(
       org_id uuid,
       member_roles text[],
       member_user_id uuid

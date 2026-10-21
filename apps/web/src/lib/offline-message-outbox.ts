@@ -7,7 +7,7 @@ import {
 } from "@/lib/device-outbox-db";
 import { classifyDeliveryError, type OutboxFailure } from "@/lib/outbox-failure";
 
-export const OFFLINE_MESSAGE_OUTBOX_EVENT = "milos:offline-message-outbox";
+export const OFFLINE_MESSAGE_OUTBOX_EVENT = "palee:offline-message-outbox";
 
 export type QueuedMessageStatus = "pending" | "failed";
 

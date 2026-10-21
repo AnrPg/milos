@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.RenamePlatformOwnerToVendor do
+defmodule Palee.Repo.Migrations.RenamePlatformOwnerToVendor do
   use Ecto.Migration
 
   # ADR-089: "platform owner" collided with the tenant-scoped `owner` role

@@ -9,8 +9,8 @@ missing_tools =
 
 ExUnit.start(exclude: missing_tools)
 # TD-046: the RLS-enforcing role that ConnCase requests and `:rls_enforced` tests run as.
-MilosTraining.RLSCase.ensure_runtime_role!()
-Ecto.Adapters.SQL.Sandbox.mode(MilosTraining.Repo, :manual)
-MilosTraining.TestSupport.MemoryObjectStore.start()
+Palee.RLSCase.ensure_runtime_role!()
+Ecto.Adapters.SQL.Sandbox.mode(Palee.Repo, :manual)
+Palee.TestSupport.MemoryObjectStore.start()
 
-if MilosTraining.UnscopedQueryDetector.enabled?(), do: MilosTraining.UnscopedQueryDetector.start()
+if Palee.UnscopedQueryDetector.enabled?(), do: Palee.UnscopedQueryDetector.start()

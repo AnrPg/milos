@@ -1,0 +1,43 @@
+defmodule Palee.Messaging.ThreadStore do
+  @behaviour Palee.Messaging.Ports.ThreadStore
+
+  alias Palee.Infrastructure.Tenancy.RepoContext
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
+
+  @impl true
+  def get_thread(id), do: impl().get_thread(id)
+  @impl true
+  def get_thread_with_participants(id), do: impl().get_thread_with_participants(id)
+  @impl true
+  def find_direct_thread(a, b), do: impl().find_direct_thread(a, b)
+  @impl true
+  def find_context_thread(type, id), do: impl().find_context_thread(type, id)
+  @impl true
+  def list_threads_for_user(user_id, context_type),
+    do: impl().list_threads_for_user(user_id, context_type)
+
+  @impl true
+  def create_thread(attrs), do: impl().create_thread(attrs)
+  @impl true
+  def get_or_create_thread(attrs, participant_ids),
+    do: impl().get_or_create_thread(attrs, participant_ids)
+
+  @impl true
+  def add_participant(thread_id, user_id), do: impl().add_participant(thread_id, user_id)
+  @impl true
+  def mark_read(thread_id, user_id, message_id),
+    do: impl().mark_read(thread_id, user_id, message_id)
+
+  @impl true
+  def count_unread_threads(user_id), do: impl().count_unread_threads(user_id)
+
+  @impl true
+  def list_box_conversation_organization_ids,
+    do: impl().list_box_conversation_organization_ids()
+
+  defp impl do
+    Application.fetch_env!(:palee, :messaging_thread_store)
+  end
+end

@@ -1,13 +1,13 @@
-# Milos Training - Journal-First Product Redesign
+# Palee - Journal-First Product Redesign
 
 **Date:** 2026-07-19  
 **Status:** Approved product direction and cross-feature constraints; ADR codification remains required before implementation  
-**Ground truth:** `/home/rodochrousbisbiki/MyApps/Milos - training journal feature design discussion.md`  
+**Ground truth:** `/home/rodochrousbisbiki/MyApps/Palee - training journal feature design discussion.md`  
 **Extends:** `docs/superpowers/specs/2026-06-05-gym-app-design.md`
 
 ## 1. Product Thesis
 
-For an ordinary training user, Milos Training is first a durable personal training
+For an ordinary training user, Palee is first a durable personal training
 memory. Coaching, gym community, class logistics, subscriptions, and programming
 are valuable connected layers, but they are not prerequisites for using the core
 product.
@@ -413,7 +413,7 @@ Pantheon, Wellbeing, and Gamification facts. It is not another data-entry surfac
 
 ## 13. Multi-Tenant and Catalog Constraints
 
-Milos Training uses one browser origin and one deployment. Personal routes such as
+Palee uses one browser origin and one deployment. Personal routes such as
 `/today`, `/journal`, and `/progress` are user-scoped. Organization routes use
 `/org/:slug/...`; the application router changes these paths through normal in-app
 navigation, and users never need to type an endpoint.
@@ -442,7 +442,7 @@ makes it global. Rejection never removes the user's original text.
 
 Before the first Journal migration, accepted ADRs must codify these approved choices:
 
-1. Add `MilosTraining.TrainingJournal` for independent workouts, recovery, personal
+1. Add `Palee.Palee` for independent workouts, recovery, personal
    notes, links, revisions, grants, suppressions, trash, and the timeline projection.
 2. Treat Journal-native records, self-authored Wellbeing facts, and Pantheon PRs as
    global user-owned resources protected by user-scoped RLS. Optional organization
@@ -483,5 +483,5 @@ The redesign succeeds when:
   matrix and revoke immediately;
 - custom movement text remains visible while analytics include only appropriately
   approved catalog identities;
-- personal users understand Milos Training's first screen without needing a gym or
+- personal users understand Palee's first screen without needing a gym or
   coach relationship.

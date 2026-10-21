@@ -1,6 +1,6 @@
 "use client";
 
-export const USER_SYNC_EVENT = "milos:user-sync";
+export const USER_SYNC_EVENT = "palee:user-sync";
 
 export type UserSyncDetail = {
   user_id?: string;

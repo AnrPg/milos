@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 
-const path = new URL("../lib/milos_training_web/controllers/fallback_controller.ex", import.meta.url).pathname;
+const path = new URL("../lib/palee_web/controllers/fallback_controller.ex", import.meta.url).pathname;
 let source = await readFile(path, "utf8");
 
 source = source.replace(

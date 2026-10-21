@@ -39,7 +39,7 @@ Enforce PR visibility in PostgreSQL with additional permissive `FOR SELECT`
 policies, keep every write owner-only, and route every "is the session user a
 coach of org X" decision through one seam.
 
-- **Coach seam.** `milos_acting_user_coaches(org_id uuid)` (SQL, `STABLE`,
+- **Coach seam.** `palee_acting_user_coaches(org_id uuid)` (SQL, `STABLE`,
   `SECURITY DEFINER`, `SET search_path = public, pg_temp`) is the single
   database answer. Today: an active membership of the session user in `org_id`
   with `role = 'coach'`. Its application mirror is
@@ -47,7 +47,7 @@ coach of org X" decision through one seam.
   `Organizations.Domain.TenantAuthorization.coaches?/1`, `role == :coach`).
   Owners and admins are therefore not coaches under the single-role model.
 - **Coach read policy.** `user_pr_records_coach_read_policy` admits a row when
-  `milos_pr_visible_to_acting_coach(user_id, organization_id)` holds: the PR
+  `palee_pr_visible_to_acting_coach(user_id, organization_id)` holds: the PR
   has provenance, the provenance equals the session's `app.organization_id`
   (a coach reads only inside that gym's tenant scope), the session user coaches
   that gym (via the seam), the PR owner has an active membership there, and the
@@ -77,7 +77,7 @@ coach of org X" decision through one seam.
 - **Ownership scope everywhere.** Every Pantheon application service runs in an
   explicit `RepoContext` scope through `Pantheon.with_user_context/2` (owner and
   grantee operations) or `Pantheon.with_tenant_context/2` (coach reads).
-  `pantheon/pr_store` joined the `mix milos.architecture` tenant-scope gate.
+  `pantheon/pr_store` joined the `mix palee.architecture` tenant-scope gate.
 - **Dossier.** `GET /api/org/:slug/admin/users/:id/prs` now admits
   owner/admin/coach (new `:tenant_staff` pipeline; the rest of the dossier stays
   owner/admin-only). A coach receives `visibility: "coach"` and the PRs recorded
@@ -123,7 +123,7 @@ one-line change in one place instead of an edit to every policy.
 ## Consequences
 - **Multi-role swap (one line).** When memberships carry a role set
   (`organization_memberships.roles`, branch `claude/loving-franklin-vuxz19`),
-  replace the last predicate of `milos_acting_user_coaches/1`:
+  replace the last predicate of `palee_acting_user_coaches/1`:
 
   ```sql
   AND om.role = 'coach'            -- today

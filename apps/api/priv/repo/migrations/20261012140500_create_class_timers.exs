@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateClassTimers do
+defmodule Palee.Repo.Migrations.CreateClassTimers do
   use Ecto.Migration
 
   # A coach-run timer for one scheduled class, shown on the gym's wall display
@@ -31,7 +31,7 @@ defmodule MilosTraining.Repo.Migrations.CreateClassTimers do
     create index(:class_timers, [:organization_id])
 
     predicate = """
-    milos_acting_user_is_vendor()
+    palee_acting_user_is_vendor()
     OR class_timers.organization_id = NULLIF(current_setting('app.organization_id', true), '')::uuid
     """
 

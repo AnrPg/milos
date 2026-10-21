@@ -135,8 +135,8 @@ Implemented on 2026-10-12 (TD-033).
   table, check constraints (source types, status, freeform-has-no-reference,
   effort 1-10, non-negative duration), the idempotency unique index, the partial
   "live source" unique index, and the forced RLS policy. The table is registered
-  as a ready tenant table in `MilosTraining.Infrastructure.Tenancy.Audit` and
-  `execution/training_log_store` joined the `mix milos.architecture` tenant
+  as a ready tenant table in `Palee.Infrastructure.Tenancy.Audit` and
+  `execution/training_log_store` joined the `mix palee.architecture` tenant
   store list.
 - Layering: `Execution.Domain.TrainingLogPolicy` holds all rules (detail
   normalization, class authorization decision, double counting, source-picker

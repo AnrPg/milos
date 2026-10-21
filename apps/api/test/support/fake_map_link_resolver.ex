@@ -1,7 +1,7 @@
-defmodule MilosTraining.FakeMapLinkResolver do
+defmodule Palee.FakeMapLinkResolver do
   @moduledoc "Test stand-in: one known short link expands to a long one."
 
-  @behaviour MilosTraining.Application.Ports.MapLinkResolver
+  @behaviour Palee.Application.Ports.MapLinkResolver
 
   @impl true
   def expand("https://maps.app.goo.gl/kypseli"),

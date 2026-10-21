@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.DropInertUsersRlsPolicy do
+defmodule Palee.Repo.Migrations.DropInertUsersRlsPolicy do
   use Ecto.Migration
 
   # F-08 / P3.3: `users_owner_policy` was created but Row Level Security was
@@ -12,7 +12,7 @@ defmodule MilosTraining.Repo.Migrations.DropInertUsersRlsPolicy do
   # (admin directory, booking nickname lookups).
   #
   # `users` is therefore application-layer-only by design. `mix
-  # milos.tenancy.audit` now reports it under platform-administered tables so
+  # palee.tenancy.audit` now reports it under platform-administered tables so
   # the exemption is stated rather than merely absent.
 
   def up do

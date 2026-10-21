@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.RetainWorkoutDslAuthoringState do
+defmodule Palee.Repo.Migrations.RetainWorkoutDslAuthoringState do
   use Ecto.Migration
 
   def change do

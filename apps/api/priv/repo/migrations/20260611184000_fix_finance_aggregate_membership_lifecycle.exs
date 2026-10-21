@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.FixFinanceAggregateMembershipLifecycle do
+defmodule Palee.Repo.Migrations.FixFinanceAggregateMembershipLifecycle do
   use Ecto.Migration
 
   def up do

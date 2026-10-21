@@ -15,7 +15,7 @@ import { syncWidgets, widgetsSupported, type WidgetLabels } from "@/lib/platform
 type Removable = { remove: () => Promise<void> };
 
 /** Fired by Box › Check-in after the member turns the reminder on or off. */
-export const GEOFENCE_SYNC_EVENT = "milos:geofence-sync";
+export const GEOFENCE_SYNC_EVENT = "palee:geofence-sync";
 
 type Translate = ReturnType<typeof useTranslations<"NativeExtras">>;
 

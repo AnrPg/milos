@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowRebookingAfterRejection do
+defmodule Palee.Repo.Migrations.AllowRebookingAfterRejection do
   use Ecto.Migration
 
   def change do

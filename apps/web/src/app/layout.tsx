@@ -26,7 +26,7 @@ import "./globals.css";
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
   return {
-    title: i18n("milosTraining5b1a1c1"),
+    title: i18n("brandName"),
     description: i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a"),
     manifest: "/manifest.webmanifest",
     icons: {

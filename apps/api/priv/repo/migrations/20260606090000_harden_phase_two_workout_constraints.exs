@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.HardenPhaseTwoWorkoutConstraints do
+defmodule Palee.Repo.Migrations.HardenPhaseTwoWorkoutConstraints do
   use Ecto.Migration
 
   def up do

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateUsers do
+defmodule Palee.Repo.Migrations.CreateUsers do
   use Ecto.Migration
 
   def change do

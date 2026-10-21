@@ -50,8 +50,8 @@ are taken, so this is ADR-158.
    `/body/snapshots/:id`): coach role, `view_health` on that client (own
    clients, all for a head coach), client active in the gym. Only shared
    snapshots; photos only on `coach_full` while consent is active; notes
-   never. Row security repeats it (`milos_body_visible_to_acting_coach`,
-   `milos_body_photos_consented`, definer functions answering one boolean).
+   never. Row security repeats it (`palee_body_visible_to_acting_coach`,
+   `palee_body_photos_consented`, definer functions answering one boolean).
    Every read writes `body_access_log` (gym, coach, subject list|snapshot,
    snapshot ids, whether photos were shown), which the member reads at
    `GET /api/me/body/access-log`; no notification.
@@ -64,7 +64,7 @@ are taken, so this is ADR-158.
    or off), default_visibility (the last one used), blur_photos (default
    on), compare_mode (slider default, side_by_side).
 8. **Measure reminder.** `BodyRemindersJob` (daily 09:30) finds due people
-   through `milos_body_reminders_due` (ids only), checks again in each
+   through `palee_body_reminders_due` (ids only), checks again in each
    person's session, marks, and sends `body_measure_reminder` (deduped per
    day, neutral copy, no numbers).
 9. **Sharing a before/after.** `POST /api/me/body/share` with two of the
@@ -98,7 +98,7 @@ consent row per grant keeps the history GDPR needs.
 
 ## Implementation Notes
 Migration `20261028100000_body_snapshots` (tables, policies, functions,
-`media_account_objects_attached_check` and `milos_dangling_post_media` learn
+`media_account_objects_attached_check` and `palee_dangling_post_media` learn
 `body_snapshot`, notification type added by reading the current list).
 Member routes under `/api/me/body/...`; photo uploads under
 `/api/me/body/photos/uploads` (media upload rate limit).

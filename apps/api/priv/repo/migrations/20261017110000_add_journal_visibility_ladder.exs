@@ -1,8 +1,8 @@
-defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
+defmodule Palee.Repo.Migrations.AddJournalVisibilityLadder do
   @moduledoc """
   ADR-139: one visibility ladder on every journal entry type.
 
-  * `milos_journal_visibility_reaches_coach/1` is the single SQL definition of
+  * `palee_journal_visibility_reaches_coach/1` is the single SQL definition of
     "this rung lets the member's coach read the entry".
   * `journal_visibility` on executions, training-log entries, PRs and injuries,
     backfilled from what coaches could already see: executions and log entries
@@ -12,7 +12,7 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     PR switch becomes the `pr` default and `user_pr_sharing_preferences` is
     dropped; `down` rebuilds it from the defaults.
   * The ADR-129 coach read policy on PRs asks the record's own rung instead of
-    the owner's switch, through `milos_entry_visible_to_acting_coach/3`, which
+    the owner's switch, through `palee_entry_visible_to_acting_coach/3`, which
     the new entry tables reuse.
 
   Runs as the migration role, which is not subject to the owner-only RLS
@@ -26,7 +26,7 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
 
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_journal_visibility_reaches_coach(visibility text)
+    CREATE OR REPLACE FUNCTION palee_journal_visibility_reaches_coach(visibility text)
     RETURNS boolean
     LANGUAGE sql
     IMMUTABLE
@@ -90,7 +90,7 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     # SECURITY DEFINER. It answers one boolean about one entry, only for the
     # gym the session is scoped to (same shape as ADR-129's PR check).
     execute("""
-    CREATE OR REPLACE FUNCTION milos_entry_visible_to_acting_coach(
+    CREATE OR REPLACE FUNCTION palee_entry_visible_to_acting_coach(
       entry_user_id uuid, entry_org_id uuid, visibility text
     )
     RETURNS boolean
@@ -100,9 +100,9 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     SET search_path = public, pg_temp
     AS $$
       SELECT entry_org_id IS NOT NULL
-        AND public.milos_journal_visibility_reaches_coach(visibility)
+        AND public.palee_journal_visibility_reaches_coach(visibility)
         AND entry_org_id = NULLIF(current_setting('app.organization_id', true), '')::uuid
-        AND public.milos_acting_user_coaches(entry_org_id)
+        AND public.palee_acting_user_coaches(entry_org_id)
         AND EXISTS (
           SELECT 1
           FROM public.organization_memberships target
@@ -118,10 +118,10 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     execute("""
     CREATE POLICY user_pr_records_coach_read_policy ON user_pr_records
     FOR SELECT
-    USING (milos_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility))
+    USING (palee_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility))
     """)
 
-    execute("DROP FUNCTION IF EXISTS milos_pr_visible_to_acting_coach(uuid, uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_pr_visible_to_acting_coach(uuid, uuid)")
     drop table(:user_pr_sharing_preferences)
   end
 
@@ -152,7 +152,7 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     execute("ALTER TABLE user_pr_sharing_preferences FORCE ROW LEVEL SECURITY")
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_pr_visible_to_acting_coach(pr_user_id uuid, pr_org_id uuid)
+    CREATE OR REPLACE FUNCTION palee_pr_visible_to_acting_coach(pr_user_id uuid, pr_org_id uuid)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -161,7 +161,7 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     AS $$
       SELECT pr_org_id IS NOT NULL
         AND pr_org_id = NULLIF(current_setting('app.organization_id', true), '')::uuid
-        AND public.milos_acting_user_coaches(pr_org_id)
+        AND public.palee_acting_user_coaches(pr_org_id)
         AND EXISTS (
           SELECT 1
           FROM public.organization_memberships target
@@ -183,10 +183,10 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
     execute("""
     CREATE POLICY user_pr_records_coach_read_policy ON user_pr_records
     FOR SELECT
-    USING (milos_pr_visible_to_acting_coach(user_id, organization_id))
+    USING (palee_pr_visible_to_acting_coach(user_id, organization_id))
     """)
 
-    execute("DROP FUNCTION IF EXISTS milos_entry_visible_to_acting_coach(uuid, uuid, text)")
+    execute("DROP FUNCTION IF EXISTS palee_entry_visible_to_acting_coach(uuid, uuid, text)")
 
     drop table(:journal_visibility_defaults)
 
@@ -196,7 +196,7 @@ defmodule MilosTraining.Repo.Migrations.AddJournalVisibilityLadder do
       end
     end
 
-    execute("DROP FUNCTION IF EXISTS milos_journal_visibility_reaches_coach(text)")
+    execute("DROP FUNCTION IF EXISTS palee_journal_visibility_reaches_coach(text)")
   end
 
   defp add_ladder(table, default, allowed) do

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddStructuredWorkoutSetComposition do
+defmodule Palee.Repo.Migrations.AddStructuredWorkoutSetComposition do
   use Ecto.Migration
 
   def change do

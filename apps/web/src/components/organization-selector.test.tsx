@@ -8,7 +8,7 @@ const clear = vi.fn();
 let membershipData: unknown[] = [];
 
 vi.mock("next/navigation", () => ({
-  usePathname: () => "/org/milos",
+  usePathname: () => "/org/palee",
   useRouter: () => ({ push }),
 }));
 
@@ -31,7 +31,7 @@ describe("OrganizationSelector", () => {
       {
         id: "membership-1",
         role: "member",
-        organization: { slug: "milos", name: "Milos Training" },
+        organization: { slug: "palee", name: "Palee" },
         settings: null,
       },
     ];
@@ -46,7 +46,7 @@ describe("OrganizationSelector", () => {
       {
         id: "membership-1",
         role: "member",
-        organization: { slug: "milos", name: "Milos Training" },
+        organization: { slug: "palee", name: "Palee" },
         settings: null,
       },
       {

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MessagesToMembers do
+defmodule Palee.Repo.Migrations.MessagesToMembers do
   @moduledoc """
   ADR-140 §6-7 (M5.6): three kinds of message to a member.
 

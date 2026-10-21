@@ -78,14 +78,14 @@ export default function PlacesMap({
     markers.current = places.map((place) => {
       const element = document.createElement("button");
       element.type = "button";
-      element.className = "milos-map-pin";
+      element.className = "palee-map-pin";
       element.dataset.selected = String(place.selected);
       element.setAttribute("aria-label", place.name);
       const label = document.createElement("span");
-      label.className = "milos-map-pin__label";
+      label.className = "palee-map-pin__label";
       label.textContent = place.name;
       const dot = document.createElement("span");
-      dot.className = "milos-map-pin__dot";
+      dot.className = "palee-map-pin__dot";
       element.append(label, dot);
       element.addEventListener("click", () => callbacks.current.onSelect(place.id));
       return new maplibregl.Marker({ element, anchor: "bottom" })

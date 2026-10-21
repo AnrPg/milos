@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPublicThemeSlugFunction do
+defmodule Palee.Repo.Migrations.AddPublicThemeSlugFunction do
   use Ecto.Migration
 
   # TD-092 / ADR-131: the public `GET /api/theme` (unauthenticated - it paints
@@ -12,7 +12,7 @@ defmodule MilosTraining.Repo.Migrations.AddPublicThemeSlugFunction do
   # organization identified by its (public) slug - and nothing else.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_public_theme_slug(org_slug text)
+    CREATE OR REPLACE FUNCTION palee_public_theme_slug(org_slug text)
     RETURNS text
     LANGUAGE sql
     STABLE
@@ -29,11 +29,11 @@ defmodule MilosTraining.Repo.Migrations.AddPublicThemeSlugFunction do
     $$
     """)
 
-    # EXECUTE stays with PUBLIC (the default), like the other milos_*
+    # EXECUTE stays with PUBLIC (the default), like the other palee_*
     # SECURITY DEFINER helpers.
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_public_theme_slug(text)")
+    execute("DROP FUNCTION IF EXISTS palee_public_theme_slug(text)")
   end
 end

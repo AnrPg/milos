@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.JournalFeedAndReplyRequests do
+defmodule Palee.Repo.Migrations.JournalFeedAndReplyRequests do
   @moduledoc """
   ADR-139 read side (M5.4).
 

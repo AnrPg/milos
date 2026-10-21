@@ -60,7 +60,7 @@ export function ServiceWorkerBootstrap() {
       className="fixed inset-x-4 bottom-4 z-[100] mx-auto flex max-w-xl items-center justify-between gap-4 rounded-2xl border p-4 shadow-2xl"
       style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}
     >
-      <p className="text-sm">{i18n("aSaferNewerVersionOfMilosTrainingIs2462a71")}</p>
+      <p className="text-sm">{i18n("aSaferNewerVersionOfPaleeIsReady")}</p>
       <button
         type="button"
         className="shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeExecutionAdminModeBypassByOrganization do
+defmodule Palee.Repo.Migrations.ScopeExecutionAdminModeBypassByOrganization do
   use Ecto.Migration
 
   def up do

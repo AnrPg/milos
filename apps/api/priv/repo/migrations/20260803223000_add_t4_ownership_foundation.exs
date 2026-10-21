@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
+defmodule Palee.Repo.Migrations.AddT4OwnershipFoundation do
   use Ecto.Migration
 
   @tenant_tables ~w(
@@ -63,7 +63,7 @@ defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
 
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_legacy_organization_id()
+    CREATE OR REPLACE FUNCTION palee_legacy_organization_id()
     RETURNS uuid
     LANGUAGE sql
     STABLE
@@ -179,7 +179,7 @@ defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
 
     execute("""
     UPDATE injury_reports
-    SET organization_id = milos_legacy_organization_id()
+    SET organization_id = palee_legacy_organization_id()
     WHERE reported_by_role = 'admin'
     """)
 
@@ -229,7 +229,7 @@ defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
       execute("ALTER TABLE #{table} DROP COLUMN IF EXISTS organization_id")
     end)
 
-    execute("DROP FUNCTION IF EXISTS milos_legacy_organization_id()")
+    execute("DROP FUNCTION IF EXISTS palee_legacy_organization_id()")
   end
 
   defp add_tenant_ownership(table) do
@@ -239,7 +239,7 @@ defmodule MilosTraining.Repo.Migrations.AddT4OwnershipFoundation do
       REFERENCES organizations(id) ON DELETE RESTRICT
     """)
 
-    execute("UPDATE #{table} SET organization_id = milos_legacy_organization_id()")
+    execute("UPDATE #{table} SET organization_id = palee_legacy_organization_id()")
 
     execute("ALTER TABLE #{table} ALTER COLUMN organization_id SET NOT NULL")
 

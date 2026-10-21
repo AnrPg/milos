@@ -4,10 +4,10 @@
 set -eu
 
 if [ -z "${METRICS_TOKEN:-}" ]; then
-  echo "observability: METRICS_TOKEN is empty; the milos-api scrape will be rejected (401) and MilosApiMetricsDown will fire" >&2
+  echo "observability: METRICS_TOKEN is empty; the palee-api scrape will be rejected (401) and PaleeApiMetricsDown will fire" >&2
 fi
 
 umask 077
-printf '%s' "${METRICS_TOKEN:-}" > /tmp/milos-metrics-token
+printf '%s' "${METRICS_TOKEN:-}" > /tmp/palee-metrics-token
 
 exec /bin/prometheus "$@"

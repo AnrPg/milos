@@ -1,15 +1,15 @@
-defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
+defmodule Palee.Repo.Migrations.QualifyRlsHelperFunctionTables do
   use Ecto.Migration
 
-  # Same bug as 20260806050000 (milos_legacy_organization_id), a second
-  # time: milos_acting_user_is_vendor/0, milos_acting_user_belongs_to/1, and
-  # milos_acting_user_administers/1 (added in 20260807050000) all read their
+  # Same bug as 20260806050000 (palee_legacy_organization_id), a second
+  # time: palee_acting_user_is_vendor/0, palee_acting_user_belongs_to/1, and
+  # palee_acting_user_administers/1 (added in 20260807050000) all read their
   # table (`vendors`, `organization_memberships`) unqualified. That resolves
   # fine for an ordinary SELECT, but these STABLE SQL functions get inlined
   # into the RLS policies of every table that calls them, and CREATE/REFRESH
   # MATERIALIZED VIEW resolves an inlined, unqualified reference differently
   # than plain execution does - failing with `relation "vendors" does not
-  # exist` (confirmed live in prod: MilosTraining.Workers.RefreshLeaderboardJob
+  # exist` (confirmed live in prod: Palee.Workers.RefreshLeaderboardJob
   # was discarding after 3 attempts on exactly this error, every 15 minutes,
   # per its cron schedule).
   #
@@ -20,7 +20,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
   # be "not yet failed" for the fix to take effect.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_is_vendor() RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_is_vendor() RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM public.vendors v
         WHERE v.user_id = NULLIF(current_setting('app.user_id', true), '')::uuid AND v.status = 'active'
@@ -29,7 +29,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_belongs_to(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_belongs_to(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM public.organization_memberships om
         WHERE om.organization_id = org_id
@@ -40,7 +40,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_administers(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_administers(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM public.organization_memberships om
         WHERE om.organization_id = org_id
@@ -54,7 +54,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
 
   def down do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_is_vendor() RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_is_vendor() RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM vendors v
         WHERE v.user_id = NULLIF(current_setting('app.user_id', true), '')::uuid AND v.status = 'active'
@@ -63,7 +63,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_belongs_to(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_belongs_to(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM organization_memberships om
         WHERE om.organization_id = org_id
@@ -74,7 +74,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyRlsHelperFunctionTables do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_administers(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_administers(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM organization_memberships om
         WHERE om.organization_id = org_id

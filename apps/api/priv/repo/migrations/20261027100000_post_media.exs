@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PostMedia do
+defmodule Palee.Repo.Migrations.PostMedia do
   use Ecto.Migration
 
   # ADR-157 (P2-M9): photos and short videos in posts.
@@ -91,7 +91,7 @@ defmodule MilosTraining.Repo.Migrations.PostMedia do
     end
 
     execute("""
-    CREATE FUNCTION milos_dangling_post_media(cutoff timestamp, max_rows integer)
+    CREATE FUNCTION palee_dangling_post_media(cutoff timestamp, max_rows integer)
     RETURNS TABLE (user_id uuid, media_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -115,7 +115,7 @@ defmodule MilosTraining.Repo.Migrations.PostMedia do
     # Attached uploads that never became ready (the upload never finished, a
     # job was lost): the sweep rejects them so their post stops waiting.
     execute("""
-    CREATE FUNCTION milos_stale_post_media(cutoff timestamp, max_rows integer)
+    CREATE FUNCTION palee_stale_post_media(cutoff timestamp, max_rows integer)
     RETURNS TABLE (user_id uuid, media_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -130,8 +130,8 @@ defmodule MilosTraining.Repo.Migrations.PostMedia do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_stale_post_media(timestamp, integer)")
-    execute("DROP FUNCTION IF EXISTS milos_dangling_post_media(timestamp, integer)")
+    execute("DROP FUNCTION IF EXISTS palee_stale_post_media(timestamp, integer)")
+    execute("DROP FUNCTION IF EXISTS palee_dangling_post_media(timestamp, integer)")
 
     for table <- ~w(community_posts community_profile_posts)a do
       execute("ALTER TABLE #{table} DROP CONSTRAINT #{table}_content_check")

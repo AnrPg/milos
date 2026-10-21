@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ReformatFinanceInvoiceNumbers do
+defmodule Palee.Repo.Migrations.ReformatFinanceInvoiceNumbers do
   use Ecto.Migration
 
   def up do

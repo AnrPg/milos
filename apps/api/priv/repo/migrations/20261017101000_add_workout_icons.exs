@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddWorkoutIcons do
+defmodule Palee.Repo.Migrations.AddWorkoutIcons do
   use Ecto.Migration
 
   # `icon` is an emoji shown for the workout in the library. `icon_source`

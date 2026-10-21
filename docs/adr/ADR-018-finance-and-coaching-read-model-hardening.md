@@ -175,11 +175,11 @@ Additional hardening completed on 2026-06-12:
 
 Verification completed:
 
-- `MIX_ENV=test mix milos.export_openapi ../web/src/api/generated/openapi.json`
+- `MIX_ENV=test mix palee.export_openapi ../web/src/api/generated/openapi.json`
 - `npx openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts`
 - `npm run lint`
 - `npm run build`
-- `DB_PORT=5434 mix test test/milos_training/finance/finance_test.exs test/milos_training_web/controllers/admin_analytics_controller_test.exs`
+- `DB_PORT=5434 mix test test/palee/finance/finance_test.exs test/palee_web/controllers/admin_analytics_controller_test.exs`
 - `DB_PORT=5434 mix test`
 
 The full API suite passed with 215 tests and 0 failures. Frontend lint and the
@@ -188,9 +188,9 @@ are tracked in `docs/technical_debt.md` as TD-018 and TD-019.
 
 Additional verification for the 2026-06-12 hardening pass:
 
-- `MIX_BUILD_PATH=/tmp/milos_api_build mix compile`
-- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/milos_api_build mix test test/milos_training/finance/domain/invoice_lifecycle_test.exs test/milos_training/finance/finance_test.exs test/milos_training/feedback/feedback_test.exs test/milos_training/analytics/analytics_test.exs test/milos_training/application/admin_search_users_test.exs`
-- `MIX_BUILD_PATH=/tmp/milos_api_build mix milos.export_openapi ../web/src/api/generated/openapi.json`
+- `MIX_BUILD_PATH=/tmp/palee_api_build mix compile`
+- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/palee_api_build mix test test/palee/finance/domain/invoice_lifecycle_test.exs test/palee/finance/finance_test.exs test/palee/feedback/feedback_test.exs test/palee/analytics/analytics_test.exs test/palee/application/admin_search_users_test.exs`
+- `MIX_BUILD_PATH=/tmp/palee_api_build mix palee.export_openapi ../web/src/api/generated/openapi.json`
 - `pnpm exec openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts`
 - `pnpm lint`
 - `pnpm exec tsc --noEmit`

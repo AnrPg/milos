@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
+defmodule Palee.Repo.Migrations.CreateJournalNotesAndCheckIns do
   @moduledoc """
   ADR-139: the two private-by-default journal entries (Σημείωση; Πώς νιώθω,
   the short questionnaire of ADR-140 §2),
@@ -8,7 +8,7 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
   Notes and check-ins are personal data with gym provenance (the gym the
   member wrote them in), like Pantheon PRs (ADR-129): the owner reads and
   writes them in any session; a coach of the provenance gym reads them only
-  while their rung reaches the coach (`milos_entry_visible_to_acting_coach`).
+  while their rung reaches the coach (`palee_entry_visible_to_acting_coach`).
   """
 
   use Ecto.Migration
@@ -154,7 +154,7 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
         FOR SELECT
         USING (
           deleted_at IS NULL
-          AND milos_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility)
+          AND palee_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility)
         )
         """,
         "DROP POLICY IF EXISTS #{table}_coach_read_policy ON #{table}"
@@ -197,7 +197,7 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalNotesAndCheckIns do
       """
       CREATE TRIGGER journal_coach_reads_apply_tenant_context
       BEFORE INSERT OR UPDATE ON journal_coach_reads
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """,
       "DROP TRIGGER IF EXISTS journal_coach_reads_apply_tenant_context ON journal_coach_reads"
     )

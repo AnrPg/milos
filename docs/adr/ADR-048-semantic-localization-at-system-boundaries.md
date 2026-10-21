@@ -106,7 +106,7 @@ generator now restores ICU plural control syntax after machine translation.
 The final catalog contains 2,194 messages in each of the twelve locales with
 key, non-empty-value, ICU placeholder, and hard-coded-copy parity enforced.
 
-Phoenix localization remains behind `MilosTraining.Localization`, whose Gettext
+Phoenix localization remains behind `Palee.Localization`, whose Gettext
 adapter normalizes the persisted `pt-PT` locale to Gettext's `pt_PT` directory.
 Three backend domains ship complete catalogs in every locale: notifications
 (33 messages), calendar (13), and sharing (7). Notification title/body rendering

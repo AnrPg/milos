@@ -1,4 +1,4 @@
-# MilosTraining
+# Palee
 
 To start your Phoenix server:
 

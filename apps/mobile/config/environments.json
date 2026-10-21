@@ -1,7 +1,7 @@
 {
-  "$comment": "ADR-171: the web app each build of the store apps loads. MILOS_APP_URL overrides the url. extraNavigationHosts may open inside the app's web view as well; every other host opens in the system browser.",
+  "$comment": "ADR-171: the web app each build of the store apps loads. PALEE_APP_URL overrides the url. extraNavigationHosts may open inside the app's web view as well; every other host opens in the system browser.",
   "appId": "app.milos.member",
-  "appName": "Milos",
+  "appName": "Palee",
   "environments": {
     "production": { "url": "https://milos.4kq.net" },
     "staging": { "url": null },

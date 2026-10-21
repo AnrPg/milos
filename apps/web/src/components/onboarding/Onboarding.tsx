@@ -21,8 +21,8 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { TOUR_STEPS, checklistLaterKey, readStorage, writeStorage, type TourAudience } from "@/lib/onboarding";
 
-const OPEN_TOUR_EVENT = "milos:open-tour";
-const OPEN_CHECKLIST_EVENT = "milos:open-onboarding";
+const OPEN_TOUR_EVENT = "palee:open-tour";
+const OPEN_CHECKLIST_EVENT = "palee:open-onboarding";
 const HIDDEN_PATHS = /^\/(?:login|register|set-admin|join)(?:\/|$)/;
 
 const STEP_LINKS: Partial<Record<OnboardingStepId, string>> = {

@@ -63,9 +63,9 @@ and global leaderboard visibility.
 
 Verification completed with:
 
-- `MIX_BUILD_PATH=/tmp/milos-api-build-test DB_PORT=5434 mix test test/milos_training_web/controllers/landing_controller_test.exs`
-- `MIX_BUILD_PATH=/tmp/milos-api-build-dev mix compile --warnings-as-errors`
-- `MIX_BUILD_PATH=/tmp/milos-api-build-dev mix milos.export_openapi ../web/src/api/generated/openapi.json`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-test DB_PORT=5434 mix test test/palee_web/controllers/landing_controller_test.exs`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-dev mix compile --warnings-as-errors`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-dev mix palee.export_openapi ../web/src/api/generated/openapi.json`
 - `npx openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts`
 - `npx eslint src/components/admin-settings.tsx src/components/landing-page.tsx src/api/landing.ts`
 - `npx tsc --noEmit`

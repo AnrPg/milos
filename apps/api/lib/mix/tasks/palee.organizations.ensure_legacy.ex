@@ -1,0 +1,18 @@
+defmodule Mix.Tasks.Palee.Organizations.EnsureLegacy do
+  use Mix.Task
+
+  @shortdoc "Idempotently creates the stable legacy organization"
+
+  @impl Mix.Task
+  def run(_args) do
+    Mix.Task.run("app.start")
+
+    case Palee.Organizations.ensure_legacy_organization_for_migration() do
+      {:ok, organization} ->
+        Mix.shell().info("Legacy organization ready: #{organization.slug} (#{organization.id})")
+
+      {:error, reason} ->
+        Mix.raise("Could not create legacy organization: #{inspect(reason)}")
+    end
+  end
+end

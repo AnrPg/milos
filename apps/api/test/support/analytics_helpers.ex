@@ -1,4 +1,4 @@
-defmodule MilosTraining.AnalyticsHelpers do
+defmodule Palee.AnalyticsHelpers do
   @moduledoc """
   Test helpers for ADR-123 instrumentation tests: tenant fixtures and direct
   reads of persisted `analytics_events` rows (the test DB role bypasses RLS,
@@ -7,8 +7,8 @@ defmodule MilosTraining.AnalyticsHelpers do
 
   import Ecto.Query
 
-  alias MilosTraining.Analytics.AnalyticsEvent
-  alias MilosTraining.{Organizations, Repo, TestFixtures}
+  alias Palee.Analytics.AnalyticsEvent
+  alias Palee.{Organizations, Repo, TestFixtures}
 
   def organization_fixture(owner \\ nil) do
     owner = owner || TestFixtures.admin_fixture()

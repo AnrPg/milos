@@ -1,5 +1,5 @@
 self.addEventListener("message", (event) => {
-  if (event.data?.type === "milos:push-config" && typeof event.data.vapidPublicKey === "string") {
+  if (event.data?.type === "palee:push-config" && typeof event.data.vapidPublicKey === "string") {
     event.waitUntil(cachePushConfig(event.data.vapidPublicKey));
   }
 });
@@ -9,7 +9,7 @@ self.addEventListener("push", (event) => {
   const notificationId = data.notification_id ?? null;
 
   event.waitUntil(
-    self.registration.showNotification(data.title ?? "TrainingJournal", {
+    self.registration.showNotification(data.title ?? "Palee", {
       body: data.body ?? "",
       lang: data.locale ?? "en",
       dir: data.locale === "ar" || data.locale === "he" ? "rtl" : "ltr",
@@ -35,14 +35,14 @@ async function handleNotificationClick(data) {
   const notificationId = data.notification_id || null;
 
   if (notificationId) {
-    await broadcastToClients({ type: "milos:notification-clicked", notificationId, url });
+    await broadcastToClients({ type: "palee:notification-clicked", notificationId, url });
   }
 
   await clients.openWindow(url);
 }
 
-const PUSH_CONFIG_CACHE = "milos-push-config-v1";
-const PUSH_CONFIG_REQUEST = "/__milos_push_config__";
+const PUSH_CONFIG_CACHE = "palee-push-config-v1";
+const PUSH_CONFIG_REQUEST = "/__palee_push_config__";
 
 function base64UrlToUint8Array(value) {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
@@ -94,7 +94,7 @@ async function handlePushSubscriptionChange() {
   const config = await readPushConfig();
 
   if (!config?.vapidPublicKey) {
-    await broadcastToClients({ type: "milos:push-subscription-stale" });
+    await broadcastToClients({ type: "palee:push-subscription-stale" });
     return;
   }
 
@@ -104,8 +104,8 @@ async function handlePushSubscriptionChange() {
       applicationServerKey: base64UrlToUint8Array(config.vapidPublicKey),
     });
 
-    await broadcastToClients({ type: "milos:push-subscription-updated" });
+    await broadcastToClients({ type: "palee:push-subscription-updated" });
   } catch {
-    await broadcastToClients({ type: "milos:push-subscription-stale" });
+    await broadcastToClients({ type: "palee:push-subscription-stale" });
   }
 }

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddUniqueIndexToCommunicationThreads do
+defmodule Palee.Repo.Migrations.AddUniqueIndexToCommunicationThreads do
   use Ecto.Migration
 
   @index_name :communication_threads_context_type_context_id_index

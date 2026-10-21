@@ -55,7 +55,7 @@ function isAllowedSharedValue(value) {
 
   return trimmed === ""
     || /^[A-Z0-9_+./ -]+$/.test(trimmed)
-    || /^(?:TrainingJournal|Milos Training|CrossFit|Rx|Rx\+|AMRAP|EMOM|RFT|PR|URL|VAPID)$/i.test(trimmed)
+    || /^(?:Palee|Palee|CrossFit|Rx|Rx\+|AMRAP|EMOM|RFT|PR|URL|VAPID)$/i.test(trimmed)
     || /^https?:\/\//.test(trimmed)
     || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trimmed)
     || /^\/[\w/?=&.-]*$/.test(trimmed)

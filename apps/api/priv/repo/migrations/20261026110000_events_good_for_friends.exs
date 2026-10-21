@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EventsGoodForFriends do
+defmodule Palee.Repo.Migrations.EventsGoodForFriends do
   use Ecto.Migration
 
   # ADR-156 (board 11 Q3 extra): staff tag an event «Καλό για φίλους» so it

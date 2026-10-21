@@ -63,7 +63,7 @@ programming/coaching records point to their existing surfaces.
 
 Validation notes: frontend TypeScript, focused admin/finance/profile tests,
 document-export tests with an extended timeout for the heavy PDF/ODT case,
-targeted ESLint, backend compile, and `mix milos.architecture` passed. The
+targeted ESLint, backend compile, and `mix palee.architecture` passed. The
 DB-backed finance controller test command could not run locally because
 PostgreSQL on `localhost:5432` refused connections; no assertion failure was
 observed before the database creation failed.

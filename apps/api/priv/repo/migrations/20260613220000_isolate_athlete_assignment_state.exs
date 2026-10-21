@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.IsolateAthleteAssignmentState do
+defmodule Palee.Repo.Migrations.IsolateAthleteAssignmentState do
   use Ecto.Migration
 
   def up do

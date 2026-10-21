@@ -1,6 +1,6 @@
 import { assetLinks } from "@/lib/platform/app-links";
 
-// ADR-171: lets Android open the share links in the Milos app (App Links).
+// ADR-171: lets Android open the share links in the Palee app (App Links).
 // Read at request time so the signing fingerprints can change without a
 // rebuild; 404 until ANDROID_SHA256_CERT_FINGERPRINTS is set.
 export const dynamic = "force-dynamic";

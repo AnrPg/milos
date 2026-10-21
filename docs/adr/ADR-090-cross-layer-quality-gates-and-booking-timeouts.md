@@ -86,9 +86,9 @@ Implemented 2026-08-08.
 - The broader hardening slice also added the deterministic non-English catalog
   prose check, utility-class-aware UI copy scanning, expanded authenticated axe
   coverage with color contrast enabled, and Scheduling-owned timeout expiry
-  through `MilosTraining.Application.TimeoutBooking`.
+  through `Palee.Application.TimeoutBooking`.
 - Verification completed: `mix compile --warnings-as-errors`,
-  `mix milos.architecture`, `mix credo --strict --format oneline`,
+  `mix palee.architecture`, `mix credo --strict --format oneline`,
   `mix hex.audit`, `mix dialyzer --list-unused-filters`, targeted booking
   timeout tests, `npm run lint`, `npm run type-check`, `npm run i18n:check`,
   and `npx playwright test e2e/public-accessibility.spec.ts`.

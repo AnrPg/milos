@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeRemainingT4UniqueIndexes do
+defmodule Palee.Repo.Migrations.ScopeRemainingT4UniqueIndexes do
   use Ecto.Migration
 
   def up do

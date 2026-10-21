@@ -4,7 +4,7 @@
  * explicitly registered non-message command operations. Upgrades are
  * additive: existing stores are never dropped, so queued messages survive.
  */
-export const DEVICE_OUTBOX_DATABASE = "milos-device-outbox-v1";
+export const DEVICE_OUTBOX_DATABASE = "palee-device-outbox-v1";
 export const DEVICE_OUTBOX_VERSION = 2;
 export const MESSAGE_OPERATIONS_STORE = "message-operations";
 export const COMMAND_OPERATIONS_STORE = "command-operations";
@@ -86,7 +86,7 @@ export async function requestPersistentStorage() {
   }
 }
 
-export const OUTBOX_SYNC_REQUESTED_EVENT = "milos:outbox-sync-requested";
+export const OUTBOX_SYNC_REQUESTED_EVENT = "palee:outbox-sync-requested";
 
 /** Asks the root sync bridge to reconcile now (after an explicit retry). */
 export function requestOutboxSync() {

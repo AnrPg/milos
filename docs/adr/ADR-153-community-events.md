@@ -81,7 +81,7 @@ Finance already exist and must not learn about events.
 12. **Tenancy.** Both tables carry `organization_id` with the tenant policy, are
     in the Community tenant data policy and the audit's ready tables. Personal
     read policies let a person read events of clubs they can see, open events
-    and events they're on (`milos_acting_user_event_ids`), and their own
+    and events they're on (`palee_acting_user_event_ids`), and their own
     attendee rows.
 
 13. **Member-group events.** An event may belong to a member group
@@ -95,7 +95,7 @@ Finance already exist and must not learn about events.
     constraint holds it. Only the group's members see them, see who's going
     and say they come (`belongs?`, `visible?`, `can_rsvp?`); their card goes in
     the group. From a personal session, RLS shows a group event to the group's
-    members (`milos_acting_user_group_ids`) and the box's staff.
+    members (`palee_acting_user_group_ids`) and the box's staff.
 14. **Late cancels for staff.** The staff attendee list marks «Ακύρωσε αργά»
     (`late_cancel` with `cancelled_at`) and gives each person's late cancels at
     the box over the last 90 days (`late_cancels_90d`); every event's numbers

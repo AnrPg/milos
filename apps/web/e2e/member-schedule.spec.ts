@@ -187,7 +187,7 @@ async function shot(page: Page, name: string) {
 test.describe("member schedule", () => {
   test.beforeEach(async ({ page, context, baseURL }) => {
     await stubApi(page);
-    await context.addCookies([{ name: "milos_locale", value: "el", url: baseURL! }]);
+    await context.addCookies([{ name: "palee_locale", value: "el", url: baseURL! }]);
     // Early morning, so every class of the day is still ahead.
     await page.clock.setFixedTime(new Date(at(6)));
   });

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddRichWorkoutAuthoringMetadata do
+defmodule Palee.Repo.Migrations.AddRichWorkoutAuthoringMetadata do
   use Ecto.Migration
 
   def change do

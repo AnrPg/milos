@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PreventDuplicateFinanceRenewalInvoices do
+defmodule Palee.Repo.Migrations.PreventDuplicateFinanceRenewalInvoices do
   use Ecto.Migration
 
   def change do

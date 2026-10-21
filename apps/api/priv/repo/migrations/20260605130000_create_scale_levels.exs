@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateScaleLevels do
+defmodule Palee.Repo.Migrations.CreateScaleLevels do
   use Ecto.Migration
 
   def change do

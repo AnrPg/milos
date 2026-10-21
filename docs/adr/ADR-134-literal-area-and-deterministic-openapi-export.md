@@ -12,7 +12,7 @@ TD-093 bundled two tooling problems.
    which raises the literal super carrier from 1 GB to 4 GB. The crash was
    recorded as "environment-specific" (ADR-124 Implementation Notes) without
    a cause.
-2. **Noisy generated-client diffs.** `mix milos.export_openapi` wrote the
+2. **Noisy generated-client diffs.** `mix palee.export_openapi` wrote the
    spec with `Jason.encode_to_iodata!(spec, pretty: true)`. Jason writes map
    keys in map iteration order:
    - Maps with more than 32 keys (`paths`, `components.schemas`) iterate in
@@ -34,13 +34,13 @@ TD-093 bundled two tooling problems.
    - Every put copies the value (about 23 MB for our spec) into the literal
      area. Replaced copies are released only after a global literal GC, so
      a cold test run with dozens of validated actions fills the 1 GB area.
-   - `MilosTrainingWeb.OpenApiSpecCache` (configured in `config/config.exs`)
+   - `PaleeWeb.OpenApiSpecCache` (configured in `config/config.exs`)
      stores the spec once and ignores later puts. With it, the full suite
      passes on VM defaults.
    - We keep it as the single cache adapter, delete the shadowed duplicate
-     `MilosTrainingWeb.ApiSpecCache`, guard the behaviour with a test, and
+     `PaleeWeb.ApiSpecCache`, guard the behaviour with a test, and
      drop `+MIscs 4096` from the documented workflow (AGENTS.md).
-2. **Deterministic export.** A new module, `MilosTrainingWeb.OpenApiExport.encode!/1`:
+2. **Deterministic export.** A new module, `PaleeWeb.OpenApiExport.encode!/1`:
    - encodes the spec with the normal encoders, so OpenApiSpex's struct
      encoders still drop `nil`s;
    - decodes the result;
@@ -114,7 +114,7 @@ TD-093 bundled two tooling problems.
   - With the default adapter temporarily restored
     (`config :open_api_spex, :cache_adapter,
     OpenApiSpex.Plug.PersistentTermCache` in `config/test.exs`), running
-    `mix test test/milos_training_web` with only `+fnu` aborted after
+    `mix test test/palee_web` with only `+fnu` aborted after
     ~120 tests:
     `literal_alloc: Cannot allocate 25801304 bytes of memory (of type
     "literal")`, followed by an `erl_crash.dump`.
@@ -128,7 +128,7 @@ TD-093 bundled two tooling problems.
   - Web suite alone (353 tests): 101 MB peak.
   - Largest `.beam` files: `Schemas.Workout` at 2.6 MB, then
     `AdminFinanceController` at 0.7 MB and `Router` at 0.6 MB.
-    `_build/test/lib/milos_training/ebin` totals 21 MB. Module literals are
+    `_build/test/lib/palee/ebin` totals 21 MB. Module literals are
     not the problem.
 - **Dead code.** Both merged lines (multi-role and assistant) had
   independently fixed the cache. Their `config :open_api_spex,

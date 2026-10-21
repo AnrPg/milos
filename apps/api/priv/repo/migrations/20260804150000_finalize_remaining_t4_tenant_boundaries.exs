@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.FinalizeRemainingT4TenantBoundaries do
+defmodule Palee.Repo.Migrations.FinalizeRemainingT4TenantBoundaries do
   use Ecto.Migration
 
   @remaining_tenant_tables ~w(
@@ -25,7 +25,7 @@ defmodule MilosTraining.Repo.Migrations.FinalizeRemainingT4TenantBoundaries do
       execute("""
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """)
 
       execute("DROP POLICY IF EXISTS #{table}_tenant_policy ON #{table}")
@@ -35,13 +35,13 @@ defmodule MilosTraining.Repo.Migrations.FinalizeRemainingT4TenantBoundaries do
       USING (
         organization_id = COALESCE(
           NULLIF(current_setting('app.organization_id', true), '')::uuid,
-          milos_legacy_organization_id()
+          palee_legacy_organization_id()
         )
       )
       WITH CHECK (
         organization_id = COALESCE(
           NULLIF(current_setting('app.organization_id', true), '')::uuid,
-          milos_legacy_organization_id()
+          palee_legacy_organization_id()
         )
       )
       """)

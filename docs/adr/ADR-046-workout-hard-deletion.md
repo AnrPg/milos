@@ -68,7 +68,7 @@ context APIs.
 ## Implementation Notes
 Phase 2/3/4 code now exposes `DELETE /api/admin/workouts/:id` through an
 admin-only controller action that delegates to
-`MilosTraining.Application.DeleteWorkout`.
+`Palee.Application.DeleteWorkout`.
 
 The original implementation service:
 

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddInventoryNotificationTypes do
+defmodule Palee.Repo.Migrations.AddInventoryNotificationTypes do
   use Ecto.Migration
 
   # ADR-104 inventory_repair_needed, inventory_stock_low and the daily inventory_digest.

@@ -1,17 +1,17 @@
-defmodule MilosTrainingWeb.RLSEnforcedEndpoint do
+defmodule PaleeWeb.RLSEnforcedEndpoint do
   @moduledoc """
-  TD-046: a test-only stand-in for `MilosTrainingWeb.Endpoint` that dispatches
+  TD-046: a test-only stand-in for `PaleeWeb.Endpoint` that dispatches
   each request as the non-superuser runtime role, so Row Level Security applies
   to the controller/application/store code under test exactly as in production.
   Fixtures and assertions outside the request keep the superuser test role.
 
-  It is the `@endpoint` of every `MilosTrainingWeb.ConnCase` test. A test that
+  It is the `@endpoint` of every `PaleeWeb.ConnCase` test. A test that
   must observe behavior RLS deliberately hides can opt out with
   `@tag rls_enforced: false`, naming the debt item that explains why.
   """
 
-  alias MilosTraining.DataCase
-  alias MilosTrainingWeb.Endpoint
+  alias Palee.DataCase
+  alias PaleeWeb.Endpoint
 
   def init(opts), do: Endpoint.init(opts)
 
@@ -25,7 +25,7 @@ defmodule MilosTrainingWeb.RLSEnforcedEndpoint do
       do:
         DataCase.with_runtime_role(fn ->
           DataCase.with_clean_session(fn ->
-            MilosTraining.UnscopedQueryDetector.watch(fn -> Endpoint.call(conn, opts) end)
+            Palee.UnscopedQueryDetector.watch(fn -> Endpoint.call(conn, opts) end)
           end)
         end),
       else: Endpoint.call(conn, opts)

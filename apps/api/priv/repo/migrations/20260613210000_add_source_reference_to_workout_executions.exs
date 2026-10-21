@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddSourceReferenceToWorkoutExecutions do
+defmodule Palee.Repo.Migrations.AddSourceReferenceToWorkoutExecutions do
   use Ecto.Migration
 
   def change do

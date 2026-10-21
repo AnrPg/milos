@@ -8,7 +8,7 @@ dashboards and alerts using only free/open-source components:
 | `otel-collector` | `otel/opentelemetry-collector-contrib:0.161.0` | Receives OTLP traces from the API and derives HTTP rate/error/latency metrics (spanmetrics connector) |
 | `prometheus` | `prom/prometheus:v3.15.0` | Scrapes the API's internal metrics listener and the collector, evaluates alert rules |
 | `alertmanager` | `prom/alertmanager:v0.34.1` | Groups, de-duplicates and delivers alerts (webhook by default, optional email) |
-| `grafana` | `grafana/grafana:13.2.3` | Provisioned datasource + the "Milos Training - Operations" dashboard |
+| `grafana` | `grafana/grafana:13.2.3` | Provisioned datasource + the "Palee - Operations" dashboard |
 
 Nothing here starts on a plain `docker compose up`. All four services carry
 `profiles: ["observability"]`, and the API keeps its listener and trace
@@ -25,7 +25,7 @@ export switched off until you set the variables below.
    METRICS_PORT=9568
    METRICS_TOKEN=<output of: openssl rand -hex 32>
    # Where alerts go
-   ALERTMANAGER_WEBHOOK_URL=https://ntfy.example.com/milos-alerts
+   ALERTMANAGER_WEBHOOK_URL=https://ntfy.example.com/palee-alerts
    # Grafana login
    GRAFANA_ADMIN_PASSWORD=<strong password>
    ```
@@ -46,7 +46,7 @@ export switched off until you set the variables below.
    ssh -L 13000:127.0.0.1:13000 -L 19090:127.0.0.1:19090 -L 19093:127.0.0.1:19093 owner@server
    ```
 
-   - Grafana: <http://127.0.0.1:13000>, folder "Milos Training"
+   - Grafana: <http://127.0.0.1:13000>, folder "Palee"
    - Prometheus: <http://127.0.0.1:19090> (Alerts tab shows rule state)
    - Alertmanager: <http://127.0.0.1:19093> (silences, delivery status)
 
@@ -95,19 +95,19 @@ example, outbox critical hides outbox warning).
 
 ## What is measured
 
-The API exports these through `MilosTrainingWeb.Telemetry.prometheus_metrics/0`:
+The API exports these through `PaleeWeb.Telemetry.prometheus_metrics/0`:
 
 | Signal (TD-031) | Metric | Source |
 |---|---|---|
 | HTTP rate / 5xx / p95 (from traces) | `traces_span_metrics_calls_total`, `traces_span_metrics_duration_milliseconds_*` | OTLP traces -> spanmetrics |
-| HTTP latency per route (in-app) | `milos_http_request_duration_seconds`, `milos_http_exceptions_total` | Phoenix telemetry |
-| Readiness failures | `milos_readiness_check_up{dependency}`, `milos_readiness_failures_total{failed}` | 30s readiness probe + `/api/health` |
-| Outbox age | `milos_outbox_oldest_due_seconds{queue}`, `milos_outbox_pending_jobs`, `milos_outbox_retryable_jobs` | 30s probe over due Oban jobs |
-| Auth anomalies | `milos_auth_anomalies_total{reason}`, `milos_rate_limit_rejections_total{bucket}` | Fallback controller, Guardian error handler, rate limiter |
-| Cache invalidation | `milos_cache_operations_total{cache,operation,result}` | Landing cache (Redis) |
-| Upload rejections | `milos_upload_rejections_total{context,reason}` | Upload validation/verification |
-| Oban failures | `milos_oban_job_failures_total{queue,worker,state}`, `milos_oban_job_completions_total`, `milos_oban_job_duration_seconds` | Oban telemetry |
-| Runtime | `milos_vm_memory_bytes`, `milos_vm_run_queue`, `milos_repo_query_duration_seconds`, `milos_repo_queue_duration_seconds` | BEAM / Ecto |
+| HTTP latency per route (in-app) | `palee_http_request_duration_seconds`, `palee_http_exceptions_total` | Phoenix telemetry |
+| Readiness failures | `palee_readiness_check_up{dependency}`, `palee_readiness_failures_total{failed}` | 30s readiness probe + `/api/health` |
+| Outbox age | `palee_outbox_oldest_due_seconds{queue}`, `palee_outbox_pending_jobs`, `palee_outbox_retryable_jobs` | 30s probe over due Oban jobs |
+| Auth anomalies | `palee_auth_anomalies_total{reason}`, `palee_rate_limit_rejections_total{bucket}` | Fallback controller, Guardian error handler, rate limiter |
+| Cache invalidation | `palee_cache_operations_total{cache,operation,result}` | Landing cache (Redis) |
+| Upload rejections | `palee_upload_rejections_total{context,reason}` | Upload validation/verification |
+| Oban failures | `palee_oban_job_failures_total{queue,worker,state}`, `palee_oban_job_completions_total`, `palee_oban_job_duration_seconds` | Oban telemetry |
+| Runtime | `palee_vm_memory_bytes`, `palee_vm_run_queue`, `palee_repo_query_duration_seconds`, `palee_repo_queue_duration_seconds` | BEAM / Ecto |
 
 The structured `telemetry_summary=` log line (TelemetryLogReporter) keeps
 working without this profile. It now also carries outbox age, readiness probe
@@ -115,28 +115,28 @@ results and rate-limit rejections.
 
 ## Alert thresholds
 
-All rules are in `prometheus/rules/milos-alerts.yml`. Unit tests for the
-boundaries are in `prometheus/tests/milos-alerts.test.yml`.
+All rules are in `prometheus/rules/palee-alerts.yml`. Unit tests for the
+boundaries are in `prometheus/tests/palee-alerts.test.yml`.
 
 | Alert | Threshold | Why |
 |---|---|---|
-| `MilosApiMetricsDown` (critical) | scrape fails 2m | API down or token mismatch; every other API alert goes blind |
-| `MilosReadinessDependencyDown` (critical) | a dependency reports down for 2m | `/api/health` returns 503 and Compose marks the API unhealthy. 2m rides out restarts |
-| `MilosReadinessFailuresRecurring` (warning) | > 5 failed evaluations / 10m | Health checks run every 10s, so 5 failures is about 1 minute of cumulative flapping |
-| `MilosHttp5xxRateCritical` / `Elevated` | 5xx > 5% for 5m / > 2% for 15m, with at least 0.1 req/s | A small gym's traffic is spiky; the traffic floor stops one failed request at night from paging |
-| `MilosHttpLatencyP95Critical` / `High` | p95 > 2.5s for 10m / > 1s for 15m | Interactive API calls should take well under 1s; 2.5s is noticeably broken on mobile |
-| `MilosOutboxBacklogCritical` / `Aging` | oldest due job > 15m / > 5m, for 5m | Healthy queues drain in seconds; 15m-old notifications and invalidations are user-visible |
-| `MilosOutboxRetryBacklog` | > 20 retryable jobs for 15m | A downstream dependency (push, search, storage) keeps failing |
-| `MilosObanJobsDiscarded` | any discard in 15m | Discarded means attempts are exhausted; the side effect is lost until someone acts |
-| `MilosObanFailureRateHigh` | > 20% failures with at least 5 failures / 15m, for 10m | Retries normally absorb transient failures; sustained 20% is systemic |
-| `MilosCredentialFailuresSpike` | > 50 failed logins / 10m | Far above what a few hundred members produce by mistyping; looks like credential stuffing |
-| `MilosRefreshTokenRejectionsSpike` | > 20 / 10m | Token replay or a broken client release |
-| `MilosCredentialEndpointRateLimited` | > 10 / 10m | Credential endpoints allow 10 req/min per client, so repeated hits mean automated traffic |
-| `MilosCacheInvalidationFailing` | failures persisting 5m | Stale data is bounded by the 60s TTL, but Redis is degraded |
-| `MilosCacheReadsBypassed` | > 50% of reads miss Redis for 10m | Every landing request is falling through to PostgreSQL |
-| `MilosUploadRejectionsSpike` | > 20 / 15m | Normal users trigger a handful of rejections; more points to a client bug or abuse |
-| `MilosUploadVerificationFailing` | > 3 missing/unverified / 15m | Usually MinIO, bucket policy or CORS/public-endpoint misconfiguration |
-| `MilosOtelCollectorDown` / `MilosTracesNotArriving` | collector down 5m / no traces for 12h | Trace-derived alerts are blind (`OTEL_EXPORTER_OTLP_ENDPOINT` unset?) |
+| `PaleeApiMetricsDown` (critical) | scrape fails 2m | API down or token mismatch; every other API alert goes blind |
+| `PaleeReadinessDependencyDown` (critical) | a dependency reports down for 2m | `/api/health` returns 503 and Compose marks the API unhealthy. 2m rides out restarts |
+| `PaleeReadinessFailuresRecurring` (warning) | > 5 failed evaluations / 10m | Health checks run every 10s, so 5 failures is about 1 minute of cumulative flapping |
+| `PaleeHttp5xxRateCritical` / `Elevated` | 5xx > 5% for 5m / > 2% for 15m, with at least 0.1 req/s | A small gym's traffic is spiky; the traffic floor stops one failed request at night from paging |
+| `PaleeHttpLatencyP95Critical` / `High` | p95 > 2.5s for 10m / > 1s for 15m | Interactive API calls should take well under 1s; 2.5s is noticeably broken on mobile |
+| `PaleeOutboxBacklogCritical` / `Aging` | oldest due job > 15m / > 5m, for 5m | Healthy queues drain in seconds; 15m-old notifications and invalidations are user-visible |
+| `PaleeOutboxRetryBacklog` | > 20 retryable jobs for 15m | A downstream dependency (push, search, storage) keeps failing |
+| `PaleeObanJobsDiscarded` | any discard in 15m | Discarded means attempts are exhausted; the side effect is lost until someone acts |
+| `PaleeObanFailureRateHigh` | > 20% failures with at least 5 failures / 15m, for 10m | Retries normally absorb transient failures; sustained 20% is systemic |
+| `PaleeCredentialFailuresSpike` | > 50 failed logins / 10m | Far above what a few hundred members produce by mistyping; looks like credential stuffing |
+| `PaleeRefreshTokenRejectionsSpike` | > 20 / 10m | Token replay or a broken client release |
+| `PaleeCredentialEndpointRateLimited` | > 10 / 10m | Credential endpoints allow 10 req/min per client, so repeated hits mean automated traffic |
+| `PaleeCacheInvalidationFailing` | failures persisting 5m | Stale data is bounded by the 60s TTL, but Redis is degraded |
+| `PaleeCacheReadsBypassed` | > 50% of reads miss Redis for 10m | Every landing request is falling through to PostgreSQL |
+| `PaleeUploadRejectionsSpike` | > 20 / 15m | Normal users trigger a handful of rejections; more points to a client bug or abuse |
+| `PaleeUploadVerificationFailing` | > 3 missing/unverified / 15m | Usually MinIO, bucket policy or CORS/public-endpoint misconfiguration |
+| `PaleeOtelCollectorDown` / `PaleeTracesNotArriving` | collector down 5m / no traces for 12h | Trace-derived alerts are blind (`OTEL_EXPORTER_OTLP_ENDPOINT` unset?) |
 | `AlertmanagerNotificationsFailing`, `PrometheusRuleEvaluationFailing` | sustained failures | The alerting pipeline itself is broken |
 
 `invalid_token` and `unauthenticated` auth anomalies are mostly expired
@@ -150,12 +150,12 @@ tarballs, or run them through `docker run` with the same image tags:
 
 ```sh
 promtool check config --syntax-only ops/observability/prometheus/prometheus.yml
-promtool check rules ops/observability/prometheus/rules/milos-alerts.yml
-promtool test rules ops/observability/prometheus/tests/milos-alerts.test.yml
+promtool check rules ops/observability/prometheus/rules/palee-alerts.yml
+promtool test rules ops/observability/prometheus/tests/palee-alerts.test.yml
 amtool check-config ops/observability/alertmanager/alertmanager.yml
 otelcol-contrib validate --config=ops/observability/otel-collector/config.yaml
 docker compose --profile observability config --quiet
 ```
 
-If you rename a metric in `MilosTrainingWeb.Telemetry`, update the rules, the
-rule tests and `grafana/dashboards/milos-operations.json` together.
+If you rename a metric in `PaleeWeb.Telemetry`, update the rules, the
+rule tests and `grafana/dashboards/palee-operations.json` together.

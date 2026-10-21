@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPackageTypesAndModules do
+defmodule Palee.Repo.Migrations.AddPackageTypesAndModules do
   use Ecto.Migration
 
   @types ~w[membership class_pack drop_in trial pt_pack add_on shared corporate]

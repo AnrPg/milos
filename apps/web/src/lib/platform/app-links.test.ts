@@ -35,18 +35,18 @@ describe("app links", () => {
   });
 
   it("opens only links to this web app's own host", () => {
-    const origin = "https://milos.example";
-    expect(inAppPath("https://milos.example/c/loc-1/abc?x=1#y", origin)).toBe("/c/loc-1/abc?x=1#y");
+    const origin = "https://palee.example";
+    expect(inAppPath("https://palee.example/c/loc-1/abc?x=1#y", origin)).toBe("/c/loc-1/abc?x=1#y");
     expect(inAppPath("https://evil.example/c/loc-1/abc", origin)).toBeNull();
     expect(inAppPath("javascript:alert(1)", origin)).toBeNull();
     expect(inAppPath("not a url", origin)).toBeNull();
   });
 
   it("turns a notification link into an in-app path", () => {
-    const origin = "https://milos.example";
+    const origin = "https://palee.example";
     expect(notificationPath("/org/box/journal", origin)).toBe("/org/box/journal");
     expect(notificationPath("//evil.example/x", origin)).toBeNull();
-    expect(notificationPath("https://milos.example/me", origin)).toBe("/me");
+    expect(notificationPath("https://palee.example/me", origin)).toBe("/me");
     expect(notificationPath(undefined, origin)).toBeNull();
   });
 });

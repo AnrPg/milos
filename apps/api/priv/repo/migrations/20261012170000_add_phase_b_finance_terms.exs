@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPhaseBFinanceTerms do
+defmodule Palee.Repo.Migrations.AddPhaseBFinanceTerms do
   use Ecto.Migration
 
   # ADR-097: commitment, activation on first use, freezes, member discounts and
@@ -94,7 +94,7 @@ defmodule MilosTraining.Repo.Migrations.AddPhaseBFinanceTerms do
     execute("""
     CREATE TRIGGER #{table}_apply_tenant_context
     BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

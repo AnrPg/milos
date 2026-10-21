@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
+defmodule Palee.Repo.Migrations.EnableRlsOnRootTenantTables do
   use Ecto.Migration
 
   # F-16 / P3.4: the root tenant tables held the tenancy model itself and had no
@@ -23,7 +23,7 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     # A vendor sees everything: platform operators provision and support every
     # organization. Membership below is what scopes ordinary accounts.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_is_vendor() RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_is_vendor() RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM vendors v
         WHERE v.user_id = #{@acting_user} AND v.status = 'active'
@@ -32,7 +32,7 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_belongs_to(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_belongs_to(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM organization_memberships om
         WHERE om.organization_id = org_id
@@ -43,7 +43,7 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_administers(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_administers(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM organization_memberships om
         WHERE om.organization_id = org_id
@@ -58,8 +58,8 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     # invitation redemption (the invitee is joining it and must be able to read
     # its name/status). See policy/2 below for how writes differ.
     policy(:organizations, """
-    milos_acting_user_is_vendor()
-    OR milos_acting_user_belongs_to(organizations.id)
+    palee_acting_user_is_vendor()
+    OR palee_acting_user_belongs_to(organizations.id)
     OR current_setting('app.invitation_redemption', true) = 'true'
     """)
 
@@ -67,16 +67,16 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     # organization switcher depends on it); owners/admins see their whole
     # organization's.
     policy(:organization_memberships, """
-    milos_acting_user_is_vendor()
+    palee_acting_user_is_vendor()
     OR organization_memberships.user_id = #{@acting_user}
-    OR milos_acting_user_administers(organization_memberships.organization_id)
+    OR palee_acting_user_administers(organization_memberships.organization_id)
     OR current_setting('app.invitation_redemption', true) = 'true'
     """)
 
     for table <- [:organization_settings, :organization_domains] do
       policy(table, """
-      milos_acting_user_is_vendor()
-      OR milos_acting_user_belongs_to(#{table}.organization_id)
+      palee_acting_user_is_vendor()
+      OR palee_acting_user_belongs_to(#{table}.organization_id)
       OR current_setting('app.invitation_redemption', true) = 'true'
       """)
     end
@@ -84,8 +84,8 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     # registration_invitations: administered by the issuing organization, plus
     # the redemption carve-out for the holder who is not yet a member.
     policy(:registration_invitations, """
-    milos_acting_user_is_vendor()
-    OR milos_acting_user_administers(registration_invitations.organization_id)
+    palee_acting_user_is_vendor()
+    OR palee_acting_user_administers(registration_invitations.organization_id)
     OR current_setting('app.invitation_redemption', true) = 'true'
     """)
 
@@ -93,13 +93,13 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
     # resolved), and vendors see all.
     policy(:vendors, """
     vendors.user_id = #{@acting_user}
-    OR milos_acting_user_is_vendor()
+    OR palee_acting_user_is_vendor()
     """)
 
     # organization_provisioning_events: a write-only vendor audit log, never
     # read back by any application code. Vendor-only, no per-tenant access.
     policy(:organization_provisioning_events, """
-    milos_acting_user_is_vendor()
+    palee_acting_user_is_vendor()
     """)
   end
 
@@ -118,9 +118,9 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
       execute("DROP POLICY IF EXISTS #{table}_tenant_policy ON #{table}")
     end
 
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_administers(uuid)")
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_belongs_to(uuid)")
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_is_vendor()")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_administers(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_belongs_to(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_is_vendor()")
   end
 
   # Reads and writes are governed separately.
@@ -131,7 +131,7 @@ defmodule MilosTraining.Repo.Migrations.EnableRlsOnRootTenantTables do
   # Writes to the root tables were already gated in application code (only
   # vendors provision organizations; only owners/admins issue invitations), and
   # they must remain possible from sessions that have no acting user at all:
-  # migrations, seeds, `mix milos.organizations.ensure_legacy`, and the
+  # migrations, seeds, `mix palee.organizations.ensure_legacy`, and the
   # provisioning transaction that creates an organization *before* any
   # membership in it can exist. WITH CHECK therefore blocks the case that
   # matters - an authenticated account writing into an organization it has no

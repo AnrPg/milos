@@ -1,0 +1,240 @@
+defmodule Palee.Application.SubmitBookingTest do
+  use Palee.DataCase, async: false
+  use Oban.Testing, repo: Palee.Repo
+
+  alias Palee.Application.SubmitBooking
+  alias Palee.{Finance, Organizations}
+  alias Palee.Notifications
+  alias Palee.Workers.BookingTimeoutJob
+  alias Oban.Testing
+
+  import ExUnit.CaptureLog
+  import Palee.TestFixtures
+
+  setup do
+    start_supervised!(
+      {Oban, Keyword.put(Application.fetch_env!(:palee, Oban), :testing, :manual)}
+    )
+
+    previous_dispatcher = Application.get_env(:palee, :notification_dispatcher)
+
+    on_exit(fn ->
+      if previous_dispatcher do
+        Application.put_env(:palee, :notification_dispatcher, previous_dispatcher)
+      else
+        Application.delete_env(:palee, :notification_dispatcher)
+      end
+    end)
+
+    # `workout_fixture/2` and `slot_fixture/2` write through the legacy,
+    # session-scoped path, which resolves its target organization from the
+    # `app.organization_id` GUC. Set it once here so slots always land in
+    # the legacy organization regardless of prior session state, and expose
+    # a helper for tests that need an actual tenant context to call the
+    # scoped application/domain functions with.
+    {:ok, legacy_organization} = Organizations.ensure_legacy_organization_for_migration()
+
+    Palee.Repo.query!("SELECT set_config($1, $2, false)", [
+      "app.organization_id",
+      legacy_organization.id
+    ])
+
+    %{legacy_organization: legacy_organization}
+  end
+
+  defp legacy_tenant_context(actor, role \\ nil) do
+    {:ok, _membership} = Organizations.ensure_legacy_membership_for_migration(actor, role)
+
+    {:ok, context} =
+      Organizations.resolve_tenant_context(actor, Organizations.legacy_organization_slug())
+
+    context
+  end
+
+  test "submitting a pending booking creates an admin notification and timeout job" do
+    Testing.with_testing_mode(:manual, fn ->
+      admin = admin_fixture()
+      member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      context = legacy_tenant_context(member)
+      workout = workout_fixture(admin)
+      slot = slot_fixture(workout, %{auto_approve: false})
+
+      assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
+      assert booking.status == :pending
+
+      assert_enqueued(worker: BookingTimeoutJob, args: %{"booking_id" => booking.id})
+
+      Oban.drain_queue(queue: :notifications, with_safety: false)
+
+      notifications = wait_for_notifications(admin.id)
+      assert Enum.any?(notifications, &(&1.type == "booking_pending"))
+    end)
+  end
+
+  test "submitting an auto-approved booking resolves immediately" do
+    Testing.with_testing_mode(:manual, fn ->
+      admin = admin_fixture()
+      member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      context = legacy_tenant_context(member)
+      workout = workout_fixture(admin)
+      slot = slot_fixture(workout, %{auto_approve: true})
+
+      assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
+      assert booking.status == :approved
+
+      Oban.drain_queue(queue: :notifications, with_safety: false)
+
+      notifications = wait_for_notifications(member.id)
+      assert Enum.any?(notifications, &(&1.type == "booking_approved"))
+      refute_enqueued(worker: BookingTimeoutJob, args: %{"booking_id" => booking.id})
+    end)
+  end
+
+  test "failed auto-approval leaves no pending booking or timeout job" do
+    Testing.with_testing_mode(:manual, fn ->
+      admin = admin_fixture()
+      first_member = user_fixture()
+      second_member = user_fixture()
+      legacy_tenant_context(admin, :owner)
+      first_context = legacy_tenant_context(first_member)
+      second_context = legacy_tenant_context(second_member)
+      workout = workout_fixture(admin)
+      slot = slot_fixture(workout, %{auto_approve: true, capacity: 1})
+
+      assert {:ok, first_booking} = SubmitBooking.call(first_context, first_member, slot.id)
+      assert first_booking.status == :approved
+
+      assert {:error, :slot_full} = SubmitBooking.call(second_context, second_member, slot.id)
+
+      refreshed_slot = Palee.Scheduling.get_slot(first_context, slot.id)
+
+      refute Enum.any?(
+               refreshed_slot.bookings,
+               &(&1.user_id == second_member.id and &1.status == :pending)
+             )
+
+      refute_enqueued(worker: BookingTimeoutJob, args: %{"booking_id" => first_booking.id})
+    end)
+  end
+
+  test "inactive managed memberships cannot book classes" do
+    admin = admin_fixture()
+    member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
+    workout = workout_fixture(admin)
+    slot = slot_fixture(workout, %{auto_approve: true})
+
+    assert {:ok, _membership} =
+             Finance.upsert_membership(member.id, %{
+               user_type_snapshot: "member",
+               status: "paused",
+               signup_source: "direct"
+             })
+
+    assert {:error, :finance_entitlement_inactive} =
+             SubmitBooking.call(context, member, slot.id)
+  end
+
+  test "package visit quota is reserved across different slots and withdrawal restores it" do
+    admin = admin_fixture()
+    member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
+    workout = workout_fixture(admin)
+    first_slot = slot_fixture(workout, %{auto_approve: true})
+
+    second_slot =
+      slot_fixture(workout, %{
+        auto_approve: true,
+        scheduled_at: DateTime.add(first_slot.scheduled_at, 3600)
+      })
+
+    {:ok, _settings} =
+      Finance.update_finance_settings(%{
+        entitlement_enforcement_mode: "enforce_managed",
+        entitlement_timezone: "Europe/Athens",
+        payment_reminder_interval_days: 7
+      })
+
+    {:ok, package} =
+      Finance.create_package(%{
+        code: "one_visit_monthly",
+        name: "One visit monthly",
+        family: "limited-visits",
+        billing_period: "monthly",
+        params: %{
+          "entitlement_version" => 1,
+          "channels" => ["in_person"],
+          "capabilities" => ["book_classes", "execute_class_workouts"],
+          "allowances" => %{
+            "class_visits" => %{"limit" => 1, "period" => "calendar_month"}
+          }
+        }
+      })
+
+    {:ok, membership} =
+      Finance.upsert_membership(member.id, %{
+        user_type_snapshot: "member",
+        status: "active",
+        signup_source: "direct"
+      })
+
+    {:ok, _subscription} =
+      Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+
+    assert {:ok, booking} = SubmitBooking.call(context, member, first_slot.id)
+
+    assert {:error, :finance_allowance_exhausted, %{limit: 1, committed: 1}} =
+             SubmitBooking.call(context, member, second_slot.id)
+
+    assert {:ok, _withdrawn} =
+             Palee.Application.WithdrawBooking.call(context, member.id, booking.id)
+
+    assert {:ok, _second_booking} = SubmitBooking.call(context, member, second_slot.id)
+  end
+
+  test "returns the committed booking when notification dispatch fails" do
+    Application.put_env(:palee, :notification_dispatcher, __MODULE__.FailingDispatcher)
+
+    admin = admin_fixture()
+    member = user_fixture()
+    legacy_tenant_context(admin, :owner)
+    context = legacy_tenant_context(member)
+    workout = workout_fixture(admin)
+    slot = slot_fixture(workout, %{auto_approve: false})
+
+    log =
+      capture_log(fn ->
+        assert {:ok, booking} = SubmitBooking.call(context, member, slot.id)
+        assert booking.status == :pending
+
+        refreshed_slot = Palee.Scheduling.get_slot(context, slot.id)
+        assert Enum.any?(refreshed_slot.bookings, &(&1.id == booking.id))
+      end)
+
+    assert log =~ "booking_notification_dispatch_failed"
+    assert log =~ "reason=:notification_store_down"
+  end
+
+  defmodule FailingDispatcher do
+    def dispatch_event(_event, _payload), do: {:error, :notification_store_down}
+  end
+
+  defp wait_for_notifications(user_id, attempts \\ 10)
+
+  defp wait_for_notifications(user_id, attempts) when attempts > 0 do
+    notifications = Notifications.list_for_user(user_id)
+
+    if notifications == [] do
+      Process.sleep(20)
+      wait_for_notifications(user_id, attempts - 1)
+    else
+      notifications
+    end
+  end
+
+  defp wait_for_notifications(user_id, 0), do: Notifications.list_for_user(user_id)
+end

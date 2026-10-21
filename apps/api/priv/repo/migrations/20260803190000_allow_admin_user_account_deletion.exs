@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowAdminUserAccountDeletion do
+defmodule Palee.Repo.Migrations.AllowAdminUserAccountDeletion do
   use Ecto.Migration
 
   def change do

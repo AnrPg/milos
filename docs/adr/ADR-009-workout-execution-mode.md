@@ -27,7 +27,7 @@ The key design questions resolved before implementation:
 
 ### Bounded Context: `Execution`
 
-A new bounded context `MilosTraining.Execution` was introduced, following the same hexagonal structure as `Workouts` and `Scheduling`:
+A new bounded context `Palee.Execution` was introduced, following the same hexagonal structure as `Workouts` and `Scheduling`:
 
 ```
 execution/
@@ -49,7 +49,7 @@ The schema stores: `user_id`, optional `master_workout_id` (nullable — workout
 
 ### TimerSequenceBuilder (Pure Domain)
 
-`MilosTraining.Execution.Domain.TimerSequenceBuilder.build/1` converts a materialized workout to a flat `[%{segment}]` list. Design rationale:
+`Palee.Execution.Domain.TimerSequenceBuilder.build/1` converts a materialized workout to a flat `[%{segment}]` list. Design rationale:
 
 - **Depth-first traversal** mirrors the display order in the authoring canvas.
 - **EMOM / complex_emom**: one segment per minute. Exercises with `interval_assignment` are filtered per round; plain EMOM repeats all exercises every round.
@@ -140,7 +140,7 @@ Phoenix Channels could broadcast timer state for group classes. Deferred — the
 
 ## Emergent Decisions
 
-- Added `materialize_workout_for_scale/2` convenience function to `MilosTraining.Workouts` context to support the timer-sequence endpoint with a scale parameter.
+- Added `materialize_workout_for_scale/2` convenience function to `Palee.Workouts` context to support the timer-sequence endpoint with a scale parameter.
 - Added `:workout_completed` notification type to the `Notification` schema `@types` list, plus a new migration to update the DB constraint.
 - `ExecutionController` placed under the `/athlete_or_admin` pipeline — admins can also execute workouts for testing purposes.
 - Execution notes were expanded from one-note-per-exercise quick words into many annotation records per execution, with multi-tag selection and highlighted selected-text anchors in the checklist UI.

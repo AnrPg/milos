@@ -5,12 +5,12 @@ import type { operations } from "@/api/generated/schema";
 
 type Json<T> = T extends { content: { "application/json": infer Body } } ? Body : never;
 
-type VideosResponse = Json<operations["MilosTrainingWeb.AdminContentController.index"]["responses"][200]>;
-type VideoResponse = Json<operations["MilosTrainingWeb.AdminContentController.update"]["responses"][200]>;
+type VideosResponse = Json<operations["PaleeWeb.AdminContentController.index"]["responses"][200]>;
+type VideoResponse = Json<operations["PaleeWeb.AdminContentController.update"]["responses"][200]>;
 
 export type ContentVideo = VideosResponse["videos"][number];
 export type ContentVideoInput = NonNullable<
-  operations["MilosTrainingWeb.AdminContentController.create"]["requestBody"]
+  operations["PaleeWeb.AdminContentController.create"]["requestBody"]
 >["content"]["application/json"];
 
 export async function fetchAdminVideos(token: string) {

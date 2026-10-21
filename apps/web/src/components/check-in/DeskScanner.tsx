@@ -11,7 +11,7 @@ import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey } from "./errors";
 import { CameraError, scannerSource, type StopScanner } from "./scanner";
 
-const AUTO_KEY = "milos:desk-auto-check-in";
+const AUTO_KEY = "palee:desk-auto-check-in";
 const SAME_CODE_MS = 4_000;
 
 function readAuto() {

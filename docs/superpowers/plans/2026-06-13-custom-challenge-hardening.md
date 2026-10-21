@@ -15,29 +15,29 @@
 **New files:**
 - `apps/api/priv/repo/migrations/20260613110000_add_last_increment_event_to_user_challenge_progress.exs`
 - `apps/api/priv/repo/migrations/20260613120000_create_challenge_leaderboard_opt_ins.exs`
-- `apps/api/lib/milos_training/gamification/domain/challenge_rule.ex`
-- `apps/api/lib/milos_training/gamification/domain/challenge_leaderboard.ex`
-- `apps/api/lib/milos_training/gamification/challenge_leaderboard_opt_in.ex`
-- `apps/api/lib/milos_training/application/opt_in_challenge_leaderboard.ex`
-- `apps/api/lib/milos_training/application/opt_out_challenge_leaderboard.ex`
-- `apps/api/lib/milos_training/application/get_challenge_leaderboard.ex`
-- `apps/api/lib/milos_training_web/controllers/challenge_controller.ex`
-- `apps/api/test/milos_training/gamification/domain/challenge_rule_test.exs`
+- `apps/api/lib/palee/gamification/domain/challenge_rule.ex`
+- `apps/api/lib/palee/gamification/domain/challenge_leaderboard.ex`
+- `apps/api/lib/palee/gamification/challenge_leaderboard_opt_in.ex`
+- `apps/api/lib/palee/application/opt_in_challenge_leaderboard.ex`
+- `apps/api/lib/palee/application/opt_out_challenge_leaderboard.ex`
+- `apps/api/lib/palee/application/get_challenge_leaderboard.ex`
+- `apps/api/lib/palee_web/controllers/challenge_controller.ex`
+- `apps/api/test/palee/gamification/domain/challenge_rule_test.exs`
 - `apps/web/src/components/workouts/ChallengeCard.tsx`
 
 **Modified files:**
-- `apps/api/lib/milos_training/gamification/domain/challenge_criteria.ex`
-- `apps/api/lib/milos_training/gamification/domain/challenge_progress.ex`
-- `apps/api/lib/milos_training/gamification/user_challenge_progress.ex`
-- `apps/api/lib/milos_training/gamification/ports/gamification_store.ex`
-- `apps/api/lib/milos_training/gamification/gamification_store.ex`
-- `apps/api/lib/milos_training/gamification.ex`
-- `apps/api/lib/milos_training/infrastructure/gamification/ecto_gamification_store.ex`
-- `apps/api/lib/milos_training/gamification/commands/record_workout_completion.ex`
-- `apps/api/lib/milos_training/application/complete_workout.ex`
-- `apps/api/lib/milos_training/application/get_landing_page.ex`
-- `apps/api/lib/milos_training/application/get_admin_challenge.ex`
-- `apps/api/lib/milos_training_web/router.ex`
+- `apps/api/lib/palee/gamification/domain/challenge_criteria.ex`
+- `apps/api/lib/palee/gamification/domain/challenge_progress.ex`
+- `apps/api/lib/palee/gamification/user_challenge_progress.ex`
+- `apps/api/lib/palee/gamification/ports/gamification_store.ex`
+- `apps/api/lib/palee/gamification/gamification_store.ex`
+- `apps/api/lib/palee/gamification.ex`
+- `apps/api/lib/palee/infrastructure/gamification/ecto_gamification_store.ex`
+- `apps/api/lib/palee/gamification/commands/record_workout_completion.ex`
+- `apps/api/lib/palee/application/complete_workout.ex`
+- `apps/api/lib/palee/application/get_landing_page.ex`
+- `apps/api/lib/palee/application/get_admin_challenge.ex`
+- `apps/api/lib/palee_web/router.ex`
 - `apps/web/src/api/challenges.ts`
 - `apps/web/src/api/landing.ts`
 - `apps/web/src/components/landing-page.tsx`
@@ -56,7 +56,7 @@
 
 ```elixir
 # apps/api/priv/repo/migrations/20260613110000_add_last_increment_event_to_user_challenge_progress.exs
-defmodule MilosTraining.Repo.Migrations.AddLastIncrementEventToUserChallengeProgress do
+defmodule Palee.Repo.Migrations.AddLastIncrementEventToUserChallengeProgress do
   use Ecto.Migration
 
   def change do
@@ -71,7 +71,7 @@ end
 
 ```elixir
 # apps/api/priv/repo/migrations/20260613120000_create_challenge_leaderboard_opt_ins.exs
-defmodule MilosTraining.Repo.Migrations.CreateChallengeLeaderboardOptIns do
+defmodule Palee.Repo.Migrations.CreateChallengeLeaderboardOptIns do
   use Ecto.Migration
 
   def change do
@@ -91,7 +91,7 @@ end
 - [ ] **Step 3: Run migrations in Docker**
 
 ```bash
-docker exec milos-api-1 sh -c "cd /app && mix ecto.migrate"
+docker exec palee-api-1 sh -c "cd /app && mix ecto.migrate"
 ```
 
 Expected output: two migration success lines.
@@ -109,17 +109,17 @@ git commit -m "feat(db): add last_increment_event to challenge progress + leader
 ## Task 2: `ChallengeRule` Domain Module
 
 **Files:**
-- Create: `apps/api/lib/milos_training/gamification/domain/challenge_rule.ex`
-- Create: `apps/api/test/milos_training/gamification/domain/challenge_rule_test.exs`
+- Create: `apps/api/lib/palee/gamification/domain/challenge_rule.ex`
+- Create: `apps/api/test/palee/gamification/domain/challenge_rule_test.exs`
 
 - [ ] **Step 1: Write failing tests**
 
 ```elixir
-# apps/api/test/milos_training/gamification/domain/challenge_rule_test.exs
-defmodule MilosTraining.Gamification.Domain.ChallengeRuleTest do
+# apps/api/test/palee/gamification/domain/challenge_rule_test.exs
+defmodule Palee.Gamification.Domain.ChallengeRuleTest do
   use ExUnit.Case, async: true
 
-  alias MilosTraining.Gamification.Domain.ChallengeRule
+  alias Palee.Gamification.Domain.ChallengeRule
 
   describe "evaluate/2 — workout_type" do
     test "awards points when workout type matches" do
@@ -242,7 +242,7 @@ end
 - [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-cd apps/api && MIX_ENV=test mix test test/milos_training/gamification/domain/challenge_rule_test.exs 2>&1 | head -20
+cd apps/api && MIX_ENV=test mix test test/palee/gamification/domain/challenge_rule_test.exs 2>&1 | head -20
 ```
 
 Expected: compile error — module not found.
@@ -250,8 +250,8 @@ Expected: compile error — module not found.
 - [ ] **Step 3: Implement `ChallengeRule`**
 
 ```elixir
-# apps/api/lib/milos_training/gamification/domain/challenge_rule.ex
-defmodule MilosTraining.Gamification.Domain.ChallengeRule do
+# apps/api/lib/palee/gamification/domain/challenge_rule.ex
+defmodule Palee.Gamification.Domain.ChallengeRule do
   @doc "Returns `points` if the rule's condition is met, 0 otherwise."
   def evaluate(%{"condition" => "workout_type", "type" => type, "points" => points}, facts) do
     if to_string(Map.get(facts, :workout_type)) == to_string(type), do: points, else: 0
@@ -302,7 +302,7 @@ end
 - [ ] **Step 4: Run tests — expect all pass**
 
 ```bash
-cd apps/api && MIX_ENV=test mix test test/milos_training/gamification/domain/challenge_rule_test.exs
+cd apps/api && MIX_ENV=test mix test test/palee/gamification/domain/challenge_rule_test.exs
 ```
 
 Expected: all green.
@@ -310,8 +310,8 @@ Expected: all green.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/gamification/domain/challenge_rule.ex \
-        apps/api/test/milos_training/gamification/domain/challenge_rule_test.exs
+git add apps/api/lib/palee/gamification/domain/challenge_rule.ex \
+        apps/api/test/palee/gamification/domain/challenge_rule_test.exs
 git commit -m "feat(domain): add ChallengeRule — multi-condition points evaluator"
 ```
 
@@ -320,15 +320,15 @@ git commit -m "feat(domain): add ChallengeRule — multi-condition points evalua
 ## Task 3: `ChallengeCriteria` — Rules Format Support
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/gamification/domain/challenge_criteria.ex`
+- Modify: `apps/api/lib/palee/gamification/domain/challenge_criteria.ex`
 
 - [ ] **Step 1: Replace `normalize_value("custom", ...)` and add helpers**
 
 Replace the existing `normalize_value("custom", ...)` clause and add `has_rules?/1` and `rules/1`:
 
 ```elixir
-# Full replacement of apps/api/lib/milos_training/gamification/domain/challenge_criteria.ex
-defmodule MilosTraining.Gamification.Domain.ChallengeCriteria do
+# Full replacement of apps/api/lib/palee/gamification/domain/challenge_criteria.ex
+defmodule Palee.Gamification.Domain.ChallengeCriteria do
   @valid_types ~w(workout_count workout_type_count pr_count custom)
   @training_types ~w(crossfit strength gymnastics aerobics flexibility recovery)
   @rule_conditions ~w(workout_type scale_level pr_beaten weekly_consistency rare_workout_type team_workout_streak)
@@ -484,7 +484,7 @@ Expected: no errors.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/gamification/domain/challenge_criteria.ex
+git add apps/api/lib/palee/gamification/domain/challenge_criteria.ex
 git commit -m "feat(domain): ChallengeCriteria — add rules format + has_rules?/rules/increment_label helpers"
 ```
 
@@ -493,14 +493,14 @@ git commit -m "feat(domain): ChallengeCriteria — add rules format + has_rules?
 ## Task 4: `ChallengeProgress` — Rules Engine
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/gamification/domain/challenge_progress.ex`
+- Modify: `apps/api/lib/palee/gamification/domain/challenge_progress.ex`
 
 - [ ] **Step 1: Replace module entirely**
 
 ```elixir
-# apps/api/lib/milos_training/gamification/domain/challenge_progress.ex
-defmodule MilosTraining.Gamification.Domain.ChallengeProgress do
-  alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeRule}
+# apps/api/lib/palee/gamification/domain/challenge_progress.ex
+defmodule Palee.Gamification.Domain.ChallengeProgress do
+  alias Palee.Gamification.Domain.{ChallengeCriteria, ChallengeRule}
 
   @doc "Advances progress and returns a result map with increment, events, new progress, target, completed?."
   def advance(challenge, progress, completion_facts) do
@@ -592,8 +592,8 @@ defp resolve_team_count(facts, _challenge), do: facts
 Full corrected file:
 
 ```elixir
-defmodule MilosTraining.Gamification.Domain.ChallengeProgress do
-  alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeRule}
+defmodule Palee.Gamification.Domain.ChallengeProgress do
+  alias Palee.Gamification.Domain.{ChallengeCriteria, ChallengeRule}
 
   def advance(challenge, progress, completion_facts) do
     {increment, events} = evaluate(challenge, completion_facts)
@@ -667,7 +667,7 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep -E "^error" | head -10
 - [ ] **Step 3: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/gamification/domain/challenge_progress.ex
+git add apps/api/lib/palee/gamification/domain/challenge_progress.ex
 git commit -m "feat(domain): ChallengeProgress — rules engine, events list, team_workout_count_fn resolver"
 ```
 
@@ -676,14 +676,14 @@ git commit -m "feat(domain): ChallengeProgress — rules engine, events list, te
 ## Task 5: `ChallengeLeaderboard` Domain + `ChallengeLeaderboardOptIn` Schema
 
 **Files:**
-- Create: `apps/api/lib/milos_training/gamification/domain/challenge_leaderboard.ex`
-- Create: `apps/api/lib/milos_training/gamification/challenge_leaderboard_opt_in.ex`
+- Create: `apps/api/lib/palee/gamification/domain/challenge_leaderboard.ex`
+- Create: `apps/api/lib/palee/gamification/challenge_leaderboard_opt_in.ex`
 
 - [ ] **Step 1: Create `ChallengeLeaderboard` domain module**
 
 ```elixir
-# apps/api/lib/milos_training/gamification/domain/challenge_leaderboard.ex
-defmodule MilosTraining.Gamification.Domain.ChallengeLeaderboard do
+# apps/api/lib/palee/gamification/domain/challenge_leaderboard.ex
+defmodule Palee.Gamification.Domain.ChallengeLeaderboard do
   @doc "Adds :rank to each participant. Ties share the same rank."
   def rank([]), do: []
 
@@ -704,8 +704,8 @@ end
 - [ ] **Step 2: Create `ChallengeLeaderboardOptIn` Ecto schema**
 
 ```elixir
-# apps/api/lib/milos_training/gamification/challenge_leaderboard_opt_in.ex
-defmodule MilosTraining.Gamification.ChallengeLeaderboardOptIn do
+# apps/api/lib/palee/gamification/challenge_leaderboard_opt_in.ex
+defmodule Palee.Gamification.ChallengeLeaderboardOptIn do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -731,7 +731,7 @@ end
 
 - [ ] **Step 3: Update `UserChallengeProgress` schema** to add `last_increment_event`
 
-In `apps/api/lib/milos_training/gamification/user_challenge_progress.ex`, add the field and cast:
+In `apps/api/lib/palee/gamification/user_challenge_progress.ex`, add the field and cast:
 
 ```elixir
 schema "user_challenge_progress" do
@@ -764,9 +764,9 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep "^error" | head -10
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/gamification/domain/challenge_leaderboard.ex \
-        apps/api/lib/milos_training/gamification/challenge_leaderboard_opt_in.ex \
-        apps/api/lib/milos_training/gamification/user_challenge_progress.ex
+git add apps/api/lib/palee/gamification/domain/challenge_leaderboard.ex \
+        apps/api/lib/palee/gamification/challenge_leaderboard_opt_in.ex \
+        apps/api/lib/palee/gamification/user_challenge_progress.ex
 git commit -m "feat(domain): ChallengeLeaderboard rank helper + opt-in schema + last_increment_event on progress"
 ```
 
@@ -775,14 +775,14 @@ git commit -m "feat(domain): ChallengeLeaderboard rank helper + opt-in schema + 
 ## Task 6: `GamificationStore` Port + `EctoGamificationStore` + `Gamification` Context
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/gamification/ports/gamification_store.ex`
-- Modify: `apps/api/lib/milos_training/gamification/gamification_store.ex`
-- Modify: `apps/api/lib/milos_training/gamification.ex`
-- Modify: `apps/api/lib/milos_training/infrastructure/gamification/ecto_gamification_store.ex`
+- Modify: `apps/api/lib/palee/gamification/ports/gamification_store.ex`
+- Modify: `apps/api/lib/palee/gamification/gamification_store.ex`
+- Modify: `apps/api/lib/palee/gamification.ex`
+- Modify: `apps/api/lib/palee/infrastructure/gamification/ecto_gamification_store.ex`
 
 - [ ] **Step 1: Add new callbacks to port**
 
-Append to `apps/api/lib/milos_training/gamification/ports/gamification_store.ex`:
+Append to `apps/api/lib/palee/gamification/ports/gamification_store.ex`:
 
 ```elixir
   @callback opt_in_challenge_leaderboard(user_id :: Ecto.UUID.t(), challenge_id :: Ecto.UUID.t()) ::
@@ -794,7 +794,7 @@ Append to `apps/api/lib/milos_training/gamification/ports/gamification_store.ex`
 
 - [ ] **Step 2: Add delegations to `GamificationStore` boundary module**
 
-In `apps/api/lib/milos_training/gamification/gamification_store.ex`, the module delegates to the adapter. Add:
+In `apps/api/lib/palee/gamification/gamification_store.ex`, the module delegates to the adapter. Add:
 
 ```elixir
 defdelegate opt_in_challenge_leaderboard(user_id, challenge_id), to: store()
@@ -807,7 +807,7 @@ defdelegate list_challenge_leaderboard_participants(challenge_id), to: store()
 
 - [ ] **Step 3: Add delegations to `Gamification` context facade**
 
-In `apps/api/lib/milos_training/gamification.ex`, find existing `defdelegate` calls and add:
+In `apps/api/lib/palee/gamification.ex`, find existing `defdelegate` calls and add:
 
 ```elixir
 defdelegate opt_in_challenge_leaderboard(user_id, challenge_id), to: GamificationStore
@@ -818,11 +818,11 @@ defdelegate list_challenge_leaderboard_participants(challenge_id), to: Gamificat
 
 - [ ] **Step 4: Implement new callbacks in `EctoGamificationStore`**
 
-Add the following to `apps/api/lib/milos_training/infrastructure/gamification/ecto_gamification_store.ex`:
+Add the following to `apps/api/lib/palee/infrastructure/gamification/ecto_gamification_store.ex`:
 
 First, add `ChallengeLeaderboardOptIn` to the existing alias block at the top:
 ```elixir
-alias MilosTraining.Gamification.{
+alias Palee.Gamification.{
   ChallengeLeaderboardOptIn,   # ADD
   GamificationSetting,
   LeaderboardOptIn,
@@ -910,10 +910,10 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep "^error" | head -10
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/gamification/ports/gamification_store.ex \
-        apps/api/lib/milos_training/gamification/gamification_store.ex \
-        apps/api/lib/milos_training/gamification.ex \
-        apps/api/lib/milos_training/infrastructure/gamification/ecto_gamification_store.ex
+git add apps/api/lib/palee/gamification/ports/gamification_store.ex \
+        apps/api/lib/palee/gamification/gamification_store.ex \
+        apps/api/lib/palee/gamification.ex \
+        apps/api/lib/palee/infrastructure/gamification/ecto_gamification_store.ex
 git commit -m "feat(infra): challenge leaderboard opt-in store operations + last_increment_event in progress"
 ```
 
@@ -922,22 +922,22 @@ git commit -m "feat(infra): challenge leaderboard opt-in store operations + last
 ## Task 7: `RecordWorkoutCompletion` — Extended Facts + Increments
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/gamification/commands/record_workout_completion.ex`
+- Modify: `apps/api/lib/palee/gamification/commands/record_workout_completion.ex`
 
 - [ ] **Step 1: Replace `call/1` body and `persist_challenge_progress`**
 
-Full replacement of `apps/api/lib/milos_training/gamification/commands/record_workout_completion.ex`:
+Full replacement of `apps/api/lib/palee/gamification/commands/record_workout_completion.ex`:
 
 ```elixir
-defmodule MilosTraining.Gamification.Commands.RecordWorkoutCompletion do
-  alias MilosTraining.Gamification.Domain.{
+defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
+  alias Palee.Gamification.Domain.{
     AchievementRules,
     ChallengeProgress,
     PRDetector,
     StreakCalculator
   }
 
-  alias MilosTraining.Gamification.GamificationStore
+  alias Palee.Gamification.GamificationStore
 
   def call(%{
         execution:
@@ -1239,7 +1239,7 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep "^error" | head -10
 - [ ] **Step 3: Run existing gamification tests**
 
 ```bash
-cd apps/api && MIX_ENV=test mix test test/milos_training/gamification/ --timeout 30000
+cd apps/api && MIX_ENV=test mix test test/palee/gamification/ --timeout 30000
 ```
 
 Expected: existing tests still pass (the public `call/1` interface is unchanged from callers' perspective).
@@ -1247,7 +1247,7 @@ Expected: existing tests still pass (the public `call/1` interface is unchanged 
 - [ ] **Step 4: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/gamification/commands/record_workout_completion.ex
+git add apps/api/lib/palee/gamification/commands/record_workout_completion.ex
 git commit -m "feat(app): RecordWorkoutCompletion — extended completion_facts, challenge_increments, rules engine wiring"
 ```
 
@@ -1256,7 +1256,7 @@ git commit -m "feat(app): RecordWorkoutCompletion — extended completion_facts,
 ## Task 8: `GetLandingPage` — Bug Fix + Enrichment
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/application/get_landing_page.ex`
+- Modify: `apps/api/lib/palee/application/get_landing_page.ex`
 
 - [ ] **Step 1: Replace the active_challenges mapping block**
 
@@ -1317,7 +1317,7 @@ active_challenges =
 
 Add the needed aliases at the top of `GetLandingPage`:
 ```elixir
-alias MilosTraining.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
+alias Palee.Gamification.Domain.{ChallengeCriteria, ChallengeProgress}
 ```
 
 - [ ] **Step 2: Compile check**
@@ -1329,7 +1329,7 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep "^error" | head -10
 - [ ] **Step 3: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/get_landing_page.ex
+git add apps/api/lib/palee/application/get_landing_page.ex
 git commit -m "fix(app): GetLandingPage — use ChallengeProgress.target, expose increment semantics + is_opted_in + completions_remaining"
 ```
 
@@ -1338,18 +1338,18 @@ git commit -m "fix(app): GetLandingPage — use ChallengeProgress.target, expose
 ## Task 9: Hall of Fame Application Services + `CompleteWorkout` Broadcast + `GetAdminChallenge`
 
 **Files:**
-- Create: `apps/api/lib/milos_training/application/opt_in_challenge_leaderboard.ex`
-- Create: `apps/api/lib/milos_training/application/opt_out_challenge_leaderboard.ex`
-- Create: `apps/api/lib/milos_training/application/get_challenge_leaderboard.ex`
-- Modify: `apps/api/lib/milos_training/application/complete_workout.ex`
-- Modify: `apps/api/lib/milos_training/application/get_admin_challenge.ex`
+- Create: `apps/api/lib/palee/application/opt_in_challenge_leaderboard.ex`
+- Create: `apps/api/lib/palee/application/opt_out_challenge_leaderboard.ex`
+- Create: `apps/api/lib/palee/application/get_challenge_leaderboard.ex`
+- Modify: `apps/api/lib/palee/application/complete_workout.ex`
+- Modify: `apps/api/lib/palee/application/get_admin_challenge.ex`
 
 - [ ] **Step 1: `OptInChallengeLeaderboard`**
 
 ```elixir
-# apps/api/lib/milos_training/application/opt_in_challenge_leaderboard.ex
-defmodule MilosTraining.Application.OptInChallengeLeaderboard do
-  alias MilosTraining.Gamification
+# apps/api/lib/palee/application/opt_in_challenge_leaderboard.ex
+defmodule Palee.Application.OptInChallengeLeaderboard do
+  alias Palee.Gamification
 
   def call(user_id, challenge_id) do
     case Gamification.get_challenge(challenge_id) do
@@ -1363,9 +1363,9 @@ end
 - [ ] **Step 2: `OptOutChallengeLeaderboard`**
 
 ```elixir
-# apps/api/lib/milos_training/application/opt_out_challenge_leaderboard.ex
-defmodule MilosTraining.Application.OptOutChallengeLeaderboard do
-  alias MilosTraining.Gamification
+# apps/api/lib/palee/application/opt_out_challenge_leaderboard.ex
+defmodule Palee.Application.OptOutChallengeLeaderboard do
+  alias Palee.Gamification
 
   def call(user_id, challenge_id) do
     Gamification.opt_out_challenge_leaderboard(user_id, challenge_id)
@@ -1377,10 +1377,10 @@ end
 - [ ] **Step 3: `GetChallengeLeaderboard`**
 
 ```elixir
-# apps/api/lib/milos_training/application/get_challenge_leaderboard.ex
-defmodule MilosTraining.Application.GetChallengeLeaderboard do
-  alias MilosTraining.{Gamification, Identity}
-  alias MilosTraining.Gamification.Domain.{ChallengeLeaderboard, ChallengeProgress}
+# apps/api/lib/palee/application/get_challenge_leaderboard.ex
+defmodule Palee.Application.GetChallengeLeaderboard do
+  alias Palee.{Gamification, Identity}
+  alias Palee.Gamification.Domain.{ChallengeLeaderboard, ChallengeProgress}
 
   def call(challenge_id, requesting_user_id) do
     with challenge when not is_nil(challenge) <- Gamification.get_challenge(challenge_id) do
@@ -1427,7 +1427,7 @@ end
 Note: `Identity.list_users_by_ids/1` may not exist yet. Check and add it:
 
 ```bash
-grep -n "list_users_by_ids\|list_all_users\|list_by_ids" /home/rodochrousbisbiki/MyApps/milos/apps/api/lib/milos_training/identity.ex | head -10
+grep -n "list_users_by_ids\|list_all_users\|list_by_ids" /home/rodochrousbisbiki/MyApps/milos/apps/api/lib/palee/identity.ex | head -10
 ```
 
 If `list_users_by_ids/1` doesn't exist, add to `Identity`:
@@ -1444,7 +1444,7 @@ Find the existing user normalization pattern and use it.
 
 - [ ] **Step 4: Update `CompleteWorkout` to broadcast `challenge_increments`**
 
-In `apps/api/lib/milos_training/application/complete_workout.ex`, update `process_completion/1`:
+In `apps/api/lib/palee/application/complete_workout.ex`, update `process_completion/1`:
 
 ```elixir
 def process_completion(%{user_id: user_id} = execution) do
@@ -1497,7 +1497,7 @@ end
 
 - [ ] **Step 5: Update `GetAdminChallenge` participant rows**
 
-In `apps/api/lib/milos_training/application/get_admin_challenge.ex`, update `normalize_participant/3`:
+In `apps/api/lib/palee/application/get_admin_challenge.ex`, update `normalize_participant/3`:
 
 ```elixir
 defp normalize_participant(user, progress_rows, challenge) do
@@ -1533,7 +1533,7 @@ defp normalize_participant(user, progress_rows, challenge) do
 end
 
 defp effective_increment(challenge) do
-  alias MilosTraining.Gamification.Domain.ChallengeCriteria
+  alias Palee.Gamification.Domain.ChallengeCriteria
 
   if ChallengeCriteria.has_rules?(challenge.criteria_value) do
     rules = ChallengeCriteria.rules(challenge.criteria_value)
@@ -1544,7 +1544,7 @@ defp effective_increment(challenge) do
 end
 ```
 
-Add the alias at the top: `alias MilosTraining.Gamification.Domain.{ChallengeProgress}` (already present) and `ChallengeCriteria`.
+Add the alias at the top: `alias Palee.Gamification.Domain.{ChallengeProgress}` (already present) and `ChallengeCriteria`.
 
 - [ ] **Step 6: Compile check**
 
@@ -1555,11 +1555,11 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep "^error" | head -10
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/opt_in_challenge_leaderboard.ex \
-        apps/api/lib/milos_training/application/opt_out_challenge_leaderboard.ex \
-        apps/api/lib/milos_training/application/get_challenge_leaderboard.ex \
-        apps/api/lib/milos_training/application/complete_workout.ex \
-        apps/api/lib/milos_training/application/get_admin_challenge.ex
+git add apps/api/lib/palee/application/opt_in_challenge_leaderboard.ex \
+        apps/api/lib/palee/application/opt_out_challenge_leaderboard.ex \
+        apps/api/lib/palee/application/get_challenge_leaderboard.ex \
+        apps/api/lib/palee/application/complete_workout.ex \
+        apps/api/lib/palee/application/get_admin_challenge.ex
 git commit -m "feat(app): Hall of Fame services, CompleteWorkout broadcast, GetAdminChallenge completions_done/remaining"
 ```
 
@@ -1568,25 +1568,25 @@ git commit -m "feat(app): Hall of Fame services, CompleteWorkout broadcast, GetA
 ## Task 10: API Layer — `ChallengeController` + Router
 
 **Files:**
-- Create: `apps/api/lib/milos_training_web/controllers/challenge_controller.ex`
-- Modify: `apps/api/lib/milos_training_web/router.ex`
+- Create: `apps/api/lib/palee_web/controllers/challenge_controller.ex`
+- Modify: `apps/api/lib/palee_web/router.ex`
 
 - [ ] **Step 1: Create `ChallengeController`**
 
 ```elixir
-# apps/api/lib/milos_training_web/controllers/challenge_controller.ex
-defmodule MilosTrainingWeb.ChallengeController do
-  use MilosTrainingWeb, :controller
+# apps/api/lib/palee_web/controllers/challenge_controller.ex
+defmodule PaleeWeb.ChallengeController do
+  use PaleeWeb, :controller
 
   alias Guardian.Plug, as: GuardianPlug
 
-  alias MilosTraining.Application.{
+  alias Palee.Application.{
     GetChallengeLeaderboard,
     OptInChallengeLeaderboard,
     OptOutChallengeLeaderboard
   }
 
-  action_fallback MilosTrainingWeb.FallbackController
+  action_fallback PaleeWeb.FallbackController
 
   def leaderboard(conn, %{"id" => id}) do
     current_user = GuardianPlug.current_resource(conn)
@@ -1614,7 +1614,7 @@ end
 
 - [ ] **Step 2: Add routes to router**
 
-In `apps/api/lib/milos_training_web/router.ex`, find the `scope "/api"` block with `pipe_through([:api, :authenticated, :user_only])` and add three new routes:
+In `apps/api/lib/palee_web/router.ex`, find the `scope "/api"` block with `pipe_through([:api, :authenticated, :user_only])` and add three new routes:
 
 ```elixir
     get("/challenges/:id/leaderboard", ChallengeController, :leaderboard)
@@ -1631,7 +1631,7 @@ cd apps/api && MIX_ENV=test mix compile 2>&1 | grep "^error" | head -10
 - [ ] **Step 4: Run controller tests**
 
 ```bash
-cd apps/api && MIX_ENV=test mix test test/milos_training_web/controllers/admin_challenge_controller_test.exs
+cd apps/api && MIX_ENV=test mix test test/palee_web/controllers/admin_challenge_controller_test.exs
 ```
 
 Expected: existing tests pass.
@@ -1639,8 +1639,8 @@ Expected: existing tests pass.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training_web/controllers/challenge_controller.ex \
-        apps/api/lib/milos_training_web/router.ex
+git add apps/api/lib/palee_web/controllers/challenge_controller.ex \
+        apps/api/lib/palee_web/router.ex
 git commit -m "feat(api): ChallengeController — leaderboard, opt_in, opt_out endpoints"
 ```
 
@@ -2591,7 +2591,7 @@ Expected: all tests pass.
 - [ ] **Step 2: Verify Docker API is healthy**
 
 ```bash
-docker exec milos-api-1 sh -c "cd /app && mix ecto.migrate" && docker ps --format "table {{.Names}}\t{{.Status}}" | grep api
+docker exec palee-api-1 sh -c "cd /app && mix ecto.migrate" && docker ps --format "table {{.Names}}\t{{.Status}}" | grep api
 ```
 
 Expected: migration already applied (0 pending), API container shows healthy.

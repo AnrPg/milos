@@ -1,4 +1,4 @@
-# Kickoff prompt: implementing the Milos product vision
+# Kickoff prompt: implementing the Palee product vision
 
 ## Setup before starting the agent
 1. **Branch:** work on `redesign/social-centered`, which is cut from `main` after PRs #2 and #3. The pre-redesign product is frozen as release **`v1.0.0`**, and the redesign will ship as **`v2.0.0`**. Each roadmap phase gets its own short-lived branch off `redesign/social-centered` (for example `redesign/p1-<milestone>`), merged back through PRs.
@@ -8,8 +8,8 @@
 4. **CLAUDE.md:** add a pointer so every future session loads the brief:
    ```
    ## Product direction
-   Member-app work must follow docs/product/2026-10-15-milos-product-vision-and-ia.md (source of truth)
-   and docs/product/mockups/milos-ia-mockup.html. milos-bottom-bar-exploration.html is SUPERSEDED.
+   Member-app work must follow docs/product/2026-10-15-palee-product-vision-and-ia.md (source of truth)
+   and docs/product/mockups/palee-ia-mockup.html. palee-bottom-bar-exploration.html is SUPERSEDED.
    ```
    Note: the current `.claude/CLAUDE.md` mandates the `vexp` MCP (`run_pipeline`). Make sure that server is connected in the session, or relax that rule. Otherwise the agent will be blocked from searching.
 5. **Fast checks:** make sure the agent can run the repo's lint, typecheck and test commands (web: Next.js/TS; api: Elixir/mix). If cloud sessions are used, add a SessionStart hook that installs dependencies.
@@ -20,13 +20,13 @@
 ## The prompt (copy-paste)
 
 ```
-You are the lead engineer implementing a product re-architecture of Milos (Next.js PWA in apps/web, Elixir/Phoenix API in apps/api).
+You are the lead engineer implementing a product re-architecture of Palee (Next.js PWA in apps/web, Elixir/Phoenix API in apps/api).
 
 SOURCE OF TRUTH — read fully before anything else:
-- docs/product/2026-10-15-milos-product-vision-and-ia.md  (business + engineering brief; its §4 principles are non-negotiable)
-- docs/product/mockups/milos-ia-mockup.html  (final clickable design; screenshots in docs/product/mockups/screens/)
+- docs/product/2026-10-15-palee-product-vision-and-ia.md  (business + engineering brief; its §4 principles are non-negotiable)
+- docs/product/mockups/palee-ia-mockup.html  (final clickable design; screenshots in docs/product/mockups/screens/)
 - docs/product/mockups/README.md
-IGNORE as a spec: docs/product/mockups/milos-bottom-bar-exploration.html (superseded, reasoning only).
+IGNORE as a spec: docs/product/mockups/palee-bottom-bar-exploration.html (superseded, reasoning only).
 
 BRANCH & VERSIONS: work on branch redesign/social-centered (baseline = release tag v1.0.0; the redesign ships as v2.0.0). The brief's roadmap "v1/v2/v3" = Phase 1/2/3 of the redesign — use the Phase names in plans/commits to avoid confusion with release tags. Ignore other redesign/* branches unless I mention them.
 

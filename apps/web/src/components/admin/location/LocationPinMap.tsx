@@ -75,12 +75,12 @@ export default function LocationPinMap({
     const at: [number, number] = [pin.longitude, pin.latitude];
     if (!marker.current) {
       const element = document.createElement("div");
-      element.className = "milos-map-pin";
+      element.className = "palee-map-pin";
       element.dataset.selected = "true";
       const text = document.createElement("span");
-      text.className = "milos-map-pin__label";
+      text.className = "palee-map-pin__label";
       const dot = document.createElement("span");
-      dot.className = "milos-map-pin__dot";
+      dot.className = "palee-map-pin__dot";
       element.append(text, dot);
       labelElement.current = text;
       const created = new maplibregl.Marker({ element, anchor: "bottom", draggable: true }).setLngLat(at).addTo(instance);

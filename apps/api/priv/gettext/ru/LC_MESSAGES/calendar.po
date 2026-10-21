@@ -25,11 +25,11 @@ msgstr "Назначенная тренировка"
 msgid "Workout: %{title}"
 msgstr "Тренировка: %{title}"
 
-msgid "Assigned workout in TrainingJournal."
-msgstr "Назначенная тренировка в TrainingJournal."
+msgid "Assigned workout in Palee."
+msgstr "Назначенная тренировка в Palee."
 
-msgid "Scheduled %{name} class in TrainingJournal."
-msgstr "Запланированное занятие %{name} в TrainingJournal."
+msgid "Scheduled %{name} class in Palee."
+msgstr "Запланированное занятие %{name} в Palee."
 
 msgid "Pending"
 msgstr "В ожидании"
@@ -40,8 +40,8 @@ msgstr "Одобренный"
 msgid "Scheduled"
 msgstr "Запланировано"
 
-msgid "TrainingJournal class booking status: %{status}."
-msgstr "Статус бронирования занятий TrainingJournal: %{status}."
+msgid "Palee class booking status: %{status}."
+msgstr "Статус бронирования занятий Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Пробное занятие в %{box}: %{name}"

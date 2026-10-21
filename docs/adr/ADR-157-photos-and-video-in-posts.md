@@ -113,7 +113,7 @@ reads to one query per source.
 ## Implementation Notes
 Migration `20261027100000_post_media` (columns on both media tables and on
 `community_posts`/`community_profile_posts`, functions
-`milos_dangling_post_media`, `milos_stale_post_media`). Config:
+`palee_dangling_post_media`, `palee_stale_post_media`). Config:
 `:image_processor`, `:video_transcoder`, `:image_describer`; env
 `GEMINI_API_KEY`, `GEMINI_VISION_MODEL`. Tests of the real adapters are
 tagged `:imagemagick` / `:ffmpeg` and skipped where the tools are missing.

@@ -38,7 +38,7 @@ const document: ExportDocument = {
   title: "Deadlift",
   metadata: [],
   sections: [],
-  footer: "TrainingJournal",
+  footer: "Palee",
 };
 
 describe("ShareExportDialog", () => {

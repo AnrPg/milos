@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddInvoiceIssuedNotificationType do
+defmodule Palee.Repo.Migrations.AddInvoiceIssuedNotificationType do
   use Ecto.Migration
 
   @types_with_invoice [

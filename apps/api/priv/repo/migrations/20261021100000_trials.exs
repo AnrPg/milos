@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.Trials do
+defmodule Palee.Repo.Migrations.Trials do
   use Ecto.Migration
 
   # ADR-144 (P2-M3): a person who is not a member tries a class, inside the
@@ -191,7 +191,7 @@ defmodule MilosTraining.Repo.Migrations.Trials do
     # which boxes the signed-in person (app.user_id, never a parameter) has
     # their own conversation, and each is then read in that box's scope.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_my_box_conversation_organization_ids()
+    CREATE OR REPLACE FUNCTION palee_my_box_conversation_organization_ids()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -209,7 +209,7 @@ defmodule MilosTraining.Repo.Migrations.Trials do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_my_box_conversation_organization_ids()")
+    execute("DROP FUNCTION IF EXISTS palee_my_box_conversation_organization_ids()")
     replace_notification_types(@notification_types)
     drop table(:scheduling_trial_requests)
     drop table(:scheduling_trial_policies)

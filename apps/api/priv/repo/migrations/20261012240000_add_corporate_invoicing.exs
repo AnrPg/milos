@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddCorporateInvoicing do
+defmodule Palee.Repo.Migrations.AddCorporateInvoicing do
   use Ecto.Migration
 
   # ADR-098 corporate invoicing: payment terms and automatic invoicing per
@@ -77,7 +77,7 @@ defmodule MilosTraining.Repo.Migrations.AddCorporateInvoicing do
     execute("""
     CREATE TRIGGER finance_corporate_payments_apply_tenant_context
     BEFORE INSERT OR UPDATE ON finance_corporate_payments
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

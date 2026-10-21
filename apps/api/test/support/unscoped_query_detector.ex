@@ -1,6 +1,6 @@
-defmodule MilosTraining.UnscopedQueryDetector do
+defmodule Palee.UnscopedQueryDetector do
   @moduledoc """
-  TD-092 diagnostic (opt-in with `MILOS_TEST_DETECT_UNSCOPED=1`): records every
+  TD-092 diagnostic (opt-in with `PALEE_TEST_DETECT_UNSCOPED=1`): records every
   Ecto query that a ConnCase request issues against a forced-RLS table while
   the session carries no scope at all (`app.organization_id` and `app.user_id`
   both empty). Under the production runtime role such a query reads nothing or
@@ -15,14 +15,14 @@ defmodule MilosTraining.UnscopedQueryDetector do
   @flag {__MODULE__, :active}
   @busy {__MODULE__, :busy}
 
-  def enabled?, do: System.get_env("MILOS_TEST_DETECT_UNSCOPED") == "1"
+  def enabled?, do: System.get_env("PALEE_TEST_DETECT_UNSCOPED") == "1"
 
   def start do
     :ets.new(@table, [:named_table, :public, :bag])
 
     :telemetry.attach(
       "td092-unscoped-query-detector",
-      [:milos_training, :repo, :query],
+      [:palee, :repo, :query],
       &__MODULE__.handle/4,
       nil
     )
@@ -51,7 +51,7 @@ defmodule MilosTraining.UnscopedQueryDetector do
 
       try do
         case Ecto.Adapters.SQL.query(
-               MilosTraining.Repo,
+               Palee.Repo,
                "SELECT current_setting('app.organization_id', true), current_setting('app.user_id', true)",
                []
              ) do
@@ -80,7 +80,7 @@ defmodule MilosTraining.UnscopedQueryDetector do
       nil ->
         %{rows: rows} =
           Ecto.Adapters.SQL.query!(
-            MilosTraining.Repo,
+            Palee.Repo,
             "SELECT relname::text FROM pg_class WHERE relkind = 'r' AND relrowsecurity AND relforcerowsecurity",
             []
           )
@@ -100,12 +100,12 @@ defmodule MilosTraining.UnscopedQueryDetector do
       nil ->
         %{rows: rows} =
           Ecto.Adapters.SQL.query!(
-            MilosTraining.Repo,
+            Palee.Repo,
             """
             SELECT tablename::text FROM pg_policies
             GROUP BY tablename
             HAVING bool_and(coalesce(qual, '') NOT LIKE '%app.user_id%'
-                            AND coalesce(qual, '') NOT LIKE '%milos_%')
+                            AND coalesce(qual, '') NOT LIKE '%palee_%')
             """,
             []
           )
@@ -126,7 +126,7 @@ defmodule MilosTraining.UnscopedQueryDetector do
     |> Enum.filter(fn {module, _fun, _arity, location} ->
       file = to_string(location[:file] || "")
 
-      String.starts_with?(Atom.to_string(module), "Elixir.MilosTraining") and
+      String.starts_with?(Atom.to_string(module), "Elixir.Palee") and
         String.starts_with?(file, "lib/") and not String.contains?(file, "infrastructure/") and
         module != __MODULE__
     end)

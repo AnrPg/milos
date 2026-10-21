@@ -9,7 +9,7 @@ import { useExecutionStore } from "@/stores/execution";
  * pending, so the normal sync sends them) and removed from the queue.
  * Remove this module once that release has been out long enough.
  */
-const DATABASE = "milos-offline-execution-v1";
+const DATABASE = "palee-offline-execution-v1";
 const STORE = "progress-operations";
 
 type LegacyCheckoff = {

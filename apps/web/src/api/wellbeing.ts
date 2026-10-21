@@ -2,26 +2,26 @@ import { apiRequest } from "@/api/client";
 import type { operations } from "@/api/generated/schema";
 
 type MyInjuriesResponse =
-  operations["MilosTrainingWeb.WellbeingController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.WellbeingController.index"]["responses"][200]["content"]["application/json"];
 type ReportInjuryResponse =
-  operations["MilosTrainingWeb.WellbeingController.create"]["responses"][201]["content"]["application/json"];
+  operations["PaleeWeb.WellbeingController.create"]["responses"][201]["content"]["application/json"];
 type HealMyInjuryResponse =
-  operations["MilosTrainingWeb.WellbeingController.heal"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.WellbeingController.heal"]["responses"][200]["content"]["application/json"];
 type AdminInjuriesResponse =
-  operations["MilosTrainingWeb.AdminWellbeingController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.AdminWellbeingController.index"]["responses"][200]["content"]["application/json"];
 type AdminReportInjuryResponse =
-  operations["MilosTrainingWeb.AdminWellbeingController.create"]["responses"][201]["content"]["application/json"];
+  operations["PaleeWeb.AdminWellbeingController.create"]["responses"][201]["content"]["application/json"];
 type AdminHealInjuryResponse =
-  operations["MilosTrainingWeb.AdminWellbeingController.heal"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.AdminWellbeingController.heal"]["responses"][200]["content"]["application/json"];
 
 export type InjuryRecord = MyInjuriesResponse["injuries"][number];
 export type ReportInjuryRequest =
-  operations["MilosTrainingWeb.WellbeingController.create"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.WellbeingController.create"]["requestBody"]["content"]["application/json"];
 export type AdminInjuryFilters = NonNullable<
-  operations["MilosTrainingWeb.AdminWellbeingController.index"]["parameters"]["query"]
+  operations["PaleeWeb.AdminWellbeingController.index"]["parameters"]["query"]
 >;
 export type AdminReportInjuryRequest =
-  operations["MilosTrainingWeb.AdminWellbeingController.create"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.AdminWellbeingController.create"]["requestBody"]["content"]["application/json"];
 
 export async function fetchMyInjuries(token: string) {
   return apiRequest<MyInjuriesResponse>("/wellbeing/injuries", { token });
@@ -70,15 +70,15 @@ export async function adminMarkInjuryHealed(token: string, injuryId: string) {
 
 // ADR-140 §2 Πώς νιώθω: immutable, timestamped check-ins.
 type CheckInTimelineResponse =
-  operations["MilosTrainingWeb.CheckInController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.CheckInController.index"]["responses"][200]["content"]["application/json"];
 type SubmitCheckInResponse =
-  operations["MilosTrainingWeb.CheckInController.create"]["responses"][201]["content"]["application/json"];
+  operations["PaleeWeb.CheckInController.create"]["responses"][201]["content"]["application/json"];
 
 export type CheckInTimeline = CheckInTimelineResponse;
 export type CheckInRecord = CheckInTimelineResponse["check_ins"][number];
 export type CheckInQuestion = CheckInTimelineResponse["questions"][number];
 export type SubmitCheckInRequest =
-  operations["MilosTrainingWeb.CheckInController.create"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.CheckInController.create"]["requestBody"]["content"]["application/json"];
 
 export async function fetchMyCheckIns(token: string, window: { from: string; to: string }) {
   const params = new URLSearchParams(window);
@@ -95,9 +95,9 @@ export async function deleteMyCheckIn(token: string, checkInId: string) {
 
 // ADR-140 §3: injury updates and reopenings are timestamped timeline events.
 type UpdateInjuryResponse =
-  operations["MilosTrainingWeb.WellbeingController.update"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.WellbeingController.update"]["responses"][200]["content"]["application/json"];
 export type InjuryUpdateRequest =
-  operations["MilosTrainingWeb.WellbeingController.update"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.WellbeingController.update"]["requestBody"]["content"]["application/json"];
 
 export async function updateMyInjury(token: string, injuryId: string, body: InjuryUpdateRequest) {
   return apiRequest<UpdateInjuryResponse>(`/wellbeing/injuries/${injuryId}`, { method: "PATCH", token, body });

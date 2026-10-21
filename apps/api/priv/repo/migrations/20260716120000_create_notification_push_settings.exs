@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateNotificationPushSettings do
+defmodule Palee.Repo.Migrations.CreateNotificationPushSettings do
   use Ecto.Migration
 
   def change do

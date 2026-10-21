@@ -6,7 +6,7 @@ import type { View } from "@/lib/role-navigation";
 
 // "My training" (ADR-103): a staff member who is also a client of the gym
 // switches the whole app to their client pages and back. Per browser.
-const KEY = "milos.view";
+const KEY = "palee.view";
 const listeners = new Set<() => void>();
 
 function read(): View {

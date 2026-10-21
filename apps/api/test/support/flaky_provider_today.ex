@@ -1,17 +1,17 @@
-defmodule MilosTraining.FlakyProviderToday do
+defmodule Palee.FlakyProviderToday do
   @moduledoc """
   A `Ports.ProviderToday` for tests: providers whose id is stored under
   `:failing_today_providers` raise; the rest answer as in production.
   """
 
-  @behaviour MilosTraining.Application.Ports.ProviderToday
+  @behaviour Palee.Application.Ports.ProviderToday
 
-  alias MilosTraining.Application.ProviderTodayItems
+  alias Palee.Application.ProviderTodayItems
 
   @impl true
   def items(tenant, user_id, date, timezone) do
     if tenant.organization_id in Application.get_env(
-         :milos_training,
+         :palee,
          :failing_today_providers,
          []
        ),

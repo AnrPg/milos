@@ -1,4 +1,4 @@
-defmodule MilosTraining.TestSupport.TelemetryCapture do
+defmodule Palee.TestSupport.TelemetryCapture do
   @moduledoc """
   Forwards telemetry events emitted by the calling test process (and only that
   process, so async tests do not observe each other) as

@@ -7,9 +7,9 @@ import { fetchPublicTheme } from "@/api/theme";
 import { useSession } from "@/components/session-provider";
 import { applyTheme, DEFAULT_THEME_SLUG, normalizeThemeSlug, THEME_STORAGE_KEY } from "@/lib/theme";
 
-export const THEME_UPDATED_EVENT = "milos:theme-updated";
-export const PERSONAL_THEME_EVENT = "milos:personal-theme";
-const PERSONAL_THEME_STORAGE_KEY = "milos:personal-theme-slug";
+export const THEME_UPDATED_EVENT = "palee:theme-updated";
+export const PERSONAL_THEME_EVENT = "palee:personal-theme";
+const PERSONAL_THEME_STORAGE_KEY = "palee:personal-theme-slug";
 
 function readPersonalTheme(): string | null {
   try {

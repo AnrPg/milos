@@ -15,7 +15,7 @@ The pieces already exist, each in its own gym's tenant:
 - open clubs (ADR-143)
 - trials (ADR-144)
 - saved filters (ADR-151)
-- PostGIS points on `facility_locations` (`milos_geo_point`, GiST)
+- PostGIS points on `facility_locations` (`palee_geo_point`, GiST)
 
 Discovery has to read across gyms without loosening tenant RLS. It must never
 show where a person is.
@@ -61,15 +61,15 @@ free text.
    `remember: false`.
 5. **Discovery through narrow definer functions, not a read model.**
    - **Matchers** are inlinable SQL with invoker rights:
-     - `milos_around_host_places`
-     - `milos_around_match_events` / `_boxes` / `_clubs` / `_posts`
-     - `milos_around_tags_match`
+     - `palee_around_host_places`
+     - `palee_around_match_events` / `_boxes` / `_clubs` / `_posts`
+     - `palee_around_tags_match`
    - **SECURITY DEFINER wrappers** call the matchers (ADR-131 §2 pattern):
-     - `milos_around_events` / `_boxes` / `_clubs` / `_posts` for keyset
+     - `palee_around_events` / `_boxes` / `_clubs` / `_posts` for keyset
        pages with `count(*) OVER ()`
-     - `milos_around_counts` for counts per radius, computed in one pass
-     - `milos_around_pins` for the capped map list
-     - `milos_around_alert_candidates`
+     - `palee_around_counts` for counts per radius, computed in one pass
+     - `palee_around_pins` for the capped map list
+     - `palee_around_alert_candidates`
 
    They return ids, distances and public card fields only. Cards are then
    read through the existing presenters, either in the person's session or
@@ -182,7 +182,7 @@ free text.
   - Boxes and clubs: `facility_locations_point_index`.
   - Posts: `community_posts_public_organization_index`, with
     `places_neighbourhoods_point_index` for people's posts.
-  - Timings: 3 km events in about 9 ms; the full `milos_around_pins`
+  - Timings: 3 km events in about 9 ms; the full `palee_around_pins`
     definer in about 12 ms.
 - The first integration run found that `organization_public_profiles` draft
   columns (`disciplines`, …) and `places_neighbourhoods.radius_m` were

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddMessageClientOperationId do
+defmodule Palee.Repo.Migrations.AddMessageClientOperationId do
   use Ecto.Migration
 
   def change do

@@ -281,10 +281,10 @@ export function useSavedFilterActions() {
 
 const subscribeStorage = (onChange: () => void) => {
   window.addEventListener("storage", onChange);
-  window.addEventListener("milos:home-scope", onChange);
+  window.addEventListener("palee:home-scope", onChange);
   return () => {
     window.removeEventListener("storage", onChange);
-    window.removeEventListener("milos:home-scope", onChange);
+    window.removeEventListener("palee:home-scope", onChange);
   };
 };
 
@@ -313,7 +313,7 @@ export function useHomeScope() {
   const setScope = useCallback(
     (scope: HomeScope) => {
       writeStored(SCOPE_STORAGE_KEY, scope);
-      window.dispatchEvent(new Event("milos:home-scope"));
+      window.dispatchEvent(new Event("palee:home-scope"));
       if (!token) return;
       const current = queryClient.getQueryData<SavedFilters>(FEED_PREFS_KEY(token));
       const params = { ...(current?.last_used ?? {}), scope };

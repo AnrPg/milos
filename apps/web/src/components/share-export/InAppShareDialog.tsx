@@ -87,7 +87,7 @@ export function InAppShareDialog({
         <div className="flex items-start justify-between gap-4">
           <div className="min-w-0">
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>
-              {i18n("shareInMilos")}
+              {i18n("shareInPalee")}
             </p>
             <h2 id={titleId} className="mt-1 truncate text-xl font-bold" style={{ color: "var(--text)" }}>{title}</h2>
           </div>

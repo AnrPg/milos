@@ -8,7 +8,7 @@ current no-hard-delete policy.
 
 ## Runtime database role
 
-New PostgreSQL volumes run `ops/postgres/init/010-milos-runtime-role.sh` automatically.
+New PostgreSQL volumes run `ops/postgres/init/010-palee-runtime-role.sh` automatically.
 The API connects as the non-owner `milos_runtime` role; releases and migrations use
 the migration-owner URL.
 
@@ -34,7 +34,7 @@ platform authority:
 
 ```bash
 cd apps/api
-mix milos.platform.grant_owner NICKNAME
+mix palee.platform.grant_owner NICKNAME
 ```
 
 Platform authority is separate from organization membership. Grant it only to the
@@ -120,7 +120,7 @@ Run restore drills in an isolated environment, never over production.
 
 CI runs the same backup script syntax checks and a containerized base-backup/restore
 drill gate before image builds.
-5. Run `mix milos.tenancy.audit` and the architecture gate.
+5. Run `mix palee.tenancy.audit` and the architecture gate.
 6. Verify two organizations cannot read each other's HTTP, socket, job, cache,
    search, storage, analytics, or export data.
 7. Verify archived and suspended organizations cannot resolve tenant context.
@@ -136,14 +136,14 @@ keys. New uploads already use canonical prefixes, but older rows can still point
 Run the dry-run first:
 
 ```bash
-mix milos.storage.migrate_legacy_objects
+mix palee.storage.migrate_legacy_objects
 ```
 
 Apply during a maintenance window after PostgreSQL and both MinIO buckets have been
 backed up:
 
 ```bash
-mix milos.storage.migrate_legacy_objects --apply
+mix palee.storage.migrate_legacy_objects --apply
 ```
 
 The task copies each legacy object to `organizations/<organization_id>/...` or

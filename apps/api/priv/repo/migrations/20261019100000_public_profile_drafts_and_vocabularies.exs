@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PublicProfileDraftsAndVocabularies do
+defmodule Palee.Repo.Migrations.PublicProfileDraftsAndVocabularies do
   use Ecto.Migration
 
   # Board 3/3b (plan §5a): the owner edits a draft and publishes a snapshot;
@@ -79,7 +79,7 @@ defmodule MilosTraining.Repo.Migrations.PublicProfileDraftsAndVocabularies do
     execute("""
     CREATE TRIGGER profile_tag_suggestions_apply_tenant_context
     BEFORE INSERT OR UPDATE ON profile_tag_suggestions
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""
@@ -94,7 +94,7 @@ defmodule MilosTraining.Repo.Migrations.PublicProfileDraftsAndVocabularies do
     # The platform reviews suggestions from every gym; these functions are the
     # only cross-tenant path, and return only what review needs.
     execute("""
-    CREATE FUNCTION milos_pending_tag_suggestions()
+    CREATE FUNCTION palee_pending_tag_suggestions()
     RETURNS TABLE (id uuid, organization_name text, list text, name text, inserted_at timestamp)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public AS $$
       SELECT s.id, o.name::text, s.list, s.name, s.inserted_at::timestamp
@@ -106,7 +106,7 @@ defmodule MilosTraining.Repo.Migrations.PublicProfileDraftsAndVocabularies do
     """)
 
     execute("""
-    CREATE FUNCTION milos_resolve_tag_suggestion(suggestion_id uuid, new_status text)
+    CREATE FUNCTION palee_resolve_tag_suggestion(suggestion_id uuid, new_status text)
     RETURNS integer
     LANGUAGE sql VOLATILE SECURITY DEFINER SET search_path = public AS $$
       WITH changed AS (
@@ -121,8 +121,8 @@ defmodule MilosTraining.Repo.Migrations.PublicProfileDraftsAndVocabularies do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_resolve_tag_suggestion(uuid, text)")
-    execute("DROP FUNCTION IF EXISTS milos_pending_tag_suggestions()")
+    execute("DROP FUNCTION IF EXISTS palee_resolve_tag_suggestion(uuid, text)")
+    execute("DROP FUNCTION IF EXISTS palee_pending_tag_suggestions()")
     drop table(:profile_tag_suggestions)
     drop constraint(:class_types, :class_types_audiences_check)
 

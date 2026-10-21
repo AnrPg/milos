@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ClassTypeLevelAudiences do
+defmodule Palee.Repo.Migrations.ClassTypeLevelAudiences do
   use Ecto.Migration
 
   # Phase 2 Πρόγραμμα filters «Επίπεδο» and «Κοινό»: the gym tags each class

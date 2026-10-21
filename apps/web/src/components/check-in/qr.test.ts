@@ -22,7 +22,7 @@ function decode(text: string) {
 
 describe("qrSvgPath", () => {
   it("draws a door deep link that scans back to the same link", () => {
-    const link = "https://milos.app/c/7d0f6a5e-1c2b-4d3e-9f80-0a1b2c3d4e5f/AbCdEf0123456789";
+    const link = "https://palee.app/c/7d0f6a5e-1c2b-4d3e-9f80-0a1b2c3d4e5f/AbCdEf0123456789";
     expect(decode(link)).toBe(link);
   });
 

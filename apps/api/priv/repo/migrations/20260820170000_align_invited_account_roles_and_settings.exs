@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AlignInvitedAccountRolesAndSettings do
+defmodule Palee.Repo.Migrations.AlignInvitedAccountRolesAndSettings do
   use Ecto.Migration
 
   def up do

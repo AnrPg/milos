@@ -14,7 +14,7 @@ enforcement.
 | Item | Category | Classification |
 |---|---|---|
 | RLS COALESCE-to-legacy-org fallback (F-04) | Compatibility behavior baked into "enforce"-stage migrations | **Requires code deployment before data deletion** — must be replaced with strict-equality policies first |
-| `DEFAULT milos_legacy_organization_id()` column defaults (F-04) | Migration-era compatibility default | **Requires data migration before deletion** — confirm no write path still depends on the default before dropping it |
+| `DEFAULT palee_legacy_organization_id()` column defaults (F-04) | Migration-era compatibility default | **Requires data migration before deletion** — confirm no write path still depends on the default before dropping it |
 | `x-organization-slug` header trust in `ResolveTenantContext`/`me_controller.ex` (F-01) | Compatibility/fallback behavior | **Requires code deployment before removal** — every `/api/admin/*` caller (backend tests, frontend) must migrate to slug-scoped routes first |
 | Legacy `/api/admin/*` route family (~140 endpoints) | Compatibility route surface | **Requires code deployment before removal** — mirror to `/api/org/:slug/admin/*`, migrate frontend, then retire |
 | Legacy no-context Scheduling/Workouts store arities (F-18) | Compatibility behavior, acknowledged migration debt | **Requires code deployment before removal** — migrate remaining Oban job callers to context-aware arities |
@@ -22,9 +22,9 @@ enforcement.
 | `MembershipPolicy.can_manage_invitations?/1` | Currently dead code, but should become *live* code as part of the F-06 fix, not deleted | **N/A — repurpose, do not delete** |
 | Global `users.role` field and its authorization-relevant read sites (F-02) | Legacy global role, per ADR-055 "must not become a fallback" | **Requires code migration for each of the 5 flagged call sites before the field can be demoted to display-only, then a data/schema decision (keep as non-authoritative metadata vs. remove) is a separate follow-up ADR** |
 | `assignment_messages` table | Explicitly marked "Removed legacy table" in the ownership inventory | **Verify actually dropped** (query 20 in `07-read-only-diagnostic-queries.sql`); if still present, safe deletion candidate |
-| Legacy object-storage keys (`invoices/...`, public avatar URLs) | Stale data, pre-tenancy paths | **Already has an operator-controlled migration tool** — `mix milos.storage.migrate_legacy_objects` (dry-run default); not a new item, tracked as TD-039/resolved, included here for completeness of the inventory |
+| Legacy object-storage keys (`invoices/...`, public avatar URLs) | Stale data, pre-tenancy paths | **Already has an operator-controlled migration tool** — `mix palee.storage.migrate_legacy_objects` (dry-run default); not a new item, tracked as TD-039/resolved, included here for completeness of the inventory |
 | Stale/expired unredeemed invitations | Historical/audit data candidate | **Historical/audit data that should be retained** for a defined retention window, then archived — do not hard-delete without a retention policy decision |
-| `mix milos.organizations.ensure_legacy` task and the legacy organization record itself | Migration tooling / seed data | **Requires product decision, not just engineering** — the legacy org holds real historical tenant data (the original single-gym deployment's actual customer). It should never be *deleted*; it should be treated as tenant #1 with no special runtime privilege once F-04 is fixed. Retiring the *fallback mechanisms* (above) is the goal, not retiring the org. |
+| `mix palee.organizations.ensure_legacy` task and the legacy organization record itself | Migration tooling / seed data | **Requires product decision, not just engineering** — the legacy org holds real historical tenant data (the original single-gym deployment's actual customer). It should never be *deleted*; it should be treated as tenant #1 with no special runtime privilege once F-04 is fixed. Retiring the *fallback mechanisms* (above) is the goal, not retiring the org. |
 | Duplicate `ReviewController` mounting (`/api/org/:slug/me/reviews` vs `/api/reviews` under `:user_only`) | Configuration coupling / dead-or-live ambiguity | **Possibly active; requires runtime evidence** — confirm whether the `:user_only` mount has any real traffic before removing |
 
 ## Phased plan
@@ -33,7 +33,7 @@ enforcement.
 - Confirm the production backup procedure in
   `docs/operations/tenant-lifecycle-and-recovery.md` has been exercised
   (restore drill) since the T4 rollout landed (2026-08-03/04) — the runbook's
-  own drill checklist (`mix milos.tenancy.audit`, two-organization
+  own drill checklist (`mix palee.tenancy.audit`, two-organization
   cross-surface verification) has never actually validated RLS given F-07.
   2026-08-08 update: Compose now provides PostgreSQL WAL archiving,
   `postgres-backup`, and `postgres-restore-drill` services, and CI runs the
@@ -79,7 +79,7 @@ enforcement.
 ### Phase 5 — Validate memberships and role scope
 - Add the missing two-organization isolation tests (F-14: Notifications,
   Wellbeing, Coaching) and the admin_mode-scoped Execution test (F-23).
-- Re-run `mix milos.tenancy.audit` with its coverage expanded per F-13's
+- Re-run `mix palee.tenancy.audit` with its coverage expanded per F-13's
   remediation (full table list including root tenant tables and
   materialized views).
 
@@ -90,14 +90,14 @@ enforcement.
   policy in `docs/operations/tenant-lifecycle-and-recovery.md`.
 
 ### Phase 7 — Tighten database constraints
-- Drop the `DEFAULT milos_legacy_organization_id()` column defaults once
+- Drop the `DEFAULT palee_legacy_organization_id()` column defaults once
   Phase 3's write-path fixes are confirmed (no remaining caller depends on
   the default).
 - Add RLS to the root tenant tables (F-16) if the product decides
   application-layer-only protection there is insufficient, or explicitly
   document the exception.
 - Add RLS support for materialized views is not possible in Postgres —
-  instead, add a `mix milos.architecture`-style static check that flags any
+  instead, add a `mix palee.architecture`-style static check that flags any
   raw SQL query against `finance_aggregates`/`coaching_aggregates`/
   `weekly_leaderboard` lacking an `organization_id` literal in the query
   text, as a permanent guardrail against F-21/F-22 recurring.

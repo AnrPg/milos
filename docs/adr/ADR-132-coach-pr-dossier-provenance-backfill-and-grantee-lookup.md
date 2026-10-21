@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 ADR-129 made members' PRs readable by every coach of the gym they were
-recorded in, through one database seam (`milos_acting_user_coaches/1`). It left
+recorded in, through one database seam (`palee_acting_user_coaches/1`). It left
 four items (TD-091):
 
 1. **The multi-role seam swap.** Once memberships carry a role set, the seam

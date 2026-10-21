@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddFinanceCorrectionAndSoftDeleteFields do
+defmodule Palee.Repo.Migrations.AddFinanceCorrectionAndSoftDeleteFields do
   use Ecto.Migration
 
   def up do

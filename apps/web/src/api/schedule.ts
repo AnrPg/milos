@@ -4,10 +4,10 @@ import { apiRequest } from "@/api/client";
 import type { operations, paths } from "@/api/generated/schema";
 
 type CreateBookingRequest = NonNullable<
-  operations["MilosTrainingWeb.ScheduleController.create_booking"]["requestBody"]
+  operations["PaleeWeb.ScheduleController.create_booking"]["requestBody"]
 >["content"]["application/json"];
 type ResolveBookingRequest = NonNullable<
-  operations["MilosTrainingWeb.AdminScheduleController.approve_booking"]["requestBody"]
+  operations["PaleeWeb.AdminScheduleController.approve_booking"]["requestBody"]
 >["content"]["application/json"];
 
 type ScheduleQuery = NonNullable<

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MakeMembershipPackageCodeOptional do
+defmodule Palee.Repo.Migrations.MakeMembershipPackageCodeOptional do
   use Ecto.Migration
 
   def change do

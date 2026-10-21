@@ -1,4 +1,4 @@
-defmodule MilosTraining.FakeGarminClient do
+defmodule Palee.FakeGarminClient do
   @moduledoc """
   Test stand-in for Garmin (ADR-161). Off until a test calls `configure/1`;
   then it answers like Garmin does, with the overrides given, and reports
@@ -7,7 +7,7 @@ defmodule MilosTraining.FakeGarminClient do
       FakeGarminClient.configure(user_id: "garmin-1", exchange: {:error, :garmin_unavailable})
   """
 
-  @behaviour MilosTraining.Devices.Ports.GarminClient
+  @behaviour Palee.Devices.Ports.GarminClient
 
   @client_id "test-garmin-client"
   @key :fake_garmin
@@ -15,12 +15,12 @@ defmodule MilosTraining.FakeGarminClient do
   def client_id, do: @client_id
 
   def configure(overrides \\ []),
-    do: Application.put_env(:milos_training, @key, Map.new([{:configured, true} | overrides]))
+    do: Application.put_env(:palee, @key, Map.new([{:configured, true} | overrides]))
 
-  def reset, do: Application.delete_env(:milos_training, @key)
+  def reset, do: Application.delete_env(:palee, @key)
 
   defp opt(key, default),
-    do: :milos_training |> Application.get_env(@key, %{}) |> Map.get(key, default)
+    do: :palee |> Application.get_env(@key, %{}) |> Map.get(key, default)
 
   defp report(call, args), do: send(self(), {:garmin, call, args})
 

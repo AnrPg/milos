@@ -1,0 +1,194 @@
+# Run: promtool test rules ops/observability/prometheus/tests/palee-alerts.test.yml
+# (from the repository root). Exercises each signal class's threshold
+# boundary so threshold edits are deliberate.
+rule_files:
+  - ../rules/palee-alerts.yml
+
+evaluation_interval: 1m
+
+tests:
+  - name: readiness dependency down after 2m, flapping counter
+    interval: 1m
+    input_series:
+      - series: 'palee_readiness_check_up{job="palee-api",dependency="redis"}'
+        values: "1 0 0 0 0"
+      - series: 'palee_readiness_check_up{job="palee-api",dependency="database"}'
+        values: "1 1 1 1 1"
+      - series: 'palee_readiness_failures_total{job="palee-api",failed="redis"}'
+        values: "0 6 12 18 24"
+    alert_rule_test:
+      - eval_time: 2m
+        alertname: PaleeReadinessDependencyDown
+        exp_alerts: []
+      - eval_time: 4m
+        alertname: PaleeReadinessDependencyDown
+        exp_alerts:
+          - exp_labels: { severity: critical, job: palee-api, dependency: redis }
+            exp_annotations:
+              summary: "Readiness dependency redis is failing"
+              description: "The API's readiness probe has reported redis as unavailable for 2m. /api/health returns 503 and Compose marks the API unhealthy."
+      - eval_time: 4m
+        alertname: PaleeReadinessFailuresRecurring
+        exp_alerts:
+          - exp_labels: { severity: warning, failed: redis }
+            exp_annotations:
+              summary: "Readiness flapping (redis)"
+              description: "24 readiness evaluations failed in 10m for redis. Compose health checks hit /api/health every 10s, so more than 5 failures means roughly a minute of cumulative degradation."
+
+  - name: outbox age escalates from warning to critical
+    interval: 1m
+    input_series:
+      - series: 'palee_outbox_oldest_due_seconds{job="palee-api",queue="notifications"}'
+        values: "0 400 460 520 580 640 700 760 820 880 940 1000 1060 1120 1180 1240"
+      - series: 'palee_outbox_oldest_due_seconds{job="palee-api",queue="default"}'
+        values: "0x15"
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: PaleeOutboxBacklogAging
+        exp_alerts: []
+      - eval_time: 6m
+        alertname: PaleeOutboxBacklogAging
+        exp_alerts:
+          - exp_labels: { severity: warning, signal: outbox_age, queue: notifications }
+            exp_annotations:
+              summary: "Outbox queue notifications lagging"
+              description: "The oldest due notifications job has waited 11m 40s (healthy queues drain in seconds)."
+      - eval_time: 14m
+        alertname: PaleeOutboxBacklogCritical
+        exp_alerts: []
+      - eval_time: 15m
+        alertname: PaleeOutboxBacklogCritical
+        exp_alerts:
+          - exp_labels: { severity: critical, signal: outbox_age, queue: notifications }
+            exp_annotations:
+              summary: "Outbox queue notifications stalled for 15m+"
+              description: "The oldest due notifications job has waited 20m 40s. Notifications, analytics, search indexing or cache invalidation are not being delivered."
+
+  - name: discarded Oban jobs alert immediately, retries do not
+    interval: 1m
+    input_series:
+      - series: 'palee_oban_job_failures_total{job="palee-api",queue="notifications",worker="Palee.Workers.PushDispatchJob",state="discard"}'
+        values: "0 0 1 1"
+      - series: 'palee_oban_job_failures_total{job="palee-api",queue="default",worker="Palee.Workers.SyncPrSearchJob",state="failure"}'
+        values: "0 1 2 3"
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: PaleeObanJobsDiscarded
+        exp_alerts:
+          - exp_labels:
+              severity: warning
+              queue: notifications
+              worker: Palee.Workers.PushDispatchJob
+            exp_annotations:
+              summary: "Palee.Workers.PushDispatchJob discarded jobs"
+              description: "1 Palee.Workers.PushDispatchJob job(s) on notifications exhausted their attempts in 15m. Their side effects will not happen without manual action."
+
+  - name: credential stuffing and refresh replay thresholds
+    interval: 1m
+    input_series:
+      - series: 'palee_auth_anomalies_total{job="palee-api",reason="invalid_credentials"}'
+        values: "0+6x10"
+      - series: 'palee_auth_anomalies_total{job="palee-api",reason="invalid_refresh_token"}'
+        values: "0+1x10"
+    alert_rule_test:
+      - eval_time: 10m
+        alertname: PaleeCredentialFailuresSpike
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: "Login failures spiking"
+              description: "60 failed logins in 10m; possible credential stuffing."
+      - eval_time: 10m
+        alertname: PaleeRefreshTokenRejectionsSpike
+        exp_alerts: []
+
+  - name: cache invalidation failures persist for 5m
+    interval: 1m
+    input_series:
+      - series: 'palee_cache_operations_total{job="palee-api",cache="landing",operation="invalidate",result="unavailable"}'
+        values: "0 1 2 3 4 5 6 7"
+    alert_rule_test:
+      - eval_time: 4m
+        alertname: PaleeCacheInvalidationFailing
+        exp_alerts: []
+      - eval_time: 7m
+        alertname: PaleeCacheInvalidationFailing
+        exp_alerts:
+          - exp_labels: { severity: warning, cache: landing }
+            exp_annotations:
+              summary: "landing cache invalidations failing"
+              description: "Invalidations could not reach Redis. Users may see stale landing data for up to the 60s TTL, and Redis is likely degraded."
+
+  - name: upload verification failures
+    interval: 1m
+    input_series:
+      - series: 'palee_upload_rejections_total{job="palee-api",context="invoice",reason="document_upload_unverified"}'
+        values: "0 2 4 6"
+    alert_rule_test:
+      - eval_time: 3m
+        alertname: PaleeUploadVerificationFailing
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: "Uploads failing storage verification"
+              description: "6 uploads in 15m were missing or unverifiable in object storage; check MinIO health, bucket policy and MINIO_PUBLIC_ENDPOINT/CORS."
+      - eval_time: 3m
+        alertname: PaleeUploadRejectionsSpike
+        exp_alerts: []
+
+  - name: trace-derived 5xx ratio needs traffic floor and duration
+    interval: 1m
+    input_series:
+      # 60 req/min total, 6 of them 5xx -> 10% error ratio at 1 req/s.
+      - series: 'traces_span_metrics_calls_total{service_name="palee-api",span_kind="SPAN_KIND_SERVER",http_response_status_code="200"}'
+        values: "0+54x30"
+      - series: 'traces_span_metrics_calls_total{service_name="palee-api",span_kind="SPAN_KIND_SERVER",http_response_status_code="500"}'
+        values: "0+6x30"
+      # Client spans (outgoing calls) never count toward the server ratio.
+      - series: 'traces_span_metrics_calls_total{service_name="palee-api",span_kind="SPAN_KIND_CLIENT",http_response_status_code="500"}'
+        values: "0+100x30"
+    alert_rule_test:
+      - eval_time: 5m
+        alertname: PaleeHttp5xxRateCritical
+        exp_alerts: []
+      - eval_time: 12m
+        alertname: PaleeHttp5xxRateCritical
+        exp_alerts:
+          - exp_labels: { severity: critical, signal: http_5xx }
+            exp_annotations:
+              summary: "API 5xx ratio above 5%"
+              description: "10% of API requests failed with 5xx over the last 5m (traffic floor 0.1 req/s)."
+      - eval_time: 12m
+        alertname: PaleeHttp5xxRateElevated
+        exp_alerts: []
+      - eval_time: 25m
+        alertname: PaleeHttp5xxRateElevated
+        exp_alerts:
+          - exp_labels: { severity: warning, signal: http_5xx }
+            exp_annotations:
+              summary: "API 5xx ratio above 2%"
+              description: "10% of API requests failed with 5xx, sustained for 15m."
+
+  - name: trace-derived p95 latency
+    interval: 1m
+    input_series:
+      # Every request lands between 1s and 2.5s -> p95 ~ 2.4s.
+      - series: 'traces_span_metrics_duration_milliseconds_bucket{service_name="palee-api",span_kind="SPAN_KIND_SERVER",le="1000"}'
+        values: "0x30"
+      - series: 'traces_span_metrics_duration_milliseconds_bucket{service_name="palee-api",span_kind="SPAN_KIND_SERVER",le="2500"}'
+        values: "0+60x30"
+      - series: 'traces_span_metrics_duration_milliseconds_bucket{service_name="palee-api",span_kind="SPAN_KIND_SERVER",le="+Inf"}'
+        values: "0+60x30"
+      - series: 'traces_span_metrics_calls_total{service_name="palee-api",span_kind="SPAN_KIND_SERVER",http_response_status_code="200"}'
+        values: "0+60x30"
+    alert_rule_test:
+      - eval_time: 25m
+        alertname: PaleeHttpLatencyP95High
+        exp_alerts:
+          - exp_labels: { severity: warning, signal: http_latency }
+            exp_annotations:
+              summary: "API p95 latency above 1s"
+              description: "p95 server latency is 2425ms (traces, 5m window)."
+      - eval_time: 25m
+        alertname: PaleeHttpLatencyP95Critical
+        exp_alerts: []

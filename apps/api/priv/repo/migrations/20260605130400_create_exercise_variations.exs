@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateExerciseVariations do
+defmodule Palee.Repo.Migrations.CreateExerciseVariations do
   use Ecto.Migration
 
   def change do

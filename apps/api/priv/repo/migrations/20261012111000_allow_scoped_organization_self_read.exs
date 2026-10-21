@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowScopedOrganizationSelfRead do
+defmodule Palee.Repo.Migrations.AllowScopedOrganizationSelfRead do
   use Ecto.Migration
 
   # TD-046 / TD-076: organizations RLS admitted only vendors, members (via

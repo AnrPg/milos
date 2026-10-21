@@ -131,7 +131,7 @@ async function shot(page: Page, name: string) {
 
 test.describe("admin public page editor", () => {
   test.beforeEach(async ({ context, baseURL }) => {
-    await context.addCookies([{ name: "milos_locale", value: "el", url: baseURL! }]);
+    await context.addCookies([{ name: "palee_locale", value: "el", url: baseURL! }]);
   });
 
   test("walks the steps, picks tags and publishes the draft", async ({ page }) => {
@@ -227,7 +227,7 @@ test.describe("admin public page editor", () => {
 
 test.describe("platform tag suggestions", () => {
   test.beforeEach(async ({ context, baseURL }) => {
-    await context.addCookies([{ name: "milos_locale", value: "el", url: baseURL! }]);
+    await context.addCookies([{ name: "palee_locale", value: "el", url: baseURL! }]);
   });
 
   test("platform staff mark a suggestion added", async ({ page }) => {

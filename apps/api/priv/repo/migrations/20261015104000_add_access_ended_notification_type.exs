@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddAccessEndedNotificationType do
+defmodule Palee.Repo.Migrations.AddAccessEndedNotificationType do
   use Ecto.Migration
 
   @types ~w(

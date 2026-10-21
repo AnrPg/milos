@@ -157,7 +157,7 @@ export function TopNav() {
     journalSections: bodySettingsQuery.data?.settings?.journal_sections ?? null,
   });
 
-  const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
+  const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("brandName");
   const brandLogoUrl = tenantBrandLogoUrl(memberships, selectedOrganizationSlug);
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;

@@ -57,7 +57,7 @@ clutter. Priority+ guarantees the phone fit independently of label length.
 ## Consequences
 The web shell reads roles and capabilities (ADR-099) to choose links;
 `TopNav` gains priority+ overflow and the account-menu role view. Mockup:
-"Milos workspaces navigation" artifact (revised version).
+"Palee workspaces navigation" artifact (revised version).
 
 ## Implementation Notes
 Implemented in `aa4ec6d`, `a37ab33` and `4a44f1e`.

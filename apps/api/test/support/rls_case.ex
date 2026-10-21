@@ -1,18 +1,18 @@
-defmodule MilosTraining.RLSCase do
+defmodule Palee.RLSCase do
   @moduledoc """
   For tests that must prove an RLS policy actually blocks something.
 
   This whole suite runs against Postgres as a superuser (rolbypassrls =
   true - see F-07 in the multi-tenancy audit), so ordinary Ecto-based tests
   never exercise Row Level Security: every query succeeds regardless of
-  policy correctness, RED and GREEN alike. `use MilosTraining.RLSCase`
+  policy correctness, RED and GREEN alike. `use Palee.RLSCase`
   self-provisions a dedicated non-superuser role and hands each test a raw
   `Postgrex` connection (`conn` in the test context) that genuinely enforces
   RLS, plus small helpers for setting the `app.*` session GUCs the policies
   read.
 
   This is scoped to genuinely RLS-relevant tests only - most tests should
-  keep using `MilosTraining.DataCase`, which is faster and simpler because it
+  keep using `Palee.DataCase`, which is faster and simpler because it
   doesn't need real tenant isolation to hold.
   """
 
@@ -20,19 +20,19 @@ defmodule MilosTraining.RLSCase do
 
   using do
     quote do
-      import MilosTraining.RLSCase, only: [as_session: 5, uuid: 0]
+      import Palee.RLSCase, only: [as_session: 5, uuid: 0]
     end
   end
 
-  @runtime_role "milos_test_runtime"
-  @runtime_password "milos_test_runtime_pw"
+  @runtime_role "palee_test_runtime"
+  @runtime_password "palee_test_runtime_pw"
 
   setup do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(MilosTraining.Repo, shared: false)
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Palee.Repo, shared: false)
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
 
     # Provisioning the runtime role has to happen on a connection outside the
-    # Ecto sandbox: `MilosTraining.Repo` runs every query inside a transaction
+    # Ecto sandbox: `Palee.Repo` runs every query inside a transaction
     # that's rolled back when the owner above stops, so CREATE ROLE/GRANT
     # issued through it never durably take effect. The separate `conn` this
     # test gets below is a genuinely different physical connection/role and
@@ -45,8 +45,7 @@ defmodule MilosTraining.RLSCase do
         port: String.to_integer(System.get_env("DB_PORT", "5432")),
         username: @runtime_role,
         password: @runtime_password,
-        database:
-          System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+        database: System.get_env("DB_NAME", "palee_test#{System.get_env("MIX_TEST_PARTITION")}")
       )
 
     # These tests write outside the Ecto sandbox (the raw connection is the whole
@@ -64,7 +63,7 @@ defmodule MilosTraining.RLSCase do
           database:
             System.get_env(
               "DB_NAME",
-              "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}"
+              "palee_test#{System.get_env("MIX_TEST_PARTITION")}"
             )
         )
 
@@ -97,8 +96,7 @@ defmodule MilosTraining.RLSCase do
         port: String.to_integer(System.get_env("DB_PORT", "5432")),
         username: System.get_env("DB_USER", "postgres"),
         password: System.get_env("DB_PASSWORD", "postgres"),
-        database:
-          System.get_env("DB_NAME", "milos_training_test#{System.get_env("MIX_TEST_PARTITION")}")
+        database: System.get_env("DB_NAME", "palee_test#{System.get_env("MIX_TEST_PARTITION")}")
       )
 
     Postgrex.query!(

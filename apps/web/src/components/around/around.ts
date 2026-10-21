@@ -328,7 +328,7 @@ export function initialViewport(latitude: number, longitude: number, radiusKm: n
 
 export type HomeScope = "clubs" | "around";
 
-export const SCOPE_STORAGE_KEY = "milos:home-scope";
+export const SCOPE_STORAGE_KEY = "palee:home-scope";
 
 export function readStored(key: string): string | null {
   try {

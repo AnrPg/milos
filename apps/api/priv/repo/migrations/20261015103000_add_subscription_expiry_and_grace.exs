@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddSubscriptionExpiryAndGrace do
+defmodule Palee.Repo.Migrations.AddSubscriptionExpiryAndGrace do
   use Ecto.Migration
 
   # Merged into main after the multi-role line (2026-10-13): the list carries

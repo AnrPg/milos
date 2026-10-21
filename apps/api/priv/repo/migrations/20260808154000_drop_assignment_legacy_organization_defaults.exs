@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.DropLegacyOrganizationDefaults do
+defmodule Palee.Repo.Migrations.DropLegacyOrganizationDefaults do
   use Ecto.Migration
 
   @tenant_tables ~w(
@@ -59,7 +59,7 @@ defmodule MilosTraining.Repo.Migrations.DropLegacyOrganizationDefaults do
   def down do
     Enum.each(@tenant_tables, fn table ->
       execute(
-        "ALTER TABLE #{table} ALTER COLUMN organization_id SET DEFAULT milos_legacy_organization_id()"
+        "ALTER TABLE #{table} ALTER COLUMN organization_id SET DEFAULT palee_legacy_organization_id()"
       )
     end)
   end

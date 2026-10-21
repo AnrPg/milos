@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddThemeSlugToGamificationSettings do
+defmodule Palee.Repo.Migrations.AddThemeSlugToGamificationSettings do
   use Ecto.Migration
 
   def change do

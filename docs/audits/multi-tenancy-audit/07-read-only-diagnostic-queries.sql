@@ -1,4 +1,4 @@
--- Read-only diagnostic queries for the Milos Training multi-tenancy audit.
+-- Read-only diagnostic queries for the Palee multi-tenancy audit.
 -- Every query here is SELECT-only. Run against a read-only connection or a
 -- replica where possible. None of these were executed against production;
 -- they were validated for syntax against the local dev schema during this
@@ -30,8 +30,8 @@ SELECT
   p.polname AS policy_name,
   pg_get_expr(p.polqual, p.polrelid) AS using_expression,
   pg_get_expr(p.polwithcheck, p.polrelid) AS with_check_expression,
-  pg_get_expr(p.polqual, p.polrelid) ILIKE '%milos_legacy_organization_id%'
-    OR pg_get_expr(p.polwithcheck, p.polrelid) ILIKE '%milos_legacy_organization_id%'
+  pg_get_expr(p.polqual, p.polrelid) ILIKE '%palee_legacy_organization_id%'
+    OR pg_get_expr(p.polwithcheck, p.polrelid) ILIKE '%palee_legacy_organization_id%'
     AS has_legacy_fallback
 FROM pg_class c
 LEFT JOIN pg_policy p ON p.polrelid = c.oid
@@ -265,7 +265,7 @@ JOIN organization_provisioning_events ope
 WHERE o.status IN ('suspended', 'archived');
 
 -- =============================================================================
--- 19. Materialized views not covered by mix milos.tenancy.audit's table list:
+-- 19. Materialized views not covered by mix palee.tenancy.audit's table list:
 --     confirm they are backed by explicit organization_id predicates in the
 --     defining query (informational — re-run \d+ or pg_matviews after any
 --     view redefinition).

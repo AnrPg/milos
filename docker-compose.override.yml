@@ -12,7 +12,7 @@ services:
       - api_build:/app/_build
     environment:
       DB_HOST: postgres
-      DB_NAME: ${DB_NAME:-milos_training_dev}
+      DB_NAME: ${DB_NAME:-palee_dev}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_USER: ${DB_USER:-postgres}
       MIX_ENV: dev
@@ -41,7 +41,7 @@ services:
       - api_build:/app/_build
     environment:
       DB_HOST: postgres
-      DB_NAME: ${DB_NAME:-milos_training_dev}
+      DB_NAME: ${DB_NAME:-palee_dev}
       DB_PASSWORD: ${DB_PASSWORD:-postgres}
       DB_USER: ${DB_USER:-postgres}
       MIX_ENV: dev
@@ -75,7 +75,7 @@ services:
       context: ./apps/web
       dockerfile: Dockerfile.dev
       args:
-        WEB_DEV_BASE_IMAGE: ${WEB_DEV_BASE_IMAGE:-milos-web:latest}
+        WEB_DEV_BASE_IMAGE: ${WEB_DEV_BASE_IMAGE:-palee-web:latest}
     command: sh -lc "npm install && npm run dev -- --hostname 0.0.0.0 --port 3000"
     volumes:
       - ./apps/web:/app

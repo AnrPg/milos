@@ -88,7 +88,7 @@ const membership = (role: string, capabilities: Record<string, string> = {}) => 
 });
 
 async function common(page: Page, persona: ReturnType<typeof personaFor> | null, memberships: unknown[] = []) {
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   // Copying, not the system share sheet, so the link can be read back.
   await page.addInitScript(() => Object.defineProperty(navigator, "share", { value: undefined, configurable: true }));
   await page.route("**/api/**", (route) => route.fulfill(json({})));
@@ -226,7 +226,7 @@ test.describe("referrals", () => {
     await expect(page.getByText(/Maria will see your first name/)).toBeVisible();
     await expect(page.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", `/register?next=${encodeURIComponent(`/r/${CODE}`)}`);
 
-    const kept = await page.evaluate(() => window.localStorage.getItem("milos:pending-referrals"));
+    const kept = await page.evaluate(() => window.localStorage.getItem("palee:pending-referrals"));
     expect(JSON.parse(kept ?? "[]")).toMatchObject([{ code: CODE, channel: "link", event_id: null }]);
   });
 
@@ -243,7 +243,7 @@ test.describe("referrals", () => {
     await expect(page.getByRole("link", { name: "See the event" })).toHaveAttribute("href", `/events/${EVENT_ID}`);
     await expect(page.getByRole("link", { name: "Book a trial" })).toHaveAttribute("href", "/b/kypseli?trial=1");
     expect(claims).toEqual([{ code: CODE, channel: "event", event_id: EVENT_ID }]);
-    expect(await page.evaluate(() => window.localStorage.getItem("milos:pending-referrals"))).toBeNull();
+    expect(await page.evaluate(() => window.localStorage.getItem("palee:pending-referrals"))).toBeNull();
   });
 
   test("an invite that no longer works says so", async ({ page }) => {

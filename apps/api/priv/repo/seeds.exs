@@ -5,13 +5,13 @@
 # Inside the script, you can read and write to any of your
 # repositories directly:
 #
-#     MilosTraining.Repo.insert!(%MilosTraining.SomeSchema{})
+#     Palee.Repo.insert!(%Palee.SomeSchema{})
 #
 # We recommend using the bang functions (`insert!`, `update!`
 # and so on) as they will fail if something goes wrong.
 
-alias MilosTraining.{Identity, Organizations, Repo, Workouts}
-alias MilosTraining.Gamification.TrainingQuote
+alias Palee.{Identity, Organizations, Repo, Workouts}
+alias Palee.Gamification.TrainingQuote
 
 quotes = [
   %{body: "The only bad workout is the one that didn't happen.", author: nil},
@@ -72,7 +72,7 @@ end
 # set when it is provisioned, and existing organizations were backfilled by
 # the 20261012160000 migration. Re-assert the defaults for any organization
 # that has none (idempotent).
-for organization <- Repo.all(MilosTraining.Organizations.Organization) do
+for organization <- Repo.all(Palee.Organizations.Organization) do
   {:ok, _levels} = Workouts.seed_default_scale_levels(%{organization_id: organization.id})
 end
 

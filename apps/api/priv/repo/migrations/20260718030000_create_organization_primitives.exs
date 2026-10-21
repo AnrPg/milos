@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateOrganizationPrimitives do
+defmodule Palee.Repo.Migrations.CreateOrganizationPrimitives do
   use Ecto.Migration
 
   def change do

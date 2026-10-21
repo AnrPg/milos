@@ -126,13 +126,13 @@ export default function AroundMap({
       const element = document.createElement("button");
       element.type = "button";
       element.tabIndex = -1;
-      element.classList.add("milos-map-pin", "milos-around-pin");
+      element.classList.add("palee-map-pin", "palee-around-pin");
       element.dataset.kind = pin.kind;
       element.dataset.pinId = pin.id;
       element.setAttribute("aria-label", pin.label);
       element.title = pin.label;
       const dot = document.createElement("span");
-      dot.className = "milos-map-pin__dot";
+      dot.className = "palee-map-pin__dot";
       element.append(dot);
       element.addEventListener("click", (event) => {
         event.stopPropagation();

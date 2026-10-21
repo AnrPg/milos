@@ -44,9 +44,9 @@ Six interconnected feature areas:
 
 All calculators receive `off_days: [integer]` as explicit parameter (zero DB coupling):
 
-- `MilosTraining.Gamification.Domain.MotivationCalculator` — pure function, takes `completed_dates`, `target`, `off_days`
-- `MilosTraining.Gamification.Domain.DayStreakCalculator` — replaces weekly logic; takes `completed_dates`, `off_days`, `current_date`
-- `MilosTraining.Gamification.Domain.PerseveranceCalculator` — takes `exercise_modifications`, `workout_prescriptions`, `off_days`
+- `Palee.Gamification.Domain.MotivationCalculator` — pure function, takes `completed_dates`, `target`, `off_days`
+- `Palee.Gamification.Domain.DayStreakCalculator` — replaces weekly logic; takes `completed_dates`, `off_days`, `current_date`
+- `Palee.Gamification.Domain.PerseveranceCalculator` — takes `exercise_modifications`, `workout_prescriptions`, `off_days`
 
 ### 1.4 Off-Days Setting — Full Hexagonal Stack
 

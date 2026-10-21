@@ -1,0 +1,59 @@
+defmodule Palee.Infrastructure.Security.MemoryRateLimiter do
+  @table :palee_rate_limits
+
+  def check_rate(key, interval_ms, max) do
+    check_rate(key, interval_ms, max, now_ms: System.system_time(:millisecond))
+  end
+
+  def check_rate(key, interval_ms, max, opts) do
+    ensure_table!()
+    now = Keyword.fetch!(opts, :now_ms)
+
+    entries =
+      case :ets.lookup(@table, key) do
+        [{^key, timestamps}] -> timestamps
+        [] -> []
+      end
+      |> Enum.filter(&(&1 > now - interval_ms))
+
+    if length(entries) >= max do
+      true = :ets.insert(@table, {key, entries})
+      {:error, length(entries)}
+    else
+      updated_entries = [now | entries]
+      true = :ets.insert(@table, {key, updated_entries})
+      {:ok, length(updated_entries)}
+    end
+  end
+
+  def reset! do
+    ensure_table!()
+    :ets.delete_all_objects(@table)
+    :ok
+  end
+
+  defp ensure_table! do
+    case :ets.whereis(@table) do
+      :undefined ->
+        # :ets.whereis/:ets.new is check-then-create, not atomic - concurrent
+        # callers (many async test cases hit this via the rate-limit plug)
+        # can both see :undefined and race to create the named table. The
+        # loser's :ets.new raises ArgumentError; the table it lost the race
+        # for is exactly the one it wanted, so that's a success, not a
+        # failure.
+        try do
+          :ets.new(@table, [
+            :named_table,
+            :public,
+            read_concurrency: true,
+            write_concurrency: true
+          ])
+        rescue
+          ArgumentError -> @table
+        end
+
+      _table ->
+        @table
+    end
+  end
+end

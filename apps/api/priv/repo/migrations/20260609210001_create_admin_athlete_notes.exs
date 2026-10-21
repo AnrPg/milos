@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateAdminAthleteNotes do
+defmodule Palee.Repo.Migrations.CreateAdminAthleteNotes do
   use Ecto.Migration
 
   def change do

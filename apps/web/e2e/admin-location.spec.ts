@@ -95,7 +95,7 @@ async function shot(page: Page, name: string) {
 
 test.describe("admin location editor", () => {
   test.beforeEach(async ({ context, baseURL }) => {
-    await context.addCookies([{ name: "milos_locale", value: "el", url: baseURL! }]);
+    await context.addCookies([{ name: "palee_locale", value: "el", url: baseURL! }]);
   });
 
   test("pins a location from the address search and saves its hours", async ({ page }) => {

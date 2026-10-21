@@ -4,7 +4,7 @@
  * Where the desk's scanner gets codes from (ADR-155 §7). The camera source
  * uses the browser's `BarcodeDetector` where it exists and the `jsqr`
  * decoder elsewhere (loaded only when needed). A test can put its own
- * source on `window.__milosScannerSource` before the page loads; nothing in
+ * source on `window.__paleeScannerSource` before the page loads; nothing in
  * the app sets it.
  */
 export type StopScanner = () => void;
@@ -96,6 +96,6 @@ export const cameraSource: ScannerSource = {
 
 /** The source in use: a test's, or the camera. */
 export function scannerSource(): ScannerSource {
-  const injected = (window as unknown as { __milosScannerSource?: ScannerSource }).__milosScannerSource;
+  const injected = (window as unknown as { __paleeScannerSource?: ScannerSource }).__paleeScannerSource;
   return injected ?? cameraSource;
 }

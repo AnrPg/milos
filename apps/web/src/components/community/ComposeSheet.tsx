@@ -63,8 +63,8 @@ export function ComposeButton({
 }
 
 const SHAREABLE_KINDS = ["execution", "training_log", "pr"] as const;
-const LAST_TARGET_KEY = "milos:compose-target";
-const PUBLIC_NOTE_KEY = "milos:compose-public-note-seen";
+const LAST_TARGET_KEY = "palee:compose-target";
+const PUBLIC_NOTE_KEY = "palee:compose-public-note-seen";
 
 function readStored<T>(key: string): T | null {
   try {

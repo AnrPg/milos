@@ -144,7 +144,7 @@ dependency.
   brand name, in addition to the organization selector. All copy goes through the
   `Ui` catalog in all 12 locales, including API error codes in `presentation.ts`.
 - **Branded surfaces not changed**: the login page has no tenant context
-  (ADR-086: TrainingJournal shell before tenant resolution), and no email template
+  (ADR-086: Palee shell before tenant resolution), and no email template
   reads `brand_logo_url`, so neither renders a logo. Both are follow-ups if
   per-tenant login pages or branded emails are introduced.
 - **Deferred**: orphaned objects from uploads that are never finalized stay inside

@@ -13,7 +13,7 @@ checklist (plan §6, vision §8.6) and ADR-147 keep cravings private by
 default and forbid comparison and medical claims.
 
 Board 15 picked every recommended option: up to two buddies, each with what
-they receive (A); anyone you know here or a link for someone not on Milos,
+they receive (A); anyone you know here or a link for someone not on Palee,
 invitations expiring after seven days (A); «Χρειάζομαι στήριξη» from
 Λιγούρα and from a quick button, with a 5-second undo and nothing about the
 craving shared (A); a push with quick replies that opens a private
@@ -52,11 +52,11 @@ so this is ADR-160.
    session user); a support request to its sender, and to a buddy only once
    it was delivered and not taken back; settings and grants to their owner.
    Narrow SECURITY DEFINER functions answer what crosses people:
-   `milos_buddy_relation` (coach, club or follow, for the session user
-   only), `milos_buddy_candidates`, `milos_buddy_invite_preview` and
-   `milos_buddy_claim_invite`, `milos_buddy_quiet_hours` and
-   `milos_buddy_shared_phone` (only across an active link),
-   `milos_buddy_summary_requesters` (ids and zones for the job).
+   `palee_buddy_relation` (coach, club or follow, for the session user
+   only), `palee_buddy_candidates`, `palee_buddy_invite_preview` and
+   `palee_buddy_claim_invite`, `palee_buddy_quiet_hours` and
+   `palee_buddy_shared_phone` (only across an active link),
+   `palee_buddy_summary_requesters` (ids and zones for the job).
 3. **The link's life is a pure state machine** (`LinkPolicy`): invite →
    pending; the buddy accepts or declines; either side leaves (a requester
    may also withdraw a pending invite); a block ends it at once
@@ -135,9 +135,9 @@ so this is ADR-160.
    `coach_wellness_summary` linking to the client page: the three counts
    only, never craving times; one per coach, gym, member and week. Definer
    lookups name the members and their coaches (ids only).
-10. **M11 seam.** `MilosTraining.Application.Ports.SupportRequests.request/2`
+10. **M11 seam.** `Palee.Application.Ports.SupportRequests.request/2`
     (config `:support_requests`) is implemented by
-    `MilosTraining.Application.SupportRequests`, which also exposes
+    `Palee.Application.SupportRequests`, which also exposes
     `request_support/3` (a user context or id, `%{message, source,
     source_ref}`). Only the craving's id crosses, as an opaque reference.
 11. **Notifications** in 12 locales: `buddy_invite`, `buddy_accepted`,
@@ -166,7 +166,7 @@ in SQL.
 - **Coach grants per gym or per coach.** The M11 answer is one member
   toggle applying to their coaches with client access; per-coach grants can
   be added on the same table if needed.
-- **A crisis or emergency flow.** Milos must not act as a medical or crisis
+- **A crisis or emergency flow.** Palee must not act as a medical or crisis
   service (board 15 Q5); help lines are information only.
 
 ## Consequences
@@ -179,7 +179,7 @@ in SQL.
 
 ## Implementation Notes
 - Migrations `20261030100000_buddy_support.exs` and
-  `20261030110000_buddy_messages_and_wellness_access.exs`; context `MilosTraining.Buddies`
+  `20261030110000_buddy_messages_and_wellness_access.exs`; context `Palee.Buddies`
   (domain `LinkPolicy`, `Eligibility`, `SupportPolicy`, `QuietHours`,
   `SettingsPolicy`, `WeeklySummary`, `SummarySharingPolicy`,
   `InviteToken`), store port and `EctoBuddyStore`, scheduler port and

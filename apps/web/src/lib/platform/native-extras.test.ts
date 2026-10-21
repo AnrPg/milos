@@ -9,9 +9,9 @@ vi.mock("@/api/widgets", () => ({
   revokeWidgetToken: (...args: unknown[]) => revoke(...args),
 }));
 
-import { forgetGeofences, reminderEnabled, setReminderEnabled, syncGeofences, toNativeRegions, type MilosGeofencePlugin } from "./geofence";
-import { nfcWriter, writeNfcTag, type MilosNfcPlugin } from "./nfc";
-import { forgetWidgets, renewalDue, syncWidgets, WIDGET_PATHS, type MilosWidgetsPlugin, type WidgetLabels } from "./widgets";
+import { forgetGeofences, reminderEnabled, setReminderEnabled, syncGeofences, toNativeRegions, type PaleeGeofencePlugin } from "./geofence";
+import { nfcWriter, writeNfcTag, type PaleeNfcPlugin } from "./nfc";
+import { forgetWidgets, renewalDue, syncWidgets, WIDGET_PATHS, type PaleeWidgetsPlugin, type WidgetLabels } from "./widgets";
 
 function bridge(platform: "ios" | "android", plugins: string[]) {
   (window as unknown as { Capacitor?: unknown }).Capacitor = {
@@ -34,7 +34,7 @@ afterEach(() => {
 });
 
 describe("widgets", () => {
-  const plugin = (): MilosWidgetsPlugin & { setSession: ReturnType<typeof vi.fn>; clear: ReturnType<typeof vi.fn> } => ({
+  const plugin = (): PaleeWidgetsPlugin & { setSession: ReturnType<typeof vi.fn>; clear: ReturnType<typeof vi.fn> } => ({
     setSession: vi.fn().mockResolvedValue(undefined),
     clear: vi.fn().mockResolvedValue(undefined),
   });
@@ -48,20 +48,20 @@ describe("widgets", () => {
   });
 
   it("issues once, then hands the stored token with the host, words and paths", async () => {
-    bridge("ios", ["MilosWidgets"]);
+    bridge("ios", ["PaleeWidgets"]);
     issue.mockResolvedValue({ id: "w1", token: "widget-token", expires_at: "2027-05-01T00:00:00Z" });
     const native = plugin();
 
-    await syncWidgets("access", "u1", labels, { plugin: native, origin: "https://milos.test", now: NOW });
-    await syncWidgets("access", "u1", labels, { plugin: native, origin: "https://milos.test", now: NOW });
+    await syncWidgets("access", "u1", labels, { plugin: native, origin: "https://palee.test", now: NOW });
+    await syncWidgets("access", "u1", labels, { plugin: native, origin: "https://palee.test", now: NOW });
 
     expect(issue).toHaveBeenCalledTimes(1);
     expect(issue).toHaveBeenCalledWith("access", "ios", null);
-    expect(native.setSession).toHaveBeenLastCalledWith({ token: "widget-token", baseUrl: "https://milos.test", labels, paths: WIDGET_PATHS });
+    expect(native.setSession).toHaveBeenLastCalledWith({ token: "widget-token", baseUrl: "https://palee.test", labels, paths: WIDGET_PATHS });
   });
 
   it("replaces the install's own token when it gets old, and forgets it on sign-out", async () => {
-    bridge("android", ["MilosWidgets"]);
+    bridge("android", ["PaleeWidgets"]);
     issue.mockResolvedValueOnce({ id: "w1", token: "one" }).mockResolvedValueOnce({ id: "w2", token: "two" });
     const native = plugin();
 
@@ -72,13 +72,13 @@ describe("widgets", () => {
     await forgetWidgets("access", native);
     expect(native.clear).toHaveBeenCalled();
     expect(revoke).toHaveBeenCalledWith("access", "w2");
-    expect(window.localStorage.getItem("milos-widget-token")).toBeNull();
+    expect(window.localStorage.getItem("palee-widget-token")).toBeNull();
   });
 });
 
 describe("geofence", () => {
   const region: GeofenceRegion = {
-    id: "milos-loc",
+    id: "palee-loc",
     organization_id: "org",
     box_name: "Box",
     location_id: "loc",
@@ -92,20 +92,20 @@ describe("geofence", () => {
   const words = ({ box, className, time }: { box: string; className: string; time: string }) => ({ title: box, body: `${className} ${time}` });
 
   it("turns the server's regions into what the phone watches", () => {
-    expect(toNativeRegions([region], words, () => "20:00", "https://milos.test")).toEqual([
+    expect(toNativeRegions([region], words, () => "20:00", "https://palee.test")).toEqual([
       {
-        id: "milos-loc",
+        id: "palee-loc",
         latitude: 37.9,
         longitude: 23.7,
         radius: 150,
-        url: "https://milos.test/c/loc/g/a.b.c",
+        url: "https://palee.test/c/loc/g/a.b.c",
         windows: [{ from: Date.parse("2026-11-23T17:30:00Z"), to: Date.parse("2026-11-23T18:15:00Z"), title: "Box", body: "WOD 20:00" }],
       },
     ]);
   });
 
   it("clears while off and syncs once on; sign-out turns it off", async () => {
-    const native: MilosGeofencePlugin = {
+    const native: PaleeGeofencePlugin = {
       checkPermissions: vi.fn(),
       requestPermissions: vi.fn(),
       setRegions: vi.fn().mockResolvedValue({ monitored: 1 }),
@@ -139,9 +139,9 @@ describe("nfc", () => {
     await writeNfcTag("https://x/c/l/n/c");
     expect(write).toHaveBeenCalledWith({ records: [{ recordType: "url", data: "https://x/c/l/n/c" }] });
 
-    bridge("android", ["MilosNfc"]);
+    bridge("android", ["PaleeNfc"]);
     expect(nfcWriter()).toBe("app");
-    const plugin: MilosNfcPlugin = { isAvailable: vi.fn(), write: vi.fn().mockResolvedValue(undefined) };
+    const plugin: PaleeNfcPlugin = { isAvailable: vi.fn(), write: vi.fn().mockResolvedValue(undefined) };
     await writeNfcTag("https://x/c/l/n/c", "app", plugin);
     expect(plugin.write).toHaveBeenCalledWith({ url: "https://x/c/l/n/c" });
   });

@@ -2,22 +2,22 @@ import { apiRequest } from "@/api/client";
 import type { operations } from "@/api/generated/schema";
 
 type MyReviewsResponse =
-  operations["MilosTrainingWeb.ReviewController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.ReviewController.index"]["responses"][200]["content"]["application/json"];
 type SubmitReviewResponse =
-  operations["MilosTrainingWeb.ReviewController.create"]["responses"][201]["content"]["application/json"];
+  operations["PaleeWeb.ReviewController.create"]["responses"][201]["content"]["application/json"];
 type AdminReviewsResponse =
-  operations["MilosTrainingWeb.AdminReviewController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.AdminReviewController.index"]["responses"][200]["content"]["application/json"];
 type UpdateReviewResponse =
-  operations["MilosTrainingWeb.AdminReviewController.update_status"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.AdminReviewController.update_status"]["responses"][200]["content"]["application/json"];
 
 export type ReviewRecord = MyReviewsResponse["reviews"][number];
 export type SubmitReviewRequest =
-  operations["MilosTrainingWeb.ReviewController.create"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.ReviewController.create"]["requestBody"]["content"]["application/json"];
 export type AdminReviewFilters = NonNullable<
-  operations["MilosTrainingWeb.AdminReviewController.index"]["parameters"]["query"]
+  operations["PaleeWeb.AdminReviewController.index"]["parameters"]["query"]
 >;
 export type UpdateReviewStatusRequest =
-  operations["MilosTrainingWeb.AdminReviewController.update_status"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.AdminReviewController.update_status"]["requestBody"]["content"]["application/json"];
 
 /** Query key of the member's own reviews (reviews page, Ροή, realtime sync). */
 export const MY_REVIEWS_KEY = ["my", "reviews"] as const;

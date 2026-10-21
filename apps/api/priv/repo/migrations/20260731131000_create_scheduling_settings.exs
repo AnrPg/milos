@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateSchedulingSettings do
+defmodule Palee.Repo.Migrations.CreateSchedulingSettings do
   use Ecto.Migration
 
   def change do

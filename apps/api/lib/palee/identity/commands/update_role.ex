@@ -1,0 +1,6 @@
+defmodule Palee.Identity.Commands.UpdateRole do
+  alias Palee.Identity.{Account, UserStore}
+
+  def call(%Account{} = user, role), do: call(user.id, role)
+  def call(user_id, role) when is_binary(user_id), do: UserStore.update_user_role(user_id, role)
+end

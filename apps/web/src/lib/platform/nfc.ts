@@ -1,13 +1,13 @@
 "use client";
 
 // ADR-173: writing a location's NFC door tag from «Ρυθμίσεις › Τοποθεσία».
-// Inside the store apps through the app's own `MilosNfc` plugin (Core NFC on
+// Inside the store apps through the app's own `PaleeNfc` plugin (Core NFC on
 // iOS, Android's NFC adapter); in Chrome on Android through Web NFC. Reading
 // a tag needs no code: the tag holds an https link under /c/, which the phone
 // opens in the app (universal link / App Link) or in the browser.
 import { hasCapability } from "./index";
 
-export type MilosNfcPlugin = {
+export type PaleeNfcPlugin = {
   isAvailable(): Promise<{ available: boolean; enabled: boolean }>;
   /** Waits for a tag near the phone and writes one URL record to it. */
   write(options: { url: string }): Promise<void>;
@@ -30,18 +30,18 @@ export function nfcWriter(): NfcWriter {
   return webNdef() ? "web" : null;
 }
 
-let pluginPromise: Promise<MilosNfcPlugin> | null = null;
+let pluginPromise: Promise<PaleeNfcPlugin> | null = null;
 
-export function nfcPlugin(): Promise<MilosNfcPlugin> {
+export function nfcPlugin(): Promise<PaleeNfcPlugin> {
   pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => {
-    const native = registerPlugin<MilosNfcPlugin>("MilosNfc");
+    const native = registerPlugin<PaleeNfcPlugin>("PaleeNfc");
     return { isAvailable: () => native.isAvailable(), write: (options) => native.write(options) };
   });
   return pluginPromise;
 }
 
 /** Writes the tag link; rejects when the person cancels or the tag can't be written. */
-export async function writeNfcTag(url: string, writer: NfcWriter = nfcWriter(), plugin?: MilosNfcPlugin): Promise<void> {
+export async function writeNfcTag(url: string, writer: NfcWriter = nfcWriter(), plugin?: PaleeNfcPlugin): Promise<void> {
   if (writer === "app") {
     await (plugin ?? (await nfcPlugin())).write({ url });
     return;

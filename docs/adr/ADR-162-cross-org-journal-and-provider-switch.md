@@ -12,14 +12,14 @@ The engineering gap: PRs and injuries were account-scoped, but the
 training log, Πρόοδος, history and the coach's view were org-scoped. The
 journal feed (ADR-139) already read the member's own rows across
 organizations in their personal session, and coaches read through
-`{:coach, organization_id}` and `milos_entry_visible_to_acting_coach`.
+`{:coach, organization_id}` and `palee_entry_visible_to_acting_coach`.
 
 ## Decision
 1. **Providers.** `organizations.provider_kind` (`gym` | `coach`) and
    `organization_memberships.ended_at`, which a trigger sets when a
    membership leaves `active` (suspended, revoked) and clears when it
    returns. That way the end date is right whichever code path changed the
-   status. `milos_my_providers()` is a definer lookup that answers only the
+   status. `palee_my_providers()` is a definer lookup that answers only the
    caller's own memberships of any status, with name, kind, brand, status
    and end date. A former provider's `organizations` row is invisible to
    the member's session, yet every view still labels its entries.
@@ -100,7 +100,7 @@ organizations in their personal session, and coaches read through
    move to `coach_can_view` once it has an audience. A reply request still
    needs the entry's own gym. Shareable kinds: execution, training_log, pr,
    note and check_in.
-   - The SQL twin is `milos_journal_entry_shared_with_coach`, checked
+   - The SQL twin is `palee_journal_entry_shared_with_coach`, checked
      against the acting coach. It is used by
      `FeedScope`'s coach scope and by additive `…_coach_shared_read_policy`
      row policies on `journal_notes`, `wellbeing_check_ins`,
@@ -198,7 +198,7 @@ organizations in their personal session, and coaches read through
     includes it is refused as a whole.
 - Per coach (migration `20261125100000_journal_audience_per_coach`):
   `coach_user_id` joins the primary keys of `journal_entry_audiences` and
-  `journal_coach_audience_exclusions`; `milos_my_provider_coaches()` lists
+  `journal_coach_audience_exclusions`; `palee_my_provider_coaches()` lists
   the coaches of the caller's active providers for the chooser. The web
   chooser (`lib/coach-audience.ts`, `CoachChips`) groups coaches by
   provider and hides the home provider's coaches, who always read.

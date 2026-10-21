@@ -8,7 +8,7 @@ page, and the box should see who came and who joined (plan §5a board 6). Bookin
 attendance and memberships already exist and must not learn about trials.
 
 ## Decision
-1. **Own context.** `MilosTraining.Trials` (facade, `TrialStore` and
+1. **Own context.** `Palee.Trials` (facade, `TrialStore` and
    `TrialScheduler` ports, Ecto and Oban adapters) owns
    `scheduling_trial_policies` (one row per box, defaults all off) and
    `scheduling_trial_requests`. Rules and the lifecycle are pure domain modules

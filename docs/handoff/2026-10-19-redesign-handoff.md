@@ -1,4 +1,4 @@
-# Milos redesign: handoff report (2026-10-19)
+# Palee redesign: handoff report (2026-10-19)
 
 > For the next agent continuing the redesign. Read this file first, then the documents it
 > points to. It covers the big picture, where things stand, every decision taken so far, the
@@ -12,9 +12,9 @@
 ## 0. Read order
 
 1. This file.
-2. `docs/product/2026-10-15-milos-product-vision-and-ia.md`: **the brief**. It is the product source of
+2. `docs/product/2026-10-15-palee-product-vision-and-ia.md`: **the brief**. It is the product source of
    truth, and its §4 principles are non-negotiable.
-3. `docs/product/mockups/milos-ia-mockup.html`: **the final clickable design** (34 phone screens).
+3. `docs/product/mockups/palee-ia-mockup.html`: **the final clickable design** (34 phone screens).
    Open it in a browser. PNGs are in `docs/product/mockups/screens/`.
 4. `docs/plans/redesign-phase-2-open-up.md`: **the Phase 2 plan**. It has the decisions (§3),
    architecture (§4), milestones (§5), the screen-level UX decisions (§5a) and progress (§9).
@@ -23,15 +23,15 @@
 6. ADRs `docs/adr/ADR-137` … `ADR-142`, `ADR-148`, `ADR-151` (see §6).
 7. `.claude/CLAUDE.md` (multi-agent rules) and `AGENTS.md` / `apps/api/AGENTS.md` (hexagonal rules).
 
-Ignore as a spec: `docs/product/mockups/milos-bottom-bar-exploration.html`. It is **superseded**
+Ignore as a spec: `docs/product/mockups/palee-bottom-bar-exploration.html`. It is **superseded**
 and records only why 13 rejected options were rejected.
 
 ---
 
 ## 1. The big picture
 
-### What Milos is
-Milos is **gym-management software that turns the gym into a living club**. The product is
+### What Palee is
+Palee is **gym-management software that turns the gym into a living club**. The product is
 B2B2C:
 
 1. A **gym owner** (or an independent coach) pays for the SaaS. They run bookings, packages,
@@ -229,7 +229,7 @@ are remembered.
 - **Tag suggestions.** `profile_tag_suggestions` is a tenant table with RLS. `POST
   /api/org/:slug/admin/public-profile/suggestions` creates one. Platform staff review all gyms'
   suggestions at `GET/PATCH /api/platform/tag-suggestions` (via SECURITY DEFINER functions
-  `milos_pending_tag_suggestions()` and `milos_resolve_tag_suggestion()`). «Added» only records
+  `palee_pending_tag_suggestions()` and `palee_resolve_tag_suggestion()`). «Added» only records
   the outcome. **Adding a tag is a code change** to `BoxProfilePolicy` plus 12 translations.
 
 ### Web
@@ -344,7 +344,7 @@ The plan reserves ADR-141…151:
 ## 7. Final mockups and visual references
 
 ### The design (source of truth)
-`docs/product/mockups/milos-ia-mockup.html` has 34 clickable screens, a sitemap, coverage tables
+`docs/product/mockups/palee-ia-mockup.html` has 34 clickable screens, a sitemap, coverage tables
 and the anatomy atlas prototype. Each PNG in `docs/product/mockups/screens/` maps to a
 milestone:
 
@@ -411,7 +411,7 @@ API (`apps/api`):
 mix format --check-formatted
 mix compile --warnings-as-errors
 mix credo --strict
-mix milos.architecture          # hexagonal boundaries
+mix palee.architecture          # hexagonal boundaries
 mix test                        # ~1560 tests, ~4–5 min
 MIX_ENV=test mix ecto.rollback -n 1 && MIX_ENV=test mix ecto.migrate   # new migrations reversible
 ```

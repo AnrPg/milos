@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddExerciseModificationsAndNotes do
+defmodule Palee.Repo.Migrations.AddExerciseModificationsAndNotes do
   use Ecto.Migration
 
   def change do

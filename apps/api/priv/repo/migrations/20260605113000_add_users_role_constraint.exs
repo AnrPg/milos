@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddUsersRoleConstraint do
+defmodule Palee.Repo.Migrations.AddUsersRoleConstraint do
   use Ecto.Migration
 
   def change do

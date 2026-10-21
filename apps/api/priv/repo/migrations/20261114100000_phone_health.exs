@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PhoneHealth do
+defmodule Palee.Repo.Migrations.PhoneHealth do
   @moduledoc """
   ADR-172: Apple Health and Health Connect send what the phone reads through
   the same Devices tables as Garmin (ADR-161).

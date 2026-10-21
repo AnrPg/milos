@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddRoleNotificationTypes do
+defmodule Palee.Repo.Migrations.AddRoleNotificationTypes do
   use Ecto.Migration
 
   # ADR-100 coach_client_assigned and ADR-101 coach_note_viewed.

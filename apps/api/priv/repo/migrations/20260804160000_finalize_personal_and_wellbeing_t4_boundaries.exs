@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.FinalizePersonalAndWellbeingT4Boundaries do
+defmodule Palee.Repo.Migrations.FinalizePersonalAndWellbeingT4Boundaries do
   use Ecto.Migration
 
   @personal_tables ~w(

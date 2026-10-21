@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinanceCreditLedgerEntries do
+defmodule Palee.Repo.Migrations.CreateFinanceCreditLedgerEntries do
   use Ecto.Migration
 
   def up do

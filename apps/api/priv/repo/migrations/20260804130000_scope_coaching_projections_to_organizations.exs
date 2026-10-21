@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeCoachingProjectionsToOrganizations do
+defmodule Palee.Repo.Migrations.ScopeCoachingProjectionsToOrganizations do
   use Ecto.Migration
 
   def up do
