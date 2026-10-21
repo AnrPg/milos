@@ -490,6 +490,8 @@ defmodule MilosTrainingWeb.Router do
 
     get("/injury-warnings", MyInjuryWarningController, :show)
     post("/injury-warnings/acknowledge", MyInjuryWarningController, :acknowledge)
+    # ADR-174: the coach-approved adaptation (never a pending suggestion).
+    get("/scaling", MyScalingController, :show)
   end
 
   # ADR-163: WOD goals on the workout card and «τι ένιωσες» on the member's
@@ -664,6 +666,10 @@ defmodule MilosTrainingWeb.Router do
     get("/form-reviews", CoachingExtrasController, :form_review_queue)
     post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
     get("/reply-queue", CoachingExtrasController, :reply_queue)
+    # ADR-174: the AI scaling approval queue.
+    get("/scaling-suggestions", StaffScalingController, :index)
+    post("/scaling-suggestions/:id/approve", StaffScalingController, :approve)
+    post("/scaling-suggestions/:id/dismiss", StaffScalingController, :dismiss)
     get("/my-client-stats", CoachingExtrasController, :my_client_stats)
     get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
     put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
@@ -786,6 +792,9 @@ defmodule MilosTrainingWeb.Router do
     get("/onboarding", AdminOnboardingController, :show)
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
+    # ADR-174: the gym's AI settings (own key, scaling switch, usage).
+    get("/ai-settings", AdminAiSettingsController, :show)
+    put("/ai-settings", AdminAiSettingsController, :update)
     get("/branding", AdminBrandingController, :show)
     get("/trial-policy", AdminTrialController, :policy)
     put("/trial-policy", AdminTrialController, :update_policy)

@@ -8699,5 +8699,61 @@
       "range": "Período",
       "sharedOnly": "Apenas das entradas que o cliente partilha com os coaches da box."
     }
+  },
+  "Scaling": {
+    "loading": "A carregar…",
+    "settings": {
+      "title": "Assistente de IA",
+      "description": "Sugestões de adaptação para atletas lesionados, com a vossa própria chave. Um coach aprova cada sugestão.",
+      "enable": "Sugestões de adaptação",
+      "enableHint": "Desativadas por predefinição. Precisam de uma chave API.",
+      "key": "Chave API (Anthropic)",
+      "keySet": "Está definida uma chave terminada em {last4}.",
+      "keyRejected": "O fornecedor recusou a chave terminada em {last4}. Adicione uma nova chave.",
+      "keyMissing": "Nenhuma chave definida.",
+      "keyPlaceholder": "Cole a chave",
+      "saveKey": "Guardar chave",
+      "removeKey": "Remover chave",
+      "model": "Modelo (opcional)",
+      "saveModel": "Guardar modelo",
+      "usage": "Este mês · sugestões: {count} · custo: ${cost}",
+      "privacy": "Só são enviados o treino e as lesões registadas pelo ginásio, sem nomes. A chave nunca mais é mostrada."
+    },
+    "queue": {
+      "eyebrow": "Os meus clientes",
+      "title": "Sugestões de adaptação · {count}",
+      "hint": "Sugestão assistida por IA. O atleta não vê nada antes da sua aprovação.",
+      "workout": "Treino",
+      "aiBadge": "IA",
+      "include": "Incluir: {movement}",
+      "editSuggested": "Sugestão para {movement}",
+      "scaleLevel": "Nível: {level}",
+      "notePlaceholder": "Mensagem para o atleta (opcional)",
+      "approve": "Aprovar",
+      "dismiss": "Rejeitar"
+    },
+    "member": {
+      "title": "Adaptado pelo teu coach",
+      "scaleLevel": "Nível: {level}",
+      "disclosure": "Assistido por IA · aprovado pelo teu coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: saltar"
+    },
+    "regions": {
+      "shoulder": "ombro",
+      "elbow": "cotovelo",
+      "wrist": "pulso",
+      "neck": "pescoço",
+      "back": "costas",
+      "hip": "anca",
+      "knee": "joelho",
+      "hamstring": "isquiotibiais",
+      "ankle": "tornozelo",
+      "chest": "peito",
+      "core": "core"
+    }
   }
 }

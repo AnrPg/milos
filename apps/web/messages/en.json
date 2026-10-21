@@ -8699,5 +8699,61 @@
       "range": "Period",
       "sharedOnly": "Only from entries the client shares with the box's coaches."
     }
+  },
+  "Scaling": {
+    "loading": "Loading…",
+    "settings": {
+      "title": "AI assistant",
+      "description": "Scaling suggestions for injured athletes, with your own key. A coach approves every suggestion.",
+      "enable": "Scaling suggestions",
+      "enableHint": "Off by default. Needs an API key.",
+      "key": "API key (Anthropic)",
+      "keySet": "A key ending in {last4} is set.",
+      "keyRejected": "The provider rejected the key ending in {last4}. Add a new key.",
+      "keyMissing": "No key set.",
+      "keyPlaceholder": "Paste the key",
+      "saveKey": "Save key",
+      "removeKey": "Remove key",
+      "model": "Model (optional)",
+      "saveModel": "Save model",
+      "usage": "This month · suggestions: {count} · cost: ${cost}",
+      "privacy": "Only the workout and the injuries the gym recorded are sent, without names. The key is never shown again."
+    },
+    "queue": {
+      "eyebrow": "My clients",
+      "title": "Scaling suggestions · {count}",
+      "hint": "AI-assisted suggestion. The athlete sees nothing until you approve.",
+      "workout": "Workout",
+      "aiBadge": "AI",
+      "include": "Include: {movement}",
+      "editSuggested": "Suggestion for {movement}",
+      "scaleLevel": "Level: {level}",
+      "notePlaceholder": "Message to the athlete (optional)",
+      "approve": "Approve",
+      "dismiss": "Dismiss"
+    },
+    "member": {
+      "title": "Adjusted by your coach",
+      "scaleLevel": "Level: {level}",
+      "disclosure": "AI-assisted · approved by your coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: skip"
+    },
+    "regions": {
+      "shoulder": "shoulder",
+      "elbow": "elbow",
+      "wrist": "wrist",
+      "neck": "neck",
+      "back": "back",
+      "hip": "hip",
+      "knee": "knee",
+      "hamstring": "hamstring",
+      "ankle": "ankle",
+      "chest": "chest",
+      "core": "core"
+    }
   }
 }

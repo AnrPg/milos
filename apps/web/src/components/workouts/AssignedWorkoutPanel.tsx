@@ -23,6 +23,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
 
@@ -450,6 +451,7 @@ export function AssignedWorkoutPanel({
                 surface="assignment_detail"
                 sourceContextId={assignment.id}
               />
+              <MyWorkoutScaling token={accessToken} workoutId={assignment.master_workout_id} className="mt-3" />
             </div>
           ) : null}
 

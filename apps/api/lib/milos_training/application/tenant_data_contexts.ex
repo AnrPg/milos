@@ -33,6 +33,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Pantheon,
     Partners,
     Referrals,
+    Scaling,
     Scheduling,
     Seasons,
     Trials,
@@ -46,6 +47,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
 
   @purgeable [
     AiUsage,
+    Scaling,
     Analytics,
     Partners,
     Community,
