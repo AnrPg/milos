@@ -1,0 +1,11 @@
+# ADR-171: generated per environment by scripts/configure.mjs
+www/app-config.js
+
+# Firebase and signing material never go in git (owner actions in ADR-171)
+android/app/google-services.json
+ios/App/App/GoogleService-Info.plist
+*.jks
+*.keystore
+*.p8
+*.p12
+*.mobileprovision

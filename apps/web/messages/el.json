@@ -6909,7 +6909,9 @@
     "integrationHint_unavailable": "Δεν υπάρχει ακόμα σύνδεση.",
     "integrationHint_native_only": "Χρειάζεται την εφαρμογή για κινητό· δεν γίνεται από τον browser.",
     "integrationStatus_error": "Θέλει επανασύνδεση",
-    "integrationHint_error": "Το Garmin σταμάτησε να απαντά· κάνε επανασύνδεση."
+    "integrationHint_error": "Το Garmin σταμάτησε να απαντά· κάνε επανασύνδεση.",
+    "integrationStatus_native_soon": "Σύντομα",
+    "integrationHint_native_soon": "Έρχεται σε επόμενη έκδοση της εφαρμογής."
   },
   "Media": {
     "add": "Πρόσθεσε φωτογραφίες ή βίντεο",

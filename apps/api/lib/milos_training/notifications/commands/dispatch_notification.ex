@@ -1,5 +1,6 @@
 defmodule MilosTraining.Notifications.Commands.DispatchNotification do
   alias MilosTraining.Notifications.Commands.CreateNotification
+  alias MilosTraining.Notifications.Commands.EnqueueNativePushDispatch
   alias MilosTraining.Notifications.Commands.EnqueuePushDispatch
   alias MilosTraining.Notifications.NotificationStore
   alias MilosTraining.Notifications.Domain.{PayloadNormalizer, PushMessageBuilder}
@@ -54,11 +55,13 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
 
   defp maybe_enqueue_push(_notification, true), do: :ok
 
+  # ADR-171: the store apps' installs get the same push as the browser ones.
   defp maybe_enqueue_push(notification, false) do
-    if PushConfig.enabled?() do
-      EnqueuePushDispatch.call(notification)
-    else
-      :ok
+    web = if PushConfig.enabled?(), do: EnqueuePushDispatch.call(notification), else: :ok
+
+    case {web, EnqueueNativePushDispatch.call(notification)} do
+      {:ok, native} -> native
+      {web_error, _native} -> web_error
     end
   end
 

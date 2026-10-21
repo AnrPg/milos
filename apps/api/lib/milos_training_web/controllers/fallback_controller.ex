@@ -2302,7 +2302,10 @@ defmodule MilosTrainingWeb.FallbackController do
       {:unprocessable_entity, "Choose one of the suggested classes or workouts"},
     device_confirmation_required:
       {:unprocessable_entity, "Choose a class or workout, or keep it as its own entry"},
-    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr"}
+    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr"},
+    # ADR-171: push to the store apps.
+    native_push_not_configured:
+      {:service_unavailable, "Push to the app isn't available on this server yet"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

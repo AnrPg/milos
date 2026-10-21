@@ -2,14 +2,19 @@ defmodule MilosTraining.Notifications do
   require Logger
 
   alias MilosTraining.{Identity, Organizations}
+  alias MilosTraining.Notifications.Commands.DeleteNativePushToken
   alias MilosTraining.Notifications.Commands.DeletePushSubscription
   alias MilosTraining.Notifications.Commands.DispatchNotification
   alias MilosTraining.Notifications.Commands.EnqueueNotificationEvent
   alias MilosTraining.Notifications.Commands.MarkAllRead
   alias MilosTraining.Notifications.Commands.MarkNotificationRead
+  alias MilosTraining.Notifications.Commands.SaveNativePushToken
   alias MilosTraining.Notifications.Commands.SavePushSubscription
   alias MilosTraining.Notifications.Domain.NotificationDedupe
+  alias MilosTraining.Notifications.NativePush
+  alias MilosTraining.Notifications.NativePushTokenStore
   alias MilosTraining.Notifications.PushConfig
+  alias MilosTraining.Notifications.Queries.ListNativePushTokens
   alias MilosTraining.Notifications.Queries.GetUnreadCount
   alias MilosTraining.Notifications.Queries.ListInboxPage
   alias MilosTraining.Notifications.Queries.GetPushSubscriptionStatus
@@ -89,8 +94,69 @@ defmodule MilosTraining.Notifications do
   def push_config do
     %{
       enabled: PushConfig.enabled?(),
-      vapid_public_key: PushConfig.public_key()
+      vapid_public_key: PushConfig.public_key(),
+      native_providers: NativePush.configured_providers()
     }
+  end
+
+  # ADR-171: push to the store apps (FCM on Android, APNs on iOS).
+
+  @doc """
+  Registers a store app install's push token for the person. Answers
+  `{:error, :native_push_not_configured}` while the provider has no
+  credentials, so nothing is stored that could not be used.
+  """
+  def register_native_push_token(user_id, attrs) when is_map(attrs) do
+    provider = attr(attrs, :provider)
+
+    if NativePush.configured?(provider) do
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        SaveNativePushToken.call(%{
+          user_id: user_id,
+          provider: provider,
+          platform: attr(attrs, :platform),
+          token: attr(attrs, :token),
+          app_id: attr(attrs, :app_id),
+          app_version: attr(attrs, :app_version),
+          apns_environment:
+            if(provider == "apns", do: attr(attrs, :apns_environment) || "production"),
+          last_registered_at: DateTime.utc_now()
+        })
+      end)
+    else
+      {:error, :native_push_not_configured}
+    end
+  end
+
+  def list_native_push_tokens(user_id),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        ListNativePushTokens.call(user_id)
+      end)
+
+  def get_native_push_token(user_id, id),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        ListNativePushTokens.get(user_id, id)
+      end)
+
+  def delete_native_push_token(user_id, token) when is_binary(token),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        DeleteNativePushToken.call(user_id, token)
+      end)
+
+  def delete_native_push_token_by_id(user_id, id),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        DeleteNativePushToken.by_id(user_id, id)
+      end)
+
+  defp attr(attrs, key) do
+    case Map.get(attrs, key) || Map.get(attrs, Atom.to_string(key)) do
+      value when is_binary(value) -> String.trim(value)
+      _other -> nil
+    end
   end
 
   def get_push_settings, do: NotificationStore.get_push_settings()

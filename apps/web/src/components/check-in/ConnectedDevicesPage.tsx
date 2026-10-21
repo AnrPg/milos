@@ -10,6 +10,8 @@ import { DEVICES_KEY as CONNECTED_DEVICES_KEY, fetchDevices } from "@/api/device
 import { GarminRowItem } from "@/components/devices/GarminRow";
 import { garminReturn, garminRowOf, returnReasonKey } from "@/components/devices/garmin-model";
 import { useSession } from "@/components/session-provider";
+import { usePlatform } from "@/hooks/usePlatform";
+import { integrationStatusKey, visibleIntegrations } from "@/lib/platform/device-rows";
 
 import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey } from "./errors";
@@ -220,31 +222,35 @@ function IntegrationsSection({ token, integrations }: { token: string; integrati
   const t = useTranslations("CheckIn");
   const [message, setMessage] = useState<string | null>(null);
   const garmin = garminRowOf(integrations);
-  const tone: Record<Integration["status"], { color: string; background: string }> = {
+  const { platform, capabilities } = usePlatform();
+  const tone: Record<string, { color: string; background: string }> = {
     connected: { color: "var(--success)", background: "color-mix(in srgb, var(--success) 16%, transparent)" },
     disconnected: { color: "var(--text-soft)", background: "var(--panel-raised)" },
     unavailable: { color: "var(--dim)", background: "var(--panel-raised)" },
     native_only: { color: "var(--text-soft)", background: "var(--panel-raised)" },
+    native_soon: { color: "var(--dim)", background: "var(--panel-raised)" },
     error: { color: "var(--danger)", background: "color-mix(in srgb, var(--danger) 16%, transparent)" },
   };
   return (
     <Card title={t("integrationsTitle")} hint={t("integrationsHint")} testId="devices-integrations">
       <ul className="flex flex-col gap-2">
-        {integrations.map((integration) =>
-          integration.provider === "garmin" && garmin ? (
-            <GarminRowItem key="garmin" row={garmin} token={token} onMessage={setMessage} />
-          ) : (
+        {visibleIntegrations(integrations, platform).map((integration) => {
+          if (integration.provider === "garmin" && garmin) {
+            return <GarminRowItem key="garmin" row={garmin} token={token} onMessage={setMessage} />;
+          }
+          const status = integrationStatusKey(integration, platform, capabilities);
+          return (
           <li key={integration.provider} className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
             <span className="flex min-w-0 flex-col">
               <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t(["provider", integration.provider].join("_"))}</span>
-              <span className="text-xs" style={{ color: "var(--text-soft)" }}>{t(["integrationHint", integration.status].join("_"))}</span>
+              <span className="text-xs" style={{ color: "var(--text-soft)" }}>{t(["integrationHint", status].join("_"))}</span>
             </span>
-            <span className="shrink-0 rounded-full px-3 py-1 text-xs font-bold" style={tone[integration.status]}>
-              {t(["integrationStatus", integration.status].join("_"))}
+            <span className="shrink-0 rounded-full px-3 py-1 text-xs font-bold" style={tone[status]}>
+              {t(["integrationStatus", status].join("_"))}
             </span>
           </li>
-          ),
-        )}
+          );
+        })}
       </ul>
       {message ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{message}</p> : null}
     </Card>

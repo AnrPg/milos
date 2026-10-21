@@ -206,6 +206,8 @@ export function TopNav() {
     <header
       className="sticky top-0 z-50 flex flex-col overflow-x-clip"
       style={{
+        // ADR-171: below the status bar inside the store apps (0 on the web).
+        top: "var(--safe-top, 0px)",
         background: "var(--bg)",
         borderBottom: "1px solid var(--border)",
         minHeight: "3.25rem",

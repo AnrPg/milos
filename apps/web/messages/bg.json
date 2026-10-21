@@ -6909,7 +6909,9 @@
     "integrationHint_unavailable": "Все още няма връзка.",
     "integrationHint_native_only": "Нужно е мобилното приложение; от браузъра не може.",
     "integrationStatus_error": "Трябва повторно свързване",
-    "integrationHint_error": "Garmin спря да отговаря; свържи го отново."
+    "integrationHint_error": "Garmin спря да отговаря; свържи го отново.",
+    "integrationStatus_native_soon": "Скоро",
+    "integrationHint_native_soon": "Идва в следваща версия на приложението."
   },
   "Media": {
     "add": "Добави снимки или видео",

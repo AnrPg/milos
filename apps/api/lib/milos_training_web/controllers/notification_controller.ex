@@ -5,6 +5,7 @@ defmodule MilosTrainingWeb.NotificationController do
   alias Guardian.Plug, as: GuardianPlug
 
   alias MilosTraining.Application.{
+    DeleteNativePushToken,
     DeletePushSubscription,
     GetNotifications,
     GetPushNotificationConfig,
@@ -12,6 +13,7 @@ defmodule MilosTrainingWeb.NotificationController do
     MarkNotificationClicked,
     MarkNotificationRead,
     MarkNotificationsRead,
+    RegisterNativePushToken,
     SavePushSubscription
   }
 
@@ -30,6 +32,8 @@ defmodule MilosTrainingWeb.NotificationController do
               :create_push_subscription,
               :delete_push_subscription,
               :push_subscription_status,
+              :create_native_push_token,
+              :delete_native_push_token,
               :mark_clicked,
               :mark_read
             ]
@@ -88,6 +92,35 @@ defmodule MilosTrainingWeb.NotificationController do
       subscription: %Schema{allOf: [@push_subscription_schema], nullable: true}
     },
     required: [:registered, :subscription]
+  }
+
+  # ADR-171: a store app install's push token. The token itself is never
+  # echoed back.
+  @native_push_token_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      provider: %Schema{type: :string, enum: ["fcm", "apns"]},
+      platform: %Schema{type: :string, enum: ["android", "ios"]},
+      app_id: %Schema{type: :string, nullable: true},
+      app_version: %Schema{type: :string, nullable: true},
+      apns_environment: %Schema{type: :string, enum: ["production", "sandbox"], nullable: true},
+      last_registered_at: %Schema{type: :string, format: :"date-time"}
+    },
+    required: [:id, :provider, :platform, :last_registered_at]
+  }
+
+  @native_push_token_params_schema %Schema{
+    type: :object,
+    properties: %{
+      provider: %Schema{type: :string, enum: ["fcm", "apns"]},
+      platform: %Schema{type: :string, enum: ["android", "ios"]},
+      token: %Schema{type: :string, minLength: 16, maxLength: 4096},
+      app_id: %Schema{type: :string, maxLength: 255, nullable: true},
+      app_version: %Schema{type: :string, maxLength: 64, nullable: true},
+      apns_environment: %Schema{type: :string, enum: ["production", "sandbox"], nullable: true}
+    },
+    required: [:provider, :platform, :token]
   }
 
   @push_subscription_endpoint_param %Parameter{
@@ -216,9 +249,14 @@ defmodule MilosTrainingWeb.NotificationController do
            type: :object,
            properties: %{
              enabled: %Schema{type: :boolean},
-             vapid_public_key: %Schema{type: :string, nullable: true}
+             vapid_public_key: %Schema{type: :string, nullable: true},
+             native_providers: %Schema{
+               type: :array,
+               items: %Schema{type: :string, enum: ["fcm", "apns"]},
+               description: "Store app push providers this server can deliver to (ADR-171)"
+             }
            },
-           required: [:enabled, :vapid_public_key]
+           required: [:enabled, :vapid_public_key, :native_providers]
          }}
     ]
   )
@@ -278,6 +316,59 @@ defmodule MilosTrainingWeb.NotificationController do
     },
     responses: [
       ok: {"Push subscription status", "application/json", @push_subscription_status_schema}
+    ]
+  )
+
+  operation(:create_native_push_token,
+    summary: "Register a store app install's push token for the current user",
+    description:
+      "ADR-171: FCM tokens come from the Android app, APNs tokens from the iOS app. " <>
+        "Answers 503 native_push_not_configured while the provider has no credentials.",
+    request_body: %RequestBody{
+      required: true,
+      content: %{"application/json" => %MediaType{schema: @native_push_token_params_schema}}
+    },
+    responses: [
+      ok:
+        {"Native push token", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{native_push_token: @native_push_token_schema},
+           required: [:native_push_token]
+         }},
+      created:
+        {"Native push token", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{native_push_token: @native_push_token_schema},
+           required: [:native_push_token]
+         }}
+    ]
+  )
+
+  operation(:delete_native_push_token,
+    summary: "Stop push to a store app install of the current user",
+    description: "ADR-171: the token travels in the body so it never lands in URLs or logs.",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{token: %Schema{type: :string, minLength: 1, maxLength: 4096}},
+            required: [:token]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Delete result", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{deleted: %Schema{type: :boolean}},
+           required: [:deleted]
+         }}
     ]
   )
 
@@ -345,6 +436,28 @@ defmodule MilosTrainingWeb.NotificationController do
     with {:ok, endpoint} <- ParamExtractor.fetch(body, "endpoint") do
       deleted = DeletePushSubscription.call(actor.id, endpoint)
       json(conn, %{deleted: deleted})
+    end
+  end
+
+  def create_native_push_token(conn, params) do
+    actor = GuardianPlug.current_resource(conn)
+    body = normalize_body_params(conn, params)
+
+    with {:ok, token, status} <- RegisterNativePushToken.call(actor.id, body) do
+      conn
+      |> put_status(if(status == :created, do: :created, else: :ok))
+      |> json(%{
+        native_push_token: Map.drop(token, [:token, :user_id, :inserted_at, :updated_at])
+      })
+    end
+  end
+
+  def delete_native_push_token(conn, params) do
+    actor = GuardianPlug.current_resource(conn)
+    body = normalize_body_params(conn, params)
+
+    with {:ok, token} <- ParamExtractor.fetch(body, "token") do
+      json(conn, %{deleted: DeleteNativePushToken.call(actor.id, token)})
     end
   end
 

@@ -6909,7 +6909,9 @@
     "integrationHint_unavailable": "لا يوجد ربط بعد.",
     "integrationHint_native_only": "يتطلب تطبيق الهاتف؛ لا يمكن ذلك من المتصفح.",
     "integrationStatus_error": "يحتاج إلى إعادة ربط",
-    "integrationHint_error": "توقف Garmin عن الاستجابة؛ أعد ربطه."
+    "integrationHint_error": "توقف Garmin عن الاستجابة؛ أعد ربطه.",
+    "integrationStatus_native_soon": "قريبًا",
+    "integrationHint_native_soon": "سيتوفر في إصدار لاحق من التطبيق."
   },
   "Media": {
     "add": "أضف صورًا أو فيديو",

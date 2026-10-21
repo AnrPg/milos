@@ -12,6 +12,15 @@ import {
   type PushSubscriptionPayload,
 } from "@/api/notifications";
 import { clearBrowserPushSubscription, registerAppServiceWorker } from "@/lib/push-subscription";
+import { isNative, nativePushProvider } from "@/lib/platform";
+import {
+  nativePushPermission,
+  nativePushSupported,
+  registerNativePush,
+  requestNativePushPermission,
+  unregisterNativePush,
+  type NativePushPermission,
+} from "@/lib/platform/native-push";
 import { ApiError } from "@/api/client";
 import { localizeError } from "@/i18n/presentation";
 
@@ -87,7 +96,16 @@ async function persistPushConfig(config: PushNotificationConfig) {
   });
 }
 
+// ADR-171: inside the store apps push goes through the OS (APNs / FCM)
+// instead of Web Push; both hooks run, only the one for this device acts.
 export function usePushNotifications(accessToken: string | null | undefined) {
+  const [native] = useState(() => isNative());
+  const web = useWebPushNotifications(accessToken, !native);
+  const app = useNativePushNotifications(accessToken, native);
+  return native ? app : web;
+}
+
+function useWebPushNotifications(accessToken: string | null | undefined, active: boolean) {
   const i18n = useUiTranslations();
   type PushSyncState =
     | "idle"
@@ -107,7 +125,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     | "complete";
 
   const [supported] = useState(() => {
-    if (typeof window === "undefined") {
+    if (typeof window === "undefined" || !active) {
       return false;
     }
 
@@ -121,6 +139,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
   const [configured, setConfigured] = useState<boolean | null>(null);
   const [permission, setPermission] = useState<NotificationPermission | "unsupported">(() => {
     if (
+      !active ||
       typeof window === "undefined" ||
       !("serviceWorker" in navigator) ||
       !("PushManager" in window) ||
@@ -221,6 +240,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
   }, [i18n]);
 
   useEffect(() => {
+    if (!active) return;
     if (!accessToken || !supported) {
       void clearStoredServiceWorkerToken();
       return;
@@ -247,7 +267,7 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     return () => {
       cancelled = true;
     };
-  }, [accessToken, i18n, supported, syncSubscription]);
+  }, [accessToken, active, i18n, supported, syncSubscription]);
 
   useEffect(() => {
     if (!accessToken || !supported || !("serviceWorker" in navigator)) return;
@@ -352,6 +372,130 @@ export function usePushNotifications(accessToken: string | null | undefined) {
     busy,
     state,
     step,
+    error,
+    enablePush,
+    disablePush,
+    refreshCapability,
+  };
+}
+
+type PushState = ReturnType<typeof useWebPushNotifications>["state"];
+
+function useNativePushNotifications(accessToken: string | null | undefined, active: boolean) {
+  const i18n = useUiTranslations();
+  const [supported] = useState(() => active && nativePushSupported());
+  const [enabled, setEnabled] = useState(false);
+  const [configured, setConfigured] = useState<boolean | null>(null);
+  const [permission, setPermission] = useState<NativePushPermission>(supported ? "default" : "unsupported");
+  const [busy, setBusy] = useState(false);
+  const [state, setState] = useState<PushState>(supported ? "idle" : "blocked");
+  const [error, setError] = useState<string | null>(null);
+
+  const sync = useCallback(
+    async (token: string, ask: boolean) => {
+      setError(null);
+      setState(ask ? "enabling" : "checking");
+      const config = await fetchPushNotificationConfig(token);
+      const provider = nativePushProvider();
+      const available = Boolean(provider && (config.native_providers ?? []).includes(provider));
+      setConfigured(available);
+      if (!available) {
+        setEnabled(false);
+        setState("ready");
+        return false;
+      }
+
+      let current = await nativePushPermission();
+      if (current !== "granted" && ask) current = await requestNativePushPermission();
+      setPermission(current);
+      if (current !== "granted") {
+        setEnabled(false);
+        setState(current === "denied" ? "blocked" : "ready");
+        return false;
+      }
+
+      await registerNativePush(token);
+      setEnabled(true);
+      setState("enabled");
+      return true;
+    },
+    [],
+  );
+
+  const fail = useCallback(
+    (caught: unknown, fallback: string) => {
+      setEnabled(false);
+      setState("error");
+      setError(caught instanceof ApiError ? localizeError(caught, i18n) : i18n(fallback));
+      return false;
+    },
+    [i18n],
+  );
+
+  useEffect(() => {
+    if (!supported || !accessToken) return;
+    const token = accessToken;
+    let cancelled = false;
+
+    async function syncExisting() {
+      try {
+        await sync(token, false);
+      } catch (caught) {
+        if (!cancelled) fail(caught, "pushInitializationError");
+      }
+    }
+
+    void syncExisting();
+    return () => {
+      cancelled = true;
+    };
+  }, [accessToken, fail, supported, sync]);
+
+  async function enablePush() {
+    if (!accessToken || !supported) return false;
+    setBusy(true);
+    try {
+      return await sync(accessToken, true);
+    } catch (caught) {
+      return fail(caught, "pushEnableError");
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function disablePush() {
+    if (!accessToken || !supported) return false;
+    setBusy(true);
+    try {
+      await unregisterNativePush(accessToken);
+      setEnabled(false);
+      setState("ready");
+      return true;
+    } catch (caught) {
+      fail(caught, "pushDisableError");
+      return false;
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function refreshCapability() {
+    if (!accessToken || !supported) return false;
+    try {
+      return await sync(accessToken, false);
+    } catch (caught) {
+      return fail(caught, "pushRefreshError");
+    }
+  }
+
+  return {
+    supported,
+    enabled,
+    configured,
+    permission,
+    busy,
+    state,
+    step: (enabled ? "complete" : "idle") as ReturnType<typeof useWebPushNotifications>["step"],
     error,
     enablePush,
     disablePush,

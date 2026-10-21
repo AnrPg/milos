@@ -2905,6 +2905,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/notifications/native-push-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register a store app install's push token for the current user
+         * @description ADR-171: FCM tokens come from the Android app, APNs tokens from the iOS app. Answers 503 native_push_not_configured while the provider has no credentials.
+         */
+        post: operations["MilosTrainingWeb.NotificationController.create_native_push_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/notifications/native-push-tokens/unregister": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Stop push to a store app install of the current user
+         * @description ADR-171: the token travels in the body so it never lands in URLs or logs.
+         */
+        post: operations["MilosTrainingWeb.NotificationController.delete_native_push_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/notifications/push-config": {
         parameters: {
             query?: never;
@@ -40332,6 +40372,107 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.NotificationController.create_native_push_token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string|null} */
+                    apns_environment?: "production" | "sandbox" | null;
+                    app_id?: string | null;
+                    app_version?: string | null;
+                    /** @enum {string} */
+                    platform: "android" | "ios";
+                    /** @enum {string} */
+                    provider: "fcm" | "apns";
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Native push token */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        native_push_token: {
+                            /** @enum {string|null} */
+                            apns_environment?: "production" | "sandbox" | null;
+                            app_id?: string | null;
+                            app_version?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_registered_at: string;
+                            /** @enum {string} */
+                            platform: "android" | "ios";
+                            /** @enum {string} */
+                            provider: "fcm" | "apns";
+                        };
+                    };
+                };
+            };
+            /** @description Native push token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        native_push_token: {
+                            /** @enum {string|null} */
+                            apns_environment?: "production" | "sandbox" | null;
+                            app_id?: string | null;
+                            app_version?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_registered_at: string;
+                            /** @enum {string} */
+                            platform: "android" | "ios";
+                            /** @enum {string} */
+                            provider: "fcm" | "apns";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.NotificationController.delete_native_push_token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Delete result */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deleted: boolean;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.NotificationController.push_config": {
         parameters: {
             query?: never;
@@ -40349,6 +40490,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         enabled: boolean;
+                        /** @description Store app push providers this server can deliver to (ADR-171) */
+                        native_providers: ("fcm" | "apns")[];
                         vapid_public_key: string | null;
                     };
                 };
