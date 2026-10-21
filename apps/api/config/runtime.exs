@@ -129,6 +129,19 @@ config :milos_training, :wallet,
       |> Enum.map(&String.trim/1)
   ]
 
+# ADR-171: push to the store apps. FCM (Android) needs the Firebase service
+# account JSON (the text or a path); APNs (iOS) needs the team id, the key id
+# and the .p8 key (text or path). APNS_TOPIC is the iOS bundle id. Without
+# them that provider is off: nothing is registered or sent.
+config :milos_training, :native_push,
+  fcm: [service_account: present_env.("FCM_SERVICE_ACCOUNT_JSON")],
+  apns: [
+    team_id: present_env.("APNS_TEAM_ID"),
+    key_id: present_env.("APNS_KEY_ID"),
+    private_key: present_env.("APNS_PRIVATE_KEY"),
+    topic: present_env.("APNS_TOPIC")
+  ]
+
 # ADR-161: Garmin (Health + Activity APIs). Without the client id and
 # secret the devices row shows «Σύντομα» and connecting answers
 # garmin_not_configured. GARMIN_PUSH_TOKEN, when set, must also appear as

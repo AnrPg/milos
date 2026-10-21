@@ -81,6 +81,21 @@ defmodule MilosTraining.Workouts.Domain.ExerciseDescriptors do
     }
   end
 
+  @doc """
+  The catalog entry an exercise names, as `%{id, label, category}`: the
+  given ref when it is a catalog id, else the name resolved leniently
+  (plural-tolerant), else nil.
+  """
+  def resolve_catalog_entry(exercise_ref, name) do
+    entry =
+      case is_binary(exercise_ref) && ExerciseCatalog.fetch(exercise_ref) do
+        %{} = entry -> entry
+        _missing -> FreeTextExercises.resolve_name(name)
+      end
+
+    entry && %{id: entry.id, label: entry.label, category: entry.category}
+  end
+
   defp weight(sets) when is_integer(sets) and sets > 0, do: sets
   defp weight(_sets), do: 1
 

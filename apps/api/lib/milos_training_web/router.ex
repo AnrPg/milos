@@ -500,6 +500,8 @@ defmodule MilosTrainingWeb.Router do
     get("/workouts/:id/goals", WorkoutGoalsController, :show)
     get("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :show)
     put("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :update)
+    # ADR-164: the gym's exercises (and videos) for an atlas node.
+    get("/anatomy/nodes/:node_id/exercises", AnatomyAtlasController, :exercises)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -1150,6 +1152,15 @@ defmodule MilosTrainingWeb.Router do
     )
 
     delete("/notifications/push-subscriptions", NotificationController, :delete_push_subscription)
+    # ADR-171: push to the store apps.
+    post("/notifications/native-push-tokens", NotificationController, :create_native_push_token)
+
+    post(
+      "/notifications/native-push-tokens/unregister",
+      NotificationController,
+      :delete_native_push_token
+    )
+
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
@@ -1186,6 +1197,8 @@ defmodule MilosTrainingWeb.Router do
     get("/me/history", AccountTrainingController, :history)
     get("/me/progress", AccountTrainingController, :progress)
     get("/me/vault", AccountTrainingController, :vault)
+    # ADR-164: the anatomy atlas, the member's coverage across providers.
+    get("/me/atlas", AnatomyAtlasController, :show)
     get("/me/filters/:surface", SavedFilterController, :show)
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)

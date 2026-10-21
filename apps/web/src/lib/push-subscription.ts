@@ -1,6 +1,8 @@
 "use client";
 
 import { deletePushSubscription } from "@/api/notifications";
+import { isNative } from "@/lib/platform";
+import { unregisterNativePush } from "@/lib/platform/native-push";
 
 export async function registerAppServiceWorker() {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
@@ -41,6 +43,12 @@ export async function clearWorkoutCache() {
 }
 
 export async function clearBrowserPushSubscription(accessToken?: string | null) {
+  // ADR-171: inside the store apps the install's push token is forgotten instead.
+  if (isNative()) {
+    await unregisterNativePush(accessToken);
+    return;
+  }
+
   if (
     typeof window === "undefined" ||
     !("serviceWorker" in navigator) ||

@@ -44,6 +44,10 @@
   --anatomy-secondary: #EFA36F;
   --anatomy-stabilizer: #F3CDB0;
   --anatomy-felt: #3FA37A;
+  /* Atlas heat map (ADR-164): one warm hue, darker and more saturated with volume. */
+  --anatomy-heat-low: #D9A27E;
+  --anatomy-heat-medium: #E07A3C;
+  --anatomy-heat-high: #C2361F;
   --anatomy-base: #8E7A75;
   --anatomy-bone: #E3DACB;
 }
@@ -76,6 +80,9 @@ html[data-theme="sunset"] {
   color-scheme: light;
   --anatomy-base: #AE9891;
   --anatomy-bone: #D8CDBB;
+  --anatomy-heat-low: #E6B48F;
+  --anatomy-heat-medium: #DD6F2E;
+  --anatomy-heat-high: #A82A17;
 }
 
 html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {
@@ -360,4 +367,25 @@ input[type="number"] {
   .checkin-print-hide { display: none !important; }
   .checkin-print-root { min-height: auto !important; background: #fff !important; color: #000 !important; }
   @page { size: A4 portrait; margin: 14mm; }
+}
+
+/* ADR-171: inside the store apps the page draws edge to edge (viewport-fit=cover),
+   so the content starts below the status bar and a strip in the page colour sits
+   behind it. Browsers never set data-platform, so the web is unchanged. */
+html[data-platform] {
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html[data-platform] body {
+  padding-top: var(--safe-top);
+}
+
+html[data-platform]::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--safe-top);
+  background: var(--bg);
+  z-index: 1000;
+  pointer-events: none;
 }
