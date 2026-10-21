@@ -90,7 +90,7 @@ export function EventRow({ event, lead }: { event: CommunityEvent; lead?: string
           className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold"
           style={{
             background: status === "going" ? "var(--primary)" : "color-mix(in srgb, var(--primary) 16%, transparent)",
-            color: status === "going" ? "var(--bg)" : "var(--primary-strong, var(--primary))",
+            color: status === "going" ? "var(--primary-contrast)" : "var(--primary-strong, var(--primary))",
           }}
         >
           {pill}
@@ -169,7 +169,7 @@ export function RsvpButton({
         className={`${pill} ${compact ? "" : "flex-1"}`}
         style={
           state === "join"
-            ? { background: "var(--primary)", color: "var(--bg)" }
+            ? { background: "var(--primary)", color: "var(--primary-contrast)" }
             : { background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--primary)" }
         }
       >

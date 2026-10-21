@@ -88,7 +88,7 @@ export function InlineAssignPackage({ currentCode, currentLabel, packages, pendi
           style={{
             background: "var(--panel-raised)",
             border: "1px solid var(--border-strong)",
-            boxShadow: "0 18px 48px rgba(0, 0, 0, 0.6)",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           <select

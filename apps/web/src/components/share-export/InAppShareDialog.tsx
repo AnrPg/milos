@@ -73,7 +73,7 @@ export function InAppShareDialog({
       className="fixed inset-0 z-[80] flex items-end justify-center p-3 sm:items-center sm:p-6"
       onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
       role="presentation"
-      style={{ background: "rgba(8, 12, 24, 0.72)", backdropFilter: "blur(8px)" }}
+      style={{ background: "var(--scrim)", backdropFilter: "blur(8px)" }}
     >
       <div
         ref={dialogRef}

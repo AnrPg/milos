@@ -11,8 +11,6 @@ defmodule PaleeWeb.LandingController do
   tags(["Landing"])
   security([%{"bearerAuth" => []}])
 
-  @theme_slugs Palee.Themes.slugs()
-
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
        when action in [:update_leaderboard_preference]
@@ -62,10 +60,9 @@ defmodule PaleeWeb.LandingController do
     properties: %{
       weekly_workout_target: %Schema{type: :integer, minimum: 1},
       streak_shield_reset_day: %Schema{type: :integer, minimum: 1, maximum: 28, nullable: true},
-      leaderboard_enabled: %Schema{type: :boolean},
-      theme_slug: %Schema{type: :string, enum: @theme_slugs}
+      leaderboard_enabled: %Schema{type: :boolean}
     },
-    required: [:weekly_workout_target, :leaderboard_enabled, :theme_slug]
+    required: [:weekly_workout_target, :leaderboard_enabled]
   }
 
   operation(:show,

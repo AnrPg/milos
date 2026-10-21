@@ -23,7 +23,7 @@ export function HeartButton() {
         <span
           aria-hidden="true"
           className="absolute -end-1 -top-1 min-w-5 rounded-full px-1 text-center text-[10px] font-bold leading-5"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {unread > 99 ? "99+" : unread}
         </span>

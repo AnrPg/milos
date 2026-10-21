@@ -45,7 +45,7 @@ export function MemberVisibilitySetting() {
         {hidden ? t("visibilityShow") : t("visibilityHide")}
       </button>
       {save.error ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{clientErrorMessage(save.error, tUi)}</p>
+        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{clientErrorMessage(save.error, tUi)}</p>
       ) : null}
     </div>
   );

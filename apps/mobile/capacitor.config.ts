@@ -8,6 +8,9 @@ import type { CapacitorConfig } from "@capacitor/cli";
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { resolveEnvironment } = require("./config/resolve.cjs");
 
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const theme = require("./palee-theme.json"); // generated from the web theme (npm run theme:native)
+
 const environment = resolveEnvironment();
 
 const config: CapacitorConfig = {
@@ -38,7 +41,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 600,
-      backgroundColor: "#0b0d10",
+      backgroundColor: theme.light.background,
       showSpinner: false,
     },
     PushNotifications: {

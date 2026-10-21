@@ -57,6 +57,7 @@ import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel"
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 import { FreeTextAnalysisPanel, type AnalysisStatus } from "./FreeTextAnalysisPanel";
+import { readToken } from "@/lib/theme";
 
 type Props = {
   draftId: string | null;
@@ -545,7 +546,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
                 >
                   {tab === "assistant" ? assistantT("tabAssistant") : assistantT("tabPreview")}
                   {tab === "assistant" && review && openIssues(review).length > 0 ? (
-                    <span className="ms-1 rounded-full px-1.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+                    <span className="ms-1 rounded-full px-1.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                       {openIssues(review).length}
                     </span>
                   ) : null}
@@ -647,7 +648,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
 
   const headingLevels = [1, 2, 3, 4, 5] as const;
   const selectedTextColor = editor.getAttributes("textColor").color as string | undefined;
-  const colorPickerValue = /^#[0-9a-f]{6}$/i.test(selectedTextColor ?? "") ? selectedTextColor! : "#f4efe8";
+  const colorPickerValue = /^#[0-9a-f]{6}$/i.test(selectedTextColor ?? "") ? selectedTextColor! : readToken("text");
   const activeHeadingLevel = headingLevels.find((level) => editor.isActive("heading", { level }));
   const textActions = [
     toolbarButton(i18n("editorBold"), i18n("editorBold"), editor.isActive("bold"), () => editor.chain().focus().toggleBold().run()),
@@ -743,7 +744,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
             className="h-8 min-w-8 rounded-md px-2 text-sm font-bold"
             style={{
               background: selectedTextColor ? "var(--primary)" : "transparent",
-              color: selectedTextColor ? "var(--primary-foreground, white)" : "var(--text)",
+              color: selectedTextColor ? "var(--primary-contrast)" : "var(--text)",
             }}
           >
             ×
@@ -772,7 +773,7 @@ function ToolbarGroup({ actions }: { actions: ReturnType<typeof toolbarButton>[]
           className="h-8 min-w-8 rounded-md px-2 text-sm font-bold"
           style={{
             background: action.active ? "var(--primary)" : "transparent",
-            color: action.active ? "var(--primary-foreground, white)" : "var(--text)",
+            color: action.active ? "var(--primary-contrast)" : "var(--text)",
           }}
         >
           {action.text}
@@ -843,7 +844,7 @@ const FreeTextEditingAssist = Extension.create({
 
               dispatch(
                 state.tr
-                  .addMark(wordRange.from, wordRange.to, highlight.create({ color: "#fde68a" }))
+                  .addMark(wordRange.from, wordRange.to, highlight.create({ color: readToken("highlight") }))
                   .setMeta("addToHistory", true),
               );
               return true;

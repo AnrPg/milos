@@ -142,13 +142,13 @@ defmodule PaleeWeb.MeControllerTest do
         |> patch("/api/me/profile", Jason.encode!(%{preferred_theme_slug: slug}))
       end
 
-      assert %{"user" => %{"preferred_theme_slug" => "paper"}} =
-               "paper" |> patch_theme.() |> json_response(200)
+      assert %{"user" => %{"preferred_theme_slug" => "graphite"}} =
+               "graphite" |> patch_theme.() |> json_response(200)
 
       "neon" |> patch_theme.() |> json_response(422)
-      assert Identity.find_by_id(user.id).preferred_theme_slug == "paper"
+      assert Identity.find_by_id(user.id).preferred_theme_slug == "graphite"
 
-      assert %{"preferred_theme_slug" => "paper"} =
+      assert %{"preferred_theme_slug" => "graphite"} =
                conn
                |> put_req_header("authorization", "Bearer " <> access_token)
                |> get("/api/auth/me")

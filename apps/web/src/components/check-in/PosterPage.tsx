@@ -38,7 +38,7 @@ export function PosterPage({ locationId }: { locationId: string }) {
             type="button"
             onClick={() => window.print()}
             className="min-h-11 rounded-full px-5 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("posterPrint")}
           </button>
@@ -57,7 +57,7 @@ export function PosterPage({ locationId }: { locationId: string }) {
       {poster.data?.enabled ? (
         <article
           className="flex w-full max-w-2xl flex-col items-center gap-6 rounded-[2rem] px-8 py-10 text-center"
-          style={{ background: "#fff", color: "#000", border: "1px solid var(--border)" }}
+          style={{ background: "var(--paper)", color: "var(--on-paper)", border: "1px solid var(--border)" }}
           data-testid="poster-sheet"
         >
           {logo ? (

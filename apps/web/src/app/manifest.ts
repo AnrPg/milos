@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 
 import { DEFAULT_LOCALE, isAppLocale, localeDirection } from "@/i18n/locales";
+import { APP_THEMES, DEFAULT_THEME_SLUG } from "@/lib/theme";
 
 export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const requestedLocale = await getLocale();
@@ -15,8 +16,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     dir: localeDirection(locale),
     start_url: "/",
     display: "standalone",
-    background_color: "#0b0d10",
-    theme_color: "#c9ff45",
+    background_color: APP_THEMES[DEFAULT_THEME_SLUG].tokens.bg,
+    theme_color: APP_THEMES[DEFAULT_THEME_SLUG].tokens.bg,
     orientation: "any",
     categories: ["fitness", "health", "sports"],
     icons: [

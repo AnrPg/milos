@@ -80,7 +80,7 @@ export function ProviderAvatar({
     <span
       aria-hidden="true"
       className="flex shrink-0 items-center justify-center rounded-full text-sm font-extrabold"
-      style={{ width: size, height: size, background: color, color: "#1A0F0A" }}
+      style={{ width: size, height: size, background: color, color: "var(--on-series)" }}
     >
       {clubInitials(name)}
     </span>

@@ -212,7 +212,7 @@ function ModeButton({
       className="rounded-xl px-4 py-2 text-sm font-bold transition-colors"
       style={{
         background: active ? "var(--primary)" : "transparent",
-        color: active ? "var(--primary-foreground, white)" : "var(--muted)",
+        color: active ? "var(--primary-contrast)" : "var(--muted)",
       }}
     >
       {label}

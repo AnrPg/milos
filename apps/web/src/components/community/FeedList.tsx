@@ -19,7 +19,7 @@ export function FeedList({ filter, empty }: { filter: FeedFilter; empty?: string
   );
 
   if (feed.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
-  if (feed.isError) return <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{t("loadFailed")}</p>;
+  if (feed.isError) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t("loadFailed")}</p>;
   if (pinned.length === 0 && posts.length === 0)
     return <p className="text-sm" style={{ color: "var(--text-soft)" }}>{empty ?? t("feedEmpty")}</p>;
 

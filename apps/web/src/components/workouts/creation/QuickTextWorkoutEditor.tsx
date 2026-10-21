@@ -639,7 +639,7 @@ export function QuickTextWorkoutEditor({
               disabled={!canPublish}
               onClick={publish}
               className="rounded-xl px-5 py-2 text-sm font-black disabled:opacity-40"
-              style={{ background: "var(--primary)", color: "var(--primary-foreground, white)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {publishing ? i18n("quickTextPublishing") : i18n("quickTextPublish")}
             </button>
@@ -710,7 +710,7 @@ function EditorToolbar({ editor, onManualOpen }: { editor: Editor | null; onManu
           className="min-w-9 rounded-lg px-2 py-1.5 text-sm font-bold"
           style={{
             background: action.active ? "var(--primary)" : "var(--card)",
-            color: action.active ? "var(--primary-foreground, white)" : "var(--text)",
+            color: action.active ? "var(--primary-contrast)" : "var(--text)",
           }}
         >
           {action.text}
@@ -793,7 +793,7 @@ function DiagnosticsPanel({ diagnostics }: { diagnostics: WorkoutDslDiagnostic[]
       <div className="mt-3 space-y-2">
         {diagnostics.map((diagnostic, index) => {
           const danger = diagnostic.severity === "error";
-          const color = danger ? "var(--danger)" : "var(--warning, #b7791f)";
+          const color = danger ? "var(--danger)" : "var(--warning)";
 
           return (
             <div
@@ -910,7 +910,7 @@ function ManualDialog({ markdown, onClose }: { markdown: string; onClose: () => 
   const i18n = useUiTranslations();
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-black/55 p-4" role="presentation">
+    <div className="fixed inset-0 z-50 grid place-items-center bg-[var(--scrim)] p-4" role="presentation">
       <section
         role="dialog"
         aria-modal="true"

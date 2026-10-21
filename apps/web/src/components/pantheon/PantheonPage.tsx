@@ -132,7 +132,7 @@ export function PantheonPage() {
       {deleteConfirm && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "rgba(0,0,0,0.5)" }}
+          style={{ background: "var(--scrim)" }}
           onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(null); }}
         >
           <div className="w-full max-w-sm rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
@@ -146,7 +146,7 @@ export function PantheonPage() {
                 disabled={deleteMutation.isPending}
                 onClick={() => deleteMutation.mutate(deleteConfirm.id)}
                 className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-50"
-                style={{ background: "var(--danger, var(--primary))", color: "#fff" }}
+                style={{ background: "var(--danger, var(--primary))", color: "var(--danger-contrast)" }}
               >
                 {deleteMutation.isPending ? i18n("deletingc7ac551") : i18n("deletef6fdbe4")}
               </button>

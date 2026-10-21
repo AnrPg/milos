@@ -422,7 +422,7 @@ function SeasonEditor({
               disabled={!canSave}
               onClick={() => save.mutate("published")}
               className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {t("publish")}
             </button>
@@ -434,7 +434,7 @@ function SeasonEditor({
                 disabled={save.isPending}
                 onClick={() => save.mutate("cancelled")}
                 className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "var(--danger)", color: "var(--bg)" }}
+                style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
               >
                 {t("cancelSeasonConfirm")}
               </button>
@@ -559,7 +559,7 @@ function ActionButton({
       disabled={disabled}
       onClick={onClick}
       className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
-      style={primary ? { background: "var(--primary)", color: "var(--bg)" } : { background: "var(--border)", color: "var(--text-soft)" }}
+      style={primary ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--border)", color: "var(--text-soft)" }}
     >
       {children}
     </button>

@@ -116,7 +116,7 @@ function ScoreEntryStep({
           type="button"
           onClick={() => onNext(scores)}
           className="w-full max-w-xs rounded-2xl py-3.5 text-base font-semibold"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {i18n("next2f04eb1")}
         </button>
@@ -210,7 +210,7 @@ function ScoreEntryStep({
           type="button"
           onClick={() => onNext(buildResult())}
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {i18n("next2f04eb1")}
         </button>
@@ -625,7 +625,7 @@ function ModificationsEditorStep({
             onNext(currentModifications());
           }}
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {i18n("next2f04eb1")}
         </button>
@@ -741,7 +741,7 @@ function FreeTextCommentsStep({
           type="button"
           onClick={onNext}
           className="w-full rounded-2xl py-3.5 text-base font-semibold"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {i18n("next2f04eb1")}
         </button>
@@ -904,7 +904,7 @@ function ConfirmStep({
           onClick={onSave}
           disabled={isSaving}
           className="w-full rounded-2xl py-3.5 text-base font-semibold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {isSaving ? i18n("saving56a2285") : i18n("saveDone3614269")}
         </button>

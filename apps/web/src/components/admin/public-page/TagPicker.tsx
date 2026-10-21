@@ -110,7 +110,7 @@ export function TagPicker({
         tabIndex={-1}
         onClick={onClose}
         className="absolute inset-0"
-        style={{ background: "color-mix(in srgb, black 45%, transparent)" }}
+        style={{ background: "var(--scrim)" }}
       />
       <div
         ref={panel}

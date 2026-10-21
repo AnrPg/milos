@@ -88,16 +88,16 @@ export function MemberCheckIn() {
       </header>
 
       <section className="flex flex-col items-center gap-3 rounded-3xl p-5 text-center" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-        <div ref={frameRef} className="flex w-full flex-col items-center justify-center gap-3 rounded-3xl bg-white p-4 [&:fullscreen]:h-full">
+        <div ref={frameRef} className="flex w-full flex-col items-center justify-center gap-3 rounded-3xl bg-[var(--paper)] p-4 [&:fullscreen]:h-full">
           {data ? (
             <QrCode value={data.code} label={t("memberQrLabel")} testId="member-qr" className="aspect-square w-full max-w-[22rem]" />
           ) : (
-            <div className="flex aspect-square w-full max-w-[22rem] items-center justify-center text-sm" style={{ color: "#555" }}>
+            <div className="flex aspect-square w-full max-w-[22rem] items-center justify-center text-sm" style={{ color: "var(--on-paper)", opacity: 0.65 }}>
               {code.isError ? t(checkInErrorKey(code.error)) : t("loading")}
             </div>
           )}
           {secondsLeft !== null ? (
-            <p className="font-mono text-sm" style={{ color: "#333" }} data-testid="member-countdown">{t("memberRotatesIn", { time: countdownLabel(secondsLeft) })}</p>
+            <p className="font-mono text-sm" style={{ color: "var(--on-paper)", opacity: 0.8 }} data-testid="member-countdown">{t("memberRotatesIn", { time: countdownLabel(secondsLeft) })}</p>
           ) : null}
         </div>
         <p className="text-base font-bold" style={{ color: "var(--text)" }}>{t("memberShow")}</p>

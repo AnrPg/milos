@@ -173,7 +173,7 @@ function VisibilityPicker({
   return (
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.45)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={onClose}
     >
       <div
@@ -221,7 +221,7 @@ function VisibilityPicker({
             disabled={blocked || mutation.isPending}
             onClick={() => mutation.mutate()}
             className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {mutation.isPending ? t("saving") : needsQuestion(choice) ? t("askCoach") : t("save")}
           </button>

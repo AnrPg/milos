@@ -7,6 +7,7 @@ defmodule Palee.Wallet.Domain.GooglePass do
   when the card changes. Pure.
   """
 
+  alias Palee.BrandPalette
   alias Palee.Wallet.Domain.PassContent
 
   @class_suffix "milos_member_card"
@@ -37,7 +38,7 @@ defmodule Palee.Wallet.Domain.GooglePass do
         %{"id" => "how", "header" => copy.how_label, "body" => copy.how}
       ]
     }
-    |> put_color(content.box.primary_color)
+    |> Map.put("hexBackgroundColor", BrandPalette.colour(:deep))
     |> put_logo(logo_url)
   end
 
@@ -66,11 +67,6 @@ defmodule Palee.Wallet.Domain.GooglePass do
 
   defp localized(value, language),
     do: %{"defaultValue" => %{"language" => language, "value" => value}}
-
-  defp put_color(object, "#" <> hex = color) when byte_size(hex) == 6,
-    do: Map.put(object, "hexBackgroundColor", color)
-
-  defp put_color(object, _color), do: object
 
   defp put_logo(object, url) when is_binary(url) and url != "",
     do: Map.put(object, "logo", %{"sourceUri" => %{"uri" => url}})

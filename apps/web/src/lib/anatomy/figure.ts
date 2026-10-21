@@ -5,6 +5,7 @@
  * focus bounds from the atlas index.
  */
 import { MUSCLE_NODES, groupOf, leafForTa2, muscleNode, type MuscleNodeId } from "./taxonomy";
+import { APP_THEMES, DEFAULT_THEME_SLUG } from "@/lib/theme";
 
 export const ANATOMY_ROLES = ["primary", "secondary", "stabilizer", "felt", "heat-high", "heat-medium", "heat-low"] as const;
 export type AnatomyRole = (typeof ANATOMY_ROLES)[number];
@@ -123,16 +124,17 @@ export function focusBounds(nodeId: MuscleNodeId, index: AtlasIndex): FocusBound
 export type AnatomyPalette = Record<AnatomyRole | "base" | "bone", string>;
 
 /** Used before CSS is readable (tests, SSR) and when a token is missing. */
+const defaults = APP_THEMES[DEFAULT_THEME_SLUG].tokens;
 export const DEFAULT_ANATOMY_PALETTE: AnatomyPalette = {
-  primary: "#D9743D",
-  secondary: "#EFA36F",
-  stabilizer: "#F3CDB0",
-  felt: "#3FA37A",
-  "heat-low": "#D9A27E",
-  "heat-medium": "#E07A3C",
-  "heat-high": "#C2361F",
-  base: "#8E7A75",
-  bone: "#E3DACB",
+  primary: defaults.anatomyPrimary,
+  secondary: defaults.anatomySecondary,
+  stabilizer: defaults.anatomyStabilizer,
+  felt: defaults.anatomyFelt,
+  "heat-low": defaults.anatomyHeatLow,
+  "heat-medium": defaults.anatomyHeatMedium,
+  "heat-high": defaults.anatomyHeatHigh,
+  base: defaults.anatomyBase,
+  bone: defaults.anatomyBone,
 };
 
 const PALETTE_TOKENS: Record<keyof AnatomyPalette, string> = {

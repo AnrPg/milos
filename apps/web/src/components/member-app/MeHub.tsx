@@ -63,7 +63,7 @@ export function MeHub() {
             <span
               aria-hidden="true"
               className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-2xl font-extrabold"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {initials}
             </span>
@@ -120,7 +120,7 @@ export function MeHub() {
         type="button"
         onClick={() => signOut()}
         className="min-h-11 rounded-2xl text-sm font-semibold"
-        style={{ color: "var(--danger, #dc2626)", border: "1px solid var(--border)" }}
+        style={{ color: "var(--danger)", border: "1px solid var(--border)" }}
       >
         {t("signOut")}
       </button>

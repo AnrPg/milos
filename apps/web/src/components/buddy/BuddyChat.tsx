@@ -151,7 +151,7 @@ export function BuddyChat({ linkId }: { linkId: string }) {
             type="submit"
             disabled={send.isPending || !draft.trim()}
             className="min-h-11 self-end rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("replySend")}
           </button>
@@ -169,7 +169,7 @@ function Bubble({ message, time, readLabel }: { message: BuddyMessage; time: str
         className="whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm"
         style={{
           background: message.mine ? "var(--primary)" : "var(--panel-raised)",
-          color: message.mine ? "var(--bg)" : "var(--text)",
+          color: message.mine ? "var(--primary-contrast)" : "var(--text)",
         }}
       >
         {message.body}

@@ -45,7 +45,7 @@ export function WellnessSupportCard({ initialOpen = false }: { initialOpen?: boo
             type="button"
             onClick={() => setOpen(true)}
             className="flex min-h-11 shrink-0 items-center gap-2 rounded-2xl px-4 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             <HeartIcon />
             {t("ask")}

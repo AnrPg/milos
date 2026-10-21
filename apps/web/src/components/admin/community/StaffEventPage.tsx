@@ -132,7 +132,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
           {[formatWhen(event.starts_at, event.ends_at, locale), placeName(event.place), price(event)].filter(Boolean).join(" · ")}
         </p>
         {event.cancelled ? (
-          <p role="status" className="mt-2 rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger, #dc2626) 14%, var(--panel))", color: "var(--text)" }}>
+          <p role="status" className="mt-2 rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 14%, var(--panel))", color: "var(--text)" }}>
             {event.cancel_reason ? tEvents("cancelledWithReason", { reason: event.cancel_reason }) : tEvents("cancelledNotice")}
           </p>
         ) : null}
@@ -194,7 +194,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
             className="min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-2xl px-3 text-sm font-semibold"
             style={{
               background: tab === value ? "var(--primary)" : "var(--panel)",
-              color: tab === value ? "var(--bg)" : "var(--text)",
+              color: tab === value ? "var(--primary-contrast)" : "var(--text)",
               border: "1px solid var(--border)",
             }}
           >
@@ -284,7 +284,7 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
           </span>
         </Link>
         {row.late_cancel && row.cancelled_at ? (
-          <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning, #b45309) 18%, transparent)", color: "var(--warning, #b45309)" }}>
+          <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning) 18%, transparent)", color: "var(--warning)" }}>
             {t("lateCancelTag", { time: clock(row.cancelled_at) })}
           </span>
         ) : null}
@@ -299,7 +299,7 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
             className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
             style={{
               background: row.checked_in_at ? "var(--primary)" : "var(--panel-raised)",
-              color: row.checked_in_at ? "var(--bg)" : "var(--text)",
+              color: row.checked_in_at ? "var(--primary-contrast)" : "var(--text)",
               border: row.checked_in_at ? "none" : "1px solid var(--border)",
             }}
           >

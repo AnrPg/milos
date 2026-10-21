@@ -6,6 +6,7 @@ import * as maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 
 import { mapStyleUrl } from "@/lib/map-style";
+import { followMapTheme } from "@/lib/map-theme";
 
 export type Pin = { latitude: number; longitude: number };
 
@@ -55,9 +56,11 @@ export default function LocationPinMap({
       return;
     }
     instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    const stopTheme = followMapTheme(instance);
     instance.on("click", (event) => onMoveRef.current({ latitude: event.lngLat.lat, longitude: event.lngLat.lng }));
     map.current = instance;
     return () => {
+      stopTheme();
       instance.remove();
       map.current = null;
       marker.current = null;

@@ -120,7 +120,7 @@ function GroupView({ club, clubs, group }: { club: CommunityClub; clubs: Communi
               className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
               style={{
                 background: tab === id ? "var(--primary)" : "var(--panel)",
-                color: tab === id ? "var(--bg)" : "var(--text)",
+                color: tab === id ? "var(--primary-contrast)" : "var(--text)",
                 border: "1px solid var(--border)",
               }}
             >
@@ -459,7 +459,7 @@ export function SmallButton({
       className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
       style={{
         background: primary ? "var(--primary)" : "var(--panel-raised)",
-        color: primary ? "var(--bg)" : "var(--text)",
+        color: primary ? "var(--primary-contrast)" : "var(--text)",
         border: primary ? "none" : "1px solid var(--border)",
       }}
     >

@@ -210,7 +210,7 @@ export function LocationPicker() {
 
         <section
           aria-label={t("listAria")}
-          className="absolute inset-x-0 bottom-0 flex flex-col rounded-t-3xl shadow-[0_-12px_30px_rgba(0,0,0,0.35)] transition-[height] duration-200"
+          className="absolute inset-x-0 bottom-0 flex flex-col rounded-t-3xl shadow-[var(--shadow-md)] transition-[height] duration-200"
           style={{
             height: SHEET_HEIGHT[sheet],
             background: "var(--bg)",

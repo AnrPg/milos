@@ -128,7 +128,7 @@ export function StartCoachPractice() {
           type="submit"
           disabled={create.isPending || name.trim().length < 2}
           className="min-h-12 rounded-2xl px-4 text-base font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {create.isPending ? t("start.creating") : t("start.submit")}
         </button>

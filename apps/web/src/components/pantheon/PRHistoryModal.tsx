@@ -69,7 +69,7 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
-      style={{ background: "rgba(0,0,0,0.5)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div

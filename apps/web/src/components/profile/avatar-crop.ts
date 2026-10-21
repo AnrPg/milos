@@ -1,3 +1,5 @@
+import { readToken } from "@/lib/theme";
+
 export type AvatarCrop = {
   dx: number;
   dy: number;
@@ -89,7 +91,7 @@ export function drawAvatarCrop(
   const radians = (normalizedRotation * Math.PI) / 180;
 
   context.clearRect(0, 0, canvas.width, canvas.height);
-  context.fillStyle = "#111713";
+  context.fillStyle = readToken("deep");
   context.fillRect(0, 0, canvas.width, canvas.height);
   context.save();
   context.translate(crop.dx + crop.width / 2, crop.dy + crop.height / 2);

@@ -300,6 +300,11 @@ Usage rules:
 - Never a surface of only Dojo and white (reads as the national flag).
 - Dark mode is "Graphite Night": Graphite page, `#22242A` cards, Frost text,
   glow tones.
+- In the app the palette is the only theme, for gyms and members alike:
+  `frost` (light, the default) and `graphite` (Graphite Night), both in
+  `apps/web/src/lib/theme.ts`, the single source of every colour. Members may
+  switch to dark; gyms do not pick a theme. [THEME.md](THEME.md) lists which
+  token dresses each UI element and its parts.
 
 Retired (draft v1): Pomegranate, Chalk, Breath, Sun.
 

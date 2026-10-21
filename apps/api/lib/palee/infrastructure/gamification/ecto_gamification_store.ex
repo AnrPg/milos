@@ -46,22 +46,11 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
         %{
           weekly_workout_target: 2,
           streak_shield_reset_day: nil,
-          leaderboard_enabled: true,
-          theme_slug: "ember"
+          leaderboard_enabled: true
         }
 
       settings ->
         normalize_settings(settings)
-    end
-  end
-
-  # TD-092 / ADR-131: the public theme has no session scope; the narrow
-  # SECURITY DEFINER helper answers only an active gym's theme slug.
-  @impl true
-  def get_public_theme_slug(organization_slug) when is_binary(organization_slug) do
-    case Repo.query("SELECT palee_public_theme_slug($1)", [organization_slug]) do
-      {:ok, %{rows: [[slug]]}} when is_binary(slug) -> slug
-      _missing_or_error -> nil
     end
   end
 
@@ -507,7 +496,6 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
       weekly_workout_target: settings.weekly_workout_target,
       streak_shield_reset_day: settings.streak_shield_reset_day,
       leaderboard_enabled: settings.leaderboard_enabled,
-      theme_slug: settings.theme_slug,
       inserted_at: settings.inserted_at,
       updated_at: settings.updated_at
     }

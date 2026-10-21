@@ -77,7 +77,7 @@ export function BreathingTimer({ seconds = BREATHING_SECONDS, onDone }: { second
             type="button"
             onClick={() => setRunning(!running)}
             className="min-h-11 rounded-2xl px-4 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {running ? t("breathPause") : elapsed > 0 ? t("breathResume") : t("breathStart")}
           </button>

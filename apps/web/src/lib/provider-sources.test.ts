@@ -36,10 +36,10 @@ describe("provider sources (ADR-162)", () => {
     expect(sourceToken({ kind: "device", organization_id: null })).toBe("device");
   });
 
-  it("uses a valid brand colour and a stable palette colour otherwise", () => {
-    expect(providerColor(box)).toBe("#d9743d");
-    expect(providerColor({ organization_id: "org-x", primary_color: "red" })).toBe(paletteColor("org-x"));
+  it("gives each provider a stable theme series colour, never its brand colour", () => {
+    expect(providerColor(box)).toBe(paletteColor(box.organization_id));
     expect(paletteColor("org-x")).toBe(paletteColor("org-x"));
+    expect(paletteColor("org-x")).toMatch(/^var\(--series-\d\)$/);
   });
 
   it("labels providers' entries only once there are two providers to tell apart", () => {
@@ -56,7 +56,7 @@ describe("provider sources (ADR-162)", () => {
     const directory = sourceDirectory(providers([box]));
     expect(sourceColor({ kind: "organization", organization_id: "org-box", name: "x", former: true }, directory)).toBe(FORMER_COLOR);
     expect(sourceColor({ kind: "device", organization_id: null, name: "Garmin", former: false }, directory)).toBe(DEVICE_COLOR);
-    expect(sourceColor({ kind: "organization", organization_id: "org-box", name: "x", former: false }, directory)).toBe("#d9743d");
+    expect(sourceColor({ kind: "organization", organization_id: "org-box", name: "x", former: false }, directory)).toBe(providerColor(box));
   });
 
   it("lists sources for the filters: active, former, freeform, device", () => {

@@ -591,7 +591,7 @@ export function CravingSheet({
                   setWatered(true);
                 }}
                 className="rounded-full px-3 py-1 text-xs font-bold disabled:opacity-60"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               >
                 {watered ? t("craving.waterCounted") : t("water.add")}
               </button>

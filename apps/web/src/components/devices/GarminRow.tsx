@@ -102,7 +102,7 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
             type="button"
             onClick={() => setSheet("connect")}
             className="min-h-11 shrink-0 rounded-2xl px-4 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("connect")}
           </button>
@@ -127,7 +127,7 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
                 type="button"
                 onClick={() => setSheet("reconnect")}
                 className="min-h-11 self-start rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               >
                 {t("reconnect")}
               </button>
@@ -152,7 +152,7 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
                   disabled={save.isPending || (askConsent && !consentTicked)}
                   onClick={() => save.mutate(editing)}
                   className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
                   {t("save")}
                 </button>

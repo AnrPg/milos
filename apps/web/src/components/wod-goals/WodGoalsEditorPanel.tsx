@@ -97,7 +97,7 @@ function GoalsPanel({ workoutId, refreshKey, timeDomainSeconds = null }: { worko
 
   if (query.isError && !state.loaded) {
     return (
-      <div className="flex flex-wrap items-center gap-2 p-4 text-sm" role="alert" style={{ color: "var(--danger, #dc2626)" }}>
+      <div className="flex flex-wrap items-center gap-2 p-4 text-sm" role="alert" style={{ color: "var(--danger)" }}>
         {t("loadError")}
         <button type="button" className="font-semibold underline" onClick={() => void refetch()}>{t("retry")}</button>
       </div>
@@ -223,7 +223,7 @@ function SaveLine({ status, saved, onKeep, onRetry }: { status: SaveStatus; save
   const t = useTranslations("WodGoals");
   if (status === "error" || status === "invalid") {
     return (
-      <p role="alert" className="flex flex-wrap items-center gap-2 text-xs font-semibold" style={{ color: "var(--danger, #dc2626)" }}>
+      <p role="alert" className="flex flex-wrap items-center gap-2 text-xs font-semibold" style={{ color: "var(--danger)" }}>
         {status === "invalid" ? t("invalid") : t("status.error")}
         <button type="button" className="underline" onClick={onRetry}>{t("retry")}</button>
       </p>

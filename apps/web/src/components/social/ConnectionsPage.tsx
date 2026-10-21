@@ -71,7 +71,7 @@ export function ConnectionsPage() {
             className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold"
             style={
               tab === value
-                ? { background: "var(--primary)", color: "var(--bg)" }
+                ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                 : { background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }
             }
           >
@@ -257,7 +257,7 @@ function RemoveFollower({ followId }: { followId: string }) {
         onClick={() => (confirming ? void remove() : setConfirming(true))}
         onBlur={() => setConfirming(false)}
         className="min-h-11 rounded-2xl px-3 text-xs font-semibold"
-        style={{ color: confirming ? "var(--danger, #dc2626)" : "var(--dim)", border: "1px solid var(--border)" }}
+        style={{ color: confirming ? "var(--danger)" : "var(--dim)", border: "1px solid var(--border)" }}
       >
         {confirming ? t("removeConfirm") : t("remove")}
       </button>

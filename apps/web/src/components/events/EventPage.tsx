@@ -108,7 +108,7 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
         ) : (
           <div className="aspect-[16/7] w-full" />
         )}
-        <span className="absolute bottom-3 start-3 rounded-xl" style={{ boxShadow: "0 6px 18px rgba(0,0,0,0.25)" }}>
+        <span className="absolute bottom-3 start-3 rounded-xl" style={{ boxShadow: "var(--shadow-md)" }}>
           <DateBlock iso={event.starts_at} size="lg" />
         </span>
       </div>
@@ -127,7 +127,7 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
       </header>
 
       {event.cancelled ? (
-        <p role="status" className="rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger, #dc2626) 14%, var(--panel))", color: "var(--text)" }}>
+        <p role="status" className="rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 14%, var(--panel))", color: "var(--text)" }}>
           {event.cancel_reason ? t("cancelledWithReason", { reason: event.cancel_reason }) : t("cancelledNotice")}
         </p>
       ) : null}
@@ -189,7 +189,7 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
             <RsvpButton event={event} inviteToken={invitation?.usable ? invite : null} />
           </div>
           {going && event.price_cents > 0 ? (
-            <p className="text-sm font-semibold" style={{ color: event.my?.paid ? "var(--success, #16a34a)" : "var(--text-soft)" }}>
+            <p className="text-sm font-semibold" style={{ color: event.my?.paid ? "var(--success)" : "var(--text-soft)" }}>
               {event.my?.paid ? t("paidDone") : t("payAtBoxLong", { price: price ?? "" })}
             </p>
           ) : null}
@@ -354,7 +354,7 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
           <Link
             href={`/org/${event.box.slug}/admin/community/events/${event.id}`}
             className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("openAttendees")}
           </Link>

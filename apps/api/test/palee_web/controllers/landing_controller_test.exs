@@ -39,8 +39,7 @@ defmodule PaleeWeb.LandingControllerTest do
       Gamification.update_settings(%{
         weekly_workout_target: 3,
         streak_shield_reset_day: 7,
-        leaderboard_enabled: true,
-        theme_slug: "sage"
+        leaderboard_enabled: true
       })
 
     {:ok, execution} =
@@ -124,7 +123,7 @@ defmodule PaleeWeb.LandingControllerTest do
     assert get_in(landing, ["gamification", "settings", "weekly_workout_target"]) == 3
     assert get_in(landing, ["gamification", "settings", "streak_shield_reset_day"]) == 7
     assert get_in(landing, ["gamification", "settings", "leaderboard_enabled"]) == true
-    assert get_in(landing, ["gamification", "settings", "theme_slug"]) == "sage"
+    refute Map.has_key?(get_in(landing, ["gamification", "settings"]), "theme_slug")
     assert get_in(landing, ["gamification", "leaderboard", "visible"]) == false
     assert get_in(landing, ["membership", "package_name"]) == "Landing Package"
     assert get_in(landing, ["membership", "entitlement_status"]) == "active"

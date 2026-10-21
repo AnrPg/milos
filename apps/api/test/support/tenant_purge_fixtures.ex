@@ -60,8 +60,7 @@ defmodule Palee.TenantPurgeFixtures do
       GamificationSetting.changeset(%GamificationSetting{}, %{
         organization_id: organization.id,
         weekly_workout_target: 3,
-        leaderboard_enabled: true,
-        theme_slug: "ember"
+        leaderboard_enabled: true
       })
     )
 

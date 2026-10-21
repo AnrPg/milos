@@ -1,55 +1,22 @@
 @import "tailwindcss";
 
+/*
+ * Theme variables (--bg, --primary, ...) are generated from src/lib/theme.ts,
+ * the single source of every colour, and inlined by the root layout. This file
+ * only maps them onto elements: never write a colour literal here
+ * (theme-guard.test.ts fails on one). docs/brand/THEME.md lists which token
+ * dresses which UI part.
+ */
 :root {
-  --bg: #0B0807;
-  --panel: #150F0D;
-  --panel-raised: #1E1512;
-  --panel-muted: #110C0A;
-  --card: #1A1210;
-  --border: #2C201B;
-  --border-strong: #9C7E68;
-  --text: #FBF3EE;
-  --text-soft: #E0CFC5;
-  --muted: #A0897C;
-  --dim: #9C8778;
-  --primary: #D9743D;
-  --primary-strong: #F0985C;
-  --success: #6FCB8B;
-  --warning: #F0B94C;
-  --danger: #F2604D;
-  --info: #6EC6D9;
-
+  /* Aliases kept for older components. */
   --background: var(--bg);
   --foreground: var(--text);
   --surface: var(--panel);
   --accent: var(--primary);
   --accent-strong: var(--primary-strong);
-  --primary-contrast: var(--bg);
   --amber: var(--warning);
   --lime: var(--success);
   --red: var(--danger);
-  --scale-base: var(--text);
-  --scale-scaled: var(--success);
-  --scale-rx: var(--warning);
-  --scale-advanced: var(--danger);
-  --workout-crossfit: #D94D3D;
-  --workout-strength: var(--primary);
-  --workout-gymnastics: #E08A4B;
-  --workout-aerobics: #D9A441;
-  --workout-flexibility: #78BFA6;
-  --workout-recovery: #9C8CC8;
-
-  /* Anatomy figure (ADR-164): role colours and the neutral muscle/bone base. */
-  --anatomy-primary: #D9743D;
-  --anatomy-secondary: #EFA36F;
-  --anatomy-stabilizer: #F3CDB0;
-  --anatomy-felt: #3FA37A;
-  /* Atlas heat map (ADR-164): one warm hue, darker and more saturated with volume. */
-  --anatomy-heat-low: #D9A27E;
-  --anatomy-heat-medium: #E07A3C;
-  --anatomy-heat-high: #C2361F;
-  --anatomy-base: #8E7A75;
-  --anatomy-bone: #E3DACB;
 }
 
 @theme inline {
@@ -58,39 +25,57 @@
   --color-surface: var(--surface);
   --color-accent: var(--accent);
   --color-accent-strong: var(--accent-strong);
-  --font-sans: "Avenir Next", "Segoe UI", sans-serif;
-  --font-mono: "SFMono-Regular", "Menlo", monospace;
+  --font-sans: var(--font-brand);
+  --font-mono: var(--font-code);
+}
+
+html {
+  background: var(--bg);
+  accent-color: var(--primary);
+  caret-color: var(--primary);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+  scrollbar-width: thin;
 }
 
 body {
   background: var(--bg);
   color: var(--text);
-  font-family: "Avenir Next", "Segoe UI", sans-serif;
+  font-family: var(--font-brand);
 }
 
-html {
-  scrollbar-color: var(--border-strong) var(--panel-muted);
-  scrollbar-width: thin;
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-code);
 }
 
-html[data-theme="daybreak"],
-html[data-theme="paper"],
-html[data-theme="lagoon"],
-html[data-theme="sunset"] {
-  color-scheme: light;
-  --anatomy-base: #AE9891;
-  --anatomy-bone: #D8CDBB;
-  --anatomy-heat-low: #E6B48F;
-  --anatomy-heat-medium: #DD6F2E;
-  --anatomy-heat-high: #A82A17;
+::selection {
+  background: var(--selection);
+  color: var(--selection-text);
 }
 
-html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {
-  color-scheme: dark;
+:focus-visible {
+  outline-color: var(--focus-ring);
 }
 
+mark {
+  background: var(--highlight);
+  color: var(--highlight-text);
+}
+
+hr {
+  border-color: var(--border);
+}
+
+::placeholder {
+  color: var(--placeholder);
+  opacity: 1;
+}
+
+/* Scrollbars (every scroll container, Firefox and WebKit). */
 * {
-  scrollbar-color: var(--border-strong) var(--panel-muted);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
   scrollbar-width: thin;
 }
 
@@ -99,27 +84,33 @@ html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lag
   height: 0.7rem;
 }
 
-*::-webkit-scrollbar-track {
-  background: var(--panel-muted);
+*::-webkit-scrollbar-track,
+*::-webkit-scrollbar-corner {
+  background: var(--scrollbar-track);
 }
 
 *::-webkit-scrollbar-thumb {
-  background: var(--border-strong);
-  border: 2px solid var(--panel-muted);
+  background: var(--scrollbar-thumb);
+  border: 2px solid var(--scrollbar-track);
   border-radius: 999px;
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: var(--dim);
+  background: var(--scrollbar-thumb-hover);
 }
 
+/* Native form controls: dropdowns, date and time pickers, checkboxes, radios,
+   range sliders, progress bars and autofilled fields. The browser draws the
+   pickers' popups itself; color-scheme (set per theme) and accent-color make
+   them follow the theme. */
 select,
 input[type="date"],
 input[type="datetime-local"],
 input[type="month"],
+input[type="week"],
 input[type="time"] {
-  background-color: var(--panel-muted);
-  border-color: var(--border-strong);
+  background-color: var(--control-bg);
+  border-color: var(--control-border);
   color: var(--text);
 }
 
@@ -129,12 +120,56 @@ select optgroup {
   color: var(--text);
 }
 
+select option:checked {
+  background: var(--selection);
+  color: var(--selection-text);
+}
+
 input[type="date"]::-webkit-calendar-picker-indicator,
 input[type="datetime-local"]::-webkit-calendar-picker-indicator,
 input[type="month"]::-webkit-calendar-picker-indicator,
+input[type="week"]::-webkit-calendar-picker-indicator,
 input[type="time"]::-webkit-calendar-picker-indicator {
   cursor: pointer;
   opacity: 0.85;
+}
+
+input[type="date"]::-webkit-datetime-edit-fields-wrapper,
+input[type="time"]::-webkit-datetime-edit-fields-wrapper {
+  color: var(--text);
+}
+
+input[type="checkbox"],
+input[type="radio"],
+input[type="range"],
+progress,
+meter {
+  accent-color: var(--primary);
+}
+
+input[type="color"] {
+  background: var(--control-bg);
+  border-color: var(--control-border);
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+select:-webkit-autofill {
+  -webkit-text-fill-color: var(--text);
+  caret-color: var(--primary);
+  box-shadow: 0 0 0 1000px var(--control-bg) inset;
+  transition: background-color 9999s ease-out 0s;
+}
+
+input[type="search"]::-webkit-search-cancel-button {
+  filter: none;
+  opacity: 0.7;
+}
+
+details > summary::marker {
+  color: var(--muted);
 }
 
 html[dir="rtl"] body {
@@ -224,7 +259,8 @@ input[type="number"] {
 }
 
 .free-text-rich-content :where(mark) {
-  background: #f5f113;
+  background: var(--highlight);
+  color: var(--highlight-text);
   border-radius: 0.2rem;
   padding-inline: 0.08rem;
 }
@@ -284,7 +320,7 @@ input[type="number"] {
   white-space: nowrap;
   border-radius: 6px;
   padding: 2px 6px;
-  font: 700 11px/1.3 var(--font-sans, system-ui), sans-serif;
+  font: 700 11px/1.3 var(--font-brand);
   color: var(--text);
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   border: 1px solid var(--border);
@@ -303,6 +339,57 @@ input[type="number"] {
 .palee-map-pin:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 2px;
+}
+
+/* MapLibre's own controls (zoom buttons, attribution) in the theme: the
+   library ships white buttons with dark icon images, so the icons are drawn
+   here in the text colour instead. */
+.maplibregl-ctrl-group,
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  background: var(--panel) !important;
+  color: var(--muted);
+  box-shadow: var(--shadow-sm) !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top-color: var(--border) !important;
+}
+.maplibregl-ctrl-group button:not(:disabled):hover {
+  background: var(--panel-muted) !important;
+}
+.maplibregl-ctrl-group button:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus-ring) !important;
+}
+.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: none !important;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  font: 700 18px/1 var(--font-brand);
+}
+.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon::before {
+  content: "+";
+}
+.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon::before {
+  content: "\2212";
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--muted) !important;
+}
+.maplibregl-ctrl-attrib-button {
+  background-color: var(--panel-muted) !important;
+  background-image: none !important;
+  color: var(--text);
+  font: italic 700 13px/24px Georgia, serif;
+  text-align: center;
+}
+.maplibregl-ctrl-attrib-button::before {
+  content: "i";
+}
+.maplibregl-canvas-container,
+.maplibregl-map {
+  background: var(--map-land);
 }
 
 /* Γύρω μου pins (ADR-154): events round in the brand colour, boxes square. */
@@ -353,7 +440,7 @@ input[type="number"] {
   100% { opacity: 0; }
 }
 .checkin-flash {
-  background: var(--success, #22c55e);
+  background: var(--success);
   opacity: 0;
   animation: checkin-flash 1.4s ease-out;
 }
@@ -365,7 +452,7 @@ input[type="number"] {
 @media print {
   body > *:not(.checkin-print-root):not(:has(.checkin-print-root)) { display: none !important; }
   .checkin-print-hide { display: none !important; }
-  .checkin-print-root { min-height: auto !important; background: #fff !important; color: #000 !important; }
+  .checkin-print-root { min-height: auto !important; background: var(--paper) !important; color: var(--on-paper) !important; }
   @page { size: A4 portrait; margin: 14mm; }
 }
 

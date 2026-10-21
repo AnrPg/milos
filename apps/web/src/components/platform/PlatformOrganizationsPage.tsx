@@ -46,7 +46,6 @@ const defaultForm: ProvisionOrganizationInput = {
   initial_owner_email: "",
   brand_name: "",
   brand_logo_url: "",
-  brand_primary_color: "#1f6f5f",
 };
 
 const membershipRoles: OrganizationMembershipRole[] = ["owner", "admin", "coach", "member", "athlete"];
@@ -263,7 +262,7 @@ export function PlatformOrganizationsPage() {
           <button
             type="button"
             onClick={() => setProvisioningOpen(true)}
-            className="bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white"
+            className="bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-[var(--primary-contrast)]"
           >
             {copy.create}
           </button>
@@ -271,7 +270,7 @@ export function PlatformOrganizationsPage() {
       </header>
 
       {error ? (
-        <div className="mt-5 flex items-center justify-between gap-4 border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <div className="mt-5 flex items-center justify-between gap-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
           <span>{error}</span>
           <button type="button" className="font-semibold underline" onClick={() => void organizationsQuery.refetch()}>
             {copy.retry}
@@ -280,20 +279,20 @@ export function PlatformOrganizationsPage() {
       ) : null}
 
       {!error && organizationsQuery.isError && !forbidden ? (
-        <div className="mt-5 border-l-4 border-red-600 bg-red-50 px-4 py-3 text-sm text-red-900">
+        <div className="mt-5 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
           {copy.loadError}
         </div>
       ) : null}
 
       {invitation ? (
-        <section className="mt-6 border border-amber-400 bg-amber-50 p-5 text-amber-950">
+        <section className="mt-6 border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[color-mix(in_srgb,var(--warning)_10%,var(--panel))] p-5 text-[var(--text)]">
           <h2 className="text-lg font-semibold">{copy.copyTokenTitle}</h2>
           <p className="mt-1 text-sm">{copy.copyTokenWarning}</p>
           <p className="mt-4 text-xs font-semibold uppercase">{copy.ownerSetupLink}</p>
-          <code className="mt-1 block break-all border border-amber-300 bg-white px-3 py-3 text-sm">
+          <code className="mt-1 block break-all border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[var(--panel)] px-3 py-3 text-sm">
             {ownerSetupUrl(invitation.initial_owner_invitation.token)}
           </code>
-          <code className="mt-4 block break-all border border-amber-300 bg-white px-3 py-3 text-sm">
+          <code className="mt-4 block break-all border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[var(--panel)] px-3 py-3 text-sm">
             {invitation.initial_owner_invitation.token}
           </code>
           <p className="mt-2 text-xs">
@@ -306,7 +305,7 @@ export function PlatformOrganizationsPage() {
                 await navigator.clipboard.writeText(invitation.initial_owner_invitation.token);
                 setCopied("token");
               }}
-              className="border border-amber-900 bg-amber-900 px-4 py-2 text-sm font-semibold text-white"
+              className="border border-[var(--warning)] bg-[var(--warning)] px-4 py-2 text-sm font-semibold text-[var(--warning-contrast)]"
             >
               {copied === "token" ? copy.copied : copy.copyToken}
             </button>
@@ -316,25 +315,25 @@ export function PlatformOrganizationsPage() {
                 await navigator.clipboard.writeText(ownerSetupUrl(invitation.initial_owner_invitation.token));
                 setCopied("link");
               }}
-              className="border border-amber-900 bg-amber-900 px-4 py-2 text-sm font-semibold text-white"
+              className="border border-[var(--warning)] bg-[var(--warning)] px-4 py-2 text-sm font-semibold text-[var(--warning-contrast)]"
             >
               {copied === "link" ? copy.copied : copy.copyOwnerSetupLink}
             </button>
             <button
               type="button"
               onClick={() => setInvitation(null)}
-              className="border border-amber-900 px-4 py-2 text-sm font-semibold"
+              className="border border-[var(--warning)] px-4 py-2 text-sm font-semibold"
             >
               {copy.dismiss}
             </button>
           </div>
           {invitationEmail ? (
-            <div className="mt-4 border-t border-amber-300 pt-4">
+            <div className="mt-4 border-t border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] pt-4">
               <button
                 type="button"
                 disabled={sendingEmail || emailSent}
                 onClick={() => void sendInvitationEmail()}
-                className="border border-amber-900 bg-amber-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                className="border border-[var(--warning)] bg-[var(--warning)] px-4 py-2 text-sm font-semibold text-[var(--warning-contrast)] disabled:opacity-60"
               >
                 {emailSent
                   ? copy.emailSent
@@ -342,7 +341,7 @@ export function PlatformOrganizationsPage() {
                     ? copy.sendingEmail
                     : `${copy.sendEmail} ${invitationEmail}`}
               </button>
-              {emailSendError ? <p className="mt-2 text-sm text-red-900">{emailSendError}</p> : null}
+              {emailSendError ? <p className="mt-2 text-sm text-[var(--danger)]">{emailSendError}</p> : null}
             </div>
           ) : null}
         </section>
@@ -387,11 +386,11 @@ export function PlatformOrganizationsPage() {
                     </div>
                     <div className="flex shrink-0 flex-wrap items-center gap-2">
                       {entry.pending_registration ? (
-                        <span className="inline-flex border border-[var(--primary)] bg-[var(--surface-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--primary)]">
+                        <span className="inline-flex border border-[var(--primary)] bg-[var(--panel-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--primary)]">
                           {copy.pendingRegistration}
                         </span>
                       ) : null}
-                      <span className="inline-flex border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--text)]">
+                      <span className="inline-flex border border-[var(--border)] bg-[var(--panel-muted)] px-3 py-1.5 text-sm font-semibold text-[var(--text)]">
                         {statusLabels[entry.organization.status]}
                       </span>
                     </div>
@@ -443,7 +442,7 @@ export function PlatformOrganizationsPage() {
                       <button
                         type="button"
                         onClick={() => setConfirmingArchive(entry)}
-                        className="border border-red-700 px-3 py-2 text-sm font-semibold text-red-800"
+                        className="border border-[var(--danger)] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
                       >
                         {copy.archive}
                       </button>
@@ -451,14 +450,14 @@ export function PlatformOrganizationsPage() {
                     <button
                       type="button"
                       onClick={() => setReviewingPurge(entry)}
-                      className="border border-red-900 px-3 py-2 text-sm font-semibold text-red-900"
+                      className="border border-[var(--danger)] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
                     >
                       {purgeCopy.open}
                     </button>
                     <button
                       type="button"
                       onClick={() => setConfirmingDelete(entry)}
-                      className="border border-red-900 bg-red-50 px-3 py-2 text-sm font-semibold text-red-900"
+                      className="border border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
                     >
                       {copy.delete}
                     </button>
@@ -681,7 +680,7 @@ function AccessDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.accessTitle}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.accessTitle}>
       <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -691,8 +690,8 @@ function AccessDialog({
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">{copy.cancel}</button>
         </div>
 
-        {error ? <p className="mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{error}</p> : null}
-        {accessQuery.isError ? <p className="mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{copy.accessError}</p> : null}
+        {error ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
+        {accessQuery.isError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.accessError}</p> : null}
 
         <form className="mt-5 grid gap-3 border-y border-[var(--border)] py-5 sm:grid-cols-[1fr_1fr_1fr_auto]" onSubmit={invite}>
           <label className="text-sm font-medium text-[var(--text)]">
@@ -707,20 +706,20 @@ function AccessDialog({
           </label>
           <TextField label={copy.inviteEmail} type="email" value={email} onChange={setEmail} />
           <TextField label={copy.inviteLifetime} type="number" min={1} value={lifetimeHours} required onChange={setLifetimeHours} />
-          <button type="submit" disabled={invitePending} className="self-end bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-white disabled:opacity-50">
+          <button type="submit" disabled={invitePending} className="self-end bg-[var(--accent)] px-4 py-3 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
             {invitePending ? copy.issuingInvite : copy.invite}
           </button>
         </form>
 
         {invitation ? (
-          <section className="mt-4 border border-amber-400 bg-amber-50 p-4 text-amber-950">
+          <section className="mt-4 border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[color-mix(in_srgb,var(--warning)_10%,var(--panel))] p-4 text-[var(--text)]">
             <p className="text-sm font-semibold">{copy.ownerSetupLink}</p>
-            <code className="mt-2 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{invitationSetupUrl(invitation)}</code>
-            <code className="mt-3 block break-all border border-amber-300 bg-white px-3 py-2 text-sm">{invitation.token}</code>
+            <code className="mt-2 block break-all border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[var(--panel)] px-3 py-2 text-sm">{invitationSetupUrl(invitation)}</code>
+            <code className="mt-3 block break-all border border-[color-mix(in_srgb,var(--warning)_45%,var(--border))] bg-[var(--panel)] px-3 py-2 text-sm">{invitation.token}</code>
             <p className="mt-2 text-xs">{copy.expires}: {new Date(invitation.expires_at).toLocaleString()}</p>
             <div className="mt-3 flex flex-wrap gap-2">
-              <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitation.token); setCopied("token"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "token" ? copy.copied : copy.copyToken}</button>
-              <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitationSetupUrl(invitation)); setCopied("link"); }} className="border border-amber-900 px-3 py-2 text-sm font-semibold">{copied === "link" ? copy.copied : copy.copyOwnerSetupLink}</button>
+              <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitation.token); setCopied("token"); }} className="border border-[var(--warning)] px-3 py-2 text-sm font-semibold">{copied === "token" ? copy.copied : copy.copyToken}</button>
+              <button type="button" onClick={async () => { await navigator.clipboard.writeText(invitationSetupUrl(invitation)); setCopied("link"); }} className="border border-[var(--warning)] px-3 py-2 text-sm font-semibold">{copied === "link" ? copy.copied : copy.copyOwnerSetupLink}</button>
             </div>
           </section>
         ) : null}
@@ -776,7 +775,7 @@ function GeneratedInvitationsList({
   if (invitations.length === 0) return null;
 
   return (
-    <section className="mt-4 border border-[var(--border)] bg-[var(--surface-muted)] p-3">
+    <section className="mt-4 border border-[var(--border)] bg-[var(--panel-muted)] p-3">
       <button
         type="button"
         aria-expanded={expanded}
@@ -801,11 +800,11 @@ function GeneratedInvitationsList({
                 <Detail label={copy.expires} value={new Date(invitation.expires_at).toLocaleString(locale)} />
               </dl>
               <p className="mt-3 text-xs font-semibold uppercase text-[var(--text-soft)]">{copy.setupLink}</p>
-              <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-2 text-xs">
+              <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--panel-muted)] px-3 py-2 text-xs">
                 {invitationSetupUrl(invitation)}
               </code>
               <p className="mt-3 text-xs font-semibold uppercase text-[var(--text-soft)]">{copy.token}</p>
-              <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--surface-muted)] px-3 py-2 text-xs">
+              <code className="mt-1 block break-all border border-[var(--border)] bg-[var(--panel-muted)] px-3 py-2 text-xs">
                 {invitation.token}
               </code>
             </details>
@@ -825,7 +824,7 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.create}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.create}>
       <form
         className="max-h-[90vh] w-full max-w-lg overflow-y-auto bg-[var(--surface)] p-6 shadow-xl"
         onSubmit={onSubmit}
@@ -847,11 +846,10 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
           <TextField label={copy.ownerEmail} type="email" required value={form.initial_owner_email ?? ""} onChange={(initial_owner_email) => onChange({ ...form, initial_owner_email })} />
           <TextField label={copy.brandName} value={form.brand_name ?? ""} onChange={(brand_name) => onChange({ ...form, brand_name })} />
           <TextField label={copy.brandLogo} type="url" value={form.brand_logo_url ?? ""} onChange={(brand_logo_url) => onChange({ ...form, brand_logo_url })} />
-          <TextField label={copy.brandColor} value={form.brand_primary_color ?? ""} onChange={(brand_primary_color) => onChange({ ...form, brand_primary_color })} />
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="submit" disabled={submitting} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+          <button type="submit" disabled={submitting} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
             {submitting ? copy.provisioning : copy.provision}
           </button>
         </div>
@@ -868,14 +866,14 @@ function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: 
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.archiveTitle}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.archiveTitle}>
       <div className="w-full max-w-md bg-[var(--surface)] p-6 shadow-xl">
         <h2 className="text-xl font-semibold text-[var(--text)]">{copy.archiveTitle}</h2>
         <p className="mt-2 font-semibold text-[var(--text)]">{organization.organization.name}</p>
         <p className="mt-3 text-sm leading-6 text-[var(--text-soft)]">{copy.archiveBody}</p>
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="button" disabled={submitting} onClick={onConfirm} className="bg-red-700 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+          <button type="button" disabled={submitting} onClick={onConfirm} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
             {copy.archiveConfirm}
           </button>
         </div>
@@ -892,14 +890,14 @@ function DeleteDialog({ copy, organization, submitting, onCancel, onConfirm }: {
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.deleteTitle}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.deleteTitle}>
       <div className="w-full max-w-md bg-[var(--surface)] p-6 shadow-xl">
         <h2 className="text-xl font-semibold text-[var(--text)]">{copy.deleteTitle}</h2>
         <p className="mt-2 font-semibold text-[var(--text)]">{organization.organization.name}</p>
         <p className="mt-3 text-sm leading-6 text-[var(--text-soft)]">{copy.deleteBody}</p>
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="button" disabled={submitting} onClick={onConfirm} className="bg-red-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+          <button type="button" disabled={submitting} onClick={onConfirm} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
             {copy.deleteConfirm}
           </button>
         </div>
@@ -925,7 +923,7 @@ function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onL
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.settings}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.settings}>
       <form
         className="max-h-[90vh] w-full max-w-lg overflow-y-auto bg-[var(--surface)] p-6 shadow-xl"
         onSubmit={async (event) => {
@@ -962,11 +960,10 @@ function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onL
               </div>
             </div>
           ) : null}
-          <TextField label={copy.brandColor} value={settings.brand_primary_color ?? ""} onChange={(brand_primary_color) => setSettings({ ...settings, brand_primary_color })} />
         </div>
         <div className="mt-6 flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="submit" disabled={saving} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">{saving ? copy.saving : copy.saveSettings}</button>
+          <button type="submit" disabled={saving} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">{saving ? copy.saving : copy.saveSettings}</button>
         </div>
       </form>
     </div>

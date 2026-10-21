@@ -68,7 +68,7 @@ function ExerciseDragPreview({ exercise, section }: { exercise: DraftExercise; s
       style={{
         background: "var(--card, var(--panel-muted))",
         border: "1px solid var(--accent, var(--primary))",
-        boxShadow: "0 12px 40px rgba(0,0,0,0.65)",
+        boxShadow: "var(--shadow-md)",
         opacity: 0.93,
       }}
     >
@@ -124,7 +124,7 @@ function SectionDragPreview({ name }: { name: string }) {
         background: "var(--panel, var(--panel))",
         border: "1px solid var(--accent, var(--primary))",
         color: "var(--text)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+        boxShadow: "var(--shadow-md)",
         opacity: 0.93,
       }}
     >

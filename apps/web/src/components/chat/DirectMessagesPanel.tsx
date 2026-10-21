@@ -181,13 +181,13 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
   return createPortal(
     <div
       className="fixed inset-0 z-[70]"
-      style={{ background: "rgba(0,0,0,0.55)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={onClose}
       role="presentation"
     >
       <aside
         aria-label={i18n("chat2ced57f")}
-        className="absolute end-0 top-0 flex h-full w-full max-w-md flex-col overflow-hidden shadow-[-20px_0_60px_rgba(0,0,0,0.5)] rtl:shadow-[20px_0_60px_rgba(0,0,0,0.5)]"
+        className="absolute end-0 top-0 flex h-full w-full max-w-md flex-col overflow-hidden shadow-[var(--shadow-lg)] rtl:shadow-[var(--shadow-lg)]"
         style={{
           background: "var(--panel-muted)",
           borderInlineStart: "1px solid var(--border-strong)",

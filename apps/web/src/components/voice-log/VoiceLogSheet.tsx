@@ -98,7 +98,7 @@ export function VoiceLogSheet({
   return (
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.45)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={recording || phase.name === "working" ? undefined : onClose}
     >
       <div
@@ -124,7 +124,7 @@ export function VoiceLogSheet({
             className="flex h-20 w-20 items-center justify-center rounded-full disabled:opacity-60"
             style={{
               background: recording ? "var(--danger)" : "var(--primary)",
-              color: "var(--bg)",
+              color: "var(--primary-contrast)",
               boxShadow: recording ? "0 0 0 8px color-mix(in srgb, var(--danger) 25%, transparent)" : undefined,
             }}
           >

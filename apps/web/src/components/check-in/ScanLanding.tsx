@@ -71,7 +71,7 @@ export function ScanLanding({ locationId, code, source }: { locationId: string; 
         <Card>
           <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("scanFailedTitle")}</h1>
           <p role="alert" className="text-sm" style={{ color: "var(--text-soft)" }}>{t(checkInErrorKey(scan.error))}</p>
-          <button type="button" onClick={() => void scan.refetch()} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+          <button type="button" onClick={() => void scan.refetch()} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {t("tryAgain")}
           </button>
         </Card>
@@ -177,7 +177,7 @@ function Outcome({
                 {(result.classes ?? []).map((slot) => (
                   <li key={slot.id} className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
                     <ClassLabel slot={slot} />
-                    <Link href={schedule(slot.id)} className="flex min-h-11 shrink-0 items-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+                    <Link href={schedule(slot.id)} className="flex min-h-11 shrink-0 items-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                       {t("scanBook")}
                     </Link>
                   </li>
@@ -237,7 +237,7 @@ function CheckedIn({ token, result, receivedAt, onUndone }: { token: string; res
   return (
     <Card tone="success">
       <BoxLine result={result} />
-      <p aria-hidden="true" className="text-5xl" style={{ color: "var(--success, #22c55e)" }}>✓</p>
+      <p aria-hidden="true" className="text-5xl" style={{ color: "var(--success)" }}>✓</p>
       <h1 className="text-3xl font-extrabold" style={{ color: "var(--text)" }} data-testid="scan-checked-in">
         <CheckInLine result={result} />
       </h1>
@@ -313,7 +313,7 @@ function VisitorView({ token, result }: { token: string; result: ScanResult }) {
                   type="button"
                   onClick={() => setPicked(slot)}
                   className="min-h-11 shrink-0 rounded-2xl px-4 text-sm font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
                   {t("scanTrialBook")}
                 </button>
@@ -346,8 +346,8 @@ function Card({ children, tone }: { children: React.ReactNode; tone?: "success" 
     <section
       className="flex flex-col gap-3 rounded-3xl p-5"
       style={{
-        background: tone === "success" ? "color-mix(in srgb, var(--success, #22c55e) 10%, var(--panel))" : "var(--panel)",
-        border: `1px solid ${tone === "success" ? "color-mix(in srgb, var(--success, #22c55e) 45%, transparent)" : "var(--border)"}`,
+        background: tone === "success" ? "color-mix(in srgb, var(--success) 10%, var(--panel))" : "var(--panel)",
+        border: `1px solid ${tone === "success" ? "color-mix(in srgb, var(--success) 45%, transparent)" : "var(--border)"}`,
       }}
     >
       {children}

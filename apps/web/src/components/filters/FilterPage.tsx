@@ -85,7 +85,7 @@ export function FilterPage({
           type="button"
           onClick={onClose}
           className="min-h-12 rounded-2xl text-sm font-bold"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {resultCount === undefined ? t("show") : t("showResults", { count: resultCount })}
         </button>

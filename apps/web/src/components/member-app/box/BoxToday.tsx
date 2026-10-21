@@ -161,7 +161,7 @@ export function BoxToday({
                 <button
                   type="button"
                   className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   onClick={() => launcher.resume(today.resumeExecutionId!)}
                 >
                   {t("resumeWorkout")} ▶
@@ -229,7 +229,7 @@ export function BoxToday({
             {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
 
             {launcher.error ? (
-              <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>
+              <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
                 {localizeError(launcher.error, i18n)}
               </p>
             ) : null}
@@ -247,7 +247,7 @@ export function BoxToday({
               <button
                 type="button"
                 className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 onClick={() => void start(selected)}
                 disabled={launcher.pendingKey !== null}
               >
@@ -273,7 +273,7 @@ export function BoxToday({
               </div>
               <span
                 className="shrink-0 rounded-full px-3 py-1 text-xs font-bold"
-                style={{ background: "color-mix(in srgb, var(--success, #22c55e) 16%, transparent)", color: "var(--success, #22c55e)" }}
+                style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
               >
                 {t(`bookingStatus.${booking.current_user_booking?.status ?? "approved"}`)}
               </span>

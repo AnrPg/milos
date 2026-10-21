@@ -103,7 +103,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                 maxHeight: dropdownRect.maxHeight,
                 background: "var(--card)",
                 border: "1px solid var(--dim)",
-                boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                boxShadow: "var(--shadow-md)",
               }}
             >
               {formatGroups.map((group) => (
@@ -147,7 +147,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
                   background: "var(--panel)",
                   border: "1px solid var(--dim)",
                   color: "var(--text)",
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+                  boxShadow: "var(--shadow-md)",
                 }}
               >
                 <div className="mb-2 font-bold">{formatLabels[hoveredFormat!]}</div>

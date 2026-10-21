@@ -53,7 +53,7 @@ export function OpenClubsTab() {
           type="button"
           onClick={() => setEditing("new")}
           className="min-h-11 rounded-2xl text-sm font-bold"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           + {t("clubNew")}
         </button>

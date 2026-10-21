@@ -51,7 +51,7 @@ export function ComposeButton({
         onClick={() => setOpen(true)}
         aria-label={t("compose")}
         className="flex h-11 w-11 items-center justify-center rounded-full"
-        style={{ background: "var(--primary)", color: "var(--bg)" }}
+        style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
@@ -199,7 +199,7 @@ export function ComposeSheet({
   return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.45)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={cancel}
     >
       <div
@@ -300,7 +300,7 @@ export function ComposeSheet({
             {media.busy ? tMedia("waitUploads") : tMedia("fixUploads")}
           </p>
         ) : null}
-        {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+        {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
         <div className="flex gap-2">
           <button
             type="button"
@@ -315,7 +315,7 @@ export function ComposeSheet({
             onClick={() => void publish()}
             disabled={!canPublish}
             className="min-h-12 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {busy ? t("publishing") : t("publish")}
           </button>
@@ -371,7 +371,7 @@ function AudienceSheet({
   return (
     <div
       className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.35)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={(event) => {
         event.stopPropagation();
         onClose();

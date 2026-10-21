@@ -59,7 +59,7 @@ export function CompareSlider({
 
   return (
     <div className="flex flex-col gap-2" data-testid="compare-slider">
-      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl" style={{ background: "#1e1915" }}>
+      <div className="relative aspect-[3/4] w-full overflow-hidden rounded-xl" style={{ background: "var(--media)" }}>
         {/* eslint-disable-next-line @next/next/no-img-element -- short-lived presigned URL */}
         <img src={fromUrl} alt={fromLabel} className="absolute inset-0 h-full w-full object-cover" style={hidden ? { filter: "blur(18px)" } : undefined} draggable={false} />
         {/* eslint-disable-next-line @next/next/no-img-element -- short-lived presigned URL */}
@@ -70,17 +70,17 @@ export function CompareSlider({
           style={{ clipPath: `inset(0 0 0 ${split}%)`, ...(hidden ? { filter: "blur(18px)" } : {}) }}
           draggable={false}
         />
-        <span aria-hidden="true" className="absolute inset-y-0 w-0.5" style={{ left: `${split}%`, background: "#fff" }} />
-        <span className="absolute bottom-1.5 start-2 text-[11px] font-bold text-white">{fromLabel}</span>
-        <span className="absolute bottom-1.5 end-2 text-[11px] font-bold text-white">{toLabel}</span>
+        <span aria-hidden="true" className="absolute inset-y-0 w-0.5" style={{ left: `${split}%`, background: "var(--on-media)" }} />
+        <span className="absolute bottom-1.5 start-2 text-[11px] font-bold text-[var(--on-media)]">{fromLabel}</span>
+        <span className="absolute bottom-1.5 end-2 text-[11px] font-bold text-[var(--on-media)]">{toLabel}</span>
         {hidden ? (
           <button
             type="button"
             onClick={() => setRevealed(true)}
-            className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white"
+            className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[var(--on-media)]"
             aria-label={t("revealCompare")}
           >
-            <span className="rounded-full px-2 py-1" style={{ background: "rgba(0,0,0,0.45)" }}>{t("tapToShow")}</span>
+            <span className="rounded-full px-2 py-1" style={{ background: "var(--media-control)" }}>{t("tapToShow")}</span>
           </button>
         ) : null}
       </div>
@@ -213,7 +213,7 @@ export function ComparePage() {
                     className="min-h-9 rounded-full px-3 text-sm font-semibold disabled:opacity-40"
                     style={{
                       background: item === pose ? "var(--primary)" : "var(--panel-raised)",
-                      color: item === pose ? "var(--bg)" : "var(--text)",
+                      color: item === pose ? "var(--primary-contrast)" : "var(--text)",
                       border: "1px solid var(--border)",
                     }}
                   >

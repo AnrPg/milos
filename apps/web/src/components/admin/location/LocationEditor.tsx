@@ -268,7 +268,7 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
               id={`${listId}-list`}
               role="listbox"
               className="absolute inset-x-0 top-[4.9rem] z-20 overflow-hidden rounded-2xl"
-              style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", boxShadow: "0 12px 30px rgba(0,0,0,.3)" }}
+              style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", boxShadow: "var(--shadow-md)" }}
             >
               {searchFailed ? (
                 <li className="px-4 py-3 text-sm" style={{ color: "var(--muted)" }}>{t("searchUnavailable")}</li>

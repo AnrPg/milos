@@ -694,14 +694,14 @@ function PhotosStep({
             <li key={photo.id} className="relative overflow-hidden rounded-2xl" style={{ border: "1px solid var(--border)" }}>
               {/* eslint-disable-next-line @next/next/no-img-element -- media URLs come from object storage */}
               <img src={photo.url ?? ""} alt={t("photoNumber", { number: at + 1 })} className="aspect-square w-full object-cover" />
-              <div className="absolute inset-x-0 bottom-0 flex justify-between gap-1 p-1.5" style={{ background: "linear-gradient(transparent, rgba(0,0,0,.6))" }}>
+              <div className="absolute inset-x-0 bottom-0 flex justify-between gap-1 p-1.5" style={{ background: "linear-gradient(transparent, var(--media-control))" }}>
                 <span className="flex gap-1">
                   <button
                     type="button"
                     disabled={at === 0}
                     aria-label={t("moveEarlier", { number: at + 1 })}
                     onClick={() => move(at, at - 1)}
-                    className="grid h-8 w-8 place-items-center rounded-full text-white disabled:opacity-30"
+                    className="grid h-8 w-8 place-items-center rounded-full text-[var(--on-media)] disabled:opacity-30"
                   >
                     <span aria-hidden="true">‹</span>
                   </button>
@@ -710,7 +710,7 @@ function PhotosStep({
                     disabled={at === draft.photos.length - 1}
                     aria-label={t("moveLater", { number: at + 1 })}
                     onClick={() => move(at, at + 1)}
-                    className="grid h-8 w-8 place-items-center rounded-full text-white disabled:opacity-30"
+                    className="grid h-8 w-8 place-items-center rounded-full text-[var(--on-media)] disabled:opacity-30"
                   >
                     <span aria-hidden="true">›</span>
                   </button>
@@ -729,7 +729,7 @@ function PhotosStep({
                         ].slice(0, MAX_PHOTOS),
                       })
                     }
-                    className="grid h-8 w-8 place-items-center rounded-full text-white"
+                    className="grid h-8 w-8 place-items-center rounded-full text-[var(--on-media)]"
                   >
                     <span aria-hidden="true">★</span>
                   </button>
@@ -737,7 +737,7 @@ function PhotosStep({
                     type="button"
                     aria-label={t("removeNumber", { number: at + 1 })}
                     onClick={() => setDraft({ ...draft, photos: draft.photos.filter((other) => other.id !== photo.id) })}
-                    className="grid h-8 w-8 place-items-center rounded-full text-white"
+                    className="grid h-8 w-8 place-items-center rounded-full text-[var(--on-media)]"
                   >
                     <span aria-hidden="true">✕</span>
                   </button>

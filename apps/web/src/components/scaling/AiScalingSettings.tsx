@@ -146,7 +146,7 @@ export function AiScalingSettings({ token }: { token: string }) {
           <button
             type="submit"
             className="min-h-11 shrink-0 rounded-xl px-4 text-sm font-bold disabled:opacity-60"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             disabled={key.trim().length < 20 || busy}
           >
             {t("settings.saveKey")}

@@ -139,7 +139,7 @@ export function Segmented<T extends string>({
   label: string;
 }) {
   return (
-    <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1 rounded-2xl p-1" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+    <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1 rounded-2xl p-1" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       {options.map((option) => (
         <button
           key={option.value}
@@ -151,7 +151,7 @@ export function Segmented<T extends string>({
           style={{
             background: value === option.value ? "var(--panel)" : "transparent",
             color: value === option.value ? "var(--text)" : "var(--dim)",
-            boxShadow: value === option.value ? "0 1px 3px rgba(0,0,0,0.12)" : "none",
+            boxShadow: value === option.value ? "var(--shadow-sm)" : "none",
           }}
         >
           {option.label}
@@ -184,7 +184,7 @@ export function Stepper({
         aria-label={`${label} −`}
         onClick={() => onChange(clamp(value - 1))}
         className="h-11 w-11 shrink-0 rounded-xl text-lg font-semibold"
-        style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
       >
         −
       </button>
@@ -204,7 +204,7 @@ export function Stepper({
         aria-label={`${label} +`}
         onClick={() => onChange(clamp(value + 1))}
         className="h-11 w-11 shrink-0 rounded-xl text-lg font-semibold"
-        style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
       >
         +
       </button>
@@ -215,7 +215,7 @@ export function Stepper({
 
 export function LockedValue({ text, reason }: { text: string; reason: string }) {
   return (
-    <div className="flex items-start gap-2 rounded-xl px-3 py-2 text-sm" style={{ background: "var(--bg-soft)", border: "1px dashed var(--border)", color: "var(--text-soft)" }}>
+    <div className="flex items-start gap-2 rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px dashed var(--border)", color: "var(--text-soft)" }}>
       <span aria-hidden="true">🔒</span>
       <div>
         <p className="font-semibold">{text}</p>
@@ -434,7 +434,7 @@ export function ChipList({
             onClick={() => onChange(on ? value.filter((item) => item !== option.value) : [...value, option.value])}
             className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
             style={{
-              background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--bg-soft)",
+              background: on ? "color-mix(in srgb, var(--primary) 14%, transparent)" : "var(--panel-muted)",
               border: `1px solid ${on ? "var(--primary)" : "var(--border)"}`,
               color: on ? "var(--primary)" : "var(--text-soft)",
             }}
@@ -467,7 +467,7 @@ export function ClassTypeLimits({
   return (
     <div className="space-y-2">
       {value.map((limit, index) => (
-        <div key={limit.id} className="flex flex-wrap items-center gap-2 rounded-xl p-2" style={{ background: "var(--bg-soft)" }}>
+        <div key={limit.id} className="flex flex-wrap items-center gap-2 rounded-xl p-2" style={{ background: "var(--panel-muted)" }}>
           <select
             aria-label={t("pkgClassType")}
             className={inputClass + " h-11 min-w-[9rem] flex-1"}
@@ -502,7 +502,7 @@ export function ClassTypeLimits({
         <button
           type="button"
           className="rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
           onClick={() => onChange([...value, { id: unused[0].id, limit: 4, period: "calendar_month" }])}
         >
           + {t("pkgAddClassTypeLimit")}
@@ -783,7 +783,7 @@ function TimeWindowsControl({ value, onChange }: { value: TimeWindow[]; onChange
     <div className="space-y-3">
       {value.length === 0 ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgTimeWindowsAnyTime")}</p> : null}
       {value.map((window, index) => (
-        <div key={index} className="space-y-2 rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
+        <div key={index} className="space-y-2 rounded-xl p-3" style={{ background: "var(--panel-muted)" }}>
           <ChipList
             options={ISO_WEEKDAYS.map((day) => ({ value: String(day), label: names[day - 1] }))}
             value={window.days.map(String)}
@@ -803,7 +803,7 @@ function TimeWindowsControl({ value, onChange }: { value: TimeWindow[]; onChange
       <button
         type="button"
         className="min-h-[2.5rem] rounded-full px-4 text-sm font-semibold"
-        style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
         onClick={() => onChange([...value, { days: [1, 2, 3, 4, 5], from: "06:00", to: "16:00" }])}
       >
         {t("pkgTimeWindowAdd")}
@@ -859,7 +859,7 @@ export function FieldControl({
   switch (spec.kind) {
     case "boolean":
       control = (
-        <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}>
+        <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)" }}>
           <span className="text-sm" style={{ color: "var(--text-soft)" }}>{value === true ? t("pkgYes") : t("pkgNo")}</span>
           <Toggle label={label} checked={value === true} onChange={(next) => onFieldChange(spec.key, next)} />
         </div>
@@ -1173,7 +1173,7 @@ export function AdvancedSettings({
           disabled={changedCount === 0}
           onClick={onResetAll}
           className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
-          style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
         >
           ↺ {t("pkgResetAll")}
         </button>
@@ -1233,7 +1233,7 @@ export function MemberPreview({
       aria-live="polite"
       aria-label={t("pkgMemberPreview")}
       className={"rounded-2xl " + (compact ? "p-4" : "p-5")}
-      style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
     >
       <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("pkgMemberPreview")}</p>
       <p className={"mt-2 font-semibold " + (compact ? "text-base" : "text-lg")} style={{ color: "var(--text)" }}>

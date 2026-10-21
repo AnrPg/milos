@@ -350,7 +350,7 @@ function AppointmentItem({
                 }}
                 disabled={cancelling}
                 className="rounded-full px-3 py-1 text-xs font-semibold disabled:opacity-50"
-                style={{ background: "var(--danger)", color: "#fff" }}
+                style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
               >
                 {i18n("clApptConfirmCancel")}
               </button>

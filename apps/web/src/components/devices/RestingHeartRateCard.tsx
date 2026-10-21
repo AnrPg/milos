@@ -52,7 +52,7 @@ export function RestingHeartRateCard() {
               className="rounded-full px-2.5 py-1 text-xs font-semibold"
               style={{
                 background: range === option ? "var(--primary)" : "var(--panel-raised)",
-                color: range === option ? "var(--bg)" : "var(--text)",
+                color: range === option ? "var(--primary-contrast)" : "var(--text)",
                 border: "1px solid var(--border)",
               }}
             >

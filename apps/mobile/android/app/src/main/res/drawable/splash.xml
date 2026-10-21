@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The launch screen: the arms-up mark on the page colour. Colours come from
+     values/palee_theme.xml (light) and values-night/palee_theme.xml (dark),
+     generated from the web theme. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/palee_background" />
+    <item
+        android:width="96dp"
+        android:height="96dp"
+        android:gravity="center"
+        android:drawable="@drawable/palee_mark" />
+</layer-list>

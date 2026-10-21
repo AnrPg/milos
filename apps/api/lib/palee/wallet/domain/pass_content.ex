@@ -22,7 +22,7 @@ defmodule Palee.Wallet.Domain.PassContent do
 
   @type t :: %__MODULE__{
           serial: String.t(),
-          box: %{name: String.t(), slug: String.t(), primary_color: String.t() | nil},
+          box: %{name: String.t(), slug: String.t()},
           member: %{name: String.t()},
           barcode: String.t(),
           next_booking:
@@ -79,20 +79,4 @@ defmodule Palee.Wallet.Domain.PassContent do
   end
 
   def rgb(_color), do: nil
-
-  @doc "Black or white text, whichever reads better on the colour."
-  def foreground(nil), do: "rgb(255, 255, 255)"
-
-  def foreground("#" <> hex) when byte_size(hex) == 6 do
-    case Integer.parse(hex, 16) do
-      {value, ""} ->
-        <<r, g, b>> = <<value::24>>
-        if r * 299 + g * 587 + b * 114 > 150_000, do: "rgb(0, 0, 0)", else: "rgb(255, 255, 255)"
-
-      _invalid ->
-        foreground(nil)
-    end
-  end
-
-  def foreground(_color), do: foreground(nil)
 end

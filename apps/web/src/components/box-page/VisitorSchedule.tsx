@@ -267,7 +267,7 @@ function VisitorClassSheet({
   ].filter(Boolean) as [string, string][];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center" style={{ background: "rgba(0,0,0,0.55)" }} onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
       <section
         ref={dialog}
         role="dialog"
@@ -297,11 +297,11 @@ function VisitorClassSheet({
         </div>
         <footer className="flex flex-col gap-2 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3" style={{ borderTop: "1px solid var(--border)" }}>
           {memberHref ? (
-            <Link href={memberHref} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <Link href={memberHref} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {t("bookAsMember")}
             </Link>
           ) : onTrial ? (
-            <button type="button" onClick={onTrial} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <button type="button" onClick={onTrial} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {tTrials("bookWithTrial")}
             </button>
           ) : null}

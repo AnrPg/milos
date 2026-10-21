@@ -7,17 +7,19 @@
     <!-- ADR-171: shown by the native shell (server.errorPath) when the web app
          cannot be reached, e.g. a cold start without a connection. -->
     <script src="app-config.js"></script>
+    <!-- Colours: palee-theme.css, generated from the web theme. -->
+    <link rel="stylesheet" href="palee-theme.css" />
     <style>
-      :root { color-scheme: dark; }
-      html, body { margin: 0; height: 100%; background: #0b0d10; color: #e8ebef;
+      html, body { margin: 0; height: 100%; background: var(--background); color: var(--text);
         font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
       main { box-sizing: border-box; min-height: 100%; display: flex; flex-direction: column;
         align-items: center; justify-content: center; gap: 12px; text-align: center;
         padding: max(24px, env(safe-area-inset-top)) 24px max(24px, env(safe-area-inset-bottom)); }
       h1 { font-size: 20px; margin: 0; }
-      p { margin: 0; color: #9aa3ad; max-width: 28rem; }
+      p { margin: 0; color: var(--muted); max-width: 28rem; }
       button { margin-top: 8px; min-height: 44px; padding: 0 20px; border: 0; border-radius: 999px;
-        background: #c9ff45; color: #0b0d10; font: inherit; font-weight: 600; }
+        background: var(--primary); color: var(--primary-contrast); font: inherit; font-weight: 600; }
+      button:focus-visible { outline: 2px solid var(--primary); outline-offset: 2px; }
     </style>
   </head>
   <body>

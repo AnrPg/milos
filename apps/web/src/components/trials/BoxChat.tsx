@@ -122,7 +122,7 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
               {!mine ? <span className="px-1 text-[11px] font-semibold" style={{ color: "var(--dim)" }}>{staff.get(message.sender_id) ?? data.box.name}</span> : null}
               <p
                 className="whitespace-pre-line rounded-2xl px-3.5 py-2 text-sm"
-                style={mine ? { background: "var(--primary)", color: "var(--bg)" } : { background: "var(--panel-raised)", color: "var(--text)" }}
+                style={mine ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--panel-raised)", color: "var(--text)" }}
               >
                 {message.body}
               </p>
@@ -156,7 +156,7 @@ export function BoxChat({ slug, draft }: { slug: string; draft: string | null })
           type="submit"
           disabled={!text || send.isPending}
           className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("send")}
         </button>

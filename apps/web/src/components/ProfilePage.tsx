@@ -336,7 +336,7 @@ export function ProfilePage() {
               disabled={securityPending}
               onClick={() => void handleSignOutAllDevices()}
               className="rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "var(--danger)", color: "white" }}
+              style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
             >
               {securityPending ? i18n("revokingSessions8eee998") : i18n("signOutAllDevicesf14a071")}
             </button>

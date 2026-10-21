@@ -60,12 +60,12 @@ export function WeekStrip({
                 className="flex min-h-12 w-full flex-col items-center justify-center rounded-xl text-[11px] font-semibold"
                 style={{
                   background: selected ? "var(--primary)" : "transparent",
-                  color: selected ? "var(--bg)" : "var(--dim)",
+                  color: selected ? "var(--primary-contrast)" : "var(--dim)",
                   boxShadow: !selected && day === today ? "inset 0 0 0 1px var(--border)" : undefined,
                 }}
               >
                 {weekday.format(date)}
-                <span className="text-base font-bold" style={{ color: selected ? "var(--bg)" : "var(--text-soft)" }}>
+                <span className="text-base font-bold" style={{ color: selected ? "var(--primary-contrast)" : "var(--text-soft)" }}>
                   {date.getDate()}
                 </span>
               </button>

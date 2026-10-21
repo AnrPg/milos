@@ -64,7 +64,7 @@ export function InviteClientsDialog({ onClose, initialTab = "link" }: { onClose:
   const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center p-0 sm:items-center sm:p-4" style={{ background: "rgba(0,0,0,0.6)" }} onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center p-0 sm:items-center sm:p-4" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
       <div
         ref={dialogRef}
         role="dialog"
@@ -140,7 +140,7 @@ function ClientAccessTabs({ initialTab }: { initialTab: Tab }) {
             aria-selected={tab === item.id}
             onClick={() => setTab(item.id)}
             className="rounded-lg px-2 py-2 text-xs font-semibold sm:text-sm"
-            style={tab === item.id ? { background: "var(--panel)", color: "var(--text)", boxShadow: "0 1px 3px rgba(0,0,0,.15)" } : { color: "var(--muted)" }}
+            style={tab === item.id ? { background: "var(--panel)", color: "var(--text)", boxShadow: "var(--shadow-sm)" } : { color: "var(--muted)" }}
           >
             {item.label}
           </button>
@@ -253,7 +253,7 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
           ))}
         </select>
       </label>
-      {issue.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{localizeError(issue.error, uiT)}</p> : null}
+      {issue.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(issue.error, uiT)}</p> : null}
       <button type="submit" disabled={issue.isPending} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
         {issue.isPending ? t("creating") : t("createLink")}
       </button>
@@ -275,7 +275,7 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
   const origin = typeof window === "undefined" ? "" : window.location.origin;
 
   if (joinLink.isPending) return <p className="text-sm" style={{ color: "var(--muted)" }}>{t("loading")}</p>;
-  if (joinLink.error) return <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{localizeError(joinLink.error, uiT)}</p>;
+  if (joinLink.error) return <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(joinLink.error, uiT)}</p>;
 
   const data = joinLink.data!;
   const url = joinUrl(origin, slug);
@@ -297,7 +297,7 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
           className="relative h-7 w-12 shrink-0 rounded-full transition-colors disabled:opacity-50"
           style={{ background: data.enabled ? "var(--success, var(--primary))" : "var(--border-strong, var(--border))" }}
         >
-          <span className="absolute top-1 h-5 w-5 rounded-full bg-white transition-all" style={{ insetInlineStart: data.enabled ? "1.5rem" : "0.25rem" }} />
+          <span className="absolute top-1 h-5 w-5 rounded-full bg-[var(--control-knob)] transition-all" style={{ insetInlineStart: data.enabled ? "1.5rem" : "0.25rem" }} />
         </button>
       </div>
       <RolePicker t={t} value={data.role as ClientRole} onChange={(role) => save.mutate({ role })} />
@@ -309,7 +309,7 @@ function PublicJoinLink({ t, slug, token }: { t: Translate; slug: string; token:
       ) : (
         <p className="text-sm" style={{ color: "var(--muted)" }}>{t("publicOff")}</p>
       )}
-      {save.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{localizeError(save.error, uiT)}</p> : null}
+      {save.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(save.error, uiT)}</p> : null}
     </div>
   );
 }
@@ -347,7 +347,7 @@ function PendingInvitations({ t, slug, token }: { t: Translate; slug: string; to
           </div>
           {confirming === invitation.id ? (
             <div className="flex gap-2">
-              <button type="button" onClick={() => revoke.mutate(invitation.id)} disabled={revoke.isPending} className="rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--danger, #dc2626)", color: "white" }}>
+              <button type="button" onClick={() => revoke.mutate(invitation.id)} disabled={revoke.isPending} className="rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
                 {t("confirmRevoke")}
               </button>
               <button type="button" onClick={() => setConfirming(null)} className="rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>

@@ -64,7 +64,7 @@ export function EventsTab() {
           ))}
         </div>
         {manage && chosenClub ? (
-          <button type="button" onClick={() => setCreating(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+          <button type="button" onClick={() => setCreating(true)} className="min-h-11 shrink-0 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {tEvents("newEvent")}
           </button>
         ) : null}

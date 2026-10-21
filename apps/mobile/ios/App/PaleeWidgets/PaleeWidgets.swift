@@ -131,12 +131,13 @@ private struct Card<Content: View>: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title).font(.caption.bold()).foregroundStyle(.secondary)
+            Text(title).font(.caption.bold()).foregroundStyle(PaleeTheme.muted)
             content
             Spacer(minLength: 0)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-        .containerBackground(.background, for: .widget)
+        .foregroundStyle(PaleeTheme.text)
+        .containerBackground(PaleeTheme.panel, for: .widget)
     }
 }
 
@@ -149,6 +150,8 @@ struct WaterView: View {
                 if water.can_add {
                     Button(intent: AddWaterIntent()) { Text(PaleeShared.label("addGlass", "+1")).frame(maxWidth: .infinity) }
                         .buttonStyle(.borderedProminent)
+                        .tint(PaleeTheme.primary)
+                        .foregroundStyle(PaleeTheme.primaryContrast)
                 } else {
                     Link(PaleeShared.label("addGlass", "+1"), destination: PaleeShared.url("water") ?? URL(string: "about:blank")!)
                 }
@@ -186,7 +189,7 @@ struct CheckInView: View {
                 Text(PaleeShared.label("openApp", "Open Palee")).font(.subheadline)
             } else if let next = entry.snapshot?.next_class {
                 Text(line(next)).font(.headline).lineLimit(2)
-                if let box = next.box_name { Text(box).font(.caption).foregroundStyle(.secondary) }
+                if let box = next.box_name { Text(box).font(.caption).foregroundStyle(PaleeTheme.muted) }
             } else {
                 Text(PaleeShared.label("noClass", "No booking today")).font(.subheadline)
             }

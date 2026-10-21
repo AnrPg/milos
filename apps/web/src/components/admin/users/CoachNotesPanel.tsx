@@ -138,7 +138,7 @@ export function CoachNotesPanel({
       ) : (
         <ul className="grid gap-2">
           {shown.map((note) => (
-            <li key={note.id} className="rounded-[1.2rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+            <li key={note.id} className="rounded-[1.2rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
               <p className="text-xs" style={{ color: "var(--muted)" }}>
                 {own(note) ? i18n("rhYou") : (note.coach_nickname ?? i18n("stfCoach"))}
                 {note.inserted_at ? ` · ${formatDateTime(note.inserted_at, locale)}` : ""}
@@ -245,7 +245,7 @@ export function CoachNotesPanel({
       {failed ? <StatusText tone="error">{errorText(failed.error)}</StatusText> : null}
 
       {isCoach && canWrite && !kinds ? (
-        <details className="rounded-[1.2rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+        <details className="rounded-[1.2rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
           <summary className="cursor-pointer font-semibold" style={{ color: "var(--text)" }}>{i18n("rhNotePrivacy")}</summary>
           <label className="mt-3 flex items-start gap-3">
             <input

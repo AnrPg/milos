@@ -103,7 +103,7 @@ function FeltForm({
       footer={
         <>
           {save.isError ? (
-            <p role="alert" className="text-center text-sm" style={{ color: "var(--danger, #dc2626)" }}>{t("felt.error")}</p>
+            <p role="alert" className="text-center text-sm" style={{ color: "var(--danger)" }}>{t("felt.error")}</p>
           ) : null}
           <div className="flex gap-2">
             <button
@@ -119,7 +119,7 @@ function FeltForm({
               onClick={() => void submit()}
               disabled={save.isPending}
               className="min-h-12 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {save.isPending ? t("felt.saving") : t("felt.save")}
             </button>

@@ -66,7 +66,7 @@ export function AccessNotice({ entitlement }: { entitlement: EffectiveEntitlemen
         ? i18n("accessGraceOverdue", { date: formatDate(uiLocale, entitlement.grace_until) })
         : i18n("accessGraceEnded", { date: formatDate(uiLocale, entitlement.grace_until) });
     return (
-      <p role="status" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning, #d97706) 14%, transparent)", color: "var(--text)", border: "1px solid var(--warning, #d97706)" }}>
+      <p role="status" className="rounded-2xl p-4 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning) 14%, transparent)", color: "var(--text)", border: "1px solid var(--warning)" }}>
         {message}
       </p>
     );
@@ -112,7 +112,7 @@ export function EntitlementCard({ entitlement }: { entitlement: EffectiveEntitle
       </div>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
         {allowanceEntries.map(([key, usage]) => usage ? (
-          <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}>
+          <div key={key} className="rounded-xl p-3" style={{ background: "var(--panel-muted)" }}>
             <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{allowanceLabel(key, i18n, entitlement.class_type_names)}</p>
             <p className="mt-1 text-2xl font-semibold" style={{ color: "var(--primary)" }}>{String(usage.remaining)}</p>
             {shouldShowAllowanceQuota(usage) ? <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("remainingOf8553660")} {String(usage.limit)} {i18n("resets5de1b0d")} {formatDate(uiLocale, usage.period_end)}</p> : null}

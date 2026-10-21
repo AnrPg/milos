@@ -338,7 +338,9 @@ defmodule PaleeWeb.AuthController do
              preferred_theme_slug: %Schema{
                type: :string,
                nullable: true,
-               description: "The member's own theme; null follows the gym's"
+               enum: Palee.Themes.slugs() ++ [nil],
+               description:
+                 "The member's own theme: graphite (dark) or frost (light); null is frost"
              },
              completed_tours: %Schema{
                type: :array,

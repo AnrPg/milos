@@ -210,7 +210,7 @@ export function PackageWizard({
               aria-current={state === "current" ? ARIA_CURRENT_STEP : undefined}
               className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold"
               style={{
-                background: state === "current" ? "var(--text)" : "var(--bg-soft)",
+                background: state === "current" ? "var(--text)" : "var(--panel-muted)",
                 color: state === "current" ? "var(--bg)" : state === "done" ? "var(--success)" : "var(--dim)",
                 border: "1px solid var(--border)",
               }}
@@ -318,7 +318,7 @@ export function PackageWizard({
             <button
               type="button"
               className="min-h-[2.75rem] rounded-full px-6 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "white" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               disabled={createMutation.isPending || issues.length > 0}
               onClick={() => createMutation.mutate()}
             >
@@ -528,7 +528,7 @@ export function BasicsStep({
       {draft.packageType === "trial" ? (
         <>
           <FieldShell label={t("pkgFieldTermsNewMembersOnly")} hint={t("pkgFieldTermsNewMembersOnlyHint")}>
-            <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)" }}>
+            <div className="flex items-center justify-between gap-3 rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)" }}>
               <span className="text-sm" style={{ color: "var(--text-soft)" }}>{draft.fields["terms.new_members_only"] ? t("pkgYes") : t("pkgNo")}</span>
               <Toggle label={t("pkgFieldTermsNewMembersOnly")} checked={draft.fields["terms.new_members_only"] === true} onChange={(value) => setField("terms.new_members_only", value)} />
             </div>
@@ -633,7 +633,7 @@ export function IncludedStep({
           error={coachingError}
         >
           {(["online_coaching.assigned_programming", "online_coaching.messaging"] as const).map((key) => (
-            <label key={key} className="flex min-h-[2.75rem] items-center gap-3 rounded-xl px-3" style={{ background: "var(--bg-soft)" }}>
+            <label key={key} className="flex min-h-[2.75rem] items-center gap-3 rounded-xl px-3" style={{ background: "var(--panel-muted)" }}>
               <input type="checkbox" className="h-5 w-5" checked={draft.fields[key] === true} onChange={(event) => onField(key, event.target.checked)} />
               <span className="text-sm" style={{ color: "var(--text)" }}>{t(fieldLabelKey(key))}</span>
             </label>
@@ -687,7 +687,7 @@ export function IncludedStep({
           }}
         >
           {contentKeys.map((key) => (
-            <label key={key} className="flex min-h-[2.75rem] items-center gap-3 rounded-xl px-3" style={{ background: "var(--bg-soft)" }}>
+            <label key={key} className="flex min-h-[2.75rem] items-center gap-3 rounded-xl px-3" style={{ background: "var(--panel-muted)" }}>
               <input type="checkbox" className="h-5 w-5" checked={draft.fields[key] === true} onChange={(event) => onField(key, event.target.checked)} />
               <span className="text-sm" style={{ color: "var(--text)" }}>
                 {t(fieldLabelKey(key))}

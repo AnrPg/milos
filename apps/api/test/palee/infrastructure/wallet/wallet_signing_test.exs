@@ -28,7 +28,7 @@ defmodule Palee.Infrastructure.Wallet.WalletSigningTest do
   defp content do
     %PassContent{
       serial: Ecto.UUID.generate(),
-      box: %{name: "Iron Box", slug: "iron", primary_color: "#112233"},
+      box: %{name: "Iron Box", slug: "iron"},
       member: %{name: "Maria"},
       barcode: "W1test",
       next_booking: nil

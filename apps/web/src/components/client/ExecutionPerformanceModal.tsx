@@ -45,7 +45,7 @@ export function ExecutionPerformanceModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-4"
-      style={{ background: "rgba(0,0,0,0.65)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={onClose}
       role="presentation"
     >

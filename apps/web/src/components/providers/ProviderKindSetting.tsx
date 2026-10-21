@@ -78,7 +78,7 @@ export function ProviderKindSetting({ token }: { token: string }) {
             onClick={() => save.mutate(kind)}
             disabled={save.isPending}
             className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("kindSetting.save")}
           </button>

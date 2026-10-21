@@ -100,7 +100,7 @@ export function TrialSheet({
 
   // Portalled: the box page's side card is its own stacking context.
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center" style={{ background: "rgba(0,0,0,0.55)" }} onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
       <section
         ref={dialog}
         role="dialog"
@@ -220,7 +220,7 @@ export function TrialSheet({
 
         <footer className="flex flex-col gap-2 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3" style={{ borderTop: "1px solid var(--border)" }}>
           {done ? (
-            <Link href={`/trials/${done.id}`} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <Link href={`/trials/${done.id}`} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {t("seeTrial")}
             </Link>
           ) : picked ? (
@@ -229,7 +229,7 @@ export function TrialSheet({
               disabled={ask.isPending || !phoneValid}
               onClick={() => ask.mutate()}
               className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold disabled:opacity-60"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {ask.isPending ? t("sending") : manual ? t("confirmManual") : t("confirmAuto")}
             </button>

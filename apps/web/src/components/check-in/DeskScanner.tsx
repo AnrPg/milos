@@ -171,9 +171,9 @@ export function DeskScanner({ token, locationId }: { token: string; locationId: 
       </div>
       <p className="text-sm" style={{ color: "var(--muted)" }}>{auto ? t("deskAutoOnHint") : t("deskAutoOffHint")}</p>
 
-      <div className="relative overflow-hidden rounded-2xl" style={{ background: "#000", display: scanning ? "block" : "none" }}>
+      <div className="relative overflow-hidden rounded-2xl" style={{ background: "var(--media)", display: scanning ? "block" : "none" }}>
         <video ref={videoRef} className="aspect-video w-full object-cover" muted playsInline aria-label={t("deskCameraLabel")} />
-        <span aria-hidden="true" className="pointer-events-none absolute inset-[18%] rounded-2xl border-4" style={{ borderColor: "rgba(255,255,255,0.75)" }} />
+        <span aria-hidden="true" className="pointer-events-none absolute inset-[18%] rounded-2xl border-4" style={{ borderColor: "var(--on-media-soft)" }} />
       </div>
 
       <div className="flex flex-wrap gap-2">
@@ -273,8 +273,8 @@ function DeskResultCard({
     <article
       className="space-y-3 rounded-[1.5rem] p-4"
       style={{
-        background: done ? "color-mix(in srgb, var(--success, #22c55e) 12%, var(--panel-muted))" : "var(--panel-muted)",
-        border: `1px solid ${done ? "var(--success, #22c55e)" : problems.length ? "var(--danger)" : "var(--border)"}`,
+        background: done ? "color-mix(in srgb, var(--success) 12%, var(--panel-muted))" : "var(--panel-muted)",
+        border: `1px solid ${done ? "var(--success)" : problems.length ? "var(--danger)" : "var(--border)"}`,
       }}
       data-testid="desk-result"
       aria-live="polite"
@@ -284,7 +284,7 @@ function DeskResultCard({
           // eslint-disable-next-line @next/next/no-img-element -- member photo from the media origin
           <img src={result.member.avatar_url} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" />
         ) : (
-          <span aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-extrabold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+          <span aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-extrabold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {name.slice(0, 2).toUpperCase() || "?"}
           </span>
         )}
@@ -295,7 +295,7 @@ function DeskResultCard({
       </div>
 
       {done ? (
-        <p className="text-base font-bold" style={{ color: "var(--success, #22c55e)" }} data-testid="desk-checked-in">
+        <p className="text-base font-bold" style={{ color: "var(--success)" }} data-testid="desk-checked-in">
           {done.kind === "class" && done.booking
             ? t("deskCheckedInClass", { name: done.booking.name ?? "", time: clock(done.booking.starts_at) })
             : t("deskCheckedInOpenGym")}
@@ -345,7 +345,7 @@ function DeskResultCard({
             </li>
           ))}
           {warnings.map((warning) => (
-            <li key={warning} className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning, #f59e0b) 18%, transparent)", color: "var(--text)" }}>
+            <li key={warning} className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning) 18%, transparent)", color: "var(--text)" }}>
               {t(["warning", warning].join("_"))}
             </li>
           ))}
@@ -373,7 +373,7 @@ function DeskResultCard({
             disabled={busy}
             onClick={() => onCheckIn({ bookingId: bookings.length === 1 ? bookings[0].id : undefined, override: true })}
             className="min-h-11 rounded-full px-5 text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--danger, #dc2626)", color: "#fff" }}
+            style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
             data-testid="desk-override"
           >
             {t("deskOverride")}
