@@ -5274,6 +5274,26 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminScheduleController.update_slot"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/goal-feedback-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coach totals of «τι ένιωσες» on a scheduled class
+         * @description Entries logged from the class or timed from its bookings, whatever workout version they followed; same rules as the workout summary.
+         */
+        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/injury-warnings": {
         parameters: {
             query?: never;
@@ -6204,6 +6224,26 @@ export interface paths {
         put?: never;
         /** Duplicate a workout as a new draft */
         post: operations["MilosTrainingWeb.AdminWorkoutController.duplicate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/workouts/{id}/goal-feedback-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coach totals of «τι ένιωσες» on a workout
+         * @description Counts only feedback on non-voided entries whose visibility reaches the caller as a coach; shown only from 3 entries.
+         */
+        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -12546,6 +12586,8 @@ export interface components {
             compare_mode?: "slider" | "side_by_side";
             /** @enum {string} */
             default_visibility?: "private" | "coach_numbers" | "coach_full";
+            /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+            felt_prompt_without_goals?: boolean;
             journal_sections?: {
                 body?: boolean;
                 cravings?: boolean;
@@ -12584,6 +12626,8 @@ export interface components {
                 compare_mode: "slider" | "side_by_side";
                 /** @enum {string} */
                 default_visibility: "private" | "coach_numbers" | "coach_full";
+                /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                felt_prompt_without_goals: boolean;
                 journal_sections: {
                     body?: boolean;
                     cravings?: boolean;
@@ -19132,6 +19176,11 @@ export interface components {
             /** Format: date-time */
             updated_at: string;
         } | null;
+        /** GoalFeedbackCount */
+        GoalFeedbackCount: {
+            count: number;
+            id: string;
+        };
         /** GoalFeedbackResponse */
         GoalFeedbackResponse: {
             /** Format: uuid */
@@ -19162,6 +19211,33 @@ export interface components {
                 workout_id: string;
             } | null;
             voided: boolean;
+        };
+        /**
+         * GoalFeedbackSummary
+         * @description Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.
+         */
+        GoalFeedbackSummary: {
+            entries: number;
+            /** @description Muscle groups (heads rolled up), most felt first */
+            felt_muscles: {
+                count: number;
+                id: string;
+            }[];
+            /** @description Most felt first */
+            felt_qualities: {
+                count: number;
+                id: string;
+            }[];
+            /** @description Groups of the goal's primary and secondary muscles nobody felt */
+            goals_not_felt: string[];
+            /**
+             * Format: uuid
+             * @description Only on the scheduled-class summary
+             */
+            scheduled_class_id?: string;
+            shown: boolean;
+            /** Format: uuid */
+            workout_id: string | null;
         };
         /** GoalMuscle */
         GoalMuscle: {
@@ -21864,7 +21940,7 @@ export interface components {
             }[];
             qualities: string[];
             stimulus?: string | null;
-            /** @description Left out: keep the saved value (hidden on a first save) */
+            /** @description Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default */
             visible_to_members?: boolean;
         };
         /** SavedFilter */
@@ -23336,6 +23412,11 @@ export interface components {
         };
         /** StaffWorkoutGoals */
         StaffWorkoutGoals: {
+            /**
+             * Format: uuid
+             * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+             */
+            inherited_from: string | null;
             muscles: {
                 /** @description Taxonomy group or head id */
                 id: string;
@@ -23343,7 +23424,7 @@ export interface components {
                 role: "primary" | "secondary" | "stabilizer";
             }[];
             qualities: string[];
-            /** @description False when nothing is saved yet and these are the live suggestion */
+            /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
             saved: boolean;
             /** @enum {string} */
             source: "suggested" | "edited";
@@ -23361,6 +23442,11 @@ export interface components {
         StaffWorkoutGoalsResponse: {
             /** StaffWorkoutGoals */
             goals: {
+                /**
+                 * Format: uuid
+                 * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+                 */
+                inherited_from: string | null;
                 muscles: {
                     /** @description Taxonomy group or head id */
                     id: string;
@@ -23368,7 +23454,7 @@ export interface components {
                     role: "primary" | "secondary" | "stabilizer";
                 }[];
                 qualities: string[];
-                /** @description False when nothing is saved yet and these are the live suggestion */
+                /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
                 saved: boolean;
                 /** @enum {string} */
                 source: "suggested" | "edited";
@@ -29438,6 +29524,8 @@ export interface operations {
                             compare_mode: "slider" | "side_by_side";
                             /** @enum {string} */
                             default_visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                            felt_prompt_without_goals: boolean;
                             journal_sections: {
                                 body?: boolean;
                                 cravings?: boolean;
@@ -29470,6 +29558,8 @@ export interface operations {
                     compare_mode?: "slider" | "side_by_side";
                     /** @enum {string} */
                     default_visibility?: "private" | "coach_numbers" | "coach_full";
+                    /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                    felt_prompt_without_goals?: boolean;
                     journal_sections?: {
                         body?: boolean;
                         cravings?: boolean;
@@ -29516,6 +29606,8 @@ export interface operations {
                             compare_mode: "slider" | "side_by_side";
                             /** @enum {string} */
                             default_visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                            felt_prompt_without_goals: boolean;
                             journal_sections: {
                                 body?: boolean;
                                 cravings?: boolean;
@@ -51309,6 +51401,63 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class (slot) ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal feedback summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: number;
+                        /** @description Muscle groups (heads rolled up), most felt first */
+                        felt_muscles: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Most felt first */
+                        felt_qualities: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Groups of the goal's primary and secondary muscles nobody felt */
+                        goals_not_felt: string[];
+                        /**
+                         * Format: uuid
+                         * @description Only on the scheduled-class summary
+                         */
+                        scheduled_class_id?: string;
+                        shown: boolean;
+                        /** Format: uuid */
+                        workout_id: string | null;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminInjuryWarningController.slot": {
         parameters: {
             query?: never;
@@ -51510,6 +51659,11 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
+                        /** @description ADR-163: workout-authoring defaults */
+                        workouts: {
+                            /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
+                            wod_goals_visible_by_default: boolean;
+                        };
                     };
                 };
             };
@@ -51559,6 +51713,10 @@ export interface operations {
                         /** @description Withdrawals closer to the class than this use the visit */
                         default_cancellation_cutoff_hours?: number | null;
                         default_capacity?: number;
+                    };
+                    workouts?: {
+                        /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
+                        wod_goals_visible_by_default?: boolean;
                     };
                 };
             };
@@ -51630,6 +51788,11 @@ export interface operations {
                             inserted_at?: string | null;
                             /** Format: date-time */
                             updated_at?: string | null;
+                        };
+                        /** @description ADR-163: workout-authoring defaults */
+                        workouts: {
+                            /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
+                            wod_goals_visible_by_default: boolean;
                         };
                     };
                 };
@@ -55943,6 +56106,63 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Workout ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal feedback summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: number;
+                        /** @description Muscle groups (heads rolled up), most felt first */
+                        felt_muscles: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Most felt first */
+                        felt_qualities: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Groups of the goal's primary and secondary muscles nobody felt */
+                        goals_not_felt: string[];
+                        /**
+                         * Format: uuid
+                         * @description Only on the scheduled-class summary
+                         */
+                        scheduled_class_id?: string;
+                        shown: boolean;
+                        /** Format: uuid */
+                        workout_id: string | null;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminWorkoutGoalsController.show": {
         parameters: {
             query?: never;
@@ -55964,6 +56184,11 @@ export interface operations {
                     "application/json": {
                         /** StaffWorkoutGoals */
                         goals: {
+                            /**
+                             * Format: uuid
+                             * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+                             */
+                            inherited_from: string | null;
                             muscles: {
                                 /** @description Taxonomy group or head id */
                                 id: string;
@@ -55971,7 +56196,7 @@ export interface operations {
                                 role: "primary" | "secondary" | "stabilizer";
                             }[];
                             qualities: string[];
-                            /** @description False when nothing is saved yet and these are the live suggestion */
+                            /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
                             saved: boolean;
                             /** @enum {string} */
                             source: "suggested" | "edited";
@@ -56036,7 +56261,7 @@ export interface operations {
                     }[];
                     qualities: string[];
                     stimulus?: string | null;
-                    /** @description Left out: keep the saved value (hidden on a first save) */
+                    /** @description Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default */
                     visible_to_members?: boolean;
                 };
             };
@@ -56051,6 +56276,11 @@ export interface operations {
                     "application/json": {
                         /** StaffWorkoutGoals */
                         goals: {
+                            /**
+                             * Format: uuid
+                             * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+                             */
+                            inherited_from: string | null;
                             muscles: {
                                 /** @description Taxonomy group or head id */
                                 id: string;
@@ -56058,7 +56288,7 @@ export interface operations {
                                 role: "primary" | "secondary" | "stabilizer";
                             }[];
                             qualities: string[];
-                            /** @description False when nothing is saved yet and these are the live suggestion */
+                            /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
                             saved: boolean;
                             /** @enum {string} */
                             source: "suggested" | "edited";
