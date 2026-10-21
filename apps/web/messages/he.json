@@ -4867,7 +4867,8 @@
         "check_in": "איך אני מרגיש",
         "body": "גוף",
         "wellness": "רווחה",
-        "craving": "חשק לאכול"
+        "craving": "חשק לאכול",
+        "device_activity": "אימון מהשעון"
       },
       "loadMore": "רשומות קודמות",
       "loadingMore": "טוען…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "האימונים מסתנכרנים.",
     "integrationHint_disconnected": "לא מסתנכרן.",
     "integrationHint_unavailable": "עדיין אין חיבור.",
-    "integrationHint_native_only": "צריך את האפליקציה לנייד; מהדפדפן זה לא אפשרי."
+    "integrationHint_native_only": "צריך את האפליקציה לנייד; מהדפדפן זה לא אפשרי.",
+    "integrationStatus_error": "צריך לחבר מחדש",
+    "integrationHint_error": "Garmin הפסיק להגיב; חברו אותו מחדש."
   },
   "Media": {
     "add": "הוספת תמונות או סרטון",

@@ -4867,7 +4867,8 @@
         "check_in": "Hoe ik me voel",
         "body": "Lichaam",
         "wellness": "Welzijn",
-        "craving": "Trek"
+        "craving": "Trek",
+        "device_activity": "Training van je horloge"
       },
       "loadMore": "Oudere invoer",
       "loadingMore": "Laden…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Trainingen worden gesynchroniseerd.",
     "integrationHint_disconnected": "Wordt niet gesynchroniseerd.",
     "integrationHint_unavailable": "Er is nog geen koppeling.",
-    "integrationHint_native_only": "Vraagt de telefoonapp; in de browser kan dit niet."
+    "integrationHint_native_only": "Vraagt de telefoonapp; in de browser kan dit niet.",
+    "integrationStatus_error": "Opnieuw koppelen",
+    "integrationHint_error": "Garmin reageert niet meer; koppel het opnieuw."
   },
   "Media": {
     "add": "Foto's of een video toevoegen",

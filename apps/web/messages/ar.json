@@ -4867,7 +4867,8 @@
         "check_in": "كيف أشعر",
         "body": "الجسم",
         "wellness": "العافية",
-        "craving": "الرغبة الشديدة"
+        "craving": "الرغبة الشديدة",
+        "device_activity": "تمرين من الساعة"
       },
       "loadMore": "إدخالات أقدم",
       "loadingMore": "جارٍ التحميل…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "تتم مزامنة التمارين.",
     "integrationHint_disconnected": "لا تتم المزامنة.",
     "integrationHint_unavailable": "لا يوجد ربط بعد.",
-    "integrationHint_native_only": "يتطلب تطبيق الهاتف؛ لا يمكن ذلك من المتصفح."
+    "integrationHint_native_only": "يتطلب تطبيق الهاتف؛ لا يمكن ذلك من المتصفح.",
+    "integrationStatus_error": "يحتاج إلى إعادة ربط",
+    "integrationHint_error": "توقف Garmin عن الاستجابة؛ أعد ربطه."
   },
   "Media": {
     "add": "أضف صورًا أو فيديو",

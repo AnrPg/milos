@@ -4867,7 +4867,8 @@
         "check_in": "Как я себя чувствую",
         "body": "Тело",
         "wellness": "Самочувствие",
-        "craving": "Тяга к еде"
+        "craving": "Тяга к еде",
+        "device_activity": "Тренировка с часов"
       },
       "loadMore": "Более ранние записи",
       "loadingMore": "Загрузка…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Тренировки синхронизируются.",
     "integrationHint_disconnected": "Не синхронизируется.",
     "integrationHint_unavailable": "Подключения пока нет.",
-    "integrationHint_native_only": "Нужно мобильное приложение; из браузера это невозможно."
+    "integrationHint_native_only": "Нужно мобильное приложение; из браузера это невозможно.",
+    "integrationStatus_error": "Нужно переподключить",
+    "integrationHint_error": "Garmin перестал отвечать; подключите его заново."
   },
   "Media": {
     "add": "Добавить фото или видео",

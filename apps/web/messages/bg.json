@@ -4867,7 +4867,8 @@
         "check_in": "Как се чувствам",
         "body": "Тяло",
         "wellness": "Благосъстояние",
-        "craving": "Глад за нещо"
+        "craving": "Глад за нещо",
+        "device_activity": "Тренировка от часовника"
       },
       "loadMore": "По-стари записи",
       "loadingMore": "Зареждане…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Тренировките се синхронизират.",
     "integrationHint_disconnected": "Не се синхронизира.",
     "integrationHint_unavailable": "Все още няма връзка.",
-    "integrationHint_native_only": "Нужно е мобилното приложение; от браузъра не може."
+    "integrationHint_native_only": "Нужно е мобилното приложение; от браузъра не може.",
+    "integrationStatus_error": "Трябва повторно свързване",
+    "integrationHint_error": "Garmin спря да отговаря; свържи го отново."
   },
   "Media": {
     "add": "Добави снимки или видео",

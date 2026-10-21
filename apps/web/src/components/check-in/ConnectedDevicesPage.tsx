@@ -175,6 +175,7 @@ function IntegrationsSection({ integrations }: { integrations: Integration[] }) 
     disconnected: { color: "var(--text-soft)", background: "var(--panel-raised)" },
     unavailable: { color: "var(--dim)", background: "var(--panel-raised)" },
     native_only: { color: "var(--text-soft)", background: "var(--panel-raised)" },
+    error: { color: "var(--danger)", background: "color-mix(in srgb, var(--danger) 16%, transparent)" },
   };
   return (
     <Card title={t("integrationsTitle")} hint={t("integrationsHint")} testId="devices-integrations">

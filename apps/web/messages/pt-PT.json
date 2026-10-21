@@ -4867,7 +4867,8 @@
         "check_in": "Como me sinto",
         "body": "Corpo",
         "wellness": "Bem-estar",
-        "craving": "Desejo"
+        "craving": "Desejo",
+        "device_activity": "Treino do relógio"
       },
       "loadMore": "Entradas anteriores",
       "loadingMore": "A carregar…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Os treinos estão a sincronizar.",
     "integrationHint_disconnected": "Não sincroniza.",
     "integrationHint_unavailable": "Ainda não há ligação.",
-    "integrationHint_native_only": "Precisa da app do telemóvel; não é possível no navegador."
+    "integrationHint_native_only": "Precisa da app do telemóvel; não é possível no navegador.",
+    "integrationStatus_error": "Precisa de nova ligação",
+    "integrationHint_error": "O Garmin deixou de responder; volta a ligá-lo."
   },
   "Media": {
     "add": "Adicionar fotografias ou um vídeo",

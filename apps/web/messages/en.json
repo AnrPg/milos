@@ -4867,7 +4867,8 @@
         "check_in": "How I feel",
         "body": "Body",
         "wellness": "Wellness",
-        "craving": "Craving"
+        "craving": "Craving",
+        "device_activity": "Watch workout"
       },
       "loadMore": "Older entries",
       "loadingMore": "Loading…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Workouts are syncing.",
     "integrationHint_disconnected": "Not syncing.",
     "integrationHint_unavailable": "There's no connection yet.",
-    "integrationHint_native_only": "Needs the phone app; it can't be done from the browser."
+    "integrationHint_native_only": "Needs the phone app; it can't be done from the browser.",
+    "integrationStatus_error": "Needs reconnecting",
+    "integrationHint_error": "Garmin stopped answering; reconnect it."
   },
   "Media": {
     "add": "Add photos or a video",

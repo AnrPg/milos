@@ -37,6 +37,8 @@ export type JournalEntryOf = {
   /** ADR-159: a day of water, sleep and meals (the member's summary only in their own feed). */
   wellness: WellnessFeedDay;
   craving: Craving;
+  /** ADR-161: a watch workout that matched nothing (always the owner's). */
+  device_activity: components["schemas"]["DeviceActivity"];
 };
 
 export type WellnessFeedDay = {

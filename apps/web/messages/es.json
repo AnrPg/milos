@@ -4867,7 +4867,8 @@
         "check_in": "Cómo me siento",
         "body": "Cuerpo",
         "wellness": "Bienestar",
-        "craving": "Antojo"
+        "craving": "Antojo",
+        "device_activity": "Entreno del reloj"
       },
       "loadMore": "Entradas anteriores",
       "loadingMore": "Cargando…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Los entrenamientos se sincronizan.",
     "integrationHint_disconnected": "No se sincroniza.",
     "integrationHint_unavailable": "Todavía no hay conexión.",
-    "integrationHint_native_only": "Necesita la app del móvil; no se puede desde el navegador."
+    "integrationHint_native_only": "Necesita la app del móvil; no se puede desde el navegador.",
+    "integrationStatus_error": "Hay que reconectar",
+    "integrationHint_error": "Garmin ha dejado de responder; vuelve a conectarlo."
   },
   "Media": {
     "add": "Añadir fotos o un vídeo",

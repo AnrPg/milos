@@ -4867,7 +4867,8 @@
         "check_in": "Wie ich mich fühle",
         "body": "Körper",
         "wellness": "Wohlbefinden",
-        "craving": "Heißhunger"
+        "craving": "Heißhunger",
+        "device_activity": "Training von der Uhr"
       },
       "loadMore": "Ältere Einträge",
       "loadingMore": "Wird geladen…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Trainings werden synchronisiert.",
     "integrationHint_disconnected": "Keine Synchronisierung.",
     "integrationHint_unavailable": "Es gibt noch keine Verbindung.",
-    "integrationHint_native_only": "Braucht die Handy-App; im Browser geht das nicht."
+    "integrationHint_native_only": "Braucht die Handy-App; im Browser geht das nicht.",
+    "integrationStatus_error": "Neu verbinden",
+    "integrationHint_error": "Garmin antwortet nicht mehr; verbinde es neu."
   },
   "Media": {
     "add": "Fotos oder ein Video hinzufügen",

@@ -4867,7 +4867,8 @@
         "check_in": "Πώς νιώθω",
         "body": "Σώμα",
         "wellness": "Ευεξία",
-        "craving": "Λιγούρα"
+        "craving": "Λιγούρα",
+        "device_activity": "Προπόνηση από ρολόι"
       },
       "loadMore": "Παλαιότερα",
       "loadingMore": "Φόρτωση…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Οι προπονήσεις συγχρονίζονται.",
     "integrationHint_disconnected": "Δεν συγχρονίζεται.",
     "integrationHint_unavailable": "Δεν υπάρχει ακόμα σύνδεση.",
-    "integrationHint_native_only": "Χρειάζεται την εφαρμογή για κινητό· δεν γίνεται από τον browser."
+    "integrationHint_native_only": "Χρειάζεται την εφαρμογή για κινητό· δεν γίνεται από τον browser.",
+    "integrationStatus_error": "Θέλει επανασύνδεση",
+    "integrationHint_error": "Το Garmin σταμάτησε να απαντά· κάνε επανασύνδεση."
   },
   "Media": {
     "add": "Πρόσθεσε φωτογραφίες ή βίντεο",

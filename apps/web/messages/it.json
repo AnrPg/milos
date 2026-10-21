@@ -4867,7 +4867,8 @@
         "check_in": "Come mi sento",
         "body": "Corpo",
         "wellness": "Benessere",
-        "craving": "Voglia di cibo"
+        "craving": "Voglia di cibo",
+        "device_activity": "Allenamento dall'orologio"
       },
       "loadMore": "Voci precedenti",
       "loadingMore": "Caricamento…",
@@ -6899,7 +6900,9 @@
     "integrationHint_connected": "Gli allenamenti si sincronizzano.",
     "integrationHint_disconnected": "Non si sincronizza.",
     "integrationHint_unavailable": "Non c'è ancora un collegamento.",
-    "integrationHint_native_only": "Serve l'app per telefono; dal browser non si può."
+    "integrationHint_native_only": "Serve l'app per telefono; dal browser non si può.",
+    "integrationStatus_error": "Da ricollegare",
+    "integrationHint_error": "Garmin non risponde più; ricollegalo."
   },
   "Media": {
     "add": "Aggiungi foto o un video",
