@@ -471,3 +471,9 @@ msgstr "כוס מים?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "אחר הצהריים הוא זמן טוב להשלים מים."
+
+msgid "Garmin stopped syncing"
+msgstr "הסנכרון עם Garmin נעצר"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "חברו אותו מחדש ממכשירים מחוברים כדי שהאימונים יגיעו שוב."

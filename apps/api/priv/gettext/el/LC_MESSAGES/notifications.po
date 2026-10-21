@@ -471,3 +471,9 @@ msgstr "Ένα ποτήρι νερό;"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Το απόγευμα είναι καλή στιγμή να προλάβεις το νερό σου."
+
+msgid "Garmin stopped syncing"
+msgstr "Ο συγχρονισμός με το Garmin σταμάτησε"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Κάνε επανασύνδεση από τις Συνδεδεμένες συσκευές για να έρχονται ξανά οι προπονήσεις σου."

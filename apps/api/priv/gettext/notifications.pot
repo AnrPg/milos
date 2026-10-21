@@ -469,3 +469,9 @@ msgstr ""
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr ""
+
+msgid "Garmin stopped syncing"
+msgstr ""
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr ""

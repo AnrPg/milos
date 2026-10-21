@@ -471,3 +471,9 @@ msgstr "Un bicchiere d'acqua?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Il pomeriggio è un buon momento per recuperare con l'acqua."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin ha smesso di sincronizzarsi"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Ricollegalo da Dispositivi collegati per ricevere di nuovo i tuoi allenamenti."

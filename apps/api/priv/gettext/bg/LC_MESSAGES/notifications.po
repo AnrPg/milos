@@ -471,3 +471,9 @@ msgstr "Чаша вода?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "Следобедът е добър момент да наваксаш с водата."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin спря да се синхронизира"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Свържи го отново от Свързани устройства, за да идват пак тренировките ти."

@@ -471,3 +471,9 @@ msgstr "Стакан воды?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "День — хорошее время наверстать воду."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin перестал синхронизироваться"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Подключите его снова в разделе «Подключённые устройства», чтобы тренировки снова поступали."

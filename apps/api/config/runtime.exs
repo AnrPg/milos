@@ -129,6 +129,32 @@ config :milos_training, :wallet,
       |> Enum.map(&String.trim/1)
   ]
 
+# ADR-161: Garmin (Health + Activity APIs). Without the client id and
+# secret the devices row shows «Σύντομα» and connecting answers
+# garmin_not_configured. GARMIN_PUSH_TOKEN, when set, must also appear as
+# ?token=… in the push URLs registered at Garmin.
+config :milos_training, :garmin,
+  client_id: present_env.("GARMIN_CLIENT_ID"),
+  client_secret: present_env.("GARMIN_CLIENT_SECRET"),
+  redirect_uri: present_env.("GARMIN_REDIRECT_URI"),
+  push_token: present_env.("GARMIN_PUSH_TOKEN")
+
+# ADR-161: the key that encrypts device tokens at rest (32 bytes, base64).
+# Without it a key is derived from SECRET_KEY_BASE for this one purpose.
+case present_env.("DATA_ENCRYPTION_KEY") do
+  nil ->
+    :ok
+
+  encoded ->
+    case Base.decode64(encoded) do
+      {:ok, key} when byte_size(key) == 32 ->
+        config :milos_training, :data_encryption_key, key
+
+      _invalid ->
+        raise "DATA_ENCRYPTION_KEY must be 32 bytes, base64-encoded"
+    end
+end
+
 otel_traces_endpoint = present_env.("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
 otel_base_endpoint = present_env.("OTEL_EXPORTER_OTLP_ENDPOINT")
 otel_endpoint = otel_traces_endpoint || otel_base_endpoint

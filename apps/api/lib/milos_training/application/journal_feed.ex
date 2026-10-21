@@ -16,6 +16,7 @@ defmodule MilosTraining.Application.JournalFeed do
 
   alias MilosTraining.Application.{
     BodySnapshots,
+    DeviceImports,
     JournalComments,
     ListWorkoutExecutions,
     WellnessFeed
@@ -94,15 +95,22 @@ defmodule MilosTraining.Application.JournalFeed do
   defp rows("craving", user_id, bound, limit, scope),
     do: WellnessFeed.craving_items(user_id, bound, limit, scope)
 
+  # ADR-161: watch workouts of their own; merged ones only add their numbers
+  # to the entry they belong to (`device` on executions and logs).
+  defp rows("device_activity", user_id, bound, limit, scope),
+    do: DeviceImports.feed_entries(user_id, bound, limit, scope)
+
   defp items(executions, "execution") do
     executions
     |> ListWorkoutExecutions.summarize()
+    |> DeviceImports.attach("execution")
     |> Enum.map(&Journal.feed_item("execution", &1, &1.completed_at_utc, tz: &1.completed_at_tz))
   end
 
   defp items(entries, "training_log") do
     entries
     |> JournalComments.attach("training_log")
+    |> DeviceImports.attach("training_log")
     |> Enum.map(
       &Journal.feed_item("training_log", &1, &1.performed_at_utc, tz: &1.performed_at_tz)
     )
@@ -138,6 +146,13 @@ defmodule MilosTraining.Application.JournalFeed do
 
   defp items(days, "wellness"),
     do: Enum.map(days, &Journal.feed_item("wellness", &1, &1.at, on: &1.date))
+
+  defp items(activities, "device_activity"),
+    do:
+      Enum.map(
+        activities,
+        &Journal.feed_item("device_activity", &1, &1.started_at, tz: &1.started_tz)
+      )
 
   defp items(cravings, "craving"),
     do: Enum.map(cravings, &Journal.feed_item("craving", &1, &1.occurred_at, tz: &1.occurred_tz))

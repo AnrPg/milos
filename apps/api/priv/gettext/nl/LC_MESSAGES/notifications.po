@@ -471,3 +471,9 @@ msgstr "Een glas water?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "De middag is een goed moment om je water in te halen."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin synchroniseert niet meer"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Koppel het opnieuw via Verbonden apparaten om je trainingen weer binnen te halen."

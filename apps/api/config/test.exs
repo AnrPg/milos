@@ -72,3 +72,6 @@ config :milos_training, :wallet_pass_updaters, %{
 }
 
 config :milos_training, :wallet_image_source, MilosTraining.FakeWalletImageSource
+
+# ADR-161: Garmin is faked; tests turn it on and script its answers.
+config :milos_training, :garmin_client, MilosTraining.FakeGarminClient
