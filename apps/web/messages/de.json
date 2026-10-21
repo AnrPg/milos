@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Einchecken geht nur mit einer bestätigten Buchung.",
     "coachProgrammeTitle": "Mein Programm",
     "coachProgrammeHint": "Tag ändern, ein Workout ablehnen oder deinen Coach um eines bitten.",
+    "mpTabBody": "Körper",
     "stfPortionsTitle": "Tägliche Handportionen",
     "stfPortionsHint": "Das sieht das Mitglied auf der Wohlbefinden-Seite statt Zahlen. Halbe sind möglich.",
     "stfPortionsFromGrams": "Aus den Gramm übernehmen",
     "stfInvalidPortions": "Portionen gehen von 0 bis 20, in Halben.",
     "stfMealSlots": "Mahlzeiten am Tag",
-    "stfMealSlotsHint": "Die Mahlzeiten, zu denen das Mitglied einträgt. Leer lassen für Frühstück, Mittag, Abendessen und Snack.",
-    "mpTabBody": "Körper"
+    "stfMealSlotsHint": "Die Mahlzeiten, zu denen das Mitglied einträgt. Leer lassen für Frühstück, Mittag, Abendessen und Snack."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -4965,9 +4965,9 @@
       "review": "Bewertung",
       "checkIn": "Wie ich mich fühle",
       "note": "Notiz oder Gedanke",
+      "measure": "Messung",
       "wellness": "Wasser · Schlaf · Mahlzeit",
-      "craving": "Heißhunger",
-      "measure": "Messung"
+      "craving": "Heißhunger"
     },
     "entryKindHint": {
       "workout": "Ergebnis, RPE, Notizen",
@@ -4977,9 +4977,9 @@
       "review": "Bewerte einen Kurs oder ein Training",
       "checkIn": "Ein paar kurze Fragen",
       "note": "Technik, Ziel, Stimmung",
+      "measure": "Gewicht, Umfänge, Fotos",
       "wellness": "Ein Glas, die letzte Nacht, eine Mahlzeit",
-      "craving": "Notieren oder Unterstützung holen",
-      "measure": "Gewicht, Umfänge, Fotos"
+      "craving": "Notieren oder Unterstützung holen"
     },
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "Live-Kurstimer",
     "classCheckIn": "Einchecken",
     "programmeManage": "Tag ändern oder ablehnen",
+    "meReferrals": "Freund mitbringen",
+    "meReferralsHint": "Dein Link, QR und Einladungen",
+    "membershipReferral": "Freund mitbringen",
     "wellness": {
       "eyebrow": "Wohlbefinden",
       "today": "Heute",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "Prüfe die Werte und versuch es noch einmal.",
         "invalid_media": "Das Foto ist nicht bereit. Wähle es noch einmal."
       }
-    },
-    "meReferrals": "Freund mitbringen",
-    "meReferralsHint": "Dein Link, QR und Einladungen",
-    "membershipReferral": "Freund mitbringen"
+    }
   },
   "Community": {
     "all": "Alle",

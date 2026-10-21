@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Check-in γίνεται μόνο με εγκεκριμένη κράτηση.",
     "coachProgrammeTitle": "Το πρόγραμμά μου",
     "coachProgrammeHint": "Άλλαξε ημέρα, απόρριψε ή ζήτα προπόνηση από τον coach.",
+    "mpTabBody": "Σώμα",
     "stfPortionsTitle": "Ημερήσιες μερίδες με το χέρι",
     "stfPortionsHint": "Αυτό βλέπει το μέλος στην Ευεξία αντί για αριθμούς. Επιτρέπονται και μισές.",
     "stfPortionsFromGrams": "Συμπλήρωση από τα γραμμάρια",
     "stfInvalidPortions": "Οι μερίδες είναι από 0 έως 20, ανά μισή.",
     "stfMealSlots": "Γεύματα της ημέρας",
-    "stfMealSlotsHint": "Τα γεύματα στα οποία καταγράφει το μέλος. Άφησέ τα κενά για πρωινό, μεσημεριανό, βραδινό και σνακ.",
-    "mpTabBody": "Σώμα"
+    "stfMealSlotsHint": "Τα γεύματα στα οποία καταγράφει το μέλος. Άφησέ τα κενά για πρωινό, μεσημεριανό, βραδινό και σνακ."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -4965,9 +4965,9 @@
       "review": "Αξιολόγηση",
       "checkIn": "Πώς νιώθω",
       "note": "Σημείωση ή σκέψη",
+      "measure": "Μέτρηση",
       "wellness": "Νερό · Ύπνος · Γεύμα",
-      "craving": "Λιγούρα",
-      "measure": "Μέτρηση"
+      "craving": "Λιγούρα"
     },
     "entryKindHint": {
       "workout": "Σκορ, RPE, σημειώσεις",
@@ -4977,9 +4977,9 @@
       "review": "Βαθμολόγησε μάθημα ή προπόνηση",
       "checkIn": "Λίγες γρήγορες ερωτήσεις",
       "note": "Τεχνική, στόχος, διάθεση",
+      "measure": "Βάρος, περιφέρειες, φωτογραφίες",
       "wellness": "Ένα ποτήρι, η χθεσινή νύχτα, ένα γεύμα",
-      "craving": "Κατέγραψέ τη ή ζήτα στήριξη",
-      "measure": "Βάρος, περιφέρειες, φωτογραφίες"
+      "craving": "Κατέγραψέ τη ή ζήτα στήριξη"
     },
     "homeTitle": "Αρχική",
     "wodToday": "Το WOD της ημέρας στο box",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "Ζωντανό χρονόμετρο",
     "classCheckIn": "Check-in",
     "programmeManage": "Αλλαγή ημέρας ή απόρριψη",
+    "meReferrals": "Φέρε φίλο",
+    "meReferralsHint": "Ο σύνδεσμός σου, QR και προσκλήσεις",
+    "membershipReferral": "Φέρε φίλο",
     "wellness": {
       "eyebrow": "Ευεξία",
       "today": "Σήμερα",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "Έλεγξε τις τιμές και δοκίμασε ξανά.",
         "invalid_media": "Η φωτογραφία δεν είναι έτοιμη. Διάλεξέ τη ξανά."
       }
-    },
-    "meReferrals": "Φέρε φίλο",
-    "meReferralsHint": "Ο σύνδεσμός σου, QR και προσκλήσεις",
-    "membershipReferral": "Φέρε φίλο"
+    }
   },
   "Community": {
     "all": "Όλα",

@@ -22,8 +22,8 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
  * feature map groups them: Προπόνηση · Ευεξία · Coach · Σημείωση. Each kind
  * opens the flow that owns it. Μέτρηση (Σώμα, ADR-158) is here unless Σώμα
  * is switched off; Νερό · Ύπνος · Γεύμα and Λιγούρα (ADR-159) open Ευεξία.
- * The sheet never shows a button that leads nowhere, and a group with no
- * kinds is not shown.
+ * A group with no kinds is not shown, so the sheet never shows a button
+ * that leads nowhere.
  */
 export type NewEntryKind =
   | "workout"
@@ -93,10 +93,10 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const { tokens } = useSession();
   const { entitlement } = useClientEntitlement();
   const [flow, setFlow] = useState<"menu" | "pr" | "note" | TrainingLogDialogState>("menu");
+  const bodySettings = useBodySettings();
   const today = localDate(new Date());
   const range = wellnessWindow(today, 0);
   const hidden = useWellness(range.from, range.to).data?.preferences?.hidden_items ?? [];
-  const bodySettings = useBodySettings();
   const groups = newEntryGroups({
     canRequestFormReview: hasCapability(entitlement, "request_form_reviews"),
     body: bodySettings.data?.settings?.journal_sections?.body !== false,

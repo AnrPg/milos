@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "צ'ק-אין אפשרי רק עם הזמנה מאושרת.",
     "coachProgrammeTitle": "התוכנית שלי",
     "coachProgrammeHint": "שנו יום, דחו אימון או בקשו אימון מהמאמן.",
+    "mpTabBody": "גוף",
     "stfPortionsTitle": "מנות יומיות לפי יד",
     "stfPortionsHint": "מה שהמתאמן רואה בעמוד הרווחה במקום מספרים. אפשר גם חצאים.",
     "stfPortionsFromGrams": "מילוי מהגרמים",
     "stfInvalidPortions": "המנות הן מ־0 עד 20, בחצאים.",
     "stfMealSlots": "ארוחות היום",
-    "stfMealSlotsHint": "הארוחות שאליהן המתאמן רושם. השאר/י ריק לבוקר, צהריים, ערב ונשנוש.",
-    "mpTabBody": "גוף"
+    "stfMealSlotsHint": "הארוחות שאליהן המתאמן רושם. השאר/י ריק לבוקר, צהריים, ערב ונשנוש."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4965,9 +4965,9 @@
       "review": "ביקורת",
       "checkIn": "איך אני מרגיש",
       "note": "הערה או מחשבה",
+      "measure": "מדידה",
       "wellness": "מים · שינה · ארוחה",
-      "craving": "חשק לאכול",
-      "measure": "מדידה"
+      "craving": "חשק לאכול"
     },
     "entryKindHint": {
       "workout": "תוצאה, RPE, הערות",
@@ -4977,9 +4977,9 @@
       "review": "דרגו שיעור או אימון",
       "checkIn": "כמה שאלות קצרות",
       "note": "טכניקה, מטרה, מצב רוח",
+      "measure": "משקל, היקפים, תמונות",
       "wellness": "כוס, הלילה שעבר, ארוחה",
-      "craving": "רשום/י אותו או בקש/י תמיכה",
-      "measure": "משקל, היקפים, תמונות"
+      "craving": "רשום/י אותו או בקש/י תמיכה"
     },
     "homeTitle": "בית",
     "wodToday": "האימון היומי במכון",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "טיימר השיעור בשידור חי",
     "classCheckIn": "צ'ק-אין",
     "programmeManage": "שינוי יום או דחייה",
+    "meReferrals": "הבא חבר",
+    "meReferralsHint": "הקישור שלך, QR והזמנות",
+    "membershipReferral": "הבא חבר",
     "wellness": {
       "eyebrow": "רווחה",
       "today": "היום",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "בדוק/י את הערכים ונסה/י שוב.",
         "invalid_media": "התמונה לא מוכנה. בחר/י אותה שוב."
       }
-    },
-    "meReferrals": "הבא חבר",
-    "meReferralsHint": "הקישור שלך, QR והזמנות",
-    "membershipReferral": "הבא חבר"
+    }
   },
   "Community": {
     "all": "הכול",

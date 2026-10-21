@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Só uma reserva aprovada permite fazer check-in.",
     "coachProgrammeTitle": "O meu programa",
     "coachProgrammeHint": "Muda um dia, recusa um treino ou pede um ao teu coach.",
+    "mpTabBody": "Corpo",
     "stfPortionsTitle": "Porções diárias com a mão",
     "stfPortionsHint": "O que o membro vê no Bem-estar em vez de números. Metades são aceites.",
     "stfPortionsFromGrams": "Preencher a partir dos gramas",
     "stfInvalidPortions": "As porções vão de 0 a 20, em metades.",
     "stfMealSlots": "Refeições do dia",
-    "stfMealSlotsHint": "As refeições em que o membro regista. Deixa vazio para pequeno-almoço, almoço, jantar e lanche.",
-    "mpTabBody": "Corpo"
+    "stfMealSlotsHint": "As refeições em que o membro regista. Deixa vazio para pequeno-almoço, almoço, jantar e lanche."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -4965,9 +4965,9 @@
       "review": "Avaliação",
       "checkIn": "Como me sinto",
       "note": "Nota ou pensamento",
+      "measure": "Medição",
       "wellness": "Água · Sono · Refeição",
-      "craving": "Desejo",
-      "measure": "Medição"
+      "craving": "Desejo"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
@@ -4977,9 +4977,9 @@
       "review": "Avalie uma aula ou um treino",
       "checkIn": "Algumas perguntas rápidas",
       "note": "Técnica, objetivo, humor",
+      "measure": "Peso, perímetros, fotografias",
       "wellness": "Um copo, a noite passada, uma refeição",
-      "craving": "Regista ou pede apoio",
-      "measure": "Peso, perímetros, fotografias"
+      "craving": "Regista ou pede apoio"
     },
     "homeTitle": "Início",
     "wodToday": "O WOD de hoje no box",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "Cronómetro da aula em direto",
     "classCheckIn": "Fazer check-in",
     "programmeManage": "Mudar o dia ou recusar",
+    "meReferrals": "Traz um amigo",
+    "meReferralsHint": "O teu link, QR e convites",
+    "membershipReferral": "Traz um amigo",
     "wellness": {
       "eyebrow": "Bem-estar",
       "today": "Hoje",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "Verifica os valores e tenta de novo.",
         "invalid_media": "A foto não está pronta. Escolhe-a de novo."
       }
-    },
-    "meReferrals": "Traz um amigo",
-    "meReferralsHint": "O teu link, QR e convites",
-    "membershipReferral": "Traz um amigo"
+    }
   },
   "Community": {
     "all": "Tudo",

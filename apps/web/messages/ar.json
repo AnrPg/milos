@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "لا يمكن تسجيل الحضور إلا بحجز معتمد.",
     "coachProgrammeTitle": "برنامجي",
     "coachProgrammeHint": "غيّر يومًا أو ارفض تمرينًا أو اطلب تمرينًا من مدربك.",
+    "mpTabBody": "الجسم",
     "stfPortionsTitle": "حصص يومية باليد",
     "stfPortionsHint": "ما يراه العضو في صفحة العافية بدل الأرقام. الأنصاف مقبولة.",
     "stfPortionsFromGrams": "املأ من الغرامات",
     "stfInvalidPortions": "الحصص من 0 إلى 20، بالأنصاف.",
     "stfMealSlots": "وجبات اليوم",
-    "stfMealSlotsHint": "الوجبات التي يسجّل فيها العضو. اتركها فارغة للفطور والغداء والعشاء ووجبة خفيفة.",
-    "mpTabBody": "الجسم"
+    "stfMealSlotsHint": "الوجبات التي يسجّل فيها العضو. اتركها فارغة للفطور والغداء والعشاء ووجبة خفيفة."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4965,9 +4965,9 @@
       "review": "تقييم",
       "checkIn": "كيف أشعر",
       "note": "ملاحظة أو فكرة",
+      "measure": "قياس",
       "wellness": "ماء · نوم · وجبة",
-      "craving": "الرغبة الشديدة",
-      "measure": "قياس"
+      "craving": "الرغبة الشديدة"
     },
     "entryKindHint": {
       "workout": "النتيجة وRPE والملاحظات",
@@ -4977,9 +4977,9 @@
       "review": "قيّم حصة أو تمرينًا",
       "checkIn": "بضعة أسئلة سريعة",
       "note": "التقنية، الهدف، المزاج",
+      "measure": "الوزن، المحيطات، الصور",
       "wellness": "كوب، الليلة الماضية، وجبة",
-      "craving": "سجّلها أو اطلب الدعم",
-      "measure": "الوزن، المحيطات، الصور"
+      "craving": "سجّلها أو اطلب الدعم"
     },
     "homeTitle": "الرئيسية",
     "wodToday": "تمرين اليوم في النادي",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "مؤقت الحصة المباشر",
     "classCheckIn": "تسجيل الحضور",
     "programmeManage": "تغيير اليوم أو الرفض",
+    "meReferrals": "أحضر صديقًا",
+    "meReferralsHint": "رابطك ورمز QR والدعوات",
+    "membershipReferral": "أحضر صديقًا",
     "wellness": {
       "eyebrow": "العافية",
       "today": "اليوم",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "تحقق من القيم وحاول مجددًا.",
         "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
       }
-    },
-    "meReferrals": "أحضر صديقًا",
-    "meReferralsHint": "رابطك ورمز QR والدعوات",
-    "membershipReferral": "أحضر صديقًا"
+    }
   },
   "Community": {
     "all": "الكل",

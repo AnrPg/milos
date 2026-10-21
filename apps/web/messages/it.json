@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Solo una prenotazione approvata permette il check-in.",
     "coachProgrammeTitle": "Il mio programma",
     "coachProgrammeHint": "Cambia un giorno, rifiuta un allenamento o chiedine uno al tuo coach.",
+    "mpTabBody": "Corpo",
     "stfPortionsTitle": "Porzioni giornaliere a mano",
     "stfPortionsHint": "Ciò che il membro vede in Benessere al posto dei numeri. Vanno bene anche le mezze.",
     "stfPortionsFromGrams": "Compila dai grammi",
     "stfInvalidPortions": "Le porzioni vanno da 0 a 20, a metà.",
     "stfMealSlots": "Pasti della giornata",
-    "stfMealSlotsHint": "I pasti su cui registra il membro. Lascia vuoto per colazione, pranzo, cena e spuntino.",
-    "mpTabBody": "Corpo"
+    "stfMealSlotsHint": "I pasti su cui registra il membro. Lascia vuoto per colazione, pranzo, cena e spuntino."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -4965,9 +4965,9 @@
       "review": "Recensione",
       "checkIn": "Come mi sento",
       "note": "Nota o pensiero",
+      "measure": "Misurazione",
       "wellness": "Acqua · Sonno · Pasto",
-      "craving": "Voglia di cibo",
-      "measure": "Misurazione"
+      "craving": "Voglia di cibo"
     },
     "entryKindHint": {
       "workout": "Punteggio, RPE, note",
@@ -4977,9 +4977,9 @@
       "review": "Valuta una lezione o un allenamento",
       "checkIn": "Poche domande rapide",
       "note": "Tecnica, obiettivo, umore",
+      "measure": "Peso, circonferenze, foto",
       "wellness": "Un bicchiere, la notte scorsa, un pasto",
-      "craving": "Annotala o chiedi supporto",
-      "measure": "Peso, circonferenze, foto"
+      "craving": "Annotala o chiedi supporto"
     },
     "homeTitle": "Home",
     "wodToday": "Il WOD di oggi in palestra",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "Timer della classe dal vivo",
     "classCheckIn": "Check-in",
     "programmeManage": "Cambia giorno o rifiuta",
+    "meReferrals": "Porta un amico",
+    "meReferralsHint": "Il tuo link, QR e inviti",
+    "membershipReferral": "Porta un amico",
     "wellness": {
       "eyebrow": "Benessere",
       "today": "Oggi",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "Controlla i valori e riprova.",
         "invalid_media": "La foto non è pronta. Sceglila di nuovo."
       }
-    },
-    "meReferrals": "Porta un amico",
-    "meReferralsHint": "Il tuo link, QR e inviti",
-    "membershipReferral": "Porta un amico"
+    }
   },
   "Community": {
     "all": "Tutti",

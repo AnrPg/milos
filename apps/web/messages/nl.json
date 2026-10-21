@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Alleen met een goedgekeurde boeking kun je inchecken.",
     "coachProgrammeTitle": "Mijn programma",
     "coachProgrammeHint": "Wijzig een dag, weiger een training of vraag je coach om een training.",
+    "mpTabBody": "Lichaam",
     "stfPortionsTitle": "Dagelijkse handporties",
     "stfPortionsHint": "Wat het lid op de Welzijn-pagina ziet in plaats van getallen. Halve mogen ook.",
     "stfPortionsFromGrams": "Invullen vanuit de grammen",
     "stfInvalidPortions": "Porties gaan van 0 tot 20, per halve.",
     "stfMealSlots": "Maaltijden van de dag",
-    "stfMealSlotsHint": "De maaltijden waarop het lid logt. Laat leeg voor ontbijt, lunch, avondeten en een snack.",
-    "mpTabBody": "Lichaam"
+    "stfMealSlotsHint": "De maaltijden waarop het lid logt. Laat leeg voor ontbijt, lunch, avondeten en een snack."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4965,9 +4965,9 @@
       "review": "Beoordeling",
       "checkIn": "Hoe ik me voel",
       "note": "Notitie of gedachte",
+      "measure": "Meting",
       "wellness": "Water · Slaap · Maaltijd",
-      "craving": "Trek",
-      "measure": "Meting"
+      "craving": "Trek"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
@@ -4977,9 +4977,9 @@
       "review": "Beoordeel een les of training",
       "checkIn": "Een paar snelle vragen",
       "note": "Techniek, doel, stemming",
+      "measure": "Gewicht, omtrekken, foto's",
       "wellness": "Een glas, afgelopen nacht, een maaltijd",
-      "craving": "Noteer het of vraag om steun",
-      "measure": "Gewicht, omtrekken, foto's"
+      "craving": "Noteer het of vraag om steun"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "Live lestimer",
     "classCheckIn": "Inchecken",
     "programmeManage": "Dag wijzigen of weigeren",
+    "meReferrals": "Neem een vriend mee",
+    "meReferralsHint": "Je link, QR en uitnodigingen",
+    "membershipReferral": "Neem een vriend mee",
     "wellness": {
       "eyebrow": "Welzijn",
       "today": "Vandaag",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "Controleer de waarden en probeer het opnieuw.",
         "invalid_media": "De foto is niet klaar. Kies hem opnieuw."
       }
-    },
-    "meReferrals": "Neem een vriend mee",
-    "meReferralsHint": "Je link, QR en uitnodigingen",
-    "membershipReferral": "Neem een vriend mee"
+    }
   },
   "Community": {
     "all": "Alles",

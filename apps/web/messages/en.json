@@ -4335,13 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Only an approved booking can check in.",
     "coachProgrammeTitle": "My programme",
     "coachProgrammeHint": "Change a day, decline a workout or ask your coach for one.",
+    "mpTabBody": "Body",
     "stfPortionsTitle": "Daily hand portions",
     "stfPortionsHint": "What the member sees on the Wellness page instead of numbers. Halves are fine.",
     "stfPortionsFromGrams": "Fill from the grams",
     "stfInvalidPortions": "Portions go from 0 to 20, in halves.",
     "stfMealSlots": "Meals in the day",
-    "stfMealSlotsHint": "The meals the member logs against. Leave empty for breakfast, lunch, dinner and a snack.",
-    "mpTabBody": "Body"
+    "stfMealSlotsHint": "The meals the member logs against. Leave empty for breakfast, lunch, dinner and a snack."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4965,9 +4965,9 @@
       "review": "Review",
       "checkIn": "How I feel",
       "note": "Note or thought",
+      "measure": "Measurement",
       "wellness": "Water · Sleep · Meal",
-      "craving": "Craving",
-      "measure": "Measurement"
+      "craving": "Craving"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notes",
@@ -4977,9 +4977,9 @@
       "review": "Rate a class or workout",
       "checkIn": "A few quick questions",
       "note": "Technique, goal, mood",
+      "measure": "Weight, measurements, photos",
       "wellness": "A glass, last night, a meal",
-      "craving": "Note it or ask for support",
-      "measure": "Weight, measurements, photos"
+      "craving": "Note it or ask for support"
     },
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
@@ -5093,6 +5093,9 @@
     "followClassTimer": "Live class timer",
     "classCheckIn": "Check in",
     "programmeManage": "Change the day or decline",
+    "meReferrals": "Bring a friend",
+    "meReferralsHint": "Your link, QR and invites",
+    "membershipReferral": "Bring a friend",
     "wellness": {
       "eyebrow": "Wellness",
       "today": "Today",
@@ -5305,10 +5308,7 @@
         "invalid_wellness_value": "Check the values and try again.",
         "invalid_media": "The photo isn't ready. Pick it again."
       }
-    },
-    "meReferrals": "Bring a friend",
-    "meReferralsHint": "Your link, QR and invites",
-    "membershipReferral": "Bring a friend"
+    }
   },
   "Community": {
     "all": "All",
