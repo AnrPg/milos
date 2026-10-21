@@ -4,8 +4,8 @@ import type { ReactNode } from "react";
 import { useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
-import type { FullSyncPrefs, SyncPref } from "@/components/devices/garmin-model";
-import { PREF_DESTINATION, SYNC_PREFS } from "@/components/devices/garmin-model";
+import type { DevicePref } from "@/components/devices/garmin-model";
+import { PREF_DESTINATION } from "@/components/devices/garmin-model";
 
 /** API error codes of ADR-161 with their own wording in the Devices namespace. */
 const CODES = [
@@ -20,6 +20,7 @@ const CODES = [
   "import_already_settled",
   "unknown_device_candidate",
   "device_confirmation_required",
+  "phone_health_not_connected",
 ] as const;
 
 export function deviceErrorCode(error: unknown): string | null {
@@ -36,7 +37,7 @@ export function deviceErrorKey(error: unknown): string {
 }
 
 /** One on/off row: «Προπονήσεις · Στο Ημερολόγιο». */
-export function PrefSwitch({ pref, on, onToggle, disabled }: { pref: SyncPref; on: boolean; onToggle: () => void; disabled?: boolean }) {
+export function PrefSwitch({ pref, on, onToggle, disabled }: { pref: DevicePref; on: boolean; onToggle: () => void; disabled?: boolean }) {
   const t = useTranslations("Devices");
   const label = t(["pref", pref].join("_"));
   return (
@@ -68,10 +69,21 @@ export function PrefSwitch({ pref, on, onToggle, disabled }: { pref: SyncPref; o
   );
 }
 
-export function PrefSwitches({ prefs, onToggle, disabled }: { prefs: FullSyncPrefs; onToggle: (pref: SyncPref) => void; disabled?: boolean }) {
+/** The switches for `keys` (Garmin's four, or the phone's five). */
+export function PrefSwitches<K extends DevicePref>({
+  keys,
+  prefs,
+  onToggle,
+  disabled,
+}: {
+  keys: readonly K[];
+  prefs: Record<K, boolean>;
+  onToggle: (pref: K) => void;
+  disabled?: boolean;
+}) {
   return (
     <div className="flex flex-col gap-2">
-      {SYNC_PREFS.map((pref) => (
+      {keys.map((pref) => (
         <PrefSwitch key={pref} pref={pref} on={prefs[pref]} disabled={disabled} onToggle={() => onToggle(pref)} />
       ))}
     </div>

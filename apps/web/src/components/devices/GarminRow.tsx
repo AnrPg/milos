@@ -17,6 +17,7 @@ import {
   formatPercent,
   fullPrefs,
   garminRowState,
+  SYNC_PREFS,
   togglePref,
   type FullSyncPrefs,
 } from "@/components/devices/garmin-model";
@@ -135,7 +136,7 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
 
           {editing ? (
             <div className="flex flex-col gap-2" data-testid="garmin-prefs">
-              <PrefSwitches prefs={editing} onToggle={(pref) => setEditing((current) => (current ? togglePref(current, pref) : current))} disabled={save.isPending} />
+              <PrefSwitches keys={SYNC_PREFS} prefs={editing} onToggle={(pref) => setEditing((current) => (current ? togglePref(current, pref) : current))} disabled={save.isPending} />
               {askConsent ? (
                 <label className="flex items-start gap-3 rounded-2xl p-3 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
                   <input type="checkbox" checked={consentTicked} onChange={(event) => setConsentTicked(event.target.checked)} className="mt-0.5 h-5 w-5 shrink-0" />
