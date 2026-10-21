@@ -50,7 +50,8 @@ defmodule MilosTrainingWeb.AnatomyAtlasControllerTest do
       quads = Enum.find(body["nodes"], &(&1["id"] == "quadriceps"))
       # The fixture's Air Squats: 3 sets, quadriceps primary.
       assert %{"sets" => 3.0, "level" => "low", "kind" => "group", "felt" => 0} = quads
-      assert [%{"exercise_ref" => "air-squat", "sets" => 3.0}] = quads["top_exercises"]
+      assert [%{"exercise_ref" => "air-squat", "label" => "Air Squat", "sets" => 3.0}] =
+               quads["top_exercises"]
 
       # Someone else sees none of it.
       other = authed(ctx, ctx.owner) |> get("/api/me/atlas?range=12w") |> json_response(200)

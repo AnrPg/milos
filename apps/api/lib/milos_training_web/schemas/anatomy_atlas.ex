@@ -29,9 +29,10 @@ defmodule MilosTrainingWeb.Schemas.AnatomyAtlas do
           type: :object,
           properties: %{
             exercise_ref: %Schema{type: :string},
+            label: %Schema{type: :string},
             sets: %Schema{type: :number}
           },
-          required: [:exercise_ref, :sets]
+          required: [:exercise_ref, :label, :sets]
         }
       }
     },

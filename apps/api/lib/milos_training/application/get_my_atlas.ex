@@ -11,8 +11,8 @@ defmodule MilosTraining.Application.GetMyAtlas do
   the member's own data.
   """
 
-  alias MilosTraining.Anatomy
   alias MilosTraining.Application.AthleteTrainingVolume
+  alias MilosTraining.{Anatomy, Workouts}
 
   def call(context, params, today \\ Date.utc_today()) do
     with {:ok, range, weeks} <- Anatomy.parse_coverage_range(params["range"]) do
@@ -21,7 +21,9 @@ defmodule MilosTraining.Application.GetMyAtlas do
       coverage = Anatomy.coverage(volume.performances, volume.felt, weeks)
 
       {:ok,
-       Map.merge(coverage, %{
+       coverage
+       |> Map.update!(:nodes, fn nodes -> Enum.map(nodes, &label_exercises/1) end)
+       |> Map.merge(%{
          range: range,
          weeks: weeks,
          from: from,
@@ -31,5 +33,15 @@ defmodule MilosTraining.Application.GetMyAtlas do
          felt_entries: length(volume.felt)
        })}
     end
+  end
+
+  # The catalog label next to each top exercise, for display.
+  defp label_exercises(node) do
+    Map.update!(node, :top_exercises, fn exercises ->
+      Enum.map(exercises, fn exercise ->
+        entry = Workouts.resolve_catalog_exercise(exercise.exercise_ref, nil)
+        Map.put(exercise, :label, (entry && entry.label) || exercise.exercise_ref)
+      end)
+    end)
   end
 end

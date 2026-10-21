@@ -245,7 +245,7 @@ export function sectionGroupFor(
         ...(context.journalSections?.wellness === false
           ? []
           : [{ id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] }]),
-        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon"] },
+        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon", "/journal/atlas"] },
       ],
     });
   }

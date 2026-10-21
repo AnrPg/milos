@@ -123,6 +123,8 @@ export function AtlasScreen() {
             view="both"
             interactive
             size="full"
+            // On a phone the panel sits under the figure; keep it in reach.
+            className="max-md:h-[48vh]"
             focus={selected}
             onPick={(id) => select(id)}
           />
