@@ -63,7 +63,7 @@ export function SquadsBoxSection({ membership, showCoach = false }: { membership
   if (squads.isError) {
     return showCoach ? (
       <HubCard eyebrow={t("title")}>
-        <p className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{clientErrorMessage(squads.error, tUi)}</p>
+        <p className="text-sm" style={{ color: "var(--danger)" }}>{clientErrorMessage(squads.error, tUi)}</p>
       </HubCard>
     ) : null;
   }

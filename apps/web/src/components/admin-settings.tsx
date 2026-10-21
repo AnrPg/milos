@@ -27,8 +27,6 @@ import { listScaleLevels, replaceScaleLevels, type ScaleLevel } from "@/api/work
 import { adminLogoApi, fetchAdminBranding } from "@/api/organization-branding";
 import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { useSession } from "@/components/session-provider";
-import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
-import { APP_THEMES, DEFAULT_THEME_SLUG, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { LocationSettings } from "@/components/admin/LocationSettings";
 import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
@@ -135,7 +133,7 @@ function FieldInfo({
       </button>
       {active && (
         <span
-          className="absolute end-0 top-9 z-50 w-[min(22rem,calc(100vw-3rem))] rounded-2xl shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          className="absolute end-0 top-9 z-50 w-[min(22rem,calc(100vw-3rem))] rounded-2xl shadow-[var(--shadow-lg)]"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
         >
           <span
@@ -189,86 +187,6 @@ function CollapsibleSection({
         </div>
       )}
     </section>
-  );
-}
-
-// ── Appearance section ───────────────────────────────────────────────────────
-
-function AppearanceSection({ token }: { token: string }) {
-  const i18n = useUiTranslations();
-  const queryClient = useQueryClient();
-  const [themeSlug, setThemeSlug] = useState<ThemeSlug>(DEFAULT_THEME_SLUG);
-  const [initialized, setInitialized] = useState(false);
-
-  const settingsQuery = useQuery({
-    queryKey: ["admin", "settings"],
-    queryFn: () => fetchAdminSettings(token),
-  });
-
-  useEffect(() => {
-    if (!settingsQuery.data?.gamification) return;
-    const slug = normalizeThemeSlug(settingsQuery.data.gamification.theme_slug);
-    queueMicrotask(() => { setThemeSlug(slug); setInitialized(true); });
-  }, [settingsQuery.data]);
-
-  const saveMutation = useMutation({
-    mutationFn: () => updateAdminSettings(token, { gamification: { theme_slug: themeSlug } }),
-    onSuccess: (data) => {
-      queryClient.setQueryData(["admin", "settings"], data);
-      window.dispatchEvent(
-        new CustomEvent(THEME_UPDATED_EVENT, { detail: { theme_slug: data.gamification.theme_slug } }),
-      );
-    },
-  });
-
-  const serverSlug = settingsQuery.data?.gamification
-    ? normalizeThemeSlug(settingsQuery.data.gamification.theme_slug)
-    : DEFAULT_THEME_SLUG;
-  const dirty = initialized && themeSlug !== serverSlug;
-
-  return (
-    <div className="space-y-4">
-      <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        {THEME_SLUGS.map((slug) => {
-          const theme = APP_THEMES[slug];
-          const selected = themeSlug === slug;
-          return (
-            <button
-              key={slug}
-              type="button"
-              className="rounded-[1.2rem] border p-4 text-start transition-colors"
-              style={{
-                background: selected
-                  ? "color-mix(in srgb, var(--primary) 12%, var(--panel-muted))"
-                  : "var(--panel-muted)",
-                borderColor: selected ? "var(--primary)" : "var(--border)",
-              }}
-              onClick={() => setThemeSlug(slug)}
-            >
-              <span className="mb-3 flex gap-1.5">
-                {[theme.colors.primary, theme.colors.success, theme.colors.warning, theme.colors.danger].map((color) => (
-                  <span
-                    key={color}
-                    className="h-4 w-4 rounded-full"
-                    style={{ background: color, border: "1px solid color-mix(in srgb, var(--bg) 20%, transparent)" }}
-                  />
-                ))}
-              </span>
-              <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n(theme.label)}</span>
-              <span className="mt-1 block text-xs leading-5" style={{ color: "var(--muted)" }}>{i18n(theme.description)}</span>
-            </button>
-          );
-        })}
-      </div>
-      <SaveBar
-        dirty={dirty}
-        pending={saveMutation.isPending}
-        success={saveMutation.isSuccess}
-        error={saveMutation.error}
-        onSave={() => saveMutation.mutate()}
-        onReset={() => setThemeSlug(serverSlug)}
-      />
-    </div>
   );
 }
 
@@ -866,7 +784,7 @@ function FinanceCleanupSection({ token }: { token: string }) {
         </div>
         <button
           className="rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ background: "var(--danger)", color: "white" }}
+          style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
           type="button"
           onClick={() => setOpen(true)}
         >
@@ -878,7 +796,7 @@ function FinanceCleanupSection({ token }: { token: string }) {
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
           <button
             aria-label={i18n("featureFinanceCleanupCloseAria")}
-            className="absolute inset-0 bg-black/70"
+            className="absolute inset-0 bg-[var(--scrim)]"
             type="button"
             onClick={() => setOpen(false)}
           />
@@ -995,7 +913,7 @@ function FinanceCleanupSection({ token }: { token: string }) {
                 <button
                   className="w-full rounded-full px-4 py-3 text-sm font-semibold disabled:opacity-50"
                   disabled={!canPurge}
-                  style={{ background: "var(--danger)", color: "white" }}
+                  style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
                   type="button"
                   onClick={() => purgeMutation.mutate()}
                 >
@@ -1373,14 +1291,6 @@ export function AdminSettingsHub() {
         {token ? (
           <>
             <PlanSection token={token} />
-
-            <CollapsibleSection
-              id="appearance"
-              title={i18n("appearance41def7a")}
-              description={i18n("appColourPalette9dc5de5")}
-            >
-              <AppearanceSection token={token} />
-            </CollapsibleSection>
 
             <CollapsibleSection
               id="branding"

@@ -38,7 +38,7 @@ export function PostMediaView({
 
   if (first.kind === "video") {
     return (
-      <div className="overflow-hidden rounded-2xl" style={{ aspectRatio: String(aspect), background: "#000" }}>
+      <div className="overflow-hidden rounded-2xl" style={{ aspectRatio: String(aspect), background: "var(--media)" }}>
         <InlineVideo item={first} label={label(first, 0)} onOpen={() => onOpen(0)} />
       </div>
     );
@@ -137,7 +137,7 @@ function MediaCarousel({
       <span
         aria-hidden="true"
         className="pointer-events-none absolute end-2 top-2 rounded-full px-2 py-0.5 text-xs font-bold tabular-nums"
-        style={{ background: "rgba(0,0,0,.6)", color: "#fff" }}
+        style={{ background: "var(--media-control)", color: "var(--on-media)" }}
         data-testid="media-counter"
       >
         {t("counter", { current: index + 1, count })}
@@ -190,7 +190,7 @@ function CarouselArrow({
         "absolute top-[calc(50%-1.5rem)] hidden h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full shadow focus-visible:outline-2 [@media(hover:hover)_and_(pointer:fine)]:flex",
         direction === "previous" ? "start-2" : "end-2",
       ].join(" ")}
-      style={{ background: "rgba(255,255,255,.88)", color: "#111", outlineColor: "var(--primary)" }}
+      style={{ background: "var(--media-control)", color: "var(--on-media)", outlineColor: "var(--primary)" }}
     >
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" aria-hidden="true" className="rtl:-scale-x-100">
         <path d={direction === "previous" ? "M15 6l-6 6 6 6" : "M9 6l6 6-6 6"} />
@@ -354,10 +354,10 @@ export function InlineVideo({ item, label, onOpen }: { item: PostMedia; label: s
           className="absolute inset-0 flex items-end justify-between p-3 focus-visible:outline-2 focus-visible:-outline-offset-4"
           style={{ outlineColor: "var(--primary)" }}
         >
-          <span className="rounded-full px-2 py-0.5 text-xs font-bold tabular-nums" style={{ background: "rgba(0,0,0,.6)", color: "#fff" }}>
+          <span className="rounded-full px-2 py-0.5 text-xs font-bold tabular-nums" style={{ background: "var(--media-control)", color: "var(--on-media)" }}>
             {formatDuration(item.duration_ms)}
           </span>
-          <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "rgba(0,0,0,.6)", color: "#fff" }} aria-hidden="true">
+          <span className="flex h-9 w-9 items-center justify-center rounded-full" style={{ background: "var(--media-control)", color: "var(--on-media)" }} aria-hidden="true">
             {still ? (
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z" /></svg>
             ) : (
@@ -374,7 +374,7 @@ export function InlineVideo({ item, label, onOpen }: { item: PostMedia; label: s
           onClick={onOpen}
           aria-label={t("openViewer")}
           className="absolute end-2 top-2 flex h-9 w-9 items-center justify-center rounded-full focus-visible:outline-2"
-          style={{ background: "rgba(0,0,0,.55)", color: "#fff", outlineColor: "var(--primary)" }}
+          style={{ background: "var(--media-control)", color: "var(--on-media)", outlineColor: "var(--primary)" }}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden="true">
             <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" />

@@ -14,6 +14,7 @@ import {
   type ExportDocument,
   type ExportLabels,
 } from "@/lib/document-export";
+import { PRINT_TOKENS } from "@/lib/theme";
 
 const labels: ExportLabels = {
   appName: "Palee",
@@ -319,7 +320,7 @@ describe("document export adapters", () => {
     const odtContent = await odtArchive.file("content.xml")?.async("string");
     expect(odtContent).toContain("Deadlift");
     expect(odtContent).toContain("🏆");
-    expect(odtContent).toContain('fo:color="#7C3AED"');
+    expect(odtContent).toContain(`fo:color="${PRINT_TOKENS.primary}"`);
   });
 
   it("keeps wrapped metadata and long paragraph details in the PDF", async () => {

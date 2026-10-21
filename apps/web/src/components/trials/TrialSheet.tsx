@@ -100,7 +100,7 @@ export function TrialSheet({
 
   // Portalled: the box page's side card is its own stacking context.
   return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center" style={{ background: "rgba(0,0,0,0.55)" }} onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
       <section
         ref={dialog}
         role="dialog"

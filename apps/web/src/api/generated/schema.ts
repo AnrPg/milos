@@ -10180,23 +10180,6 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/theme": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Fetch active public UI theme */
-        get: operations["PaleeWeb.ThemeController.show"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/api/wallet/passes/{token}": {
         parameters: {
             query?: never;
@@ -30649,8 +30632,11 @@ export interface operations {
                         nickname: string;
                         /** @enum {string} */
                         preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
-                        /** @description The member's own theme; null follows the gym's */
-                        preferred_theme_slug?: string | null;
+                        /**
+                         * @description The member's own theme: graphite (dark) or frost (light); null is frost
+                         * @enum {string|null}
+                         */
+                        preferred_theme_slug?: "frost" | "graphite" | null;
                         role: string;
                         vendor: boolean;
                     };
@@ -42749,10 +42735,10 @@ export interface operations {
                     /** @enum {string} */
                     preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                     /**
-                     * @description Your own theme; null follows your gym's
+                     * @description Your own theme: graphite (dark) or frost (light); null is frost
                      * @enum {string|null}
                      */
-                    preferred_theme_slug?: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset" | null;
+                    preferred_theme_slug?: "frost" | "graphite" | null;
                 };
             };
         };
@@ -58905,8 +58891,6 @@ export interface operations {
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
                             streak_shield_reset_day?: number | null;
-                            /** @enum {string} */
-                            theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
@@ -58975,8 +58959,6 @@ export interface operations {
                     gamification?: {
                         leaderboard_enabled?: boolean;
                         streak_shield_reset_day?: number | null;
-                        /** @enum {string} */
-                        theme_slug?: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                         weekly_workout_target?: number;
                     };
                     notifications?: {
@@ -59035,8 +59017,6 @@ export interface operations {
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
                             streak_shield_reset_day?: number | null;
-                            /** @enum {string} */
-                            theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
@@ -68299,8 +68279,6 @@ export interface operations {
                             settings: {
                                 leaderboard_enabled: boolean;
                                 streak_shield_reset_day?: number | null;
-                                /** @enum {string} */
-                                theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                                 weekly_workout_target: number;
                             };
                         } & {
@@ -79596,29 +79574,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
-                };
-            };
-        };
-    };
-    "PaleeWeb.ThemeController.show": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Active theme */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {string} */
-                        theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
-                    };
                 };
             };
         };

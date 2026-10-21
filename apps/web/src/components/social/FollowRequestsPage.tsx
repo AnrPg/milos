@@ -112,7 +112,7 @@ function RequestRow({ entry }: { entry: FollowEntry }) {
           {t("accept")}
         </button>
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </li>
   );
 }

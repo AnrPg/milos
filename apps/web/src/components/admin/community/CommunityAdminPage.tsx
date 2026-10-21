@@ -248,7 +248,7 @@ function ReportItem({ row }: { row: ReportRow }) {
       {row.author?.nickname ? <p className="text-sm font-bold" style={{ color: "var(--text)" }}>{row.author.nickname}</p> : null}
       <p className="whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm" style={{ background: "var(--panel-raised)", color: "var(--text)" }}>
         {row.preview?.name ?? row.preview?.body ?? t("previewGone")}
-        {row.preview?.hidden ? <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("alreadyHidden")}</span> : null}
+        {row.preview?.hidden ? <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning)" }}>{t("alreadyHidden")}</span> : null}
       </p>
       {row.preview?.media?.length ? <ReportMedia media={row.preview.media} status={row.preview.media_status} /> : null}
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>{reasons.join(" · ")}</p>
@@ -307,7 +307,7 @@ function ReportMedia({
               </span>
             )}
             {item.kind === "video" ? (
-              <span className="absolute bottom-1 start-1 rounded-full px-1 text-[10px] font-bold" style={{ background: "rgba(0,0,0,.6)", color: "#fff" }} aria-hidden="true">
+              <span className="absolute bottom-1 start-1 rounded-full px-1 text-[10px] font-bold" style={{ background: "var(--media-control)", color: "var(--on-media)" }} aria-hidden="true">
                 ▶
               </span>
             ) : null}

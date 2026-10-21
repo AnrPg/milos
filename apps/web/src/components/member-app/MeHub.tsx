@@ -120,7 +120,7 @@ export function MeHub() {
         type="button"
         onClick={() => signOut()}
         className="min-h-11 rounded-2xl text-sm font-semibold"
-        style={{ color: "var(--danger, #dc2626)", border: "1px solid var(--border)" }}
+        style={{ color: "var(--danger)", border: "1px solid var(--border)" }}
       >
         {t("signOut")}
       </button>

@@ -335,7 +335,7 @@ function ManageFilterSheet({ entry, onClose }: { entry: SavedFilter; onClose: ()
             type="button"
             onClick={() => setConfirmDelete(true)}
             className="min-h-11 rounded-2xl text-sm font-bold"
-            style={{ color: "var(--danger, #dc2626)", border: "1px solid var(--border)" }}
+            style={{ color: "var(--danger)", border: "1px solid var(--border)" }}
           >
             {t("delete")}
           </button>

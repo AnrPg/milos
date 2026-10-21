@@ -116,7 +116,7 @@ export function AroundBoxRow({ item }: { item: AroundBoxItem }) {
           <span
             aria-hidden="true"
             className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-sm font-extrabold"
-            style={{ background: box.primary_color ?? "var(--panel)", color: "var(--text)" }}
+            style={{ background: "var(--panel)", color: "var(--text)" }}
           >
             {clubInitials(box.name)}
           </span>

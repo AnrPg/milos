@@ -65090,7 +65090,12 @@
                       "type": "string"
                     },
                     "preferred_theme_slug": {
-                      "description": "The member's own theme; null follows the gym's",
+                      "description": "The member's own theme: graphite (dark) or frost (light); null is frost",
+                      "enum": [
+                        "frost",
+                        "graphite",
+                        null
+                      ],
                       "nullable": true,
                       "type": "string"
                     },
@@ -96832,21 +96837,10 @@
                     "type": "string"
                   },
                   "preferred_theme_slug": {
-                    "description": "Your own theme; null follows your gym's",
+                    "description": "Your own theme: graphite (dark) or frost (light); null is frost",
                     "enum": [
                       "frost",
                       "graphite",
-                      "ember",
-                      "sage",
-                      "steel",
-                      "aurora",
-                      "royal",
-                      "volt",
-                      "noir",
-                      "daybreak",
-                      "paper",
-                      "lagoon",
-                      "sunset",
                       null
                     ],
                     "nullable": true,
@@ -139810,24 +139804,6 @@
                           "nullable": true,
                           "type": "integer"
                         },
-                        "theme_slug": {
-                          "enum": [
-                            "frost",
-                            "graphite",
-                            "ember",
-                            "sage",
-                            "steel",
-                            "aurora",
-                            "royal",
-                            "volt",
-                            "noir",
-                            "daybreak",
-                            "paper",
-                            "lagoon",
-                            "sunset"
-                          ],
-                          "type": "string"
-                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -139840,8 +139816,7 @@
                       },
                       "required": [
                         "weekly_workout_target",
-                        "leaderboard_enabled",
-                        "theme_slug"
+                        "leaderboard_enabled"
                       ],
                       "type": "object"
                     },
@@ -140056,24 +140031,6 @@
                         "nullable": true,
                         "type": "integer"
                       },
-                      "theme_slug": {
-                        "enum": [
-                          "frost",
-                          "graphite",
-                          "ember",
-                          "sage",
-                          "steel",
-                          "aurora",
-                          "royal",
-                          "volt",
-                          "noir",
-                          "daybreak",
-                          "paper",
-                          "lagoon",
-                          "sunset"
-                        ],
-                        "type": "string"
-                      },
                       "weekly_workout_target": {
                         "minimum": 1,
                         "type": "integer"
@@ -140240,24 +140197,6 @@
                           "nullable": true,
                           "type": "integer"
                         },
-                        "theme_slug": {
-                          "enum": [
-                            "frost",
-                            "graphite",
-                            "ember",
-                            "sage",
-                            "steel",
-                            "aurora",
-                            "royal",
-                            "volt",
-                            "noir",
-                            "daybreak",
-                            "paper",
-                            "lagoon",
-                            "sunset"
-                          ],
-                          "type": "string"
-                        },
                         "updated_at": {
                           "format": "date-time",
                           "nullable": true,
@@ -140270,8 +140209,7 @@
                       },
                       "required": [
                         "weekly_workout_target",
-                        "leaderboard_enabled",
-                        "theme_slug"
+                        "leaderboard_enabled"
                       ],
                       "type": "object"
                     },
@@ -166099,24 +166037,6 @@
                               "nullable": true,
                               "type": "integer"
                             },
-                            "theme_slug": {
-                              "enum": [
-                                "frost",
-                                "graphite",
-                                "ember",
-                                "sage",
-                                "steel",
-                                "aurora",
-                                "royal",
-                                "volt",
-                                "noir",
-                                "daybreak",
-                                "paper",
-                                "lagoon",
-                                "sunset"
-                              ],
-                              "type": "string"
-                            },
                             "weekly_workout_target": {
                               "minimum": 1,
                               "type": "integer"
@@ -166124,8 +166044,7 @@
                           },
                           "required": [
                             "weekly_workout_target",
-                            "leaderboard_enabled",
-                            "theme_slug"
+                            "leaderboard_enabled"
                           ],
                           "type": "object"
                         }
@@ -196443,52 +196362,6 @@
         "summary": "Records that the signed-in person came through a member's invite (first invite wins)",
         "tags": [
           "Referrals"
-        ]
-      }
-    },
-    "/api/theme": {
-      "get": {
-        "callbacks": {},
-        "operationId": "PaleeWeb.ThemeController.show",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "content": {
-              "application/json": {
-                "schema": {
-                  "properties": {
-                    "theme_slug": {
-                      "enum": [
-                        "frost",
-                        "graphite",
-                        "ember",
-                        "sage",
-                        "steel",
-                        "aurora",
-                        "royal",
-                        "volt",
-                        "noir",
-                        "daybreak",
-                        "paper",
-                        "lagoon",
-                        "sunset"
-                      ],
-                      "type": "string"
-                    }
-                  },
-                  "required": [
-                    "theme_slug"
-                  ],
-                  "type": "object"
-                }
-              }
-            },
-            "description": "Active theme"
-          }
-        },
-        "summary": "Fetch active public UI theme",
-        "tags": [
-          "Theme"
         ]
       }
     },

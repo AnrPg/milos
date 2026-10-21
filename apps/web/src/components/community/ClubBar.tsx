@@ -31,7 +31,6 @@ export function ClubBar({
             href={`/clubs/${club.id}`}
             label={club.name}
             initials={clubInitials(club.name)}
-            color={club.primary_color}
             logo={club.logo_url}
             active={club.id === activeClubId}
           />
@@ -46,7 +45,6 @@ function Bubble({
   href,
   label,
   initials,
-  color,
   logo,
   active,
   dashed,
@@ -54,7 +52,6 @@ function Bubble({
   href: string;
   label: string;
   initials: string;
-  color?: string | null;
   logo?: string | null;
   active: boolean;
   dashed?: boolean;
@@ -65,8 +62,8 @@ function Bubble({
         <span
           className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-full text-sm font-extrabold"
           style={{
-            background: color ?? "var(--panel-raised)",
-            color: color ? "#fff" : "var(--text)",
+            background: "var(--panel-raised)",
+            color: "var(--text)",
             outline: active ? "2px solid var(--primary)" : `1px ${dashed ? "dashed" : "solid"} var(--border)`,
             outlineOffset: 2,
           }}

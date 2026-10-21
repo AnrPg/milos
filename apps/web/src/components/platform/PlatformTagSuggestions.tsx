@@ -80,7 +80,7 @@ export function PlatformTagSuggestions() {
                     disabled={resolve.isPending}
                     aria-label={t("addedNamed", { name: suggestion.name })}
                     onClick={() => resolve.mutate({ id: suggestion.id, status: "added" })}
-                    className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-40"
+                    className="rounded-full bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-40"
                   >
                     {t("added")}
                   </button>

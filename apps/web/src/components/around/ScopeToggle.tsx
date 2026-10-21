@@ -26,7 +26,7 @@ export function ScopeToggle({ current }: { current: HomeScope }) {
         style={{
           background: on ? "var(--panel-raised)" : "transparent",
           color: on ? "var(--text)" : "var(--dim)",
-          boxShadow: on ? "0 1px 2px rgba(0,0,0,0.2)" : undefined,
+          boxShadow: on ? "var(--shadow-sm)" : undefined,
         }}
       >
         {label}

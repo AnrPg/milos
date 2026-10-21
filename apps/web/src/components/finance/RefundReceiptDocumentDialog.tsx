@@ -63,7 +63,7 @@ export function RefundReceiptDocumentDialog({
           className="w-full flex-1 rounded-xl"
           sandbox=""
           srcDoc={html}
-          style={{ border: "1px solid var(--border)", background: "#fff" }}
+          style={{ border: "1px solid var(--border)", background: "var(--paper)" }}
           title={t("documentTitle", { number: receiptNumber })}
         />
       </div>

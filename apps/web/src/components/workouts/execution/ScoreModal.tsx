@@ -68,7 +68,7 @@ export function ScoreModal({
         aria-labelledby={titleId}
         tabIndex={-1}
         className="absolute inset-0"
-        style={{ background: "rgba(0,0,0,0.7)" }}
+        style={{ background: "var(--scrim)" }}
       />
       <div
         className="relative z-10 w-full max-w-sm rounded-2xl p-6"

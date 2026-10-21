@@ -664,8 +664,8 @@ export function ScheduleConsole({
       ) : null}
 
       {editor ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.7)" }}>
-          <div className="w-full max-w-2xl rounded-[2rem] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.7)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "var(--scrim)" }}>
+          <div className="w-full max-w-2xl rounded-[2rem] p-6 shadow-[var(--shadow-lg)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("adminSlotEditor")}</p>
@@ -870,7 +870,7 @@ export function ScheduleConsole({
       ) : null}
 
       {seriesEditor ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.72)" }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--scrim)" }}>
           <div className="w-full max-w-2xl rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.2em]" style={{ color: "var(--primary)" }}>{i18n("featureBatchScheduling")}</p><h3 className="mt-2 text-2xl font-semibold">{i18n("featureCreateClassSeries")}</h3></div><button type="button" onClick={() => setSeriesEditor(null)}>×</button></div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2">

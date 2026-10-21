@@ -7,26 +7,27 @@ import { SESSION_UPDATED_EVENT } from "@/api/client";
 import { updateProfile } from "@/api/profile";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
-import { APP_THEMES, THEME_SLUGS, type ThemeSlug } from "@/lib/theme";
+import { APP_THEMES, DEFAULT_THEME_SLUG, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 
 /**
- * Ρυθμίσεις › Θέμα: the member's own theme, saved on their account so every
- * device follows it, or their gym's theme (the default).
+ * Ρυθμίσεις › Θέμα: light (Frost, the default) or dark (Graphite), saved on
+ * the member's account so every device follows it. The palette is the same
+ * Palee one for everyone.
  */
 export function ThemeSetting() {
   const t = useTranslations("Profile");
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
-  const current = (currentUser?.preferred_theme_slug ?? null) as ThemeSlug | null;
+  const current = normalizeThemeSlug(currentUser?.preferred_theme_slug);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  async function choose(slug: ThemeSlug | null) {
+  async function choose(slug: ThemeSlug) {
     if (!tokens || !currentUser || slug === current) return;
     setPending(true);
     setError(null);
     try {
-      const result = await updateProfile(tokens.access_token, { preferred_theme_slug: slug });
+      const result = await updateProfile(tokens.access_token, { preferred_theme_slug: slug === DEFAULT_THEME_SLUG ? null : slug });
       window.dispatchEvent(
         new CustomEvent(SESSION_UPDATED_EVENT, {
           detail: { tokens, currentUser: { ...currentUser, preferred_theme_slug: result.user.preferred_theme_slug ?? null } },
@@ -39,12 +40,12 @@ export function ThemeSetting() {
     }
   }
 
-  const option = (slug: ThemeSlug | null) => {
+  const option = (slug: ThemeSlug) => {
     const selected = slug === current;
-    const colors = slug ? APP_THEMES[slug].colors : null;
+    const { tokens: colors } = APP_THEMES[slug];
     return (
       <button
-        key={slug ?? "gym"}
+        key={slug}
         type="button"
         role="radio"
         aria-checked={selected}
@@ -56,27 +57,22 @@ export function ThemeSetting() {
           borderColor: selected ? "var(--primary)" : "var(--border)",
         }}
       >
-        {colors ? (
-          <span className="mb-2 flex gap-1.5" aria-hidden="true">
-            {[colors.background, colors.primary, colors.success].map((color) => (
-              <span key={color} className="h-4 w-4 rounded-full" style={{ background: color, border: "1px solid var(--border)" }} />
-            ))}
-          </span>
-        ) : null}
-        <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
-          {slug ? i18n(APP_THEMES[slug].label) : t("themeGym")}
+        <span className="mb-2 flex gap-1.5" aria-hidden="true">
+          {[colors.bg, colors.primary, colors.spark].map((color) => (
+            <span key={color} className="h-4 w-4 rounded-full" style={{ background: color, border: "1px solid var(--border)" }} />
+          ))}
         </span>
-        {slug ? null : (
-          <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>{t("themeGymHint")}</span>
-        )}
+        <span className="block text-sm font-semibold" style={{ color: "var(--text)" }}>
+          {i18n(APP_THEMES[slug].label)}
+        </span>
+        <span className="mt-1 block text-xs" style={{ color: "var(--muted)" }}>{i18n(APP_THEMES[slug].description)}</span>
       </button>
     );
   };
 
   return (
     <div className="space-y-3">
-      <div role="radiogroup" aria-label={t("themeTitle")} className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-        {option(null)}
+      <div role="radiogroup" aria-label={t("themeTitle")} className="grid grid-cols-2 gap-2">
         {THEME_SLUGS.map((slug) => option(slug))}
       </div>
       {error ? <p role="alert" className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p> : null}

@@ -290,7 +290,7 @@ function MenuItem({ onClick, danger, children }: { onClick: () => void; danger?:
         role="menuitem"
         onClick={onClick}
         className="min-h-11 w-full px-4 text-start text-sm font-semibold"
-        style={{ color: danger ? "var(--danger, #dc2626)" : "var(--text)" }}
+        style={{ color: danger ? "var(--danger)" : "var(--text)" }}
       >
         {children}
       </button>

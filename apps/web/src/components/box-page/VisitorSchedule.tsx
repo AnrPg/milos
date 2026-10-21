@@ -267,7 +267,7 @@ function VisitorClassSheet({
   ].filter(Boolean) as [string, string][];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center" style={{ background: "rgba(0,0,0,0.55)" }} onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
       <section
         ref={dialog}
         role="dialog"

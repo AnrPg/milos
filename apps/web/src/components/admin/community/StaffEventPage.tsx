@@ -132,7 +132,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
           {[formatWhen(event.starts_at, event.ends_at, locale), placeName(event.place), price(event)].filter(Boolean).join(" · ")}
         </p>
         {event.cancelled ? (
-          <p role="status" className="mt-2 rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger, #dc2626) 14%, var(--panel))", color: "var(--text)" }}>
+          <p role="status" className="mt-2 rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 14%, var(--panel))", color: "var(--text)" }}>
             {event.cancel_reason ? tEvents("cancelledWithReason", { reason: event.cancel_reason }) : tEvents("cancelledNotice")}
           </p>
         ) : null}
@@ -284,7 +284,7 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
           </span>
         </Link>
         {row.late_cancel && row.cancelled_at ? (
-          <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning, #b45309) 18%, transparent)", color: "var(--warning, #b45309)" }}>
+          <span className="shrink-0 rounded-full px-2.5 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning) 18%, transparent)", color: "var(--warning)" }}>
             {t("lateCancelTag", { time: clock(row.cancelled_at) })}
           </span>
         ) : null}

@@ -66,7 +66,7 @@ function PackageSidePanel({
   return (
     <div
       className="fixed inset-0 z-50 flex justify-end"
-      style={{ background: "rgba(0,0,0,0.55)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}

@@ -202,7 +202,7 @@ function AdminChecklistDialog({
   const dialogRef = useModalFocusTrap<HTMLDivElement>(onLater);
 
   return (
-    <div className="fixed inset-0 z-[65] flex items-end justify-center sm:items-center sm:p-4" style={{ background: "rgba(0,0,0,0.6)" }} role="presentation" onClick={onLater}>
+    <div className="fixed inset-0 z-[65] flex items-end justify-center sm:items-center sm:p-4" style={{ background: "var(--scrim)" }} role="presentation" onClick={onLater}>
       <div
         ref={dialogRef}
         role="dialog"
@@ -212,9 +212,9 @@ function AdminChecklistDialog({
         tabIndex={-1}
         onClick={(event) => event.stopPropagation()}
         className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-[1.6rem] p-5 sm:rounded-[1.6rem] sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid color-mix(in srgb, var(--warning, #d97706) 45%, var(--border))" }}
+        style={{ background: "var(--panel)", border: "1px solid color-mix(in srgb, var(--warning) 45%, var(--border))" }}
       >
-        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--warning, #d97706)" }}>
+        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--warning)" }}>
           <span aria-hidden="true">⚠</span>
           {t("popupEyebrow")}
         </p>
@@ -288,13 +288,13 @@ function ChecklistView({
             <li
               key={step.id}
               className="rounded-xl p-3"
-              style={{ border: isNext ? "1.5px solid var(--primary)" : "1px solid var(--border)", background: open ? "transparent" : "color-mix(in srgb, var(--success, #16a34a) 6%, transparent)" }}
+              style={{ border: isNext ? "1.5px solid var(--primary)" : "1px solid var(--border)", background: open ? "transparent" : "color-mix(in srgb, var(--success) 6%, transparent)" }}
             >
               <div className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
                   className="mt-0.5 grid h-6 w-6 shrink-0 place-items-center rounded-full text-xs font-bold"
-                  style={step.done ? { background: "var(--success, #16a34a)", color: "white" } : { border: "1.5px solid var(--border-strong, var(--border))", color: "var(--muted)" }}
+                  style={step.done ? { background: "var(--success)", color: "var(--success-contrast)" } : { border: "1.5px solid var(--border-strong, var(--border))", color: "var(--muted)" }}
                 >
                   {step.done ? "✓" : index + 1}
                 </span>
@@ -418,7 +418,7 @@ export function ProductTour({ audience, slug, onClose }: { audience: TourAudienc
   }, [steps.length]);
 
   return (
-    <div className="fixed inset-0 z-[75] flex items-end justify-center sm:items-center sm:p-4" style={{ background: "rgba(0,0,0,0.65)" }} role="presentation">
+    <div className="fixed inset-0 z-[75] flex items-end justify-center sm:items-center sm:p-4" style={{ background: "var(--scrim)" }} role="presentation">
       <div
         ref={dialogRef}
         role="dialog"

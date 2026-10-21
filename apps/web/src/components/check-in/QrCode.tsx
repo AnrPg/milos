@@ -19,10 +19,10 @@ export function QrCode({ value, label, className, testId }: { value: string; lab
       viewBox={`0 0 ${size} ${size}`}
       shapeRendering="crispEdges"
       className={className}
-      style={{ background: "#fff", borderRadius: "0.75rem" }}
+      style={{ background: "var(--paper)", borderRadius: "0.75rem" }}
     >
-      <rect width={size} height={size} fill="#fff" />
-      <path d={path} fill="#000" />
+      <rect width={size} height={size} fill="var(--paper)" />
+      <path d={path} fill="var(--on-paper)" />
     </svg>
   );
 }

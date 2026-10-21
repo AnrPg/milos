@@ -199,7 +199,7 @@ export function ComposeSheet({
   return createPortal(
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.45)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={cancel}
     >
       <div
@@ -300,7 +300,7 @@ export function ComposeSheet({
             {media.busy ? tMedia("waitUploads") : tMedia("fixUploads")}
           </p>
         ) : null}
-        {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+        {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
         <div className="flex gap-2">
           <button
             type="button"
@@ -371,7 +371,7 @@ function AudienceSheet({
   return (
     <div
       className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.35)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={(event) => {
         event.stopPropagation();
         onClose();

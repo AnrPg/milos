@@ -145,7 +145,7 @@ function useDossierQuery<T>(token: string | undefined, userId: string, key: stri
 
 function Avatar({ user }: { user: Pick<AdminUserDirectoryEntry, "nickname" | "avatar_url"> }) {
   return (
-    <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.7rem] text-3xl font-semibold" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--primary)" }}>
+    <div className="flex h-24 w-24 shrink-0 items-center justify-center overflow-hidden rounded-[1.7rem] text-3xl font-semibold" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--primary)" }}>
       {user.avatar_url ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={user.avatar_url} alt="" className="h-full w-full object-cover" />
@@ -160,7 +160,7 @@ function StatGrid({ items }: { items: Array<[string, React.ReactNode]> }) {
   return (
     <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {items.map(([label, value]) => (
-        <div key={label} className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+        <div key={label} className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
           <dt className="text-xs uppercase tracking-[0.14em]" style={{ color: "var(--muted)" }}>{label}</dt>
           <dd className="mt-1 font-semibold" style={{ color: "var(--text)" }}>{value}</dd>
         </div>
@@ -191,7 +191,7 @@ function DetailCard({ title, meta, value, children, plainChildren = false }: { t
   );
 
   return (
-    <div className="group relative rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+    <div className="group relative rounded-[1.4rem] p-4 transition-transform hover:-translate-y-0.5" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       {content}
     </div>
   );
@@ -254,23 +254,23 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
   return (
     <>
       <div className="mt-4 grid gap-3 sm:grid-cols-2">
-        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><p className="font-semibold">{allowanceLabel(key, i18n, entitlement?.class_type_names)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
+        {Object.entries(entitlement?.allowances ?? {}).filter(([key]) => key !== "coaching_touchpoints").map(([key, allowance]) => allowance ? <div key={key} className="rounded-xl p-3" style={{ background: "var(--panel-muted)" }}><p className="font-semibold">{allowanceLabel(key, i18n, entitlement?.class_type_names)}</p>{shouldShowAllowanceQuota(allowance) ? <p>{String(allowance.remaining)} {i18n("remainingOf8553660")} {String(allowance.limit)}{allowance.extensions > 0 ? i18n("personalExtensionCount", { count: allowance.extensions }) : ""}</p> : null}<p className="text-xs" style={{ color: "var(--muted)" }}>{i18n("resetsAftere96e46e")} {date(allowance.period_end)}</p></div> : null)}
       </div>
       <div className="mt-5 space-y-5 rounded-2xl p-4" style={{ border: "1px solid var(--border)" }}>
         <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <select aria-label={i18n("classVisits142b3b0")} value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}>{grantableAllowances(entitlement?.allowances).map((key) => <option key={key} value={key}>{allowanceLabel(key, i18n, entitlement?.class_type_names)}</option>)}</select>
-            <IntegerInput aria-label={i18n("additionalUnits1d9dac0")} min={1} value={form.quantity} emptyValue={1} onValueChange={(quantity) => setForm({ ...form, quantity: quantity ?? 1 })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
-            <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
+            <select aria-label={i18n("classVisits142b3b0")} value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}>{grantableAllowances(entitlement?.allowances).map((key) => <option key={key} value={key}>{allowanceLabel(key, i18n, entitlement?.class_type_names)}</option>)}</select>
+            <IntegerInput aria-label={i18n("additionalUnits1d9dac0")} min={1} value={form.quantity} emptyValue={1} onValueChange={(quantity) => setForm({ ...form, quantity: quantity ?? 1 })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)" }} />
+            <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
           </div>
-          <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", color: "var(--text)", border: "1px solid var(--border)" }} />
+          <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)" }} />
           <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
           {grant.isError ? <p style={{ color: "var(--danger)" }}>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</p> : null}
         </form>
         <div className="mt-5 space-y-2">
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("personalExtensionHistory752eda5")}</p>
-          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--bg-soft)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {allowanceLabel(entry.allowance_key, i18n, entitlement?.class_type_names)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "white" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
+          {entries.filter((entry) => entry.allowance_key !== "coaching_touchpoints" && entry.event_type === "adjustment" && entry.quantity_delta < 0).map((entry) => <div key={entry.id} className="rounded-xl p-3" style={{ background: "var(--panel-muted)" }}><div className="flex flex-wrap items-center justify-between gap-2"><div><strong>+{Math.abs(entry.quantity_delta)} {allowanceLabel(entry.allowance_key, i18n, entitlement?.class_type_names)}</strong><p className="text-xs" style={{ color: "var(--muted)" }}>{entry.reason} · {date(entry.inserted_at)} {i18n("validThrough263dc88")} {date(entry.period_end)}</p></div>{revoked.has(entry.id) ? <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>{i18n("revoked85f17ac")}</span> : <button type="button" onClick={() => setRevokeTarget(entry.id)} className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{i18n("revoke0be7207")}</button>}</div>{revokeTarget === entry.id ? <form className="mt-3 flex flex-col gap-2 sm:flex-row" onSubmit={(event) => { event.preventDefault(); revoke.mutate(); }}><input required minLength={3} value={revokeReason} onChange={(event) => setRevokeReason(event.target.value)} placeholder={i18n("reasonForRevocationac5b98c")} className="min-w-0 flex-1 rounded-xl px-3 py-2" style={{ background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }} /><button disabled={revoke.isPending || revokeReason.trim().length < 3} className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>{i18n("confirmRevocationc1a9d03")}</button></form> : null}</div>)}
           {entries.every((entry) => entry.allowance_key === "coaching_touchpoints" || entry.event_type !== "adjustment" || entry.quantity_delta >= 0) ? <Empty>{i18n("noPersonalExtensionsRecorded558dcb3")}</Empty> : null}
         </div>
       </div>
@@ -390,7 +390,7 @@ function EditableFinanceCard({ label, value, editing = false, onOpen, children }
     </>
   );
   return (
-    <div className="w-full rounded-[1.25rem] p-4 text-start" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+    <div className="w-full rounded-[1.25rem] p-4 text-start" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       {onOpen ? <button type="button" className="w-full text-start" onClick={onOpen}>{content}</button> : <div>{content}</div>}
       {editing ? <div className="mt-3">{children}</div> : null}
     </div>
@@ -419,7 +419,7 @@ function CoachingContextSummary({ drillDown }: { drillDown: Record<string, unkno
       </div>
 
       {cues.length ? (
-        <div className="rounded-[1.5rem] p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+        <div className="rounded-[1.5rem] p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
           <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("attention74e0b9c")}</p>
           <div className="mt-3 grid gap-2 sm:grid-cols-2">
             {cues.slice(0, 4).map((cue, index) => (
@@ -855,7 +855,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                           disabled={roleMutation.isPending || selected}
                           onClick={() => roleMutation.mutate(role)}
                           className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-70"
-                          style={{ background: selected ? "var(--primary)" : "var(--bg-soft)", border: "1px solid var(--border)", color: selected ? "var(--bg)" : "var(--text-soft)" }}
+                          style={{ background: selected ? "var(--primary)" : "var(--panel-muted)", border: "1px solid var(--border)", color: selected ? "var(--bg)" : "var(--text-soft)" }}
                         >
                           <SemanticLabel value={role} />
                         </button>
@@ -865,7 +865,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                   {roleMutation.isError ? <p className="mt-2" style={{ color: "var(--danger)" }}>{i18n("roleUpdateFailed493da52")}</p> : null}
                 </div>
                 )}
-                <div className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+                <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                   <button
                     type="button"
                     disabled={!canDelete || deleteMutation.isPending}
@@ -873,7 +873,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                       if (window.confirm(i18n("delete63346e8") + profile.identity.nickname + "\"?")) deleteMutation.mutate();
                     }}
                     className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-40"
-                    style={{ background: "var(--danger)", color: "white" }}
+                    style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
                   >
                     {deleteMutation.isPending ? i18n("loading33ce417") : i18n("deletef6fdbe4")}
                   </button>

@@ -28,7 +28,7 @@ export function LockedTab({ slug, tab }: { slug: string; tab: "schedule" | "even
         ))}
       </div>
       <div className="absolute inset-x-0 top-6 flex justify-center px-2">
-        <div className="flex w-full max-w-sm flex-col items-center gap-3 rounded-3xl p-5 text-center shadow-[0_18px_40px_rgba(0,0,0,0.35)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
+        <div className="flex w-full max-w-sm flex-col items-center gap-3 rounded-3xl p-5 text-center shadow-[var(--shadow-md)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <span className="grid h-11 w-11 place-items-center rounded-full" style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}>
             <Icon name="lock" />
           </span>

@@ -79,7 +79,7 @@ export function MemberRolesEditor({
                 onClick={() => toggle(role)}
                 className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-60"
                 style={{
-                  background: selected ? "var(--primary)" : "var(--bg-soft)",
+                  background: selected ? "var(--primary)" : "var(--panel-muted)",
                   border: `1px ${STAFF.includes(role) ? "solid" : "dashed"} var(--border)`,
                   color: selected ? "var(--bg)" : "var(--text-soft)",
                 }}
@@ -104,7 +104,7 @@ export function MemberRolesEditor({
               type="button"
               onClick={() => setDraft(null)}
               className="rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
             >
               {i18n("cancel77dfd21")}
             </button>
@@ -118,7 +118,7 @@ export function MemberRolesEditor({
       </div>
 
       {showHeadCoach ? (
-        <label className="flex items-start gap-3 rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+        <label className="flex items-start gap-3 rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
           <input
             type="checkbox"
             className="mt-1"

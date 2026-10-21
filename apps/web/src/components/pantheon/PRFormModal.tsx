@@ -249,7 +249,7 @@ export function PRFormModal({
   return (
     <div
       className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto overscroll-contain p-2 sm:p-4"
-      style={{ background: "rgba(0,0,0,0.5)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
     >
       <div

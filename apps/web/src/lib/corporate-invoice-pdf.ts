@@ -1,4 +1,8 @@
 import type { CorporateInvoiceDocument, CorporatePaymentMethod } from "@/api/payment-models";
+import { PRINT_TOKENS, rgbChannels, type ThemeTokens } from "@/lib/theme";
+
+/** A print colour (PRINT_TOKENS) as jsPDF RGB channels. */
+const ink = (token: keyof ThemeTokens) => rgbChannels(PRINT_TOKENS[token]);
 
 // ADR-098 corporate invoicing: the invoice PDF is produced in the browser with
 // jsPDF and the DejaVu fonts (as in document-export.ts) so Greek prints. The
@@ -165,7 +169,7 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
   const text = (value: string, x: number, size: number, options: { bold?: boolean; align?: "left" | "right"; color?: [number, number, number] } = {}) => {
     pdf.setFont(font, options.bold ? "bold" : "normal");
     pdf.setFontSize(size);
-    pdf.setTextColor(...(options.color ?? [23, 32, 51]));
+    pdf.setTextColor(...(options.color ?? ink("text")));
     pdf.text(value, x, y, { align: options.align ?? "left" });
   };
   const ensureSpace = (height: number) => {
@@ -178,12 +182,12 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
   // never overlap.
   text(layout.issuer, margin, 15, { bold: true });
   y += 26;
-  text(layout.title, margin, 17, { bold: true, color: [124, 58, 237] });
-  text(layout.status, right, 9.5, { align: "right", color: [100, 116, 139] });
+  text(layout.title, margin, 17, { bold: true, color: ink("primary") });
+  text(layout.status, right, 9.5, { align: "right", color: ink("muted") });
   y += 34;
 
   const blockTop = y;
-  text(layout.billToTitle.toLocaleUpperCase(), margin, 8, { bold: true, color: [100, 116, 139] });
+  text(layout.billToTitle.toLocaleUpperCase(), margin, 8, { bold: true, color: ink("muted") });
   y += 15;
   layout.billTo.forEach((line, index) => {
     text(line, margin, index === 0 ? 11.5 : 9.5, { bold: index === 0 });
@@ -192,19 +196,19 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
   const billToBottom = y;
   y = blockTop;
   layout.meta.forEach(([label, value]) => {
-    text(`${label}: ${value}`, right, 9.5, { align: "right", color: [71, 85, 105] });
+    text(`${label}: ${value}`, right, 9.5, { align: "right", color: ink("textSoft") });
     y += 15;
   });
   y = Math.max(billToBottom, y) + 22;
 
   const columns = [margin, right - 230, right - 120, right];
-  pdf.setFillColor(241, 245, 249);
+  pdf.setFillColor(...ink("panelMuted"));
   pdf.rect(margin, y - 13, right - margin, 20, "F");
   layout.tableHead.forEach((head, index) => {
     text(head, index === 0 ? columns[0] + 6 : columns[index] - (index === 3 ? 6 : 0), 9, {
       bold: true,
       align: index === 0 ? "left" : "right",
-      color: [71, 85, 105],
+      color: ink("textSoft"),
     });
   });
   y += 22;
@@ -213,12 +217,12 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
     const description = pdf.splitTextToSize(row[0], columns[1] - columns[0] - 40) as string[];
     pdf.setFont(font, "normal");
     pdf.setFontSize(10);
-    pdf.setTextColor(23, 32, 51);
+    pdf.setTextColor(...ink("text"));
     pdf.text(description, columns[0] + 6, y);
     row.slice(1).forEach((cell, index) => text(cell, columns[index + 1] - (index === 2 ? 6 : 0), 10, { align: "right" }));
     y += description.length * 14 + 6;
   }
-  pdf.setDrawColor(226, 232, 240);
+  pdf.setDrawColor(...ink("border"));
   pdf.line(margin, y, right, y);
   y += 20;
 
@@ -232,11 +236,11 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
   if (layout.payments.length > 0) {
     y += 14;
     ensureSpace(30);
-    text(layout.paymentsTitle, margin, 11, { bold: true, color: [15, 118, 110] });
+    text(layout.paymentsTitle, margin, 11, { bold: true, color: ink("primary") });
     y += 16;
     for (const payment of layout.payments) {
       ensureSpace(14);
-      text(payment, margin, 9.5, { color: [51, 65, 85] });
+      text(payment, margin, 9.5, { color: ink("textSoft") });
       y += 14;
     }
   }
@@ -244,11 +248,11 @@ export async function renderCorporateInvoicePdf(layout: CorporateInvoiceLayout):
   const pages = pdf.getNumberOfPages();
   for (let page = 1; page <= pages; page += 1) {
     pdf.setPage(page);
-    pdf.setDrawColor(226, 232, 240);
+    pdf.setDrawColor(...ink("border"));
     pdf.line(margin, pageHeight - 37, right, pageHeight - 37);
     pdf.setFont(font, "normal");
     pdf.setFontSize(8);
-    pdf.setTextColor(148, 163, 184);
+    pdf.setTextColor(...ink("dim"));
     pdf.text(layout.footer, margin, pageHeight - 24);
     pdf.text(`${page} / ${pages}`, right, pageHeight - 24, { align: "right" });
   }

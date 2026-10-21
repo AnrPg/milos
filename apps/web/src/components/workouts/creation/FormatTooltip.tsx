@@ -47,7 +47,7 @@ export function FormatTooltip({ format, children }: Props) {
             background: "var(--panel)",
             border: "1px solid var(--dim)",
             color: "var(--text)",
-            boxShadow: "0 8px 32px rgba(0,0,0,0.5)",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           <div className="mb-2 font-bold">{formatLabels[format]}</div>

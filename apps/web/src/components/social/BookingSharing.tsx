@@ -71,7 +71,7 @@ export function BookingSharingOffer() {
           {t("bookingSharingNo")}
         </button>
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </section>
   );
 }
@@ -97,7 +97,7 @@ export function BookingSharingSetting() {
       >
         {enabled ? t("bookingSharingTurnOff") : t("bookingSharingTurnOn")}
       </button>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </div>
   );
 }

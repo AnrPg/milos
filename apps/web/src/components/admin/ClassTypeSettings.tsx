@@ -228,7 +228,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
       {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
 
       {archiveMapping ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,0.68)" }}>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--scrim)" }}>
           <div className="w-full max-w-lg rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}>
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--danger)" }}>{i18n("replacementRequireda658534")}</p>
             <h3 className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("mapFutureClassesBeforeRemoval544f152")}</h3>
@@ -259,7 +259,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
                 className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                 disabled={!archiveMapping.replacementId || archiveMutation.isPending}
                 onClick={() => archiveMutation.mutate({ source: archiveMapping.source, replacementId: archiveMapping.replacementId })}
-                style={{ background: "var(--danger)", color: "white" }}
+                style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
                 type="button"
               >
                 {archiveMutation.isPending ? i18n("mapping2712740") : i18n("mapAndRemove79dd58a")}

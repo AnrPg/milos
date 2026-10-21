@@ -59,7 +59,7 @@ export function ConfirmButton({
             onConfirm();
             setAsking(false);
           }}
-          style={{ background: "var(--danger, #dc2626)", color: "#fff" }}
+          style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
         >
           {pending ? t("working") : confirmLabel}
         </button>

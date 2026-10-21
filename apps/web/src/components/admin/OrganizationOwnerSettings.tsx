@@ -11,7 +11,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
 
 const field = "w-full rounded-2xl px-4 py-3 text-sm";
-const fieldStyle = { background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" };
+const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 const button = "rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50";
 
 /** The owner's gym actions: new gym, hand over ownership, archive (ADR-099). */
@@ -76,7 +76,7 @@ export function OrganizationOwnerSettings({ token, slug, currentUserId }: { toke
             <option key={member.user_id} value={member.user_id}>{member.nickname}</option>
           ))}
         </select>
-        <button type="submit" className={button} disabled={!newOwner || transfer.isPending} style={{ background: "var(--bg-soft)", border: "1px solid var(--border)", color: "var(--text)" }}>
+        <button type="submit" className={button} disabled={!newOwner || transfer.isPending} style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}>
           {i18n("orgTransferAction")}
         </button>
         {transfer.isSuccess ? <p className="text-sm" style={{ color: "var(--success, var(--primary))" }}>{i18n("orgTransferDone")}</p> : null}
@@ -94,7 +94,7 @@ export function OrganizationOwnerSettings({ token, slug, currentUserId }: { toke
         <h3 className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{i18n("orgArchiveTitle")}</h3>
         <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("orgArchiveHelp", { slug: slug ?? "" })}</p>
         <input className={field} style={fieldStyle} value={confirm} onChange={(event) => setConfirm(event.target.value)} aria-label={i18n("orgArchiveConfirmLabel")} placeholder={slug ?? ""} />
-        <button type="submit" className={button} disabled={confirm.trim() !== slug || archive.isPending} style={{ background: "var(--danger)", color: "white" }}>
+        <button type="submit" className={button} disabled={confirm.trim() !== slug || archive.isPending} style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
           {i18n("orgArchiveAction")}
         </button>
         {archive.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(archive.error, i18n)}</p> : null}

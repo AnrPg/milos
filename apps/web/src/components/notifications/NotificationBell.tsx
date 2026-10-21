@@ -755,7 +755,6 @@ export function NotificationBell({
       (Array.isArray(membershipsQuery.data) ? membershipsQuery.data : []).map((membership) => ({
         id: membership.organization.id,
         name: membership.settings?.brand_name?.trim() || membership.organization.name,
-        brandColor: membership.settings?.brand_primary_color ?? null,
         slug: membership.organization.slug,
       })),
     [membershipsQuery.data],
@@ -983,12 +982,12 @@ export function NotificationBell({
       {open ? (
         <div
           className="fixed inset-0 z-30"
-          style={{ background: "rgba(0,0,0,0.55)" }}
+          style={{ background: "var(--scrim)" }}
           onClick={() => setOpen(false)}
           role="presentation"
         >
           <aside
-            className="absolute end-0 top-0 h-full w-full max-w-md overflow-y-auto p-6 shadow-[-20px_0_60px_rgba(0,0,0,0.5)] rtl:shadow-[20px_0_60px_rgba(0,0,0,0.5)]"
+            className="absolute end-0 top-0 h-full w-full max-w-md overflow-y-auto p-6 shadow-[var(--shadow-lg)] rtl:shadow-[var(--shadow-lg)]"
             style={{ background: "var(--panel)", borderInlineStart: "1px solid var(--border)" }}
             onClick={(e) => e.stopPropagation()}
           >

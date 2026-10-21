@@ -142,7 +142,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
     <>
       <div
         className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: "rgba(0,0,0,0.65)" }}
+        style={{ background: "var(--scrim)" }}
         onClick={onClose}
         role="presentation"
       >
@@ -404,14 +404,14 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
       {creatingWorkout ? (
         <div
           className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-5"
-          style={{ background: "rgba(0,0,0,0.82)" }}
+          style={{ background: "var(--scrim)" }}
           role="dialog"
           aria-modal="true"
           aria-label={i18n("createWorkoutc7c6baa")}
         >
           <div
             className="w-full max-w-[96rem] overflow-hidden rounded-[1.5rem]"
-            style={{ border: "1px solid var(--border)", boxShadow: "0 30px 90px rgba(0,0,0,.55)" }}
+            style={{ border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}
           >
             <WorkoutCreationCanvas
               embedded

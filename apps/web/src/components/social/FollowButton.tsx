@@ -84,7 +84,7 @@ export function FollowButton({
             type="button"
             disabled={busy}
             className={`${base} flex-1`}
-            style={{ background: "var(--danger, #dc2626)", color: "#fff" }}
+            style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
             onClick={() => void run(() => unfollow(token!, targetType, targetId))}
           >
             {current === "requested" ? t("withdraw") : t("unfollow")}
@@ -125,7 +125,7 @@ export function FollowButton({
           )}
         </button>
       )}
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </div>
   );
 }

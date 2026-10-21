@@ -176,7 +176,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
       {/* Backdrop */}
       <div
         className="fixed inset-0 z-40"
-        style={{ background: "rgba(0,0,0,0.5)" }}
+        style={{ background: "var(--scrim)" }}
         onClick={onClose}
       />
 

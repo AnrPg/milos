@@ -237,7 +237,7 @@ function CheckedIn({ token, result, receivedAt, onUndone }: { token: string; res
   return (
     <Card tone="success">
       <BoxLine result={result} />
-      <p aria-hidden="true" className="text-5xl" style={{ color: "var(--success, #22c55e)" }}>✓</p>
+      <p aria-hidden="true" className="text-5xl" style={{ color: "var(--success)" }}>✓</p>
       <h1 className="text-3xl font-extrabold" style={{ color: "var(--text)" }} data-testid="scan-checked-in">
         <CheckInLine result={result} />
       </h1>
@@ -346,8 +346,8 @@ function Card({ children, tone }: { children: React.ReactNode; tone?: "success" 
     <section
       className="flex flex-col gap-3 rounded-3xl p-5"
       style={{
-        background: tone === "success" ? "color-mix(in srgb, var(--success, #22c55e) 10%, var(--panel))" : "var(--panel)",
-        border: `1px solid ${tone === "success" ? "color-mix(in srgb, var(--success, #22c55e) 45%, transparent)" : "var(--border)"}`,
+        background: tone === "success" ? "color-mix(in srgb, var(--success) 10%, var(--panel))" : "var(--panel)",
+        border: `1px solid ${tone === "success" ? "color-mix(in srgb, var(--success) 45%, transparent)" : "var(--border)"}`,
       }}
     >
       {children}

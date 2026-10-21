@@ -206,10 +206,10 @@ function IssueCard({
       className="rounded-2xl border p-4"
       style={{
         borderColor: isError
-          ? "var(--danger, #dc2626)"
+          ? "var(--danger)"
           : isAssumption
             ? "var(--dim)"
-            : "color-mix(in srgb, var(--warning, #d97706) 55%, var(--dim))",
+            : "color-mix(in srgb, var(--warning) 55%, var(--dim))",
         background: "var(--card)",
       }}
     >
@@ -218,11 +218,11 @@ function IssueCard({
           className="rounded-full px-2 py-0.5 text-[11px] font-black uppercase tracking-wide"
           style={{
             background: isError
-              ? "color-mix(in srgb, var(--danger, #dc2626) 16%, transparent)"
+              ? "color-mix(in srgb, var(--danger) 16%, transparent)"
               : isAssumption
                 ? "var(--bg)"
-                : "color-mix(in srgb, var(--warning, #d97706) 16%, transparent)",
-            color: isError ? "var(--danger, #dc2626)" : isAssumption ? "var(--primary)" : "var(--warning, #d97706)",
+                : "color-mix(in srgb, var(--warning) 16%, transparent)",
+            color: isError ? "var(--danger)" : isAssumption ? "var(--primary)" : "var(--warning)",
           }}
         >
           {isError ? t("severityError") : isAssumption ? t("severityAssumption") : t("severityWarning")}
@@ -256,10 +256,10 @@ function IssueCard({
               }}
               aria-invalid={invalid}
               className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-              style={{ background: "var(--bg)", borderColor: invalid ? "var(--danger, #dc2626)" : "var(--dim)", color: "var(--text)" }}
+              style={{ background: "var(--bg)", borderColor: invalid ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
             />
           </label>
-          {invalid ? <p className="mt-1 text-xs" style={{ color: "var(--danger, #dc2626)" }}>{t("invalidTyped")}</p> : null}
+          {invalid ? <p className="mt-1 text-xs" style={{ color: "var(--danger)" }}>{t("invalidTyped")}</p> : null}
         </div>
       ) : null}
 
@@ -340,9 +340,9 @@ function SuggestionCard({
         }}
         aria-invalid={invalid}
         className="mt-1 w-full rounded-lg border px-3 py-2 text-sm outline-none"
-        style={{ background: "var(--bg)", borderColor: invalid ? "var(--danger, #dc2626)" : "var(--dim)", color: "var(--text)" }}
+        style={{ background: "var(--bg)", borderColor: invalid ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
       />
-      {invalid ? <p className="mt-1 text-xs" style={{ color: "var(--danger, #dc2626)" }}>{t("invalidTyped")}</p> : null}
+      {invalid ? <p className="mt-1 text-xs" style={{ color: "var(--danger)" }}>{t("invalidTyped")}</p> : null}
       {suggestion.text_insert ? (
         <label className="mt-2 flex items-start gap-2 text-xs" style={{ color: "var(--muted)" }}>
           <input type="checkbox" checked={alsoInText} onChange={(event) => setAlsoInText(event.target.checked)} />
@@ -419,7 +419,7 @@ function StructurePreview({ t, workout }: { t: Translate; workout: CanonicalWork
                         {slotText(t, section.timer_config?.type, exercise.interval_assignment)} ·
                       </span>
                     ) : null}
-                    <span className={exercise.name ? "" : "italic"} style={exercise.name ? undefined : { color: "var(--danger, #dc2626)" }}>
+                    <span className={exercise.name ? "" : "italic"} style={exercise.name ? undefined : { color: "var(--danger)" }}>
                       {exercise.name || t("unnamed")}
                     </span>
                     <span style={{ color: "var(--muted)" }}>{prescriptionText(t, exercise)}</span>
@@ -451,9 +451,9 @@ function TipsCard({ t }: { t: Translate }) {
 function Callout({ tone, children }: { tone: "info" | "warning" | "error" | "success"; children: ReactNode }) {
   const color = {
     info: "var(--primary)",
-    warning: "var(--warning, #d97706)",
-    error: "var(--danger, #dc2626)",
-    success: "var(--success, #16a34a)",
+    warning: "var(--warning)",
+    error: "var(--danger)",
+    success: "var(--success)",
   }[tone];
 
   return (

@@ -137,7 +137,7 @@ function PlanEditor({ token, plan }: { token: string; plan: PlatformPlan }) {
           {plan.code} · {t(`console.audience.${plan.audience}`)}
         </p>
         {plan.price_status === "placeholder" ? (
-          <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning, #d97706) 18%, transparent)", color: "var(--warning, #d97706)" }}>
+          <span className="rounded-full px-3 py-1 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--warning) 18%, transparent)", color: "var(--warning)" }}>
             {t("console.placeholder")}
           </span>
         ) : null}
@@ -170,7 +170,7 @@ function PlanEditor({ token, plan }: { token: string; plan: PlatformPlan }) {
       </div>
       {save.error ? <p role="alert" className="text-sm text-[var(--danger)]">{localizeError(save.error, i18n)}</p> : null}
       <div>
-        <button type="submit" disabled={save.isPending} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+        <button type="submit" disabled={save.isPending} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
           {save.isSuccess && !save.isPending ? t("console.saved") : t("console.save")}
         </button>
       </div>
@@ -330,7 +330,7 @@ function SubscriptionRow({
             <input className={inputClass} maxLength={1000} value={notes} onChange={(event) => setNotes(event.target.value)} />
           </Field>
           <div className="flex items-end">
-            <button type="submit" disabled={save.isPending} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+            <button type="submit" disabled={save.isPending} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
               {t("console.save")}
             </button>
           </div>

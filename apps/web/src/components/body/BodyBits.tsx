@@ -147,12 +147,12 @@ export function BodyPhotoView({
   const [revealed, setRevealed] = useState(false);
   const url = photo ? (size === "thumb" ? photo.thumb_url : size === "full" ? (photo.full_url ?? photo.feed_url) : (photo.feed_url ?? photo.thumb_url)) : null;
   const frame = ["relative overflow-hidden rounded-xl", className].join(" ");
-  const style = { background: "linear-gradient(160deg, #4a3d33, #1e1915)" };
+  const style = { background: "linear-gradient(160deg, var(--deep), var(--media))" };
 
   if (!photo || photo.status !== "ready" || !url) {
     return (
       <div className={frame} style={style} data-testid="body-photo-empty">
-        <span className="absolute inset-x-1 bottom-1 truncate text-[10px] font-bold text-white">
+        <span className="absolute inset-x-1 bottom-1 truncate text-[10px] font-bold text-[var(--on-media)]">
           {photo?.status === "processing" ? t("photoProcessing") : photo?.status === "failed" ? t("photoFailed") : label}
         </span>
       </div>
@@ -174,10 +174,10 @@ export function BodyPhotoView({
         <button
           type="button"
           onClick={() => setRevealed(true)}
-          className="absolute inset-0 flex items-center justify-center text-xs font-bold text-white"
+          className="absolute inset-0 flex items-center justify-center text-xs font-bold text-[var(--on-media)]"
           aria-label={t("revealPhoto", { label })}
         >
-          <span className="rounded-full px-2 py-1" style={{ background: "rgba(0,0,0,0.45)" }}>{t("tapToShow")}</span>
+          <span className="rounded-full px-2 py-1" style={{ background: "var(--media-control)" }}>{t("tapToShow")}</span>
         </button>
       ) : null}
     </div>

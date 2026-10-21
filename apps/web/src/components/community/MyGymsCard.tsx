@@ -135,7 +135,7 @@ function JoinForm() {
         </button>
       </div>
       {message ? (
-        <p role={message.error ? "alert" : "status"} className="text-xs" style={{ color: message.error ? "var(--danger, #dc2626)" : "var(--success)" }}>
+        <p role={message.error ? "alert" : "status"} className="text-xs" style={{ color: message.error ? "var(--danger)" : "var(--success)" }}>
           {message.text}
         </p>
       ) : null}

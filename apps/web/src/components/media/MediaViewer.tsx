@@ -100,7 +100,7 @@ export function MediaViewer({
       tabIndex={-1}
       onKeyDown={onKeyDown}
       className="fixed inset-0 z-[80] flex flex-col"
-      style={{ background: "#000", color: "#fff" }}
+      style={{ background: "var(--media)", color: "var(--on-media)" }}
       data-testid="media-viewer"
     >
       <div className="flex items-center gap-2 px-2 pt-[max(0.5rem,env(safe-area-inset-top))]">
@@ -109,7 +109,7 @@ export function MediaViewer({
           onClick={onClose}
           aria-label={t("close")}
           className="flex h-11 w-11 items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2"
-          style={{ outlineColor: "#fff" }}
+          style={{ outlineColor: "var(--on-media)" }}
         >
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" aria-hidden="true">
             <path d="M6 6l12 12M18 6L6 18" />
@@ -163,10 +163,10 @@ export function MediaViewer({
       </div>
 
       {caption || current?.alt_text ? (
-        <div className="max-h-[30vh] overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 text-sm" style={{ background: "linear-gradient(transparent, rgba(0,0,0,.85) 30%)" }}>
+        <div className="max-h-[30vh] overflow-y-auto px-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3 text-sm" style={{ background: "linear-gradient(transparent, var(--scrim-strong) 30%)" }}>
           {caption ? <p className="line-clamp-4 whitespace-pre-wrap">{caption}</p> : null}
           {current?.alt_text ? (
-            <p className="mt-1 text-xs" style={{ color: "rgba(255,255,255,.75)" }}>
+            <p className="mt-1 text-xs" style={{ color: "var(--on-media-soft)" }}>
               <span className="font-bold">{t("altText")}:</span> {current.alt_text}
             </p>
           ) : null}
@@ -187,7 +187,7 @@ function ViewerArrow({ direction, label, onClick }: { direction: "previous" | "n
         "absolute top-1/2 hidden h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full focus-visible:outline-2 [@media(hover:hover)_and_(pointer:fine)]:flex",
         direction === "previous" ? "start-3" : "end-3",
       ].join(" ")}
-      style={{ background: "rgba(255,255,255,.18)", color: "#fff", outlineColor: "#fff" }}
+      style={{ background: "var(--media-control-inverse)", color: "var(--on-media)", outlineColor: "var(--on-media)" }}
     >
       <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true" className="rtl:-scale-x-100">
         <path d={direction === "previous" ? "M15 6l-6 6 6 6" : "M9 6l6 6-6 6"} />
@@ -312,7 +312,7 @@ function ZoomableImage({
       onWheel={onWheel}
       onKeyDown={onKeyDown}
       className="relative flex h-full w-full items-center justify-center overflow-hidden focus-visible:outline-2 focus-visible:-outline-offset-4"
-      style={{ touchAction: zoom.scale > 1 ? "none" : "pan-x", outlineColor: "#fff" }}
+      style={{ touchAction: zoom.scale > 1 ? "none" : "pan-x", outlineColor: "var(--on-media)" }}
       data-zoom={zoom.scale.toFixed(2)}
       data-testid="viewer-photo"
     >

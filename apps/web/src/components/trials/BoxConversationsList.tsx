@@ -24,7 +24,7 @@ export function BoxConversationsList({ token }: { token: string | null }) {
           <span
             aria-hidden="true"
             className="grid h-8 w-8 shrink-0 place-items-center rounded-full text-xs font-bold"
-            style={{ background: row.box.primary_color ?? "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {row.box.name[0]?.toUpperCase()}
           </span>

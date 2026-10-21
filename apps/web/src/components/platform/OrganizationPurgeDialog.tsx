@@ -76,7 +76,7 @@ export function OrganizationPurgeDialog({
   const canApprove = purge?.status === "exported" && confirmation.trim() === slug;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
       <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -95,8 +95,8 @@ export function OrganizationPurgeDialog({
 
         <p className="mt-4 text-sm leading-6 text-[var(--text-soft)]">{copy.intro}</p>
 
-        {actionError ? <p className="mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{actionError}</p> : null}
-        {purgeQuery.isError ? <p className="mt-4 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{copy.loadError}</p> : null}
+        {actionError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{actionError}</p> : null}
+        {purgeQuery.isError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.loadError}</p> : null}
 
         {purgeQuery.isSuccess && !purge ? (
           <div className="mt-5 border-y border-[var(--border)] py-5">
@@ -105,7 +105,7 @@ export function OrganizationPurgeDialog({
               type="button"
               disabled={pending !== null}
               onClick={() => void run("request", () => requestOrganizationPurge(accessToken!, organizationId))}
-              className="mt-4 bg-red-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+              className="mt-4 bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50"
             >
               {pending === "request" ? copy.requesting : copy.request}
             </button>
@@ -137,7 +137,7 @@ export function OrganizationPurgeDialog({
             {purge.status === "completed" ? <p className="text-sm font-semibold text-[var(--text)]">{copy.completedBody}</p> : null}
             {purge.status === "cancelled" ? <p className="text-sm text-[var(--text)]">{copy.cancelledBody}</p> : null}
             {purge.status === "failed" ? (
-              <div className="border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm text-red-900">
+              <div className="border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
                 <p>
                   {formatPurgeCopy(copy.failedBody, {
                     stage: purge.failed_stage === "export" ? copy.stageExport : copy.stagePurge,
@@ -148,7 +148,7 @@ export function OrganizationPurgeDialog({
                   type="button"
                   disabled={pending !== null}
                   onClick={() => void run("resume", () => resumeOrganizationPurge(accessToken!, organizationId))}
-                  className="mt-3 border border-red-900 px-3 py-2 text-sm font-semibold disabled:opacity-50"
+                  className="mt-3 border border-[var(--danger)] px-3 py-2 text-sm font-semibold disabled:opacity-50"
                 >
                   {pending === "resume" ? copy.resuming : copy.resume}
                 </button>
@@ -195,7 +195,7 @@ export function OrganizationPurgeDialog({
             ) : null}
 
             {purge.status === "exported" ? (
-              <section className="border border-red-300 bg-red-50 p-4 text-red-950">
+              <section className="border border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] p-4 text-[var(--text)]">
                 <h3 className="text-base font-semibold">{copy.approveTitle}</h3>
                 <p className="mt-2 text-sm leading-6">{copy.approveBody}</p>
                 <label className="mt-3 block text-sm font-medium">
@@ -203,7 +203,7 @@ export function OrganizationPurgeDialog({
                   <input
                     value={confirmation}
                     onChange={(event) => setConfirmation(event.target.value)}
-                    className="w-full border border-red-300 bg-white px-3 py-2.5 text-[var(--text)] outline-none focus:border-red-700"
+                    className="w-full border border-[var(--danger)] bg-[var(--panel)] px-3 py-2.5 text-[var(--text)] outline-none focus:border-[var(--danger)]"
                     autoComplete="off"
                   />
                 </label>
@@ -211,7 +211,7 @@ export function OrganizationPurgeDialog({
                   type="button"
                   disabled={!canApprove || pending !== null}
                   onClick={() => void run("approve", () => approveOrganizationPurge(accessToken!, organizationId, confirmation))}
-                  className="mt-3 bg-red-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                  className="mt-3 bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50"
                 >
                   {pending === "approve" ? copy.approving : copy.approve}
                 </button>

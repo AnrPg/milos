@@ -61,7 +61,7 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
   if (scores.length === 0) return null;
   return (
     <div
-      className="pointer-events-none absolute bottom-full start-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+      className="pointer-events-none absolute bottom-full start-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[var(--shadow-md)]"
       style={{
         background: "var(--panel)",
         border: "1px solid var(--border-strong)",

@@ -265,7 +265,7 @@ function ChannelRow({
         <p className="text-xs" style={{ color: "var(--dim)" }}>
           {t(WRITE_KEYS[channel.write_policy])} · {channel.membership === "everyone" ? t("channelEveryone") : t("channelOptIn")}
         </p>
-        {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+        {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
       </div>
       {channel.can_leave ? (
         <button

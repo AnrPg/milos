@@ -123,9 +123,9 @@ export function BodyCamera({
   }
 
   const mirrored = facing === "user";
-  const light = { color: "#fff" };
+  const light = { color: "var(--on-media)" };
   const control = { className: "inline-flex min-h-11 items-center justify-center gap-1.5 rounded-full px-3 text-sm font-semibold" };
-  const controlStyle = { background: "rgba(0,0,0,0.45)", color: "#fff", border: "1px solid rgba(255,255,255,0.35)" };
+  const controlStyle = { background: "var(--media-control)", color: "var(--on-media)", border: "1px solid var(--media-control-border)" };
 
   return createPortal(
     <div
@@ -134,7 +134,7 @@ export function BodyCamera({
       aria-modal="true"
       aria-labelledby={titleId}
       className="fixed inset-0 z-[80] flex flex-col"
-      style={{ background: "#000" }}
+      style={{ background: "var(--media)" }}
       data-testid="body-camera"
     >
       <div className="flex items-center justify-between gap-2 px-3 pt-3" style={{ paddingTop: "calc(0.75rem + env(safe-area-inset-top))" }}>
@@ -174,7 +174,7 @@ export function BodyCamera({
             ) : null}
             {countdown !== null ? (
               <div className="pointer-events-none absolute inset-0 flex items-center justify-center" aria-live="assertive">
-                <span className="text-7xl font-extrabold tabular-nums" style={{ ...light, textShadow: "0 2px 12px rgba(0,0,0,0.6)" }}>{countdown}</span>
+                <span className="text-7xl font-extrabold tabular-nums" style={{ ...light, textShadow: "var(--shadow-md)" }}>{countdown}</span>
               </div>
             ) : null}
           </>
@@ -221,7 +221,7 @@ export function BodyCamera({
                 disabled={cameraError}
                 aria-label={countdown !== null ? t("cancelTimer") : t("takePhoto")}
                 className="h-16 w-16 shrink-0 rounded-full disabled:opacity-40"
-                style={{ border: "4px solid #fff", background: countdown !== null ? "rgba(255,255,255,0.4)" : "transparent" }}
+                style={{ border: "4px solid var(--on-media)", background: countdown !== null ? "var(--media-control-border)" : "transparent" }}
               />
               <div className="flex gap-2">
                 <button

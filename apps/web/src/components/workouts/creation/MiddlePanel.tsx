@@ -238,8 +238,8 @@ export function MiddlePanel({ scaleLevels }: Props) {
           <div
             className="sticky top-0 z-10 flex flex-wrap items-center gap-2 px-3 py-2"
             style={{
-              background: "var(--panel, #ffffff)",
-              border: "1px solid var(--border, #cfe1e8)",
+              background: "var(--panel)",
+              border: "1px solid var(--border)",
             }}
           >
             <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
@@ -247,10 +247,10 @@ export function MiddlePanel({ scaleLevels }: Props) {
             </span>
             {selectedExerciseIds.size >= 2 ? (
               <>
-                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--workout-crossfit, #d94d3d) 16%, #ffffff)", color: "var(--workout-crossfit, #a93226)" }} onClick={() => groupSelected("superset")} type="button">
+                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--workout-crossfit) 16%, var(--panel))", color: "var(--workout-crossfit)" }} onClick={() => groupSelected("superset")} type="button">
                   {i18n("groupAsSuperset")}
                 </button>
-                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--info, #27869b) 18%, #ffffff)", color: "var(--info, #1f6f80)" }} onClick={() => groupSelected("alternating")} type="button">
+                <button className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--info) 18%, var(--panel))", color: "var(--info)" }} onClick={() => groupSelected("alternating")} type="button">
                   {i18n("groupAsAlternating")}
                 </button>
               </>
@@ -262,8 +262,8 @@ export function MiddlePanel({ scaleLevels }: Props) {
                 setSelectedExerciseIds(new Set());
               }}
               style={{
-                background: "var(--panel-muted, #edf4f6)",
-                color: "var(--text-soft, #39515a)",
+                background: "var(--panel-muted)",
+                color: "var(--text-soft)",
               }}
               type="button"
             >

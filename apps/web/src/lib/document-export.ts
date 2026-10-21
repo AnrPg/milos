@@ -8,6 +8,10 @@ import type {
   WorkoutSectionRecord,
   WorkoutVariationRecord,
 } from "@/api/workouts";
+import { PRINT_TOKENS, rgbChannels, type ThemeTokens } from "@/lib/theme";
+
+/** A print colour (PRINT_TOKENS) as jsPDF RGB channels. */
+const ink = (token: keyof ThemeTokens) => rgbChannels(PRINT_TOKENS[token]);
 
 export type ExportFormat = "pdf" | "md" | "txt" | "odt" | "csv";
 
@@ -748,16 +752,16 @@ async function renderOdt(document: ExportDocument): Promise<Blob> {
   zip.file("content.xml", `<?xml version="1.0" encoding="UTF-8"?>
 <office:document-content xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" xmlns:text="urn:oasis:names:tc:opendocument:xmlns:text:1.0" xmlns:style="urn:oasis:names:tc:opendocument:xmlns:style:1.0" xmlns:fo="urn:oasis:names:tc:opendocument:xmlns:xsl-fo-compatible:1.0" office:version="1.3">
 <office:automatic-styles>
-  <style:style style:name="Category" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.08in"/><style:text-properties fo:color="#7C3AED" fo:font-weight="bold" fo:font-size="11pt"/></style:style>
-  <style:style style:name="Title" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.12in"/><style:text-properties fo:color="#172033" fo:font-weight="bold" fo:font-size="25pt"/></style:style>
-  <style:style style:name="Subtitle" style:family="paragraph"><style:text-properties fo:color="#DB2777" fo:font-weight="bold" fo:font-size="15pt"/></style:style>
-  <style:style style:name="Meta" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.04in"/><style:text-properties fo:color="#475569"/></style:style>
-  <style:style style:name="MetaLabel" style:family="text"><style:text-properties fo:color="#7C3AED" fo:font-weight="bold"/></style:style>
-  <style:style style:name="Section" style:family="paragraph"><style:paragraph-properties fo:margin-top="0.2in" fo:margin-bottom="0.08in"/><style:text-properties fo:color="#0F766E" fo:font-weight="bold" fo:font-size="16pt"/></style:style>
-  <style:style style:name="Item" style:family="paragraph"><style:paragraph-properties fo:margin-left="0.12in" fo:margin-bottom="0.05in"/><style:text-properties fo:color="#172033"/></style:style>
-  <style:style style:name="ItemLabel" style:family="text"><style:text-properties fo:font-weight="bold" fo:color="#DB2777"/></style:style>
-  <style:style style:name="Detail" style:family="paragraph"><style:paragraph-properties fo:margin-left="0.3in"/><style:text-properties fo:color="#64748B" fo:font-size="9pt"/></style:style>
-  <style:style style:name="Footer" style:family="paragraph"><style:paragraph-properties fo:margin-top="0.3in"/><style:text-properties fo:color="#94A3B8" fo:font-size="8pt"/></style:style>
+  <style:style style:name="Category" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.08in"/><style:text-properties fo:color="${PRINT_TOKENS.primary}" fo:font-weight="bold" fo:font-size="11pt"/></style:style>
+  <style:style style:name="Title" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.12in"/><style:text-properties fo:color="${PRINT_TOKENS.text}" fo:font-weight="bold" fo:font-size="25pt"/></style:style>
+  <style:style style:name="Subtitle" style:family="paragraph"><style:text-properties fo:color="${PRINT_TOKENS.primaryStrong}" fo:font-weight="bold" fo:font-size="15pt"/></style:style>
+  <style:style style:name="Meta" style:family="paragraph"><style:paragraph-properties fo:margin-bottom="0.04in"/><style:text-properties fo:color="${PRINT_TOKENS.textSoft}"/></style:style>
+  <style:style style:name="MetaLabel" style:family="text"><style:text-properties fo:color="${PRINT_TOKENS.primary}" fo:font-weight="bold"/></style:style>
+  <style:style style:name="Section" style:family="paragraph"><style:paragraph-properties fo:margin-top="0.2in" fo:margin-bottom="0.08in"/><style:text-properties fo:color="${PRINT_TOKENS.primary}" fo:font-weight="bold" fo:font-size="16pt"/></style:style>
+  <style:style style:name="Item" style:family="paragraph"><style:paragraph-properties fo:margin-left="0.12in" fo:margin-bottom="0.05in"/><style:text-properties fo:color="${PRINT_TOKENS.text}"/></style:style>
+  <style:style style:name="ItemLabel" style:family="text"><style:text-properties fo:font-weight="bold" fo:color="${PRINT_TOKENS.primaryStrong}"/></style:style>
+  <style:style style:name="Detail" style:family="paragraph"><style:paragraph-properties fo:margin-left="0.3in"/><style:text-properties fo:color="${PRINT_TOKENS.muted}" fo:font-size="9pt"/></style:style>
+  <style:style style:name="Footer" style:family="paragraph"><style:paragraph-properties fo:margin-top="0.3in"/><style:text-properties fo:color="${PRINT_TOKENS.dim}" fo:font-size="8pt"/></style:style>
 </office:automatic-styles><office:body><office:text>${paragraphs}</office:text></office:body></office:document-content>`);
   zip.file("styles.xml", `<?xml version="1.0" encoding="UTF-8"?><office:document-styles xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3"><office:styles/></office:document-styles>`);
   zip.file("meta.xml", `<?xml version="1.0" encoding="UTF-8"?><office:document-meta xmlns:office="urn:oasis:names:tc:opendocument:xmlns:office:1.0" office:version="1.3"><office:meta/></office:document-meta>`);
@@ -789,15 +793,15 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
   let pageNumber = 1;
 
   const drawContinuationHeader = () => {
-    pdf.setDrawColor(226, 232, 240);
+    pdf.setDrawColor(...ink("border"));
     pdf.setLineWidth(0.75);
     pdf.line(margin, 42, pageWidth - margin, 42);
     pdf.setFont(fontFamily, "bold");
     pdf.setFontSize(8);
-    pdf.setTextColor(124, 58, 237);
+    pdf.setTextColor(...ink("primary"));
     pdf.text(document.category.toLocaleUpperCase(), margin, 31);
     pdf.setFont(fontFamily, "normal");
-    pdf.setTextColor(100, 116, 139);
+    pdf.setTextColor(...ink("muted"));
     pdf.text(document.title, pageWidth - margin, 31, { align: "right", maxWidth: contentWidth * 0.62 });
   };
 
@@ -836,51 +840,51 @@ async function renderPdf(document: ExportDocument): Promise<Blob> {
     y += gapAfter;
   };
 
-  pdf.setFillColor(124, 58, 237);
+  pdf.setFillColor(...ink("primary"));
   pdf.roundedRect(margin, y, contentWidth, 24, 8, 8, "F");
-  pdf.setTextColor(255, 255, 255);
+  pdf.setTextColor(...ink("primaryContrast"));
   pdf.setFont(fontFamily, "bold");
   pdf.setFontSize(10);
   pdf.text(document.category.toUpperCase(), margin + 12, y + 16);
   y += 54;
-  textBlock(document.title, 27, [23, 32, 51], { bold: true, gapAfter: 8 });
-  if (document.subtitle) textBlock(document.subtitle, 15, [219, 39, 119], { bold: true, gapAfter: 12 });
+  textBlock(document.title, 27, ink("text"), { bold: true, gapAfter: 8 });
+  if (document.subtitle) textBlock(document.subtitle, 15, ink("primaryStrong"), { bold: true, gapAfter: 12 });
   y += 5;
 
   for (const meta of document.metadata) {
     ensureSpace(26);
-    textBlock(`${meta.label}: ${meta.value}`, 9.5, [71, 85, 105], { gapAfter: 5 });
+    textBlock(`${meta.label}: ${meta.value}`, 9.5, ink("textSoft"), { gapAfter: 5 });
   }
 
   for (const section of document.sections) {
     y += 12;
     ensureSpace(42);
-    pdf.setDrawColor(13, 148, 136);
+    pdf.setDrawColor(...ink("primary"));
     pdf.setLineWidth(3);
     pdf.line(margin, y - 12, margin, y + 8);
-    textBlock(section.title, 16, [15, 118, 110], { bold: true, indent: 12, gapAfter: 9 });
+    textBlock(section.title, 16, ink("primary"), { bold: true, indent: 12, gapAfter: 9 });
     for (const item of section.items) {
       if (item.label) {
-        textBlock(item.label, 11, [23, 32, 51], { bold: true, indent: 12, gapAfter: 2 });
-        textBlock(item.value, 10.5, [51, 65, 85], { indent: 20, gapAfter: 4 });
+        textBlock(item.label, 11, ink("text"), { bold: true, indent: 12, gapAfter: 2 });
+        textBlock(item.value, 10.5, ink("textSoft"), { indent: 20, gapAfter: 4 });
       } else {
-        textBlock(item.value, 10.5, [23, 32, 51], { indent: 12, gapAfter: 4 });
+        textBlock(item.value, 10.5, ink("text"), { indent: 12, gapAfter: 4 });
       }
-      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9.5, [100, 116, 139], { indent: 28, gapAfter: 3 });
+      for (const detail of item.details ?? []) textBlock(`• ${detail}`, 9.5, ink("muted"), { indent: 28, gapAfter: 3 });
     }
   }
 
   y += 14;
-  textBlock(document.footer, 8, [148, 163, 184], { gapAfter: 0 });
+  textBlock(document.footer, 8, ink("dim"), { gapAfter: 0 });
 
   for (let page = 1; page <= pageNumber; page += 1) {
     pdf.setPage(page);
-    pdf.setDrawColor(226, 232, 240);
+    pdf.setDrawColor(...ink("border"));
     pdf.setLineWidth(0.75);
     pdf.line(margin, pageHeight - 37, pageWidth - margin, pageHeight - 37);
     pdf.setFont(fontFamily, "normal");
     pdf.setFontSize(8);
-    pdf.setTextColor(148, 163, 184);
+    pdf.setTextColor(...ink("dim"));
     pdf.text(document.footer, margin, pageHeight - 24);
     pdf.text(`${page} / ${pageNumber}`, pageWidth - margin, pageHeight - 24, { align: "right" });
   }

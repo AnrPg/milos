@@ -1,542 +1,380 @@
-export const THEME_SLUGS = [
-  "frost",
-  "graphite",
-  "ember",
-  "sage",
-  "steel",
-  "aurora",
-  "royal",
-  "volt",
-  "noir",
-  "daybreak",
-  "paper",
-  "lagoon",
-  "sunset",
-] as const;
+/**
+ * The Palee theme: the single source of every colour, shadow and font in the
+ * app (docs/brand/THEME.md lists which token dresses which UI part).
+ *
+ * Gyms and members all wear the same brand palette (Frost Graphite, see
+ * docs/brand/BRAND.md) in a light ("frost", the default) and a dark
+ * ("graphite") variant. Components never use colour literals: they read the
+ * CSS variables generated from these tokens (`--bg`, `--primary`, ...), and
+ * the few places that cannot read CSS (share images, document exports, the
+ * PWA manifest, QR codes) import the token values from here. Re-dressing the
+ * app means editing this file only; `theme-guard.test.ts` fails on any colour
+ * literal elsewhere.
+ */
+
+export const THEME_SLUGS = ["frost", "graphite"] as const;
 
 export type ThemeSlug = (typeof THEME_SLUGS)[number];
 
-type ThemeColors = {
-  background: string;
+export const DEFAULT_THEME_SLUG: ThemeSlug = "frost";
+
+export type ThemeTokens = {
+  // Surfaces
+  bg: string;
   panel: string;
   panelRaised: string;
   panelMuted: string;
   card: string;
   border: string;
   borderStrong: string;
+  // Text
   text: string;
   textSoft: string;
   muted: string;
   dim: string;
+  placeholder: string;
+  // Brand roles (BRAND.md): Dojo primary for actions and navigation, Spark for
+  // what is alive now (LIVE, new, WOD tags, challenges), Heat for emotion
+  // (kudos, PRs, comebacks, support), Deep for the one hero surface per screen.
   primary: string;
   primaryStrong: string;
   primaryContrast: string;
+  spark: string;
+  sparkContrast: string;
+  heat: string;
+  heatContrast: string;
+  deep: string;
+  deepContrast: string;
+  // Status
   success: string;
+  successContrast: string;
   warning: string;
+  warningContrast: string;
   danger: string;
+  dangerContrast: string;
   info: string;
+  infoContrast: string;
+  // Interaction
+  focusRing: string;
+  selection: string;
+  selectionText: string;
+  highlight: string;
+  highlightText: string;
+  // Form controls (inputs, selects, date and time pickers, switches, sliders)
+  controlBg: string;
+  controlBorder: string;
+  controlKnob: string;
+  // Scrollbars
+  scrollbarTrack: string;
+  scrollbarThumb: string;
+  scrollbarThumbHover: string;
+  // Overlays and media: dialog backdrops, photo and video stages, controls
+  // drawn over media, and white "paper" (QR codes, receipts, print).
+  scrim: string;
+  scrimStrong: string;
+  media: string;
+  onMedia: string;
+  onMediaSoft: string;
+  mediaControl: string;
+  mediaControlBorder: string;
+  mediaControlInverse: string;
+  paper: string;
+  onPaper: string;
+  // Elevation
+  shadowSm: string;
+  shadowMd: string;
+  shadowLg: string;
+  // Scale levels
   scaleBase: string;
   scaleScaled: string;
   scaleRx: string;
   scaleAdvanced: string;
+  // Workout types
+  workoutCrossfit: string;
+  workoutStrength: string;
+  workoutGymnastics: string;
+  workoutAerobics: string;
+  workoutFlexibility: string;
+  workoutRecovery: string;
+  // Chart and data series (sources, wellness, analytics)
+  series1: string;
+  series2: string;
+  series3: string;
+  series4: string;
+  series5: string;
+  series6: string;
+  series7: string;
+  series8: string;
+  seriesNeutral: string;
+  onSeries: string;
+  // Anatomy figure (ADR-164)
+  anatomyPrimary: string;
+  anatomySecondary: string;
+  anatomyStabilizer: string;
+  anatomyFelt: string;
+  anatomyHeatLow: string;
+  anatomyHeatMedium: string;
+  anatomyHeatHigh: string;
+  anatomyBase: string;
+  anatomyBone: string;
+  // Street maps (MapLibre style colours)
+  mapLand: string;
+  mapWater: string;
+  mapPark: string;
+  mapBuilding: string;
+  mapRoad: string;
+  mapRoadMajor: string;
+  mapRoadCasing: string;
+  mapBoundary: string;
+  mapLabel: string;
+  mapLabelHalo: string;
 };
 
 export type AppTheme = {
   slug: ThemeSlug;
   label: string;
   description: string;
-  colors: ThemeColors;
-  workoutTypes: Record<string, string>;
+  scheme: "light" | "dark";
+  tokens: ThemeTokens;
 };
 
+export const THEME_FONTS = {
+  // Self-hosted (@fontsource-variable/commissioner, imported by the root
+  // layout): Latin, Greek and Cyrillic; Arabic and Hebrew fall back.
+  sans: '"Commissioner Variable", "Commissioner", "Avenir Next", "Segoe UI", system-ui, sans-serif',
+  mono: '"SFMono-Regular", "Menlo", ui-monospace, monospace',
+} as const;
+
+// The brand palette's named colours (BRAND.md).
+const FROST = "#F4F5F7";
+const GRAPHITE = "#17181C";
+const WHITE = "#FFFFFF";
+const BLACK = "#000000";
+const DOJO = "#2F5BFF";
+const DOJO_GLOW = "#5B7CFF";
+const SPARK = "#E4FF6E";
+const HEAT = "#E0203F";
+const HEAT_GLOW = "#FF4D6A";
+
 export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
-  // Palee brand palette (docs/brand/BRAND.md, Frost Graphite): Frost page,
-  // Graphite text, Dojo blue primary, Heat red for emotion.
   frost: {
     slug: "frost",
     label: "theme_frost_label",
     description: "theme_frost_description",
-    colors: {
-      background: "#F4F5F7",
-      panel: "#FFFFFF",
-      panelRaised: "#FFFFFF",
+    scheme: "light",
+    tokens: {
+      bg: FROST,
+      panel: WHITE,
+      panelRaised: WHITE,
       panelMuted: "#ECEEF2",
-      card: "#FFFFFF",
+      card: WHITE,
       border: "#DFE2E8",
       borderStrong: "#A2A8B3",
-      text: "#17181C",
+      text: GRAPHITE,
       textSoft: "#3A3D45",
       muted: "#5E6470",
       dim: "#6B717C",
-      primary: "#2F5BFF",
+      placeholder: "#8A909B",
+      primary: DOJO,
       primaryStrong: "#1F45E0",
-      primaryContrast: "#FFFFFF",
-      success: "#1F8A4C",
-      warning: "#B26B00",
-      danger: "#E0203F",
+      primaryContrast: WHITE,
+      spark: SPARK,
+      sparkContrast: GRAPHITE,
+      heat: HEAT,
+      heatContrast: WHITE,
+      deep: GRAPHITE,
+      deepContrast: FROST,
+      success: "#1B7A43",
+      successContrast: WHITE,
+      warning: "#9A5C00",
+      warningContrast: WHITE,
+      danger: HEAT,
+      dangerContrast: WHITE,
       info: "#0B7FA8",
-      scaleBase: "#17181C",
-      scaleScaled: "#1F8A4C",
-      scaleRx: "#B26B00",
-      scaleAdvanced: "#E0203F",
-    },
-    workoutTypes: {
-      crossfit: "#E0203F",
-      strength: "#2F5BFF",
-      gymnastics: "#B26B00",
-      aerobics: "#C2410C",
-      flexibility: "#1F8A4C",
-      recovery: "#0B7FA8",
+      infoContrast: WHITE,
+      focusRing: DOJO,
+      selection: "#C9D5FF",
+      selectionText: GRAPHITE,
+      highlight: SPARK,
+      highlightText: GRAPHITE,
+      controlBg: "#ECEEF2",
+      controlBorder: "#A2A8B3",
+      controlKnob: WHITE,
+      scrollbarTrack: "#ECEEF2",
+      scrollbarThumb: "#A2A8B3",
+      scrollbarThumbHover: "#6B717C",
+      scrim: "rgb(23 24 28 / 0.5)",
+      scrimStrong: "rgb(14 15 18 / 0.94)",
+      media: BLACK,
+      onMedia: WHITE,
+      onMediaSoft: "rgb(255 255 255 / 0.75)",
+      mediaControl: "rgb(14 15 18 / 0.55)",
+      mediaControlBorder: "rgb(255 255 255 / 0.35)",
+      mediaControlInverse: "rgb(255 255 255 / 0.16)",
+      paper: WHITE,
+      onPaper: BLACK,
+      shadowSm: "0 1px 3px rgb(23 24 28 / 0.12)",
+      shadowMd: "0 12px 32px rgb(23 24 28 / 0.16)",
+      shadowLg: "0 30px 90px rgb(23 24 28 / 0.24)",
+      scaleBase: GRAPHITE,
+      scaleScaled: "#1B7A43",
+      scaleRx: "#9A5C00",
+      scaleAdvanced: HEAT,
+      workoutCrossfit: HEAT,
+      workoutStrength: DOJO,
+      workoutGymnastics: "#9A5C00",
+      workoutAerobics: "#7A5AF8",
+      workoutFlexibility: "#1F8A4C",
+      workoutRecovery: "#0B7FA8",
+      series1: DOJO,
+      series2: "#E0203F",
+      series3: "#1F8A4C",
+      series4: "#7A5AF8",
+      series5: "#9A5C00",
+      series6: "#0B7FA8",
+      series7: "#C2187A",
+      series8: "#5E7A00",
+      seriesNeutral: "#8A909B",
+      onSeries: WHITE,
+      anatomyPrimary: DOJO,
+      anatomySecondary: "#8FA4FF",
+      anatomyStabilizer: "#C9D5FF",
+      anatomyFelt: HEAT,
+      anatomyHeatLow: "#C9D5FF",
+      anatomyHeatMedium: "#5B7CFF",
+      anatomyHeatHigh: "#1F45E0",
+      anatomyBase: "#A2A8B3",
+      anatomyBone: "#DFE2E8",
+      mapLand: FROST,
+      mapWater: "#C9D5FF",
+      mapPark: "#E3EBDD",
+      mapBuilding: "#E4E6EB",
+      mapRoad: WHITE,
+      mapRoadMajor: WHITE,
+      mapRoadCasing: "#DFE2E8",
+      mapBoundary: "#A2A8B3",
+      mapLabel: "#3A3D45",
+      mapLabelHalo: FROST,
     },
   },
-  // The brand's dark mode, "Graphite Night": Graphite page, glow tones.
+  // The brand's dark variant, "Graphite Night": Graphite page, glow tones.
   graphite: {
     slug: "graphite",
     label: "theme_graphite_label",
     description: "theme_graphite_description",
-    colors: {
-      background: "#17181C",
+    scheme: "dark",
+    tokens: {
+      bg: GRAPHITE,
       panel: "#1D1F24",
       panelRaised: "#22242A",
       panelMuted: "#131418",
       card: "#22242A",
       border: "#2C2F37",
       borderStrong: "#4A4F5A",
-      text: "#F4F5F7",
+      text: FROST,
       textSoft: "#D2D5DB",
       muted: "#A2A8B3",
       dim: "#8A909B",
-      primary: "#5B7CFF",
+      placeholder: "#6B717C",
+      primary: DOJO_GLOW,
       primaryStrong: "#8FA4FF",
       primaryContrast: "#0E0F12",
+      spark: SPARK,
+      sparkContrast: GRAPHITE,
+      heat: HEAT_GLOW,
+      heatContrast: "#0E0F12",
+      deep: "#2C2F37",
+      deepContrast: FROST,
       success: "#4CC27E",
+      successContrast: "#0E0F12",
       warning: "#F0A63A",
-      danger: "#FF4D6A",
+      warningContrast: "#0E0F12",
+      danger: HEAT_GLOW,
+      dangerContrast: "#0E0F12",
       info: "#6FB8FF",
-      scaleBase: "#F4F5F7",
+      infoContrast: "#0E0F12",
+      focusRing: "#8FA4FF",
+      selection: "#2F3F80",
+      selectionText: FROST,
+      highlight: SPARK,
+      highlightText: GRAPHITE,
+      controlBg: "#131418",
+      controlBorder: "#4A4F5A",
+      controlKnob: FROST,
+      scrollbarTrack: "#131418",
+      scrollbarThumb: "#4A4F5A",
+      scrollbarThumbHover: "#8A909B",
+      scrim: "rgb(0 0 0 / 0.6)",
+      scrimStrong: "rgb(0 0 0 / 0.94)",
+      media: BLACK,
+      onMedia: WHITE,
+      onMediaSoft: "rgb(255 255 255 / 0.75)",
+      mediaControl: "rgb(0 0 0 / 0.55)",
+      mediaControlBorder: "rgb(255 255 255 / 0.35)",
+      mediaControlInverse: "rgb(255 255 255 / 0.16)",
+      paper: WHITE,
+      onPaper: BLACK,
+      shadowSm: "0 1px 3px rgb(0 0 0 / 0.4)",
+      shadowMd: "0 12px 32px rgb(0 0 0 / 0.5)",
+      shadowLg: "0 30px 90px rgb(0 0 0 / 0.6)",
+      scaleBase: FROST,
       scaleScaled: "#4CC27E",
       scaleRx: "#F0A63A",
-      scaleAdvanced: "#FF4D6A",
-    },
-    workoutTypes: {
-      crossfit: "#FF4D6A",
-      strength: "#5B7CFF",
-      gymnastics: "#F0A63A",
-      aerobics: "#E4FF6E",
-      flexibility: "#4CC27E",
-      recovery: "#8FA4FF",
-    },
-  },
-  ember: {
-    slug: "ember",
-    label: "theme_ember_label",
-    description: "theme_ember_description",
-    colors: {
-      background: "#0B0807",
-      panel: "#150F0D",
-      panelRaised: "#1E1512",
-      panelMuted: "#110C0A",
-      card: "#1A1210",
-      border: "#2C201B",
-      borderStrong: "#9C7E68",
-      text: "#FBF3EE",
-      textSoft: "#E0CFC5",
-      muted: "#A0897C",
-      dim: "#9C8778",
-      primary: "#D9743D",
-      primaryStrong: "#F0985C",
-      primaryContrast: "#0B0807",
-      success: "#6FCB8B",
-      warning: "#F0B94C",
-      danger: "#F2604D",
-      info: "#6EC6D9",
-      scaleBase: "#FBF3EE",
-      scaleScaled: "#6FCB8B",
-      scaleRx: "#F0B94C",
-      scaleAdvanced: "#F2604D",
-    },
-    workoutTypes: {
-      crossfit: "#D94D3D",
-      strength: "#D9743D",
-      gymnastics: "#E08A4B",
-      aerobics: "#D9A441",
-      flexibility: "#78BFA6",
-      recovery: "#9C8CC8",
-    },
-  },
-  sage: {
-    slug: "sage",
-    label: "theme_sage_label",
-    description: "theme_sage_description",
-    colors: {
-      background: "#07100D",
-      panel: "#0F1A16",
-      panelRaised: "#16231E",
-      panelMuted: "#0A1511",
-      card: "#14201C",
-      border: "#20332C",
-      borderStrong: "#315044",
-      text: "#F1F6EF",
-      textSoft: "#C8D8CF",
-      muted: "#86A095",
-      dim: "#536B61",
-      primary: "#D89A3D",
-      primaryStrong: "#F0B35C",
-      primaryContrast: "#07100D",
-      success: "#68D391",
-      warning: "#F2C94C",
-      danger: "#EE6C4D",
-      info: "#69B3A2",
-      scaleBase: "#F1F6EF",
-      scaleScaled: "#68D391",
-      scaleRx: "#F2C94C",
-      scaleAdvanced: "#EE6C4D",
-    },
-    workoutTypes: {
-      crossfit: "#EE6C4D",
-      strength: "#D89A3D",
-      gymnastics: "#C77D46",
-      aerobics: "#F2C94C",
-      flexibility: "#69B3A2",
-      recovery: "#9AAE7A",
-    },
-  },
-  steel: {
-    slug: "steel",
-    label: "theme_steel_label",
-    description: "theme_steel_description",
-    colors: {
-      background: "#080B0E",
-      panel: "#10151A",
-      panelRaised: "#171D23",
-      panelMuted: "#0C1116",
-      card: "#151A20",
-      border: "#202A33",
-      borderStrong: "#33414D",
-      text: "#F2F5F7",
-      textSoft: "#C7D0D7",
-      muted: "#8795A0",
-      dim: "#596772",
-      primary: "#E26D3D",
-      primaryStrong: "#F2895A",
-      primaryContrast: "#080B0E",
-      success: "#4FD1A5",
-      warning: "#F5B84B",
-      danger: "#F25F5C",
-      info: "#58C7D8",
-      scaleBase: "#F2F5F7",
-      scaleScaled: "#4FD1A5",
-      scaleRx: "#F5B84B",
-      scaleAdvanced: "#F25F5C",
-    },
-    workoutTypes: {
-      crossfit: "#F25F5C",
-      strength: "#E26D3D",
-      gymnastics: "#C88C4A",
-      aerobics: "#F5B84B",
-      flexibility: "#58C7D8",
-      recovery: "#8FA3B8",
-    },
-  },
-  aurora: {
-    slug: "aurora",
-    label: "theme_aurora_label",
-    description: "theme_aurora_description",
-    colors: {
-      background: "#050814",
-      panel: "#0B1024",
-      panelRaised: "#121A35",
-      panelMuted: "#080C1B",
-      card: "#111833",
-      border: "#202B4E",
-      borderStrong: "#374572",
-      text: "#F4F7FF",
-      textSoft: "#C9D3F2",
-      muted: "#8C9AC8",
-      dim: "#566384",
-      primary: "#8B5CF6",
-      primaryStrong: "#A78BFA",
-      primaryContrast: "#050814",
-      success: "#2DD4BF",
-      warning: "#FBBF24",
-      danger: "#FB7185",
-      info: "#38BDF8",
-      scaleBase: "#F4F7FF",
-      scaleScaled: "#2DD4BF",
-      scaleRx: "#FBBF24",
-      scaleAdvanced: "#FB7185",
-    },
-    workoutTypes: {
-      crossfit: "#FB7185",
-      strength: "#A78BFA",
-      gymnastics: "#F472B6",
-      aerobics: "#FBBF24",
-      flexibility: "#2DD4BF",
-      recovery: "#38BDF8",
-    },
-  },
-  royal: {
-    slug: "royal",
-    label: "theme_royal_label",
-    description: "theme_royal_description",
-    colors: {
-      background: "#0A0618",
-      panel: "#130D26",
-      panelRaised: "#1C1435",
-      panelMuted: "#0E0A1E",
-      card: "#1A1230",
-      border: "#2B2147",
-      borderStrong: "#493A73",
-      text: "#FAF7FF",
-      textSoft: "#D7CDEF",
-      muted: "#9C8EBF",
-      dim: "#62577F",
-      primary: "#C084FC",
-      primaryStrong: "#E9D5FF",
-      primaryContrast: "#130D26",
-      success: "#A3E635",
-      warning: "#F4C95D",
-      danger: "#F43F5E",
-      info: "#7DD3FC",
-      scaleBase: "#FAF7FF",
-      scaleScaled: "#A3E635",
-      scaleRx: "#F4C95D",
-      scaleAdvanced: "#F43F5E",
-    },
-    workoutTypes: {
-      crossfit: "#F43F5E",
-      strength: "#F4C95D",
-      gymnastics: "#C084FC",
-      aerobics: "#FB923C",
-      flexibility: "#A3E635",
-      recovery: "#7DD3FC",
-    },
-  },
-  volt: {
-    slug: "volt",
-    label: "theme_volt_label",
-    description: "theme_volt_description",
-    colors: {
-      background: "#030504",
-      panel: "#0A0F0D",
-      panelRaised: "#101915",
-      panelMuted: "#050907",
-      card: "#0D1512",
-      border: "#1C2A24",
-      borderStrong: "#355044",
-      text: "#F5FFF8",
-      textSoft: "#C8EAD2",
-      muted: "#8AB79A",
-      dim: "#557263",
-      primary: "#BEF264",
-      primaryStrong: "#D9F99D",
-      primaryContrast: "#030504",
-      success: "#22C55E",
-      warning: "#FDE047",
-      danger: "#F43F5E",
-      info: "#22D3EE",
-      scaleBase: "#F5FFF8",
-      scaleScaled: "#22C55E",
-      scaleRx: "#FDE047",
-      scaleAdvanced: "#F43F5E",
-    },
-    workoutTypes: {
-      crossfit: "#F43F5E",
-      strength: "#BEF264",
-      gymnastics: "#E879F9",
-      aerobics: "#FDE047",
-      flexibility: "#22C55E",
-      recovery: "#22D3EE",
-    },
-  },
-  noir: {
-    slug: "noir",
-    label: "theme_noir_label",
-    description: "theme_noir_description",
-    colors: {
-      background: "#050505",
-      panel: "#101010",
-      panelRaised: "#181818",
-      panelMuted: "#0A0A0A",
-      card: "#151515",
-      border: "#262626",
-      borderStrong: "#3F3F3F",
-      text: "#F8F5EF",
-      textSoft: "#D9D2C7",
-      muted: "#A59D92",
-      dim: "#6E675F",
-      primary: "#EBCB8B",
-      primaryStrong: "#F7E0A3",
-      primaryContrast: "#050505",
-      success: "#5EEAD4",
-      warning: "#FACC15",
-      danger: "#E11D48",
-      info: "#93C5FD",
-      scaleBase: "#F8F5EF",
-      scaleScaled: "#5EEAD4",
-      scaleRx: "#FACC15",
-      scaleAdvanced: "#E11D48",
-    },
-    workoutTypes: {
-      crossfit: "#E11D48",
-      strength: "#EBCB8B",
-      gymnastics: "#D8B4FE",
-      aerobics: "#FACC15",
-      flexibility: "#5EEAD4",
-      recovery: "#93C5FD",
-    },
-  },
-  daybreak: {
-    slug: "daybreak",
-    label: "theme_daybreak_label",
-    description: "theme_daybreak_description",
-    colors: {
-      background: "#FFF7ED",
-      panel: "#FFFFFF",
-      panelRaised: "#FFF1DF",
-      panelMuted: "#F9EAD8",
-      card: "#FFFDF8",
-      border: "#E8D4BD",
-      borderStrong: "#CFAF8D",
-      text: "#24160D",
-      textSoft: "#5B4635",
-      muted: "#846B55",
-      dim: "#A98D73",
-      primary: "#EA580C",
-      primaryStrong: "#C2410C",
-      primaryContrast: "#24160D",
-      success: "#15803D",
-      warning: "#B45309",
-      danger: "#DC2626",
-      info: "#0369A1",
-      scaleBase: "#24160D",
-      scaleScaled: "#15803D",
-      scaleRx: "#B45309",
-      scaleAdvanced: "#DC2626",
-    },
-    workoutTypes: {
-      crossfit: "#DC2626",
-      strength: "#EA580C",
-      gymnastics: "#B45309",
-      aerobics: "#D97706",
-      flexibility: "#15803D",
-      recovery: "#0369A1",
-    },
-  },
-  paper: {
-    slug: "paper",
-    label: "theme_paper_label",
-    description: "theme_paper_description",
-    colors: {
-      background: "#F2FBFF",
-      panel: "#FFFFFF",
-      panelRaised: "#E3F6FF",
-      panelMuted: "#D7EFFA",
-      card: "#FBFEFF",
-      border: "#B9DDEA",
-      borderStrong: "#7EB8D1",
-      text: "#123447",
-      textSoft: "#28576B",
-      muted: "#5E8798",
-      dim: "#8FB5C4",
-      primary: "#0EA5E9",
-      primaryStrong: "#0369A1",
-      primaryContrast: "#123447",
-      success: "#0F9F7A",
-      warning: "#D69222",
-      danger: "#D43F5E",
-      info: "#0284C7",
-      scaleBase: "#123447",
-      scaleScaled: "#0F9F7A",
-      scaleRx: "#D69222",
-      scaleAdvanced: "#D43F5E",
-    },
-    workoutTypes: {
-      crossfit: "#D43F5E",
-      strength: "#0369A1",
-      gymnastics: "#7DD3FC",
-      aerobics: "#D69222",
-      flexibility: "#0F9F7A",
-      recovery: "#0EA5E9",
-    },
-  },
-  lagoon: {
-    slug: "lagoon",
-    label: "theme_lagoon_label",
-    description: "theme_lagoon_description",
-    colors: {
-      background: "#ECFEFF",
-      panel: "#F8FFFF",
-      panelRaised: "#DDF7F6",
-      panelMuted: "#D1F0EE",
-      card: "#FFFFFF",
-      border: "#A7D8D5",
-      borderStrong: "#69B8B2",
-      text: "#083D3D",
-      textSoft: "#245B59",
-      muted: "#4A807C",
-      dim: "#77A8A4",
-      primary: "#0F766E",
-      primaryStrong: "#115E59",
-      primaryContrast: "#ECFEFF",
-      success: "#16A34A",
-      warning: "#CA8A04",
-      danger: "#E11D48",
-      info: "#0284C7",
-      scaleBase: "#083D3D",
-      scaleScaled: "#16A34A",
-      scaleRx: "#CA8A04",
-      scaleAdvanced: "#E11D48",
-    },
-    workoutTypes: {
-      crossfit: "#E11D48",
-      strength: "#0F766E",
-      gymnastics: "#8B5CF6",
-      aerobics: "#CA8A04",
-      flexibility: "#16A34A",
-      recovery: "#0284C7",
-    },
-  },
-  sunset: {
-    slug: "sunset",
-    label: "theme_sunset_label",
-    description: "theme_sunset_description",
-    colors: {
-      background: "#FFF1F2",
-      panel: "#FFFFFF",
-      panelRaised: "#FFE4E6",
-      panelMuted: "#FFECEF",
-      card: "#FFFBFB",
-      border: "#F5C2C8",
-      borderStrong: "#E99AA6",
-      text: "#3B1020",
-      textSoft: "#683047",
-      muted: "#92566B",
-      dim: "#B98191",
-      primary: "#E11D48",
-      primaryStrong: "#BE123C",
-      primaryContrast: "#FFFFFF",
-      success: "#0F766E",
-      warning: "#B45309",
-      danger: "#B91C1C",
-      info: "#2563EB",
-      scaleBase: "#3B1020",
-      scaleScaled: "#0F766E",
-      scaleRx: "#B45309",
-      scaleAdvanced: "#B91C1C",
-    },
-    workoutTypes: {
-      crossfit: "#B91C1C",
-      strength: "#E11D48",
-      gymnastics: "#9333EA",
-      aerobics: "#F97316",
-      flexibility: "#0F766E",
-      recovery: "#2563EB",
+      scaleAdvanced: HEAT_GLOW,
+      workoutCrossfit: HEAT_GLOW,
+      workoutStrength: DOJO_GLOW,
+      workoutGymnastics: "#F0A63A",
+      workoutAerobics: "#A894FF",
+      workoutFlexibility: "#4CC27E",
+      workoutRecovery: "#6FB8FF",
+      series1: DOJO_GLOW,
+      series2: HEAT_GLOW,
+      series3: "#4CC27E",
+      series4: "#A894FF",
+      series5: "#F0A63A",
+      series6: "#6FB8FF",
+      series7: "#FF7AC6",
+      series8: SPARK,
+      seriesNeutral: "#8A909B",
+      onSeries: "#0E0F12",
+      anatomyPrimary: DOJO_GLOW,
+      anatomySecondary: "#8FA4FF",
+      anatomyStabilizer: "#3A4A8C",
+      anatomyFelt: HEAT_GLOW,
+      anatomyHeatLow: "#3A4A8C",
+      anatomyHeatMedium: DOJO_GLOW,
+      anatomyHeatHigh: "#C9D5FF",
+      anatomyBase: "#4A4F5A",
+      anatomyBone: "#2C2F37",
+      mapLand: GRAPHITE,
+      mapWater: "#1E2A4D",
+      mapPark: "#1C2620",
+      mapBuilding: "#22242A",
+      mapRoad: "#2C2F37",
+      mapRoadMajor: "#3A3D45",
+      mapRoadCasing: "#131418",
+      mapBoundary: "#4A4F5A",
+      mapLabel: "#D2D5DB",
+      mapLabelHalo: GRAPHITE,
     },
   },
 };
 
-export const DEFAULT_THEME_SLUG: ThemeSlug = "frost";
+/**
+ * Colours for surfaces drawn outside the page (link previews and share
+ * images): the dark variant, so a card reads as Palee in any feed.
+ */
+export const SHARE_CARD_TOKENS: ThemeTokens = APP_THEMES.graphite.tokens;
+
+/** Colours for printed and exported documents (PDF, ODT, invoices): paper is light. */
+export const PRINT_TOKENS: ThemeTokens = APP_THEMES[DEFAULT_THEME_SLUG].tokens;
+
+/** `#2F5BFF` → `[47, 91, 255]`, for libraries that take RGB channels (jsPDF). */
+export function rgbChannels(hex: string): [number, number, number] {
+  const value = Number.parseInt(hex.replace("#", ""), 16);
+  return [(value >> 16) & 255, (value >> 8) & 255, value & 255];
+}
+
 export const THEME_STORAGE_KEY = "palee:theme-slug";
 
 export function themeBySlug(slug: string | null | undefined): AppTheme {
@@ -547,67 +385,83 @@ export function normalizeThemeSlug(slug: string | null | undefined): ThemeSlug {
   return THEME_SLUGS.includes(slug as ThemeSlug) ? (slug as ThemeSlug) : DEFAULT_THEME_SLUG;
 }
 
-export function cssVariablesForTheme(theme: AppTheme): Record<string, string> {
-  const { colors } = theme;
+/** `panelRaised` → `--panel-raised`. */
+export function tokenVariable(name: keyof ThemeTokens): string {
+  return `--${name.replace(/([a-z])([A-Z0-9])/g, "$1-$2").toLowerCase()}`;
+}
 
-  return {
-    "--background": colors.background,
-    "--foreground": colors.text,
-    "--surface": colors.panel,
-    "--accent": colors.primary,
-    "--accent-strong": colors.primaryStrong,
-    "--bg": colors.background,
-    "--panel": colors.panel,
-    "--panel-raised": colors.panelRaised,
-    "--panel-muted": colors.panelMuted,
-    "--card": colors.card,
-    "--border": colors.border,
-    "--border-strong": colors.borderStrong,
-    "--text": colors.text,
-    "--text-soft": colors.textSoft,
-    "--muted": colors.muted,
-    "--dim": colors.dim,
-    "--primary": colors.primary,
-    "--primary-strong": colors.primaryStrong,
-    "--primary-contrast": colors.primaryContrast,
-    "--success": colors.success,
-    "--warning": colors.warning,
-    "--danger": colors.danger,
-    "--info": colors.info,
-    "--scale-base": colors.scaleBase,
-    "--scale-scaled": colors.scaleScaled,
-    "--scale-rx": colors.scaleRx,
-    "--scale-advanced": colors.scaleAdvanced,
-    "--workout-crossfit": theme.workoutTypes.crossfit,
-    "--workout-strength": theme.workoutTypes.strength,
-    "--workout-gymnastics": theme.workoutTypes.gymnastics,
-    "--workout-aerobics": theme.workoutTypes.aerobics,
-    "--workout-flexibility": theme.workoutTypes.flexibility,
-    "--workout-recovery": theme.workoutTypes.recovery,
-  };
+/** `var(--panel-raised)`, for code that builds styles from token names. */
+export function tokenVar(name: keyof ThemeTokens): string {
+  return `var(${tokenVariable(name)})`;
+}
+
+export function cssVariablesForTheme(theme: AppTheme): Record<string, string> {
+  const variables: Record<string, string> = {};
+  for (const [name, value] of Object.entries(theme.tokens)) {
+    variables[tokenVariable(name as keyof ThemeTokens)] = value;
+  }
+  variables["--font-brand"] = THEME_FONTS.sans;
+  variables["--font-code"] = THEME_FONTS.mono;
+  return variables;
+}
+
+/**
+ * The stylesheet that defines every theme variable: the default theme on
+ * `:root`, each theme on `html[data-theme=…]`. The root layout inlines it,
+ * so the page paints in the right colours before any script runs.
+ */
+export function themeStylesheet(): string {
+  const block = (selector: string, theme: AppTheme) =>
+    `${selector}{color-scheme:${theme.scheme};${Object.entries(cssVariablesForTheme(theme))
+      .map(([name, value]) => `${name}:${value}`)
+      .join(";")}}`;
+  return [
+    block(":root", APP_THEMES[DEFAULT_THEME_SLUG]),
+    ...THEME_SLUGS.map((slug) => block(`html[data-theme="${slug}"]`, APP_THEMES[slug])),
+  ].join("\n");
 }
 
 export function applyTheme(slug: string | null | undefined) {
   if (typeof document === "undefined") return;
-
   const theme = themeBySlug(slug);
-  const root = document.documentElement;
-  root.dataset.theme = theme.slug;
-
-  Object.entries(cssVariablesForTheme(theme)).forEach(([name, value]) => {
-    root.style.setProperty(name, value);
+  document.documentElement.dataset.theme = theme.slug;
+  // The browser chrome and the phone's status bar follow the page.
+  document.querySelectorAll<HTMLMetaElement>('meta[name="theme-color"]').forEach((meta) => {
+    meta.content = theme.tokens.bg;
   });
 }
 
-export function workoutTypeColor(type: string, slug?: string | null): string {
-  if (!slug) {
-    const normalized = type.toLowerCase().replace(/[^a-z0-9]+/g, "-");
-    return `var(--workout-${normalized}, var(--primary))`;
-  }
-
-  const theme = themeBySlug(slug);
-  return theme.workoutTypes[type] ?? theme.colors.primary;
+/** The current value of a theme token on the page (for canvas and map code). */
+export function readToken(name: keyof ThemeTokens): string {
+  if (typeof document === "undefined") return APP_THEMES[DEFAULT_THEME_SLUG].tokens[name];
+  const value = getComputedStyle(document.documentElement).getPropertyValue(tokenVariable(name)).trim();
+  return value || themeBySlug(document.documentElement.dataset.theme).tokens[name];
 }
+
+const WORKOUT_TYPE_TOKENS: Record<string, keyof ThemeTokens> = {
+  crossfit: "workoutCrossfit",
+  strength: "workoutStrength",
+  gymnastics: "workoutGymnastics",
+  aerobics: "workoutAerobics",
+  flexibility: "workoutFlexibility",
+  recovery: "workoutRecovery",
+};
+
+export function workoutTypeColor(type: string): string {
+  const token = WORKOUT_TYPE_TOKENS[type.toLowerCase().replace(/[^a-z0-9]+/g, "-")];
+  return token ? tokenVar(token) : tokenVar("primary");
+}
+
+export const SERIES_TOKENS: readonly (keyof ThemeTokens)[] = [
+  "series1",
+  "series2",
+  "series3",
+  "series4",
+  "series5",
+  "series6",
+  "series7",
+  "series8",
+];
 
 export function scaleLevelTone(value: string | null | undefined): "base" | "scaled" | "rx" | "advanced" {
   const normalized = (value ?? "")

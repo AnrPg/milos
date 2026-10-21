@@ -372,7 +372,7 @@ function QrSheet({ code, boxName, onClose }: { code: string; boxName: string; on
   return (
     <Sheet title={t("qr.title")} eyebrow={boxName} onClose={onClose} labelId="referral-qr-title" footer={<SheetButton onClick={onClose}>{t("qr.close")}</SheetButton>}>
       <div className="flex flex-col items-center gap-3 py-2">
-        <div className="rounded-2xl bg-white p-4">
+        <div className="rounded-2xl bg-[var(--paper)] p-4">
           <QrCode value={url} size={260} label={t("qr.alt")} />
         </div>
         <p className="font-mono text-lg font-bold tracking-[0.2em]" style={{ color: "var(--text)" }}>{code}</p>

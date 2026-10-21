@@ -54,7 +54,7 @@ export function MobileNavMenu({
       {open ? (
         <nav
           aria-label={label}
-          className="absolute start-0 top-full mt-1 w-64 max-w-[calc(100vw-1rem)] rounded-2xl py-1.5 shadow-[0_20px_60px_rgba(0,0,0,0.7)]"
+          className="absolute start-0 top-full mt-1 w-64 max-w-[calc(100vw-1rem)] rounded-2xl py-1.5 shadow-[var(--shadow-lg)]"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
         >
           {links.map((link) => {

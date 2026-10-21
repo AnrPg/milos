@@ -1,12 +1,10 @@
 import { apiRequest } from "@/api/client";
-import type { ThemeSlug } from "@/lib/theme";
 
 export type GamificationSettings = {
   id?: string | null;
   weekly_workout_target: number;
   streak_shield_reset_day: number | null;
   leaderboard_enabled: boolean;
-  theme_slug: ThemeSlug;
   inserted_at?: string | null;
   updated_at?: string | null;
 };
@@ -67,7 +65,7 @@ export type WorkoutAuthoringSettings = {
 };
 
 export type GamificationUpdate = Partial<
-  Pick<GamificationSettings, "weekly_workout_target" | "streak_shield_reset_day" | "leaderboard_enabled" | "theme_slug">
+  Pick<GamificationSettings, "weekly_workout_target" | "streak_shield_reset_day" | "leaderboard_enabled">
 >;
 
 export type FinanceUpdate = Partial<Pick<FinanceSettings, "payment_reminder_interval_days" | "subscription_expiry_reminder_days" | "subscription_grace_days" | "document_mode" | "package_modules">>;

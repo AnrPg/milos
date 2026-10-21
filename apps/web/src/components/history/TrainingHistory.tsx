@@ -52,7 +52,7 @@ export function TrainingHistory({
       </button>
       {open ? (
         <div className="border-t px-4 pb-5 pt-4 sm:px-6" style={{ borderColor: "var(--border)" }}>
-          <div role="tablist" className="mb-4 inline-flex rounded-full p-1" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+          <div role="tablist" className="mb-4 inline-flex rounded-full p-1" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
             {(["workouts", "classes"] as const).map((option) => (
               <button
                 key={option}
@@ -149,7 +149,7 @@ function LogEntry({ entry, kind }: { entry: TrainingHistoryEntry; kind: Training
   const minutes = performance?.elapsed_ms ? Math.round(performance.elapsed_ms / 60000) : null;
 
   return (
-    <article className="rounded-2xl p-4" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+    <article className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
       <header className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
         <div className="min-w-0">
           <p className="text-xs" style={{ color: "var(--muted)" }}>

@@ -1,13 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
 
-import { fetchPublicTheme } from "@/api/theme";
 import { useSession } from "@/components/session-provider";
 import { applyTheme, DEFAULT_THEME_SLUG, normalizeThemeSlug, THEME_STORAGE_KEY } from "@/lib/theme";
 
-export const THEME_UPDATED_EVENT = "palee:theme-updated";
 export const PERSONAL_THEME_EVENT = "palee:personal-theme";
 const PERSONAL_THEME_STORAGE_KEY = "palee:personal-theme-slug";
 
@@ -28,23 +25,18 @@ function remember(key: string, slug: string | null) {
   }
 }
 
-/** Announces the member's own theme (Ρυθμίσεις › Θέμα); null follows the gym's. */
+/** Announces the member's own theme (Ρυθμίσεις › Θέμα); null is the default. */
 export function announcePersonalTheme(slug: string | null) {
   remember(PERSONAL_THEME_STORAGE_KEY, slug);
   window.dispatchEvent(new CustomEvent(PERSONAL_THEME_EVENT, { detail: { theme_slug: slug } }));
 }
 
 /**
- * The page theme: the member's own choice when they made one, else their
- * gym's (public theme). The effective slug is stored for the pre-paint
- * bootstrap script, so a reload does not flash the other theme.
+ * The page theme: one Palee palette for everyone, light by default or the
+ * member's own dark choice. The effective slug is stored for the pre-paint
+ * bootstrap script, so a reload does not flash the other variant.
  */
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const themeQuery = useQuery({
-    queryKey: ["public", "theme"],
-    queryFn: fetchPublicTheme,
-    staleTime: 60_000,
-  });
   const [personal, setPersonal] = useState<string | null>(null);
 
   useEffect(() => {
@@ -56,21 +48,12 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener(PERSONAL_THEME_EVENT, handlePersonal as EventListener);
   }, []);
 
-  const slug = personal ? normalizeThemeSlug(personal) : (themeQuery.data?.theme_slug ?? DEFAULT_THEME_SLUG);
+  const slug = personal ? normalizeThemeSlug(personal) : DEFAULT_THEME_SLUG;
 
   useEffect(() => {
     applyTheme(slug);
     remember(THEME_STORAGE_KEY, slug);
   }, [slug]);
-
-  useEffect(() => {
-    function handleThemeUpdated() {
-      void themeQuery.refetch();
-    }
-
-    window.addEventListener(THEME_UPDATED_EVENT, handleThemeUpdated);
-    return () => window.removeEventListener(THEME_UPDATED_EVENT, handleThemeUpdated);
-  }, [themeQuery]);
 
   return children;
 }

@@ -6,6 +6,7 @@ import { getTranslations } from "next-intl/server";
 
 import { BRAND_NAME } from "@/lib/public-box";
 import { loadReferralInvite } from "@/lib/referral-invite";
+import { SHARE_CARD_TOKENS as card } from "@/lib/theme";
 
 export const alt = BRAND_NAME;
 export const size = { width: 1200, height: 630 };
@@ -33,7 +34,6 @@ export default async function Image({ params }: { params: Promise<{ code: string
       : t("invite.titleNoName", { box: name })
     : "";
   const cover = invite?.box.cover?.url ?? null;
-  const brand = invite?.box.primary_color ?? "#D9743D";
   const initials = name
     .split(/\s+/)
     .slice(0, 2)
@@ -42,22 +42,22 @@ export default async function Image({ params }: { params: Promise<{ code: string
     .toUpperCase();
 
   return new ImageResponse(
-    <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: "#150F0D", color: "#FBF3EE" }}>
+    <div style={{ width: "100%", height: "100%", display: "flex", position: "relative", background: card.bg, color: card.text }}>
       {cover ? <img src={cover} alt="" width={1200} height={630} style={{ objectFit: "cover", width: "100%", height: "100%", opacity: 0.55 }} /> : null}
       <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", gap: 48, padding: 72 }}>
         {invite?.box.logo_url ? (
           <img src={invite.box.logo_url} alt="" width={200} height={200} style={{ borderRadius: 100, objectFit: "cover" }} />
         ) : (
-          <div style={{ width: 200, height: 200, borderRadius: 100, background: brand, color: "#0B0807", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80, fontWeight: 700 }}>
+          <div style={{ width: 200, height: 200, borderRadius: 100, background: card.primary, color: card.primaryContrast, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 80, fontWeight: 700 }}>
             {initials}
           </div>
         )}
         <div style={{ display: "flex", flexDirection: "column", gap: 18, flex: 1 }}>
           <div style={{ fontSize: 68, fontWeight: 700 }}>{name}</div>
-          {line ? <div style={{ fontSize: 36, color: "#E0CFC5" }}>{line}</div> : null}
+          {line ? <div style={{ fontSize: 36, color: card.textSoft }}>{line}</div> : null}
         </div>
       </div>
-      <div style={{ position: "absolute", right: 56, bottom: 44, fontSize: 28, fontWeight: 700, color: brand, letterSpacing: 4 }}>{BRAND_NAME.toUpperCase()}</div>
+      <div style={{ position: "absolute", right: 56, bottom: 44, fontSize: 28, fontWeight: 700, color: card.primary, letterSpacing: 4 }}>{BRAND_NAME.toUpperCase()}</div>
     </div>,
     {
       ...size,

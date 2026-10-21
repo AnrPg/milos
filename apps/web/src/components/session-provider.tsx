@@ -298,7 +298,7 @@ function SessionExpiredDialog({
   return (
     <div
       className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
-      style={{ background: "rgba(0,0,0,0.7)" }}
+      style={{ background: "var(--scrim)" }}
       role="presentation"
       onMouseDown={(event) => {
         if (event.currentTarget === event.target) onDismiss();
@@ -310,7 +310,7 @@ function SessionExpiredDialog({
         aria-modal="true"
         aria-labelledby="session-expired-title"
         tabIndex={-1}
-        className="w-full max-w-lg rounded-[28px] border p-6 shadow-[0_24px_80px_rgba(0,0,0,0.55)]"
+        className="w-full max-w-lg rounded-[28px] border p-6 shadow-[var(--shadow-md)]"
         style={{ background: "var(--panel)", borderColor: "var(--border-strong)", color: "var(--text)" }}
       >
             <div className="text-xs font-black uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>

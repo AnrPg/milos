@@ -112,7 +112,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
       </header>
 
       {post.hidden ? (
-        <p className="text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("hiddenNotice")}</p>
+        <p className="text-xs font-semibold" style={{ color: "var(--warning)" }}>{t("hiddenNotice")}</p>
       ) : null}
       {post.media_status === "processing" ? (
         <p role="status" className="flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--text-soft)" }}>
@@ -122,7 +122,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
           {tMedia("processingHint")}
         </p>
       ) : post.media_status === "failed" ? (
-        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger, #dc2626)" }}>{tMedia("failed")}</p>
+        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{tMedia("failed")}</p>
       ) : null}
       {media.length > 0 ? <PostMediaView media={media} author={author} onOpen={setViewing} /> : null}
       {post.body ? (
@@ -185,7 +185,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
         ) : null}
         {post.can_report ? <ReportButton label={t("report")} onClick={() => setReporting(true)} className="-me-2" /> : null}
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
       {showComments ? <Comments post={post} /> : null}
       {viewing !== null ? (
         <MediaViewer
@@ -392,7 +392,7 @@ function Comments({ post }: { post: CommunityPost }) {
             <p className="min-w-0 grow">
               <b>{comment.author.nickname ?? "?"}</b> <span className="whitespace-pre-wrap">{comment.body}</span>
               {comment.hidden ? (
-                <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("commentHidden")}</span>
+                <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning)" }}>{t("commentHidden")}</span>
               ) : null}
               {comment.can_moderate ? (
                 <button
@@ -447,7 +447,7 @@ function Comments({ post }: { post: CommunityPost }) {
           {t("send")}
         </button>
       </form>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
       {reporting ? (
         <ReportSheet target="comment" targetId={reporting} onClose={() => setReporting(null)} onReported={() => void refresh()} />
       ) : null}

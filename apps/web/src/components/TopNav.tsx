@@ -333,7 +333,7 @@ export function TopNav() {
 
             {menuOpen ? (
               <div
-                className="absolute end-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[0_16px_60px_rgba(0,0,0,0.6)]"
+                className="absolute end-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[var(--shadow-lg)]"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
               >
                 <div className="border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
@@ -359,7 +359,7 @@ export function TopNav() {
                   >
                     {t("notifications")}
                     {unreadNotifications > 0 ? (
-                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
                         {unreadNotifications > 99 ? "99+" : unreadNotifications}
                       </span>
                     ) : null}
@@ -445,7 +445,7 @@ export function TopNav() {
                         <span className="flex items-center justify-between gap-2">
                           {t("billing")}
                           {outstandingCents > 0 ? (
-                            <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                            <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
                               !
                             </span>
                           ) : null}

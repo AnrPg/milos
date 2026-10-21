@@ -158,7 +158,7 @@ export const ComposeMediaPicker = forwardRef<ComposeMediaPickerHandle, { media: 
                 ) : null}
               </div>
               {selected.upload.error ? (
-                <p className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>
+                <p className="text-sm" style={{ color: "var(--danger)" }}>
                   {t(["error", selected.upload.error].join("_"), { minutes })}
                 </p>
               ) : null}
@@ -214,7 +214,7 @@ export const ComposeMediaPicker = forwardRef<ComposeMediaPickerHandle, { media: 
       )}
 
       {media.refusal ? (
-        <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>
+        <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
           {t(["refusal", media.refusal].join("_"), { photos: limits.max_photos })}
         </p>
       ) : null}
@@ -323,17 +323,17 @@ function Tile({
           />
         )}
         {item.kind === "video" ? (
-          <span className="absolute bottom-1.5 start-1.5 rounded-full px-1.5 text-[10px] font-bold" style={{ background: "rgba(0,0,0,.6)", color: "#fff" }} aria-hidden="true">
+          <span className="absolute bottom-1.5 start-1.5 rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--media-control)", color: "var(--on-media)" }} aria-hidden="true">
             ▶
           </span>
         ) : null}
         {phase === "processing" ? (
-          <span className="absolute inset-x-0 bottom-0 px-1 py-0.5 text-center text-[10px] font-semibold" style={{ background: "rgba(0,0,0,.55)", color: "#fff" }} aria-hidden="true">
+          <span className="absolute inset-x-0 bottom-0 px-1 py-0.5 text-center text-[10px] font-semibold" style={{ background: "var(--media-control)", color: "var(--on-media)" }} aria-hidden="true">
             {t("status_processing")}
           </span>
         ) : null}
         {phase === "failed" || phase === "rejected" ? (
-          <span className="absolute inset-0 flex items-center justify-center" style={{ background: "rgba(0,0,0,.5)", color: "#fff" }} aria-hidden="true">
+          <span className="absolute inset-0 flex items-center justify-center" style={{ background: "var(--media-control)", color: "var(--on-media)" }} aria-hidden="true">
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M12 8v5M12 16.5v.5" />
               <circle cx="12" cy="12" r="9" />
@@ -349,7 +349,7 @@ function Tile({
           aria-valuemax={100}
           aria-valuenow={Math.round(progress * 100)}
           className="pointer-events-none absolute inset-x-2 bottom-2 h-1.5 overflow-hidden rounded-full"
-          style={{ background: "rgba(0,0,0,.45)" }}
+          style={{ background: "var(--media-control)" }}
         >
           <div className="h-full rounded-full transition-[width]" style={{ width: `${Math.max(4, progress * 100)}%`, background: "var(--primary)" }} />
         </div>

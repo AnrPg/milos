@@ -197,7 +197,7 @@ function PRHistoryTooltip({
             border: "1px solid var(--border)",
             borderRadius: "1rem",
             padding: "12px 16px",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>
