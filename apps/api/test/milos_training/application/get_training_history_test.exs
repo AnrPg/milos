@@ -1,11 +1,13 @@
 defmodule MilosTraining.Application.GetTrainingLogTest do
   use MilosTraining.DataCase, async: false
 
+  import Ecto.Query
   import MilosTraining.TestFixtures
 
   alias MilosTraining.Application.GetTrainingHistory
   alias MilosTraining.Execution.WorkoutExecution
   alias MilosTraining.{Organizations, Repo}
+  alias MilosTraining.Organizations.OrganizationMembership
   alias MilosTraining.Scheduling.{Booking, ClassAttendanceRecord, ScheduledClass}
 
   setup do
@@ -200,5 +202,54 @@ defmodule MilosTraining.Application.GetTrainingLogTest do
 
     assert {:error, :invalid_history_kind} =
              GetTrainingHistory.call(ctx.context, ctx.member.id, %{"kind" => "other"})
+  end
+
+  test "a gym stops reading a former member's workouts but keeps the bookings (ADR-162)", ctx do
+    slot =
+      Repo.insert!(%ScheduledClass{
+        organization_id: ctx.organization.id,
+        master_workout_id: ctx.workout.id,
+        class_type_id: ctx.class_type.id,
+        scheduled_at: DateTime.add(DateTime.utc_now(), -1, :day) |> DateTime.truncate(:second),
+        capacity: 10
+      })
+
+    booking =
+      Repo.insert!(%Booking{
+        organization_id: ctx.organization.id,
+        scheduled_class_id: slot.id,
+        user_id: ctx.member.id,
+        status: :approved
+      })
+
+    execution!(ctx, %{
+      source: :class_booking,
+      source_reference_id: booking.id,
+      section_scores: [%{"section_id" => hd(ctx.workout.sections).id, "value" => "4:12"}]
+    })
+
+    assert {:ok, %{total: 1}} =
+             GetTrainingHistory.call(ctx.context, ctx.member.id, %{"kind" => "workouts"})
+
+    Repo.update_all(
+      from(m in OrganizationMembership,
+        where: m.organization_id == ^ctx.organization.id and m.user_id == ^ctx.member.id
+      ),
+      set: [status: :revoked]
+    )
+
+    assert {:ok, %{total: 0, entries: [], next_offset: nil}} =
+             GetTrainingHistory.call(ctx.context, ctx.member.id, %{"kind" => "workouts"})
+
+    assert {:ok, %{entries: [%{performance: nil, workout: %{title: "Fran"}}]}} =
+             GetTrainingHistory.call(ctx.context, ctx.member.id, %{"kind" => "classes"})
+
+    # The history stays the member's own.
+    assert {:ok, %{total: 1}} =
+             GetTrainingHistory.call(
+               %{ctx.member_context | organization_id: ctx.organization.id},
+               ctx.member.id,
+               %{"kind" => "workouts"}
+             )
   end
 end

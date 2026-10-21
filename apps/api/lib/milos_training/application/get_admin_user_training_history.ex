@@ -1,12 +1,21 @@
 defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
-  @moduledoc false
+  @moduledoc """
+  Staff dossier training tab. Executions are the member's journal entries:
+  they are read only while the member is active here (ADR-162 §7); the
+  gym's own assignments stay visible.
+  """
 
-  alias MilosTraining.Application.{GetCoachingAthleteDrillDown, ListWorkoutExecutions}
+  alias MilosTraining.Application.{
+    GetCoachingAthleteDrillDown,
+    ListWorkoutExecutions,
+    StaffJournalAccess
+  }
+
   alias MilosTraining.Identity
 
   def call(context, user_id) do
     with %{} = user <- Identity.find_by_id(user_id) || {:error, :not_found},
-         {:ok, executions} <- ListWorkoutExecutions.call(context, user_id) do
+         {:ok, executions} <- executions(context, user_id) do
       history = Enum.map(executions, &execution_summary/1)
 
       {:ok,
@@ -23,6 +32,12 @@ defmodule MilosTraining.Application.GetAdminUserTrainingHistory do
          }
        }}
     end
+  end
+
+  defp executions(context, user_id) do
+    if StaffJournalAccess.readable?(context, user_id),
+      do: ListWorkoutExecutions.call(context, user_id),
+      else: {:ok, []}
   end
 
   # Assignments are tenant data: read them in the dossier's tenant (ADR-133).
