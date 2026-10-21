@@ -59,6 +59,8 @@ defmodule MilosTraining.Application.SetJournalVisibility do
   defp owned("note", id, user_id), do: Journal.get_note_for_user(id, user_id)
   defp owned("check_in", id, user_id), do: Wellbeing.get_check_in_for_user(id, user_id)
   defp owned("review", _id, _user_id), do: {:error, :visibility_not_allowed}
+  # ADR-158: a snapshot's visibility is set on the snapshot (Σώμα).
+  defp owned("body", _id, _user_id), do: {:error, :visibility_not_allowed}
   defp owned(_kind, _id, _user_id), do: {:error, :unknown_kind}
 
   defp found({:error, _reason} = error), do: error

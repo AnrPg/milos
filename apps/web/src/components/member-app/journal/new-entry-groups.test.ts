@@ -6,10 +6,15 @@ describe("newEntryGroups", () => {
   it("groups the entry kinds that exist today as the feature map does", () => {
     expect(newEntryGroups({ canRequestFormReview: false })).toEqual([
       { group: "training", kinds: ["workout", "pr"] },
+      { group: "body", kinds: ["measure"] },
       { group: "wellbeing", kinds: ["checkIn", "injury"] },
       { group: "coach", kinds: ["review"] },
       { group: "note", kinds: ["note"] },
     ]);
+  });
+
+  it("leaves Μέτρηση out when Σώμα is switched off", () => {
+    expect(newEntryGroups({ canRequestFormReview: false, body: false }).map((entry) => entry.group)).not.toContain("body");
   });
 
   it("adds technique videos to Coach when the package allows them", () => {

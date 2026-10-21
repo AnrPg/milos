@@ -531,6 +531,15 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-158: neutral wording, no numbers.
+  def build("body_measure_reminder", payload, localize) do
+    %{
+      title: localize.("Time for a new measurement", %{}),
+      body: localize.("A new snapshot helps you see your trend. It takes a minute.", %{}),
+      url: payload["url"] || "/journal"
+    }
+  end
+
   # ADR-155 (board 10, Q3).
   def build("check_in_visitor", payload, localize) do
     bindings = %{

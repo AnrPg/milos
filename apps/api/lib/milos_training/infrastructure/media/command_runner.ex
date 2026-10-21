@@ -18,7 +18,14 @@ defmodule MilosTraining.Infrastructure.Media.CommandRunner do
         args: args
       ])
 
-    os_pid = port |> Port.info(:os_pid) |> elem(1)
+    # A tool that exits at once can close its port before we ask, and then
+    # there is no pid left to kill.
+    os_pid =
+      case Port.info(port, :os_pid) do
+        {:os_pid, pid} -> pid
+        nil -> nil
+      end
+
     deadline = System.monotonic_time(:millisecond) + timeout_ms
     collect(port, os_pid, deadline, [])
   end

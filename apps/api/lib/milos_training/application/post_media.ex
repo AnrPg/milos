@@ -84,8 +84,10 @@ defmodule MilosTraining.Application.PostMedia do
     end
   end
 
-  @doc "The post an upload belongs to, as `refresh/1` takes it, or nil."
-  def ref_of(%{attached_type: type, attached_id: id} = media) when is_binary(type) do
+  @post_types ~w(community_post profile_post)
+
+  @doc "The post an upload belongs to, as `refresh/1` takes it, or nil (not in a post)."
+  def ref_of(%{attached_type: type, attached_id: id} = media) when type in @post_types do
     %{
       type: type,
       id: id,

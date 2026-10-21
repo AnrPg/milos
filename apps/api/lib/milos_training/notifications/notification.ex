@@ -71,7 +71,8 @@ defmodule MilosTraining.Notifications.Notification do
     :referral_reward,
     :referral_review,
     :around_new_matches,
-    :check_in_visitor
+    :check_in_visitor,
+    :body_measure_reminder
   ]
 
   schema "notifications" do

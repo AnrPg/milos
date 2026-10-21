@@ -45,7 +45,8 @@ config :milos_training, Oban,
        {"37 3 * * *", MilosTraining.Workers.SweepOrphanMediaJob, args: %{"dangling" => true}},
        {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
        {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
-       {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob}
+       {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob},
+       {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob}
      ]}
   ],
   queues: [
@@ -232,6 +233,7 @@ config :milos_training,
 
 config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRStore
 config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.EctoJournalStore
+config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
 
 config :milos_training,
        :push_subscription_store,

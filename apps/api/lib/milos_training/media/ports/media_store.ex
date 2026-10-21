@@ -37,6 +37,7 @@ defmodule MilosTraining.Media.Ports.MediaStore do
             }
   @callback delete(context(), scope(), [binary()]) :: {:ok, [media()]}
   @callback list_unattached(context(), scope(), DateTime.t()) :: [media()]
+  @callback list_ids_by_purpose(context(), scope(), purpose :: String.t()) :: [binary()]
   @doc "System path: people with unattached account media older than `before`."
   @callback account_orphan_owner_ids(DateTime.t()) :: [binary()]
   @doc "System path: `{user_id, media_id}` of uploads attached to a post that is gone."

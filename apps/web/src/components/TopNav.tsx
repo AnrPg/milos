@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
+import { BODY_SETTINGS_KEY, fetchBodySettings } from "@/api/body";
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
 import { fetchOrganizationMemberships } from "@/api/organizations";
@@ -141,7 +142,20 @@ export function TopNav() {
   const hrefFor = (href: string, scoped?: boolean) => (scoped ? adminHref(href, selectedOrganizationSlug) : href);
   const navLinks = navItems.map((item) => ({ id: item.id, href: hrefFor(item.href, item.scoped), label: t(item.labelKey) }));
   const activeNavId = activeItemId(pathname, navItems);
-  const sectionGroup = sectionGroupFor(pathname, { surface: role, staffItems, features });
+  // Ρυθμίσεις › Σώμα can switch the Σώμα and Ευεξία segments off (ADR-158 §7).
+  const onJournal = role !== "admin" && stripOrganizationPrefix(pathname).startsWith("/journal");
+  const bodySettingsQuery = useQuery({
+    queryKey: BODY_SETTINGS_KEY,
+    enabled: authenticated && onJournal,
+    queryFn: () => fetchBodySettings(tokens!.access_token),
+    staleTime: 5 * 60_000,
+  });
+  const sectionGroup = sectionGroupFor(pathname, {
+    surface: role,
+    staffItems,
+    features,
+    journalSections: bodySettingsQuery.data?.settings?.journal_sections ?? null,
+  });
 
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const brandLogoUrl = tenantBrandLogoUrl(memberships, selectedOrganizationSlug);

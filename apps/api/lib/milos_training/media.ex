@@ -3,7 +3,7 @@ defmodule MilosTraining.Media do
   Media bounded context (ADR-148, ADR-157): uploaded images and videos and
   their lifecycle (pending → [processing →] ready | rejected → attached →
   deleted). A gym owns box photos; a person owns body photos and the photos
-  and videos they post. Consumers (Organizations, Community, Wellbeing) keep
+  and videos they post. Consumers (Organizations, Community, Body) keep
   media ids and attach or release them through this API; unattached uploads
   are swept after a day.
   """
@@ -53,6 +53,7 @@ defmodule MilosTraining.Media do
   defdelegate usage(context, scope, since), to: MediaStore
   defdelegate delete(context, scope, ids), to: MediaStore
   defdelegate list_unattached(context, scope, before), to: MediaStore
+  defdelegate list_ids_by_purpose(context, scope, purpose), to: MediaStore
   defdelegate account_orphan_owner_ids(before), to: MediaStore
   defdelegate dangling_post_media(before, limit), to: MediaStore
   defdelegate stale_post_media(before, limit), to: MediaStore

@@ -207,6 +207,15 @@ defmodule MilosTraining.Infrastructure.Media.EctoMediaStore do
   end
 
   @impl true
+  def list_ids_by_purpose(context, scope, purpose) do
+    context
+    |> owned(scope)
+    |> where([m], m.purpose == ^purpose)
+    |> select([m], m.id)
+    |> Repo.all()
+  end
+
+  @impl true
   def account_orphan_owner_ids(before) do
     %{rows: rows} =
       Repo.query!("SELECT id FROM milos_account_media_orphan_owner_ids($1) AS id", [before])

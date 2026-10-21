@@ -559,6 +559,10 @@ defmodule MilosTrainingWeb.Router do
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
     get("/clients/:user_id/journal", JournalController, :client_journal)
+    # ADR-158: shared body snapshots (audited in the client's access log).
+    get("/clients/:user_id/body", ClientBodyController, :index)
+    get("/clients/:user_id/body/snapshots/:id", ClientBodyController, :show)
+    get("/clients/:user_id/body/series", ClientBodyController, :series)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -1156,6 +1160,25 @@ defmodule MilosTrainingWeb.Router do
     get("/me/trials/:id", TrialController, :show)
     post("/me/trials/:id/cancel", TrialController, :cancel)
     post("/me/trials/:id/follow-up", TrialController, :follow_up)
+    # ADR-158: Ημερολόγιο › Σώμα.
+    get("/me/body/snapshots", MyBodyController, :index)
+    post("/me/body/snapshots", MyBodyController, :create)
+    get("/me/body/snapshots/:id", MyBodyController, :show)
+    patch("/me/body/snapshots/:id", MyBodyController, :update)
+    delete("/me/body/snapshots/:id", MyBodyController, :delete)
+    post("/me/body/snapshots/:id/photos", MyBodyController, :add_photo)
+    delete("/me/body/snapshots/:id/photos/:photo_id", MyBodyController, :remove_photo)
+    get("/me/body/series", MyBodyController, :series)
+    get("/me/body/compare", MyBodyController, :compare)
+    get("/me/body/photos/latest", MyBodyController, :latest_photos)
+    delete("/me/body/photos", MyBodyController, :delete_photos)
+    get("/me/body/settings", MyBodyController, :settings)
+    put("/me/body/settings", MyBodyController, :update_settings)
+    get("/me/body/consents", MyBodyController, :consents)
+    put("/me/body/consents/:scope", MyBodyController, :grant_consent)
+    delete("/me/body/consents/:scope", MyBodyController, :withdraw_consent)
+    get("/me/body/access-log", MyBodyController, :access_log)
+    post("/me/body/share", MyBodyController, :share)
   end
 
   # ADR-157: photos and videos for posts.
@@ -1186,6 +1209,19 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     post("/:id/alt-text-suggestion", MyMediaController, :suggest_alt_text)
+  end
+
+  # ADR-158: body photo uploads share the media upload limits.
+  scope "/api/me/body/photos", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :media_upload_rate_limited
+    ])
+
+    post("/uploads", MyBodyController, :upload)
   end
 
   # ADR-155: the door scan (any box: the door says which) and connected devices.

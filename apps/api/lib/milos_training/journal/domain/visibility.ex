@@ -9,7 +9,7 @@ defmodule MilosTraining.Journal.Domain.Visibility do
   """
 
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
-  @kinds ~w(execution training_log pr injury review note check_in)
+  @kinds ~w(execution training_log pr injury review note check_in body)
   # What each kind may hold, and which of those the member picks by hand
   # (`posted` comes from attaching the entry to a post, ADR-138).
   @allowed %{
@@ -19,8 +19,13 @@ defmodule MilosTraining.Journal.Domain.Visibility do
     "injury" => ~w(coach_can_view coach_reply_requested posted),
     "review" => ~w(rated),
     "note" => ~w(private coach_can_view coach_reply_requested posted),
-    "check_in" => ~w(private coach_can_view coach_reply_requested posted)
+    "check_in" => ~w(private coach_can_view coach_reply_requested posted),
+    # ADR-158: a body snapshot keeps its own visibility (private,
+    # coach_numbers, coach_full), set on the snapshot; the feed shows it as
+    # `private` or `coach_can_view` and never moves it from here.
+    "body" => ~w(private coach_can_view)
   }
+  @self_managed ~w(body)
   @manual ~w(private coach_can_view coach_reply_requested)
 
   # Kinds whose default a member chooses, and the default without a choice:
@@ -40,6 +45,8 @@ defmodule MilosTraining.Journal.Domain.Visibility do
   def default_rungs, do: @default_rungs
 
   @doc "Rungs the member may move an entry of `kind` to by hand."
+  def choosable(kind) when kind in @self_managed, do: []
+
   def choosable(kind) when is_map_key(@allowed, kind),
     do: Enum.filter(@manual, &(&1 in Map.fetch!(@allowed, kind)))
 

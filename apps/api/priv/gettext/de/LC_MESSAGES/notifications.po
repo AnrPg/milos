@@ -453,3 +453,9 @@ msgstr "%{nickname} hat die Tür bei %{box} gescannt (%{when}) - noch kein Mitgl
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr "%{nickname} hat die Tür bei %{box} gescannt (%{when}) - noch kein Mitglied. Probetrainings sind offen."
+
+msgid "Time for a new measurement"
+msgstr "Zeit für eine neue Messung"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Ein neuer Schnappschuss zeigt dir deinen Trend. Es dauert nur eine Minute."

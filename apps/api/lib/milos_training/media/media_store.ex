@@ -54,6 +54,10 @@ defmodule MilosTraining.Media.MediaStore do
   def list_unattached(context, scope, before),
     do: scoped(context, :list_unattached, [scope, before])
 
+  @impl true
+  def list_ids_by_purpose(context, scope, purpose),
+    do: scoped(context, :list_ids_by_purpose, [scope, purpose])
+
   # Answered by narrow SECURITY DEFINER functions, outside any session.
   @impl true
   def account_orphan_owner_ids(before), do: adapter().account_orphan_owner_ids(before)

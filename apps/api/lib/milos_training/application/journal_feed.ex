@@ -9,10 +9,11 @@ defmodule MilosTraining.Application.JournalFeed do
   personal session, across gyms) and for a coach of one gym
   (`{:coach, organization_id}`, in the coach's tenant session), where each
   source applies the ladder: only entries on a rung that reaches the coach,
-  plus every injury (vision §4.5) and every review.
+  plus every injury (vision §4.5) and every review. Body snapshots
+  (ADR-158) appear only in the member's own feed.
   """
 
-  alias MilosTraining.Application.{JournalComments, ListWorkoutExecutions}
+  alias MilosTraining.Application.{BodySnapshots, JournalComments, ListWorkoutExecutions}
   alias MilosTraining.{Execution, Feedback, Journal, Pantheon, Wellbeing}
 
   @default_limit 30
@@ -72,6 +73,14 @@ defmodule MilosTraining.Application.JournalFeed do
   defp rows("check_in", user_id, bound, limit, scope),
     do: Wellbeing.list_check_in_items(user_id, bound, limit, scope)
 
+  # ADR-158: body snapshots are the member's alone. A coach reads shared ones
+  # through `ClientBody` (audited), never through the journal feed; a member
+  # who switched the Σώμα section off sees none here either.
+  defp rows("body", user_id, bound, limit, :owner),
+    do: BodySnapshots.feed_entries(%{user_id: user_id}, bound, limit)
+
+  defp rows("body", _user_id, _bound, _limit, _coach), do: []
+
   defp items(executions, "execution") do
     executions
     |> ListWorkoutExecutions.summarize()
@@ -110,6 +119,9 @@ defmodule MilosTraining.Application.JournalFeed do
         check_ins,
         &Journal.feed_item("check_in", &1, &1.recorded_at, tz: &1.recorded_tz)
       )
+
+  defp items(snapshots, "body"),
+    do: Enum.map(snapshots, &Journal.feed_item("body", &1, &1.taken_at, tz: &1.taken_tz))
 
   defp midnight(%Date{} = date), do: DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
 

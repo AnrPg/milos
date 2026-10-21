@@ -453,3 +453,9 @@ msgstr "%{nickname} סרק/ה את הקוד בדלת של %{box} (%{when}) - ע�
 
 msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
 msgstr "%{nickname} סרק/ה את הקוד בדלת של %{box} (%{when}) - עדיין לא חבר/ה. אימוני ניסיון פתוחים."
+
+msgid "Time for a new measurement"
+msgstr "הגיע הזמן למדידה חדשה"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "תמונת מצב חדשה עוזרת לך לראות את המגמה שלך. זה לוקח דקה."
