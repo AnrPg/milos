@@ -562,6 +562,7 @@ defmodule MilosTrainingWeb.Router do
     # ADR-158: shared body snapshots (audited in the client's access log).
     get("/clients/:user_id/body", ClientBodyController, :index)
     get("/clients/:user_id/body/snapshots/:id", ClientBodyController, :show)
+    get("/clients/:user_id/body/series", ClientBodyController, :series)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)

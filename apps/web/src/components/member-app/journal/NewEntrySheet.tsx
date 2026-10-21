@@ -8,6 +8,7 @@ import { useTranslations } from "next-intl";
 import { hasCapability } from "@/components/client/entitlement";
 import { JOURNAL_FEED_KEY } from "@/api/journal";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
+import { useBodySettings } from "@/components/body/use-body";
 import { NoteSheet } from "@/components/journal/NoteSheet";
 import { localDate } from "@/components/member-app/wellness/wellness-model";
 import { useWellness, wellnessWindow } from "@/components/member-app/wellness/WellnessPanel";
@@ -19,14 +20,15 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 /**
  * The kinds of entry a member can write today (brief §7.7), grouped as the
  * feature map groups them: Προπόνηση · Ευεξία · Coach · Σημείωση. Each kind
- * opens the flow that owns it. Νερό · Ύπνος · Γεύμα and Λιγούρα (ADR-159)
- * open Ευεξία; kinds still to come (Μέτρηση) join their group then, so the
- * sheet never shows a button that leads nowhere, and a group with no kinds
- * is not shown.
+ * opens the flow that owns it. Μέτρηση (Σώμα, ADR-158) is here unless Σώμα
+ * is switched off; Νερό · Ύπνος · Γεύμα and Λιγούρα (ADR-159) open Ευεξία.
+ * The sheet never shows a button that leads nowhere, and a group with no
+ * kinds is not shown.
  */
 export type NewEntryKind =
   | "workout"
   | "pr"
+  | "measure"
   | "wellness"
   | "craving"
   | "checkIn"
@@ -34,16 +36,19 @@ export type NewEntryKind =
   | "formReview"
   | "review"
   | "note";
-export type NewEntryGroup = "training" | "wellbeing" | "coach" | "note";
+export type NewEntryGroup = "training" | "body" | "wellbeing" | "coach" | "note";
 
 export function newEntryGroups(options: {
   canRequestFormReview: boolean;
+  /** False when Σώμα is switched off in Ρυθμίσεις › Σώμα. */
+  body?: boolean;
   /** False when the member turned water, sleep and meals all off in Ευεξία. */
   showWellness?: boolean;
 }): { group: NewEntryGroup; kinds: NewEntryKind[] }[] {
   const wellness: NewEntryKind[] = options.showWellness === false ? [] : ["wellness"];
   const groups: { group: NewEntryGroup; kinds: NewEntryKind[] }[] = [
     { group: "training", kinds: ["workout", "pr"] },
+    { group: "body", kinds: options.body === false ? [] : ["measure"] },
     { group: "wellbeing", kinds: [...wellness, "checkIn", "craving", "injury"] },
     { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
     { group: "note", kinds: ["note"] },
@@ -52,6 +57,7 @@ export function newEntryGroups(options: {
 }
 
 const ROUTES: Partial<Record<NewEntryKind, string>> = {
+  measure: "/journal/body/new",
   wellness: "/journal/wellbeing#today",
   craving: "/journal/wellbeing?craving=new",
   checkIn: "/journal/wellbeing#check-in",
@@ -90,8 +96,10 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const today = localDate(new Date());
   const range = wellnessWindow(today, 0);
   const hidden = useWellness(range.from, range.to).data?.preferences?.hidden_items ?? [];
+  const bodySettings = useBodySettings();
   const groups = newEntryGroups({
     canRequestFormReview: hasCapability(entitlement, "request_form_reviews"),
+    body: bodySettings.data?.settings?.journal_sections?.body !== false,
     showWellness: !(["water", "sleep", "meals"] as const).every((item) => hidden.includes(item)),
   });
 

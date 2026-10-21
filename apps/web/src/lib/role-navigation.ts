@@ -191,7 +191,13 @@ export type SectionGroup = { id: string; tabs: SectionTab[] };
 /** The tab strip of the page group `pathname` belongs to, if any. */
 export function sectionGroupFor(
   pathname: string,
-  context: { surface: "admin" | "member" | "athlete"; staffItems: NavItem[]; features: ClientFeature[] },
+  context: {
+    surface: "admin" | "member" | "athlete";
+    staffItems: NavItem[];
+    features: ClientFeature[];
+    /** Ρυθμίσεις › Σώμα (ADR-158 §7): a section switched off loses its segment. */
+    journalSections?: { body?: boolean; wellness?: boolean } | null;
+  },
 ): SectionGroup | null {
   const path = relativePath(pathname);
   const groups: SectionGroup[] = [];
@@ -224,8 +230,8 @@ export function sectionGroupFor(
         ...(feature("coaching") ? [{ id: "coaching", href: "/box/coach", labelKey: "coach", match: ["/box/coach"] }] : []),
       ],
     });
-    // Journal segments in the map's order: Ροή · Vault · (Σώμα, Phase 2) ·
-    // Ευεξία · Πρόοδος. Reviews are entries of Ροή; their form page lights Ροή.
+    // Journal segments in the map's order: Ροή · Vault · Σώμα · Ευεξία ·
+    // Πρόοδος. Σώμα and Ευεξία leave when switched off in Ρυθμίσεις › Σώμα. Reviews are entries of Ροή; their form page lights Ροή.
     // Πρόοδος is for everyone (its advanced statistics stay package-gated
     // inside the page) and owns the full Pantheon page.
     groups.push({
@@ -233,7 +239,12 @@ export function sectionGroupFor(
       tabs: [
         { id: "flow", href: "/journal", labelKey: "journalFlow", match: ["/journal"] },
         { id: "vault", href: "/journal/vault", labelKey: "vault", match: ["/journal/vault"] },
-        { id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] },
+        ...(context.journalSections?.body === false
+          ? []
+          : [{ id: "body", href: "/journal/body", labelKey: "body", match: ["/journal/body"] }]),
+        ...(context.journalSections?.wellness === false
+          ? []
+          : [{ id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] }]),
         { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon"] },
       ],
     });

@@ -24,6 +24,7 @@ import { setView } from "@/lib/view-mode";
  */
 export function MeHub() {
   const t = useTranslations("MemberApp");
+  const tBody = useTranslations("Body");
   const tNav = useTranslations("Navigation");
   const tSocial = useTranslations("Social");
   const tCheckIn = useTranslations("CheckIn");
@@ -80,6 +81,7 @@ export function MeHub() {
         <HubListRow href="/me/payments" label={t("mePayments")} detail={t("mePaymentsHint")} />
         <HubListRow href="/me/activity/chats" label={t("meChats")} />
         <HubListRow href="/me/settings" label={t("meSettings")} detail={t("meSettingsHint")} />
+        <HubListRow href="/me/settings/body" label={tBody("settingsTitle")} detail={tBody("settingsHubHint")} />
         <HubListRow onClick={openProductTour} label={t("meTour")} />
         <HubListRow onClick={openOnboardingChecklist} label={t("meChecklist")} />
         {extras.map((item) => (

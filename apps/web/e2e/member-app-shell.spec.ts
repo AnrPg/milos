@@ -357,8 +357,8 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("heading", { name: "Journal", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "New entry" }).click();
     const sheet = page.getByRole("dialog", { name: "New entry" });
-    await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Training", "Wellbeing", "Coach", "Note"]);
-    await expect(sheet.getByRole("button")).toContainText(["Workout", "PR", "Injury", "Technique video", "Review", "Cancel"]);
+    await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Training", "Body", "Wellbeing", "Coach", "Note"]);
+    await expect(sheet.getByRole("button")).toContainText(["Workout", "PR", "Measurement", "Injury", "Technique video", "Review", "Cancel"]);
     await page.screenshot({ path: "test-results/member-app/journal-new-entry.png" });
   });
 
@@ -393,7 +393,7 @@ test.describe("member app shell", () => {
     await expect(flow.getByText("Fran")).toBeVisible();
     await expect(flow.getByText("Park run")).toBeVisible();
     await expect(flow.getByText("Love the new journal")).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Wellbeing", "Progress"]);
+    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Body", "Wellbeing", "Progress"]);
     await expect(flow.getByRole("button", { name: /Share in Milos: Fran/ })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
 

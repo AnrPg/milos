@@ -242,6 +242,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     # ADR-158: health data; the use case also requires the coach role.
     {W.ClientBodyController, :index} => [:view_health],
     {W.ClientBodyController, :show} => [:view_health],
+    {W.ClientBodyController, :series} => [:view_health],
 
     # Private coach notes (ADR-101)
     {W.CoachNotesController, :index} => [:write_coach_notes, :read_coach_notes],

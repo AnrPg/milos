@@ -117,10 +117,23 @@ describe("sectionGroupFor", () => {
     const box = sectionGroupFor("/box/schedule", { surface: "member", staffItems: [], features: ["videos"] });
     expect(box?.tabs.map((tab) => tab.id)).toEqual(["boxToday", "myWorkouts", "classes", "videos"]);
     const journal = sectionGroupFor("/journal/pantheon", { surface: "athlete", staffItems: [], features: [] });
-    expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "wellbeing", "progress"]);
+    expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "body", "wellbeing", "progress"]);
     expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/pantheon");
     expect(sectionGroupFor("/box", { surface: "member", staffItems: [], features: ["videos"] })).toBeNull();
     const entitled = sectionGroupFor("/journal", { surface: "athlete", staffItems: [], features: ["progress", "coaching"] });
     expect(entitled?.tabs.map((tab) => tab.id)).toContain("progress");
+  });
+
+  it("drops Σώμα and Ευεξία when switched off in Ρυθμίσεις › Σώμα (ADR-158)", () => {
+    const off = sectionGroupFor("/journal/body", {
+      surface: "member",
+      staffItems: [],
+      features: [],
+      journalSections: { body: false, wellness: false },
+    });
+    expect(off?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "progress"]);
+    const on = sectionGroupFor("/journal/body/new", { surface: "member", staffItems: [], features: [], journalSections: { body: true } });
+    expect(on?.id).toBe("journal");
+    expect(activeItemId("/journal/body/new", on!.tabs)).toBe("body");
   });
 });
