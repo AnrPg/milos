@@ -273,7 +273,7 @@ defmodule MilosTraining.Application.ClubScope do
 
   defp visible?(%{kind: "pt_squad"}, _role, _user_id), do: true
 
-  # Invite-only channels (seasons ADR-167, squads ADR-168) are for participants and staff.
+  # Invite-only channels (e.g. a season, ADR-167) are for participants and staff.
   defp visible?(%{membership: "invite"} = channel, role, _user_id),
     do: channel.participant or role == "staff"
 
