@@ -33,6 +33,12 @@ defmodule MilosTraining.Community.Ports.SocialStore do
   @callback following_count(id()) :: non_neg_integer()
   @callback hidden_member_ids([id()]) :: [id()]
 
+  # Blocks (ADR-169 §5).
+  @callback insert_block(context(), map()) :: {:ok, map()} | {:error, term()}
+  @callback delete_block(context(), id(), id()) :: :ok
+  @callback list_blocks(context(), id()) :: [map()]
+  @callback blocked_user_ids(context()) :: [id()]
+
   # Profile posts.
   @callback create_profile_post(context(), map()) :: {:ok, map()} | {:error, term()}
   @callback get_profile_post(context(), id(), id() | nil) :: map() | nil
