@@ -16,8 +16,9 @@ defmodule MilosTraining.Body.Domain.SnapshotPolicy do
   @max_photos 4
   @max_notes 2_000
   @photo_statuses ~w(processing ready failed)
-  # `garmin`: a weight sent by a connected device (P2-M13).
-  @sources ~w(manual garmin)
+  # A weight sent by a connected device: Garmin (P2-M13), or the phone's
+  # Apple Health / Health Connect (ADR-172).
+  @sources ~w(manual garmin apple_health health_connect)
 
   def visibilities, do: @visibilities
   def poses, do: @poses

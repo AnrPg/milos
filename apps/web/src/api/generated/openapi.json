@@ -10309,7 +10309,9 @@
                 "description": "manual, or garmin when a connected device sent it",
                 "enum": [
                   "manual",
-                  "garmin"
+                  "garmin",
+                  "apple_health",
+                  "health_connect"
                 ],
                 "type": "string"
               },
@@ -10521,7 +10523,9 @@
                 "description": "manual, or garmin when a connected device sent it",
                 "enum": [
                   "manual",
-                  "garmin"
+                  "garmin",
+                  "apple_health",
+                  "health_connect"
                 ],
                 "type": "string"
               },
@@ -11445,7 +11449,9 @@
             "description": "manual, or garmin when a connected device sent it",
             "enum": [
               "manual",
-              "garmin"
+              "garmin",
+              "apple_health",
+              "health_connect"
             ],
             "type": "string"
           },
@@ -11773,7 +11779,9 @@
                   "description": "manual, or garmin when a connected device sent it",
                   "enum": [
                     "manual",
-                    "garmin"
+                    "garmin",
+                    "apple_health",
+                    "health_connect"
                   ],
                   "type": "string"
                 },
@@ -11996,7 +12004,9 @@
                 "description": "manual, or garmin when a connected device sent it",
                 "enum": [
                   "manual",
-                  "garmin"
+                  "garmin",
+                  "apple_health",
+                  "health_connect"
                 ],
                 "type": "string"
               },
@@ -27290,7 +27300,7 @@
           },
           "integrations": {
             "items": {
-              "description": "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection",
+              "description": "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection; Apple Health and Health Connect (ADR-172) carry sync_prefs, history_days and connection",
               "properties": {
                 "backfill_day_options": {
                   "items": {
@@ -27310,84 +27320,151 @@
                 },
                 "connection": {
                   "nullable": true,
-                  "properties": {
-                    "backfill_days": {
-                      "enum": [
-                        0,
-                        30,
-                        90
-                      ],
-                      "type": "integer"
-                    },
-                    "backfill_progress": {
-                      "description": "«Εισαγωγή… 40%» while the history import runs",
-                      "maximum": 100,
-                      "minimum": 0,
+                  "oneOf": [
+                    {
                       "nullable": true,
-                      "type": "integer"
-                    },
-                    "backfill_status": {
-                      "enum": [
-                        "none",
-                        "running",
-                        "done",
-                        "failed"
-                      ],
-                      "type": "string"
-                    },
-                    "connected_at": {
-                      "format": "date-time",
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "last_error": {
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "last_synced_at": {
-                      "format": "date-time",
-                      "nullable": true,
-                      "type": "string"
-                    },
-                    "needs_reconnect": {
-                      "type": "boolean"
-                    },
-                    "status": {
-                      "enum": [
-                        "active",
-                        "error"
-                      ],
-                      "type": "string"
-                    },
-                    "sync_prefs": {
-                      "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
                       "properties": {
-                        "activities": {
+                        "backfill_days": {
+                          "enum": [
+                            0,
+                            30,
+                            90
+                          ],
+                          "type": "integer"
+                        },
+                        "backfill_progress": {
+                          "description": "«Εισαγωγή… 40%» while the history import runs",
+                          "maximum": 100,
+                          "minimum": 0,
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "backfill_status": {
+                          "enum": [
+                            "none",
+                            "running",
+                            "done",
+                            "failed"
+                          ],
+                          "type": "string"
+                        },
+                        "connected_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_error": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_synced_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "needs_reconnect": {
                           "type": "boolean"
                         },
-                        "resting_hr": {
-                          "type": "boolean"
+                        "status": {
+                          "enum": [
+                            "active",
+                            "error"
+                          ],
+                          "type": "string"
                         },
-                        "sleep": {
-                          "type": "boolean"
-                        },
-                        "weight": {
-                          "type": "boolean"
+                        "sync_prefs": {
+                          "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
+                          "properties": {
+                            "activities": {
+                              "type": "boolean"
+                            },
+                            "resting_hr": {
+                              "type": "boolean"
+                            },
+                            "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "description": "Phones only (ADR-172)",
+                              "type": "boolean"
+                            },
+                            "weight": {
+                              "type": "boolean"
+                            }
+                          },
+                          "title": "DeviceSyncPrefs",
+                          "type": "object"
                         }
                       },
-                      "title": "DeviceSyncPrefs",
+                      "required": [
+                        "status",
+                        "sync_prefs",
+                        "backfill_days",
+                        "backfill_status",
+                        "needs_reconnect"
+                      ],
+                      "title": "GarminConnection",
+                      "type": "object"
+                    },
+                    {
+                      "nullable": true,
+                      "properties": {
+                        "connected_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "last_synced_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "read_from": {
+                          "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "sync_prefs": {
+                          "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                          "properties": {
+                            "activities": {
+                              "type": "boolean"
+                            },
+                            "resting_hr": {
+                              "type": "boolean"
+                            },
+                            "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "type": "boolean"
+                            },
+                            "weight": {
+                              "type": "boolean"
+                            }
+                          },
+                          "title": "PhoneHealthSyncPrefs",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "status",
+                        "sync_prefs"
+                      ],
+                      "title": "PhoneHealthConnection",
                       "type": "object"
                     }
-                  },
-                  "required": [
-                    "status",
-                    "sync_prefs",
-                    "backfill_days",
-                    "backfill_status",
-                    "needs_reconnect"
-                  ],
-                  "title": "GarminConnection",
-                  "type": "object"
+                  ]
+                },
+                "history_days": {
+                  "type": "integer"
                 },
                 "provider": {
                   "enum": [
@@ -27417,6 +27494,10 @@
                       "type": "boolean"
                     },
                     "sleep": {
+                      "type": "boolean"
+                    },
+                    "steps": {
+                      "description": "Phones only (ADR-172)",
                       "type": "boolean"
                     },
                     "weight": {
@@ -28298,7 +28379,7 @@
             "type": "string"
           },
           "value": {
-            "description": "Beats per minute for resting_hr",
+            "description": "Beats per minute for resting_hr, a count for steps",
             "type": "integer"
           }
         },
@@ -28326,7 +28407,7 @@
             "type": "string"
           },
           "value": {
-            "description": "Beats per minute for resting_hr",
+            "description": "Beats per minute for resting_hr, a count for steps",
             "type": "integer"
           }
         },
@@ -28366,7 +28447,7 @@
                 "type": "string"
               },
               "value": {
-                "description": "Beats per minute for resting_hr",
+                "description": "Beats per minute for resting_hr, a count for steps",
                 "type": "integer"
               }
             },
@@ -28380,7 +28461,8 @@
           },
           "metric": {
             "enum": [
-              "resting_hr"
+              "resting_hr",
+              "steps"
             ],
             "type": "string"
           },
@@ -28401,7 +28483,7 @@
                   "type": "string"
                 },
                 "value": {
-                  "description": "Beats per minute for resting_hr",
+                  "description": "Beats per minute for resting_hr, a count for steps",
                   "type": "integer"
                 }
               },
@@ -29261,6 +29343,276 @@
         "title": "DeviceActivityResponse",
         "type": "object"
       },
+      "DeviceDataExport": {
+        "description": "Everything the connected devices brought in, except nights and weigh-ins (in the Ευεξία and Σώμα exports)",
+        "properties": {
+          "activities": {
+            "items": {
+              "description": "A workout from a watch: its own journal entry, or waiting for confirmation (pending)",
+              "properties": {
+                "activity_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "avg_heart_rate": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "calories": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "candidates": {
+                  "items": {
+                    "properties": {
+                      "ends_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          "training_log",
+                          "execution",
+                          "class"
+                        ],
+                        "type": "string"
+                      },
+                      "organization_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "starts_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "title": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "starts_at",
+                      "ends_at"
+                    ],
+                    "title": "DeviceActivityCandidate",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "class_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "distance_meters": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "duration_seconds": {
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "journal_visibility": {
+                  "enum": [
+                    "private",
+                    "coach_can_view"
+                  ],
+                  "type": "string"
+                },
+                "max_heart_rate": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "provider": {
+                  "enum": [
+                    "garmin",
+                    "apple_health",
+                    "health_connect"
+                  ],
+                  "type": "string"
+                },
+                "sport": {
+                  "description": "Localized by the client; the raw type is `activity_type`",
+                  "enum": [
+                    "run",
+                    "ride",
+                    "swim",
+                    "walk",
+                    "hike",
+                    "strength",
+                    "cardio",
+                    "hiit",
+                    "yoga",
+                    "row",
+                    "ski",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "started_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "started_tz": {
+                  "type": "string"
+                },
+                "state": {
+                  "enum": [
+                    "own",
+                    "merged",
+                    "pending"
+                  ],
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "provider",
+                "state",
+                "sport",
+                "title",
+                "started_at",
+                "duration_seconds"
+              ],
+              "title": "DeviceActivity",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "connections": {
+            "items": {
+              "properties": {
+                "connected_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "last_synced_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "revoked_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "sync_prefs": {
+                  "additionalProperties": {
+                    "type": "boolean"
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "provider",
+                "status"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "daily_stats": {
+            "items": {
+              "properties": {
+                "on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "resting_heart_rate": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "source": {
+                  "type": "string"
+                },
+                "steps": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "on",
+                "source"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "exported_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "imports": {
+            "items": {
+              "properties": {
+                "kind": {
+                  "type": "string"
+                },
+                "provider": {
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "received_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "target_type": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "provider",
+                "kind",
+                "status",
+                "received_at"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "exported_at",
+          "connections",
+          "activities",
+          "daily_stats",
+          "imports"
+        ],
+        "title": "DeviceDataExport",
+        "type": "object"
+      },
       "DeviceImportConfirmRequest": {
         "description": "Either one of the activity's candidates, or keep it as its own entry",
         "properties": {
@@ -29562,7 +29914,15 @@
             "type": "integer"
           },
           "provider": {
+            "description": "The device whose news the card shows (Garmin first when connected)",
             "type": "string"
+          },
+          "providers": {
+            "description": "Every connected device",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "seen_at": {
             "format": "date-time",
@@ -29598,6 +29958,10 @@
             "type": "boolean"
           },
           "sleep": {
+            "type": "boolean"
+          },
+          "steps": {
+            "description": "Phones only (ADR-172)",
             "type": "boolean"
           },
           "weight": {
@@ -32490,6 +32854,10 @@
               "sleep": {
                 "type": "boolean"
               },
+              "steps": {
+                "description": "Phones only (ADR-172)",
+                "type": "boolean"
+              },
               "weight": {
                 "type": "boolean"
               }
@@ -32580,6 +32948,10 @@
                 "type": "boolean"
               },
               "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "description": "Phones only (ADR-172)",
                 "type": "boolean"
               },
               "weight": {
@@ -32681,6 +33053,10 @@
                   "sleep": {
                     "type": "boolean"
                   },
+                  "steps": {
+                    "description": "Phones only (ADR-172)",
+                    "type": "boolean"
+                  },
                   "weight": {
                     "type": "boolean"
                   }
@@ -32725,6 +33101,10 @@
                 "type": "boolean"
               },
               "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "description": "Phones only (ADR-172)",
                 "type": "boolean"
               },
               "weight": {
@@ -32828,6 +33208,10 @@
                       "sleep": {
                         "type": "boolean"
                       },
+                      "steps": {
+                        "description": "Phones only (ADR-172)",
+                        "type": "boolean"
+                      },
                       "weight": {
                         "type": "boolean"
                       }
@@ -32872,6 +33256,10 @@
                     "type": "boolean"
                   },
                   "sleep": {
+                    "type": "boolean"
+                  },
+                  "steps": {
+                    "description": "Phones only (ADR-172)",
                     "type": "boolean"
                   },
                   "weight": {
@@ -32967,6 +33355,10 @@
                 "type": "boolean"
               },
               "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "description": "Phones only (ADR-172)",
                 "type": "boolean"
               },
               "weight": {
@@ -41977,6 +42369,741 @@
           "id"
         ],
         "title": "PersonRef",
+        "type": "object"
+      },
+      "PhoneHealthActivity": {
+        "properties": {
+          "avg_hr": {
+            "nullable": true,
+            "type": "number"
+          },
+          "distance_m": {
+            "nullable": true,
+            "type": "number"
+          },
+          "end": {
+            "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+            "type": "string"
+          },
+          "id": {
+            "description": "The phone's id of the workout",
+            "type": "string"
+          },
+          "max_hr": {
+            "nullable": true,
+            "type": "number"
+          },
+          "source_app": {
+            "description": "The app that recorded it",
+            "nullable": true,
+            "type": "string"
+          },
+          "start": {
+            "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+            "type": "string"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "description": "The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …)",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "start",
+          "end"
+        ],
+        "title": "PhoneHealthActivity",
+        "type": "object"
+      },
+      "PhoneHealthConnectRequest": {
+        "properties": {
+          "health_data_consent": {
+            "description": "Grants the health-data consent in the same step when it is missing; needed when sleep, weight, resting heart rate or steps sync",
+            "type": "boolean"
+          },
+          "sync_prefs": {
+            "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+            "properties": {
+              "activities": {
+                "type": "boolean"
+              },
+              "resting_hr": {
+                "type": "boolean"
+              },
+              "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "type": "boolean"
+              },
+              "weight": {
+                "type": "boolean"
+              }
+            },
+            "title": "PhoneHealthSyncPrefs",
+            "type": "object"
+          }
+        },
+        "title": "PhoneHealthConnectRequest",
+        "type": "object"
+      },
+      "PhoneHealthConnection": {
+        "nullable": true,
+        "properties": {
+          "connected_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "last_synced_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "read_from": {
+            "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "active"
+            ],
+            "type": "string"
+          },
+          "sync_prefs": {
+            "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+            "properties": {
+              "activities": {
+                "type": "boolean"
+              },
+              "resting_hr": {
+                "type": "boolean"
+              },
+              "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "type": "boolean"
+              },
+              "weight": {
+                "type": "boolean"
+              }
+            },
+            "title": "PhoneHealthSyncPrefs",
+            "type": "object"
+          }
+        },
+        "required": [
+          "status",
+          "sync_prefs"
+        ],
+        "title": "PhoneHealthConnection",
+        "type": "object"
+      },
+      "PhoneHealthDaily": {
+        "properties": {
+          "date": {
+            "description": "The wearer's local day, YYYY-MM-DD",
+            "type": "string"
+          },
+          "resting_hr": {
+            "nullable": true,
+            "type": "number"
+          },
+          "steps": {
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "required": [
+          "date"
+        ],
+        "title": "PhoneHealthDaily",
+        "type": "object"
+      },
+      "PhoneHealthIngestRequest": {
+        "description": "What the app read from the phone; at most 500 records per list",
+        "properties": {
+          "activities": {
+            "items": {
+              "properties": {
+                "avg_hr": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "distance_m": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "end": {
+                  "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                  "type": "string"
+                },
+                "id": {
+                  "description": "The phone's id of the workout",
+                  "type": "string"
+                },
+                "max_hr": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "source_app": {
+                  "description": "The app that recorded it",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "start": {
+                  "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                  "type": "string"
+                },
+                "title": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "type": {
+                  "description": "The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …)",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "start",
+                "end"
+              ],
+              "title": "PhoneHealthActivity",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "dailies": {
+            "items": {
+              "properties": {
+                "date": {
+                  "description": "The wearer's local day, YYYY-MM-DD",
+                  "type": "string"
+                },
+                "resting_hr": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "steps": {
+                  "nullable": true,
+                  "type": "number"
+                }
+              },
+              "required": [
+                "date"
+              ],
+              "title": "PhoneHealthDaily",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sleeps": {
+            "items": {
+              "description": "The main sleep of one night (the app joins the phone's segments)",
+              "properties": {
+                "end": {
+                  "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "start": {
+                  "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "start",
+                "end"
+              ],
+              "title": "PhoneHealthSleep",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "weights": {
+            "items": {
+              "properties": {
+                "at": {
+                  "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "kg": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "at",
+                "kg"
+              ],
+              "title": "PhoneHealthWeight",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "title": "PhoneHealthIngestRequest",
+        "type": "object"
+      },
+      "PhoneHealthIngestResponse": {
+        "properties": {
+          "counts": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Records by outcome: imported, merged, duplicate, ignored, skipped, invalid, failed",
+            "type": "object"
+          },
+          "row": {
+            "description": "Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it",
+            "properties": {
+              "connection": {
+                "nullable": true,
+                "properties": {
+                  "connected_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "last_synced_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "read_from": {
+                    "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "active"
+                    ],
+                    "type": "string"
+                  },
+                  "sync_prefs": {
+                    "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                    "properties": {
+                      "activities": {
+                        "type": "boolean"
+                      },
+                      "resting_hr": {
+                        "type": "boolean"
+                      },
+                      "sleep": {
+                        "type": "boolean"
+                      },
+                      "steps": {
+                        "type": "boolean"
+                      },
+                      "weight": {
+                        "type": "boolean"
+                      }
+                    },
+                    "title": "PhoneHealthSyncPrefs",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "status",
+                  "sync_prefs"
+                ],
+                "title": "PhoneHealthConnection",
+                "type": "object"
+              },
+              "history_days": {
+                "description": "Days read back at the first sync",
+                "type": "integer"
+              },
+              "provider": {
+                "enum": [
+                  "apple_health",
+                  "health_connect"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "native_only",
+                  "connected"
+                ],
+                "type": "string"
+              },
+              "sync_prefs": {
+                "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                "properties": {
+                  "activities": {
+                    "type": "boolean"
+                  },
+                  "resting_hr": {
+                    "type": "boolean"
+                  },
+                  "sleep": {
+                    "type": "boolean"
+                  },
+                  "steps": {
+                    "type": "boolean"
+                  },
+                  "weight": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "PhoneHealthSyncPrefs",
+                "type": "object"
+              }
+            },
+            "required": [
+              "provider",
+              "status",
+              "sync_prefs"
+            ],
+            "title": "PhoneHealthRow",
+            "type": "object"
+          }
+        },
+        "required": [
+          "counts",
+          "row"
+        ],
+        "title": "PhoneHealthIngestResponse",
+        "type": "object"
+      },
+      "PhoneHealthRow": {
+        "description": "Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it",
+        "properties": {
+          "connection": {
+            "nullable": true,
+            "properties": {
+              "connected_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "last_synced_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "read_from": {
+                "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "active"
+                ],
+                "type": "string"
+              },
+              "sync_prefs": {
+                "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                "properties": {
+                  "activities": {
+                    "type": "boolean"
+                  },
+                  "resting_hr": {
+                    "type": "boolean"
+                  },
+                  "sleep": {
+                    "type": "boolean"
+                  },
+                  "steps": {
+                    "type": "boolean"
+                  },
+                  "weight": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "PhoneHealthSyncPrefs",
+                "type": "object"
+              }
+            },
+            "required": [
+              "status",
+              "sync_prefs"
+            ],
+            "title": "PhoneHealthConnection",
+            "type": "object"
+          },
+          "history_days": {
+            "description": "Days read back at the first sync",
+            "type": "integer"
+          },
+          "provider": {
+            "enum": [
+              "apple_health",
+              "health_connect"
+            ],
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "native_only",
+              "connected"
+            ],
+            "type": "string"
+          },
+          "sync_prefs": {
+            "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+            "properties": {
+              "activities": {
+                "type": "boolean"
+              },
+              "resting_hr": {
+                "type": "boolean"
+              },
+              "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "type": "boolean"
+              },
+              "weight": {
+                "type": "boolean"
+              }
+            },
+            "title": "PhoneHealthSyncPrefs",
+            "type": "object"
+          }
+        },
+        "required": [
+          "provider",
+          "status",
+          "sync_prefs"
+        ],
+        "title": "PhoneHealthRow",
+        "type": "object"
+      },
+      "PhoneHealthRowResponse": {
+        "properties": {
+          "row": {
+            "description": "Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it",
+            "properties": {
+              "connection": {
+                "nullable": true,
+                "properties": {
+                  "connected_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "last_synced_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "read_from": {
+                    "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "active"
+                    ],
+                    "type": "string"
+                  },
+                  "sync_prefs": {
+                    "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                    "properties": {
+                      "activities": {
+                        "type": "boolean"
+                      },
+                      "resting_hr": {
+                        "type": "boolean"
+                      },
+                      "sleep": {
+                        "type": "boolean"
+                      },
+                      "steps": {
+                        "type": "boolean"
+                      },
+                      "weight": {
+                        "type": "boolean"
+                      }
+                    },
+                    "title": "PhoneHealthSyncPrefs",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "status",
+                  "sync_prefs"
+                ],
+                "title": "PhoneHealthConnection",
+                "type": "object"
+              },
+              "history_days": {
+                "description": "Days read back at the first sync",
+                "type": "integer"
+              },
+              "provider": {
+                "enum": [
+                  "apple_health",
+                  "health_connect"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "native_only",
+                  "connected"
+                ],
+                "type": "string"
+              },
+              "sync_prefs": {
+                "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                "properties": {
+                  "activities": {
+                    "type": "boolean"
+                  },
+                  "resting_hr": {
+                    "type": "boolean"
+                  },
+                  "sleep": {
+                    "type": "boolean"
+                  },
+                  "steps": {
+                    "type": "boolean"
+                  },
+                  "weight": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "PhoneHealthSyncPrefs",
+                "type": "object"
+              }
+            },
+            "required": [
+              "provider",
+              "status",
+              "sync_prefs"
+            ],
+            "title": "PhoneHealthRow",
+            "type": "object"
+          }
+        },
+        "required": [
+          "row"
+        ],
+        "title": "PhoneHealthRowResponse",
+        "type": "object"
+      },
+      "PhoneHealthSleep": {
+        "description": "The main sleep of one night (the app joins the phone's segments)",
+        "properties": {
+          "end": {
+            "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "start": {
+            "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "start",
+          "end"
+        ],
+        "title": "PhoneHealthSleep",
+        "type": "object"
+      },
+      "PhoneHealthSyncPrefs": {
+        "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+        "properties": {
+          "activities": {
+            "type": "boolean"
+          },
+          "resting_hr": {
+            "type": "boolean"
+          },
+          "sleep": {
+            "type": "boolean"
+          },
+          "steps": {
+            "type": "boolean"
+          },
+          "weight": {
+            "type": "boolean"
+          }
+        },
+        "title": "PhoneHealthSyncPrefs",
+        "type": "object"
+      },
+      "PhoneHealthUpdateRequest": {
+        "properties": {
+          "health_data_consent": {
+            "type": "boolean"
+          },
+          "sync_prefs": {
+            "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+            "properties": {
+              "activities": {
+                "type": "boolean"
+              },
+              "resting_hr": {
+                "type": "boolean"
+              },
+              "sleep": {
+                "type": "boolean"
+              },
+              "steps": {
+                "type": "boolean"
+              },
+              "weight": {
+                "type": "boolean"
+              }
+            },
+            "title": "PhoneHealthSyncPrefs",
+            "type": "object"
+          }
+        },
+        "required": [
+          "sync_prefs"
+        ],
+        "title": "PhoneHealthUpdateRequest",
+        "type": "object"
+      },
+      "PhoneHealthWeight": {
+        "properties": {
+          "at": {
+            "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kg": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "at",
+          "kg"
+        ],
+        "title": "PhoneHealthWeight",
         "type": "object"
       },
       "PlatformPlan": {
@@ -69603,7 +70730,9 @@
                           "description": "manual, or garmin when a connected device sent it",
                           "enum": [
                             "manual",
-                            "garmin"
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
                           ],
                           "type": "string"
                         },
@@ -69815,7 +70944,9 @@
                           "description": "manual, or garmin when a connected device sent it",
                           "enum": [
                             "manual",
-                            "garmin"
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
                           ],
                           "type": "string"
                         },
@@ -71907,7 +73038,9 @@
                             "description": "manual, or garmin when a connected device sent it",
                             "enum": [
                               "manual",
-                              "garmin"
+                              "garmin",
+                              "apple_health",
+                              "health_connect"
                             ],
                             "type": "string"
                           },
@@ -72269,7 +73402,9 @@
                           "description": "manual, or garmin when a connected device sent it",
                           "enum": [
                             "manual",
-                            "garmin"
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
                           ],
                           "type": "string"
                         },
@@ -72561,7 +73696,9 @@
                           "description": "manual, or garmin when a connected device sent it",
                           "enum": [
                             "manual",
-                            "garmin"
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
                           ],
                           "type": "string"
                         },
@@ -72914,7 +74051,9 @@
                           "description": "manual, or garmin when a connected device sent it",
                           "enum": [
                             "manual",
-                            "garmin"
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
                           ],
                           "type": "string"
                         },
@@ -81499,7 +82638,7 @@
                     },
                     "integrations": {
                       "items": {
-                        "description": "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection",
+                        "description": "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection; Apple Health and Health Connect (ADR-172) carry sync_prefs, history_days and connection",
                         "properties": {
                           "backfill_day_options": {
                             "items": {
@@ -81519,84 +82658,151 @@
                           },
                           "connection": {
                             "nullable": true,
-                            "properties": {
-                              "backfill_days": {
-                                "enum": [
-                                  0,
-                                  30,
-                                  90
-                                ],
-                                "type": "integer"
-                              },
-                              "backfill_progress": {
-                                "description": "«Εισαγωγή… 40%» while the history import runs",
-                                "maximum": 100,
-                                "minimum": 0,
+                            "oneOf": [
+                              {
                                 "nullable": true,
-                                "type": "integer"
-                              },
-                              "backfill_status": {
-                                "enum": [
-                                  "none",
-                                  "running",
-                                  "done",
-                                  "failed"
-                                ],
-                                "type": "string"
-                              },
-                              "connected_at": {
-                                "format": "date-time",
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "last_error": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "last_synced_at": {
-                                "format": "date-time",
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "needs_reconnect": {
-                                "type": "boolean"
-                              },
-                              "status": {
-                                "enum": [
-                                  "active",
-                                  "error"
-                                ],
-                                "type": "string"
-                              },
-                              "sync_prefs": {
-                                "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
                                 "properties": {
-                                  "activities": {
+                                  "backfill_days": {
+                                    "enum": [
+                                      0,
+                                      30,
+                                      90
+                                    ],
+                                    "type": "integer"
+                                  },
+                                  "backfill_progress": {
+                                    "description": "«Εισαγωγή… 40%» while the history import runs",
+                                    "maximum": 100,
+                                    "minimum": 0,
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "backfill_status": {
+                                    "enum": [
+                                      "none",
+                                      "running",
+                                      "done",
+                                      "failed"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "connected_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_error": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_synced_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "needs_reconnect": {
                                     "type": "boolean"
                                   },
-                                  "resting_hr": {
-                                    "type": "boolean"
+                                  "status": {
+                                    "enum": [
+                                      "active",
+                                      "error"
+                                    ],
+                                    "type": "string"
                                   },
-                                  "sleep": {
-                                    "type": "boolean"
-                                  },
-                                  "weight": {
-                                    "type": "boolean"
+                                  "sync_prefs": {
+                                    "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
+                                    "properties": {
+                                      "activities": {
+                                        "type": "boolean"
+                                      },
+                                      "resting_hr": {
+                                        "type": "boolean"
+                                      },
+                                      "sleep": {
+                                        "type": "boolean"
+                                      },
+                                      "steps": {
+                                        "description": "Phones only (ADR-172)",
+                                        "type": "boolean"
+                                      },
+                                      "weight": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "title": "DeviceSyncPrefs",
+                                    "type": "object"
                                   }
                                 },
-                                "title": "DeviceSyncPrefs",
+                                "required": [
+                                  "status",
+                                  "sync_prefs",
+                                  "backfill_days",
+                                  "backfill_status",
+                                  "needs_reconnect"
+                                ],
+                                "title": "GarminConnection",
+                                "type": "object"
+                              },
+                              {
+                                "nullable": true,
+                                "properties": {
+                                  "connected_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_synced_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "read_from": {
+                                    "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "active"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sync_prefs": {
+                                    "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                                    "properties": {
+                                      "activities": {
+                                        "type": "boolean"
+                                      },
+                                      "resting_hr": {
+                                        "type": "boolean"
+                                      },
+                                      "sleep": {
+                                        "type": "boolean"
+                                      },
+                                      "steps": {
+                                        "type": "boolean"
+                                      },
+                                      "weight": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "title": "PhoneHealthSyncPrefs",
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "status",
+                                  "sync_prefs"
+                                ],
+                                "title": "PhoneHealthConnection",
                                 "type": "object"
                               }
-                            },
-                            "required": [
-                              "status",
-                              "sync_prefs",
-                              "backfill_days",
-                              "backfill_status",
-                              "needs_reconnect"
-                            ],
-                            "title": "GarminConnection",
-                            "type": "object"
+                            ]
+                          },
+                          "history_days": {
+                            "type": "integer"
                           },
                           "provider": {
                             "enum": [
@@ -81626,6 +82832,10 @@
                                 "type": "boolean"
                               },
                               "sleep": {
+                                "type": "boolean"
+                              },
+                              "steps": {
+                                "description": "Phones only (ADR-172)",
                                 "type": "boolean"
                               },
                               "weight": {
@@ -81761,7 +82971,8 @@
             "schema": {
               "default": "resting_hr",
               "enum": [
-                "resting_hr"
+                "resting_hr",
+                "steps"
               ],
               "type": "string"
             }
@@ -81813,7 +83024,7 @@
                           "type": "string"
                         },
                         "value": {
-                          "description": "Beats per minute for resting_hr",
+                          "description": "Beats per minute for resting_hr, a count for steps",
                           "type": "integer"
                         }
                       },
@@ -81827,7 +83038,8 @@
                     },
                     "metric": {
                       "enum": [
-                        "resting_hr"
+                        "resting_hr",
+                        "steps"
                       ],
                       "type": "string"
                     },
@@ -81848,7 +83060,7 @@
                             "type": "string"
                           },
                           "value": {
-                            "description": "Beats per minute for resting_hr",
+                            "description": "Beats per minute for resting_hr, a count for steps",
                             "type": "integer"
                           }
                         },
@@ -82193,7 +83405,7 @@
                     },
                     "integrations": {
                       "items": {
-                        "description": "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection",
+                        "description": "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection; Apple Health and Health Connect (ADR-172) carry sync_prefs, history_days and connection",
                         "properties": {
                           "backfill_day_options": {
                             "items": {
@@ -82213,84 +83425,151 @@
                           },
                           "connection": {
                             "nullable": true,
-                            "properties": {
-                              "backfill_days": {
-                                "enum": [
-                                  0,
-                                  30,
-                                  90
-                                ],
-                                "type": "integer"
-                              },
-                              "backfill_progress": {
-                                "description": "«Εισαγωγή… 40%» while the history import runs",
-                                "maximum": 100,
-                                "minimum": 0,
+                            "oneOf": [
+                              {
                                 "nullable": true,
-                                "type": "integer"
-                              },
-                              "backfill_status": {
-                                "enum": [
-                                  "none",
-                                  "running",
-                                  "done",
-                                  "failed"
-                                ],
-                                "type": "string"
-                              },
-                              "connected_at": {
-                                "format": "date-time",
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "last_error": {
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "last_synced_at": {
-                                "format": "date-time",
-                                "nullable": true,
-                                "type": "string"
-                              },
-                              "needs_reconnect": {
-                                "type": "boolean"
-                              },
-                              "status": {
-                                "enum": [
-                                  "active",
-                                  "error"
-                                ],
-                                "type": "string"
-                              },
-                              "sync_prefs": {
-                                "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
                                 "properties": {
-                                  "activities": {
+                                  "backfill_days": {
+                                    "enum": [
+                                      0,
+                                      30,
+                                      90
+                                    ],
+                                    "type": "integer"
+                                  },
+                                  "backfill_progress": {
+                                    "description": "«Εισαγωγή… 40%» while the history import runs",
+                                    "maximum": 100,
+                                    "minimum": 0,
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "backfill_status": {
+                                    "enum": [
+                                      "none",
+                                      "running",
+                                      "done",
+                                      "failed"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "connected_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_error": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_synced_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "needs_reconnect": {
                                     "type": "boolean"
                                   },
-                                  "resting_hr": {
-                                    "type": "boolean"
+                                  "status": {
+                                    "enum": [
+                                      "active",
+                                      "error"
+                                    ],
+                                    "type": "string"
                                   },
-                                  "sleep": {
-                                    "type": "boolean"
-                                  },
-                                  "weight": {
-                                    "type": "boolean"
+                                  "sync_prefs": {
+                                    "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
+                                    "properties": {
+                                      "activities": {
+                                        "type": "boolean"
+                                      },
+                                      "resting_hr": {
+                                        "type": "boolean"
+                                      },
+                                      "sleep": {
+                                        "type": "boolean"
+                                      },
+                                      "steps": {
+                                        "description": "Phones only (ADR-172)",
+                                        "type": "boolean"
+                                      },
+                                      "weight": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "title": "DeviceSyncPrefs",
+                                    "type": "object"
                                   }
                                 },
-                                "title": "DeviceSyncPrefs",
+                                "required": [
+                                  "status",
+                                  "sync_prefs",
+                                  "backfill_days",
+                                  "backfill_status",
+                                  "needs_reconnect"
+                                ],
+                                "title": "GarminConnection",
+                                "type": "object"
+                              },
+                              {
+                                "nullable": true,
+                                "properties": {
+                                  "connected_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "last_synced_at": {
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "read_from": {
+                                    "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                                    "format": "date-time",
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "active"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "sync_prefs": {
+                                    "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                                    "properties": {
+                                      "activities": {
+                                        "type": "boolean"
+                                      },
+                                      "resting_hr": {
+                                        "type": "boolean"
+                                      },
+                                      "sleep": {
+                                        "type": "boolean"
+                                      },
+                                      "steps": {
+                                        "type": "boolean"
+                                      },
+                                      "weight": {
+                                        "type": "boolean"
+                                      }
+                                    },
+                                    "title": "PhoneHealthSyncPrefs",
+                                    "type": "object"
+                                  }
+                                },
+                                "required": [
+                                  "status",
+                                  "sync_prefs"
+                                ],
+                                "title": "PhoneHealthConnection",
                                 "type": "object"
                               }
-                            },
-                            "required": [
-                              "status",
-                              "sync_prefs",
-                              "backfill_days",
-                              "backfill_status",
-                              "needs_reconnect"
-                            ],
-                            "title": "GarminConnection",
-                            "type": "object"
+                            ]
+                          },
+                          "history_days": {
+                            "type": "integer"
                           },
                           "provider": {
                             "enum": [
@@ -82320,6 +83599,10 @@
                                 "type": "boolean"
                               },
                               "sleep": {
+                                "type": "boolean"
+                              },
+                              "steps": {
+                                "description": "Phones only (ADR-172)",
                                 "type": "boolean"
                               },
                               "weight": {
@@ -82443,6 +83726,301 @@
         ]
       }
     },
+    "/api/me/devices/export": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PhoneHealthController.export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Everything the connected devices brought in, except nights and weigh-ins (in the Ευεξία and Σώμα exports)",
+                  "properties": {
+                    "activities": {
+                      "items": {
+                        "description": "A workout from a watch: its own journal entry, or waiting for confirmation (pending)",
+                        "properties": {
+                          "activity_type": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "avg_heart_rate": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "calories": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "candidates": {
+                            "items": {
+                              "properties": {
+                                "ends_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "training_log",
+                                    "execution",
+                                    "class"
+                                  ],
+                                  "type": "string"
+                                },
+                                "organization_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "starts_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "id",
+                                "starts_at",
+                                "ends_at"
+                              ],
+                              "title": "DeviceActivityCandidate",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "class_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "distance_meters": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "duration_seconds": {
+                            "type": "integer"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "journal_visibility": {
+                            "enum": [
+                              "private",
+                              "coach_can_view"
+                            ],
+                            "type": "string"
+                          },
+                          "max_heart_rate": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "provider": {
+                            "enum": [
+                              "garmin",
+                              "apple_health",
+                              "health_connect"
+                            ],
+                            "type": "string"
+                          },
+                          "sport": {
+                            "description": "Localized by the client; the raw type is `activity_type`",
+                            "enum": [
+                              "run",
+                              "ride",
+                              "swim",
+                              "walk",
+                              "hike",
+                              "strength",
+                              "cardio",
+                              "hiit",
+                              "yoga",
+                              "row",
+                              "ski",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "started_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "started_tz": {
+                            "type": "string"
+                          },
+                          "state": {
+                            "enum": [
+                              "own",
+                              "merged",
+                              "pending"
+                            ],
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "provider",
+                          "state",
+                          "sport",
+                          "title",
+                          "started_at",
+                          "duration_seconds"
+                        ],
+                        "title": "DeviceActivity",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "connections": {
+                      "items": {
+                        "properties": {
+                          "connected_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "last_synced_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "revoked_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "sync_prefs": {
+                            "additionalProperties": {
+                              "type": "boolean"
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "provider",
+                          "status"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "daily_stats": {
+                      "items": {
+                        "properties": {
+                          "on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "resting_heart_rate": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "source": {
+                            "type": "string"
+                          },
+                          "steps": {
+                            "nullable": true,
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "on",
+                          "source"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "exported_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "imports": {
+                      "items": {
+                        "properties": {
+                          "kind": {
+                            "type": "string"
+                          },
+                          "provider": {
+                            "type": "string"
+                          },
+                          "reason": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "received_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "type": "string"
+                          },
+                          "target_type": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "provider",
+                          "kind",
+                          "status",
+                          "received_at"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "exported_at",
+                    "connections",
+                    "activities",
+                    "daily_stats",
+                    "imports"
+                  ],
+                  "title": "DeviceDataExport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Device data"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Everything connected devices brought in, as JSON (workouts, daily stats, import log)",
+        "tags": [
+          "Connected devices"
+        ]
+      }
+    },
     "/api/me/devices/garmin": {
       "delete": {
         "callbacks": {},
@@ -82550,6 +84128,10 @@
                       "sleep": {
                         "type": "boolean"
                       },
+                      "steps": {
+                        "description": "Phones only (ADR-172)",
+                        "type": "boolean"
+                      },
                       "weight": {
                         "type": "boolean"
                       }
@@ -82655,6 +84237,10 @@
                                 "sleep": {
                                   "type": "boolean"
                                 },
+                                "steps": {
+                                  "description": "Phones only (ADR-172)",
+                                  "type": "boolean"
+                                },
                                 "weight": {
                                   "type": "boolean"
                                 }
@@ -82699,6 +84285,10 @@
                               "type": "boolean"
                             },
                             "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "description": "Phones only (ADR-172)",
                               "type": "boolean"
                             },
                             "weight": {
@@ -82797,6 +84387,10 @@
                         "type": "boolean"
                       },
                       "sleep": {
+                        "type": "boolean"
+                      },
+                      "steps": {
+                        "description": "Phones only (ADR-172)",
                         "type": "boolean"
                       },
                       "weight": {
@@ -83187,6 +84781,10 @@
                                 "sleep": {
                                   "type": "boolean"
                                 },
+                                "steps": {
+                                  "description": "Phones only (ADR-172)",
+                                  "type": "boolean"
+                                },
                                 "weight": {
                                   "type": "boolean"
                                 }
@@ -83231,6 +84829,10 @@
                               "type": "boolean"
                             },
                             "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "description": "Phones only (ADR-172)",
                               "type": "boolean"
                             },
                             "weight": {
@@ -83285,6 +84887,843 @@
         ]
       }
     },
+    "/api/me/devices/phone/{provider}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PhoneHealthController.disconnect",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "enum": [
+                "apple_health",
+                "health_connect"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "delete_data",
+            "required": false,
+            "schema": {
+              "default": false,
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "deleted": {
+                      "description": "What was deleted, when delete_data=true",
+                      "nullable": true,
+                      "properties": {
+                        "activities": {
+                          "type": "integer"
+                        },
+                        "daily_stats": {
+                          "type": "integer"
+                        },
+                        "imports": {
+                          "type": "integer"
+                        },
+                        "sleep": {
+                          "type": "integer"
+                        },
+                        "weight": {
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "status": {
+                      "enum": [
+                        "revoked"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "title": "GarminDisconnectResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Disconnected"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Never connected"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Disconnect the phone's health data, keeping or deleting what it brought in",
+        "tags": [
+          "Connected devices"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PhoneHealthController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "enum": [
+                "apple_health",
+                "health_connect"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "health_data_consent": {
+                    "type": "boolean"
+                  },
+                  "sync_prefs": {
+                    "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                    "properties": {
+                      "activities": {
+                        "type": "boolean"
+                      },
+                      "resting_hr": {
+                        "type": "boolean"
+                      },
+                      "sleep": {
+                        "type": "boolean"
+                      },
+                      "steps": {
+                        "type": "boolean"
+                      },
+                      "weight": {
+                        "type": "boolean"
+                      }
+                    },
+                    "title": "PhoneHealthSyncPrefs",
+                    "type": "object"
+                  }
+                },
+                "required": [
+                  "sync_prefs"
+                ],
+                "title": "PhoneHealthUpdateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "row": {
+                      "description": "Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it",
+                      "properties": {
+                        "connection": {
+                          "nullable": true,
+                          "properties": {
+                            "connected_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_synced_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "read_from": {
+                              "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "active"
+                              ],
+                              "type": "string"
+                            },
+                            "sync_prefs": {
+                              "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                              "properties": {
+                                "activities": {
+                                  "type": "boolean"
+                                },
+                                "resting_hr": {
+                                  "type": "boolean"
+                                },
+                                "sleep": {
+                                  "type": "boolean"
+                                },
+                                "steps": {
+                                  "type": "boolean"
+                                },
+                                "weight": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "title": "PhoneHealthSyncPrefs",
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "sync_prefs"
+                          ],
+                          "title": "PhoneHealthConnection",
+                          "type": "object"
+                        },
+                        "history_days": {
+                          "description": "Days read back at the first sync",
+                          "type": "integer"
+                        },
+                        "provider": {
+                          "enum": [
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "native_only",
+                            "connected"
+                          ],
+                          "type": "string"
+                        },
+                        "sync_prefs": {
+                          "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                          "properties": {
+                            "activities": {
+                              "type": "boolean"
+                            },
+                            "resting_hr": {
+                              "type": "boolean"
+                            },
+                            "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "type": "boolean"
+                            },
+                            "weight": {
+                              "type": "boolean"
+                            }
+                          },
+                          "title": "PhoneHealthSyncPrefs",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "provider",
+                        "status",
+                        "sync_prefs"
+                      ],
+                      "title": "PhoneHealthRow",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "row"
+                  ],
+                  "title": "PhoneHealthRowResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The phone's row"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health-data consent needed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not connected or invalid"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change what the phone brings in",
+        "tags": [
+          "Connected devices"
+        ]
+      }
+    },
+    "/api/me/devices/phone/{provider}/connect": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PhoneHealthController.connect",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "enum": [
+                "apple_health",
+                "health_connect"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "health_data_consent": {
+                    "description": "Grants the health-data consent in the same step when it is missing; needed when sleep, weight, resting heart rate or steps sync",
+                    "type": "boolean"
+                  },
+                  "sync_prefs": {
+                    "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                    "properties": {
+                      "activities": {
+                        "type": "boolean"
+                      },
+                      "resting_hr": {
+                        "type": "boolean"
+                      },
+                      "sleep": {
+                        "type": "boolean"
+                      },
+                      "steps": {
+                        "type": "boolean"
+                      },
+                      "weight": {
+                        "type": "boolean"
+                      }
+                    },
+                    "title": "PhoneHealthSyncPrefs",
+                    "type": "object"
+                  }
+                },
+                "title": "PhoneHealthConnectRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "row": {
+                      "description": "Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it",
+                      "properties": {
+                        "connection": {
+                          "nullable": true,
+                          "properties": {
+                            "connected_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_synced_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "read_from": {
+                              "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "active"
+                              ],
+                              "type": "string"
+                            },
+                            "sync_prefs": {
+                              "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                              "properties": {
+                                "activities": {
+                                  "type": "boolean"
+                                },
+                                "resting_hr": {
+                                  "type": "boolean"
+                                },
+                                "sleep": {
+                                  "type": "boolean"
+                                },
+                                "steps": {
+                                  "type": "boolean"
+                                },
+                                "weight": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "title": "PhoneHealthSyncPrefs",
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "sync_prefs"
+                          ],
+                          "title": "PhoneHealthConnection",
+                          "type": "object"
+                        },
+                        "history_days": {
+                          "description": "Days read back at the first sync",
+                          "type": "integer"
+                        },
+                        "provider": {
+                          "enum": [
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "native_only",
+                            "connected"
+                          ],
+                          "type": "string"
+                        },
+                        "sync_prefs": {
+                          "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                          "properties": {
+                            "activities": {
+                              "type": "boolean"
+                            },
+                            "resting_hr": {
+                              "type": "boolean"
+                            },
+                            "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "type": "boolean"
+                            },
+                            "weight": {
+                              "type": "boolean"
+                            }
+                          },
+                          "title": "PhoneHealthSyncPrefs",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "provider",
+                        "status",
+                        "sync_prefs"
+                      ],
+                      "title": "PhoneHealthRow",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "row"
+                  ],
+                  "title": "PhoneHealthRowResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The phone's row"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health-data consent needed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid choices"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Connect Apple Health or Health Connect after the phone granted read access",
+        "tags": [
+          "Connected devices"
+        ]
+      }
+    },
+    "/api/me/devices/phone/{provider}/ingest": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PhoneHealthController.ingest",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "provider",
+            "required": true,
+            "schema": {
+              "enum": [
+                "apple_health",
+                "health_connect"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "What the app read from the phone; at most 500 records per list",
+                "properties": {
+                  "activities": {
+                    "items": {
+                      "properties": {
+                        "avg_hr": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "distance_m": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "end": {
+                          "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                          "type": "string"
+                        },
+                        "id": {
+                          "description": "The phone's id of the workout",
+                          "type": "string"
+                        },
+                        "max_hr": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "source_app": {
+                          "description": "The app that recorded it",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "start": {
+                          "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                          "type": "string"
+                        },
+                        "title": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "type": {
+                          "description": "The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …)",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "start",
+                        "end"
+                      ],
+                      "title": "PhoneHealthActivity",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "dailies": {
+                    "items": {
+                      "properties": {
+                        "date": {
+                          "description": "The wearer's local day, YYYY-MM-DD",
+                          "type": "string"
+                        },
+                        "resting_hr": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "steps": {
+                          "nullable": true,
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "date"
+                      ],
+                      "title": "PhoneHealthDaily",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "sleeps": {
+                    "items": {
+                      "description": "The main sleep of one night (the app joins the phone's segments)",
+                      "properties": {
+                        "end": {
+                          "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "start": {
+                          "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "start",
+                        "end"
+                      ],
+                      "title": "PhoneHealthSleep",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "weights": {
+                    "items": {
+                      "properties": {
+                        "at": {
+                          "description": "ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00",
+                          "type": "string"
+                        },
+                        "id": {
+                          "type": "string"
+                        },
+                        "kg": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "at",
+                        "kg"
+                      ],
+                      "title": "PhoneHealthWeight",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  }
+                },
+                "title": "PhoneHealthIngestRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "counts": {
+                      "additionalProperties": {
+                        "type": "integer"
+                      },
+                      "description": "Records by outcome: imported, merged, duplicate, ignored, skipped, invalid, failed",
+                      "type": "object"
+                    },
+                    "row": {
+                      "description": "Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it",
+                      "properties": {
+                        "connection": {
+                          "nullable": true,
+                          "properties": {
+                            "connected_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "last_synced_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "read_from": {
+                              "description": "Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync",
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "active"
+                              ],
+                              "type": "string"
+                            },
+                            "sync_prefs": {
+                              "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                              "properties": {
+                                "activities": {
+                                  "type": "boolean"
+                                },
+                                "resting_hr": {
+                                  "type": "boolean"
+                                },
+                                "sleep": {
+                                  "type": "boolean"
+                                },
+                                "steps": {
+                                  "type": "boolean"
+                                },
+                                "weight": {
+                                  "type": "boolean"
+                                }
+                              },
+                              "title": "PhoneHealthSyncPrefs",
+                              "type": "object"
+                            }
+                          },
+                          "required": [
+                            "status",
+                            "sync_prefs"
+                          ],
+                          "title": "PhoneHealthConnection",
+                          "type": "object"
+                        },
+                        "history_days": {
+                          "description": "Days read back at the first sync",
+                          "type": "integer"
+                        },
+                        "provider": {
+                          "enum": [
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "native_only",
+                            "connected"
+                          ],
+                          "type": "string"
+                        },
+                        "sync_prefs": {
+                          "description": "What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)",
+                          "properties": {
+                            "activities": {
+                              "type": "boolean"
+                            },
+                            "resting_hr": {
+                              "type": "boolean"
+                            },
+                            "sleep": {
+                              "type": "boolean"
+                            },
+                            "steps": {
+                              "type": "boolean"
+                            },
+                            "weight": {
+                              "type": "boolean"
+                            }
+                          },
+                          "title": "PhoneHealthSyncPrefs",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "provider",
+                        "status",
+                        "sync_prefs"
+                      ],
+                      "title": "PhoneHealthRow",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "counts",
+                    "row"
+                  ],
+                  "title": "PhoneHealthIngestResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "What happened to each record, and the row"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not connected, or too many records"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A batch the app read from the phone: workouts, nights, weigh-ins, daily numbers",
+        "tags": [
+          "Connected devices"
+        ]
+      }
+    },
     "/api/me/devices/summary": {
       "get": {
         "callbacks": {},
@@ -83330,7 +85769,15 @@
                       "type": "integer"
                     },
                     "provider": {
+                      "description": "The device whose news the card shows (Garmin first when connected)",
                       "type": "string"
+                    },
+                    "providers": {
+                      "description": "Every connected device",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
                     },
                     "seen_at": {
                       "format": "date-time",
@@ -83417,7 +85864,15 @@
                       "type": "integer"
                     },
                     "provider": {
+                      "description": "The device whose news the card shows (Garmin first when connected)",
                       "type": "string"
+                    },
+                    "providers": {
+                      "description": "Every connected device",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
                     },
                     "seen_at": {
                       "format": "date-time",
@@ -171584,7 +174039,9 @@
                             "description": "manual, or garmin when a connected device sent it",
                             "enum": [
                               "manual",
-                              "garmin"
+                              "garmin",
+                              "apple_health",
+                              "health_connect"
                             ],
                             "type": "string"
                           },
@@ -172039,7 +174496,9 @@
                           "description": "manual, or garmin when a connected device sent it",
                           "enum": [
                             "manual",
-                            "garmin"
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
                           ],
                           "type": "string"
                         },

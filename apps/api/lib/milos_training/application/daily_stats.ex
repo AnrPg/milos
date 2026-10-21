@@ -1,14 +1,15 @@
 defmodule MilosTraining.Application.DailyStats do
   @moduledoc """
-  Πρόοδος › resting heart rate (ADR-161, board 16 Q4 A): the member's own
-  daily stats from a connected device, one point per day and source, read
-  in their personal session (owner row security). An indicator to look at,
-  never a judgement: no grades, no targets.
+  Πρόοδος › resting heart rate (ADR-161, board 16 Q4 A) and steps (ADR-172):
+  the member's own daily stats from a connected device, one point per day
+  and source, read in their personal session (owner row security). An
+  indicator to look at, never a judgement: no grades, no targets.
   """
 
   alias MilosTraining.Devices
 
-  @metrics ~w(resting_hr)
+  @metrics ~w(resting_hr steps)
+  @fields %{"resting_hr" => :resting_heart_rate, "steps" => :steps}
   @ranges %{"1m" => 30, "3m" => 90, "1y" => 365}
   @default_range "3m"
 
@@ -26,11 +27,13 @@ defmodule MilosTraining.Application.DailyStats do
          {:ok, range, days} <- range(param(params, "range")) do
       from = Date.add(today, -(days - 1))
 
+      field = Map.fetch!(@fields, metric)
+
       points =
         context
         |> Devices.with_context(fn -> Devices.list_daily_stats(user_id, from, today) end)
-        |> Enum.filter(&is_integer(&1.resting_heart_rate))
-        |> Enum.map(&%{on: &1.on, value: &1.resting_heart_rate, source: &1.source})
+        |> Enum.filter(&is_integer(Map.get(&1, field)))
+        |> Enum.map(&%{on: &1.on, value: Map.get(&1, field), source: &1.source})
 
       {:ok,
        %{

@@ -15,6 +15,7 @@ import {
   DEFAULT_BACKFILL_DAYS,
   fullPrefs,
   showsConsentLine,
+  SYNC_PREFS,
   togglePref,
   type FullSyncPrefs,
 } from "@/components/devices/garmin-model";
@@ -80,7 +81,7 @@ export function GarminConnectSheet({
       <div className="flex flex-col gap-5" data-testid="garmin-connect-sheet">
         <section className="flex flex-col gap-2">
           <SectionLabel>{t("bringTitle")}</SectionLabel>
-          <PrefSwitches prefs={prefs} onToggle={(pref) => setPrefs((current) => togglePref(current, pref))} disabled={redirecting} />
+          <PrefSwitches keys={SYNC_PREFS} prefs={prefs} onToggle={(pref) => setPrefs((current) => togglePref(current, pref))} disabled={redirecting} />
         </section>
 
         <section className="flex flex-col gap-2">

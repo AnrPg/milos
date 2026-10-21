@@ -1695,6 +1695,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/devices/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Everything connected devices brought in, as JSON (workouts, daily stats, import log) */
+        get: operations["MilosTrainingWeb.PhoneHealthController.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/devices/garmin": {
         parameters: {
             query?: never;
@@ -1758,6 +1775,58 @@ export interface paths {
         put?: never;
         /** «Συγχρονισμός τώρα»: Garmin resends the last two days (at most every 5 minutes) */
         post: operations["MilosTrainingWeb.DevicesController.sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/phone/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Disconnect the phone's health data, keeping or deleting what it brought in */
+        delete: operations["MilosTrainingWeb.PhoneHealthController.disconnect"];
+        options?: never;
+        head?: never;
+        /** Change what the phone brings in */
+        patch: operations["MilosTrainingWeb.PhoneHealthController.update"];
+        trace?: never;
+    };
+    "/api/me/devices/phone/{provider}/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect Apple Health or Health Connect after the phone granted read access */
+        post: operations["MilosTrainingWeb.PhoneHealthController.connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/phone/{provider}/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A batch the app read from the phone: workouts, nights, weigh-ins, daily numbers */
+        post: operations["MilosTrainingWeb.PhoneHealthController.ingest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -13373,7 +13442,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -13438,7 +13507,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -13722,7 +13791,7 @@ export interface components {
              * @description manual, or garmin when a connected device sent it
              * @enum {string}
              */
-            source?: "manual" | "garmin";
+            source?: "manual" | "garmin" | "apple_health" | "health_connect";
             /** Format: date-time */
             taken_at: string;
             taken_tz?: string;
@@ -13834,7 +13903,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -13902,7 +13971,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -18656,8 +18725,7 @@ export interface components {
                 /** @enum {string} */
                 capability?: "available" | "not_configured";
                 configured?: boolean;
-                /** GarminConnection */
-                connection?: {
+                connection?: (({
                     /** @enum {integer} */
                     backfill_days: 0 | 30 | 90;
                     /** @description «Εισαγωγή… 40%» while the history import runs */
@@ -18680,9 +18748,35 @@ export interface components {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
-                } | null;
+                } | null) | ({
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                     */
+                    read_from?: string | null;
+                    /** @enum {string} */
+                    status: "active";
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                } | null)) | null;
+                history_days?: number;
                 /** @enum {string} */
                 provider: "garmin" | "apple_health" | "health_connect";
                 /** @enum {string} */
@@ -18695,6 +18789,8 @@ export interface components {
                     activities?: boolean;
                     resting_hr?: boolean;
                     sleep?: boolean;
+                    /** @description Phones only (ADR-172) */
+                    steps?: boolean;
                     weight?: boolean;
                 };
             }[];
@@ -18968,7 +19064,7 @@ export interface components {
              * @enum {string}
              */
             source: "garmin" | "apple_health" | "health_connect";
-            /** @description Beats per minute for resting_hr */
+            /** @description Beats per minute for resting_hr, a count for steps */
             value: number;
         } | null;
         /** DailyStatPoint */
@@ -18980,7 +19076,7 @@ export interface components {
              * @enum {string}
              */
             source: "garmin" | "apple_health" | "health_connect";
-            /** @description Beats per minute for resting_hr */
+            /** @description Beats per minute for resting_hr, a count for steps */
             value: number;
         };
         /**
@@ -19000,11 +19096,11 @@ export interface components {
                  * @enum {string}
                  */
                 source: "garmin" | "apple_health" | "health_connect";
-                /** @description Beats per minute for resting_hr */
+                /** @description Beats per minute for resting_hr, a count for steps */
                 value: number;
             } | null;
             /** @enum {string} */
-            metric: "resting_hr";
+            metric: "resting_hr" | "steps";
             points: {
                 /** Format: date */
                 on: string;
@@ -19013,7 +19109,7 @@ export interface components {
                  * @enum {string}
                  */
                 source: "garmin" | "apple_health" | "health_connect";
-                /** @description Beats per minute for resting_hr */
+                /** @description Beats per minute for resting_hr, a count for steps */
                 value: number;
             }[];
             /** @enum {string} */
@@ -19277,6 +19373,85 @@ export interface components {
             };
         };
         /**
+         * DeviceDataExport
+         * @description Everything the connected devices brought in, except nights and weigh-ins (in the Ευεξία and Σώμα exports)
+         */
+        DeviceDataExport: {
+            activities: {
+                activity_type?: string | null;
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                candidates?: {
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "training_log" | "execution" | "class";
+                    /** Format: uuid */
+                    organization_id?: string | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title?: string | null;
+                }[];
+                /** Format: uuid */
+                class_id?: string | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                journal_visibility?: "private" | "coach_can_view";
+                max_heart_rate?: number | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /**
+                 * @description Localized by the client; the raw type is `activity_type`
+                 * @enum {string}
+                 */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+                started_tz?: string;
+                /** @enum {string} */
+                state: "own" | "merged" | "pending";
+                title: string;
+            }[];
+            connections: {
+                /** Format: date-time */
+                connected_at?: string | null;
+                /** Format: date-time */
+                last_synced_at?: string | null;
+                provider: string;
+                /** Format: date-time */
+                revoked_at?: string | null;
+                status: string;
+                sync_prefs?: {
+                    [key: string]: boolean;
+                };
+            }[];
+            daily_stats: {
+                /** Format: date */
+                on: string;
+                resting_heart_rate?: number | null;
+                source: string;
+                steps?: number | null;
+            }[];
+            /** Format: date-time */
+            exported_at: string;
+            imports: {
+                kind: string;
+                provider: string;
+                reason?: string | null;
+                /** Format: date-time */
+                received_at: string;
+                status: string;
+                target_type?: string | null;
+            }[];
+        };
+        /**
          * DeviceImportConfirmRequest
          * @description Either one of the activity's candidates, or keep it as its own entry
          */
@@ -19374,7 +19549,10 @@ export interface components {
                 weight?: number;
             };
             new_total: number;
+            /** @description The device whose news the card shows (Garmin first when connected) */
             provider: string;
+            /** @description Every connected device */
+            providers?: string[];
             /** Format: date-time */
             seen_at?: string | null;
             status?: string | null;
@@ -19388,6 +19566,8 @@ export interface components {
             activities?: boolean;
             resting_hr?: boolean;
             sleep?: boolean;
+            /** @description Phones only (ADR-172) */
+            steps?: boolean;
             weight?: boolean;
         };
         /**
@@ -20257,6 +20437,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         };
@@ -20291,6 +20473,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         } | null;
@@ -20324,6 +20508,8 @@ export interface components {
                     activities?: boolean;
                     resting_hr?: boolean;
                     sleep?: boolean;
+                    /** @description Phones only (ADR-172) */
+                    steps?: boolean;
                     weight?: boolean;
                 };
             } | null;
@@ -20342,6 +20528,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         };
@@ -20377,6 +20565,8 @@ export interface components {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
                 } | null;
@@ -20395,6 +20585,8 @@ export interface components {
                     activities?: boolean;
                     resting_hr?: boolean;
                     sleep?: boolean;
+                    /** @description Phones only (ADR-172) */
+                    steps?: boolean;
                     weight?: boolean;
                 };
             };
@@ -20430,6 +20622,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         };
@@ -23015,6 +23209,310 @@ export interface components {
             /** Format: uuid */
             id: string;
             nickname?: string | null;
+        };
+        /** PhoneHealthActivity */
+        PhoneHealthActivity: {
+            avg_hr?: number | null;
+            distance_m?: number | null;
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            end: string;
+            /** @description The phone's id of the workout */
+            id: string;
+            max_hr?: number | null;
+            /** @description The app that recorded it */
+            source_app?: string | null;
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            start: string;
+            title?: string | null;
+            /** @description The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …) */
+            type?: string;
+        };
+        /** PhoneHealthConnectRequest */
+        PhoneHealthConnectRequest: {
+            /** @description Grants the health-data consent in the same step when it is missing; needed when sleep, weight, resting heart rate or steps sync */
+            health_data_consent?: boolean;
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs?: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** PhoneHealthConnection */
+        PhoneHealthConnection: {
+            /** Format: date-time */
+            connected_at?: string | null;
+            /** Format: date-time */
+            last_synced_at?: string | null;
+            /**
+             * Format: date-time
+             * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+             */
+            read_from?: string | null;
+            /** @enum {string} */
+            status: "active";
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        } | null;
+        /** PhoneHealthDaily */
+        PhoneHealthDaily: {
+            /** @description The wearer's local day, YYYY-MM-DD */
+            date: string;
+            resting_hr?: number | null;
+            steps?: number | null;
+        };
+        /**
+         * PhoneHealthIngestRequest
+         * @description What the app read from the phone; at most 500 records per list
+         */
+        PhoneHealthIngestRequest: {
+            activities?: {
+                avg_hr?: number | null;
+                distance_m?: number | null;
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                end: string;
+                /** @description The phone's id of the workout */
+                id: string;
+                max_hr?: number | null;
+                /** @description The app that recorded it */
+                source_app?: string | null;
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                start: string;
+                title?: string | null;
+                /** @description The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …) */
+                type?: string;
+            }[];
+            dailies?: {
+                /** @description The wearer's local day, YYYY-MM-DD */
+                date: string;
+                resting_hr?: number | null;
+                steps?: number | null;
+            }[];
+            sleeps?: {
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                end: string;
+                id: string;
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                start: string;
+            }[];
+            weights?: {
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                at: string;
+                id: string;
+                kg: number;
+            }[];
+        };
+        /** PhoneHealthIngestResponse */
+        PhoneHealthIngestResponse: {
+            /** @description Records by outcome: imported, merged, duplicate, ignored, skipped, invalid, failed */
+            counts: {
+                [key: string]: number;
+            };
+            /**
+             * PhoneHealthRow
+             * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+             */
+            row: {
+                /** PhoneHealthConnection */
+                connection?: {
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                     */
+                    read_from?: string | null;
+                    /** @enum {string} */
+                    status: "active";
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                } | null;
+                /** @description Days read back at the first sync */
+                history_days?: number;
+                /** @enum {string} */
+                provider: "apple_health" | "health_connect";
+                /** @enum {string} */
+                status: "native_only" | "connected";
+                /**
+                 * PhoneHealthSyncPrefs
+                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    steps?: boolean;
+                    weight?: boolean;
+                };
+            };
+        };
+        /**
+         * PhoneHealthRow
+         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+         */
+        PhoneHealthRow: {
+            /** PhoneHealthConnection */
+            connection?: {
+                /** Format: date-time */
+                connected_at?: string | null;
+                /** Format: date-time */
+                last_synced_at?: string | null;
+                /**
+                 * Format: date-time
+                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                 */
+                read_from?: string | null;
+                /** @enum {string} */
+                status: "active";
+                /**
+                 * PhoneHealthSyncPrefs
+                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    steps?: boolean;
+                    weight?: boolean;
+                };
+            } | null;
+            /** @description Days read back at the first sync */
+            history_days?: number;
+            /** @enum {string} */
+            provider: "apple_health" | "health_connect";
+            /** @enum {string} */
+            status: "native_only" | "connected";
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** PhoneHealthRowResponse */
+        PhoneHealthRowResponse: {
+            /**
+             * PhoneHealthRow
+             * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+             */
+            row: {
+                /** PhoneHealthConnection */
+                connection?: {
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                     */
+                    read_from?: string | null;
+                    /** @enum {string} */
+                    status: "active";
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                } | null;
+                /** @description Days read back at the first sync */
+                history_days?: number;
+                /** @enum {string} */
+                provider: "apple_health" | "health_connect";
+                /** @enum {string} */
+                status: "native_only" | "connected";
+                /**
+                 * PhoneHealthSyncPrefs
+                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    steps?: boolean;
+                    weight?: boolean;
+                };
+            };
+        };
+        /**
+         * PhoneHealthSleep
+         * @description The main sleep of one night (the app joins the phone's segments)
+         */
+        PhoneHealthSleep: {
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            end: string;
+            id: string;
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            start: string;
+        };
+        /**
+         * PhoneHealthSyncPrefs
+         * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+         */
+        PhoneHealthSyncPrefs: {
+            activities?: boolean;
+            resting_hr?: boolean;
+            sleep?: boolean;
+            steps?: boolean;
+            weight?: boolean;
+        };
+        /** PhoneHealthUpdateRequest */
+        PhoneHealthUpdateRequest: {
+            health_data_consent?: boolean;
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** PhoneHealthWeight */
+        PhoneHealthWeight: {
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            at: string;
+            id: string;
+            kg: number;
         };
         /** PlatformPlan */
         PlatformPlan: {
@@ -32517,7 +33015,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -32582,7 +33080,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -33312,7 +33810,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -33442,7 +33940,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -33530,7 +34028,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -33669,7 +34167,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -36757,8 +37255,7 @@ export interface operations {
                             /** @enum {string} */
                             capability?: "available" | "not_configured";
                             configured?: boolean;
-                            /** GarminConnection */
-                            connection?: {
+                            connection?: (({
                                 /** @enum {integer} */
                                 backfill_days: 0 | 30 | 90;
                                 /** @description «Εισαγωγή… 40%» while the history import runs */
@@ -36781,9 +37278,35 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
-                            } | null;
+                            } | null) | ({
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null)) | null;
+                            history_days?: number;
                             /** @enum {string} */
                             provider: "garmin" | "apple_health" | "health_connect";
                             /** @enum {string} */
@@ -36796,6 +37319,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         }[];
@@ -36833,7 +37358,7 @@ export interface operations {
     "MilosTrainingWeb.DevicesController.daily_stats": {
         parameters: {
             query?: {
-                metric?: "resting_hr";
+                metric?: "resting_hr" | "steps";
                 range?: "1m" | "1y" | "3m";
             };
             header?: never;
@@ -36861,11 +37386,11 @@ export interface operations {
                              * @enum {string}
                              */
                             source: "garmin" | "apple_health" | "health_connect";
-                            /** @description Beats per minute for resting_hr */
+                            /** @description Beats per minute for resting_hr, a count for steps */
                             value: number;
                         } | null;
                         /** @enum {string} */
-                        metric: "resting_hr";
+                        metric: "resting_hr" | "steps";
                         points: {
                             /** Format: date */
                             on: string;
@@ -36874,7 +37399,7 @@ export interface operations {
                              * @enum {string}
                              */
                             source: "garmin" | "apple_health" | "health_connect";
-                            /** @description Beats per minute for resting_hr */
+                            /** @description Beats per minute for resting_hr, a count for steps */
                             value: number;
                         }[];
                         /** @enum {string} */
@@ -37026,8 +37551,7 @@ export interface operations {
                             /** @enum {string} */
                             capability?: "available" | "not_configured";
                             configured?: boolean;
-                            /** GarminConnection */
-                            connection?: {
+                            connection?: (({
                                 /** @enum {integer} */
                                 backfill_days: 0 | 30 | 90;
                                 /** @description «Εισαγωγή… 40%» while the history import runs */
@@ -37050,9 +37574,35 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
-                            } | null;
+                            } | null) | ({
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null)) | null;
+                            history_days?: number;
                             /** @enum {string} */
                             provider: "garmin" | "apple_health" | "health_connect";
                             /** @enum {string} */
@@ -37065,6 +37615,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         }[];
@@ -37094,6 +37646,100 @@ export interface operations {
                                 google?: boolean;
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Device data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        activities: {
+                            activity_type?: string | null;
+                            avg_heart_rate?: number | null;
+                            calories?: number | null;
+                            candidates?: {
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "training_log" | "execution" | "class";
+                                /** Format: uuid */
+                                organization_id?: string | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            class_id?: string | null;
+                            distance_meters?: number | null;
+                            duration_seconds: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            journal_visibility?: "private" | "coach_can_view";
+                            max_heart_rate?: number | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string} */
+                            provider: "garmin" | "apple_health" | "health_connect";
+                            /**
+                             * @description Localized by the client; the raw type is `activity_type`
+                             * @enum {string}
+                             */
+                            sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                            /** Format: date-time */
+                            started_at: string;
+                            started_tz?: string;
+                            /** @enum {string} */
+                            state: "own" | "merged" | "pending";
+                            title: string;
+                        }[];
+                        connections: {
+                            /** Format: date-time */
+                            connected_at?: string | null;
+                            /** Format: date-time */
+                            last_synced_at?: string | null;
+                            provider: string;
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                            status: string;
+                            sync_prefs?: {
+                                [key: string]: boolean;
+                            };
+                        }[];
+                        daily_stats: {
+                            /** Format: date */
+                            on: string;
+                            resting_heart_rate?: number | null;
+                            source: string;
+                            steps?: number | null;
+                        }[];
+                        /** Format: date-time */
+                        exported_at: string;
+                        imports: {
+                            kind: string;
+                            provider: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            received_at: string;
+                            status: string;
+                            target_type?: string | null;
+                        }[];
                     };
                 };
             };
@@ -37163,6 +37809,8 @@ export interface operations {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
                 };
@@ -37206,6 +37854,8 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
                             } | null;
@@ -37224,6 +37874,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         };
@@ -37279,6 +37931,8 @@ export interface operations {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
                 };
@@ -37455,6 +38109,8 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
                             } | null;
@@ -37473,6 +38129,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         };
@@ -37481,6 +38139,399 @@ export interface operations {
             };
             /** @description Asked too recently */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.disconnect": {
+        parameters: {
+            query?: {
+                delete_data?: boolean;
+            };
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disconnected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description What was deleted, when delete_data=true */
+                        deleted?: {
+                            activities?: number;
+                            daily_stats?: number;
+                            imports?: number;
+                            sleep?: number;
+                            weight?: number;
+                        } | null;
+                        /** @enum {string} */
+                        status: "revoked";
+                    };
+                };
+            };
+            /** @description Never connected */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    health_data_consent?: boolean;
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The phone's row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * PhoneHealthRow
+                         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+                         */
+                        row: {
+                            /** PhoneHealthConnection */
+                            connection?: {
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @description Days read back at the first sync */
+                            history_days?: number;
+                            /** @enum {string} */
+                            provider: "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "native_only" | "connected";
+                            /**
+                             * PhoneHealthSyncPrefs
+                             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                steps?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not connected or invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Grants the health-data consent in the same step when it is missing; needed when sleep, weight, resting heart rate or steps sync */
+                    health_data_consent?: boolean;
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs?: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The phone's row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * PhoneHealthRow
+                         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+                         */
+                        row: {
+                            /** PhoneHealthConnection */
+                            connection?: {
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @description Days read back at the first sync */
+                            history_days?: number;
+                            /** @enum {string} */
+                            provider: "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "native_only" | "connected";
+                            /**
+                             * PhoneHealthSyncPrefs
+                             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                steps?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid choices */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    activities?: {
+                        avg_hr?: number | null;
+                        distance_m?: number | null;
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        end: string;
+                        /** @description The phone's id of the workout */
+                        id: string;
+                        max_hr?: number | null;
+                        /** @description The app that recorded it */
+                        source_app?: string | null;
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        start: string;
+                        title?: string | null;
+                        /** @description The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …) */
+                        type?: string;
+                    }[];
+                    dailies?: {
+                        /** @description The wearer's local day, YYYY-MM-DD */
+                        date: string;
+                        resting_hr?: number | null;
+                        steps?: number | null;
+                    }[];
+                    sleeps?: {
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        end: string;
+                        id: string;
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        start: string;
+                    }[];
+                    weights?: {
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        at: string;
+                        id: string;
+                        kg: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description What happened to each record, and the row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Records by outcome: imported, merged, duplicate, ignored, skipped, invalid, failed */
+                        counts: {
+                            [key: string]: number;
+                        };
+                        /**
+                         * PhoneHealthRow
+                         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+                         */
+                        row: {
+                            /** PhoneHealthConnection */
+                            connection?: {
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @description Days read back at the first sync */
+                            history_days?: number;
+                            /** @enum {string} */
+                            provider: "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "native_only" | "connected";
+                            /**
+                             * PhoneHealthSyncPrefs
+                             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                steps?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not connected, or too many records */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -37519,7 +38570,10 @@ export interface operations {
                             weight?: number;
                         };
                         new_total: number;
+                        /** @description The device whose news the card shows (Garmin first when connected) */
                         provider: string;
+                        /** @description Every connected device */
+                        providers?: string[];
                         /** Format: date-time */
                         seen_at?: string | null;
                         status?: string | null;
@@ -37556,7 +38610,10 @@ export interface operations {
                             weight?: number;
                         };
                         new_total: number;
+                        /** @description The device whose news the card shows (Garmin first when connected) */
                         provider: string;
+                        /** @description Every connected device */
+                        providers?: string[];
                         /** Format: date-time */
                         seen_at?: string | null;
                         status?: string | null;
@@ -70441,7 +71498,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -70582,7 +71639,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;

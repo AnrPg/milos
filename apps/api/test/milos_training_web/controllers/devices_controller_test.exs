@@ -218,7 +218,7 @@ defmodule MilosTrainingWeb.DevicesControllerTest do
              |> json_response(200)
 
     conn |> again(user) |> get("/api/me/daily-stats?range=5y") |> json_response(422)
-    conn |> again(user) |> get("/api/me/daily-stats?metric=steps") |> json_response(422)
+    conn |> again(user) |> get("/api/me/daily-stats?metric=calories") |> json_response(422)
   end
 
   test "Garmin's refusal at sign-in comes back as an error", %{conn: conn, user: user} do

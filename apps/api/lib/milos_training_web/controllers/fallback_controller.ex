@@ -2370,7 +2370,13 @@ defmodule MilosTrainingWeb.FallbackController do
       {:unprocessable_entity, "Choose one of the suggested classes or workouts"},
     device_confirmation_required:
       {:unprocessable_entity, "Choose a class or workout, or keep it as its own entry"},
-    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr"},
+    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr or steps"},
+    # ADR-172: Apple Health and Health Connect from the store apps.
+    phone_health_not_connected:
+      {:unprocessable_entity, "Connect it in the app first, under Connected devices"},
+    phone_health_batch_too_large:
+      {:unprocessable_entity, "Send at most 500 records per list in one batch"},
+    invalid_phone_health_batch: {:unprocessable_entity, "Send the records as lists"},
     # ADR-171: push to the store apps.
     native_push_not_configured:
       {:service_unavailable, "Push to the app isn't available on this server yet"}
