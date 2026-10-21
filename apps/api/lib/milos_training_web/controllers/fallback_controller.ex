@@ -86,6 +86,12 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: "No map point could be read from this link"})
   end
 
+  def call(conn, {:error, :invalid_provider_kind}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_provider_kind", error: "Provider kind must be gym or coach"})
+  end
+
   def call(conn, {:error, :invalid_timezone}) do
     conn
     |> put_status(:unprocessable_entity)

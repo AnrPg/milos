@@ -1,11 +1,12 @@
 defmodule MilosTraining.Application.UpdateAdminSettings do
   alias MilosTraining.Application.{
     BroadcastUserSync,
+    GetAdminSettings,
     InvalidateLandingPages,
     TenantStaffRecipients
   }
 
-  alias MilosTraining.{Finance, Gamification, Notifications, Scheduling}
+  alias MilosTraining.{Finance, Gamification, Notifications, Organizations, Scheduling}
 
   def call(context, params) do
     do_call(context, params)
@@ -19,7 +20,8 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
     notification_params = notification_params(params)
     scheduling_params = scheduling_params(params)
 
-    with {:ok, gamification_settings} <- maybe_update_gamification(context, gamification_params),
+    with :ok <- maybe_update_provider(context, provider_params(params)),
+         {:ok, gamification_settings} <- maybe_update_gamification(context, gamification_params),
          {:ok, finance_settings} <- maybe_update_finance(context, finance_params),
          {:ok, notification_settings} <- maybe_update_notifications(notification_params),
          {:ok, scheduling_settings} <- maybe_update_scheduling(context, scheduling_params) do
@@ -32,8 +34,19 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
          gamification: gamification_settings,
          finance: finance_settings,
          notifications: notification_settings,
-         scheduling: scheduling_settings
+         scheduling: scheduling_settings,
+         provider: GetAdminSettings.provider(context)
        }}
+    end
+  end
+
+  # ADR-162: first, so an admin's save that tries it changes nothing.
+  defp maybe_update_provider(_context, params) when map_size(params) == 0, do: :ok
+
+  defp maybe_update_provider(context, params) do
+    case Map.get(params, :kind, Map.get(params, "kind")) do
+      nil -> :ok
+      kind -> Organizations.put_provider_kind(context, kind)
     end
   end
 
@@ -90,4 +103,10 @@ defmodule MilosTraining.Application.UpdateAdminSettings do
   defp scheduling_params(%{body: body}) when is_map(body), do: scheduling_params(body)
   defp scheduling_params(%{"body" => body}) when is_map(body), do: scheduling_params(body)
   defp scheduling_params(_), do: %{}
+
+  defp provider_params(%{provider: value}) when is_map(value), do: value
+  defp provider_params(%{"provider" => value}) when is_map(value), do: value
+  defp provider_params(%{body: body}) when is_map(body), do: provider_params(body)
+  defp provider_params(%{"body" => body}) when is_map(body), do: provider_params(body)
+  defp provider_params(_), do: %{}
 end

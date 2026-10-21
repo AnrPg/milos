@@ -31816,6 +31816,8 @@ export interface operations {
                 date_to?: string;
                 /** @description Text search (2–100 characters) over entries and their comments */
                 q?: string;
+                /** @description IANA zone the date range's days are counted in (UTC by default) */
+                timezone?: string;
                 /** @description Also remember this filter as your last-used Ημερολόγιο filter */
                 remember?: boolean;
             };
@@ -46970,6 +46972,12 @@ export interface operations {
                             vapid_public_key?: string | null;
                             vapid_subject?: string | null;
                         };
+                        /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
+                        provider: {
+                            editable: boolean;
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                        };
                         scheduling: {
                             default_auto_approve: boolean;
                             default_booking_timeout_minutes: number;
@@ -47019,6 +47027,10 @@ export interface operations {
                         vapid_private_key?: string | null;
                         vapid_public_key?: string | null;
                         vapid_subject?: string | null;
+                    };
+                    provider?: {
+                        /** @enum {string} */
+                        kind?: "gym" | "coach";
                     };
                     scheduling?: {
                         default_auto_approve?: boolean;
@@ -47080,6 +47092,12 @@ export interface operations {
                             vapid_private_key_configured: boolean;
                             vapid_public_key?: string | null;
                             vapid_subject?: string | null;
+                        };
+                        /** @description ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it. */
+                        provider: {
+                            editable: boolean;
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
                         };
                         scheduling: {
                             default_auto_approve: boolean;

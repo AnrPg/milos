@@ -7593,6 +7593,15 @@
       "entries": "{count, plural, one {# entry} other {# entries}}",
       "download": "Download {name}",
       "expires": "Available until {date}"
+    },
+    "kindSetting": {
+      "title": "Box or personal coach",
+      "description": "How your members see you in their app.",
+      "gym": "A box or gym with classes and a team of coaches.",
+      "coach": "An independent coach who trains people one to one or in small groups.",
+      "ownerOnly": "Only the owner can change this.",
+      "save": "Save",
+      "cancel": "Cancel"
     }
   }
 }

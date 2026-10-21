@@ -7593,6 +7593,15 @@
       "entries": "{count, plural, one {# registo} other {# registos}}",
       "download": "Transferir {name}",
       "expires": "Disponível até {date}"
+    },
+    "kindSetting": {
+      "title": "Box ou treinador pessoal",
+      "description": "Como os seus membros o veem na app.",
+      "gym": "Uma box ou ginásio com aulas e uma equipa de treinadores.",
+      "coach": "Um treinador independente que treina individualmente ou em pequenos grupos.",
+      "ownerOnly": "Só o proprietário pode alterar isto.",
+      "save": "Guardar",
+      "cancel": "Cancelar"
     }
   }
 }

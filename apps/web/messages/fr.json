@@ -7593,6 +7593,15 @@
       "entries": "{count, plural, one {# entrée} many {# entrées} other {# entrées}}",
       "download": "Télécharger {name}",
       "expires": "Disponible jusqu'au {date}"
+    },
+    "kindSetting": {
+      "title": "Box ou coach personnel",
+      "description": "Comment vos membres vous voient dans leur appli.",
+      "gym": "Une box ou une salle avec des cours et une équipe de coachs.",
+      "coach": "Un coach indépendant qui entraîne en individuel ou en petits groupes.",
+      "ownerOnly": "Seul le propriétaire peut modifier ceci.",
+      "save": "Enregistrer",
+      "cancel": "Annuler"
     }
   }
 }

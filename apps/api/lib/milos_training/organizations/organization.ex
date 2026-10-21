@@ -11,6 +11,9 @@ defmodule MilosTraining.Organizations.Organization do
     field :slug, :string
     field :name, :string
     field :status, Ecto.Enum, values: OrganizationPolicy.statuses(), default: :active
+    # ADR-162: `gym` or `coach` (an independent coach); set by the owner
+    # (`Organizations.put_provider_kind/2`), never through `changeset/2`.
+    field :provider_kind, :string, default: "gym"
 
     timestamps(type: :utc_datetime_usec)
   end

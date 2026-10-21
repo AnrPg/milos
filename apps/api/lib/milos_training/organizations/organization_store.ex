@@ -235,5 +235,12 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def put_provider_selection(user_id, organization_id),
     do: impl().put_provider_selection(user_id, organization_id)
 
+  @impl true
+  def get_provider_kind(organization_id), do: impl().get_provider_kind(organization_id)
+
+  @impl true
+  def put_provider_kind(organization_id, kind),
+    do: impl().put_provider_kind(organization_id, kind)
+
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

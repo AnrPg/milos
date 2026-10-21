@@ -92,6 +92,31 @@ defmodule MilosTraining.Organizations do
         OrganizationStore.put_provider_selection(user_id, organization_id)
       end)
 
+  @doc "Whether the gym presents as a gym or an independent coach (ADR-162)."
+  def get_provider_kind(%{organization_id: organization_id} = context)
+      when is_binary(organization_id) do
+    RepoContext.run(context, fn ->
+      kind = OrganizationStore.get_provider_kind(organization_id)
+      if kind in Provider.kinds(), do: kind, else: "gym"
+    end)
+  end
+
+  @doc """
+  The owner marks the organization as a gym or an independent coach
+  (ADR-162): members see it so in Box ▾, labels and the coach audience.
+  """
+  def put_provider_kind(%{organization_id: organization_id} = context, kind)
+      when is_binary(organization_id) do
+    with :ok <- TenantAuthorization.authorize(context, [:owner]),
+         :ok <- if(kind in Provider.kinds(), do: :ok, else: {:error, :invalid_provider_kind}) do
+      RepoContext.run(context, fn ->
+        OrganizationStore.put_provider_kind(organization_id, kind)
+      end)
+    end
+  end
+
+  def put_provider_kind(_context, _kind), do: {:error, :organization_context_required}
+
   defdelegate split_providers(providers), to: Provider, as: :split
   defdelegate provider_directory(providers), to: Provider, as: :directory
   defdelegate selected_provider(active, remembered_id), to: Provider, as: :selected

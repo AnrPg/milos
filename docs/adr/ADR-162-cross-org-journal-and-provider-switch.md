@@ -148,8 +148,8 @@ organizations in their personal session, and coaches read through
 ## Consequences
 - Org-scoped endpoints remain for per-provider screens. The web moves
   Ημερολόγιο, Vault, Πρόοδος and Box ▾ to the account endpoints.
-- `provider_kind` defaults to `gym`. An owner setting to mark an
-  independent coach is a follow-up.
+- `provider_kind` defaults to `gym`. The owner marks an independent coach
+  in the gym settings (`provider` on `GET|PATCH /admin/settings`).
 - A rejoined member's earlier entries become visible to the provider again,
   under the same rules.
 
@@ -176,4 +176,18 @@ organizations in their personal session, and coaches read through
 - «Οι coach μου» is asked in the visibility picker the first time a coach
   rung is chosen with several providers (once per device). The default can
   also be changed in Ρυθμίσεις, next to «Εξαγωγή ημερολογίου».
-
+- Closing the review gaps:
+  - Staff history reads (`/admin/users/:id/history` and the dossier
+    training tab) go through `StaffJournalAccess.readable?/2`. A former
+    member's workouts page is empty and booked classes come without the
+    performance; the gym keeps bookings, attendance and assignments.
+  - Migration `20261105100200_journal_comments_coach_shared_read` adds
+    `journal_comments_coach_shared_read_policy`, so a shared entry carries
+    its comments to the other provider's coaches, on the entry's rung.
+  - `GET /api/me/journal` takes `timezone` (IANA, UTC by default). The
+    date range is the member's own midnight-to-midnight span; a day that
+    starts in a DST gap starts when the clocks resume. The zone is not part
+    of the stored filter, so a saved filter means the member's days
+    wherever they are. The web sends the browser's zone with a date range.
+  - `Organizations.put_provider_kind/2` is owner-only. An admin's save that
+    includes it is refused as a whole.

@@ -7593,6 +7593,15 @@
       "entries": "{count, plural, one {# Eintrag} other {# Einträge}}",
       "download": "{name} herunterladen",
       "expires": "Verfügbar bis {date}"
+    },
+    "kindSetting": {
+      "title": "Box oder Personal Coach",
+      "description": "Wie dich deine Mitglieder in ihrer App sehen.",
+      "gym": "Eine Box oder ein Studio mit Kursen und einem Coach-Team.",
+      "coach": "Ein unabhängiger Coach, der einzeln oder in kleinen Gruppen trainiert.",
+      "ownerOnly": "Nur der Inhaber kann das ändern.",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
     }
   }
 }

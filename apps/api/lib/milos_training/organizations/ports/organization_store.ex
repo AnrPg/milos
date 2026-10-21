@@ -124,4 +124,6 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback list_my_providers() :: [map()]
   @callback get_provider_selection(Ecto.UUID.t()) :: Ecto.UUID.t() | nil
   @callback put_provider_selection(Ecto.UUID.t(), Ecto.UUID.t()) :: :ok | {:error, term()}
+  @callback get_provider_kind(Ecto.UUID.t()) :: String.t() | nil
+  @callback put_provider_kind(Ecto.UUID.t(), String.t()) :: :ok | {:error, term()}
 end

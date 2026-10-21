@@ -7593,6 +7593,15 @@
       "entries": "{count, plural, one {# item} other {# items}}",
       "download": "{name} downloaden",
       "expires": "Beschikbaar tot {date}"
+    },
+    "kindSetting": {
+      "title": "Box of personal coach",
+      "description": "Hoe je leden je zien in hun app.",
+      "gym": "Een box of sportschool met lessen en een team coaches.",
+      "coach": "Een zelfstandige coach die één-op-één of in kleine groepen traint.",
+      "ownerOnly": "Alleen de eigenaar kan dit wijzigen.",
+      "save": "Opslaan",
+      "cancel": "Annuleren"
     }
   }
 }

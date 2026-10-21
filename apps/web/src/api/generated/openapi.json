@@ -70044,6 +70044,15 @@
             }
           },
           {
+            "description": "IANA zone the date range's days are counted in (UTC by default)",
+            "in": "query",
+            "name": "timezone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
             "description": "Also remember this filter as your last-used Ημερολόγιο filter",
             "in": "query",
             "name": "remember",
@@ -110271,6 +110280,26 @@
                       ],
                       "type": "object"
                     },
+                    "provider": {
+                      "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
+                      "properties": {
+                        "editable": {
+                          "type": "boolean"
+                        },
+                        "kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "editable"
+                      ],
+                      "type": "object"
+                    },
                     "scheduling": {
                       "properties": {
                         "default_auto_approve": {
@@ -110326,7 +110355,8 @@
                     "gamification",
                     "finance",
                     "notifications",
-                    "scheduling"
+                    "scheduling",
+                    "provider"
                   ],
                   "type": "object"
                 }
@@ -110444,6 +110474,18 @@
                       },
                       "vapid_subject": {
                         "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "provider": {
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "gym",
+                          "coach"
+                        ],
                         "type": "string"
                       }
                     },
@@ -110641,6 +110683,26 @@
                       ],
                       "type": "object"
                     },
+                    "provider": {
+                      "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
+                      "properties": {
+                        "editable": {
+                          "type": "boolean"
+                        },
+                        "kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "editable"
+                      ],
+                      "type": "object"
+                    },
                     "scheduling": {
                       "properties": {
                         "default_auto_approve": {
@@ -110696,7 +110758,8 @@
                     "gamification",
                     "finance",
                     "notifications",
-                    "scheduling"
+                    "scheduling",
+                    "provider"
                   ],
                   "type": "object"
                 }

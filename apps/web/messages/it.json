@@ -7593,6 +7593,15 @@
       "entries": "{count, plural, one {# voce} other {# voci}}",
       "download": "Scarica {name}",
       "expires": "Disponibile fino al {date}"
+    },
+    "kindSetting": {
+      "title": "Box o personal coach",
+      "description": "Come ti vedono i tuoi membri nella loro app.",
+      "gym": "Un box o una palestra con lezioni e un team di coach.",
+      "coach": "Un coach indipendente che allena individualmente o in piccoli gruppi.",
+      "ownerOnly": "Solo il proprietario può modificarlo.",
+      "save": "Salva",
+      "cancel": "Annulla"
     }
   }
 }

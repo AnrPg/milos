@@ -97,6 +97,51 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
     assert get_in(payload, ["finance", "organization_id"]) == organization.id
   end
 
+  test "the owner marks the organization as an independent coach (ADR-162)", %{conn: conn} do
+    owner = admin_fixture()
+    organization = org_with_owner!(owner)
+    admin = admin_fixture()
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: admin.id,
+        role: :admin,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    path = "/api/org/#{organization.slug}/admin/settings"
+    as = fn user -> conn |> recycle() |> put_bearer_token(user) end
+
+    assert %{"kind" => "gym", "editable" => true} =
+             as.(owner) |> get(path) |> json_response(200) |> Map.fetch!("provider")
+
+    assert %{"kind" => "coach", "editable" => true} =
+             as.(owner)
+             |> patch(path, %{provider: %{kind: "coach"}})
+             |> json_response(200)
+             |> Map.fetch!("provider")
+
+    # Members see it in Box ▾.
+    assert [%{kind: "coach"}] =
+             MilosTraining.Organizations.list_my_providers(%{user_id: owner.id})
+             |> Enum.filter(&(&1.organization_id == organization.id))
+
+    # An admin reads it but cannot change it, and the whole save is refused.
+    assert %{"kind" => "coach", "editable" => false} =
+             as.(admin) |> get(path) |> json_response(200) |> Map.fetch!("provider")
+
+    assert as.(admin)
+           |> patch(path, %{provider: %{kind: "gym"}, gamification: %{theme_slug: "aurora"}})
+           |> json_response(403)
+
+    assert as.(owner) |> get(path) |> json_response(200) |> get_in(["gamification", "theme_slug"]) !=
+             "aurora"
+
+    assert as.(owner) |> patch(path, %{provider: %{kind: "studio"}}) |> json_response(422)
+  end
+
   defp org_with_owner!(owner) do
     {:ok, organization} =
       Organizations.create_organization(%{

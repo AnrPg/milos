@@ -1119,6 +1119,25 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def get_provider_kind(organization_id) do
+    Organization
+    |> where([organization], organization.id == ^organization_id)
+    |> select([organization], organization.provider_kind)
+    |> Repo.one()
+  end
+
+  # The column's check constraint keeps it to the known kinds.
+  @impl true
+  def put_provider_kind(organization_id, kind) do
+    case Organization
+         |> where([organization], organization.id == ^organization_id)
+         |> Repo.update_all(set: [provider_kind: kind, updated_at: DateTime.utc_now()]) do
+      {1, _rows} -> :ok
+      {0, _rows} -> {:error, :not_found}
+    end
+  end
+
+  @impl true
   def get_provider_selection(user_id) do
     ProviderSelection
     |> where([selection], selection.user_id == ^user_id)

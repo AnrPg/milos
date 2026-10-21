@@ -104,15 +104,27 @@ defmodule MilosTrainingWeb.AdminSettingsController do
     required: [:default_capacity, :default_auto_approve, :default_booking_timeout_minutes]
   }
 
+  @provider_settings_schema %Schema{
+    type: :object,
+    description:
+      "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
+    properties: %{
+      kind: %Schema{type: :string, enum: ["gym", "coach"]},
+      editable: %Schema{type: :boolean}
+    },
+    required: [:kind, :editable]
+  }
+
   @admin_settings_response_schema %Schema{
     type: :object,
     properties: %{
       gamification: @gamification_settings_schema,
       finance: @finance_settings_schema,
       notifications: @notification_push_settings_schema,
-      scheduling: @scheduling_settings_schema
+      scheduling: @scheduling_settings_schema,
+      provider: @provider_settings_schema
     },
-    required: [:gamification, :finance, :notifications, :scheduling]
+    required: [:gamification, :finance, :notifications, :scheduling, :provider]
   }
 
   @admin_settings_update_schema %Schema{
@@ -182,6 +194,11 @@ defmodule MilosTrainingWeb.AdminSettingsController do
             description: "Withdrawals closer to the class than this use the visit"
           }
         },
+        required: []
+      },
+      provider: %Schema{
+        type: :object,
+        properties: %{kind: %Schema{type: :string, enum: ["gym", "coach"]}},
         required: []
       }
     },
