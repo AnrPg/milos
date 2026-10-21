@@ -49,7 +49,7 @@ function SlotState<T>({ section, children }: { section: Section<T>; children: (d
 }
 
 function Note({ children }: { children: React.ReactNode }) {
-  return <p className="mt-3 text-xs" style={{ color: "var(--dim)" }}>{children}</p>;
+  return <p className="mt-3 self-stretch text-xs" style={{ color: "var(--dim)" }}>{children}</p>;
 }
 
 export function TrainingDepthCards({
@@ -186,6 +186,8 @@ function QualitiesCard({ section }: { section: Section<DepthQualities> }) {
 const RADAR_SIZE = 220;
 const RADAR_CENTER = RADAR_SIZE / 2;
 const RADAR_RADIUS = 72;
+// Room either side for the axis labels («Coordination», «Ευκινησία»).
+const RADAR_PAD = 48;
 
 function QualitiesBody({ qualities }: { qualities: DepthQualities }) {
   const t = useTranslations("Depth");
@@ -201,8 +203,8 @@ function QualitiesBody({ qualities }: { qualities: DepthQualities }) {
   return (
     <div className="flex flex-col items-center gap-2">
       <svg
-        viewBox={`0 0 ${RADAR_SIZE} ${RADAR_SIZE}`}
-        className="h-auto w-full max-w-[260px]"
+        viewBox={`${-RADAR_PAD} 0 ${RADAR_SIZE + RADAR_PAD * 2} ${RADAR_SIZE}`}
+        className="h-auto w-full max-w-[340px]"
         role="img"
         aria-label={`${t("qualities.title")}: ${summary}`}
       >
