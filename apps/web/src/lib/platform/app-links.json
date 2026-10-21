@@ -1,0 +1,4 @@
+{
+  "$comment": "ADR-171: the share links the store apps open (universal links / App Links). Read by the web's .well-known routes and by apps/mobile/scripts/configure.mjs.",
+  "pathPrefixes": ["/c/", "/join/", "/b/", "/r/", "/events/", "/trials/", "/buddy/"]
+}
