@@ -2110,6 +2110,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your insights (indicators, never medical advice) */
+        get: operations["MilosTrainingWeb.InsightsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/insights/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Show every dismissed insight again */
+        post: operations["MilosTrainingWeb.InsightsController.restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/insights/{rule}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide one insight until its finding changes */
+        post: operations["MilosTrainingWeb.InsightsController.dismiss"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -20261,6 +20312,71 @@ export interface components {
                 withdrawn_at?: string | null;
             }[];
         };
+        /** Insight */
+        Insight: {
+            /**
+             * InsightParams
+             * @description The numbers of the finding; which keys appear depends on the rule and variant
+             */
+            params: {
+                /** @description RPE points harder on average */
+                delta?: number | null;
+                /** @description The member's sleep goal in hours */
+                hours?: number | null;
+                logged_days?: number | null;
+                on_goal_days?: number | null;
+                /** @enum {string|null} */
+                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                part_count?: number | null;
+                percent?: number | null;
+                pr_days?: number | null;
+                /** @description How many times as often */
+                ratio?: number | null;
+                rest_percent?: number | null;
+                total?: number | null;
+                training_percent?: number | null;
+                /** @enum {string|null} */
+                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                trigger_count?: number | null;
+                with_trigger?: number | null;
+            };
+            /** Format: date */
+            period_end: string;
+            /** Format: date */
+            period_start: string;
+            /** @enum {string} */
+            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+            /** @description Copy key: insights.<rule>.<variant> */
+            variant: string;
+            /** @description Weeks of data behind the finding */
+            weeks: number;
+        };
+        /**
+         * InsightParams
+         * @description The numbers of the finding; which keys appear depends on the rule and variant
+         */
+        InsightParams: {
+            /** @description RPE points harder on average */
+            delta?: number | null;
+            /** @description The member's sleep goal in hours */
+            hours?: number | null;
+            logged_days?: number | null;
+            on_goal_days?: number | null;
+            /** @enum {string|null} */
+            part?: "morning" | "afternoon" | "evening" | "night" | null;
+            part_count?: number | null;
+            percent?: number | null;
+            pr_days?: number | null;
+            /** @description How many times as often */
+            ratio?: number | null;
+            rest_percent?: number | null;
+            total?: number | null;
+            training_percent?: number | null;
+            /** @enum {string|null} */
+            trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+            trigger_count?: number | null;
+            with_trigger?: number | null;
+        };
         /** InventoryLowReport */
         InventoryLowReport: {
             /** Format: uuid */
@@ -21159,6 +21275,65 @@ export interface components {
             source_context_id?: string | null;
             /** @enum {string|null} */
             surface?: "assignment_detail" | "class_detail" | "pre_start" | null;
+        };
+        /** MyInsights */
+        MyInsights: {
+            /** Format: date-time */
+            computed_at: string | null;
+            /** @description Weeks of data so far (at most window_weeks) */
+            data_weeks: number;
+            /** @description Findings the member dismissed */
+            hidden_count: number;
+            /** @description At most max_shown findings, in the rules' fixed order */
+            insights: {
+                /**
+                 * InsightParams
+                 * @description The numbers of the finding; which keys appear depends on the rule and variant
+                 */
+                params: {
+                    /** @description RPE points harder on average */
+                    delta?: number | null;
+                    /** @description The member's sleep goal in hours */
+                    hours?: number | null;
+                    logged_days?: number | null;
+                    on_goal_days?: number | null;
+                    /** @enum {string|null} */
+                    part?: "morning" | "afternoon" | "evening" | "night" | null;
+                    part_count?: number | null;
+                    percent?: number | null;
+                    pr_days?: number | null;
+                    /** @description How many times as often */
+                    ratio?: number | null;
+                    rest_percent?: number | null;
+                    total?: number | null;
+                    training_percent?: number | null;
+                    /** @enum {string|null} */
+                    trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                    trigger_count?: number | null;
+                    with_trigger?: number | null;
+                };
+                /** Format: date */
+                period_end: string;
+                /** Format: date */
+                period_start: string;
+                /** @enum {string} */
+                rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                /** @description Copy key: insights.<rule>.<variant> */
+                variant: string;
+                /** @description Weeks of data behind the finding */
+                weeks: number;
+            }[];
+            /** @description Findings shown at a time */
+            max_shown: number;
+            /** @description Weeks of data before any insight */
+            min_weeks: number;
+            /**
+             * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+             * @enum {string}
+             */
+            state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+            /** @description Weeks the rules look back */
+            window_weeks: number;
         };
         /** MyProviders */
         MyProviders: {
@@ -38589,6 +38764,250 @@ export interface operations {
                         next_offset: number | null;
                         offset: number;
                         total: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InsightsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Insights */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        computed_at: string | null;
+                        /** @description Weeks of data so far (at most window_weeks) */
+                        data_weeks: number;
+                        /** @description Findings the member dismissed */
+                        hidden_count: number;
+                        /** @description At most max_shown findings, in the rules' fixed order */
+                        insights: {
+                            /**
+                             * InsightParams
+                             * @description The numbers of the finding; which keys appear depends on the rule and variant
+                             */
+                            params: {
+                                /** @description RPE points harder on average */
+                                delta?: number | null;
+                                /** @description The member's sleep goal in hours */
+                                hours?: number | null;
+                                logged_days?: number | null;
+                                on_goal_days?: number | null;
+                                /** @enum {string|null} */
+                                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                                part_count?: number | null;
+                                percent?: number | null;
+                                pr_days?: number | null;
+                                /** @description How many times as often */
+                                ratio?: number | null;
+                                rest_percent?: number | null;
+                                total?: number | null;
+                                training_percent?: number | null;
+                                /** @enum {string|null} */
+                                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                                trigger_count?: number | null;
+                                with_trigger?: number | null;
+                            };
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            /** @enum {string} */
+                            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                            /** @description Copy key: insights.<rule>.<variant> */
+                            variant: string;
+                            /** @description Weeks of data behind the finding */
+                            weeks: number;
+                        }[];
+                        /** @description Findings shown at a time */
+                        max_shown: number;
+                        /** @description Weeks of data before any insight */
+                        min_weeks: number;
+                        /**
+                         * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+                         * @enum {string}
+                         */
+                        state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+                        /** @description Weeks the rules look back */
+                        window_weeks: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InsightsController.restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Insights */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        computed_at: string | null;
+                        /** @description Weeks of data so far (at most window_weeks) */
+                        data_weeks: number;
+                        /** @description Findings the member dismissed */
+                        hidden_count: number;
+                        /** @description At most max_shown findings, in the rules' fixed order */
+                        insights: {
+                            /**
+                             * InsightParams
+                             * @description The numbers of the finding; which keys appear depends on the rule and variant
+                             */
+                            params: {
+                                /** @description RPE points harder on average */
+                                delta?: number | null;
+                                /** @description The member's sleep goal in hours */
+                                hours?: number | null;
+                                logged_days?: number | null;
+                                on_goal_days?: number | null;
+                                /** @enum {string|null} */
+                                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                                part_count?: number | null;
+                                percent?: number | null;
+                                pr_days?: number | null;
+                                /** @description How many times as often */
+                                ratio?: number | null;
+                                rest_percent?: number | null;
+                                total?: number | null;
+                                training_percent?: number | null;
+                                /** @enum {string|null} */
+                                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                                trigger_count?: number | null;
+                                with_trigger?: number | null;
+                            };
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            /** @enum {string} */
+                            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                            /** @description Copy key: insights.<rule>.<variant> */
+                            variant: string;
+                            /** @description Weeks of data behind the finding */
+                            weeks: number;
+                        }[];
+                        /** @description Findings shown at a time */
+                        max_shown: number;
+                        /** @description Weeks of data before any insight */
+                        min_weeks: number;
+                        /**
+                         * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+                         * @enum {string}
+                         */
+                        state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+                        /** @description Weeks the rules look back */
+                        window_weeks: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InsightsController.dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Insights */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        computed_at: string | null;
+                        /** @description Weeks of data so far (at most window_weeks) */
+                        data_weeks: number;
+                        /** @description Findings the member dismissed */
+                        hidden_count: number;
+                        /** @description At most max_shown findings, in the rules' fixed order */
+                        insights: {
+                            /**
+                             * InsightParams
+                             * @description The numbers of the finding; which keys appear depends on the rule and variant
+                             */
+                            params: {
+                                /** @description RPE points harder on average */
+                                delta?: number | null;
+                                /** @description The member's sleep goal in hours */
+                                hours?: number | null;
+                                logged_days?: number | null;
+                                on_goal_days?: number | null;
+                                /** @enum {string|null} */
+                                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                                part_count?: number | null;
+                                percent?: number | null;
+                                pr_days?: number | null;
+                                /** @description How many times as often */
+                                ratio?: number | null;
+                                rest_percent?: number | null;
+                                total?: number | null;
+                                training_percent?: number | null;
+                                /** @enum {string|null} */
+                                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                                trigger_count?: number | null;
+                                with_trigger?: number | null;
+                            };
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            /** @enum {string} */
+                            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                            /** @description Copy key: insights.<rule>.<variant> */
+                            variant: string;
+                            /** @description Weeks of data behind the finding */
+                            weeks: number;
+                        }[];
+                        /** @description Findings shown at a time */
+                        max_shown: number;
+                        /** @description Weeks of data before any insight */
+                        min_weeks: number;
+                        /**
+                         * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+                         * @enum {string}
+                         */
+                        state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+                        /** @description Weeks the rules look back */
+                        window_weeks: number;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
                     };
                 };
             };

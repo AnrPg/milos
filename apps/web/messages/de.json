@@ -8699,5 +8699,42 @@
       "range": "Zeitraum",
       "sharedOnly": "Nur aus Einträgen, die das Mitglied mit den Coaches der Box teilt."
     }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Ausblenden",
+    "restore": "Wieder anzeigen",
+    "hidden": "Ausgeblendet: {count}",
+    "note": "Ein Hinweis, kein medizinischer Rat.",
+    "noteWithWeeks": "Aus {weeks} Wochen Daten · Ein Hinweis, kein medizinischer Rat.",
+    "empty": {
+      "collecting": "Insights erscheinen nach {min} Wochen Einträgen (Schlaf, Wasser, Heißhunger, Training). Bisher: {weeks} von {min}.",
+      "moreEntries": "Es braucht noch ein paar Einträge, bis sich ein Muster zeigt.",
+      "noPattern": "Kein klares Muster in den letzten {window} Wochen. Insights werden jede Nacht aktualisiert.",
+      "allHidden": "Du hast alle Insights ausgeblendet."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Du stellst {ratio}× häufiger PRs auf nach {hours}+ Stunden Schlaf.",
+        "all_after_goal": "Alle {count} deiner PRs kamen nach {hours}+ Stunden Schlaf."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Nach weniger als {hours} Stunden Schlaf bewertest du Trainings um {delta} RPE-Punkte anstrengender."
+      },
+      "time_of_day": {
+        "best_part": "Du stellst {ratio}× häufiger PRs auf bei Trainings {part, select, morning {am Morgen} afternoon {am Nachmittag} evening {am Abend} other {in der Nacht}}.",
+        "only_part": "Alle {count} deiner PRs kamen bei Trainings {part, select, morning {am Morgen} afternoon {am Nachmittag} evening {am Abend} other {in der Nacht}}."
+      },
+      "cravings": {
+        "part_and_trigger": "Die meisten deiner Heißhungerattacken ({count} von {total}) kommen {part, select, morning {morgens} afternoon {nachmittags} evening {abends} other {spät in der Nacht}}, meist mit {trigger, select, stress {Stress} fatigue {Müdigkeit} boredom {Langeweile} social {Gesellschaft} other {Hunger}}.",
+        "part": "Die meisten deiner Heißhungerattacken ({count} von {total}) kommen {part, select, morning {morgens} afternoon {nachmittags} evening {abends} other {spät in der Nacht}}.",
+        "trigger": "Bei Heißhunger notierst du am häufigsten {trigger, select, stress {Stress} fatigue {Müdigkeit} boredom {Langeweile} social {Gesellschaft} other {Hunger}} ({count} von {total})."
+      },
+      "hydration": {
+        "on_goal": "Du hast dein Wasserziel an {onGoal} von {logged} erfassten Tagen erreicht.",
+        "training_more": "An Trainingstagen erreichst du dein Wasserziel häufiger ({training}% gegenüber {rest}% an anderen Tagen).",
+        "training_less": "An Trainingstagen erreichst du dein Wasserziel seltener ({training}% gegenüber {rest}% an anderen Tagen)."
+      }
+    }
   }
 }

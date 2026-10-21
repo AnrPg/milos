@@ -8699,5 +8699,42 @@
       "range": "Periodo",
       "sharedOnly": "Solo dalle voci che il cliente condivide con i coach del box."
     }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Nascondi",
+    "restore": "Mostra di nuovo",
+    "hidden": "Nascosti: {count}",
+    "note": "Un indicatore, non un consiglio medico.",
+    "noteWithWeeks": "Da {weeks} settimane di dati · Un indicatore, non un consiglio medico.",
+    "empty": {
+      "collecting": "Gli insights compaiono dopo {min} settimane di registrazioni (sonno, acqua, voglie, allenamenti). Finora: {weeks} di {min}.",
+      "moreEntries": "Servono ancora alcune registrazioni prima che emerga uno schema.",
+      "noPattern": "Nessuno schema chiaro nelle ultime {window} settimane. Gli insights si aggiornano ogni notte.",
+      "allHidden": "Hai nascosto tutti gli insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Fai PR {ratio}× più spesso dopo {hours}+ ore di sonno.",
+        "all_after_goal": "Tutti i tuoi {count} PR sono arrivati dopo {hours}+ ore di sonno."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Dopo meno di {hours} ore di sonno, valuti gli allenamenti più duri di {delta} punti RPE."
+      },
+      "time_of_day": {
+        "best_part": "Fai PR {ratio}× più spesso negli allenamenti {part, select, morning {del mattino} afternoon {del pomeriggio} evening {della sera} other {notturni}}.",
+        "only_part": "Tutti i tuoi {count} PR sono arrivati in allenamenti {part, select, morning {del mattino} afternoon {del pomeriggio} evening {della sera} other {notturni}}."
+      },
+      "cravings": {
+        "part_and_trigger": "La maggior parte delle tue voglie ({count} su {total}) arriva {part, select, morning {al mattino} afternoon {al pomeriggio} evening {la sera} other {a notte fonda}}, di solito con {trigger, select, stress {stress} fatigue {stanchezza} boredom {noia} social {compagnia} other {fame}}.",
+        "part": "La maggior parte delle tue voglie ({count} su {total}) arriva {part, select, morning {al mattino} afternoon {al pomeriggio} evening {la sera} other {a notte fonda}}.",
+        "trigger": "Nelle tue voglie annoti più spesso {trigger, select, stress {stress} fatigue {stanchezza} boredom {noia} social {compagnia} other {fame}} ({count} su {total})."
+      },
+      "hydration": {
+        "on_goal": "Hai raggiunto il tuo obiettivo d'acqua in {onGoal} dei {logged} giorni registrati.",
+        "training_more": "Nei giorni di allenamento raggiungi l'obiettivo d'acqua più spesso ({training}% contro {rest}% negli altri).",
+        "training_less": "Nei giorni di allenamento raggiungi l'obiettivo d'acqua meno spesso ({training}% contro {rest}% negli altri)."
+      }
+    }
   }
 }

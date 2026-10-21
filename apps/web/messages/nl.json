@@ -8699,5 +8699,42 @@
       "range": "Periode",
       "sharedOnly": "Alleen uit items die de klant met de coaches van de box deelt."
     }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Verbergen",
+    "restore": "Weer tonen",
+    "hidden": "Verborgen: {count}",
+    "note": "Een indicatie, geen medisch advies.",
+    "noteWithWeeks": "Uit {weeks} weken gegevens · Een indicatie, geen medisch advies.",
+    "empty": {
+      "collecting": "Insights verschijnen na {min} weken registraties (slaap, water, trek, trainingen). Tot nu toe: {weeks} van {min}.",
+      "moreEntries": "Nog een paar registraties nodig voordat er een patroon zichtbaar wordt.",
+      "noPattern": "Geen duidelijk patroon in de laatste {window} weken. Insights worden elke nacht bijgewerkt.",
+      "allHidden": "Je hebt alle insights verborgen."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Je zet {ratio}× vaker een PR neer na {hours}+ uur slaap.",
+        "all_after_goal": "Al je {count} PR's kwamen na {hours}+ uur slaap."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Na minder dan {hours} uur slaap beoordeel je trainingen {delta} RPE-punten zwaarder."
+      },
+      "time_of_day": {
+        "best_part": "Je zet {ratio}× vaker een PR neer bij trainingen {part, select, morning {in de ochtend} afternoon {in de middag} evening {in de avond} other {in de nacht}}.",
+        "only_part": "Al je {count} PR's kwamen bij trainingen {part, select, morning {in de ochtend} afternoon {in de middag} evening {in de avond} other {in de nacht}}."
+      },
+      "cravings": {
+        "part_and_trigger": "De meeste momenten van trek ({count} van {total}) komen {part, select, morning {'s ochtends} afternoon {'s middags} evening {'s avonds} other {laat in de nacht}}, meestal met {trigger, select, stress {stress} fatigue {vermoeidheid} boredom {verveling} social {gezelschap} other {honger}}.",
+        "part": "De meeste momenten van trek ({count} van {total}) komen {part, select, morning {'s ochtends} afternoon {'s middags} evening {'s avonds} other {laat in de nacht}}.",
+        "trigger": "Bij trek noteer je het vaakst {trigger, select, stress {stress} fatigue {vermoeidheid} boredom {verveling} social {gezelschap} other {honger}} ({count} van {total})."
+      },
+      "hydration": {
+        "on_goal": "Je haalde je waterdoel op {onGoal} van de {logged} dagen die je registreerde.",
+        "training_more": "Op trainingsdagen haal je je waterdoel vaker ({training}% tegenover {rest}% op andere dagen).",
+        "training_less": "Op trainingsdagen haal je je waterdoel minder vaak ({training}% tegenover {rest}% op andere dagen)."
+      }
+    }
   }
 }

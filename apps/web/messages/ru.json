@@ -8699,5 +8699,42 @@
       "range": "Период",
       "sharedOnly": "Только из записей, которыми клиент делится с тренерами зала."
     }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Скрыть",
+    "restore": "Показать снова",
+    "hidden": "Скрыто: {count}",
+    "note": "Это показатель, а не медицинский совет.",
+    "noteWithWeeks": "По данным за {weeks} нед. · Это показатель, а не медицинский совет.",
+    "empty": {
+      "collecting": "Insights появятся после {min} недель записей (сон, вода, тяга к еде, тренировки). Пока: {weeks} из {min}.",
+      "moreEntries": "Нужно ещё несколько записей, чтобы появилась закономерность.",
+      "noPattern": "Явной закономерности за последние {window} недель нет. Insights обновляются каждую ночь.",
+      "allHidden": "Вы скрыли все insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Вы ставите PR в {ratio}× чаще после {hours}+ часов сна.",
+        "all_after_goal": "Все ваши PR ({count}) были после {hours}+ часов сна."
+      },
+      "sleep_effort": {
+        "harder_after_short": "После сна меньше {hours} часов вы оцениваете тренировки на {delta} пункта RPE тяжелее."
+      },
+      "time_of_day": {
+        "best_part": "Вы ставите PR в {ratio}× чаще на {part, select, morning {утренних} afternoon {дневных} evening {вечерних} other {ночных}} тренировках.",
+        "only_part": "Все ваши PR ({count}) были на {part, select, morning {утренних} afternoon {дневных} evening {вечерних} other {ночных}} тренировках."
+      },
+      "cravings": {
+        "part_and_trigger": "Большая часть тяги к еде ({count} из {total}) приходится {part, select, morning {на утро} afternoon {на день} evening {на вечер} other {на позднюю ночь}}, обычно из-за {trigger, select, stress {стресса} fatigue {усталости} boredom {скуки} social {компании} other {голода}}.",
+        "part": "Большая часть тяги к еде ({count} из {total}) приходится {part, select, morning {на утро} afternoon {на день} evening {на вечер} other {на позднюю ночь}}.",
+        "trigger": "При тяге к еде вы чаще всего отмечаете причину: {trigger, select, stress {стресс} fatigue {усталость} boredom {скука} social {компания} other {голод}} ({count} из {total})."
+      },
+      "hydration": {
+        "on_goal": "Вы достигли цели по воде в {onGoal} из {logged} отмеченных дней.",
+        "training_more": "В дни тренировок вы чаще достигаете цели по воде ({training}% против {rest}% в другие дни).",
+        "training_less": "В дни тренировок вы реже достигаете цели по воде ({training}% против {rest}% в другие дни)."
+      }
+    }
   }
 }

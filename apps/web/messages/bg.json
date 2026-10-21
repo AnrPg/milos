@@ -8699,5 +8699,42 @@
       "range": "Период",
       "sharedOnly": "Само от записи, които клиентът споделя с треньорите на залата."
     }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Скриване",
+    "restore": "Покажи отново",
+    "hidden": "Скрити: {count}",
+    "note": "Показател, не медицински съвет.",
+    "noteWithWeeks": "От {weeks} седмици данни · Показател, не медицински съвет.",
+    "empty": {
+      "collecting": "Insights се появяват след {min} седмици записи (сън, вода, глад за сладко, тренировки). Досега: {weeks} от {min}.",
+      "moreEntries": "Нужни са още няколко записа, за да се види модел.",
+      "noPattern": "Няма ясен модел през последните {window} седмици. Insights се обновяват всяка нощ.",
+      "allHidden": "Скрихте всички insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Поставяш PR {ratio}× по-често след {hours}+ часа сън.",
+        "all_after_goal": "Всичките ти {count} PR дойдоха след {hours}+ часа сън."
+      },
+      "sleep_effort": {
+        "harder_after_short": "След сън под {hours} часа оценяваш тренировките с {delta} точки RPE по-тежки."
+      },
+      "time_of_day": {
+        "best_part": "Поставяш PR {ratio}× по-често на {part, select, morning {сутрешните} afternoon {следобедните} evening {вечерните} other {нощните}} тренировки.",
+        "only_part": "Всичките ти {count} PR дойдоха на {part, select, morning {сутрешни} afternoon {следобедни} evening {вечерни} other {нощни}} тренировки."
+      },
+      "cravings": {
+        "part_and_trigger": "Повечето ти пристъпи на глад ({count} от {total}) идват {part, select, morning {сутрин} afternoon {следобед} evening {вечер} other {късно през нощта}}, обикновено при {trigger, select, stress {стрес} fatigue {умора} boredom {скука} social {компания} other {глад}}.",
+        "part": "Повечето ти пристъпи на глад ({count} от {total}) идват {part, select, morning {сутрин} afternoon {следобед} evening {вечер} other {късно през нощта}}.",
+        "trigger": "При пристъпите на глад най-често отбелязваш {trigger, select, stress {стрес} fatigue {умора} boredom {скука} social {компания} other {глад}} ({count} от {total})."
+      },
+      "hydration": {
+        "on_goal": "Достигна целта си за вода в {onGoal} от {logged} записани дни.",
+        "training_more": "В дните с тренировка достигаш целта за вода по-често ({training}% срещу {rest}% в другите дни).",
+        "training_less": "В дните с тренировка достигаш целта за вода по-рядко ({training}% срещу {rest}% в другите дни)."
+      }
+    }
   }
 }

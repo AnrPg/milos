@@ -8699,5 +8699,42 @@
       "range": "Période",
       "sharedOnly": "Uniquement à partir des entrées que le client partage avec les coachs de la box."
     }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Masquer",
+    "restore": "Réafficher",
+    "hidden": "Masqués : {count}",
+    "note": "Un indicateur, pas un avis médical.",
+    "noteWithWeeks": "Sur {weeks} semaines de données · Un indicateur, pas un avis médical.",
+    "empty": {
+      "collecting": "Les insights apparaissent après {min} semaines de saisies (sommeil, eau, envies, entraînements). Pour l'instant : {weeks} sur {min}.",
+      "moreEntries": "Encore quelques saisies avant qu'un schéma apparaisse.",
+      "noPattern": "Aucun schéma net sur les {window} dernières semaines. Les insights sont mis à jour chaque nuit.",
+      "allHidden": "Vous avez masqué tous les insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Vous battez vos records {ratio}× plus souvent après {hours}+ heures de sommeil.",
+        "all_after_goal": "Vos {count} records sont tous venus après {hours}+ heures de sommeil."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Après moins de {hours} heures de sommeil, vous jugez vos séances plus dures de {delta} points de RPE."
+      },
+      "time_of_day": {
+        "best_part": "Vous battez vos records {ratio}× plus souvent lors des séances {part, select, morning {du matin} afternoon {de l'après-midi} evening {du soir} other {de nuit}}.",
+        "only_part": "Vos {count} records sont tous venus lors de séances {part, select, morning {du matin} afternoon {de l'après-midi} evening {du soir} other {de nuit}}."
+      },
+      "cravings": {
+        "part_and_trigger": "La plupart de vos envies ({count} sur {total}) arrivent {part, select, morning {le matin} afternoon {l'après-midi} evening {le soir} other {tard la nuit}}, souvent avec {trigger, select, stress {le stress} fatigue {la fatigue} boredom {l'ennui} social {la compagnie} other {la faim}}.",
+        "part": "La plupart de vos envies ({count} sur {total}) arrivent {part, select, morning {le matin} afternoon {l'après-midi} evening {le soir} other {tard la nuit}}.",
+        "trigger": "Pour vos envies, vous notez le plus souvent {trigger, select, stress {le stress} fatigue {la fatigue} boredom {l'ennui} social {la compagnie} other {la faim}} ({count} sur {total})."
+      },
+      "hydration": {
+        "on_goal": "Vous avez atteint votre objectif d'eau {onGoal} jours sur les {logged} jours saisis.",
+        "training_more": "Les jours d'entraînement, vous atteignez votre objectif d'eau plus souvent ({training} % contre {rest} % les autres jours).",
+        "training_less": "Les jours d'entraînement, vous atteignez votre objectif d'eau moins souvent ({training} % contre {rest} % les autres jours)."
+      }
+    }
   }
 }
