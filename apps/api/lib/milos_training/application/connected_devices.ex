@@ -9,10 +9,16 @@ defmodule MilosTraining.Application.ConnectedDevices do
   Nothing here pretends: Garmin (ADR-161) is `unavailable` («Σύντομα») on a
   server without Garmin credentials, and otherwise shows its connection
   (status, last sync, what syncs, history import, error); Apple Health and
-  Health Connect are `native_only` (they come with the native apps).
+  Health Connect are `native_only` until the store app connects them, then
+  `connected` with their last sync (ADR-172).
   """
 
-  alias MilosTraining.Application.{GarminConnection, GetCalendarExportLinks, WalletPasses}
+  alias MilosTraining.Application.{
+    GarminConnection,
+    GetCalendarExportLinks,
+    PhoneHealthConnection,
+    WalletPasses
+  }
 
   def call(%{user_id: _} = context, account) do
     with {:ok, calendar} <- GetCalendarExportLinks.call(account) do
@@ -25,8 +31,8 @@ defmodule MilosTraining.Application.ConnectedDevices do
          calendar: Map.take(calendar, [:https_url, :webcal_url, :download_url, :help]),
          integrations: [
            GarminConnection.row(context),
-           %{provider: "apple_health", status: "native_only"},
-           %{provider: "health_connect", status: "native_only"}
+           PhoneHealthConnection.row(context, "apple_health"),
+           PhoneHealthConnection.row(context, "health_connect")
          ]
        }}
     end

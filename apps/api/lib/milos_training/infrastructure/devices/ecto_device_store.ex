@@ -23,6 +23,14 @@ defmodule MilosTraining.Infrastructure.Devices.EctoDeviceStore do
     do: connection |> Connection.changeset(attrs) |> Repo.update()
 
   @impl true
+  def list_connections(user_id) do
+    Connection
+    |> where([c], c.user_id == ^user_id)
+    |> order_by([c], asc: c.provider)
+    |> Repo.all()
+  end
+
+  @impl true
   def oauth_state_lookup(state_hash) do
     case Repo.query!("SELECT id, user_id FROM milos_device_connection_by_oauth_state($1)", [
            state_hash
@@ -205,6 +213,22 @@ defmodule MilosTraining.Infrastructure.Devices.EctoDeviceStore do
   end
 
   @impl true
+  def list_activities_between(user_id, from, to) do
+    DeviceActivity
+    |> where([a], a.user_id == ^user_id and a.started_at >= ^from and a.started_at <= ^to)
+    |> order_by([a], asc: a.started_at)
+    |> Repo.all()
+  end
+
+  @impl true
+  def list_activities(user_id) do
+    DeviceActivity
+    |> where([a], a.user_id == ^user_id)
+    |> order_by([a], asc: a.started_at, asc: a.id)
+    |> Repo.all()
+  end
+
+  @impl true
   def delete_activities(user_id, provider) do
     {count, _rows} =
       DeviceActivity
@@ -218,10 +242,14 @@ defmodule MilosTraining.Infrastructure.Devices.EctoDeviceStore do
 
   @impl true
   def upsert_daily_stat(attrs) do
+    # Only the numbers this import carries are replaced: a day's steps and
+    # its resting heart rate arrive separately into the same row.
+    replaced = Enum.filter([:resting_heart_rate, :steps], &Map.has_key?(attrs, &1))
+
     attrs
     |> DailyStat.changeset()
     |> Repo.insert(
-      on_conflict: {:replace, [:resting_heart_rate, :updated_at]},
+      on_conflict: {:replace, replaced ++ [:updated_at]},
       conflict_target: [:user_id, :on, :source],
       returning: true
     )
@@ -232,6 +260,14 @@ defmodule MilosTraining.Infrastructure.Devices.EctoDeviceStore do
     DailyStat
     |> where([s], s.user_id == ^user_id and s.on >= ^from and s.on <= ^to)
     |> order_by([s], asc: s.on)
+    |> Repo.all()
+  end
+
+  @impl true
+  def list_all_daily_stats(user_id) do
+    DailyStat
+    |> where([s], s.user_id == ^user_id)
+    |> order_by([s], asc: s.on, asc: s.source)
     |> Repo.all()
   end
 

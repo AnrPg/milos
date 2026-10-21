@@ -39,6 +39,33 @@ defmodule MilosTraining.Application.DevicePresenter do
     }
   end
 
+  @doc """
+  A phone's health row (ADR-172): `native_only` until the store app
+  connects it (the web says «Με την εφαρμογή»), then `connected` with what
+  syncs, the last sync and where the app reads from next.
+  """
+  def phone_row(provider, connection) do
+    live = if match?(%{status: "active"}, connection), do: connection
+
+    %{
+      provider: provider,
+      status: if(live, do: "connected", else: "native_only"),
+      sync_prefs: Map.merge(Devices.default_prefs(provider), (live && live.sync_prefs) || %{}),
+      history_days: Devices.phone_history_days(),
+      connection: live && phone_connection(provider, live)
+    }
+  end
+
+  defp phone_connection(provider, connection) do
+    %{
+      status: connection.status,
+      connected_at: connection.connected_at,
+      last_synced_at: connection.last_synced_at,
+      sync_prefs: Map.merge(Devices.default_prefs(provider), connection.sync_prefs || %{}),
+      read_from: Devices.phone_read_from(connection)
+    }
+  end
+
   @doc "A watch workout of its own, as a journal entry."
   def activity(activity) do
     %{

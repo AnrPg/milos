@@ -1,5 +1,5 @@
 defmodule MilosTraining.Devices.DailyStat do
-  @moduledoc "A day's resting heart rate from a device, for Πρόοδος (ADR-161)."
+  @moduledoc "A day's resting heart rate (ADR-161) and steps (ADR-172) from a device, for Πρόοδος."
 
   use Ecto.Schema
   import Ecto.Changeset
@@ -14,15 +14,17 @@ defmodule MilosTraining.Devices.DailyStat do
     field :on, :date
     field :source, :string
     field :resting_heart_rate, :integer
+    field :steps, :integer
 
     timestamps(type: :utc_datetime_usec)
   end
 
   def changeset(stat \\ %__MODULE__{}, attrs) do
     stat
-    |> cast(attrs, [:user_id, :on, :source, :resting_heart_rate])
+    |> cast(attrs, [:user_id, :on, :source, :resting_heart_rate, :steps])
     |> validate_required([:user_id, :on, :source])
     |> unique_constraint([:user_id, :on, :source])
     |> check_constraint(:resting_heart_rate, name: :daily_stats_resting_check)
+    |> check_constraint(:steps, name: :daily_stats_steps_check)
   end
 end

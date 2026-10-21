@@ -300,20 +300,22 @@ defmodule MilosTraining.Devices.DomainTest do
       nap = %{id: "n", kind: "sleep", source: "manual", value: %{"nap" => true}}
       garmin = %{id: "g", kind: "sleep", source: "garmin", value: %{}}
 
-      assert {:manual_wins, "m"} = ImportPolicy.sleep_decision([garmin, typed])
-      assert :import = ImportPolicy.sleep_decision([nap, garmin])
+      assert {:manual_wins, "m"} = ImportPolicy.sleep_decision([garmin, typed], "garmin")
+      assert :import = ImportPolicy.sleep_decision([nap, garmin], "garmin")
     end
 
     test "a typed weight the same day wins over the scale" do
       assert {:manual_wins, "s"} =
-               ImportPolicy.weight_decision([
-                 %{id: "s", source: "manual", metrics: %{"weight" => 72}}
-               ])
+               ImportPolicy.weight_decision(
+                 [%{id: "s", source: "manual", metrics: %{"weight" => 72}}],
+                 "garmin"
+               )
 
       assert :import =
-               ImportPolicy.weight_decision([
-                 %{id: "s", source: "manual", metrics: %{"waist" => 80}}
-               ])
+               ImportPolicy.weight_decision(
+                 [%{id: "s", source: "manual", metrics: %{"waist" => 80}}],
+                 "garmin"
+               )
     end
 
     test "imports start private" do
