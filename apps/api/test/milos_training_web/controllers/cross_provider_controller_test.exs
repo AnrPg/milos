@@ -127,10 +127,15 @@ defmodule MilosTrainingWeb.CrossProviderControllerTest do
 
     vault = authed(ctx) |> get("/api/me/vault?benchmark=fran") |> json_response(200)
 
-    assert [%{"title" => "Fran", "attempt_count" => 2, "attempts" => [latest, _]}] =
+    assert [%{"title" => "Fran", "attempt_count" => 2, "attempts" => [latest, older]}] =
              vault["groups"]
 
     assert latest["source"]["organization_id"] == ctx.coach_org.id
+
+    # «Ξανά» repeats the workout after switching to its provider.
+    assert %{"organization_id" => coach_id, "master_workout_id" => coach_workout} = latest
+    assert {coach_id, coach_workout} == {ctx.coach_org.id, coach_fran.id}
+    assert {older["organization_id"], older["master_workout_id"]} == {ctx.box.id, box_fran.id}
 
     assert authed(ctx) |> get("/api/me/vault?disciplines=yoga") |> json_response(422)
   end

@@ -75,6 +75,8 @@ defmodule MilosTraining.Application.AccountTraining do
     %{
       kind: "training_log",
       id: entry.id,
+      organization_id: entry.organization_id,
+      master_workout_id: Map.get(entry, :master_workout_id),
       key: entry.workout_key,
       title: entry.title,
       type: entry.workout_type,
@@ -94,6 +96,8 @@ defmodule MilosTraining.Application.AccountTraining do
     %{
       kind: "execution",
       id: execution.id,
+      organization_id: execution.organization_id,
+      master_workout_id: Map.get(execution, :master_workout_id),
       key: execution.workout_key,
       title: execution.workout_title,
       type: execution.workout_type && to_string(execution.workout_type),

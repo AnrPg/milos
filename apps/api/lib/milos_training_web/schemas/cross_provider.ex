@@ -321,10 +321,23 @@ defmodule MilosTrainingWeb.Schemas.CrossProvider do
                 type: :array,
                 items: %Schema{
                   type: :object,
-                  required: [:kind, :id, :at, :source],
+                  required: [:kind, :id, :organization_id, :master_workout_id, :at, :source],
                   properties: %{
                     kind: %Schema{type: :string, enum: ["execution", "training_log"]},
                     id: @uuid,
+                    organization_id: %Schema{
+                      type: :string,
+                      format: :uuid,
+                      nullable: true,
+                      description:
+                        "Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first."
+                    },
+                    master_workout_id: %Schema{
+                      type: :string,
+                      format: :uuid,
+                      nullable: true,
+                      description: "Workout to repeat, when the attempt has one."
+                    },
                     title: @nullable_string,
                     type: @nullable_string,
                     at: @datetime,
