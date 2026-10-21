@@ -83,6 +83,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     buddies/buddy_store
     partners/partner_store
     wellness/wellness_store
+    insights/insight_store
     devices/device_store
     coaching/form_review_store
     coaching/relationship_store

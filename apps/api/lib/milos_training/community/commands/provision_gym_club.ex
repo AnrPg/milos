@@ -10,4 +10,16 @@ defmodule MilosTraining.Community.Commands.ProvisionGymClub do
 
   def call(%{organization_id: organization_id} = context) when is_binary(organization_id),
     do: CommunityStore.ensure_gym_club(context, ChannelPolicy.gym_channels())
+
+  @doc """
+  ADR-170: names the gym's club (an independent coach's «Team Νίκος»), only
+  while it has no name of its own, then returns the club.
+  """
+  def call(%{organization_id: organization_id} = context, name)
+      when is_binary(organization_id) and is_binary(name) do
+    with {:ok, _club} <- call(context),
+         :ok <- CommunityStore.name_gym_club(context, String.slice(String.trim(name), 0, 80)) do
+      call(context)
+    end
+  end
 end

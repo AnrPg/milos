@@ -28,6 +28,11 @@ const RECENT_KEY = [...JOURNAL_FEED_KEY, "device-recent"] as const;
  * see (or while history comes in). Tapping marks it seen and opens what
  * needs an answer first, then the new workouts.
  */
+/** The card names the device whose news it shows (ADR-172); Garmin when unknown. */
+function providerKey(provider: string | null | undefined): string {
+  return ["provider", provider === "apple_health" || provider === "health_connect" ? provider : "garmin"].join("_");
+}
+
 export function DeviceJournalCard({ token, locale }: { token: string | null; locale: string }) {
   const t = useTranslations("Devices");
   const queryClient = useQueryClient();
@@ -78,7 +83,7 @@ export function DeviceJournalCard({ token, locale }: { token: string | null; loc
         >
           <span aria-hidden="true" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-lg" style={{ background: "var(--panel-raised)" }}>⌚</span>
           <span className="flex min-w-0 flex-1 flex-col">
-            <b className="text-sm">{[t("provider_garmin"), headline ? text(headline) : null].filter(Boolean).join(" · ")}</b>
+            <b className="text-sm">{[t(providerKey(data?.provider)), headline ? text(headline) : null].filter(Boolean).join(" · ")}</b>
             {rest.length ? <span className="text-xs" style={{ color: "var(--text-soft)" }}>{rest.map(text).join(" · ")}</span> : null}
           </span>
           <span aria-hidden="true" style={{ color: "var(--dim)" }}>›</span>
@@ -95,16 +100,16 @@ export function DeviceJournalCard({ token, locale }: { token: string | null; loc
             onClose={() => setOpen(thenNew ? "new" : null)}
           />
         ) : (
-          <NewFromDeviceSheet token={token} locale={locale} onClose={() => setOpen(null)} />
+          <NewFromDeviceSheet token={token} locale={locale} provider={data?.provider} onClose={() => setOpen(null)} />
         )
       ) : null}
-      {open === "new" ? <NewFromDeviceSheet token={token} locale={locale} onClose={() => setOpen(null)} /> : null}
+      {open === "new" ? <NewFromDeviceSheet token={token} locale={locale} provider={data?.provider} onClose={() => setOpen(null)} /> : null}
     </>
   );
 }
 
 /** The latest watch workouts of their own, each opening its detail. */
-function NewFromDeviceSheet({ token, locale, onClose }: { token: string; locale: string; onClose: () => void }) {
+function NewFromDeviceSheet({ token, locale, provider, onClose }: { token: string; locale: string; provider?: string; onClose: () => void }) {
   const t = useTranslations("Devices");
   const labelId = useId();
   const [detail, setDetail] = useState<DeviceActivity | null>(null);
@@ -117,7 +122,7 @@ function NewFromDeviceSheet({ token, locale, onClose }: { token: string; locale:
   return (
     <Sheet
       title={t("newTitle")}
-      eyebrow={t("provider_garmin")}
+      eyebrow={t(providerKey(provider))}
       labelId={labelId}
       onClose={onClose}
       footer={<SheetButton onClick={onClose}>{t("close")}</SheetButton>}

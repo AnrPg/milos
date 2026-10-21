@@ -14,6 +14,7 @@ import { useSession } from "@/components/session-provider";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
+import { ownsCoachPractice } from "@/lib/solo-coach";
 import { clientExtraLinks, hasStaffRole } from "@/lib/role-navigation";
 import { setView } from "@/lib/view-mode";
 
@@ -33,6 +34,7 @@ export function MeHub() {
   const tSocial = useTranslations("Social");
   const tCheckIn = useTranslations("CheckIn");
   const tBuddy = useTranslations("Buddy");
+  const tCoach = useTranslations("SoloCoach");
   const summary = useSocialSummary();
   const buddies = useBuddies();
   const buddyNames = recipientNames(activeBuddies(buddies.data), tBuddy("someone"));
@@ -102,6 +104,10 @@ export function MeHub() {
           <HubListRow key={item.id} href={adminHref(item.href, selectedOrganizationSlug)} label={tNav(item.labelKey)} />
         ))}
         {hasStaffRole(membership) ? <HubListRow onClick={openConsole} label={t("meConsole")} detail={t("meConsoleHint")} /> : null}
+        {/* ADR-170: anyone can open a practice as an independent coach, once. */}
+        {ownsCoachPractice(memberships) ? null : (
+          <HubListRow href="/me/coach-practice" label={tCoach("me.row")} detail={tCoach("me.rowHint")} />
+        )}
       </HubList>
 
       {memberships.length > 1 ? (

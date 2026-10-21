@@ -14,6 +14,7 @@ defmodule MilosTraining.Devices.Ports.DeviceStore do
   @callback get_connection(id(), String.t()) :: Connection.t() | nil
   @callback insert_connection(map()) :: result(Connection.t())
   @callback update_connection(Connection.t(), map()) :: result(Connection.t())
+  @callback list_connections(id()) :: [Connection.t()]
 
   @callback oauth_state_lookup(String.t()) :: {id(), id()} | nil
   @callback provider_users_lookup(String.t(), [String.t()]) :: [map()]
@@ -34,10 +35,13 @@ defmodule MilosTraining.Devices.Ports.DeviceStore do
   @callback list_activity_items(id(), term(), pos_integer(), term()) :: [DeviceActivity.t()]
   @callback list_merged(String.t(), [id()]) :: [DeviceActivity.t()]
   @callback match_candidates(DateTime.t(), DateTime.t()) :: [map()]
+  @callback list_activities_between(id(), DateTime.t(), DateTime.t()) :: [DeviceActivity.t()]
+  @callback list_activities(id()) :: [DeviceActivity.t()]
   @callback delete_activities(id(), String.t()) :: non_neg_integer()
 
   @callback upsert_daily_stat(map()) :: result(DailyStat.t())
   @callback list_daily_stats(id(), Date.t(), Date.t()) :: [DailyStat.t()]
+  @callback list_all_daily_stats(id()) :: [DailyStat.t()]
   @callback delete_daily_stats(id(), String.t()) :: non_neg_integer()
 
   @callback transaction((-> term())) :: {:ok, term()} | {:error, term()}

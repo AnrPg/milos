@@ -501,6 +501,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/coach-practices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open your practice as an independent coach (one per account) */
+        post: operations["MilosTrainingWeb.CoachPracticeController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/executions": {
         parameters: {
             query?: never;
@@ -1678,6 +1695,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/devices/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Everything connected devices brought in, as JSON (workouts, daily stats, import log) */
+        get: operations["MilosTrainingWeb.PhoneHealthController.export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/devices/garmin": {
         parameters: {
             query?: never;
@@ -1741,6 +1775,58 @@ export interface paths {
         put?: never;
         /** «Συγχρονισμός τώρα»: Garmin resends the last two days (at most every 5 minutes) */
         post: operations["MilosTrainingWeb.DevicesController.sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/phone/{provider}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Disconnect the phone's health data, keeping or deleting what it brought in */
+        delete: operations["MilosTrainingWeb.PhoneHealthController.disconnect"];
+        options?: never;
+        head?: never;
+        /** Change what the phone brings in */
+        patch: operations["MilosTrainingWeb.PhoneHealthController.update"];
+        trace?: never;
+    };
+    "/api/me/devices/phone/{provider}/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Connect Apple Health or Health Connect after the phone granted read access */
+        post: operations["MilosTrainingWeb.PhoneHealthController.connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/phone/{provider}/ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A batch the app read from the phone: workouts, nights, weigh-ins, daily numbers */
+        post: operations["MilosTrainingWeb.PhoneHealthController.ingest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2104,6 +2190,57 @@ export interface paths {
         get: operations["MilosTrainingWeb.AccountTrainingController.history"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your insights (indicators, never medical advice) */
+        get: operations["MilosTrainingWeb.InsightsController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/insights/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Show every dismissed insight again */
+        post: operations["MilosTrainingWeb.InsightsController.restore"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/insights/{rule}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide one insight until its finding changes */
+        post: operations["MilosTrainingWeb.InsightsController.dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5220,6 +5357,23 @@ export interface paths {
         put?: never;
         /** Hand ownership to an active member; the former owner stays as admin */
         post: operations["MilosTrainingWeb.OwnerOrganizationController.transfer"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The organization's platform plan with seats used */
+        get: operations["MilosTrainingWeb.AdminPlanController.show"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -9248,6 +9402,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.PlatformOrganizationController.rename"];
         trace?: never;
     };
+    "/api/platform/organizations/{id}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put an organization on a plan with a status (vendors) */
+        put: operations["MilosTrainingWeb.PlatformPlanController.assign"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organizations/{id}/purge": {
         parameters: {
             query?: never;
@@ -9363,6 +9534,58 @@ export interface paths {
         };
         /** Summarize what renaming an organization's path slug affects (ADR-122) */
         get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every platform plan (vendors) */
+        get: operations["MilosTrainingWeb.PlatformPlanController.index"];
+        put?: never;
+        /** Add a platform plan (vendors) */
+        post: operations["MilosTrainingWeb.PlatformPlanController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/plans/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a plan's name, limits, prices, trial or visibility (vendors) */
+        patch: operations["MilosTrainingWeb.PlatformPlanController.update"];
+        trace?: never;
+    };
+    "/api/platform/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The plan every organization is on (vendors) */
+        get: operations["MilosTrainingWeb.PlatformPlanController.subscriptions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9692,6 +9915,23 @@ export interface paths {
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
         get: operations["MilosTrainingWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/platform-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Active public platform plans (pricing, coach onboarding) */
+        get: operations["MilosTrainingWeb.PlatformPlanController.index_public"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10177,6 +10417,8 @@ export interface components {
         };
         /** AdminOnboardingChecklist */
         AdminOnboardingChecklist: {
+            /** @enum {string} */
+            audience: "gym" | "coach";
             completed_count: number;
             dismissed: boolean;
             finished: boolean;
@@ -10184,7 +10426,7 @@ export interface components {
                 auto: boolean;
                 done: boolean;
                 /** @enum {string} */
-                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 skipped: boolean;
             }[];
             total: number;
@@ -10273,6 +10515,9 @@ export interface components {
             kind: "pt_session" | "assessment";
             /** Format: uuid */
             location_id?: string | null;
+            meeting_url?: string | null;
+            /** @enum {string} */
+            mode?: "in_person" | "online";
             notes?: string | null;
             spots_remaining?: number | null;
             /** Format: date-time */
@@ -13111,7 +13356,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -13176,7 +13421,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -13460,7 +13705,7 @@ export interface components {
              * @description manual, or garmin when a connected device sent it
              * @enum {string}
              */
-            source?: "manual" | "garmin";
+            source?: "manual" | "garmin" | "apple_health" | "health_connect";
             /** Format: date-time */
             taken_at: string;
             taken_tz?: string;
@@ -13572,7 +13817,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -13640,7 +13885,7 @@ export interface components {
                  * @description manual, or garmin when a connected device sent it
                  * @enum {string}
                  */
-                source?: "manual" | "garmin";
+                source?: "manual" | "garmin" | "apple_health" | "health_connect";
                 /** Format: date-time */
                 taken_at: string;
                 taken_tz?: string;
@@ -15283,6 +15528,15 @@ export interface components {
             reader_nickname?: string | null;
             /** Format: uuid */
             reader_user_id: string;
+        };
+        /** CoachPractice */
+        CoachPractice: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            provider_kind: "coach";
+            slug: string;
         };
         /** CoachingRelationship */
         CoachingRelationship: {
@@ -18385,8 +18639,7 @@ export interface components {
                 /** @enum {string} */
                 capability?: "available" | "not_configured";
                 configured?: boolean;
-                /** GarminConnection */
-                connection?: {
+                connection?: (({
                     /** @enum {integer} */
                     backfill_days: 0 | 30 | 90;
                     /** @description «Εισαγωγή… 40%» while the history import runs */
@@ -18409,9 +18662,35 @@ export interface components {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
-                } | null;
+                } | null) | ({
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                     */
+                    read_from?: string | null;
+                    /** @enum {string} */
+                    status: "active";
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                } | null)) | null;
+                history_days?: number;
                 /** @enum {string} */
                 provider: "garmin" | "apple_health" | "health_connect";
                 /** @enum {string} */
@@ -18424,6 +18703,8 @@ export interface components {
                     activities?: boolean;
                     resting_hr?: boolean;
                     sleep?: boolean;
+                    /** @description Phones only (ADR-172) */
+                    steps?: boolean;
                     weight?: boolean;
                 };
             }[];
@@ -18697,7 +18978,7 @@ export interface components {
              * @enum {string}
              */
             source: "garmin" | "apple_health" | "health_connect";
-            /** @description Beats per minute for resting_hr */
+            /** @description Beats per minute for resting_hr, a count for steps */
             value: number;
         } | null;
         /** DailyStatPoint */
@@ -18709,7 +18990,7 @@ export interface components {
              * @enum {string}
              */
             source: "garmin" | "apple_health" | "health_connect";
-            /** @description Beats per minute for resting_hr */
+            /** @description Beats per minute for resting_hr, a count for steps */
             value: number;
         };
         /**
@@ -18729,11 +19010,11 @@ export interface components {
                  * @enum {string}
                  */
                 source: "garmin" | "apple_health" | "health_connect";
-                /** @description Beats per minute for resting_hr */
+                /** @description Beats per minute for resting_hr, a count for steps */
                 value: number;
             } | null;
             /** @enum {string} */
-            metric: "resting_hr";
+            metric: "resting_hr" | "steps";
             points: {
                 /** Format: date */
                 on: string;
@@ -18742,7 +19023,7 @@ export interface components {
                  * @enum {string}
                  */
                 source: "garmin" | "apple_health" | "health_connect";
-                /** @description Beats per minute for resting_hr */
+                /** @description Beats per minute for resting_hr, a count for steps */
                 value: number;
             }[];
             /** @enum {string} */
@@ -19006,6 +19287,85 @@ export interface components {
             };
         };
         /**
+         * DeviceDataExport
+         * @description Everything the connected devices brought in, except nights and weigh-ins (in the Ευεξία and Σώμα exports)
+         */
+        DeviceDataExport: {
+            activities: {
+                activity_type?: string | null;
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                candidates?: {
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "training_log" | "execution" | "class";
+                    /** Format: uuid */
+                    organization_id?: string | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title?: string | null;
+                }[];
+                /** Format: uuid */
+                class_id?: string | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                journal_visibility?: "private" | "coach_can_view";
+                max_heart_rate?: number | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /**
+                 * @description Localized by the client; the raw type is `activity_type`
+                 * @enum {string}
+                 */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+                started_tz?: string;
+                /** @enum {string} */
+                state: "own" | "merged" | "pending";
+                title: string;
+            }[];
+            connections: {
+                /** Format: date-time */
+                connected_at?: string | null;
+                /** Format: date-time */
+                last_synced_at?: string | null;
+                provider: string;
+                /** Format: date-time */
+                revoked_at?: string | null;
+                status: string;
+                sync_prefs?: {
+                    [key: string]: boolean;
+                };
+            }[];
+            daily_stats: {
+                /** Format: date */
+                on: string;
+                resting_heart_rate?: number | null;
+                source: string;
+                steps?: number | null;
+            }[];
+            /** Format: date-time */
+            exported_at: string;
+            imports: {
+                kind: string;
+                provider: string;
+                reason?: string | null;
+                /** Format: date-time */
+                received_at: string;
+                status: string;
+                target_type?: string | null;
+            }[];
+        };
+        /**
          * DeviceImportConfirmRequest
          * @description Either one of the activity's candidates, or keep it as its own entry
          */
@@ -19103,7 +19463,10 @@ export interface components {
                 weight?: number;
             };
             new_total: number;
+            /** @description The device whose news the card shows (Garmin first when connected) */
             provider: string;
+            /** @description Every connected device */
+            providers?: string[];
             /** Format: date-time */
             seen_at?: string | null;
             status?: string | null;
@@ -19117,6 +19480,8 @@ export interface components {
             activities?: boolean;
             resting_hr?: boolean;
             sleep?: boolean;
+            /** @description Phones only (ADR-172) */
+            steps?: boolean;
             weight?: boolean;
         };
         /**
@@ -19986,6 +20351,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         };
@@ -20020,6 +20387,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         } | null;
@@ -20053,6 +20422,8 @@ export interface components {
                     activities?: boolean;
                     resting_hr?: boolean;
                     sleep?: boolean;
+                    /** @description Phones only (ADR-172) */
+                    steps?: boolean;
                     weight?: boolean;
                 };
             } | null;
@@ -20071,6 +20442,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         };
@@ -20106,6 +20479,8 @@ export interface components {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
                 } | null;
@@ -20124,6 +20499,8 @@ export interface components {
                     activities?: boolean;
                     resting_hr?: boolean;
                     sleep?: boolean;
+                    /** @description Phones only (ADR-172) */
+                    steps?: boolean;
                     weight?: boolean;
                 };
             };
@@ -20159,6 +20536,8 @@ export interface components {
                 activities?: boolean;
                 resting_hr?: boolean;
                 sleep?: boolean;
+                /** @description Phones only (ADR-172) */
+                steps?: boolean;
                 weight?: boolean;
             };
         };
@@ -20260,6 +20639,71 @@ export interface components {
                 /** Format: date-time */
                 withdrawn_at?: string | null;
             }[];
+        };
+        /** Insight */
+        Insight: {
+            /**
+             * InsightParams
+             * @description The numbers of the finding; which keys appear depends on the rule and variant
+             */
+            params: {
+                /** @description RPE points harder on average */
+                delta?: number | null;
+                /** @description The member's sleep goal in hours */
+                hours?: number | null;
+                logged_days?: number | null;
+                on_goal_days?: number | null;
+                /** @enum {string|null} */
+                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                part_count?: number | null;
+                percent?: number | null;
+                pr_days?: number | null;
+                /** @description How many times as often */
+                ratio?: number | null;
+                rest_percent?: number | null;
+                total?: number | null;
+                training_percent?: number | null;
+                /** @enum {string|null} */
+                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                trigger_count?: number | null;
+                with_trigger?: number | null;
+            };
+            /** Format: date */
+            period_end: string;
+            /** Format: date */
+            period_start: string;
+            /** @enum {string} */
+            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+            /** @description Copy key: insights.<rule>.<variant> */
+            variant: string;
+            /** @description Weeks of data behind the finding */
+            weeks: number;
+        };
+        /**
+         * InsightParams
+         * @description The numbers of the finding; which keys appear depends on the rule and variant
+         */
+        InsightParams: {
+            /** @description RPE points harder on average */
+            delta?: number | null;
+            /** @description The member's sleep goal in hours */
+            hours?: number | null;
+            logged_days?: number | null;
+            on_goal_days?: number | null;
+            /** @enum {string|null} */
+            part?: "morning" | "afternoon" | "evening" | "night" | null;
+            part_count?: number | null;
+            percent?: number | null;
+            pr_days?: number | null;
+            /** @description How many times as often */
+            ratio?: number | null;
+            rest_percent?: number | null;
+            total?: number | null;
+            training_percent?: number | null;
+            /** @enum {string|null} */
+            trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+            trigger_count?: number | null;
+            with_trigger?: number | null;
         };
         /** InventoryLowReport */
         InventoryLowReport: {
@@ -21160,6 +21604,65 @@ export interface components {
             /** @enum {string|null} */
             surface?: "assignment_detail" | "class_detail" | "pre_start" | null;
         };
+        /** MyInsights */
+        MyInsights: {
+            /** Format: date-time */
+            computed_at: string | null;
+            /** @description Weeks of data so far (at most window_weeks) */
+            data_weeks: number;
+            /** @description Findings the member dismissed */
+            hidden_count: number;
+            /** @description At most max_shown findings, in the rules' fixed order */
+            insights: {
+                /**
+                 * InsightParams
+                 * @description The numbers of the finding; which keys appear depends on the rule and variant
+                 */
+                params: {
+                    /** @description RPE points harder on average */
+                    delta?: number | null;
+                    /** @description The member's sleep goal in hours */
+                    hours?: number | null;
+                    logged_days?: number | null;
+                    on_goal_days?: number | null;
+                    /** @enum {string|null} */
+                    part?: "morning" | "afternoon" | "evening" | "night" | null;
+                    part_count?: number | null;
+                    percent?: number | null;
+                    pr_days?: number | null;
+                    /** @description How many times as often */
+                    ratio?: number | null;
+                    rest_percent?: number | null;
+                    total?: number | null;
+                    training_percent?: number | null;
+                    /** @enum {string|null} */
+                    trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                    trigger_count?: number | null;
+                    with_trigger?: number | null;
+                };
+                /** Format: date */
+                period_end: string;
+                /** Format: date */
+                period_start: string;
+                /** @enum {string} */
+                rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                /** @description Copy key: insights.<rule>.<variant> */
+                variant: string;
+                /** @description Weeks of data behind the finding */
+                weeks: number;
+            }[];
+            /** @description Findings shown at a time */
+            max_shown: number;
+            /** @description Weeks of data before any insight */
+            min_weeks: number;
+            /**
+             * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+             * @enum {string}
+             */
+            state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+            /** @description Weeks the rules look back */
+            window_weeks: number;
+        };
         /** MyProviders */
         MyProviders: {
             former: {
@@ -21700,6 +22203,86 @@ export interface components {
             byte_size: number;
             /** @enum {string} */
             content_type: "image/png" | "image/jpeg" | "image/webp";
+        };
+        /** OrganizationPlan */
+        OrganizationPlan: {
+            /** @enum {string|null} */
+            notice: "trial_ending" | "trial_expired" | "past_due" | "cancelled" | null;
+            plan: {
+                active: boolean;
+                annual_price_cents: number | null;
+                /** @enum {string} */
+                audience: "gym" | "coach";
+                code: string;
+                currency: string;
+                description: string | null;
+                is_default: boolean;
+                /**
+                 * PlatformPlanLimits
+                 * @description Absent key = unlimited
+                 */
+                limits: {
+                    active_clients?: number;
+                    staff_seats?: number;
+                };
+                monthly_price_cents: number | null;
+                name: string;
+                position: number;
+                /** @enum {string} */
+                price_status: "placeholder" | "confirmed";
+                public: boolean;
+                trial_days: number;
+            } | null;
+            price_override_cents: number | null;
+            /** @enum {string|null} */
+            status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired" | null;
+            trial_days_left: number | null;
+            /** Format: date-time */
+            trial_ends_at: string | null;
+            usage: {
+                hard: boolean;
+                /** @enum {string} */
+                key: "staff_seats" | "active_clients";
+                /** @description null = unlimited */
+                limit: number | null;
+                /** @enum {string} */
+                state: "ok" | "near" | "reached" | "over";
+                used: number;
+            }[];
+        };
+        /** OrganizationPlatformSubscription */
+        OrganizationPlatformSubscription: {
+            notes: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            plan_code: string;
+            price_override_cents: number | null;
+            /** @enum {string} */
+            status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+            /** @enum {string} */
+            stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+            /** Format: date-time */
+            trial_ends_at: string | null;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        /** OrganizationPlatformSubscriptions */
+        OrganizationPlatformSubscriptions: {
+            subscriptions: {
+                notes: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                plan_code: string;
+                price_override_cents: number | null;
+                /** @enum {string} */
+                status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+                /** @enum {string} */
+                stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                /** Format: date-time */
+                trial_ends_at: string | null;
+                /** Format: date-time */
+                updated_at: string;
+            }[];
         };
         /** PRTimelineEntry */
         PRTimelineEntry: {
@@ -22413,6 +22996,372 @@ export interface components {
             /** Format: uuid */
             id: string;
             nickname?: string | null;
+        };
+        /** PhoneHealthActivity */
+        PhoneHealthActivity: {
+            avg_hr?: number | null;
+            distance_m?: number | null;
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            end: string;
+            /** @description The phone's id of the workout */
+            id: string;
+            max_hr?: number | null;
+            /** @description The app that recorded it */
+            source_app?: string | null;
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            start: string;
+            title?: string | null;
+            /** @description The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …) */
+            type?: string;
+        };
+        /** PhoneHealthConnectRequest */
+        PhoneHealthConnectRequest: {
+            /** @description Grants the health-data consent in the same step when it is missing; needed when sleep, weight, resting heart rate or steps sync */
+            health_data_consent?: boolean;
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs?: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** PhoneHealthConnection */
+        PhoneHealthConnection: {
+            /** Format: date-time */
+            connected_at?: string | null;
+            /** Format: date-time */
+            last_synced_at?: string | null;
+            /**
+             * Format: date-time
+             * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+             */
+            read_from?: string | null;
+            /** @enum {string} */
+            status: "active";
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        } | null;
+        /** PhoneHealthDaily */
+        PhoneHealthDaily: {
+            /** @description The wearer's local day, YYYY-MM-DD */
+            date: string;
+            resting_hr?: number | null;
+            steps?: number | null;
+        };
+        /**
+         * PhoneHealthIngestRequest
+         * @description What the app read from the phone; at most 500 records per list
+         */
+        PhoneHealthIngestRequest: {
+            activities?: {
+                avg_hr?: number | null;
+                distance_m?: number | null;
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                end: string;
+                /** @description The phone's id of the workout */
+                id: string;
+                max_hr?: number | null;
+                /** @description The app that recorded it */
+                source_app?: string | null;
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                start: string;
+                title?: string | null;
+                /** @description The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …) */
+                type?: string;
+            }[];
+            dailies?: {
+                /** @description The wearer's local day, YYYY-MM-DD */
+                date: string;
+                resting_hr?: number | null;
+                steps?: number | null;
+            }[];
+            sleeps?: {
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                end: string;
+                id: string;
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                start: string;
+            }[];
+            weights?: {
+                /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                at: string;
+                id: string;
+                kg: number;
+            }[];
+        };
+        /** PhoneHealthIngestResponse */
+        PhoneHealthIngestResponse: {
+            /** @description Records by outcome: imported, merged, duplicate, ignored, skipped, invalid, failed */
+            counts: {
+                [key: string]: number;
+            };
+            /**
+             * PhoneHealthRow
+             * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+             */
+            row: {
+                /** PhoneHealthConnection */
+                connection?: {
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                     */
+                    read_from?: string | null;
+                    /** @enum {string} */
+                    status: "active";
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                } | null;
+                /** @description Days read back at the first sync */
+                history_days?: number;
+                /** @enum {string} */
+                provider: "apple_health" | "health_connect";
+                /** @enum {string} */
+                status: "native_only" | "connected";
+                /**
+                 * PhoneHealthSyncPrefs
+                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    steps?: boolean;
+                    weight?: boolean;
+                };
+            };
+        };
+        /**
+         * PhoneHealthRow
+         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+         */
+        PhoneHealthRow: {
+            /** PhoneHealthConnection */
+            connection?: {
+                /** Format: date-time */
+                connected_at?: string | null;
+                /** Format: date-time */
+                last_synced_at?: string | null;
+                /**
+                 * Format: date-time
+                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                 */
+                read_from?: string | null;
+                /** @enum {string} */
+                status: "active";
+                /**
+                 * PhoneHealthSyncPrefs
+                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    steps?: boolean;
+                    weight?: boolean;
+                };
+            } | null;
+            /** @description Days read back at the first sync */
+            history_days?: number;
+            /** @enum {string} */
+            provider: "apple_health" | "health_connect";
+            /** @enum {string} */
+            status: "native_only" | "connected";
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** PhoneHealthRowResponse */
+        PhoneHealthRowResponse: {
+            /**
+             * PhoneHealthRow
+             * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+             */
+            row: {
+                /** PhoneHealthConnection */
+                connection?: {
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    /**
+                     * Format: date-time
+                     * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                     */
+                    read_from?: string | null;
+                    /** @enum {string} */
+                    status: "active";
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                } | null;
+                /** @description Days read back at the first sync */
+                history_days?: number;
+                /** @enum {string} */
+                provider: "apple_health" | "health_connect";
+                /** @enum {string} */
+                status: "native_only" | "connected";
+                /**
+                 * PhoneHealthSyncPrefs
+                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    steps?: boolean;
+                    weight?: boolean;
+                };
+            };
+        };
+        /**
+         * PhoneHealthSleep
+         * @description The main sleep of one night (the app joins the phone's segments)
+         */
+        PhoneHealthSleep: {
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            end: string;
+            id: string;
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            start: string;
+        };
+        /**
+         * PhoneHealthSyncPrefs
+         * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+         */
+        PhoneHealthSyncPrefs: {
+            activities?: boolean;
+            resting_hr?: boolean;
+            sleep?: boolean;
+            steps?: boolean;
+            weight?: boolean;
+        };
+        /** PhoneHealthUpdateRequest */
+        PhoneHealthUpdateRequest: {
+            health_data_consent?: boolean;
+            /**
+             * PhoneHealthSyncPrefs
+             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                steps?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** PhoneHealthWeight */
+        PhoneHealthWeight: {
+            /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+            at: string;
+            id: string;
+            kg: number;
+        };
+        /** PlatformPlan */
+        PlatformPlan: {
+            active: boolean;
+            annual_price_cents: number | null;
+            /** @enum {string} */
+            audience: "gym" | "coach";
+            code: string;
+            currency: string;
+            description: string | null;
+            is_default: boolean;
+            /**
+             * PlatformPlanLimits
+             * @description Absent key = unlimited
+             */
+            limits: {
+                active_clients?: number;
+                staff_seats?: number;
+            };
+            monthly_price_cents: number | null;
+            name: string;
+            position: number;
+            /** @enum {string} */
+            price_status: "placeholder" | "confirmed";
+            public: boolean;
+            trial_days: number;
+        };
+        /**
+         * PlatformPlanLimits
+         * @description Absent key = unlimited
+         */
+        PlatformPlanLimits: {
+            active_clients?: number;
+            staff_seats?: number;
+        };
+        /** PlatformPlans */
+        PlatformPlans: {
+            plans: {
+                active: boolean;
+                annual_price_cents: number | null;
+                /** @enum {string} */
+                audience: "gym" | "coach";
+                code: string;
+                currency: string;
+                description: string | null;
+                is_default: boolean;
+                /**
+                 * PlatformPlanLimits
+                 * @description Absent key = unlimited
+                 */
+                limits: {
+                    active_clients?: number;
+                    staff_seats?: number;
+                };
+                monthly_price_cents: number | null;
+                name: string;
+                position: number;
+                /** @enum {string} */
+                price_status: "placeholder" | "confirmed";
+                public: boolean;
+                trial_days: number;
+            }[];
         };
         /** PostAttachmentPreview */
         PostAttachmentPreview: {
@@ -28742,6 +29691,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -28773,6 +29724,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         /** @enum {string} */
@@ -30501,6 +31454,42 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.CoachPracticeController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    default_locale?: string | null;
+                    name: string;
+                    team_name?: string | null;
+                    timezone?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Practice */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** @enum {string} */
+                        provider_kind: "coach";
+                        slug: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.ExecutionController.index": {
         parameters: {
             query?: never;
@@ -31659,7 +32648,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -31724,7 +32713,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -32454,7 +33443,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -32584,7 +33573,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -32672,7 +33661,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -32811,7 +33800,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -35899,8 +36888,7 @@ export interface operations {
                             /** @enum {string} */
                             capability?: "available" | "not_configured";
                             configured?: boolean;
-                            /** GarminConnection */
-                            connection?: {
+                            connection?: (({
                                 /** @enum {integer} */
                                 backfill_days: 0 | 30 | 90;
                                 /** @description «Εισαγωγή… 40%» while the history import runs */
@@ -35923,9 +36911,35 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
-                            } | null;
+                            } | null) | ({
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null)) | null;
+                            history_days?: number;
                             /** @enum {string} */
                             provider: "garmin" | "apple_health" | "health_connect";
                             /** @enum {string} */
@@ -35938,6 +36952,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         }[];
@@ -35975,7 +36991,7 @@ export interface operations {
     "MilosTrainingWeb.DevicesController.daily_stats": {
         parameters: {
             query?: {
-                metric?: "resting_hr";
+                metric?: "resting_hr" | "steps";
                 range?: "1m" | "1y" | "3m";
             };
             header?: never;
@@ -36003,11 +37019,11 @@ export interface operations {
                              * @enum {string}
                              */
                             source: "garmin" | "apple_health" | "health_connect";
-                            /** @description Beats per minute for resting_hr */
+                            /** @description Beats per minute for resting_hr, a count for steps */
                             value: number;
                         } | null;
                         /** @enum {string} */
-                        metric: "resting_hr";
+                        metric: "resting_hr" | "steps";
                         points: {
                             /** Format: date */
                             on: string;
@@ -36016,7 +37032,7 @@ export interface operations {
                              * @enum {string}
                              */
                             source: "garmin" | "apple_health" | "health_connect";
-                            /** @description Beats per minute for resting_hr */
+                            /** @description Beats per minute for resting_hr, a count for steps */
                             value: number;
                         }[];
                         /** @enum {string} */
@@ -36168,8 +37184,7 @@ export interface operations {
                             /** @enum {string} */
                             capability?: "available" | "not_configured";
                             configured?: boolean;
-                            /** GarminConnection */
-                            connection?: {
+                            connection?: (({
                                 /** @enum {integer} */
                                 backfill_days: 0 | 30 | 90;
                                 /** @description «Εισαγωγή… 40%» while the history import runs */
@@ -36192,9 +37207,35 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
-                            } | null;
+                            } | null) | ({
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null)) | null;
+                            history_days?: number;
                             /** @enum {string} */
                             provider: "garmin" | "apple_health" | "health_connect";
                             /** @enum {string} */
@@ -36207,6 +37248,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         }[];
@@ -36236,6 +37279,100 @@ export interface operations {
                                 google?: boolean;
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Device data */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        activities: {
+                            activity_type?: string | null;
+                            avg_heart_rate?: number | null;
+                            calories?: number | null;
+                            candidates?: {
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "training_log" | "execution" | "class";
+                                /** Format: uuid */
+                                organization_id?: string | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            class_id?: string | null;
+                            distance_meters?: number | null;
+                            duration_seconds: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            journal_visibility?: "private" | "coach_can_view";
+                            max_heart_rate?: number | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string} */
+                            provider: "garmin" | "apple_health" | "health_connect";
+                            /**
+                             * @description Localized by the client; the raw type is `activity_type`
+                             * @enum {string}
+                             */
+                            sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                            /** Format: date-time */
+                            started_at: string;
+                            started_tz?: string;
+                            /** @enum {string} */
+                            state: "own" | "merged" | "pending";
+                            title: string;
+                        }[];
+                        connections: {
+                            /** Format: date-time */
+                            connected_at?: string | null;
+                            /** Format: date-time */
+                            last_synced_at?: string | null;
+                            provider: string;
+                            /** Format: date-time */
+                            revoked_at?: string | null;
+                            status: string;
+                            sync_prefs?: {
+                                [key: string]: boolean;
+                            };
+                        }[];
+                        daily_stats: {
+                            /** Format: date */
+                            on: string;
+                            resting_heart_rate?: number | null;
+                            source: string;
+                            steps?: number | null;
+                        }[];
+                        /** Format: date-time */
+                        exported_at: string;
+                        imports: {
+                            kind: string;
+                            provider: string;
+                            reason?: string | null;
+                            /** Format: date-time */
+                            received_at: string;
+                            status: string;
+                            target_type?: string | null;
+                        }[];
                     };
                 };
             };
@@ -36305,6 +37442,8 @@ export interface operations {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
                 };
@@ -36348,6 +37487,8 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
                             } | null;
@@ -36366,6 +37507,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         };
@@ -36421,6 +37564,8 @@ export interface operations {
                         activities?: boolean;
                         resting_hr?: boolean;
                         sleep?: boolean;
+                        /** @description Phones only (ADR-172) */
+                        steps?: boolean;
                         weight?: boolean;
                     };
                 };
@@ -36597,6 +37742,8 @@ export interface operations {
                                     activities?: boolean;
                                     resting_hr?: boolean;
                                     sleep?: boolean;
+                                    /** @description Phones only (ADR-172) */
+                                    steps?: boolean;
                                     weight?: boolean;
                                 };
                             } | null;
@@ -36615,6 +37762,8 @@ export interface operations {
                                 activities?: boolean;
                                 resting_hr?: boolean;
                                 sleep?: boolean;
+                                /** @description Phones only (ADR-172) */
+                                steps?: boolean;
                                 weight?: boolean;
                             };
                         };
@@ -36623,6 +37772,399 @@ export interface operations {
             };
             /** @description Asked too recently */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.disconnect": {
+        parameters: {
+            query?: {
+                delete_data?: boolean;
+            };
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disconnected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description What was deleted, when delete_data=true */
+                        deleted?: {
+                            activities?: number;
+                            daily_stats?: number;
+                            imports?: number;
+                            sleep?: number;
+                            weight?: number;
+                        } | null;
+                        /** @enum {string} */
+                        status: "revoked";
+                    };
+                };
+            };
+            /** @description Never connected */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    health_data_consent?: boolean;
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The phone's row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * PhoneHealthRow
+                         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+                         */
+                        row: {
+                            /** PhoneHealthConnection */
+                            connection?: {
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @description Days read back at the first sync */
+                            history_days?: number;
+                            /** @enum {string} */
+                            provider: "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "native_only" | "connected";
+                            /**
+                             * PhoneHealthSyncPrefs
+                             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                steps?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not connected or invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Grants the health-data consent in the same step when it is missing; needed when sleep, weight, resting heart rate or steps sync */
+                    health_data_consent?: boolean;
+                    /**
+                     * PhoneHealthSyncPrefs
+                     * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                     */
+                    sync_prefs?: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        steps?: boolean;
+                        weight?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The phone's row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * PhoneHealthRow
+                         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+                         */
+                        row: {
+                            /** PhoneHealthConnection */
+                            connection?: {
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @description Days read back at the first sync */
+                            history_days?: number;
+                            /** @enum {string} */
+                            provider: "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "native_only" | "connected";
+                            /**
+                             * PhoneHealthSyncPrefs
+                             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                steps?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid choices */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PhoneHealthController.ingest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                provider: "apple_health" | "health_connect";
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    activities?: {
+                        avg_hr?: number | null;
+                        distance_m?: number | null;
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        end: string;
+                        /** @description The phone's id of the workout */
+                        id: string;
+                        max_hr?: number | null;
+                        /** @description The app that recorded it */
+                        source_app?: string | null;
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        start: string;
+                        title?: string | null;
+                        /** @description The workout type in upper snake case (RUNNING, STRENGTH_TRAINING, …) */
+                        type?: string;
+                    }[];
+                    dailies?: {
+                        /** @description The wearer's local day, YYYY-MM-DD */
+                        date: string;
+                        resting_hr?: number | null;
+                        steps?: number | null;
+                    }[];
+                    sleeps?: {
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        end: string;
+                        id: string;
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        start: string;
+                    }[];
+                    weights?: {
+                        /** @description ISO 8601 with the offset at the time, e.g. 2026-10-20T07:30:00+03:00 */
+                        at: string;
+                        id: string;
+                        kg: number;
+                    }[];
+                };
+            };
+        };
+        responses: {
+            /** @description What happened to each record, and the row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Records by outcome: imported, merged, duplicate, ignored, skipped, invalid, failed */
+                        counts: {
+                            [key: string]: number;
+                        };
+                        /**
+                         * PhoneHealthRow
+                         * @description Apple Health or Health Connect on Συνδεδεμένες συσκευές: `native_only` until the store app connects it
+                         */
+                        row: {
+                            /** PhoneHealthConnection */
+                            connection?: {
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                /**
+                                 * Format: date-time
+                                 * @description Where the app starts reading at its next sync: 30 days back at first, then two days before the last sync
+                                 */
+                                read_from?: string | null;
+                                /** @enum {string} */
+                                status: "active";
+                                /**
+                                 * PhoneHealthSyncPrefs
+                                 * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    steps?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @description Days read back at the first sync */
+                            history_days?: number;
+                            /** @enum {string} */
+                            provider: "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "native_only" | "connected";
+                            /**
+                             * PhoneHealthSyncPrefs
+                             * @description What the phone brings in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate and steps (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                steps?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Not connected, or too many records */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -36661,7 +38203,10 @@ export interface operations {
                             weight?: number;
                         };
                         new_total: number;
+                        /** @description The device whose news the card shows (Garmin first when connected) */
                         provider: string;
+                        /** @description Every connected device */
+                        providers?: string[];
                         /** Format: date-time */
                         seen_at?: string | null;
                         status?: string | null;
@@ -36698,7 +38243,10 @@ export interface operations {
                             weight?: number;
                         };
                         new_total: number;
+                        /** @description The device whose news the card shows (Garmin first when connected) */
                         provider: string;
+                        /** @description Every connected device */
+                        providers?: string[];
                         /** Format: date-time */
                         seen_at?: string | null;
                         status?: string | null;
@@ -38589,6 +40137,250 @@ export interface operations {
                         next_offset: number | null;
                         offset: number;
                         total: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InsightsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Insights */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        computed_at: string | null;
+                        /** @description Weeks of data so far (at most window_weeks) */
+                        data_weeks: number;
+                        /** @description Findings the member dismissed */
+                        hidden_count: number;
+                        /** @description At most max_shown findings, in the rules' fixed order */
+                        insights: {
+                            /**
+                             * InsightParams
+                             * @description The numbers of the finding; which keys appear depends on the rule and variant
+                             */
+                            params: {
+                                /** @description RPE points harder on average */
+                                delta?: number | null;
+                                /** @description The member's sleep goal in hours */
+                                hours?: number | null;
+                                logged_days?: number | null;
+                                on_goal_days?: number | null;
+                                /** @enum {string|null} */
+                                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                                part_count?: number | null;
+                                percent?: number | null;
+                                pr_days?: number | null;
+                                /** @description How many times as often */
+                                ratio?: number | null;
+                                rest_percent?: number | null;
+                                total?: number | null;
+                                training_percent?: number | null;
+                                /** @enum {string|null} */
+                                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                                trigger_count?: number | null;
+                                with_trigger?: number | null;
+                            };
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            /** @enum {string} */
+                            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                            /** @description Copy key: insights.<rule>.<variant> */
+                            variant: string;
+                            /** @description Weeks of data behind the finding */
+                            weeks: number;
+                        }[];
+                        /** @description Findings shown at a time */
+                        max_shown: number;
+                        /** @description Weeks of data before any insight */
+                        min_weeks: number;
+                        /**
+                         * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+                         * @enum {string}
+                         */
+                        state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+                        /** @description Weeks the rules look back */
+                        window_weeks: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InsightsController.restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Insights */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        computed_at: string | null;
+                        /** @description Weeks of data so far (at most window_weeks) */
+                        data_weeks: number;
+                        /** @description Findings the member dismissed */
+                        hidden_count: number;
+                        /** @description At most max_shown findings, in the rules' fixed order */
+                        insights: {
+                            /**
+                             * InsightParams
+                             * @description The numbers of the finding; which keys appear depends on the rule and variant
+                             */
+                            params: {
+                                /** @description RPE points harder on average */
+                                delta?: number | null;
+                                /** @description The member's sleep goal in hours */
+                                hours?: number | null;
+                                logged_days?: number | null;
+                                on_goal_days?: number | null;
+                                /** @enum {string|null} */
+                                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                                part_count?: number | null;
+                                percent?: number | null;
+                                pr_days?: number | null;
+                                /** @description How many times as often */
+                                ratio?: number | null;
+                                rest_percent?: number | null;
+                                total?: number | null;
+                                training_percent?: number | null;
+                                /** @enum {string|null} */
+                                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                                trigger_count?: number | null;
+                                with_trigger?: number | null;
+                            };
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            /** @enum {string} */
+                            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                            /** @description Copy key: insights.<rule>.<variant> */
+                            variant: string;
+                            /** @description Weeks of data behind the finding */
+                            weeks: number;
+                        }[];
+                        /** @description Findings shown at a time */
+                        max_shown: number;
+                        /** @description Weeks of data before any insight */
+                        min_weeks: number;
+                        /**
+                         * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+                         * @enum {string}
+                         */
+                        state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+                        /** @description Weeks the rules look back */
+                        window_weeks: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.InsightsController.dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Insights */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        computed_at: string | null;
+                        /** @description Weeks of data so far (at most window_weeks) */
+                        data_weeks: number;
+                        /** @description Findings the member dismissed */
+                        hidden_count: number;
+                        /** @description At most max_shown findings, in the rules' fixed order */
+                        insights: {
+                            /**
+                             * InsightParams
+                             * @description The numbers of the finding; which keys appear depends on the rule and variant
+                             */
+                            params: {
+                                /** @description RPE points harder on average */
+                                delta?: number | null;
+                                /** @description The member's sleep goal in hours */
+                                hours?: number | null;
+                                logged_days?: number | null;
+                                on_goal_days?: number | null;
+                                /** @enum {string|null} */
+                                part?: "morning" | "afternoon" | "evening" | "night" | null;
+                                part_count?: number | null;
+                                percent?: number | null;
+                                pr_days?: number | null;
+                                /** @description How many times as often */
+                                ratio?: number | null;
+                                rest_percent?: number | null;
+                                total?: number | null;
+                                training_percent?: number | null;
+                                /** @enum {string|null} */
+                                trigger?: "stress" | "fatigue" | "boredom" | "social" | "hunger" | null;
+                                trigger_count?: number | null;
+                                with_trigger?: number | null;
+                            };
+                            /** Format: date */
+                            period_end: string;
+                            /** Format: date */
+                            period_start: string;
+                            /** @enum {string} */
+                            rule: "sleep_prs" | "sleep_effort" | "time_of_day" | "cravings" | "hydration";
+                            /** @description Copy key: insights.<rule>.<variant> */
+                            variant: string;
+                            /** @description Weeks of data behind the finding */
+                            weeks: number;
+                        }[];
+                        /** @description Findings shown at a time */
+                        max_shown: number;
+                        /** @description Weeks of data before any insight */
+                        min_weeks: number;
+                        /**
+                         * @description insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet
+                         * @enum {string}
+                         */
+                        state: "insights" | "all_hidden" | "no_pattern" | "collecting";
+                        /** @description Weeks the rules look back */
+                        window_weeks: number;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
                     };
                 };
             };
@@ -42754,6 +44546,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -42805,6 +44599,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -42843,6 +44639,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -42899,6 +44697,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -52711,6 +54511,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
                         completed_count: number;
                         dismissed: boolean;
                         finished: boolean;
@@ -52718,7 +54520,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -52741,7 +54543,7 @@ export interface operations {
                     /** @enum {string} */
                     action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
                     /** @enum {string} */
-                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 };
             };
         };
@@ -52753,6 +54555,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
                         completed_count: number;
                         dismissed: boolean;
                         finished: boolean;
@@ -52760,7 +54564,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -52830,6 +54634,70 @@ export interface operations {
                         name: string;
                         slug: string;
                         status: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPlanController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string|null} */
+                        notice: "trial_ending" | "trial_expired" | "past_due" | "cancelled" | null;
+                        plan: {
+                            active: boolean;
+                            annual_price_cents: number | null;
+                            /** @enum {string} */
+                            audience: "gym" | "coach";
+                            code: string;
+                            currency: string;
+                            description: string | null;
+                            is_default: boolean;
+                            /**
+                             * PlatformPlanLimits
+                             * @description Absent key = unlimited
+                             */
+                            limits: {
+                                active_clients?: number;
+                                staff_seats?: number;
+                            };
+                            monthly_price_cents: number | null;
+                            name: string;
+                            position: number;
+                            /** @enum {string} */
+                            price_status: "placeholder" | "confirmed";
+                            public: boolean;
+                            trial_days: number;
+                        } | null;
+                        price_override_cents: number | null;
+                        /** @enum {string|null} */
+                        status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired" | null;
+                        trial_days_left: number | null;
+                        /** Format: date-time */
+                        trial_ends_at: string | null;
+                        usage: {
+                            hard: boolean;
+                            /** @enum {string} */
+                            key: "staff_seats" | "active_clients";
+                            /** @description null = unlimited */
+                            limit: number | null;
+                            /** @enum {string} */
+                            state: "ok" | "near" | "reached" | "over";
+                            used: number;
+                        }[];
                     };
                 };
             };
@@ -65077,6 +66945,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -65478,6 +67348,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -68396,6 +70269,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -68426,6 +70302,9 @@ export interface operations {
                     kind: "pt_session" | "assessment";
                     /** Format: uuid */
                     location_id?: string | null;
+                    meeting_url?: string | null;
+                    /** @enum {string} */
+                    mode?: "in_person" | "online";
                     notes?: string | null;
                     /** Format: date-time */
                     starts_at: string;
@@ -68477,6 +70356,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -68614,6 +70496,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -69095,7 +70980,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -69236,7 +71121,7 @@ export interface operations {
                              * @description manual, or garmin when a connected device sent it
                              * @enum {string}
                              */
-                            source?: "manual" | "garmin";
+                            source?: "manual" | "garmin" | "apple_health" | "health_connect";
                             /** Format: date-time */
                             taken_at: string;
                             taken_tz?: string;
@@ -73654,6 +75539,54 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformPlanController.assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    notes?: string | null;
+                    plan_code: string;
+                    price_override_cents?: number | null;
+                    /** @enum {string} */
+                    status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                    /** Format: date-time */
+                    trial_ends_at?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Subscription */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        notes: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        plan_code: string;
+                        price_override_cents: number | null;
+                        /** @enum {string} */
+                        status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+                        /** @enum {string} */
+                        stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                        /** Format: date-time */
+                        trial_ends_at: string | null;
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationPurgeController.show": {
         parameters: {
             query?: never;
@@ -74195,6 +76128,234 @@ export interface operations {
                             slug: string;
                         }[];
                         purge_open: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plans */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        plans: {
+                            active: boolean;
+                            annual_price_cents: number | null;
+                            /** @enum {string} */
+                            audience: "gym" | "coach";
+                            code: string;
+                            currency: string;
+                            description: string | null;
+                            is_default: boolean;
+                            /**
+                             * PlatformPlanLimits
+                             * @description Absent key = unlimited
+                             */
+                            limits: {
+                                active_clients?: number;
+                                staff_seats?: number;
+                            };
+                            monthly_price_cents: number | null;
+                            name: string;
+                            position: number;
+                            /** @enum {string} */
+                            price_status: "placeholder" | "confirmed";
+                            public: boolean;
+                            trial_days: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active?: boolean;
+                    annual_price_cents?: number | null;
+                    /** @enum {string} */
+                    audience: "gym" | "coach";
+                    code: string;
+                    currency?: string;
+                    description?: string | null;
+                    is_default?: boolean;
+                    /**
+                     * PlatformPlanLimits
+                     * @description Absent key = unlimited
+                     */
+                    limits?: {
+                        active_clients?: number;
+                        staff_seats?: number;
+                    };
+                    monthly_price_cents?: number | null;
+                    name: string;
+                    position?: number;
+                    /** @enum {string} */
+                    price_status?: "placeholder" | "confirmed";
+                    public?: boolean;
+                    trial_days?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Plan */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active: boolean;
+                        annual_price_cents: number | null;
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
+                        code: string;
+                        currency: string;
+                        description: string | null;
+                        is_default: boolean;
+                        /**
+                         * PlatformPlanLimits
+                         * @description Absent key = unlimited
+                         */
+                        limits: {
+                            active_clients?: number;
+                            staff_seats?: number;
+                        };
+                        monthly_price_cents: number | null;
+                        name: string;
+                        position: number;
+                        /** @enum {string} */
+                        price_status: "placeholder" | "confirmed";
+                        public: boolean;
+                        trial_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active?: boolean;
+                    annual_price_cents?: number | null;
+                    /** @enum {string} */
+                    audience?: "gym" | "coach";
+                    code?: string;
+                    currency?: string;
+                    description?: string | null;
+                    is_default?: boolean;
+                    /**
+                     * PlatformPlanLimits
+                     * @description Absent key = unlimited
+                     */
+                    limits?: {
+                        active_clients?: number;
+                        staff_seats?: number;
+                    };
+                    monthly_price_cents?: number | null;
+                    name?: string;
+                    position?: number;
+                    /** @enum {string} */
+                    price_status?: "placeholder" | "confirmed";
+                    public?: boolean;
+                    trial_days?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active: boolean;
+                        annual_price_cents: number | null;
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
+                        code: string;
+                        currency: string;
+                        description: string | null;
+                        is_default: boolean;
+                        /**
+                         * PlatformPlanLimits
+                         * @description Absent key = unlimited
+                         */
+                        limits: {
+                            active_clients?: number;
+                            staff_seats?: number;
+                        };
+                        monthly_price_cents: number | null;
+                        name: string;
+                        position: number;
+                        /** @enum {string} */
+                        price_status: "placeholder" | "confirmed";
+                        public: boolean;
+                        trial_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Subscriptions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        subscriptions: {
+                            notes: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            plan_code: string;
+                            price_override_cents: number | null;
+                            /** @enum {string} */
+                            status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+                            /** @enum {string} */
+                            stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                            /** Format: date-time */
+                            trial_ends_at: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                        }[];
                     };
                 };
             };
@@ -75607,6 +77768,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.index_public": {
+        parameters: {
+            query?: {
+                audience?: "gym" | "coach";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plans */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        plans: {
+                            active: boolean;
+                            annual_price_cents: number | null;
+                            /** @enum {string} */
+                            audience: "gym" | "coach";
+                            code: string;
+                            currency: string;
+                            description: string | null;
+                            is_default: boolean;
+                            /**
+                             * PlatformPlanLimits
+                             * @description Absent key = unlimited
+                             */
+                            limits: {
+                                active_clients?: number;
+                                staff_seats?: number;
+                            };
+                            monthly_price_cents: number | null;
+                            name: string;
+                            position: number;
+                            /** @enum {string} */
+                            price_status: "placeholder" | "confirmed";
+                            public: boolean;
+                            trial_days: number;
+                        }[];
+                    };
                 };
             };
         };

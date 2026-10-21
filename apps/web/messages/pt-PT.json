@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "As porções vão de 0 a 20, em metades.",
     "stfMealSlots": "Refeições do dia",
     "stfMealSlotsHint": "As refeições em que o membro regista. Deixa vazio para pequeno-almoço, almoço, jantar e lanche.",
-    "mpWellnessSummary": "Resumo semanal de bem-estar"
+    "mpWellnessSummary": "Resumo semanal de bem-estar",
+    "apiErrorCoachPracticeExists": "Já tens um espaço de treinador com esta conta.",
+    "apiErrorPlanLimitReached": "O teu plano não tem lugares de equipa livres. Liberta um lugar ou pede-nos para mudar de plano.",
+    "apiErrorUnknownPlan": "Este plano não existe.",
+    "apiErrorTrialEndRequired": "Um período experimental precisa de uma data de fim.",
+    "apiErrorInvalidName": "O nome deve ter entre 2 e 120 caracteres."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -4742,6 +4747,26 @@
         "title": "Faz a visita de 1 minuto",
         "body": "Vê onde está cada coisa.",
         "cta": "Começar visita"
+      },
+      "profile": {
+        "title": "Publica o teu perfil",
+        "body": "A tua foto, o que treinas e onde. É assim que os clientes te encontram.",
+        "cta": "Editar perfil"
+      },
+      "sessions": {
+        "title": "Abre horários de sessões",
+        "body": "Sessões individuais ou em grupo pequeno, presenciais ou online.",
+        "cta": "Adicionar sessões"
+      },
+      "team": {
+        "title": "Conhece a tua Team",
+        "body": "O clube dos teus clientes: anúncios, conversa e treino partilhado.",
+        "cta": "Abrir Team"
+      },
+      "bootcamp": {
+        "title": "Organiza um bootcamp aberto",
+        "body": "Uma sessão ao ar livre ou online aberta a todos. Uma boa forma de conhecer novos clientes.",
+        "cta": "Criar bootcamp"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "Vê a tua adesão em {billing}. Muda o idioma e as notificações no teu perfil."
         }
       }
-    }
+    },
+    "popupTitleCoach": "Bem-vindo, coach! Vamos preparar o teu espaço",
+    "popupIntroCoach": "Sete passos curtos. Para quando quiseres: a lista espera por ti em {path}."
   },
   "MemberApp": {
     "journal": {
@@ -7642,7 +7669,36 @@
     "restingLatest": "Última medição · {date}",
     "restingAverage": "Média {value} bpm em {days, plural, one {# dia} other {# dias}}",
     "restingSpread": "entre {low} e {high}",
-    "restingNote": "Um indicador do teu dispositivo, não uma medição médica."
+    "restingNote": "Um indicador do teu dispositivo, não uma medição médica.",
+    "pref_steps": "Passos",
+    "phoneConnectHint": "Treinos, sono, peso, frequência cardíaca em repouso e passos do teu telemóvel.",
+    "phoneConnectTitle": "Ligar {provider}",
+    "phoneContinue": "Continuar",
+    "phoneAsking": "À espera da autorização…",
+    "phoneHistoryHint": "Chegam os últimos {days} dias e depois o que for novo, sempre que abres a app.",
+    "phoneConsent": "Concordo que o Milos guarde dados de saúde do meu telemóvel (sono, peso, frequência cardíaca, passos). Só eu os vejo, a não ser que os partilhe, e posso retirar a qualquer momento.",
+    "phonePrivateNote": "Os treinos importados começam como «Só eu». Nada é publicado automaticamente.",
+    "phoneDenied": "Não foi dado acesso a nada. Podes alterar isso nas definições do telemóvel.",
+    "phoneUnavailable": "Indisponível",
+    "phoneUnavailable_unsupported": "Este dispositivo não tem dados de saúde.",
+    "phoneUnavailable_not_installed": "É preciso a app Health Connect.",
+    "phoneUnavailable_update_required": "O Health Connect precisa de ser atualizado.",
+    "phoneInstall": "Instalar",
+    "phoneSynced": "{count, plural, =0 {Já estava tudo aqui.} one {Chegou # registo novo.} other {Chegaram # registos novos.}}",
+    "phoneSyncFailed": "A sincronização não terminou. Volta a correr da próxima vez que abrires a app.",
+    "phoneSyncsInApp": "sincroniza a partir da app no telemóvel",
+    "phonePrefsSaved": "Guardado.",
+    "phoneConnected": "O {provider} está ligado. Os teus dados estão a caminho.",
+    "phoneDisconnectTitle": "Desligar {provider}",
+    "phoneDisconnectDelete": "Apagar todos os dados do {provider}",
+    "phoneDisconnectDeleteHint": "É removido cada treino, noite, pesagem e dia com frequência cardíaca ou passos do {provider}.",
+    "phoneDisconnectConfirmKeep": "Desligar o {provider} e manter o que chegou?",
+    "phoneDisconnectConfirmDelete": "Desligar o {provider} e apagar tudo o que trouxe? Não é possível anular.",
+    "phoneDisconnected": "O {provider} foi desligado. O que chegou fica.",
+    "phoneDisconnectedDeleted": "O {provider} foi desligado e tudo o que trouxe foi apagado.",
+    "exportData": "Transferir dados dos dispositivos (JSON)",
+    "exportFailed": "A transferência falhou. Tenta outra vez.",
+    "error_phone_health_not_connected": "Não está ligado. Liga-o a partir da app no telemóvel."
   },
   "Buddy": {
     "title": "Buddy de apoio",
@@ -8698,6 +8754,160 @@
       "title": "Cobertura, qualidades, carga",
       "range": "Período",
       "sharedOnly": "Apenas das entradas que o cliente partilha com os coaches da box."
+    }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Ocultar",
+    "restore": "Mostrar de novo",
+    "hidden": "Ocultos: {count}",
+    "note": "Um indicador, não um conselho médico.",
+    "noteWithWeeks": "A partir de {weeks} semanas de dados · Um indicador, não um conselho médico.",
+    "empty": {
+      "collecting": "Os insights aparecem após {min} semanas de registos (sono, água, desejos, treinos). Até agora: {weeks} de {min}.",
+      "moreEntries": "Faltam mais alguns registos para surgir um padrão.",
+      "noPattern": "Nenhum padrão claro nas últimas {window} semanas. Os insights são atualizados todas as noites.",
+      "allHidden": "Ocultaste todos os insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Fazes PR {ratio}× mais vezes depois de {hours}+ horas de sono.",
+        "all_after_goal": "Os teus {count} PR vieram todos depois de {hours}+ horas de sono."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Depois de dormires menos de {hours} horas, avalias os treinos {delta} pontos de RPE mais duros."
+      },
+      "time_of_day": {
+        "best_part": "Fazes PR {ratio}× mais vezes nos treinos {part, select, morning {da manhã} afternoon {da tarde} evening {da noite} other {de madrugada}}.",
+        "only_part": "Os teus {count} PR vieram todos em treinos {part, select, morning {da manhã} afternoon {da tarde} evening {da noite} other {de madrugada}}."
+      },
+      "cravings": {
+        "part_and_trigger": "A maioria dos teus desejos ({count} de {total}) surge {part, select, morning {de manhã} afternoon {à tarde} evening {à noite} other {de madrugada}}, normalmente com {trigger, select, stress {stress} fatigue {cansaço} boredom {tédio} social {companhia} other {fome}}.",
+        "part": "A maioria dos teus desejos ({count} de {total}) surge {part, select, morning {de manhã} afternoon {à tarde} evening {à noite} other {de madrugada}}.",
+        "trigger": "Nos teus desejos registas mais vezes {trigger, select, stress {stress} fatigue {cansaço} boredom {tédio} social {companhia} other {fome}} ({count} de {total})."
+      },
+      "hydration": {
+        "on_goal": "Atingiste o teu objetivo de água em {onGoal} dos {logged} dias que registaste.",
+        "training_more": "Nos dias de treino atinges o objetivo de água mais vezes ({training}% contra {rest}% nos outros).",
+        "training_less": "Nos dias de treino atinges o objetivo de água menos vezes ({training}% contra {rest}% nos outros)."
+      }
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "Ações do treinador",
+      "sessions": "Sessões",
+      "nutrition": "Nutrição",
+      "messages": "Mensagens",
+      "package": "Pacote de sessões",
+      "assessment": "Avaliação",
+      "ptSession": "Sessão individual",
+      "online": "Online",
+      "inPerson": "Presencial",
+      "minutes": "{minutes} min",
+      "join": "Entrar na chamada",
+      "manage": "Gerir",
+      "noSession": "Ainda não marcaste nenhuma sessão.",
+      "bookSession": "Marcar sessão",
+      "noPackage": "Ainda não tens pacote de sessões. Pergunta ao teu treinador.",
+      "sessionsLeft": "Restam {remaining} de {limit} sessões",
+      "sessionsUnlimited": "Sessões ilimitadas"
+    },
+    "start": {
+      "title": "Começa como treinador",
+      "intro": "Treina os teus próprios clientes: sessões, programas, nutrição e um clube Team, tudo no Milos.",
+      "includes": "O que inclui",
+      "include": {
+        "clients": "A tua própria lista de clientes e programas",
+        "sessions": "Sessões com marcação, presenciais ou online",
+        "team": "Um clube Team para os teus clientes",
+        "bootcamps": "Bootcamps abertos a todos"
+      },
+      "trial": "{days} dias grátis",
+      "price": "depois {price}/mês",
+      "priceSoon": "O preço será anunciado antes do fim do período experimental",
+      "nameLabel": "Nome do espaço",
+      "namePlaceholder": "ex. Nikos Papadopoulos Coaching",
+      "nameHint": "Os clientes veem este nome. Podes alterá-lo mais tarde.",
+      "teamLabel": "Nome do clube Team",
+      "teamHint": "O clube dos teus clientes. Podes mudar o nome mais tarde.",
+      "submit": "Começar o meu espaço",
+      "creating": "A começar…",
+      "alreadyOpen": "Já tens um espaço de treinador. Muda para ele no menu de fornecedores."
+    },
+    "me": {
+      "row": "Treina os teus próprios clientes",
+      "rowHint": "Abre o teu espaço como treinador independente"
+    },
+    "slot": {
+      "mode": "Onde",
+      "meetingUrl": "Ligação da chamada"
+    },
+    "plan": {
+      "title": "Plano Milos",
+      "description": "O teu plano, os seus limites e o que usas.",
+      "loading": "A carregar o plano…",
+      "status": {
+        "trialing": "Experimental",
+        "active": "Ativo",
+        "past_due": "Pagamento em atraso",
+        "cancelled": "Cancelado",
+        "comped": "Oferta",
+        "trial_expired": "Período experimental terminado"
+      },
+      "trialLeft": "{days, plural, one {Falta # dia} other {Faltam # dias}} de período experimental",
+      "price": "{price}/mês",
+      "priceSoon": "Preço a anunciar",
+      "limit": {
+        "staff_seats": "Lugares de equipa",
+        "active_clients": "Clientes ativos"
+      },
+      "unlimited": "{used} · sem limite",
+      "used": "{used} de {limit}",
+      "contact": "Precisas de mais? Contacta-nos e mudamos o teu plano.",
+      "notice": {
+        "trial_ending": "O teu período experimental termina em {days, plural, one {# dia} other {# dias}}.",
+        "trial_expired": "O teu período experimental terminou. Tudo continua a funcionar; entraremos em contacto sobre o teu plano.",
+        "past_due": "Um pagamento do teu plano Milos está em atraso.",
+        "cancelled": "O teu plano Milos está cancelado. Contacta-nos para o reativar.",
+        "staff_full": "Todos os lugares de equipa do teu plano estão ocupados."
+      }
+    },
+    "console": {
+      "back": "Organizações",
+      "title": "Planos",
+      "subtitle": "Limites, períodos experimentais e preços dos planos, e o plano de cada organização. Um preço fica provisório até o confirmares; os clientes só veem preços confirmados.",
+      "forbidden": "Só a equipa da plataforma pode gerir os planos.",
+      "plans": "Catálogo",
+      "audience": {
+        "gym": "Ginásios",
+        "coach": "Treinadores"
+      },
+      "audienceLabel": "Para",
+      "placeholder": "Preço provisório",
+      "name": "Nome",
+      "monthly": "Mensal ({currency})",
+      "annual": "Anual ({currency})",
+      "trialDays": "Dias experimentais",
+      "unlimitedHint": "Vazio significa sem limite",
+      "confirmed": "Preço confirmado",
+      "default": "Predefinido para novas organizações",
+      "public": "Visível publicamente",
+      "active": "Ativo",
+      "save": "Guardar",
+      "saved": "Guardado",
+      "newPlan": "Novo plano",
+      "code": "Código",
+      "codeHint": "Minúsculas, dígitos e _. Não pode ser alterado depois.",
+      "add": "Adicionar plano",
+      "subscriptions": "Organizações",
+      "noPlan": "Sem plano",
+      "plan": "Plano",
+      "status": "Estado",
+      "trialEnds": "Fim do período experimental",
+      "override": "Preço mensal personalizado",
+      "overrideHint": "Vazio: preço do plano",
+      "notes": "Notas"
     }
   }
 }

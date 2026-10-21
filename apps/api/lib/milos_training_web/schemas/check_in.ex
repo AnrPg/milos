@@ -642,7 +642,7 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
           items: %Schema{
             type: :object,
             description:
-              "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection",
+              "Garmin (ADR-161) also carries configured, capability, sync_prefs, backfill_day_options and connection; Apple Health and Health Connect (ADR-172) carry sync_prefs, history_days and connection",
             properties: %{
               provider: %Schema{type: :string, enum: ~w(garmin apple_health health_connect)},
               status: %Schema{
@@ -653,7 +653,14 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
               capability: %Schema{type: :string, enum: ~w(available not_configured)},
               sync_prefs: MilosTrainingWeb.Schemas.Devices.sync_prefs(),
               backfill_day_options: %Schema{type: :array, items: %Schema{type: :integer}},
-              connection: MilosTrainingWeb.Schemas.Devices.garmin_connection()
+              history_days: %Schema{type: :integer},
+              connection: %Schema{
+                nullable: true,
+                oneOf: [
+                  MilosTrainingWeb.Schemas.Devices.garmin_connection(),
+                  MilosTrainingWeb.Schemas.PhoneHealth.connection()
+                ]
+              }
             },
             required: [:provider, :status]
           }

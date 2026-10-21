@@ -50,7 +50,8 @@ config :milos_training, Oban,
        {"0,30 * * * *", MilosTraining.Workers.BuddyWeeklySummaryJob},
        {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
        {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob},
-       {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob}
+       {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob},
+       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob}
      ]}
   ],
   queues: [
@@ -291,6 +292,10 @@ config :milos_training,
 config :milos_training,
        :wellness_store,
        MilosTraining.Infrastructure.Wellness.EctoWellnessStore
+
+config :milos_training,
+       :insight_store,
+       MilosTraining.Infrastructure.Insights.EctoInsightStore
 
 config :milos_training,
        :messaging_thread_store,
