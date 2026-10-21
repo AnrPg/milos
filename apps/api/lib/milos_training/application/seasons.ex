@@ -23,6 +23,7 @@ defmodule MilosTraining.Application.Seasons do
 
   alias MilosTraining.Application.{
     AssignFinanceMemberPackage,
+    BoxPublicProfile,
     BroadcastUserSync,
     RealtimePublisher
   }
@@ -34,13 +35,20 @@ defmodule MilosTraining.Application.Seasons do
 
   # ------------------------------------------------------------------ staff
 
-  @doc "The gym's seasons, newest start first, with their place counts."
+  @doc """
+  The gym's seasons, newest start first, with their place counts, and the
+  staff the builder may name as a season's coaches.
+  """
   def list(context) do
     offerings = Seasons.list_offerings(context)
     counts = Seasons.enrollment_counts(context, Enum.map(offerings, & &1.id))
     today = today(context)
     coaches = coach_directory(offerings)
-    %{seasons: Enum.map(offerings, &present(&1, counts, today, coaches, :staff))}
+
+    %{
+      seasons: Enum.map(offerings, &present(&1, counts, today, coaches, :staff)),
+      coach_candidates: BoxPublicProfile.coach_candidates(context.organization_id)
+    }
   end
 
   @doc "One season with every enrollment, for the builder's detail sheet."

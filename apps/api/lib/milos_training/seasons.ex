@@ -18,6 +18,7 @@ defmodule MilosTraining.Seasons do
   defdelegate list_offerings(context, filters \\ %{}), to: SeasonStore
   defdelegate enrollment_counts(context, ids), to: SeasonStore
   defdelegate titles(context, ids), to: SeasonStore
+  defdelegate assignment_seasons(context, assignment_ids), to: SeasonStore
   defdelegate get_enrollment(context, id), to: SeasonStore
   defdelegate get_member_enrollment(context, offering_id, user_id), to: SeasonStore
   defdelegate list_enrollments(context, offering_id), to: SeasonStore

@@ -30,6 +30,9 @@ defmodule MilosTraining.Seasons.SeasonStore do
   def titles(context, ids), do: call(context, :titles, [ids])
 
   @impl true
+  def assignment_seasons(context, ids), do: call(context, :assignment_seasons, [ids])
+
+  @impl true
   def get_enrollment(context, id), do: call(context, :get_enrollment, [id])
 
   @impl true

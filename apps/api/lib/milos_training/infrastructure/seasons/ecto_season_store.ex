@@ -69,6 +69,21 @@ defmodule MilosTraining.Infrastructure.Seasons.EctoSeasonStore do
   end
 
   @impl true
+  def assignment_seasons(_context, []), do: %{}
+
+  def assignment_seasons(%{organization_id: organization_id}, ids) do
+    from(a in "assigned_workouts",
+      join: o in SeasonOffering,
+      on: o.id == a.season_offering_id,
+      where: a.organization_id == type(^organization_id, :binary_id),
+      where: a.id in type(^ids, {:array, :binary_id}),
+      select: {type(a.id, :binary_id), %{id: o.id, title: o.title}}
+    )
+    |> Repo.all()
+    |> Map.new()
+  end
+
+  @impl true
   def get_enrollment(%{organization_id: organization_id}, id) do
     with {:ok, id} <- Ecto.UUID.cast(id) do
       Repo.one(

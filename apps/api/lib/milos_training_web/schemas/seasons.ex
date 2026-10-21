@@ -182,8 +182,23 @@ defmodule MilosTrainingWeb.Schemas.Seasons do
     do: %Schema{
       title: "StaffSeasonList",
       type: :object,
-      properties: %{seasons: %Schema{type: :array, items: staff_season()}},
-      required: [:seasons]
+      properties: %{
+        seasons: %Schema{type: :array, items: staff_season()},
+        coach_candidates: %Schema{
+          type: :array,
+          description: "Staff who may be named as a season's coaches",
+          items: %Schema{
+            type: :object,
+            properties: %{
+              id: %Schema{type: :string, format: :uuid},
+              nickname: %Schema{type: :string, nullable: true},
+              avatar_url: %Schema{type: :string, nullable: true}
+            },
+            required: [:id]
+          }
+        }
+      },
+      required: [:seasons, :coach_candidates]
     }
 
   def staff_response,

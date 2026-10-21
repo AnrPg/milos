@@ -10,6 +10,7 @@ defmodule MilosTraining.Web.SeasonsControllerTest do
   import MilosTraining.TestFixtures
 
   alias MilosTraining.{Finance, Notifications, Organizations, Repo, Seasons}
+  alias MilosTraining.Application.ListWorkoutExecutions
   alias MilosTraining.Application.Seasons, as: SeasonsService
   alias MilosTraining.Community.{Channel, Post}
   alias MilosTraining.Workouts.{AssignedWorkout, AssignedWorkoutAthlete}
@@ -107,6 +108,17 @@ defmodule MilosTraining.Web.SeasonsControllerTest do
     |> Map.fetch!("season")
   end
 
+  defp execution(ctx, source, reference_id) do
+    %{
+      id: Ecto.UUID.generate(),
+      organization_id: ctx.organization.id,
+      master_workout_id: ctx.workout.id,
+      source: source,
+      source_reference_id: reference_id,
+      section_scores: []
+    }
+  end
+
   defp enrollment_of(season, user),
     do: Enum.find(season["enrollments"], &(&1["user_id"] == user.id))
 
@@ -135,6 +147,13 @@ defmodule MilosTraining.Web.SeasonsControllerTest do
              } = season
 
       assert coach_id == ctx.coach.id
+
+      # The list names the staff the builder may pick as coaches.
+      assert %{"seasons" => [_], "coach_candidates" => candidates} =
+               ctx.as.(ctx.owner) |> get("#{ctx.admin}/seasons") |> json_response(200)
+
+      assert Enum.any?(candidates, &(&1["id"] == ctx.coach.id))
+      refute Enum.any?(candidates, &(&1["id"] == ctx.first.id))
 
       # A day outside the season is refused.
       assert ctx.as.(ctx.owner)
@@ -228,7 +247,15 @@ defmodule MilosTraining.Web.SeasonsControllerTest do
         |> get("/api/org/#{ctx.slug}/my-workouts?start_date=#{Date.to_iso8601(starts)}")
         |> json_response(200)
 
-      assert [%{"season" => %{"id" => ^id, "title" => "Hyrox prep"}} | _] = week["assignments"]
+      assert [%{"season" => %{"id" => ^id, "title" => "Hyrox prep"}} = assignment | _] =
+               week["assignments"]
+
+      # Ημερολόγιο: an execution of a season workout carries the season too.
+      assert [%{season: %{id: ^id, title: "Hyrox prep"}}, %{season: nil}] =
+               ListWorkoutExecutions.summarize([
+                 execution(ctx, :assigned, assignment["id"]),
+                 execution(ctx, :self_selected, nil)
+               ])
 
       # The #season channel: participants and staff see it; the welcome is pinned.
       channel = Repo.one!(from c in Channel, where: c.context_id == ^id, select: c)

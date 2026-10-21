@@ -27,6 +27,9 @@ defmodule MilosTraining.Seasons.Ports.SeasonStore do
   @doc "Titles of offerings by id (labels for assigned workouts)."
   @callback titles(context(), [id()]) :: %{id() => String.t()}
 
+  @doc "The season of each of these assigned workouts that belongs to one (journal labels)."
+  @callback assignment_seasons(context(), [id()]) :: %{id() => %{id: id(), title: String.t()}}
+
   @callback get_enrollment(context(), id()) :: SeasonEnrollment.t() | nil
   @callback get_member_enrollment(context(), id(), id()) :: SeasonEnrollment.t() | nil
 
