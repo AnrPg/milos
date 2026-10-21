@@ -225,5 +225,15 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def finalize_purge(purge, params, platform_user_id, completed_at),
     do: impl().finalize_purge(purge, params, platform_user_id, completed_at)
 
+  @impl true
+  def list_my_providers, do: impl().list_my_providers()
+
+  @impl true
+  def get_provider_selection(user_id), do: impl().get_provider_selection(user_id)
+
+  @impl true
+  def put_provider_selection(user_id, organization_id),
+    do: impl().put_provider_selection(user_id, organization_id)
+
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

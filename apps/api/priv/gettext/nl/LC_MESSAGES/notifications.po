@@ -471,3 +471,9 @@ msgstr "Een glas water?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "De middag is een goed moment om je water in te halen."
+
+msgid "Your journal export is ready"
+msgstr "Je dagboekexport staat klaar"
+
+msgid "Download it within seven days from Settings."
+msgstr "Download hem binnen zeven dagen via Instellingen."

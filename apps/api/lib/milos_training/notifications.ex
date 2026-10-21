@@ -269,6 +269,15 @@ defmodule MilosTraining.Notifications do
         url: "/journal/wellbeing?craving=#{field(payload, :craving_id)}"
       })
 
+  # ADR-162 (board 17 extra): the whole-journal export is ready to download.
+  def process_event("journal_export_ready", payload),
+    do:
+      enqueue_simple(:journal_export_ready, payload, %{
+        export_id: field(payload, :export_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/settings/export"
+      })
+
   # ADR-159 (board 14, Q2): the opt-in afternoon water reminder.
   def process_event("water_reminder", payload),
     do:

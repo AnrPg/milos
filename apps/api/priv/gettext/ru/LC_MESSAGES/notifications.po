@@ -471,3 +471,9 @@ msgstr "Стакан воды?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "День — хорошее время наверстать воду."
+
+msgid "Your journal export is ready"
+msgstr "Экспорт дневника готов"
+
+msgid "Download it within seven days from Settings."
+msgstr "Скачайте его в течение семи дней в Настройках."

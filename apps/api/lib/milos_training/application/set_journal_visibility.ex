@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.SetJournalVisibility do
   Reviews are their own rung and do not move.
   """
 
-  alias MilosTraining.Application.{BroadcastUserSync, RequestCoachReply}
+  alias MilosTraining.Application.{BroadcastUserSync, JournalAudience, JournalEntryLookup, RequestCoachReply}
   alias MilosTraining.{Execution, Journal, Pantheon, Wellbeing, Wellness}
 
   def call(%{user_id: user_id} = context, kind, id, params) do
@@ -18,9 +18,14 @@ defmodule MilosTraining.Application.SetJournalVisibility do
 
     Journal.with_context(context, fn ->
       Journal.transaction(fn ->
-        with {:ok, entry} <- fetch(kind, id, user_id),
+        with {:ok, entry} <- JournalEntryLookup.fetch(kind, id, user_id),
+             {:ok, audience} <- maybe_store_audience(context, kind, entry, params),
              :ok <-
-               Journal.validate_visibility_move(kind, rung, is_binary(entry.organization_id)),
+               Journal.validate_visibility_move(
+                 kind,
+                 rung,
+                 JournalAudience.reach(context, kind, entry)
+               ),
              {:ok, updated} <- move(kind, entry.id, user_id, rung),
              {:ok, message} <- maybe_request_reply(context, kind, entry, rung, params) do
           {:ok,
@@ -28,7 +33,8 @@ defmodule MilosTraining.Application.SetJournalVisibility do
              kind: kind,
              id: updated.id,
              journal_visibility: updated.journal_visibility,
-             choosable_visibilities: Journal.choosable_visibilities(kind, entry.organization_id),
+             choosable_visibilities: JournalAudience.choosable(context, kind, entry),
+             audience: audience,
              reply_request: message && %{id: message.id, thread_id: message.thread_id}
            }}
         end
@@ -37,38 +43,18 @@ defmodule MilosTraining.Application.SetJournalVisibility do
     |> broadcast(user_id)
   end
 
+  # ADR-162: the move may name the entry's own audience in the same request.
+  defp maybe_store_audience(context, kind, entry, params) do
+    case Map.fetch(params, "audience") do
+      {:ok, ids} -> JournalAudience.store_entry(context, kind, entry, ids)
+      :error -> {:ok, nil}
+    end
+  end
+
   defp maybe_request_reply(context, kind, entry, "coach_reply_requested", params),
     do: RequestCoachReply.call(context, kind, entry, params)
 
   defp maybe_request_reply(_context, _kind, _entry, _rung, _params), do: {:ok, nil}
-
-  defp fetch(kind, id, user_id) do
-    case Ecto.UUID.cast(id) do
-      {:ok, id} -> kind |> owned(id, user_id) |> found()
-      :error -> {:error, :not_found}
-    end
-  end
-
-  defp owned("execution", id, user_id), do: Execution.get_execution_for_user(id, user_id)
-
-  defp owned("training_log", id, user_id),
-    do: Execution.get_training_log_entry_for_user(id, user_id)
-
-  defp owned("pr", id, user_id), do: Pantheon.get_record_for_user(id, user_id)
-  defp owned("injury", id, user_id), do: Wellbeing.get_injury_for_user(user_id, id)
-  defp owned("note", id, user_id), do: Journal.get_note_for_user(id, user_id)
-  defp owned("check_in", id, user_id), do: Wellbeing.get_check_in_for_user(id, user_id)
-  defp owned("wellness", _id, _user_id), do: {:error, :visibility_not_allowed}
-  defp owned("wellness_entry", id, user_id), do: Wellness.get_entry(id, user_id)
-  defp owned("craving", id, user_id), do: Wellness.get_craving(id, user_id)
-  defp owned("review", _id, _user_id), do: {:error, :visibility_not_allowed}
-  # ADR-158: a snapshot's visibility is set on the snapshot (Σώμα).
-  defp owned("body", _id, _user_id), do: {:error, :visibility_not_allowed}
-  defp owned(_kind, _id, _user_id), do: {:error, :unknown_kind}
-
-  defp found({:error, _reason} = error), do: error
-  defp found(nil), do: {:error, :not_found}
-  defp found(entry), do: {:ok, entry}
 
   defp move("execution", id, user_id, rung),
     do: Execution.set_execution_visibility(id, user_id, rung)

@@ -74,7 +74,8 @@ defmodule MilosTraining.Notifications.Notification do
     :check_in_visitor,
     :body_measure_reminder,
     :craving_follow_up,
-    :water_reminder
+    :water_reminder,
+    :journal_export_ready
   ]
 
   schema "notifications" do

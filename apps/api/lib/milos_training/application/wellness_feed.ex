@@ -47,6 +47,8 @@ defmodule MilosTraining.Application.WellnessFeed do
 
   defp shared?(entry), do: Journal.visibility_reaches_coach?(entry.journal_visibility)
 
+  defp owner_extras(user_id, days, {:owner, _filter}), do: owner_extras(user_id, days, :owner)
+
   defp owner_extras(user_id, days, :owner) do
     prefs = Wellness.preferences(user_id)
 
@@ -70,7 +72,9 @@ defmodule MilosTraining.Application.WellnessFeed do
     do: %{summary: fn _on, _entries -> nil end, photos: %{}}
 
   defp organization_id({:coach, organization_id}), do: organization_id
-  defp organization_id(:owner), do: nil
+  defp organization_id(_owner), do: nil
+
+  defp section_on?(user_id, {:owner, _filter}, section), do: section_on?(user_id, :owner, section)
 
   defp section_on?(user_id, :owner, section),
     do: %{user_id: user_id} |> Body.settings(user_id) |> Body.section_on?(section)

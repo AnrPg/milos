@@ -469,3 +469,9 @@ msgstr ""
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr ""
+
+msgid "Your journal export is ready"
+msgstr ""
+
+msgid "Download it within seven days from Settings."
+msgstr ""

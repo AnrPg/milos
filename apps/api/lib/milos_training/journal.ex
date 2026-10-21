@@ -78,6 +78,34 @@ defmodule MilosTraining.Journal do
   def comments_by_entry(entry_kind, entry_ids),
     do: entry_kind |> list_comments(entry_ids) |> Enum.group_by(& &1.entry_id)
 
+  # ADR-162: one journal across providers.
+  alias MilosTraining.Journal.Domain.{CoachAudience, EntrySource, JournalFilter}
+
+  defdelegate parse_filter(params), to: JournalFilter, as: :parse
+  defdelegate filter_params(filter), to: JournalFilter, as: :to_params
+  defdelegate filter_active_count(filter), to: JournalFilter, as: :active_count
+  defdelegate filter_default?(filter), to: JournalFilter, as: :default?
+  defdelegate filter_kinds(filter, requested), to: JournalFilter, as: :kinds
+  defdelegate filter_query(filter), to: JournalFilter, as: :to_query
+  defdelegate entry_source(organization_id, device_source, directory), to: EntrySource, as: :label
+  defdelegate device_source?(source), to: EntrySource
+  defdelegate shareable_kind?(kind), to: CoachAudience, as: :shareable?
+  defdelegate audience_member(active_ids, excluded_ids), to: CoachAudience, as: :member
+  defdelegate default_audience(member), to: CoachAudience
+  defdelegate audience_readers(entry, member, override), to: CoachAudience, as: :readers
+  defdelegate audience_reach(entry, member, override), to: CoachAudience, as: :reach
+  defdelegate validate_audience(ids, entry, member), to: CoachAudience, as: :validate_override
+  defdelegate audience_exclusions_for(ids, member), to: CoachAudience, as: :exclusions_for
+
+  defdelegate list_audience_exclusions(user_id), to: JournalStore
+  defdelegate replace_audience_exclusions(user_id, ids), to: JournalStore
+  defdelegate entry_audiences(user_id, kind, ids), to: JournalStore
+  defdelegate put_entry_audience(user_id, kind, id, ids), to: JournalStore
+  defdelegate insert_export(attrs), to: JournalStore
+  defdelegate get_export(id, user_id), to: JournalStore
+  defdelegate list_exports(user_id), to: JournalStore
+  defdelegate finish_export(export, attrs), to: JournalStore
+
   def tenant_data_policy, do: MilosTraining.Journal.Domain.TenantDataPolicy.policy()
 
   def tenant_data_inventory(context),

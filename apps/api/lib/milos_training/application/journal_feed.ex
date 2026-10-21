@@ -151,6 +151,7 @@ defmodule MilosTraining.Application.JournalFeed do
   defp utc(%DateTime{} = at), do: at
   defp utc(%NaiveDateTime{} = at), do: DateTime.from_naive!(at, "Etc/UTC")
 
+  defp requested_kinds(:none), do: {:ok, []}
   defp requested_kinds(nil), do: {:ok, kinds()}
   defp requested_kinds(""), do: {:ok, kinds()}
 

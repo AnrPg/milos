@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations do
-  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, TenantAuthorization}
+  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, Provider, TenantAuthorization}
   alias MilosTraining.Organizations.OrganizationStore
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
@@ -68,6 +68,31 @@ defmodule MilosTraining.Organizations do
     as: :call
 
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
+
+  @doc """
+  ADR-162: everyone who provides the member's training, active and former
+  (`Domain.Provider`), read in the member's personal session.
+  """
+  def list_my_providers(%{user_id: user_id}) when is_binary(user_id) do
+    RepoContext.run(%{user_id: user_id}, fn ->
+      Enum.map(OrganizationStore.list_my_providers(), &Provider.from_row/1)
+    end)
+  end
+
+  @doc "The provider Box ▾ last opened on (may no longer be active)."
+  def get_provider_selection(%{user_id: user_id}) when is_binary(user_id),
+    do: RepoContext.run(%{user_id: user_id}, fn -> OrganizationStore.get_provider_selection(user_id) end)
+
+  def put_provider_selection(%{user_id: user_id}, organization_id) when is_binary(user_id),
+    do:
+      RepoContext.run(%{user_id: user_id}, fn ->
+        OrganizationStore.put_provider_selection(user_id, organization_id)
+      end)
+
+  defdelegate split_providers(providers), to: Provider, as: :split
+  defdelegate provider_directory(providers), to: Provider, as: :directory
+  defdelegate selected_provider(active, remembered_id), to: Provider, as: :selected
+  defdelegate active_provider_ids(providers), to: Provider, as: :active_ids
 
   defdelegate list_active_membership_user_ids(context_or_organization_id),
     to: ListActiveMembershipUserIds,

@@ -4,7 +4,15 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   import Ecto.Query
 
   alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
-  alias MilosTraining.Journal.{CoachRead, Comment, Note, VisibilityDefault}
+  alias MilosTraining.Journal.{
+    AudienceExclusion,
+    CoachRead,
+    Comment,
+    EntryAudience,
+    JournalExport,
+    Note,
+    VisibilityDefault
+  }
   alias MilosTraining.Repo
 
   @impl true
@@ -97,7 +105,7 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   def list_note_items(user_id, bound, limit, scope) do
     Note
     |> where([note], is_nil(note.deleted_at))
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope, kind: "note", at: :written_at, text: [:body])
     |> FeedBound.apply(:written_at, bound)
     |> order_by([note], desc: note.written_at, desc: note.id)
     |> limit(^limit)
@@ -276,4 +284,81 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
     |> Map.from_struct()
     |> Map.drop([:__meta__, :deleted_at])
   end
+
+  # ADR-162: owner-only rows, read and written in the member's session.
+  @impl true
+  def list_audience_exclusions(user_id) do
+    AudienceExclusion
+    |> where([x], x.user_id == ^user_id)
+    |> select([x], x.organization_id)
+    |> Repo.all()
+  end
+
+  @impl true
+  def replace_audience_exclusions(user_id, ids) do
+    now = DateTime.utc_now()
+
+    Repo.transaction(fn ->
+      AudienceExclusion |> where([x], x.user_id == ^user_id) |> Repo.delete_all()
+
+      Repo.insert_all(
+        AudienceExclusion,
+        Enum.map(ids, &%{user_id: user_id, organization_id: &1, inserted_at: now})
+      )
+    end)
+
+    :ok
+  end
+
+  @impl true
+  def entry_audiences(_user_id, _kind, []), do: %{}
+
+  def entry_audiences(user_id, kind, ids) do
+    EntryAudience
+    |> where([a], a.user_id == ^user_id and a.entry_kind == ^kind and a.entry_id in ^ids)
+    |> select([a], {a.entry_id, a.organization_id})
+    |> Repo.all()
+    |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
+    |> Map.new(fn {id, orgs} -> {id, Enum.sort(orgs)} end)
+  end
+
+  @impl true
+  def put_entry_audience(user_id, kind, id, ids) do
+    now = DateTime.utc_now()
+
+    Repo.transaction(fn ->
+      EntryAudience
+      |> where([a], a.user_id == ^user_id and a.entry_kind == ^kind and a.entry_id == ^id)
+      |> Repo.delete_all()
+
+      Repo.insert_all(
+        EntryAudience,
+        Enum.map(
+          ids || [],
+          &%{entry_kind: kind, entry_id: id, organization_id: &1, user_id: user_id, inserted_at: now}
+        )
+      )
+    end)
+
+    :ok
+  end
+
+  @impl true
+  def insert_export(attrs), do: attrs |> JournalExport.create_changeset() |> Repo.insert()
+
+  @impl true
+  def get_export(id, user_id), do: Repo.get_by(JournalExport, id: id, user_id: user_id)
+
+  @impl true
+  def list_exports(user_id) do
+    JournalExport
+    |> where([e], e.user_id == ^user_id)
+    |> order_by([e], desc: e.requested_at)
+    |> limit(20)
+    |> Repo.all()
+  end
+
+  @impl true
+  def finish_export(export, attrs),
+    do: export |> JournalExport.finish_changeset(attrs) |> Repo.update()
 end

@@ -62,7 +62,9 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
               enum: ~w(private coach_can_view coach_reply_requested)
             }
           },
-          entry: %Schema{type: :object, additionalProperties: true}
+          entry: %Schema{type: :object, additionalProperties: true},
+          source: MilosTrainingWeb.Schemas.CrossProvider.source(),
+          audience: MilosTrainingWeb.Schemas.CrossProvider.audience()
         }
       },
       struct?: false
@@ -107,7 +109,13 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
       required: [:items],
       properties: %{
         items: %Schema{type: :array, items: Item},
-        next_cursor: %Schema{type: :string, nullable: true}
+        next_cursor: %Schema{type: :string, nullable: true},
+        filter: %Schema{
+          type: :object,
+          additionalProperties: true,
+          description: "The Ροή filter applied, in its canonical (saved) form."
+        },
+        active_filter_count: %Schema{type: :integer}
       }
     }
   end
@@ -128,6 +136,13 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
           type: :string,
           format: :uuid,
           description: "Which coach answers, when the member has several."
+        },
+        audience: %Schema{
+          type: :array,
+          items: %Schema{type: :string, format: :uuid},
+          nullable: true,
+          description:
+            "ADR-162: providers to share with besides the entry's own; null resets to the default."
         }
       },
       additionalProperties: false
@@ -144,6 +159,7 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
         id: %Schema{type: :string, format: :uuid},
         journal_visibility: %Schema{type: :string, enum: @rungs},
         choosable_visibilities: %Schema{type: :array, items: %Schema{type: :string}},
+        audience: MilosTrainingWeb.Schemas.CrossProvider.audience(),
         reply_request: %Schema{
           type: :object,
           nullable: true,

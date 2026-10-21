@@ -39,6 +39,9 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
         Map.merge(execution, %{
           workout_title: "Deleted workout",
           workout_type: nil,
+          workout_tags: [],
+          workout_source_id: nil,
+          exercise_names: [],
           section_scores: attach_section_names(execution.section_scores || [], %{})
         })
 
@@ -46,6 +49,10 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
         Map.merge(execution, %{
           workout_title: workout.title,
           workout_type: workout.type,
+          # ADR-162: what the cross-provider Vault and Πρόοδος group by.
+          workout_tags: Map.get(workout, :tags) || [],
+          workout_source_id: Map.get(workout, :source_workout_id),
+          exercise_names: exercise_names(workout),
           section_scores:
             attach_section_names(execution.section_scores || [], section_name_lookup(workout))
         })
@@ -74,6 +81,16 @@ defmodule MilosTraining.Application.ListWorkoutExecutions do
     Enum.map(section_scores, fn score ->
       Map.put(score, :section_name, Map.get(lookup, score[:section_id] || score["section_id"]))
     end)
+  end
+
+  defp exercise_names(workout) do
+    for section <- workout.sections || [],
+        exercise <- List.wrap(Map.get(section, :exercises)),
+        is_map(exercise),
+        name = Map.get(exercise, :name),
+        is_binary(name),
+        uniq: true,
+        do: name
   end
 
   defp section_name_lookup(workout) do

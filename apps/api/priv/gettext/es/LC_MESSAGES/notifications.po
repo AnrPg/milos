@@ -471,3 +471,9 @@ msgstr "¿Un vaso de agua?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "La tarde es un buen momento para ponerte al día con el agua."
+
+msgid "Your journal export is ready"
+msgstr "Tu exportación del diario está lista"
+
+msgid "Download it within seven days from Settings."
+msgstr "Descárgala en un plazo de siete días desde Ajustes."

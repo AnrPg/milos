@@ -11,10 +11,13 @@ defmodule MilosTrainingWeb.JournalController do
   alias MilosTraining.Application.{
     GetClientJournal,
     GetJournalFeed,
+    JournalAudience,
+    JournalExports,
     JournalNotes,
     SetJournalVisibility
   }
 
+  alias MilosTrainingWeb.Schemas.CrossProvider
   alias MilosTrainingWeb.Schemas.JournalFeed, as: Schemas
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -48,6 +51,50 @@ defmodule MilosTrainingWeb.JournalController do
     }
   ]
 
+  # ADR-162: the Ροή filter (JournalFilter); `kinds` above is its Τύπος.
+  @filter_params [
+    %Parameter{
+      name: :sources,
+      in: :query,
+      required: false,
+      description: "Comma-separated provider ids, `freeform`, `device`",
+      schema: %Schema{type: :string}
+    },
+    %Parameter{
+      name: :visibilities,
+      in: :query,
+      required: false,
+      description: "Comma-separated rungs",
+      schema: %Schema{type: :string}
+    },
+    %Parameter{
+      name: :date_from,
+      in: :query,
+      required: false,
+      schema: %Schema{type: :string, format: :date}
+    },
+    %Parameter{
+      name: :date_to,
+      in: :query,
+      required: false,
+      schema: %Schema{type: :string, format: :date}
+    },
+    %Parameter{
+      name: :q,
+      in: :query,
+      required: false,
+      description: "Text search (2–100 characters) over entries and their comments",
+      schema: %Schema{type: :string}
+    },
+    %Parameter{
+      name: :remember,
+      in: :query,
+      required: false,
+      description: "Also remember this filter as your last-used Ημερολόγιο filter",
+      schema: %Schema{type: :boolean}
+    }
+  ]
+
   @id_param %Parameter{
     name: :id,
     in: :path,
@@ -56,14 +103,112 @@ defmodule MilosTrainingWeb.JournalController do
   }
 
   operation(:index,
-    summary: "Your journal: every entry kind, newest first",
-    parameters: @page_params,
+    summary: "Your journal across every provider: every entry kind, newest first",
+    parameters: @page_params ++ @filter_params,
     responses: [ok: {"Feed page", "application/json", Schemas.page()}]
   )
 
   def index(conn, params) do
-    with {:ok, page} <- GetJournalFeed.call(conn.assigns.user_context, page_params(params)) do
+    with {:ok, page} <- GetJournalFeed.call(conn.assigns.user_context, feed_params(params)) do
       json(conn, page)
+    end
+  end
+
+  operation(:coach_audience,
+    summary: "Who «Οι coach μου» means across your providers",
+    responses: [ok: {"Audience", "application/json", CrossProvider.coach_audience_response()}]
+  )
+
+  def coach_audience(conn, _params) do
+    with {:ok, audience} <- JournalAudience.get_default(conn.assigns.user_context) do
+      json(conn, audience)
+    end
+  end
+
+  operation(:put_coach_audience,
+    summary: "Choose which providers' coaches «Οι coach μου» means",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{schema: CrossProvider.coach_audience_request()}
+      }
+    },
+    responses: [
+      ok: {"Audience", "application/json", CrossProvider.coach_audience_response()},
+      unprocessable_entity: {"Unknown provider", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def put_coach_audience(conn, _params) do
+    with {:ok, audience} <-
+           JournalAudience.put_default(
+             conn.assigns.user_context,
+             body_params(conn)["organization_ids"]
+           ) do
+      json(conn, audience)
+    end
+  end
+
+  operation(:entry_audience,
+    summary: "Share one entry with specific providers (or reset it)",
+    parameters: [
+      %Parameter{
+        name: :kind,
+        in: :path,
+        required: true,
+        schema: %Schema{type: :string, enum: ~w(execution training_log pr note check_in)}
+      },
+      @id_param
+    ],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{schema: CrossProvider.entry_audience_request()}
+      }
+    },
+    responses: [
+      ok: {"Audience", "application/json", CrossProvider.entry_audience_response()},
+      not_found: {"Entry not found", "application/json", %Schema{type: :object}},
+      unprocessable_entity: {"Not allowed", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def entry_audience(conn, %{kind: kind, id: id}) do
+    with {:ok, result} <-
+           JournalAudience.put_entry(
+             conn.assigns.user_context,
+             kind,
+             id,
+             body_params(conn)["organization_ids"]
+           ) do
+      json(conn, result)
+    end
+  end
+
+  operation(:export,
+    summary: "Export your whole journal across providers (JSON and training CSV)",
+    responses: [
+      accepted: {"Export requested", "application/json", CrossProvider.export_response()},
+      conflict: {"An export is pending", "application/json", %Schema{type: :object}}
+    ]
+  )
+
+  def export(conn, _params) do
+    with {:ok, export} <- JournalExports.request(conn.assigns.user_context) do
+      conn
+      |> put_status(:accepted)
+      |> json(%{export: export})
+    end
+  end
+
+  operation(:exports,
+    summary: "Your journal exports, with short-lived download links",
+    responses: [ok: {"Exports", "application/json", CrossProvider.exports_response()}]
+  )
+
+  def exports(conn, _params) do
+    with {:ok, exports} <- JournalExports.list(conn.assigns.user_context) do
+      json(conn, %{exports: exports})
     end
   end
 
@@ -163,6 +308,20 @@ defmodule MilosTrainingWeb.JournalController do
   end
 
   defp page_params(params), do: Map.take(params, [:cursor, :kinds, :limit])
+
+  defp feed_params(params),
+    do:
+      Map.take(params, [
+        :cursor,
+        :kinds,
+        :limit,
+        :sources,
+        :visibilities,
+        :date_from,
+        :date_to,
+        :q,
+        :remember
+      ])
 
   # CastAndValidate atomizes body keys; the application reads string keys.
   defp body_params(conn), do: conn.body_params |> Jason.encode!() |> Jason.decode!()

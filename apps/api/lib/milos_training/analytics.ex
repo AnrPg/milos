@@ -70,4 +70,12 @@ defmodule MilosTraining.Analytics do
 
   def purge_tenant_data(context),
     do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
+
+  # ADR-162: Πρόοδος across providers.
+  alias MilosTraining.Analytics.Domain.ProgressFilter
+
+  defdelegate parse_progress_filter(params), to: ProgressFilter, as: :parse
+  defdelegate progress_filter_params(filter), to: ProgressFilter, as: :to_params
+  defdelegate progress_filter_active_count(filter), to: ProgressFilter, as: :active_count
+  defdelegate progress_since(filter, today), to: ProgressFilter, as: :since
 end
