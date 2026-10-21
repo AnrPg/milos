@@ -201,5 +201,5 @@ export async function requestJournalExport(token: string) {
 
 export async function fetchJournalExports(token: string) {
   const data = await apiRequest<components["schemas"]["JournalExports"]>("/me/journal/exports", { token });
-  return data.exports as JournalExport[];
+  return (data.exports ?? []) as JournalExport[];
 }

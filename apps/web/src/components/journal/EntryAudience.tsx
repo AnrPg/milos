@@ -36,7 +36,7 @@ export function useCoachAudience() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const providers = useMyProviders();
-  const multiple = (providers.data?.providers.length ?? 0) > 1;
+  const multiple = (providers.data?.providers?.length ?? 0) > 1;
   const query = useQuery({
     queryKey: [...COACH_AUDIENCE_KEY, token],
     enabled: Boolean(token) && multiple,
@@ -129,7 +129,7 @@ export function EntryAudienceNote({ item }: { item: Pick<JournalFeedItem, "audie
   const { data, multiple } = useCoachAudience();
   const audience: EntryAudience | null | undefined = item.audience;
   if (!multiple || !audience?.custom || !isCoachRung(item.journal_visibility) || !data) return null;
-  const names = data.providers
+  const names = (data.providers ?? [])
     .filter((provider) => audience.organization_ids.includes(provider.organization_id))
     .map((provider) => provider.name);
   if (names.length === 0) return null;

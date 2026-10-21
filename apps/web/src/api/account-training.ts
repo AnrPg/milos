@@ -69,7 +69,7 @@ export async function fetchAccountProgress(token: string, params: ProgressQuery)
     `/me/progress${search({ range: params.range, sources: params.sources, exercise: params.exercise?.trim() })}`,
     { token, scope: "account" },
   );
-  return data.progress;
+  return data.progress ?? null;
 }
 
 export function fetchAccountVault(token: string, params: VaultQuery) {

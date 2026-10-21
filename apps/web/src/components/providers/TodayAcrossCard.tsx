@@ -57,7 +57,7 @@ export function TodayAcrossCard() {
   const { switchTo, pending, error } = useSwitchProvider();
   const date = useMemo(() => localIsoDate(new Date()), []);
   const timezone = useMemo(() => zone(), []);
-  const multiple = (providers.data?.providers.length ?? 0) > 1;
+  const multiple = (providers.data?.providers?.length ?? 0) > 1;
   const today = useQuery({
     queryKey: [...MY_TODAY_KEY, date, timezone],
     enabled: Boolean(token) && multiple,
@@ -84,7 +84,7 @@ export function TodayAcrossCard() {
         <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
       ) : today.isError ? (
         <ErrorLine message={clientErrorMessage(today.error, i18n)} />
-      ) : today.data.items.length === 0 ? (
+      ) : !today.data.items?.length ? (
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
       ) : (
         <ul className="flex flex-col" aria-label={t("todayTitle")}>

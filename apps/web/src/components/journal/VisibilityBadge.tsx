@@ -133,7 +133,7 @@ function VisibilityPicker({
   const selected = picked ?? item.audience?.organization_ids ?? defaults;
   const choosing =
     coachAudience.multiple &&
-    (coachAudience.data?.providers.length ?? 0) > 1 &&
+    (coachAudience.data?.providers?.length ?? 0) > 1 &&
     audienceApplies(item.kind) &&
     isCoachRung(choice);
 

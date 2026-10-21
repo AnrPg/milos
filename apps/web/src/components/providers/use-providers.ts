@@ -84,7 +84,7 @@ export function useAdoptAccountProvider() {
   const providers = useMyProviders();
   const queryClient = useQueryClient();
   useEffect(() => {
-    const selected = providers.data?.providers.find((provider) => provider.selected);
+    const selected = providers.data?.providers?.find((provider) => provider.selected);
     if (!selected || storedSlug()) return;
     rememberSelectedOrganization(selected.slug);
     void queryClient.invalidateQueries({ predicate: (query) => query.queryKey[0] !== MY_PROVIDERS_KEY[0] });

@@ -22,7 +22,7 @@ export function ProviderTitle({ title }: { title: string }) {
   const providers = useMyProviders();
   const [open, setOpen] = useState(false);
   useAdoptAccountProvider();
-  const switchable = (providers.data?.providers.length ?? 0) > 1;
+  const switchable = (providers.data?.providers?.length ?? 0) > 1;
 
   if (!switchable) return <>{title}</>;
   return (

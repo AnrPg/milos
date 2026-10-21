@@ -61,12 +61,12 @@ export function CoachAudienceSetting() {
   if (audience.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if (audience.isError) return <ErrorLine message={clientErrorMessage(audience.error, i18n)} />;
 
-  const selected = save.variables ?? audience.data.organization_ids;
+  const selected = save.variables ?? audience.data.organization_ids ?? [];
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("audience.settingHint")}</p>
       <ul className="flex flex-col gap-2">
-        {audience.data.providers.map((provider) => {
+        {(audience.data.providers ?? []).map((provider) => {
           const on = selected.includes(provider.organization_id);
           const last = on && selected.length === 1;
           return (
@@ -110,7 +110,7 @@ export function JournalExportSetting() {
     queryKey: [...JOURNAL_EXPORTS_KEY, token],
     enabled: Boolean(token),
     queryFn: () => fetchJournalExports(token!),
-    refetchInterval: (query) => (query.state.data?.some((item) => item.status === "pending") ? 3000 : false),
+    refetchInterval: (query) => (query.state.data?.some?.((item) => item.status === "pending") ? 3000 : false),
   });
   const request = useMutation({
     mutationFn: () => requestJournalExport(token!),
@@ -123,7 +123,7 @@ export function JournalExportSetting() {
       }
     },
   });
-  const pending = exports.data?.some((item) => item.status === "pending") ?? false;
+  const pending = exports.data?.some?.((item) => item.status === "pending") ?? false;
   const when = (iso: string) => new Date(iso).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
   return (
@@ -140,7 +140,7 @@ export function JournalExportSetting() {
       </button>
       {conflict ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("export.inProgress")}</p> : null}
       <ErrorLine message={request.error && !conflict ? clientErrorMessage(request.error, i18n) : null} />
-      {exports.data?.length ? (
+      {Array.isArray(exports.data) && exports.data.length ? (
         <ul className="flex flex-col gap-2" aria-label={t("export.history")}>
           {exports.data.map((item) => (
             <ExportRow key={item.id} item={item} when={when} />

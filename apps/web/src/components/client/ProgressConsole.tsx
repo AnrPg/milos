@@ -71,7 +71,7 @@ function ProgressContent() {
         <LoadingLine />
       ) : query.isError ? (
         <QueryProblem error={query.error} onRetry={() => void query.refetch()} />
-      ) : (
+      ) : !query.data?.totals ? null : (
         <>
           <Totals progress={query.data} />
           <WeeklyChart progress={query.data} />
@@ -80,7 +80,7 @@ function ProgressContent() {
             <BySource progress={query.data} />
           </div>
           <PRTimeline entries={query.data.pr_timeline ?? []} />
-          <ScoreHistory series={query.data.score_history} />
+          <ScoreHistory series={query.data.score_history ?? []} />
         </>
       )}
     </div>
@@ -282,14 +282,15 @@ function BySource({ progress }: { progress: AccountProgress }) {
   const i18n = useUiTranslations();
   const t = useTranslations("Providers");
   const directory = useSourceDirectory();
-  const total = progress.by_source.reduce((sum, row) => sum + row.sessions, 0);
+  const bySource = progress.by_source ?? [];
+  const total = bySource.reduce((sum, row) => sum + row.sessions, 0);
   return (
     <ClientCard title={t("progress.bySource")}>
-      {progress.by_source.length === 0 || total === 0 ? (
+      {bySource.length === 0 || total === 0 ? (
         <EmptyLine>{i18n("clProgressSourcesEmpty")}</EmptyLine>
       ) : (
         <ul className="flex flex-col gap-2">
-          {progress.by_source.map((row) => {
+          {bySource.map((row) => {
             const percent = Math.round((row.sessions / total) * 100);
             return (
               <li key={sourceToken(row.source)}>
