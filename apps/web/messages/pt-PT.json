@@ -8727,6 +8727,43 @@
       "sharedOnly": "Apenas das entradas que o cliente partilha com os coaches da box."
     }
   },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Ocultar",
+    "restore": "Mostrar de novo",
+    "hidden": "Ocultos: {count}",
+    "note": "Um indicador, não um conselho médico.",
+    "noteWithWeeks": "A partir de {weeks} semanas de dados · Um indicador, não um conselho médico.",
+    "empty": {
+      "collecting": "Os insights aparecem após {min} semanas de registos (sono, água, desejos, treinos). Até agora: {weeks} de {min}.",
+      "moreEntries": "Faltam mais alguns registos para surgir um padrão.",
+      "noPattern": "Nenhum padrão claro nas últimas {window} semanas. Os insights são atualizados todas as noites.",
+      "allHidden": "Ocultaste todos os insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Fazes PR {ratio}× mais vezes depois de {hours}+ horas de sono.",
+        "all_after_goal": "Os teus {count} PR vieram todos depois de {hours}+ horas de sono."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Depois de dormires menos de {hours} horas, avalias os treinos {delta} pontos de RPE mais duros."
+      },
+      "time_of_day": {
+        "best_part": "Fazes PR {ratio}× mais vezes nos treinos {part, select, morning {da manhã} afternoon {da tarde} evening {da noite} other {de madrugada}}.",
+        "only_part": "Os teus {count} PR vieram todos em treinos {part, select, morning {da manhã} afternoon {da tarde} evening {da noite} other {de madrugada}}."
+      },
+      "cravings": {
+        "part_and_trigger": "A maioria dos teus desejos ({count} de {total}) surge {part, select, morning {de manhã} afternoon {à tarde} evening {à noite} other {de madrugada}}, normalmente com {trigger, select, stress {stress} fatigue {cansaço} boredom {tédio} social {companhia} other {fome}}.",
+        "part": "A maioria dos teus desejos ({count} de {total}) surge {part, select, morning {de manhã} afternoon {à tarde} evening {à noite} other {de madrugada}}.",
+        "trigger": "Nos teus desejos registas mais vezes {trigger, select, stress {stress} fatigue {cansaço} boredom {tédio} social {companhia} other {fome}} ({count} de {total})."
+      },
+      "hydration": {
+        "on_goal": "Atingiste o teu objetivo de água em {onGoal} dos {logged} dias que registaste.",
+        "training_more": "Nos dias de treino atinges o objetivo de água mais vezes ({training}% contra {rest}% nos outros).",
+        "training_less": "Nos dias de treino atinges o objetivo de água menos vezes ({training}% contra {rest}% nos outros)."
+      }
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "Ações do treinador",

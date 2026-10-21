@@ -8727,6 +8727,43 @@
       "sharedOnly": "Μόνο από καταχωρήσεις που ο πελάτης μοιράζεται με τους coach του box."
     }
   },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Απόκρυψη",
+    "restore": "Επαναφορά",
+    "hidden": "Κρυμμένα: {count}",
+    "note": "Ένδειξη, όχι ιατρική συμβουλή.",
+    "noteWithWeeks": "Από {weeks} εβδομάδες δεδομένων · Ένδειξη, όχι ιατρική συμβουλή.",
+    "empty": {
+      "collecting": "Τα insights εμφανίζονται μετά από {min} εβδομάδες καταγραφών (ύπνος, νερό, λιγούρες, προπονήσεις). Μέχρι τώρα: {weeks} από {min}.",
+      "moreEntries": "Χρειάζονται λίγες ακόμα καταγραφές για να φανεί κάποιο μοτίβο.",
+      "noPattern": "Κανένα σαφές μοτίβο στις τελευταίες {window} εβδομάδες. Τα insights ενημερώνονται κάθε νύχτα.",
+      "allHidden": "Έκρυψες όλα τα insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Κάνεις PR {ratio}× συχνότερα μετά από {hours}+ ώρες ύπνου.",
+        "all_after_goal": "Και τα {count} PR σου ήρθαν μετά από {hours}+ ώρες ύπνου."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Μετά από ύπνο κάτω από {hours} ώρες, βαθμολογείς τις προπονήσεις κατά {delta} μονάδες RPE πιο κουραστικές."
+      },
+      "time_of_day": {
+        "best_part": "Κάνεις PR {ratio}× συχνότερα στις {part, select, morning {πρωινές} afternoon {απογευματινές} evening {βραδινές} other {νυχτερινές}} προπονήσεις.",
+        "only_part": "Και τα {count} PR σου ήρθαν σε {part, select, morning {πρωινές} afternoon {απογευματινές} evening {βραδινές} other {νυχτερινές}} προπονήσεις."
+      },
+      "cravings": {
+        "part_and_trigger": "Οι περισσότερες λιγούρες σου ({count} από {total}) έρχονται {part, select, morning {το πρωί} afternoon {το απόγευμα} evening {το βράδυ} other {αργά τη νύχτα}}, συνήθως με {trigger, select, stress {στρες} fatigue {κούραση} boredom {βαρεμάρα} social {παρέα} other {πείνα}}.",
+        "part": "Οι περισσότερες λιγούρες σου ({count} από {total}) έρχονται {part, select, morning {το πρωί} afternoon {το απόγευμα} evening {το βράδυ} other {αργά τη νύχτα}}.",
+        "trigger": "Στις λιγούρες σου σημειώνεις πιο συχνά {trigger, select, stress {στρες} fatigue {κούραση} boredom {βαρεμάρα} social {παρέα} other {πείνα}} ({count} από {total})."
+      },
+      "hydration": {
+        "on_goal": "Έφτασες τον στόχο νερού σου {onGoal} από τις {logged} μέρες που κατέγραψες.",
+        "training_more": "Τις μέρες προπόνησης φτάνεις τον στόχο νερού πιο συχνά ({training}% έναντι {rest}% τις υπόλοιπες).",
+        "training_less": "Τις μέρες προπόνησης φτάνεις τον στόχο νερού πιο σπάνια ({training}% έναντι {rest}% τις υπόλοιπες)."
+      }
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "Ενέργειες προπονητή",

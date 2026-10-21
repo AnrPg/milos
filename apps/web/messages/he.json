@@ -8727,6 +8727,43 @@
       "sharedOnly": "רק מרשומות שהלקוח משתף עם המאמנים של הבוקס."
     }
   },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "הסתרה",
+    "restore": "הצגה מחדש",
+    "hidden": "מוסתרים: {count}",
+    "note": "מדד, לא ייעוץ רפואי.",
+    "noteWithWeeks": "מתוך {weeks} שבועות של נתונים · מדד, לא ייעוץ רפואי.",
+    "empty": {
+      "collecting": "ה-insights מופיעים אחרי {min} שבועות של רישומים (שינה, מים, חשקים, אימונים). עד עכשיו: {weeks} מתוך {min}.",
+      "moreEntries": "צריך עוד כמה רישומים כדי שיופיע דפוס.",
+      "noPattern": "אין דפוס ברור ב-{window} השבועות האחרונים. ה-insights מתעדכנים כל לילה.",
+      "allHidden": "הסתרת את כל ה-insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "את/ה שובר/ת שיא אישי פי {ratio} יותר אחרי {hours}+ שעות שינה.",
+        "all_after_goal": "כל {count} השיאים האישיים שלך הגיעו אחרי {hours}+ שעות שינה."
+      },
+      "sleep_effort": {
+        "harder_after_short": "אחרי פחות מ-{hours} שעות שינה, את/ה מדרג/ת אימונים קשים יותר ב-{delta} נקודות RPE."
+      },
+      "time_of_day": {
+        "best_part": "את/ה שובר/ת שיא אישי פי {ratio} יותר באימוני {part, select, morning {בוקר} afternoon {צהריים} evening {ערב} other {לילה}}.",
+        "only_part": "כל {count} השיאים האישיים שלך הגיעו באימוני {part, select, morning {בוקר} afternoon {צהריים} evening {ערב} other {לילה}}."
+      },
+      "cravings": {
+        "part_and_trigger": "רוב החשקים שלך ({count} מתוך {total}) מגיעים {part, select, morning {בבוקר} afternoon {אחר הצהריים} evening {בערב} other {מאוחר בלילה}}, בדרך כלל עם {trigger, select, stress {לחץ} fatigue {עייפות} boredom {שעמום} social {חברה} other {רעב}}.",
+        "part": "רוב החשקים שלך ({count} מתוך {total}) מגיעים {part, select, morning {בבוקר} afternoon {אחר הצהריים} evening {בערב} other {מאוחר בלילה}}.",
+        "trigger": "בחשקים שלך את/ה מציין/ת הכי הרבה {trigger, select, stress {לחץ} fatigue {עייפות} boredom {שעמום} social {חברה} other {רעב}} ({count} מתוך {total})."
+      },
+      "hydration": {
+        "on_goal": "הגעת ליעד המים שלך ב-{onGoal} מתוך {logged} הימים שרשמת.",
+        "training_more": "בימי אימון את/ה מגיע/ה ליעד המים לעתים קרובות יותר ({training}% לעומת {rest}% בשאר הימים).",
+        "training_less": "בימי אימון את/ה מגיע/ה ליעד המים לעתים רחוקות יותר ({training}% לעומת {rest}% בשאר הימים)."
+      }
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "פעולות מאמן",
