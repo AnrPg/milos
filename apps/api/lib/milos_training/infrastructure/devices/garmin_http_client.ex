@@ -166,7 +166,7 @@ defmodule MilosTraining.Infrastructure.Devices.GarminHttpClient do
 
   defp token_request(config, form) do
     (config[:token_url] || @token_url)
-    |> Req.post(form: form, receive_timeout: @timeout, retry: false)
+    |> Req.post([form: form, receive_timeout: @timeout, retry: false] ++ req_options())
     |> case do
       {:ok, %Req.Response{status: 200, body: %{"access_token" => access} = body}} ->
         {:ok,
@@ -203,6 +203,7 @@ defmodule MilosTraining.Infrastructure.Devices.GarminHttpClient do
   defp request(method, url, access_token) do
     [method: method, url: url, receive_timeout: @timeout, retry: false]
     |> Keyword.put(:headers, [{"authorization", "Bearer " <> access_token}])
+    |> Keyword.merge(req_options())
     |> Req.request()
     |> case do
       {:ok, %Req.Response{status: status, body: body}} when status in 200..299 ->
@@ -243,6 +244,9 @@ defmodule MilosTraining.Infrastructure.Devices.GarminHttpClient do
   end
 
   defp raw_config, do: Application.get_env(:milos_training, :garmin, [])
+
+  # Tests route requests through `Req.Test`.
+  defp req_options, do: Keyword.get(raw_config(), :req_options, [])
 
   defp present?(value), do: is_binary(value) and String.trim(value) != ""
 end

@@ -90,9 +90,7 @@ defmodule MilosTraining.Application.GarminConnection do
     state = param(params, "state")
 
     with true <- is_binary(state) || {:error, :invalid_oauth_state},
-         {_id, user_id} <-
-           Devices.connection_by_oauth_state(Devices.oauth_state_hash(state)) ||
-             {:error, :invalid_oauth_state} do
+         {:ok, user_id} <- sign_in_owner(state) do
       context = %{user_id: user_id}
 
       Devices.with_context(context, fn ->
@@ -114,6 +112,13 @@ defmodule MilosTraining.Application.GarminConnection do
             finish(context, connection, param(params, "code"), now)
         end
       end)
+    end
+  end
+
+  defp sign_in_owner(state) do
+    case Devices.connection_by_oauth_state(Devices.oauth_state_hash(state)) do
+      {_id, user_id} -> {:ok, user_id}
+      nil -> {:error, :invalid_oauth_state}
     end
   end
 
