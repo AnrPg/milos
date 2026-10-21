@@ -7,6 +7,7 @@ defmodule Palee.Wallet.Domain.ApplePass do
   signs the manifest and zips everything into a `.pkpass`. Pure.
   """
 
+  alias Palee.BrandPalette
   alias Palee.Wallet.Domain.PassContent
 
   @max_locations 10
@@ -26,9 +27,9 @@ defmodule Palee.Wallet.Domain.ApplePass do
       "organizationName" => content.box.name,
       "description" => "#{copy.description} · #{content.box.name}",
       "logoText" => content.box.name,
-      "backgroundColor" => PassContent.rgb(content.box.primary_color) || "rgb(17, 24, 39)",
-      "foregroundColor" => PassContent.foreground(content.box.primary_color),
-      "labelColor" => PassContent.foreground(content.box.primary_color),
+      "backgroundColor" => PassContent.rgb(BrandPalette.colour(:deep)),
+      "foregroundColor" => PassContent.rgb(BrandPalette.colour(:deep_contrast)),
+      "labelColor" => PassContent.rgb(BrandPalette.colour(:deep_contrast)),
       "webServiceURL" => apple.web_service_url,
       "authenticationToken" => apple.authentication_token,
       "sharingProhibited" => true,

@@ -1,6 +1,6 @@
 defmodule Palee.BrandPalette do
   @moduledoc """
-  The Palee print colours for emails and documents the API renders.
+  The Palee colours for the emails, documents and wallet passes the API renders.
 
   Generated from apps/web/src/lib/theme.ts by `npm run theme:native`; do not edit.
   """
@@ -13,7 +13,9 @@ defmodule Palee.BrandPalette do
     muted: "#5E6470",
     border: "#DFE2E8",
     primary: "#2F5BFF",
-    primary_contrast: "#FFFFFF"
+    primary_contrast: "#FFFFFF",
+    deep: "#17181C",
+    deep_contrast: "#F4F5F7"
   }
 
   @doc "A print colour by its theme token name, e.g. `colour(:primary)`."

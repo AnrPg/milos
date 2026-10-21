@@ -1,19 +1,21 @@
 defmodule Palee.Wallet.Domain.PassImage do
   @moduledoc """
-  Images of an Apple pass from the box's branding (ADR-155): the box's logo
-  when it has a PNG one, and otherwise a plain tile in its primary colour, so
-  every pass has the `icon.png` Apple requires. Pure (a tiny PNG encoder).
+  Images of an Apple pass (ADR-155): the box's logo when it has a PNG one,
+  and otherwise a plain tile in the Palee Dojo colour (the theme is uniform,
+  docs/brand/THEME.md), so every pass has the `icon.png` Apple requires.
+  Pure (a tiny PNG encoder).
   """
 
+  alias Palee.BrandPalette
+
   @png_signature <<137, 80, 78, 71, 13, 10, 26, 10>>
-  @default_color {17, 24, 39}
 
   @doc """
   The pass images: `icon.png`/`icon@2x.png` and `logo.png`/`logo@2x.png`.
   `logo` is the box's PNG logo bytes, or nil.
   """
-  def images(primary_color, logo \\ nil) do
-    color = parse_color(primary_color)
+  def images(logo \\ nil) do
+    color = parse_color(BrandPalette.colour(:primary))
 
     tiles = %{
       "icon.png" => solid_png(29, 29, color),
@@ -39,18 +41,11 @@ defmodule Palee.Wallet.Domain.PassImage do
       chunk("IEND", <<>>)
   end
 
+  @doc "`#RRGGBB` as `{r, g, b}`."
   def parse_color("#" <> hex) when byte_size(hex) == 6 do
-    case Integer.parse(hex, 16) do
-      {value, ""} ->
-        <<r, g, b>> = <<value::24>>
-        {r, g, b}
-
-      _invalid ->
-        @default_color
-    end
+    <<r, g, b>> = <<String.to_integer(hex, 16)::24>>
+    {r, g, b}
   end
-
-  def parse_color(_color), do: @default_color
 
   defp chunk(type, data) do
     <<byte_size(data)::32>> <> type <> data <> <<:erlang.crc32(type <> data)::32>>

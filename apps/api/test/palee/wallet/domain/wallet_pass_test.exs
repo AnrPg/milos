@@ -2,6 +2,7 @@ defmodule Palee.Wallet.Domain.WalletPassTest do
   use ExUnit.Case, async: true
 
   alias Palee.Facility.Domain.StaticMemberCode
+  alias Palee.BrandPalette
   alias Palee.Wallet.Domain.{ApplePass, GooglePass, PassContent, PassImage}
 
   @key :crypto.strong_rand_bytes(32)
@@ -13,7 +14,7 @@ defmodule Palee.Wallet.Domain.WalletPassTest do
       Keyword.merge(
         [
           serial: @serial,
-          box: %{name: "Iron Box", slug: "iron", primary_color: "#FF6600"},
+          box: %{name: "Iron Box", slug: "iron"},
           member: %{name: "Μαρία Π."},
           barcode: StaticMemberCode.sign(@key, @serial, :wallet),
           next_booking: %{
@@ -48,7 +49,7 @@ defmodule Palee.Wallet.Domain.WalletPassTest do
       assert pass["organizationName"] == "Iron Box"
       assert pass["webServiceURL"] == @apple.web_service_url
       assert pass["authenticationToken"] == @apple.authentication_token
-      assert pass["backgroundColor"] == "rgb(255, 102, 0)"
+      assert pass["backgroundColor"] == PassContent.rgb(BrandPalette.colour(:deep))
       assert pass["voided"] == false
       assert [%{"format" => "PKBarcodeFormatQR", "message" => "W1" <> _}] = pass["barcodes"]
       assert [%{"key" => "member", "value" => "Μαρία Π."}] = pass["generic"]["primaryFields"]
@@ -77,7 +78,7 @@ defmodule Palee.Wallet.Domain.WalletPassTest do
     end
 
     test "the manifest lists the SHA-1 of every file" do
-      images = PassImage.images("#FF6600")
+      images = PassImage.images()
       files = ApplePass.files(content(), @apple, images)
       manifest = files |> ApplePass.manifest() |> Jason.decode!()
 
@@ -90,10 +91,10 @@ defmodule Palee.Wallet.Domain.WalletPassTest do
     end
 
     test "generated images are valid PNGs and a PNG logo is used as is" do
-      for {_name, bytes} <- PassImage.images(nil), do: assert(PassImage.png?(bytes))
+      for {_name, bytes} <- PassImage.images(), do: assert(PassImage.png?(bytes))
 
       logo = PassImage.solid_png(10, 10, {1, 2, 3})
-      assert %{"logo.png" => ^logo} = PassImage.images("#000000", logo)
+      assert %{"logo.png" => ^logo} = PassImage.images(logo)
       assert PassImage.parse_color("#0A0B0C") == {10, 11, 12}
     end
   end
@@ -125,7 +126,7 @@ defmodule Palee.Wallet.Domain.WalletPassTest do
       assert object["classId"] == Palee.Wallet.Domain.GooglePass.class_id("3388000000012345678")
       assert object["state"] == "ACTIVE"
       assert object["barcode"] == %{"type" => "QR_CODE", "value" => content().barcode}
-      assert object["hexBackgroundColor"] == "#FF6600"
+      assert object["hexBackgroundColor"] == BrandPalette.colour(:deep)
       assert object["logo"]["sourceUri"]["uri"] == google.logo_url
       assert object["header"]["defaultValue"]["value"] == "Μαρία Π."
 

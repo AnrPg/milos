@@ -120,14 +120,14 @@ function capacitorTheme() {
   return `${JSON.stringify({ _comment: GENERATED, light: { background: light.bg }, dark: { background: dark.bg } }, null, 2)}\n`;
 }
 
-/** Print colours for the API's emails and receipts (paper is light). */
+/** Print colours for the API's emails, receipts and wallet passes (paper is light). */
 function elixirPalette() {
-  const tokens: (keyof ThemeTokens)[] = ["paper", "bg", "text", "textSoft", "muted", "border", "primary", "primaryContrast"];
+  const tokens: (keyof ThemeTokens)[] = ["paper", "bg", "text", "textSoft", "muted", "border", "primary", "primaryContrast", "deep", "deepContrast"];
   const snake = (name: string) => name.replace(/([A-Z])/g, "_$1").toLowerCase();
   const rows = tokens.map((token) => `    ${snake(token)}: "${PRINT_TOKENS[token]}"`);
   return `defmodule Palee.BrandPalette do
   @moduledoc """
-  The Palee print colours for emails and documents the API renders.
+  The Palee colours for the emails, documents and wallet passes the API renders.
 
   ${GENERATED}
   """

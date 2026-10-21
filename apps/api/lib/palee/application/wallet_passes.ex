@@ -277,11 +277,11 @@ defmodule Palee.Application.WalletPasses do
     end
   end
 
-  defp build_opts(context, %{platform: "apple"} = pass, content, now) do
+  defp build_opts(context, %{platform: "apple"} = pass, _content, now) do
     %{
       authentication_token: auth_token(pass.serial),
       web_service_url: PublicURL.base_url() <> "/api/wallet/apple",
-      images: images(context, content),
+      images: images(context),
       now: now
     }
   end
@@ -316,7 +316,7 @@ defmodule Palee.Application.WalletPasses do
 
   defp logo_url(context), do: box(context).logo_url
 
-  defp images(context, content) do
+  defp images(context) do
     logo =
       case logo_url(context) do
         url when is_binary(url) and url != "" ->
@@ -329,7 +329,7 @@ defmodule Palee.Application.WalletPasses do
           nil
       end
 
-    PassImage.images(content.box.primary_color, logo)
+    PassImage.images(logo)
   end
 
   defp next_booking(context, user_id, now) do
