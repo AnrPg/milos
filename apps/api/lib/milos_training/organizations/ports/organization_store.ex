@@ -128,6 +128,7 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
 
   # ADR-162: the caller's providers (active and former) and Box ▾'s choice.
   @callback list_my_providers() :: [map()]
+  @callback list_my_provider_coaches() :: [{Ecto.UUID.t(), Ecto.UUID.t()}]
   @callback get_provider_selection(Ecto.UUID.t()) :: Ecto.UUID.t() | nil
   @callback put_provider_selection(Ecto.UUID.t(), Ecto.UUID.t()) :: :ok | {:error, term()}
   @callback get_provider_kind(Ecto.UUID.t()) :: String.t() | nil

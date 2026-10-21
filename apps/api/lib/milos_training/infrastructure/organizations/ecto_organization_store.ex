@@ -1182,6 +1182,18 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     end)
   end
 
+  # ADR-162: the coaches of the caller's active providers, by one definer
+  # lookup (a member's session cannot read other memberships).
+  @impl true
+  def list_my_provider_coaches do
+    %{rows: rows} =
+      Repo.query!("SELECT organization_id, coach_user_id FROM milos_my_provider_coaches()")
+
+    Enum.map(rows, fn [organization_id, coach_user_id] ->
+      {Ecto.UUID.load!(organization_id), Ecto.UUID.load!(coach_user_id)}
+    end)
+  end
+
   @impl true
   def get_provider_kind(organization_id) do
     Organization

@@ -187,6 +187,8 @@ export function deleteJournalNote(token: string, id: string) {
  */
 export type CoachAudience = components["schemas"]["CoachAudience"];
 export type EntryAudience = NonNullable<components["schemas"]["EntryAudience"]>;
+/** A coach of one of the member's providers (per coach since 2026-10-21). */
+export type CoachRef = components["schemas"]["CoachRef"];
 export type AudienceKind = "execution" | "training_log" | "pr" | "note" | "check_in";
 export const AUDIENCE_KINDS: readonly JournalKind[] = ["execution", "training_log", "pr", "note", "check_in"];
 export const COACH_AUDIENCE_KEY = ["my", "journal", "coach-audience"] as const;
@@ -195,19 +197,19 @@ export function fetchCoachAudience(token: string) {
   return apiRequest<CoachAudience>("/me/journal/coach-audience", { token });
 }
 
-export function saveCoachAudience(token: string, organizationIds: string[]) {
+export function saveCoachAudience(token: string, coaches: CoachRef[]) {
   return apiRequest<CoachAudience>("/me/journal/coach-audience", {
     method: "PUT",
     token,
-    body: { organization_ids: organizationIds },
+    body: { coaches },
   });
 }
 
 /** `null` puts the entry back on the default audience. */
-export async function setEntryAudience(token: string, kind: AudienceKind, id: string, organizationIds: string[] | null) {
+export async function setEntryAudience(token: string, kind: AudienceKind, id: string, coaches: CoachRef[] | null) {
   const data = await apiRequest<components["schemas"]["EntryAudienceResponse"]>(
     `/me/journal/entries/${kind}/${id}/audience`,
-    { method: "PUT", token, body: { organization_ids: organizationIds } },
+    { method: "PUT", token, body: { coaches } },
   );
   return data.audience;
 }

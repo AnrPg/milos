@@ -292,12 +292,12 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   def list_audience_exclusions(user_id) do
     AudienceExclusion
     |> where([x], x.user_id == ^user_id)
-    |> select([x], x.organization_id)
+    |> select([x], {x.organization_id, x.coach_user_id})
     |> Repo.all()
   end
 
   @impl true
-  def replace_audience_exclusions(user_id, ids) do
+  def replace_audience_exclusions(user_id, coaches) do
     now = DateTime.utc_now()
 
     Repo.transaction(fn ->
@@ -305,7 +305,14 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
 
       Repo.insert_all(
         AudienceExclusion,
-        Enum.map(ids, &%{user_id: user_id, organization_id: &1, inserted_at: now})
+        Enum.map(coaches, fn {organization_id, coach_user_id} ->
+          %{
+            user_id: user_id,
+            organization_id: organization_id,
+            coach_user_id: coach_user_id,
+            inserted_at: now
+          }
+        end)
       )
     end)
 
@@ -318,14 +325,14 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   def entry_audiences(user_id, kind, ids) do
     EntryAudience
     |> where([a], a.user_id == ^user_id and a.entry_kind == ^kind and a.entry_id in ^ids)
-    |> select([a], {a.entry_id, a.organization_id})
+    |> select([a], {a.entry_id, {a.organization_id, a.coach_user_id}})
     |> Repo.all()
     |> Enum.group_by(&elem(&1, 0), &elem(&1, 1))
-    |> Map.new(fn {id, orgs} -> {id, Enum.sort(orgs)} end)
+    |> Map.new(fn {id, coaches} -> {id, Enum.sort(coaches)} end)
   end
 
   @impl true
-  def put_entry_audience(user_id, kind, id, ids) do
+  def put_entry_audience(user_id, kind, id, coaches) do
     now = DateTime.utc_now()
 
     Repo.transaction(fn ->
@@ -336,14 +343,17 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
       Repo.insert_all(
         EntryAudience,
         Enum.map(
-          ids || [],
-          &%{
-            entry_kind: kind,
-            entry_id: id,
-            organization_id: &1,
-            user_id: user_id,
-            inserted_at: now
-          }
+          coaches || [],
+          fn {organization_id, coach_user_id} ->
+            %{
+              entry_kind: kind,
+              entry_id: id,
+              organization_id: organization_id,
+              coach_user_id: coach_user_id,
+              user_id: user_id,
+              inserted_at: now
+            }
+          end
         )
       )
     end)

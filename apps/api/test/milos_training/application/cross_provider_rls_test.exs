@@ -142,6 +142,53 @@ defmodule MilosTraining.Application.CrossProviderRLSTest do
              MilosTraining.Application.SavedFilters.get(ctx.member_ctx, "journal")
   end
 
+  test "«Οι coach μου» names coaches: one coach of a gym can be left out", ctx do
+    {:ok, personal} =
+      JournalNotes.create(ctx.member_ctx, %{"topic" => "thought", "body" => "Tempo felt easy"})
+
+    {:ok, _moved} =
+      SetJournalVisibility.call(ctx.member_ctx, "note", personal.id, %{
+        "visibility" => "coach_can_view"
+      })
+
+    for coach <- [ctx.box_owner, ctx.box_coach],
+        do: assert(coach_sees(coach, ctx.box, ctx.member) == [personal.id])
+
+    # Leave the box coach out: the box owner (who also coaches) still reads.
+    owner = %{"organization_id" => ctx.box.id, "user_id" => ctx.box_owner.id}
+    nikos = %{"organization_id" => ctx.nikos.id, "user_id" => ctx.nikos_owner.id}
+    assert {:ok, %{coaches: [_, _]}} = JournalAudience.put_default(ctx.member_ctx, [owner, nikos])
+
+    assert coach_sees(ctx.box_owner, ctx.box, ctx.member) == [personal.id]
+    assert coach_sees(ctx.box_coach, ctx.box, ctx.member) == []
+    assert coach_sees(ctx.nikos_owner, ctx.nikos, ctx.member) == [personal.id]
+
+    # One entry for the box coach alone.
+    box_coach = %{"organization_id" => ctx.box.id, "user_id" => ctx.box_coach.id}
+    {:ok, _} = JournalAudience.put_entry(ctx.member_ctx, "note", personal.id, [box_coach])
+    assert coach_sees(ctx.box_coach, ctx.box, ctx.member) == [personal.id]
+    assert coach_sees(ctx.box_owner, ctx.box, ctx.member) == []
+    assert coach_sees(ctx.nikos_owner, ctx.nikos, ctx.member) == []
+    assert notes_visible_to(tenant!(ctx.box_owner, ctx.box), ctx.member) == []
+
+    # A coach at the gym where it was recorded always reads it.
+    {:ok, at_box} =
+      JournalNotes.create(ctx.member_ctx, %{
+        "topic" => "technique",
+        "body" => "Box squat",
+        "organization_slug" => ctx.box.slug
+      })
+
+    {:ok, _} =
+      SetJournalVisibility.call(ctx.member_ctx, "note", at_box.id, %{
+        "visibility" => "coach_can_view",
+        "audience_coaches" => [nikos]
+      })
+
+    assert at_box.id in coach_sees(ctx.box_coach, ctx.box, ctx.member)
+    assert at_box.id in coach_sees(ctx.nikos_owner, ctx.nikos, ctx.member)
+  end
+
   test "leaving a provider ends its access from that day; the member keeps the history", ctx do
     {:ok, at_box} =
       JournalNotes.create(ctx.member_ctx, %{

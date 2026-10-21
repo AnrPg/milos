@@ -1,5 +1,5 @@
 defmodule MilosTraining.Journal.EntryAudience do
-  @moduledoc "One provider an entry's own audience names (ADR-162)."
+  @moduledoc "One coach an entry's own audience names (ADR-162)."
 
   use Ecto.Schema
 
@@ -10,6 +10,7 @@ defmodule MilosTraining.Journal.EntryAudience do
     field(:entry_kind, :string, primary_key: true)
     field(:entry_id, :binary_id, primary_key: true)
     field(:organization_id, :binary_id, primary_key: true)
+    field(:coach_user_id, :binary_id, primary_key: true)
     field(:user_id, :binary_id)
 
     timestamps(type: :utc_datetime_usec, updated_at: false)

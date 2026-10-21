@@ -8066,13 +8066,14 @@
     "audience": {
       "title": "«I miei coach» significa",
       "askTitle": "Chi intendi con «I miei coach»?",
-      "hint": "Ogni provider vede sempre quello che hai fatto con lui. Scegli di chi sono i coach che vedono questa voce.",
+      "hint": "Scegli quali coach vedono questa voce.",
       "makeDefault": "Usa questa scelta per i miei coach d'ora in poi",
       "only": "Solo {names}",
       "settingTitle": "I miei coach",
-      "settingDescription": "I coach di quali provider vedono le voci che condividi con «I miei coach».",
-      "settingHint": "Quando condividi una voce con i tuoi coach, la vedono i coach di questi provider. Puoi restringere ogni singola voce.",
-      "ownAlways": "Un provider vede sempre quello che hai fatto con lui (le sue lezioni e i suoi programmi)."
+      "settingDescription": "Quali coach vedono ciò che condividi con «I miei coach».",
+      "settingHint": "Quando condividi una voce con i tuoi coach, la vedono questi coach. Puoi restringere ogni voce singolarmente.",
+      "ownAlways": "I coach di un fornitore vedono sempre ciò che hai fatto con loro (le loro lezioni e i loro programmi).",
+      "homeAlways": "I coach di {name} la vedono sempre. Scegli chi altro."
     },
     "export": {
       "title": "Esporta il mio diario",

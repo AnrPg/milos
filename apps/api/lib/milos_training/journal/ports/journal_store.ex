@@ -39,11 +39,13 @@ defmodule MilosTraining.Journal.Ports.JournalStore do
   @callback list_changes_since(Ecto.UUID.t(), DateTime.t()) :: [map()]
 
   # ADR-162: «Οι coach μου» across providers and the whole-journal export.
-  @callback list_audience_exclusions(Ecto.UUID.t()) :: [Ecto.UUID.t()]
-  @callback replace_audience_exclusions(Ecto.UUID.t(), [Ecto.UUID.t()]) :: :ok
+  # A coach is `{organization_id, coach_user_id}`.
+  @type coach :: {Ecto.UUID.t(), Ecto.UUID.t()}
+  @callback list_audience_exclusions(Ecto.UUID.t()) :: [coach()]
+  @callback replace_audience_exclusions(Ecto.UUID.t(), [coach()]) :: :ok
   @callback entry_audiences(Ecto.UUID.t(), String.t(), [Ecto.UUID.t()]) ::
-              %{Ecto.UUID.t() => [Ecto.UUID.t()]}
-  @callback put_entry_audience(Ecto.UUID.t(), String.t(), Ecto.UUID.t(), [Ecto.UUID.t()] | nil) ::
+              %{Ecto.UUID.t() => [coach()]}
+  @callback put_entry_audience(Ecto.UUID.t(), String.t(), Ecto.UUID.t(), [coach()] | nil) ::
               :ok
   @callback insert_export(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback get_export(Ecto.UUID.t(), Ecto.UUID.t()) :: map() | nil

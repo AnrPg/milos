@@ -8066,13 +8066,14 @@
     "audience": {
       "title": "«Mes coachs» signifie",
       "askTitle": "Qui veux-tu dire par «Mes coachs» ?",
-      "hint": "Chaque structure voit toujours ce que tu as fait avec elle. Choisis quels coachs voient cette entrée.",
+      "hint": "Choisissez quels coachs voient cette entrée.",
       "makeDefault": "Utiliser ce choix pour mes coachs à l'avenir",
       "only": "Seulement {names}",
       "settingTitle": "Mes coachs",
-      "settingDescription": "Les coachs de quelles structures voient les entrées que tu partages avec «Mes coachs».",
-      "settingHint": "Quand tu partages une entrée avec tes coachs, les coachs de ces structures la voient. Tu peux restreindre chaque entrée.",
-      "ownAlways": "Une structure voit toujours ce que tu as fait avec elle (ses cours et ses programmes)."
+      "settingDescription": "Quels coachs voient ce que vous partagez avec «Mes coachs».",
+      "settingHint": "Quand vous partagez une entrée avec vos coachs, ces coachs la voient. Vous pouvez restreindre chaque entrée séparément.",
+      "ownAlways": "Les coachs d'un prestataire voient toujours ce que vous avez fait avec eux (leurs cours et programmes).",
+      "homeAlways": "Les coachs de {name} la voient toujours. Choisissez qui d'autre."
     },
     "export": {
       "title": "Exporter mon journal",

@@ -1,24 +1,26 @@
 defmodule MilosTraining.Journal.Domain.CoachAudience do
   @moduledoc """
-  «Οι coach μου» across providers (ADR-162; board 17, Q5 and Q6): which
-  providers read one of a member's journal entries. One policy, mirrored in
-  SQL by `milos_entry_visible_to_acting_coach` (home provider) and
-  `milos_journal_entry_shared_with_org` (everyone else).
+  «Οι coach μου» across providers (ADR-162; board 17, Q5 and Q6; per coach
+  since ANR's call of 2026-10-21): which coaches read one of a member's
+  journal entries. One policy, mirrored in SQL by
+  `milos_entry_visible_to_acting_coach` (home provider) and
+  `milos_journal_entry_shared_with_coach` (everyone else).
+
+  A reader is a coach of a provider: `{organization_id, coach_user_id}`.
 
   1. Nothing below a coach rung reaches anyone (the ADR-139 ladder);
      injuries and reviews are the home provider's on any rung.
   2. Only a provider the member is an **active** member of reads anything:
-     once a membership ends, that provider loses access to every entry from
+     once a membership ends, its coaches lose access to every entry from
      that day (Q6), whatever it was shared with.
-  3. The **home** provider (where the entry was recorded: their class, their
-     programme) always reads it on a coach rung, as before.
-  4. Anyone else reads it only when shared: an entry's own audience
-     (`override`, a set of provider ids) when the member set one; without
-     one, a provider-less entry (freeform, device) goes to the member's
-     default audience (every active provider minus the ones they excluded),
-     and an entry recorded at one provider goes nowhere else. So a coach at
-     provider A never sees provider B's programme unless the member shared it
-     with A.
+  3. Every coach of the **home** provider (where the entry was recorded:
+     their class, their programme) reads it on a coach rung, as before.
+  4. Anyone else reads it only when shared with them: an entry's own
+     audience (`override`, a set of coaches) when the member set one;
+     without one, a provider-less entry (freeform, device) goes to the
+     member's default audience (every coach of every active provider minus
+     the ones they left out; a coach who joins later is in), and an entry
+     recorded at one provider goes nowhere else.
 
   Freeform and device entries start private (`Visibility.initial/3`); the
   default audience only matters once the member moves one up the ladder.
@@ -29,7 +31,12 @@ defmodule MilosTraining.Journal.Domain.CoachAudience do
   @shareable ~w(execution training_log pr note check_in)
   @always_home ~w(injury review)
 
-  @type member :: %{active: MapSet.t(String.t()), excluded: MapSet.t(String.t())}
+  @type coach :: {String.t(), String.t()}
+  @type member :: %{
+          active: MapSet.t(String.t()),
+          coaches: MapSet.t(coach()),
+          excluded: MapSet.t(coach())
+        }
   @type entry :: %{
           required(:kind) => String.t(),
           required(:organization_id) => String.t() | nil,
@@ -40,15 +47,25 @@ defmodule MilosTraining.Journal.Domain.CoachAudience do
   def shareable_kinds, do: @shareable
   def shareable?(kind), do: kind in @shareable
 
-  @doc "The member's providers: active organization ids and the excluded ones."
-  def member(active_ids, excluded_ids \\ []),
-    do: %{active: MapSet.new(active_ids), excluded: MapSet.new(excluded_ids)}
+  @doc """
+  The member's side: active provider ids, the coaches of those providers
+  (`{organization_id, coach_user_id}`) and the coaches left out by default.
+  """
+  def member(active_ids, coaches, excluded \\ []) do
+    active = MapSet.new(active_ids)
+
+    %{
+      active: active,
+      coaches: coaches |> Enum.filter(&MapSet.member?(active, elem(&1, 0))) |> MapSet.new(),
+      excluded: MapSet.new(excluded)
+    }
+  end
 
   @doc "Where the coach rung goes for a provider-less entry without its own audience."
-  def default_audience(%{active: active, excluded: excluded}),
-    do: MapSet.difference(active, excluded)
+  def default_audience(%{coaches: coaches, excluded: excluded}),
+    do: MapSet.difference(coaches, excluded)
 
-  @doc "Every provider that reads `entry` (a set of organization ids)."
+  @doc "Every coach that reads `entry` (a set of `{organization_id, coach_user_id}`)."
   def readers(entry, member, override \\ nil)
 
   def readers(%{kind: kind} = entry, member, _override) when kind in @always_home,
@@ -64,13 +81,16 @@ defmodule MilosTraining.Journal.Domain.CoachAudience do
     end
   end
 
-  @doc "Does provider `organization_id` read `entry`?"
-  def visible_to?(entry, organization_id, member, override \\ nil),
-    do: MapSet.member?(readers(entry, member, override), organization_id)
+  @doc "Does this coach of this provider read `entry`?"
+  def visible_to?(entry, coach, member, override \\ nil),
+    do: MapSet.member?(readers(entry, member, override), coach)
+
+  @doc "The providers among `readers`."
+  def organizations(readers), do: readers |> Enum.map(&elem(&1, 0)) |> Enum.uniq() |> Enum.sort()
 
   @doc """
   Who a coach rung on this entry would reach: `:gym` (a home provider),
-  `:audience` (shared with at least one active provider) or `:none`.
+  `:audience` (shared with at least one coach elsewhere) or `:none`.
   """
   def reach(entry, member, override \\ nil) do
     cond do
@@ -81,42 +101,79 @@ defmodule MilosTraining.Journal.Domain.CoachAudience do
   end
 
   @doc """
-  Validates an entry's own audience. `nil` resets it to the default. Every id
-  must be an active provider; the home provider is implied and dropped. A
+  Expands what a request names into coaches: `{organization_id,
+  coach_user_id}` pairs as they are, and a provider id as every coach it
+  has. Anything outside the member's providers is refused.
+  """
+  def resolve(targets, member) when is_list(targets) do
+    Enum.reduce_while(targets, {:ok, MapSet.new()}, fn target, {:ok, acc} ->
+      case target(target, member) do
+        {:ok, coaches} -> {:cont, {:ok, MapSet.union(acc, coaches)}}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
+  def resolve(_targets, _member), do: {:error, :unknown_provider}
+
+  @doc """
+  Validates an entry's own audience (already `resolve/2`d). `nil` resets it
+  to the default. The home provider's coaches are implied and dropped. A
   provider-less entry cannot be narrowed to nobody (that is `private`).
   """
   def validate_override(nil, _entry, _member), do: {:ok, nil}
 
-  def validate_override(ids, entry, member) when is_list(ids) do
+  def validate_override(%MapSet{} = coaches, entry, member) do
     with true <- shareable?(entry.kind) || {:error, :audience_not_supported},
-         true <- Enum.all?(ids, &is_binary/1) || {:error, :unknown_provider},
-         true <- Enum.all?(ids, &MapSet.member?(member.active, &1)) || {:error, :unknown_provider} do
-      ids = ids |> Enum.reject(&(&1 == entry.organization_id)) |> Enum.uniq() |> Enum.sort()
+         true <- MapSet.subset?(coaches, member.coaches) || {:error, :unknown_coach} do
+      coaches =
+        coaches
+        |> Enum.reject(&(elem(&1, 0) == entry.organization_id))
+        |> Enum.sort()
 
       cond do
-        ids == [] and is_nil(entry.organization_id) -> {:error, :empty_audience}
-        ids == [] -> {:ok, nil}
-        true -> {:ok, ids}
+        coaches == [] and is_nil(entry.organization_id) -> {:error, :empty_audience}
+        coaches == [] -> {:ok, nil}
+        true -> {:ok, coaches}
       end
     end
   end
 
-  def validate_override(_ids, _entry, _member), do: {:error, :unknown_provider}
+  def validate_override(_coaches, _entry, _member), do: {:error, :unknown_coach}
 
   @doc """
-  Validates a default audience: a subset of the active providers. Returns the
-  providers to exclude (the default includes every new provider).
+  Validates a default audience (already `resolve/2`d): the coaches to leave
+  out are every other coach of the active providers (so a coach who joins
+  later is included).
   """
-  def exclusions_for(ids, member) when is_list(ids) do
-    if Enum.all?(ids, &(is_binary(&1) and MapSet.member?(member.active, &1))),
-      do: {:ok, member.active |> MapSet.difference(MapSet.new(ids)) |> Enum.sort()},
+  def exclusions_for(%MapSet{} = coaches, member) do
+    if MapSet.subset?(coaches, member.coaches),
+      do: {:ok, member.coaches |> MapSet.difference(coaches) |> Enum.sort()},
+      else: {:error, :unknown_coach}
+  end
+
+  def exclusions_for(_coaches, _member), do: {:error, :unknown_coach}
+
+  defp target({organization_id, coach_user_id} = coach, member)
+       when is_binary(organization_id) and is_binary(coach_user_id) do
+    if MapSet.member?(member.coaches, coach),
+      do: {:ok, MapSet.new([coach])},
+      else: {:error, :unknown_coach}
+  end
+
+  defp target(organization_id, member) when is_binary(organization_id) do
+    if MapSet.member?(member.active, organization_id),
+      do: {:ok, coaches_of(member, organization_id)},
       else: {:error, :unknown_provider}
   end
 
-  def exclusions_for(_ids, _member), do: {:error, :unknown_provider}
+  defp target(_target, _member), do: {:error, :unknown_provider}
 
-  defp home(%{organization_id: id}, %{active: active}) when is_binary(id) do
-    if MapSet.member?(active, id), do: MapSet.new([id]), else: MapSet.new()
+  defp coaches_of(member, organization_id),
+    do: member.coaches |> Enum.filter(&(elem(&1, 0) == organization_id)) |> MapSet.new()
+
+  defp home(%{organization_id: id}, %{active: active} = member) when is_binary(id) do
+    if MapSet.member?(active, id), do: coaches_of(member, id), else: MapSet.new()
   end
 
   defp home(_entry, _member), do: MapSet.new()
@@ -131,7 +188,8 @@ defmodule MilosTraining.Journal.Domain.CoachAudience do
       end
 
     candidates
-    |> MapSet.intersection(member.active)
-    |> MapSet.delete(entry.organization_id)
+    |> MapSet.intersection(member.coaches)
+    |> Enum.reject(&(elem(&1, 0) == entry.organization_id))
+    |> MapSet.new()
   end
 end

@@ -15,7 +15,8 @@ import {
 } from "@/api/journal";
 import { clientErrorMessage } from "@/components/client/errors";
 import { ErrorLine } from "@/components/community/Sheet";
-import { markAudienceAsked, useCoachAudience } from "@/components/journal/EntryAudience";
+import { CoachChips, markAudienceAsked, useCoachAudience } from "@/components/journal/EntryAudience";
+import { coachGroups, keysOf, refOf, toggleCoach } from "@/lib/coach-audience";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -40,8 +41,8 @@ export function JournalSettingsSections() {
 }
 
 /**
- * Ρυθμίσεις › «Οι coach μου» (board 17 Q5): which providers' coaches the
- * coach rungs reach by default. Shown only with more than one provider.
+ * Ρυθμίσεις › «Οι coach μου» (board 17 Q5; per coach): which coaches the
+ * coach rungs reach by default. Shown once there is more than one coach.
  */
 export function CoachAudienceSetting() {
   const t = useTranslations("Providers");
@@ -50,7 +51,7 @@ export function CoachAudienceSetting() {
   const queryClient = useQueryClient();
   const audience = useCoachAudience();
   const save = useMutation({
-    mutationFn: (ids: string[]) => saveCoachAudience(tokens!.access_token, ids),
+    mutationFn: (keys: string[]) => saveCoachAudience(tokens!.access_token, keys.map(refOf)),
     onSuccess: (data) => {
       markAudienceAsked();
       queryClient.setQueriesData({ queryKey: COACH_AUDIENCE_KEY }, data);
@@ -61,32 +62,16 @@ export function CoachAudienceSetting() {
   if (audience.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if (audience.isError) return <ErrorLine message={clientErrorMessage(audience.error, i18n)} />;
 
-  const selected = save.variables ?? audience.data.organization_ids ?? [];
+  const selected = save.variables ?? keysOf(audience.data.coaches);
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("audience.settingHint")}</p>
-      <ul className="flex flex-col gap-2">
-        {(audience.data.providers ?? []).map((provider) => {
-          const on = selected.includes(provider.organization_id);
-          const last = on && selected.length === 1;
-          return (
-            <li key={provider.organization_id}>
-              <label className="flex min-h-11 items-center gap-3 rounded-2xl px-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-                <input
-                  type="checkbox"
-                  checked={on}
-                  disabled={last || save.isPending}
-                  onChange={() =>
-                    save.mutate(on ? selected.filter((id) => id !== provider.organization_id) : [...selected, provider.organization_id])
-                  }
-                />
-                <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{provider.name}</span>
-                <span className="text-xs" style={{ color: "var(--dim)" }}>{t(`kind.${provider.kind}`)}</span>
-              </label>
-            </li>
-          );
-        })}
-      </ul>
+      <CoachChips
+        groups={coachGroups(audience.data)}
+        selected={selected}
+        disabled={save.isPending}
+        onToggle={(key) => save.mutate(toggleCoach(selected, key))}
+      />
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("audience.ownAlways")}</p>
       <ErrorLine message={save.error ? clientErrorMessage(save.error, i18n) : null} />
     </div>

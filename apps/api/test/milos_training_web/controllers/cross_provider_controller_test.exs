@@ -186,24 +186,62 @@ defmodule MilosTrainingWeb.CrossProviderControllerTest do
     assert %{"code" => "invalid_timezone"} =
              authed(ctx) |> get(dated <> "Mars/Olympus") |> json_response(422)
 
+    # Per coach (ANR, 2026-10-21): the box has two coaches.
+    box_coach = user_fixture()
+    add!(ctx.box, box_coach, [:coach])
+    coach = fn org, user -> %{"organization_id" => org.id, "user_id" => user.id} end
+
     audience = authed(ctx) |> get("/api/me/journal/coach-audience") |> json_response(200)
-    assert length(audience["providers"]) == 2
+    assert [box, nikos] = audience["providers"]
+    assert box["included"] and nikos["included"]
+
+    assert Enum.sort(Enum.map(box["coaches"], & &1["user_id"])) ==
+             Enum.sort([ctx.owner.id, box_coach.id])
+
+    assert [%{"user_id" => owner_id, "included" => true}] = nikos["coaches"]
+    assert owner_id == ctx.owner.id
+    assert length(audience["coaches"]) == 3
 
     narrowed =
       authed(ctx)
-      |> put("/api/me/journal/coach-audience", %{organization_ids: [ctx.box.id]})
+      |> put("/api/me/journal/coach-audience", %{coaches: [coach.(ctx.box, box_coach)]})
       |> json_response(200)
 
     assert narrowed["organization_ids"] == [ctx.box.id]
+    assert narrowed["coaches"] == [coach.(ctx.box, box_coach)]
+
+    [box, nikos] = narrowed["providers"]
+    assert box["included"] and not nikos["included"]
+
+    assert Map.new(box["coaches"], &{&1["user_id"], &1["included"]}) ==
+             %{ctx.owner.id => false, box_coach.id => true}
+
+    # A provider id still means all its coaches.
+    assert authed(ctx)
+           |> put("/api/me/journal/coach-audience", %{organization_ids: [ctx.box.id]})
+           |> json_response(200)
+           |> Map.get("coaches")
+           |> length() == 2
 
     shared =
       authed(ctx)
       |> put("/api/me/journal/entries/note/#{note["id"]}/audience", %{
-        organization_ids: [ctx.coach_org.id]
+        coaches: [coach.(ctx.coach_org, ctx.owner)]
       })
       |> json_response(200)
 
-    assert shared["audience"] == %{"custom" => true, "organization_ids" => [ctx.coach_org.id]}
+    assert shared["audience"] == %{
+             "custom" => true,
+             "organization_ids" => [ctx.coach_org.id],
+             "coaches" => [coach.(ctx.coach_org, ctx.owner)]
+           }
+
+    assert %{"code" => "unknown_coach"} =
+             authed(ctx)
+             |> put("/api/me/journal/entries/note/#{note["id"]}/audience", %{
+               coaches: [coach.(ctx.coach_org, box_coach)]
+             })
+             |> json_response(422)
 
     moved =
       authed(ctx)

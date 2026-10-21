@@ -23,9 +23,9 @@ import {
   AudienceChooser,
   isCoachRung,
   markAudienceAsked,
-  sameIds,
   useCoachAudience,
 } from "@/components/journal/EntryAudience";
+import { coachGroups, keysOf, refOf, sameKeys, within } from "@/lib/coach-audience";
 import { orderedChoices, needsQuestion, VISIBILITY_ICON } from "@/components/journal/visibility";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
@@ -39,6 +39,8 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 type BadgeItem = Pick<JournalFeedItem, "id" | "journal_visibility" | "choosable_visibilities"> & {
   kind: JournalMoveKind;
   audience?: EntryAudience | null;
+  /** Where the entry was recorded: its coaches always see it. */
+  organization_id?: string | null;
 };
 
 export function VisibilityBadge({
@@ -127,15 +129,17 @@ function VisibilityPicker({
   const [question, setQuestion] = useState("");
   const queryClient = useQueryClient();
   const coachAudience = useCoachAudience();
-  const defaults = coachAudience.data?.organization_ids ?? [];
+  const home = item.organization_id ?? null;
+  // The coaches this entry can be shared with: everyone but its own provider's.
+  const groups = coachGroups(coachAudience.data, home);
+  const defaultKeys = keysOf(coachAudience.data?.coaches);
+  const defaults = within(defaultKeys, groups);
   const [picked, setPicked] = useState<string[] | null>(null);
   const [makeDefault, setMakeDefault] = useState<boolean | null>(() => (audienceAsked() ? null : true));
-  const selected = picked ?? item.audience?.organization_ids ?? defaults;
+  const current = item.audience?.custom ? within(keysOf(item.audience.coaches), groups) : defaults;
+  const selected = picked ?? (current.length > 0 ? current : defaults);
   const choosing =
-    coachAudience.multiple &&
-    (coachAudience.data?.providers?.length ?? 0) > 1 &&
-    audienceApplies(item.kind) &&
-    isCoachRung(choice);
+    coachAudience.multiple && groups.length > 0 && audienceApplies(item.kind) && isCoachRung(choice);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -148,14 +152,16 @@ function VisibilityPicker({
       markAudienceAsked();
       const kind = item.kind as AudienceKind;
       if (makeDefault) {
-        if (!sameIds(selected, defaults)) {
-          await saveCoachAudience(token, selected);
+        if (!sameKeys(selected, defaults)) {
+          // The home provider's coaches keep their place in the default.
+          const keep = defaultKeys.filter((key) => !within([key], groups).length);
+          await saveCoachAudience(token, [...keep, ...selected].map(refOf));
           void queryClient.invalidateQueries({ queryKey: COACH_AUDIENCE_KEY });
         }
         const audience = item.audience?.custom ? await setEntryAudience(token, kind, item.id, null) : undefined;
         return { result, audience };
       }
-      if (!sameIds(selected, defaults)) return { result, audience: await setEntryAudience(token, kind, item.id, selected) };
+      if (!sameKeys(selected, defaults)) return { result, audience: await setEntryAudience(token, kind, item.id, selected.map(refOf)) };
       if (item.audience?.custom) return { result, audience: await setEntryAudience(token, kind, item.id, null) };
       return { result, audience: undefined };
     },
@@ -189,6 +195,7 @@ function VisibilityPicker({
         {choosing && coachAudience.data ? (
           <AudienceChooser
             audience={coachAudience.data}
+            homeOrganizationId={home}
             selected={selected}
             onChange={setPicked}
             makeDefault={makeDefault}

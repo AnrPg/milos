@@ -235,6 +235,9 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   def list_my_providers, do: impl().list_my_providers()
 
   @impl true
+  def list_my_provider_coaches, do: impl().list_my_provider_coaches()
+
+  @impl true
   def get_provider_selection(user_id), do: impl().get_provider_selection(user_id)
 
   @impl true

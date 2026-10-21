@@ -34,17 +34,29 @@ defmodule MilosTrainingWeb.Schemas.CrossProvider do
     }
   end
 
+  @doc "A coach of a provider, as «Οι coach μου» names one."
+  def coach_ref do
+    %Schema{
+      title: "CoachRef",
+      type: :object,
+      required: [:organization_id, :user_id],
+      properties: %{organization_id: @uuid, user_id: @uuid},
+      additionalProperties: false
+    }
+  end
+
   def audience do
     %Schema{
       title: "EntryAudience",
       type: :object,
       nullable: true,
       description:
-        "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
-      required: [:custom, :organization_ids],
+        "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
+      required: [:custom, :organization_ids, :coaches],
       properties: %{
         custom: %Schema{type: :boolean},
-        organization_ids: %Schema{type: :array, items: @uuid}
+        organization_ids: %Schema{type: :array, items: @uuid},
+        coaches: %Schema{type: :array, items: coach_ref()}
       }
     }
   end
@@ -361,23 +373,41 @@ defmodule MilosTrainingWeb.Schemas.CrossProvider do
     %Schema{
       title: "CoachAudience",
       type: :object,
-      required: [:organization_ids, :providers],
+      required: [:organization_ids, :coaches, :providers],
       properties: %{
         organization_ids: %Schema{
           type: :array,
           items: @uuid,
-          description: "Providers «Οι coach μου» means by default."
+          description: "Providers with at least one coach «Οι coach μου» means by default."
+        },
+        coaches: %Schema{
+          type: :array,
+          items: coach_ref(),
+          description: "The coaches «Οι coach μου» means by default."
         },
         providers: %Schema{
           type: :array,
           items: %Schema{
             type: :object,
-            required: [:organization_id, :name, :kind, :included],
+            required: [:organization_id, :name, :kind, :included, :coaches],
             properties: %{
               organization_id: @uuid,
               name: %Schema{type: :string},
               kind: @provider_kind,
-              included: %Schema{type: :boolean}
+              included: %Schema{type: :boolean},
+              coaches: %Schema{
+                type: :array,
+                items: %Schema{
+                  type: :object,
+                  required: [:user_id, :name, :included],
+                  properties: %{
+                    user_id: @uuid,
+                    name: @nullable_string,
+                    avatar_url: @nullable_string,
+                    included: %Schema{type: :boolean}
+                  }
+                }
+              }
             }
           }
         }
@@ -389,8 +419,11 @@ defmodule MilosTrainingWeb.Schemas.CrossProvider do
     %Schema{
       title: "CoachAudienceRequest",
       type: :object,
-      required: [:organization_ids],
-      properties: %{organization_ids: %Schema{type: :array, items: @uuid}},
+      description: "The coaches «Οι coach μου» means; a provider id means all its coaches.",
+      properties: %{
+        organization_ids: %Schema{type: :array, items: @uuid},
+        coaches: %Schema{type: :array, items: coach_ref()}
+      },
       additionalProperties: false
     }
   end
@@ -399,14 +432,11 @@ defmodule MilosTrainingWeb.Schemas.CrossProvider do
     %Schema{
       title: "EntryAudienceRequest",
       type: :object,
-      required: [:organization_ids],
+      description:
+        "Who this entry is shared with: coaches, and providers meaning all their coaches. Both null resets to the default.",
       properties: %{
-        organization_ids: %Schema{
-          type: :array,
-          items: @uuid,
-          nullable: true,
-          description: "Providers this entry is shared with; null resets to the default."
-        }
+        organization_ids: %Schema{type: :array, items: @uuid, nullable: true},
+        coaches: %Schema{type: :array, items: coach_ref(), nullable: true}
       },
       additionalProperties: false
     }

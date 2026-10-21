@@ -79,6 +79,14 @@ defmodule MilosTraining.Organizations do
     end)
   end
 
+  @doc """
+  ADR-162: the coaches of the member's active providers, as
+  `{organization_id, coach_user_id}`, read in the member's personal session.
+  """
+  def list_my_provider_coaches(%{user_id: user_id}) when is_binary(user_id) do
+    RepoContext.run(%{user_id: user_id}, &OrganizationStore.list_my_provider_coaches/0)
+  end
+
   @doc "The provider Box ▾ last opened on (may no longer be active)."
   def get_provider_selection(%{user_id: user_id}) when is_binary(user_id),
     do:
