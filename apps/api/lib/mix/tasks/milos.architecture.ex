@@ -79,6 +79,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     journal/goal_feedback_store
     body/body_store
     buddies/buddy_store
+    partners/partner_store
     wellness/wellness_store
     devices/device_store
     coaching/form_review_store
