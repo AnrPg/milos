@@ -62,7 +62,7 @@ export function PlanCard({ token }: { token: string }) {
           .join(" · ")}
       </p>
       <ul className="flex flex-col gap-3">
-        {data.usage.map((row) => {
+        {(data.usage ?? []).map((row) => {
           const share = usageShare(row);
           const tone = usageTone(row);
           return (
@@ -112,9 +112,10 @@ function planNoticeMessage(
   data: OrganizationPlan | undefined,
   t: ReturnType<typeof useTranslations>,
 ): string | null {
-  if (!data) return null;
+  // A partial answer (an older API, a proxy error page) shows no notice rather than breaking Settings.
+  if (!data?.plan) return null;
   if (data.notice === "trial_ending") return t("plan.notice.trial_ending", { days: data.trial_days_left ?? 0 });
   if (data.notice) return t(`plan.notice.${data.notice}`);
-  const fullStaff = data.usage.find((row) => row.key === "staff_seats" && usageTone(row) === "full");
+  const fullStaff = (data.usage ?? []).find((row) => row.key === "staff_seats" && usageTone(row) === "full");
   return fullStaff ? t("plan.notice.staff_full") : null;
 }

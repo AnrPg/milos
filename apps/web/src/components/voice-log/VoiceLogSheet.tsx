@@ -60,7 +60,8 @@ export function VoiceLogSheet({
         locale,
       });
       onDraft(result);
-    } catch (error) {      setPhase({ name: "error", key: voiceErrorKey(error) });
+    } catch (error) {
+      setPhase({ name: "error", key: voiceErrorKey(error) });
     }
   }
 
