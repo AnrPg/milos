@@ -8,7 +8,7 @@ import { test } from "node:test";
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 
 const swift = read("../ios/App/App/PaleeHealthPlugin.swift");
-const kotlin = read("../android/app/src/main/java/app/palee/member/PaleeHealthPlugin.kt");
+const kotlin = read("../android/app/src/main/java/app/milos/member/PaleeHealthPlugin.kt");
 const web = read("../../web/src/lib/platform/health.ts");
 
 const KINDS = ["activities", "sleep", "weight", "resting_hr", "steps"];
@@ -46,7 +46,7 @@ test("the iOS plugin is compiled and registered", () => {
 });
 
 test("the Android plugin is registered with its read permissions", () => {
-  assert.match(read("../android/app/src/main/java/app/palee/member/MainActivity.java"), /registerPlugin\(PaleeHealthPlugin\.class\)/);
+  assert.match(read("../android/app/src/main/java/app/milos/member/MainActivity.java"), /registerPlugin\(PaleeHealthPlugin\.class\)/);
   const manifest = read("../android/app/src/main/AndroidManifest.xml");
   for (const permission of ["EXERCISE", "HEART_RATE", "DISTANCE", "SLEEP", "WEIGHT", "RESTING_HEART_RATE", "STEPS"]) {
     assert.ok(manifest.includes(`android.permission.health.READ_${permission}"`), permission);
