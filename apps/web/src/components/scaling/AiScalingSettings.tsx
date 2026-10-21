@@ -25,14 +25,18 @@ const fieldStyle = { background: "var(--panel-raised)", border: "1px solid var(-
 // ADR-175: voice logging has its own switch next to scaling, same key.
 function VoiceLogSwitch({
   data,
-  save,
+  pending: update,
+  busy,
+  onChange,
 }: {
   data: GymAiSettings;
-  save: { isPending: boolean; variables?: GymAiSettingsUpdate; mutate: (body: GymAiSettingsUpdate) => void };
+  pending: GymAiSettingsUpdate | null;
+  busy: boolean;
+  onChange: (body: GymAiSettingsUpdate) => void;
 }) {
   const t = useTranslations("VoiceLog");
   const enabled = data.voice_enabled === true;
-  const pending = save.isPending && save.variables?.voice_enabled !== undefined;
+  const pending = update?.voice_enabled !== undefined;
   return (
     <label className="flex min-h-11 items-center justify-between gap-3">
       <span className="flex flex-col">
@@ -43,9 +47,9 @@ function VoiceLogSwitch({
         type="checkbox"
         role="switch"
         aria-label={t("settings.enable")}
-        checked={pending ? Boolean(save.variables?.voice_enabled) : enabled}
-        disabled={save.isPending || (!data.key_configured && !enabled)}
-        onChange={(event) => save.mutate({ voice_enabled: event.target.checked })}
+        checked={pending ? Boolean(update?.voice_enabled) : enabled}
+        disabled={busy || (!data.key_configured && !enabled)}
+        onChange={(event) => onChange({ voice_enabled: event.target.checked })}
         className="h-5 w-5 shrink-0"
         style={{ accentColor: "var(--primary)" }}
       />
@@ -60,6 +64,10 @@ export function AiScalingSettings({ token }: { token: string }) {
   const [key, setKey] = useState("");
   const [model, setModel] = useState<string | null>(null);
   const settings = useQuery({ queryKey: AI_SETTINGS_KEY, queryFn: () => fetchAiSettings(token) });
+  // The update being saved, set in the same event as the tap: the mutation's
+  // own pending state reaches React a tick later, and a controlled switch
+  // would flip back for that tick.
+  const [pendingUpdate, setPendingUpdate] = useState<GymAiSettingsUpdate | null>(null);
   const save = useMutation({
     mutationFn: (body: GymAiSettingsUpdate) => updateAiSettings(token, body),
     onSuccess: (data) => {
@@ -67,7 +75,13 @@ export function AiScalingSettings({ token }: { token: string }) {
       setKey("");
       setModel(null);
     },
+    onSettled: () => setPendingUpdate(null),
   });
+  const busy = save.isPending || pendingUpdate !== null;
+  const submit = (body: GymAiSettingsUpdate) => {
+    setPendingUpdate(body);
+    save.mutate(body);
+  };
 
   if (settings.isPending) return <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>;
   if (!settings.data) {
@@ -93,21 +107,21 @@ export function AiScalingSettings({ token }: { token: string }) {
           type="checkbox"
           role="switch"
           aria-label={t("settings.enable")}
-          checked={save.isPending && save.variables?.scaling_enabled !== undefined ? Boolean(save.variables.scaling_enabled) : enabled}
-          disabled={save.isPending || (!data.key_configured && !enabled)}
-          onChange={(event) => save.mutate({ scaling_enabled: event.target.checked })}
+          checked={pendingUpdate?.scaling_enabled !== undefined ? Boolean(pendingUpdate.scaling_enabled) : enabled}
+          disabled={busy || (!data.key_configured && !enabled)}
+          onChange={(event) => submit({ scaling_enabled: event.target.checked })}
           className="h-5 w-5 shrink-0"
           style={{ accentColor: "var(--primary)" }}
         />
       </label>
 
-      <VoiceLogSwitch data={data} save={save} />
+      <VoiceLogSwitch data={data} pending={pendingUpdate} busy={busy} onChange={submit} />
 
       <form
         className="space-y-2"
         onSubmit={(event) => {
           event.preventDefault();
-          if (key.trim().length >= 20) save.mutate({ api_key: key.trim() });
+          if (key.trim().length >= 20) submit({ api_key: key.trim() });
         }}
       >
         <label className="text-sm font-semibold" htmlFor="ai-api-key" style={{ color: "var(--text)" }}>
@@ -133,7 +147,7 @@ export function AiScalingSettings({ token }: { token: string }) {
             type="submit"
             className="min-h-11 shrink-0 rounded-xl px-4 text-sm font-bold disabled:opacity-60"
             style={{ background: "var(--primary)", color: "var(--bg)" }}
-            disabled={key.trim().length < 20 || save.isPending}
+            disabled={key.trim().length < 20 || busy}
           >
             {t("settings.saveKey")}
           </button>
@@ -143,8 +157,8 @@ export function AiScalingSettings({ token }: { token: string }) {
             type="button"
             className="text-xs font-semibold"
             style={{ color: "var(--danger)" }}
-            onClick={() => save.mutate({ remove_key: true })}
-            disabled={save.isPending}
+            onClick={() => submit({ remove_key: true })}
+            disabled={busy}
           >
             {t("settings.removeKey")}
           </button>
@@ -155,7 +169,7 @@ export function AiScalingSettings({ token }: { token: string }) {
         className="space-y-2"
         onSubmit={(event) => {
           event.preventDefault();
-          save.mutate({ model: modelValue.trim() === "" ? null : modelValue.trim() });
+          submit({ model: modelValue.trim() === "" ? null : modelValue.trim() });
         }}
       >
         <label className="text-sm font-semibold" htmlFor="ai-model" style={{ color: "var(--text)" }}>
@@ -174,7 +188,7 @@ export function AiScalingSettings({ token }: { token: string }) {
             type="submit"
             className="min-h-11 shrink-0 rounded-xl px-4 text-sm font-semibold disabled:opacity-60"
             style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-            disabled={model === null || save.isPending}
+            disabled={model === null || busy}
           >
             {t("settings.saveModel")}
           </button>
