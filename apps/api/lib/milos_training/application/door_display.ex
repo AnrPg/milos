@@ -95,6 +95,49 @@ defmodule MilosTraining.Application.DoorDisplay do
     end
   end
 
+  @doc """
+  The NFC door tag of a location (ADR-173): whether it is on, its static
+  code and the link `/c/<location>/n/<code>` to write on the tag. Like the
+  poster, the link is shown while the tag is off so the owner can write tags
+  first and switch them on after.
+  """
+  def nfc_tag(context, location_id) do
+    with {:ok, location} <- location(context, location_id),
+         {:ok, key, tag} <- CheckInKeys.nfc_key(context, location.id) do
+      code = DoorCode.nfc_code(key, location.id)
+
+      {:ok,
+       %{
+         location: %{id: location.id, name: location.name},
+         enabled: tag.enabled,
+         code: code,
+         deep_link: nfc_link(location.id, code),
+         rotated_at: tag.rotated_at
+       }}
+    end
+  end
+
+  @doc "The owner turns the NFC tag on or off."
+  def set_nfc_tag(context, location_id, enabled) when is_boolean(enabled) do
+    with {:ok, location} <- location(context, location_id),
+         {:ok, _location} <- Facility.set_nfc_enabled(context, location.id, enabled) do
+      nfc_tag(context, location.id)
+    end
+  end
+
+  def set_nfc_tag(_context, _location_id, _enabled), do: {:error, :invalid_nfc_setting}
+
+  @doc "«Νέος κωδικός ετικέτας»: every written tag stops working."
+  def rotate_nfc_tag(context, location_id, now \\ DateTime.utc_now()) do
+    with {:ok, location} <- location(context, location_id),
+         {:ok, _rotated} <- Facility.rotate_nfc_secret(context, location.id, now) do
+      nfc_tag(context, location.id)
+    end
+  end
+
+  @doc "The link an NFC tag carries: `/c/<location>/n/<code>`."
+  def nfc_link(location_id, code), do: PublicURL.base_url() <> "/c/#{location_id}/n/#{code}"
+
   @doc "The path the poster's QR opens: `/c/<location>/p/<code>`."
   def poster_link(location_id, code), do: PublicURL.base_url() <> "/c/#{location_id}/p/#{code}"
 

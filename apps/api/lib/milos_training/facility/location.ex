@@ -37,6 +37,10 @@ defmodule MilosTraining.Facility.Location do
     field :poster_enabled, :boolean, default: false
     field :poster_secret, :binary, redact: true
     field :poster_secret_rotated_at, :utc_datetime_usec
+    # ADR-173: the NFC door tag, a static code like the poster's.
+    field :nfc_enabled, :boolean, default: false
+    field :nfc_secret, :binary, redact: true
+    field :nfc_secret_rotated_at, :utc_datetime_usec
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -46,6 +50,7 @@ defmodule MilosTraining.Facility.Location do
     |> cast(params, [:organization_id, :name, :address | @place_fields])
     |> put_change(:door_secret, :crypto.strong_rand_bytes(32))
     |> put_change(:poster_secret, :crypto.strong_rand_bytes(32))
+    |> put_change(:nfc_secret, :crypto.strong_rand_bytes(32))
     |> validate_required([:organization_id])
     |> validate_fields()
   end
@@ -69,6 +74,14 @@ defmodule MilosTraining.Facility.Location do
   @doc "The owner turns the printed poster on or off for this location."
   def poster_changeset(location, enabled) when is_boolean(enabled),
     do: change(location, poster_enabled: enabled)
+
+  @doc "A new NFC tag seed (ADR-173): every written tag stops working."
+  def rotate_nfc_changeset(location, secret, rotated_at) when byte_size(secret) >= 32,
+    do: change(location, nfc_secret: secret, nfc_secret_rotated_at: rotated_at)
+
+  @doc "The owner turns the NFC door tag on or off for this location."
+  def nfc_changeset(location, enabled) when is_boolean(enabled),
+    do: change(location, nfc_enabled: enabled)
 
   defp validate_fields(changeset) do
     changeset

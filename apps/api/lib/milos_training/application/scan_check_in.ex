@@ -26,11 +26,19 @@ defmodule MilosTraining.Application.ScanCheckIn do
   it only checks in a booking already in its window (method `door_poster`);
   never open gym, suggestions or a trial offer. It works only while the
   owner has it on for the location.
+
+  ADR-173 adds two more static sources with the same rule: an NFC door tag
+  (`nfc_code`, method `door_nfc`, while the owner has the tag on) and the
+  store app's arrival reminder (`geofence_token` from
+  `CheckInGeofences`, method `geofence`, while the box allows reminders).
+  A reminder tapped by someone who is no longer a member records nothing:
+  the door, not the reminder, is where a visitor is welcomed.
   """
 
   alias MilosTraining.Application.{
     CheckInActions,
     CheckInFacts,
+    CheckInGeofences,
     CheckInKeys,
     SignedToken,
     Trials
@@ -97,6 +105,12 @@ defmodule MilosTraining.Application.ScanCheckIn do
       poster = blank_to_nil(param(params, :poster_code)) ->
         verify_poster(param(params, :location_id), poster)
 
+      nfc = blank_to_nil(param(params, :nfc_code)) ->
+        verify_nfc(param(params, :location_id), nfc)
+
+      geofence = blank_to_nil(param(params, :geofence_token)) ->
+        verify_geofence(geofence, user_id)
+
       true ->
         verify_door(param(params, :location_id), param(params, :code), now)
     end
@@ -115,6 +129,34 @@ defmodule MilosTraining.Application.ScanCheckIn do
   end
 
   defp verify_poster(_location_id, _code), do: {:error, :invalid_door_code}
+
+  defp verify_nfc(location_id, code) when is_binary(location_id) and is_binary(code) do
+    with {:ok, location_id} <- Ecto.UUID.cast(location_id),
+         %{} = door <- Facility.door_location(location_id),
+         context = %{organization_id: door.organization_id},
+         {:ok, key, %{enabled: true}} <- CheckInKeys.nfc_key(context, location_id),
+         :ok <- DoorCode.verify_nfc(key, location_id, code) do
+      {:ok, Map.put(door, :source, :nfc)}
+    else
+      _invalid -> {:error, :invalid_door_code}
+    end
+  end
+
+  defp verify_nfc(_location_id, _code), do: {:error, :invalid_door_code}
+
+  defp verify_geofence(token, user_id) do
+    with {:ok, %{"l" => location_id, "u" => ^user_id}} <-
+           SignedToken.verify(CheckInGeofences.token_salt(), token,
+             max_age: CheckInGeofences.token_max_age()
+           ),
+         %{} = door <- Facility.door_location(location_id),
+         %{geofence_reminder: true} <-
+           Facility.check_in_rules(%{organization_id: door.organization_id}) do
+      {:ok, Map.put(door, :source, :geofence)}
+    else
+      _invalid -> {:error, :invalid_door_code}
+    end
+  end
 
   defp verify_door(location_id, code, now) when is_binary(location_id) and is_binary(code) do
     with {:ok, location_id} <- Ecto.UUID.cast(location_id),
@@ -135,11 +177,16 @@ defmodule MilosTraining.Application.ScanCheckIn do
     with {:ok, %{"l" => location_id, "u" => ^user_id} = claims} <-
            SignedToken.verify(@scan_salt, token, max_age: @scan_token_seconds),
          %{} = door <- Facility.door_location(location_id) do
-      {:ok, Map.put(door, :source, if(claims["s"] == "poster", do: :poster, else: :door))}
+      {:ok, Map.put(door, :source, scan_token_source(claims["s"]))}
     else
       _invalid -> {:error, :invalid_scan_token}
     end
   end
+
+  defp scan_token_source("poster"), do: :poster
+  defp scan_token_source("nfc"), do: :nfc
+  defp scan_token_source("geofence"), do: :geofence
+  defp scan_token_source(_door), do: :door
 
   defp scan_token(door, user_id),
     do:
@@ -150,6 +197,8 @@ defmodule MilosTraining.Application.ScanCheckIn do
       })
 
   defp method(%{source: :poster}), do: "door_poster"
+  defp method(%{source: :nfc}), do: "door_nfc"
+  defp method(%{source: :geofence}), do: "geofence"
   defp method(_door), do: "door_qr"
 
   # -- the decision
@@ -219,6 +268,10 @@ defmodule MilosTraining.Application.ScanCheckIn do
   defp carry_out(:visitor, context, user, door, _facts, now),
     do: visitor(context, user, door, now)
 
+  defp carry_out({:poster_no_booking, :visitor}, context, user, door, _facts, _now)
+       when door.source == :geofence,
+       do: no_booking(context, user, door)
+
   defp carry_out({:poster_no_booking, :visitor}, context, user, door, _facts, now),
     do: visitor(context, user, door, now)
 
@@ -234,6 +287,17 @@ defmodule MilosTraining.Application.ScanCheckIn do
   end
 
   defp carry_out({:error, reason}, _context, _user, _door, _facts, _now), do: {:error, reason}
+
+  # A reminder tapped after the membership ended: nothing to record.
+  defp no_booking(context, user, door) do
+    {:ok,
+     %{
+       outcome: "no_booking",
+       box: present_box(door),
+       location: present_location(door),
+       membership: to_string(Organizations.membership_standing(context.organization_id, user.id))
+     }}
+  end
 
   defp checked_in(context, user, door, check_in, now, trial_was) do
     payload = %{

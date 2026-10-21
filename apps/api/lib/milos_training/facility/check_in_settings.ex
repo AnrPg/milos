@@ -21,6 +21,7 @@ defmodule MilosTraining.Facility.CheckInSettings do
     field :desk_override, :boolean, default: false
     field :door_rotation_seconds, :integer, default: 30
     field :member_code_mode, :string, default: "rotating"
+    field :geofence_reminder, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end

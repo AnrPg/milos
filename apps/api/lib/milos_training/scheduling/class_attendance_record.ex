@@ -39,7 +39,7 @@ defmodule MilosTraining.Scheduling.ClassAttendanceRecord do
     |> validate_inclusion(:status, ["attended", "missed", "cancelled", "late_cancel", "no_show"])
     |> validate_inclusion(
       :check_in_method,
-      ~w(door_qr door_poster member_qr wallet desk_search self)
+      ~w(door_qr door_poster door_nfc geofence member_qr wallet desk_search self)
     )
     |> unique_constraint([:scheduled_class_id, :user_id])
     |> foreign_key_constraint(:scheduled_class_id)

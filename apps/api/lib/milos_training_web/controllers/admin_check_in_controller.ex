@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.AdminCheckInController do
   @moduledoc """
   The check-in desk and «Οθόνη πόρτας» (ADR-155): the door display with its
-  rotating code, scanning a member's personal QR or Wallet card, checking a
+  rotating code, the printed poster and the NFC door tag (ADR-173), scanning a member's personal QR or Wallet card, checking a
   member in (with the owner's override rule), today's visitors, and the
   owner's «Ρυθμίσεις › Check-in».
   """
@@ -103,6 +103,54 @@ defmodule MilosTrainingWeb.AdminCheckInController do
   def rotate_poster(conn, %{location_id: location_id}) do
     with {:ok, poster} <- DoorDisplay.rotate_poster(conn.assigns.tenant_context, location_id),
          do: json(conn, poster)
+  end
+
+  operation(:nfc_tag,
+    summary: "The NFC door tag of a location: the link to write and whether it is on",
+    parameters: [@location],
+    responses: [
+      ok: {"NFC tag", "application/json", S.nfc_tag_response()},
+      not_found: {"No such location", "application/json", S.error()}
+    ]
+  )
+
+  def nfc_tag(conn, %{location_id: location_id}) do
+    with {:ok, tag} <- DoorDisplay.nfc_tag(conn.assigns.tenant_context, location_id),
+         do: json(conn, tag)
+  end
+
+  operation(:update_nfc_tag,
+    summary: "Turn the NFC door tag of a location on or off",
+    parameters: [@location],
+    request_body: S.body(S.poster_request()),
+    responses: [
+      ok: {"NFC tag", "application/json", S.nfc_tag_response()},
+      not_found: {"No such location", "application/json", S.error()}
+    ]
+  )
+
+  def update_nfc_tag(conn, %{location_id: location_id}) do
+    with {:ok, tag} <-
+           DoorDisplay.set_nfc_tag(
+             conn.assigns.tenant_context,
+             location_id,
+             conn.body_params.enabled
+           ),
+         do: json(conn, tag)
+  end
+
+  operation(:rotate_nfc_tag,
+    summary: "«Νέος κωδικός ετικέτας»: every written tag stops working",
+    parameters: [@location],
+    responses: [
+      ok: {"NFC tag", "application/json", S.nfc_tag_response()},
+      not_found: {"No such location", "application/json", S.error()}
+    ]
+  )
+
+  def rotate_nfc_tag(conn, %{location_id: location_id}) do
+    with {:ok, tag} <- DoorDisplay.rotate_nfc_tag(conn.assigns.tenant_context, location_id),
+         do: json(conn, tag)
   end
 
   operation(:revoke_member_code,

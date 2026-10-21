@@ -37,7 +37,8 @@ defmodule MilosTraining.Application.CheckInFacts do
       else: facts
   end
 
-  defp bookings(context, user_id, now) do
+  @doc "The person's approved bookings around `now` (2 h back, 12 h ahead) with their attendance."
+  def bookings(context, user_id, now) do
     slots =
       context
       |> Scheduling.list_member_slots(

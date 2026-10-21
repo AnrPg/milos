@@ -5,6 +5,7 @@ defmodule MilosTraining.Application.CheckInKeys do
 
     * a door key per location, from its seed (rotating the seed changes it);
     * a poster key per location, from its poster seed;
+    * an NFC tag key per location, from its tag seed (ADR-173);
     * a member-code key per box (rotating and static personal codes);
     * one Wallet key (the PassKit authentication tokens).
   """
@@ -26,6 +27,16 @@ defmodule MilosTraining.Application.CheckInKeys do
     case Facility.get_poster(context, location_id) do
       %{secret: secret} = poster when is_binary(secret) ->
         {:ok, KeyDerivation.derive("door-poster", location_id <> "|" <> secret), poster}
+
+      nil ->
+        {:error, :location_not_found}
+    end
+  end
+
+  def nfc_key(context, location_id) do
+    case Facility.get_nfc_tag(context, location_id) do
+      %{secret: secret} = tag when is_binary(secret) ->
+        {:ok, KeyDerivation.derive("door-nfc", location_id <> "|" <> secret), tag}
 
       nil ->
         {:error, :location_not_found}

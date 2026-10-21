@@ -272,6 +272,11 @@ config :milos_training,
        :native_push_token_store,
        MilosTraining.Infrastructure.Notifications.EctoNativePushTokenStore
 
+# ADR-173: the app installs whose home-screen widgets hold a widget token.
+config :milos_training,
+       :widget_token_store,
+       MilosTraining.Infrastructure.Widgets.EctoWidgetTokenStore
+
 config :milos_training, :native_push_senders, %{
   fcm: MilosTraining.Infrastructure.Notifications.FcmSender,
   apns: MilosTraining.Infrastructure.Notifications.ApnsSender

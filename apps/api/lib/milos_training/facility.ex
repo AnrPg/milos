@@ -108,6 +108,16 @@ defmodule MilosTraining.Facility do
   def set_poster_enabled(context, location_id, enabled) when is_boolean(enabled),
     do: FacilityStore.set_poster_enabled(context, location_id, enabled)
 
+  @doc "The NFC door tag of a location (ADR-173): `%{enabled, secret, rotated_at}` or nil."
+  def get_nfc_tag(context, location_id), do: FacilityStore.get_nfc_tag(context, location_id)
+
+  @doc "«Νέος κωδικός ετικέτας»: a fresh tag seed; every written tag stops working."
+  def rotate_nfc_secret(context, location_id, now),
+    do: FacilityStore.rotate_nfc_secret(context, location_id, :crypto.strong_rand_bytes(32), now)
+
+  def set_nfc_enabled(context, location_id, enabled) when is_boolean(enabled),
+    do: FacilityStore.set_nfc_enabled(context, location_id, enabled)
+
   # Static member codes (board 10, Q5).
   def get_active_member_code(context, user_id),
     do: FacilityStore.get_active_member_code(context, user_id)
