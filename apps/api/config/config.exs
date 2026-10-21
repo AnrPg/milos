@@ -51,8 +51,8 @@ config :milos_training, Oban,
        {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
        {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob},
        {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob},
-       {"27 * * * *", MilosTraining.Workers.ScalingSuggestionScanJob},
-       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob}
+       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob},
+       {"27 * * * *", MilosTraining.Workers.ScalingSuggestionScanJob}
      ]}
   ],
   queues: [
