@@ -67,7 +67,7 @@ export type JournalFilter = "all" | "training" | "notes" | "wellbeing";
 /** The kinds each Ροή filter chip lists. */
 export const JOURNAL_FILTER_KINDS: Record<JournalFilter, JournalKind[] | null> = {
   all: null,
-  training: ["execution", "training_log", "pr"],
+  training: ["execution", "training_log", "pr", "device_activity"],
   notes: ["note"],
   wellbeing: ["check_in", "injury", "wellness", "craving"],
 };

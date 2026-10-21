@@ -74,6 +74,8 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
 }
 
 function fallbackUrl(notification: LinkableNotification) {
+  // ADR-161: a Garmin sync error opens the devices page to reconnect.
+  if (notification.type === "device_sync_error") return "/me/devices";
   if (notification.type === "booking_waitlist_promoted") return "/box/schedule";
   if (notification.type === "package_expiring") return "/me/payments";
   // ADR-156: the member's referral notices open their invites, staff's the queue.

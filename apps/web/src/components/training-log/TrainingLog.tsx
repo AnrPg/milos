@@ -87,6 +87,7 @@ export function TrainingLogEntryCard({
   onEdit,
   onVoid,
   badge,
+  device,
 }: {
   entry: TrainingLogEntry;
   locale: string;
@@ -94,6 +95,8 @@ export function TrainingLogEntryCard({
   onVoid: () => void;
   /** The entry's visibility badge, where the journal shows one. */
   badge?: ReactNode;
+  /** The watch's numbers once a device matched this workout (ADR-161). */
+  device?: ReactNode;
 }) {
   const i18n = useUiTranslations();
   const voided = entry.status === "voided";
@@ -132,6 +135,7 @@ export function TrainingLogEntryCard({
               ? ` · ${i18n("trainingLogEffortValue", { effort: entry.perceived_effort })}`
               : ""}
           </p>
+          {device}
           {badge ? <div className="mt-1">{badge}</div> : null}
           {entry.comments.length > 0 ? (
             <div className="mt-2">
