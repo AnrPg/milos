@@ -39,7 +39,7 @@ defmodule MilosTraining.Workouts do
     MaterializeWorkout
   }
 
-  alias MilosTraining.Workouts.WorkoutStore
+  alias MilosTraining.Workouts.{GoalStore, WorkoutStore}
 
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: WorkoutStore.with_tenant_context(context, fun)
@@ -117,6 +117,28 @@ defmodule MilosTraining.Workouts do
 
   @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-124)."
   def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
+
+  @doc """
+  `%{name, exercise_ref, category, weight}` per exercise of a workout, for
+  WOD-goal suggestion (ADR-163): sections when it has them, else its free
+  text read line by line.
+  """
+  def goal_exercises(workout), do: ExerciseDescriptors.weighted_from_workout(workout)
+
+  @doc "The saved WOD goals of a workout in the context's gym, or nil (ADR-163)."
+  def get_workout_goals(context, workout_id), do: GoalStore.get_goals(context, workout_id)
+
+  @doc """
+  The WOD goals a workout uses (ADR-163): its own, else those of the nearest
+  workout it was copied from (`source_workout_id`: class variants, member
+  versions, filed copies), as `%{goals, inherited_from}`.
+  """
+  def resolve_workout_goals(context, workout_id),
+    do: GoalStore.resolve_goals(context, workout_id)
+
+  @doc "Upserts a workout's WOD goals; attrs are already normalised (ADR-163)."
+  def put_workout_goals(context, workout_id, attrs),
+    do: GoalStore.put_goals(context, workout_id, attrs)
 
   @doc "What a workout trains, read from its movements (Πρόγραμμα «Εστίαση» filter)."
   def workout_focus(workout), do: WorkoutFocus.from_workout(workout)

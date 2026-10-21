@@ -78,6 +78,34 @@ defmodule MilosTraining.Journal do
   def comments_by_entry(entry_kind, entry_ids),
     do: entry_kind |> list_comments(entry_ids) |> Enum.group_by(& &1.entry_id)
 
+  # «Τι ένιωσες» (ADR-163): felt muscles and qualities on an entry.
+  alias MilosTraining.Journal.{GoalFeedback, GoalFeedbackStore}
+
+  def goal_feedback_entry_kinds, do: GoalFeedback.entry_kinds()
+
+  def goal_feedback_entry(context, entry_kind, entry_id),
+    do: GoalFeedbackStore.feedback_entry(context, entry_kind, entry_id)
+
+  def get_goal_feedback(context, entry_kind, entry_id, user_id),
+    do: GoalFeedbackStore.get_feedback(context, entry_kind, entry_id, user_id)
+
+  def put_goal_feedback(context, attrs), do: GoalFeedbackStore.put_feedback(context, attrs)
+
+  @doc "Felt feedback of each entry, keyed by entry id, in the caller's open session."
+  def goal_feedback_by_entry(entry_kind, entry_ids, user_id) do
+    entry_kind
+    |> GoalFeedbackStore.list_by_entries(entry_ids, user_id)
+    |> Map.new(&{&1.entry_id, &1})
+  end
+
+  @doc """
+  Feedback rows on the non-voided entries of `{:workout, id}` or
+  `{:scheduled_class, id}` that the acting person may read: queried in their
+  session, so a coach only gets rows whose entry's rung reaches them.
+  """
+  def list_goal_feedback_for(context, scope),
+    do: GoalFeedbackStore.list_feedback_for(context, scope)
+
   # ADR-162: one journal across providers.
   alias MilosTraining.Journal.Domain.{CoachAudience, EntrySource, JournalFilter}
 

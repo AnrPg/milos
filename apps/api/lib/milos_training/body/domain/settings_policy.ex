@@ -11,6 +11,9 @@ defmodule MilosTraining.Body.Domain.SettingsPolicy do
     next one starts from (`private` until then).
   - `blur_photos`: photos show blurred until tapped (default on).
   - `compare_mode`: `slider` (default) or `side_by_side`.
+  - `felt_prompt_without_goals`: offer the «Τι ένιωσες;» step after a
+    workout without goals, from the body (default on, ADR-163). Workouts
+    with goals always offer it.
   """
 
   alias MilosTraining.Body.Domain.{DisplayPolicy, MetricCatalog, SnapshotPolicy}
@@ -32,6 +35,7 @@ defmodule MilosTraining.Body.Domain.SettingsPolicy do
       default_visibility: "private",
       blur_photos: true,
       compare_mode: "slider",
+      felt_prompt_without_goals: true,
       reminder_anchor_at: nil,
       last_reminded_at: nil
     }
@@ -66,6 +70,7 @@ defmodule MilosTraining.Body.Domain.SettingsPolicy do
            put_choice(acc, params, "default_visibility", SnapshotPolicy.visibilities()),
          {:ok, acc} <- put_choice(acc, params, "compare_mode", @compare_modes),
          {:ok, acc} <- put_boolean(acc, params, "blur_photos"),
+         {:ok, acc} <- put_boolean(acc, params, "felt_prompt_without_goals"),
          {:ok, acc} <- put_sections(acc, current, params),
          {:ok, acc} <- put_reminder(acc, current, params, now) do
       {:ok, acc}

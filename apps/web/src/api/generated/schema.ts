@@ -4,6 +4,23 @@
  */
 
 export interface paths {
+    "/api/anatomy/taxonomy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The muscle taxonomy and fitness qualities used by WOD goals */
+        get: operations["MilosTrainingWeb.AnatomyController.taxonomy"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/around/pins": {
         parameters: {
             query?: never;
@@ -5257,6 +5274,26 @@ export interface paths {
         patch: operations["MilosTrainingWeb.AdminScheduleController.update_slot"];
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/goal-feedback-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coach totals of «τι ένιωσες» on a scheduled class
+         * @description Entries logged from the class or timed from its bookings, whatever workout version they followed; same rules as the workout summary.
+         */
+        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/injury-warnings": {
         parameters: {
             query?: never;
@@ -6193,6 +6230,47 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/{id}/goal-feedback-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Coach totals of «τι ένιωσες» on a workout
+         * @description Counts only feedback on non-voided entries whose visibility reaches the caller as a coach; shown only from 3 entries.
+         */
+        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/workouts/{id}/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A workout's WOD goals and the live suggestion
+         * @description Saved goals, or the suggestion from the workout's exercises (saved=false) when none are saved. Drafts included.
+         */
+        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.show"];
+        /** Save a workout's WOD goals */
+        put: operations["MilosTrainingWeb.AdminWorkoutGoalsController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/{id}/icon": {
         parameters: {
             query?: never;
@@ -6999,6 +7077,27 @@ export interface paths {
         put?: never;
         /** Withdraw an open form review; the review is given back */
         post: operations["MilosTrainingWeb.CoachingExtrasController.withdraw_form_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/goal-feedback/{entry_kind}/{entry_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * The goals of an entry's workout and what the member felt
+         * @description Only for the member's own entry. goals is null unless the coach made them visible; feedback is null until saved.
+         */
+        get: operations["MilosTrainingWeb.GoalFeedbackController.show"];
+        /** Save what the member felt after one of their entries */
+        put: operations["MilosTrainingWeb.GoalFeedbackController.update"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -8199,6 +8298,26 @@ export interface paths {
         };
         /** Get a master workout */
         get: operations["MilosTrainingWeb.WorkoutController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/workouts/{id}/goals": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * A published workout's WOD goals, when the coach made them visible
+         * @description goals is null when none are saved or the coach keeps them hidden.
+         */
+        get: operations["MilosTrainingWeb.WorkoutGoalsController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9439,6 +9558,32 @@ export interface components {
             }[];
             total: number;
             tour_completed: boolean;
+        };
+        /** AnatomyNode */
+        AnatomyNode: {
+            id: string;
+            /** @enum {string} */
+            kind: "region" | "group" | "head";
+            /** @description English reference name */
+            name: string;
+            parent_id: string | null;
+            ta2_ids: string[];
+        };
+        /** AnatomyTaxonomy */
+        AnatomyTaxonomy: {
+            /** @description Tree order: each region, then its groups, each followed by its heads */
+            nodes: {
+                id: string;
+                /** @enum {string} */
+                kind: "region" | "group" | "head";
+                /** @description English reference name */
+                name: string;
+                parent_id: string | null;
+                ta2_ids: string[];
+            }[];
+            qualities: string[];
+            roles: ("primary" | "secondary" | "stabilizer")[];
+            version: number;
         };
         /** AppointmentBooking */
         AppointmentBooking: {
@@ -12441,6 +12586,8 @@ export interface components {
             compare_mode?: "slider" | "side_by_side";
             /** @enum {string} */
             default_visibility?: "private" | "coach_numbers" | "coach_full";
+            /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+            felt_prompt_without_goals?: boolean;
             journal_sections?: {
                 body?: boolean;
                 cravings?: boolean;
@@ -12479,6 +12626,8 @@ export interface components {
                 compare_mode: "slider" | "side_by_side";
                 /** @enum {string} */
                 default_visibility: "private" | "coach_numbers" | "coach_full";
+                /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                felt_prompt_without_goals: boolean;
                 journal_sections: {
                     body?: boolean;
                     cravings?: boolean;
@@ -19020,6 +19169,83 @@ export interface components {
             longitude: number;
             neighbourhood: string | null;
         };
+        /** GoalFeedback */
+        GoalFeedback: {
+            felt_muscles: string[];
+            felt_qualities: string[];
+            /** Format: date-time */
+            updated_at: string;
+        } | null;
+        /** GoalFeedbackCount */
+        GoalFeedbackCount: {
+            count: number;
+            id: string;
+        };
+        /** GoalFeedbackResponse */
+        GoalFeedbackResponse: {
+            /** Format: uuid */
+            entry_id: string;
+            /** @enum {string} */
+            entry_kind: "execution" | "training_log";
+            /** GoalFeedback */
+            feedback: {
+                felt_muscles: string[];
+                felt_qualities: string[];
+                /** Format: date-time */
+                updated_at: string;
+            } | null;
+            /** MemberWorkoutGoals */
+            goals: {
+                muscles: {
+                    /** @description Taxonomy group or head id */
+                    id: string;
+                    /** @enum {string} */
+                    role: "primary" | "secondary" | "stabilizer";
+                }[];
+                qualities: string[];
+                stimulus: string | null;
+                taxonomy_version: number;
+                /** Format: date-time */
+                updated_at: string;
+                /** Format: uuid */
+                workout_id: string;
+            } | null;
+            voided: boolean;
+        };
+        /**
+         * GoalFeedbackSummary
+         * @description Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.
+         */
+        GoalFeedbackSummary: {
+            entries: number;
+            /** @description Muscle groups (heads rolled up), most felt first */
+            felt_muscles: {
+                count: number;
+                id: string;
+            }[];
+            /** @description Most felt first */
+            felt_qualities: {
+                count: number;
+                id: string;
+            }[];
+            /** @description Groups of the goal's primary and secondary muscles nobody felt */
+            goals_not_felt: string[];
+            /**
+             * Format: uuid
+             * @description Only on the scheduled-class summary
+             */
+            scheduled_class_id?: string;
+            shown: boolean;
+            /** Format: uuid */
+            workout_id: string | null;
+        };
+        /** GoalMuscle */
+        GoalMuscle: {
+            /** @description Taxonomy group or head id */
+            id: string;
+            /** @enum {string} */
+            role: "primary" | "secondary" | "stabilizer";
+        };
         /** HealthConsents */
         HealthConsents: {
             consents: {
@@ -19399,6 +19625,11 @@ export interface components {
                 /** Format: date-time */
                 started_at: string;
             } | null;
+            /** @description ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none. */
+            felt?: {
+                muscles: string[];
+                qualities: string[];
+            } | null;
         } & {
             [key: string]: unknown;
         };
@@ -19471,6 +19702,11 @@ export interface components {
                     sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
                     /** Format: date-time */
                     started_at: string;
+                } | null;
+                /** @description ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none. */
+                felt?: {
+                    muscles: string[];
+                    qualities: string[];
                 } | null;
             } & {
                 [key: string]: unknown;
@@ -19706,6 +19942,43 @@ export interface components {
          */
         MemberVisibility: {
             hidden: boolean;
+        };
+        /** MemberWorkoutGoals */
+        MemberWorkoutGoals: {
+            muscles: {
+                /** @description Taxonomy group or head id */
+                id: string;
+                /** @enum {string} */
+                role: "primary" | "secondary" | "stabilizer";
+            }[];
+            qualities: string[];
+            stimulus: string | null;
+            taxonomy_version: number;
+            /** Format: date-time */
+            updated_at: string;
+            /** Format: uuid */
+            workout_id: string;
+        } | null;
+        /** MemberWorkoutGoalsResponse */
+        MemberWorkoutGoalsResponse: {
+            /** MemberWorkoutGoals */
+            goals: {
+                muscles: {
+                    /** @description Taxonomy group or head id */
+                    id: string;
+                    /** @enum {string} */
+                    role: "primary" | "secondary" | "stabilizer";
+                }[];
+                qualities: string[];
+                stimulus: string | null;
+                taxonomy_version: number;
+                /** Format: date-time */
+                updated_at: string;
+                /** Format: uuid */
+                workout_id: string;
+            } | null;
+            /** Format: uuid */
+            workout_id: string;
         };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
@@ -21662,6 +21935,24 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** SaveGoalFeedbackRequest */
+        SaveGoalFeedbackRequest: {
+            felt_muscles: string[];
+            felt_qualities: string[];
+        };
+        /** SaveWorkoutGoalsRequest */
+        SaveWorkoutGoalsRequest: {
+            muscles: {
+                /** @description Taxonomy group or head id */
+                id: string;
+                /** @enum {string} */
+                role: "primary" | "secondary" | "stabilizer";
+            }[];
+            qualities: string[];
+            stimulus?: string | null;
+            /** @description Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default */
+            visible_to_members?: boolean;
+        };
         /** SavedFilter */
         SavedFilter: {
             /** @description Γύρω μου only: a daily notification when something new matches */
@@ -23127,6 +23418,78 @@ export interface components {
                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
                 /** Format: uuid */
                 user_id?: string;
+            };
+        };
+        /** StaffWorkoutGoals */
+        StaffWorkoutGoals: {
+            /**
+             * Format: uuid
+             * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+             */
+            inherited_from: string | null;
+            muscles: {
+                /** @description Taxonomy group or head id */
+                id: string;
+                /** @enum {string} */
+                role: "primary" | "secondary" | "stabilizer";
+            }[];
+            qualities: string[];
+            /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
+            saved: boolean;
+            /** @enum {string} */
+            source: "suggested" | "edited";
+            stimulus: string | null;
+            taxonomy_version: number;
+            /** Format: date-time */
+            updated_at: string | null;
+            /** Format: uuid */
+            updated_by_id: string | null;
+            visible_to_members: boolean;
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /** StaffWorkoutGoalsResponse */
+        StaffWorkoutGoalsResponse: {
+            /** StaffWorkoutGoals */
+            goals: {
+                /**
+                 * Format: uuid
+                 * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+                 */
+                inherited_from: string | null;
+                muscles: {
+                    /** @description Taxonomy group or head id */
+                    id: string;
+                    /** @enum {string} */
+                    role: "primary" | "secondary" | "stabilizer";
+                }[];
+                qualities: string[];
+                /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
+                saved: boolean;
+                /** @enum {string} */
+                source: "suggested" | "edited";
+                stimulus: string | null;
+                taxonomy_version: number;
+                /** Format: date-time */
+                updated_at: string | null;
+                /** Format: uuid */
+                updated_by_id: string | null;
+                visible_to_members: boolean;
+                /** Format: uuid */
+                workout_id: string;
+            };
+            /** WorkoutGoalSuggestion */
+            suggestion: {
+                matched_exercises: number;
+                muscles: {
+                    /** @description Taxonomy group or head id */
+                    id: string;
+                    /** @enum {string} */
+                    role: "primary" | "secondary" | "stabilizer";
+                }[];
+                qualities: string[];
+                taxonomy_version: number;
+                unmatched_exercises: number;
             };
         };
         /** SubscriptionBeneficiary */
@@ -24781,6 +25144,19 @@ export interface components {
             version: 1;
             workout_parameters: string[];
         };
+        /** WorkoutGoalSuggestion */
+        WorkoutGoalSuggestion: {
+            matched_exercises: number;
+            muscles: {
+                /** @description Taxonomy group or head id */
+                id: string;
+                /** @enum {string} */
+                role: "primary" | "secondary" | "stabilizer";
+            }[];
+            qualities: string[];
+            taxonomy_version: number;
+            unmatched_exercises: number;
+        };
     };
     responses: never;
     parameters: never;
@@ -24790,6 +25166,47 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
+    "MilosTrainingWeb.AnatomyController.taxonomy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Anatomy taxonomy */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Tree order: each region, then its groups, each followed by its heads */
+                        nodes: {
+                            id: string;
+                            /** @enum {string} */
+                            kind: "region" | "group" | "head";
+                            /** @description English reference name */
+                            name: string;
+                            parent_id: string | null;
+                            ta2_ids: string[];
+                        }[];
+                        qualities: string[];
+                        roles: ("primary" | "secondary" | "stabilizer")[];
+                        version: number;
+                    };
+                };
+            };
+            /** @description Unchanged since the given ETag */
+            304: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+        };
+    };
     "MilosTrainingWeb.AroundController.pins": {
         parameters: {
             query?: never;
@@ -29117,6 +29534,8 @@ export interface operations {
                             compare_mode: "slider" | "side_by_side";
                             /** @enum {string} */
                             default_visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                            felt_prompt_without_goals: boolean;
                             journal_sections: {
                                 body?: boolean;
                                 cravings?: boolean;
@@ -29149,6 +29568,8 @@ export interface operations {
                     compare_mode?: "slider" | "side_by_side";
                     /** @enum {string} */
                     default_visibility?: "private" | "coach_numbers" | "coach_full";
+                    /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                    felt_prompt_without_goals?: boolean;
                     journal_sections?: {
                         body?: boolean;
                         cravings?: boolean;
@@ -29195,6 +29616,8 @@ export interface operations {
                             compare_mode: "slider" | "side_by_side";
                             /** @enum {string} */
                             default_visibility: "private" | "coach_numbers" | "coach_full";
+                            /** @description ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it) */
+                            felt_prompt_without_goals: boolean;
                             journal_sections: {
                                 body?: boolean;
                                 cravings?: boolean;
@@ -50988,6 +51411,63 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Scheduled class (slot) ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal feedback summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: number;
+                        /** @description Muscle groups (heads rolled up), most felt first */
+                        felt_muscles: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Most felt first */
+                        felt_qualities: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Groups of the goal's primary and secondary muscles nobody felt */
+                        goals_not_felt: string[];
+                        /**
+                         * Format: uuid
+                         * @description Only on the scheduled-class summary
+                         */
+                        scheduled_class_id?: string;
+                        shown: boolean;
+                        /** Format: uuid */
+                        workout_id: string | null;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminInjuryWarningController.slot": {
         parameters: {
             query?: never;
@@ -51189,6 +51669,11 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
+                        /** @description ADR-163: workout-authoring defaults */
+                        workouts: {
+                            /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
+                            wod_goals_visible_by_default: boolean;
+                        };
                     };
                 };
             };
@@ -51238,6 +51723,10 @@ export interface operations {
                         /** @description Withdrawals closer to the class than this use the visit */
                         default_cancellation_cutoff_hours?: number | null;
                         default_capacity?: number;
+                    };
+                    workouts?: {
+                        /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
+                        wod_goals_visible_by_default?: boolean;
                     };
                 };
             };
@@ -51309,6 +51798,11 @@ export interface operations {
                             inserted_at?: string | null;
                             /** Format: date-time */
                             updated_at?: string | null;
+                        };
+                        /** @description ADR-163: workout-authoring defaults */
+                        workouts: {
+                            /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
+                            wod_goals_visible_by_default: boolean;
                         };
                     };
                 };
@@ -55616,6 +56110,244 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Workout ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal feedback summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: number;
+                        /** @description Muscle groups (heads rolled up), most felt first */
+                        felt_muscles: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Most felt first */
+                        felt_qualities: {
+                            count: number;
+                            id: string;
+                        }[];
+                        /** @description Groups of the goal's primary and secondary muscles nobody felt */
+                        goals_not_felt: string[];
+                        /**
+                         * Format: uuid
+                         * @description Only on the scheduled-class summary
+                         */
+                        scheduled_class_id?: string;
+                        shown: boolean;
+                        /** Format: uuid */
+                        workout_id: string | null;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutGoalsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Workout ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description WOD goals */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffWorkoutGoals */
+                        goals: {
+                            /**
+                             * Format: uuid
+                             * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+                             */
+                            inherited_from: string | null;
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
+                            saved: boolean;
+                            /** @enum {string} */
+                            source: "suggested" | "edited";
+                            stimulus: string | null;
+                            taxonomy_version: number;
+                            /** Format: date-time */
+                            updated_at: string | null;
+                            /** Format: uuid */
+                            updated_by_id: string | null;
+                            visible_to_members: boolean;
+                            /** Format: uuid */
+                            workout_id: string;
+                        };
+                        /** WorkoutGoalSuggestion */
+                        suggestion: {
+                            matched_exercises: number;
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            taxonomy_version: number;
+                            unmatched_exercises: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminWorkoutGoalsController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Workout ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    muscles: {
+                        /** @description Taxonomy group or head id */
+                        id: string;
+                        /** @enum {string} */
+                        role: "primary" | "secondary" | "stabilizer";
+                    }[];
+                    qualities: string[];
+                    stimulus?: string | null;
+                    /** @description Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default */
+                    visible_to_members?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description WOD goals */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffWorkoutGoals */
+                        goals: {
+                            /**
+                             * Format: uuid
+                             * @description The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own
+                             */
+                            inherited_from: string | null;
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            /** @description False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion */
+                            saved: boolean;
+                            /** @enum {string} */
+                            source: "suggested" | "edited";
+                            stimulus: string | null;
+                            taxonomy_version: number;
+                            /** Format: date-time */
+                            updated_at: string | null;
+                            /** Format: uuid */
+                            updated_by_id: string | null;
+                            visible_to_members: boolean;
+                            /** Format: uuid */
+                            workout_id: string;
+                        };
+                        /** WorkoutGoalSuggestion */
+                        suggestion: {
+                            matched_exercises: number;
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            taxonomy_version: number;
+                            unmatched_exercises: number;
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid goals */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
                         error: string;
                     };
                 };
@@ -60261,6 +60993,153 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.GoalFeedbackController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_kind: "execution" | "training_log";
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Goal feedback */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        entry_id: string;
+                        /** @enum {string} */
+                        entry_kind: "execution" | "training_log";
+                        /** GoalFeedback */
+                        feedback: {
+                            felt_muscles: string[];
+                            felt_qualities: string[];
+                            /** Format: date-time */
+                            updated_at: string;
+                        } | null;
+                        /** MemberWorkoutGoals */
+                        goals: {
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            stimulus: string | null;
+                            taxonomy_version: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            workout_id: string;
+                        } | null;
+                        voided: boolean;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.GoalFeedbackController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                entry_kind: "execution" | "training_log";
+                entry_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    felt_muscles: string[];
+                    felt_qualities: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Goal feedback */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        entry_id: string;
+                        /** @enum {string} */
+                        entry_kind: "execution" | "training_log";
+                        /** GoalFeedback */
+                        feedback: {
+                            felt_muscles: string[];
+                            felt_qualities: string[];
+                            /** Format: date-time */
+                            updated_at: string;
+                        } | null;
+                        /** MemberWorkoutGoals */
+                        goals: {
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            stimulus: string | null;
+                            taxonomy_version: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            workout_id: string;
+                        } | null;
+                        voided: boolean;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
+                    };
+                };
+            };
+            /** @description Invalid feedback */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error: string;
                     };
                 };
             };
@@ -65539,6 +66418,59 @@ export interface operations {
                                 [key: string]: unknown;
                             };
                         };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WorkoutGoalsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Workout ID */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description WOD goals */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MemberWorkoutGoals */
+                        goals: {
+                            muscles: {
+                                /** @description Taxonomy group or head id */
+                                id: string;
+                                /** @enum {string} */
+                                role: "primary" | "secondary" | "stabilizer";
+                            }[];
+                            qualities: string[];
+                            stimulus: string | null;
+                            taxonomy_version: number;
+                            /** Format: date-time */
+                            updated_at: string;
+                            /** Format: uuid */
+                            workout_id: string;
+                        } | null;
+                        /** Format: uuid */
+                        workout_id: string;
                     };
                 };
             };

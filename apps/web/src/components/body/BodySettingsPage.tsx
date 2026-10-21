@@ -56,6 +56,7 @@ function Switch({ checked, onChange, label, hint, disabled }: { checked: boolean
  */
 export function BodySettingsPage() {
   const t = useTranslations("Body");
+  const goalsT = useTranslations("WodGoals");
   const tUi = useUiTranslations();
   const locale = useUiLocale();
   const token = useBodyToken();
@@ -131,6 +132,12 @@ export function BodySettingsPage() {
             onChange={(next) => save({ journal_sections: { [section]: next } })}
           />
         ))}
+        <Switch
+          label={goalsT("settings.feltPrompt")}
+          hint={goalsT("settings.feltPromptHint")}
+          checked={prefs.felt_prompt_without_goals !== false}
+          onChange={(next) => save({ felt_prompt_without_goals: next })}
+        />
       </Card>
 
       <Card label={t("reminderLabel")}>

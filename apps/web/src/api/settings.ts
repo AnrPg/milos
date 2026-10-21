@@ -57,6 +57,13 @@ export type AdminSettingsPayload = {
   notifications: NotificationPushSettings;
   scheduling: SchedulingSettings;
   provider?: ProviderSettings;
+  /** ADR-163: workout-authoring defaults. */
+  workouts?: WorkoutAuthoringSettings;
+};
+
+export type WorkoutAuthoringSettings = {
+  /** Starting value of «Εμφάνιση στόχων στα μέλη» on a workout without goals of its own. */
+  wod_goals_visible_by_default: boolean;
 };
 
 export type GamificationUpdate = Partial<
@@ -76,6 +83,7 @@ export type AdminSettingsUpdate = {
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
   notifications?: NotificationPushUpdate;
+  workouts?: Partial<WorkoutAuthoringSettings>;
   scheduling?: Partial<
     Pick<
       SchedulingSettings,

@@ -23,6 +23,7 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -278,6 +279,7 @@ export function AssignedWorkoutPanel({
                     freeTextBody={assignment.workout.free_text_body}
                     freeTextDocument={assignment.workout.free_text_document}
                   />
+                  <WodGoalsStrip workoutId={assignment.master_workout_id} className="mt-3" />
                 </section>
 
                 {/* Admin controls */}

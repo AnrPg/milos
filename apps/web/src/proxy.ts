@@ -28,7 +28,9 @@ export async function proxy(request: NextRequest) {
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${development ? " 'unsafe-eval'" : ""}`,
+    // ADR-164: the anatomy atlas is meshopt-compressed and decoded in WebAssembly;
+    // 'wasm-unsafe-eval' allows compiling WebAssembly only, not JavaScript eval.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${development ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
     `img-src 'self' data: blob: ${mediaOrigins} ${mapOrigins}`,
     // ADR-157: post videos play from the media origin; compose previews a picked file from a blob.

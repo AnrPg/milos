@@ -20,6 +20,17 @@ const nextConfig: NextConfig = {
     // 30 s default. Production routes /api straight to Phoenix via Caddy.
     proxyTimeout: 90_000,
   },
+  // ADR-164: the dev-only anatomy preview (`page.dev.tsx`) is a route in `next dev` only.
+  pageExtensions: process.env.NODE_ENV === "production" ? ["tsx", "ts", "jsx", "js"] : ["dev.tsx", "tsx", "ts", "jsx", "js"],
+  async headers() {
+    // ADR-164: atlas files are versioned by folder (v1), so they never change in place.
+    return [
+      {
+        source: "/anatomy/v1/:file*",
+        headers: [{ key: "Cache-Control", value: "public, max-age=31536000, immutable" }],
+      },
+    ];
+  },
   // ADR-137: member pages moved under their tab; old links keep working.
   // Temporary (307) while the redesign settles, so a later move is not cached.
   async redirects() {

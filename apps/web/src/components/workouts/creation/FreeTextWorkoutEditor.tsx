@@ -52,6 +52,8 @@ import {
 } from "@/lib/free-text-timer";
 import { getFormatLabels, type WorkoutType } from "@/types/workout";
 
+import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel";
+
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 import { FreeTextAnalysisPanel, type AnalysisStatus } from "./FreeTextAnalysisPanel";
@@ -64,7 +66,7 @@ type Props = {
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type AsideTab = "assistant" | "preview";
-type RibbonKey = "overview" | "details" | "timer" | "tools";
+type RibbonKey = "overview" | "details" | "timer" | "goals" | "tools";
 
 const WORKOUT_TYPES: WorkoutType[] = [
   "crossfit",
@@ -78,6 +80,7 @@ const WORKOUT_TYPES: WorkoutType[] = [
 export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }: Props) {
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
+  const goalsT = useTranslations("WodGoals");
   const locale = useUiLocale();
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
@@ -88,6 +91,8 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
   const [body, setBody] = useState("");
   const [html, setHtml] = useState("");
   const [saveStatus, setSaveStatus] = useState<SaveStatus>("idle");
+  /** Counts draft autosaves; the goals panel re-reads its suggestion on each. */
+  const [draftSaves, setDraftSaves] = useState(0);
   const [publishing, setPublishing] = useState(false);
   const [previewOpen, setPreviewOpen] = useState(true);
   const [asideTab, setAsideTab] = useState<AsideTab>("assistant");
@@ -100,6 +105,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
     overview: false,
     details: false,
     timer: true,
+    goals: true,
     tools: false,
   });
   /** Optional timer the athlete gets pre-selected; kept in `workout_metadata`. */
@@ -208,6 +214,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
       }));
       revisionRef.current = draft.dsl_source_revision ?? revisionRef.current;
       setSaveStatus("saved");
+      setDraftSaves((count) => count + 1);
     } catch {
       setSaveStatus("error");
     }
@@ -468,6 +475,20 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
             {timerPreset ? (
               <FreeTextTimerFields preset={timerPreset} formatLabels={formatLabels} onChange={setTimerPreset} />
             ) : null}
+          </div>
+        </CollapsibleRibbon>
+
+        <CollapsibleRibbon
+          label={goalsT("title")}
+          collapsed={collapsedRibbons.goals}
+          onToggle={() => toggleRibbon("goals")}
+        >
+          <div className="max-h-[55vh] overflow-y-auto">
+            <WodGoalsEditorPanel
+              workoutId={draftId}
+              refreshKey={draftSaves}
+              timeDomainSeconds={timerPreset?.duration_seconds ?? null}
+            />
           </div>
         </CollapsibleRibbon>
 

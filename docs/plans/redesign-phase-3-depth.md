@@ -47,7 +47,7 @@ payments, a fifth `Clubs` tab (brief §9 validation rule), AI that writes whole 
 |---|---|---|
 | Exercise taxonomy | `exercise_catalog_entries.muscle_groups`, `movement_pattern`, `skill_domain`; `InjuryRiskPolicy` maps exercises to regions (primary/secondary) | Head-level muscles, region ↔ group ↔ head tree, fitness-quality mapping |
 | Workout goals | Nothing | `WorkoutGoals`, `GoalFeedback`, editor toggle |
-| Atlas art | Mockup prototype; library pick anatomy-models (Z-Anatomy export, share-alike) in thread "Body atlas library search", not yet confirmed by ANR | Licensed SVG/mesh assets, mapping to the taxonomy |
+| Atlas art | Mockup prototype; anatomy-models confirmed (D2), test renders in `/mnt/project-files/body-atlas/` | Licensed SVG/mesh assets, mapping to the taxonomy |
 | Load data | `training_log_entries.perceived_effort`, `duration_seconds` | Load read model, acute:chronic |
 | Insight inputs | Sleep and wellness entries (M11), cravings, PRs, Garmin sleep (M13) | Correlation jobs, data-sufficiency gate |
 | Clubs | Kinds `pt_squad`, `season` and channel kind `season` reserved (ADR-138) | Creation flows, membership sources |
@@ -61,7 +61,7 @@ payments, a fifth `Clubs` tab (brief §9 validation rule), AI that writes whole 
 | # | Decision | Default taken | ADR |
 |---|---|---|---|
 | D1 | Muscle taxonomy | Extend the existing catalog with a head-level tree; never a parallel taxonomy (brief §7.6) | ADR-163 |
-| D2 | Atlas assets | anatomy-models (Z-Anatomy), share-alike attribution in the app; swap-friendly asset manifest so another set can replace it | ADR-164 |
+| D2 | Atlas assets | **Confirmed by ANR (2026-10-21):** anatomy-models (Z-Anatomy glTF, CC BY-SA 4.0, pinned commit ac52bab, `muscles.glb` 3.8 MB, nodes `ta2-<id>.<l\|r\|m>`, heads split) rendered in three.js; attribution in the app; asset manifest keyed by TA2 ids | ADR-164 |
 | D3 | Goal suggestions | Deterministic from the catalog (sets × role weights); the AI layer may refine later, never required | ADR-163 |
 | D4 | Insight threshold | ≥4 weeks and a minimum sample per insight; every insight carries «Ένδειξη, όχι ιατρική συμβουλή» | ADR-166 |
 | D5 | Season sale | A season is a package with dates and capacity; purchase is a request the staff confirm, like today's packages (no card processor) | ADR-167 |
@@ -199,6 +199,25 @@ every milestone; all copy in the 12 locales.
 
 ## 5a. UX decisions (filled in per screen, from the boards)
 
+### WOD goals (2026-10-21, [board 18](https://claude.ai/artifact/4FpEmCjYhx3NXDUmuPqqbw))
+All recommended options, with every recommended extra.
+1. **Coach (Q1 A):** a «Στόχοι» panel in the workout editor, filled from the exercises as the coach types; edits stick,
+   «Επαναφορά πρότασης» restores the suggestion; the toggle «Εμφάνιση στόχων στα μέλη» sits at the top. Extras: a gym
+   setting «Στόχοι ορατοί από προεπιλογή» sets the toggle's starting value (off by default); class variants and scaled
+   versions inherit the goals and the coach can change them per variant.
+2. **Picking (Q2 A + note «Both tap and list search»):** one picker with the rotatable 3D body (tap group, tap again for
+   the head, long press cycles the role) and a searchable list by region, sharing one selection. Picking a head zooms
+   onto it.
+3. **Member card (Q3 A):** compact strip in the workout card (small figure, top muscles, qualities, stimulus); tap opens
+   the 3D sheet. Members see κύριοι and βοηθητικοί on the card, σταθεροποίηση only in the sheet. The strip also shows
+   on the «Έτοιμος;» screen before the timer.
+4. **«Τι ένιωσες;» (Q4 A):** one optional step after timed and logged workouts: goal chips tap to «felt», «+ Κάτι άλλο»
+   from the body, qualities, «Παράλειψη». Workouts without goals still offer the step from the body (can be switched
+   off in Ρυθμίσεις); the journal entry shows «Ένιωσα: …» with the entry's visibility.
+5. **Stimulus (Q5 A):** free text with tap-to-insert phrases.
+6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
+   entries; also lists goals nobody felt.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
@@ -211,10 +230,10 @@ every milestone; all copy in the 12 locales.
 ## 7. Open questions
 1. Brief §10 Q2: prices for gym tiers and the solo-coach tier (ANR).
 2. Brief §10 Q6: when to start the wrapper; Apple and Google developer accounts are owner actions.
-3. Atlas asset licence: confirm anatomy-models (share-alike) or pick another set.
+3. ~~Atlas asset licence~~ Decided: anatomy-models (D2).
 4. Should seasons support card payment later, and through which processor?
 
 ## 8. Progress
-- [ ] Step 1 explore · [ ] Step 2 decisions · [x] Step 3 plan (draft)
-- [ ] P3-M1 · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
+- [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
+- [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
 - [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13

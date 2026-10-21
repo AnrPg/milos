@@ -15,6 +15,7 @@ import { localizeError } from "@/i18n/presentation";
 import { CommentList } from "@/components/journal/CommentList";
 import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
+import { FeltStep } from "@/components/wod-goals/FeltStep";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
@@ -390,6 +391,7 @@ function EntryForm({
   const [idempotencyKey] = useState(newIdempotencyKey);
   const [errors, setErrors] = useState<TrainingLogFormError[]>([]);
   const [queued, setQueued] = useState(false);
+  const [feltEntryId, setFeltEntryId] = useState<string | null>(null);
   const submitCommand = useOutboxCommand();
   const commentWriter = useJournalCommentWriter();
 
@@ -397,13 +399,13 @@ function EntryForm({
     // ADR-120: new entries go through the durable outbox (the form's
     // idempotency key is the operation id); edits stay online-only because
     // they carry an optimistic-lock version.
-    mutationFn: async (): Promise<{ queued: boolean }> => {
+    mutationFn: async (): Promise<{ queued: boolean; createdId?: string }> => {
       if (state.mode === "create") {
-        const outcome = await submitCommand(
+        const outcome = await submitCommand<TrainingLogEntry, unknown>(
           "training_log.create",
           buildCreatePayload(form, state.source, { idempotencyKey, timezone: browserTimezone() }),
         );
-        return { queued: outcome.status === "queued" };
+        return outcome.status === "queued" ? { queued: true } : { queued: false, createdId: outcome.result?.id };
       }
 
       await updateTrainingLogEntry(token, state.entry.id, buildUpdatePayload(form, state.entry, sections, browserTimezone()));
@@ -420,7 +422,9 @@ function EntryForm({
         queryClient.invalidateQueries({ queryKey: ["training-log"] }),
         queryClient.invalidateQueries({ queryKey: ["landing"] }),
       ]);
-      onDone();
+      // «Τι ένιωσες;» needs the entry on the server; a queued entry skips it.
+      if (result.createdId) setFeltEntryId(result.createdId);
+      else onDone();
     },
   });
 
@@ -437,6 +441,10 @@ function EntryForm({
     setErrors(nextErrors);
     if (nextErrors.length === 0) mutation.mutate();
   };
+
+  if (feltEntryId) {
+    return <FeltStep entryKind="training_log" entryId={feltEntryId} layout="inline" onDone={() => onDone()} />;
+  }
 
   return (
     <form className="grid gap-4" onSubmit={submit} noValidate>

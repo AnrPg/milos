@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.AdminWorkoutController => [:manage_workouts],
     W.AdminWorkoutDslController => [:manage_workouts],
     W.AdminWorkoutFolderController => [:manage_workouts],
+    W.AdminWorkoutGoalsController => [:manage_workouts],
     W.AdminChallengeController => [:manage_challenges],
     W.AdminAssignedWorkoutController => [:manage_coaching],
     W.AdminContentController => [:manage_content],
@@ -146,6 +147,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminScheduleController, :approve_booking} => [:run_classes],
     {W.AdminScheduleController, :reject_booking} => [:run_classes],
     {W.AdminScheduleController, :record_attendance} => [:run_classes],
+    # ADR-163: coach totals of a class's «τι ένιωσες»; row security decides
+    # which entries count (a coach of the gym, the entry's rung).
+    {W.AdminWorkoutGoalsController, :class_feedback_summary} => [:manage_workouts, :run_classes],
 
     # Finance
     {W.AdminFinanceAccountingController, :refund_receipts} => [

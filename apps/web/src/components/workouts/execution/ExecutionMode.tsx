@@ -13,6 +13,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { LocalizedScore } from "@/components/localized-score";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { useExecutionSync, type SyncProblem } from "@/hooks/useExecutionSync";
 import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { useMediaSession } from "@/hooks/useMediaSession";
@@ -750,6 +751,7 @@ export function ExecutionMode() {
         comments={comments}
         pendingCommentIds={unsyncedCommentIds}
         clockAdjustments={clockAdjustmentSummaries()}
+        feltExecutionId={executionId}
         isSaving={isSaving}
         feedback={feedback}
         onConfirm={(editedScores, modifications) => void confirmPendingFinish(editedScores, modifications)}
@@ -777,13 +779,16 @@ export function ExecutionMode() {
             // ADR-124 / TD-088: the athlete's own injury warnings for the
             // scale they chose, before the clock starts. Informational only.
             tokens?.access_token && workoutId ? (
-              <MyInjuryWarningsPanel
-                accessToken={tokens.access_token}
-                workoutId={workoutId}
-                surface="pre_start"
-                sourceContextId={executionId ?? undefined}
-                scale={scaleSlug}
-              />
+              <div className="flex flex-col gap-3">
+                <MyInjuryWarningsPanel
+                  accessToken={tokens.access_token}
+                  workoutId={workoutId}
+                  surface="pre_start"
+                  sourceContextId={executionId ?? undefined}
+                  scale={scaleSlug}
+                />
+                <WodGoalsStrip workoutId={workoutId} />
+              </div>
             ) : null
           }
         />

@@ -905,6 +905,121 @@
         "title": "AdminOnboardingChecklist",
         "type": "object"
       },
+      "AnatomyNode": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "region",
+              "group",
+              "head"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "description": "English reference name",
+            "type": "string"
+          },
+          "parent_id": {
+            "nullable": true,
+            "type": "string"
+          },
+          "ta2_ids": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "parent_id",
+          "name",
+          "ta2_ids"
+        ],
+        "title": "AnatomyNode",
+        "type": "object"
+      },
+      "AnatomyTaxonomy": {
+        "additionalProperties": false,
+        "properties": {
+          "nodes": {
+            "description": "Tree order: each region, then its groups, each followed by its heads",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "region",
+                    "group",
+                    "head"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "description": "English reference name",
+                  "type": "string"
+                },
+                "parent_id": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ta2_ids": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "parent_id",
+                "name",
+                "ta2_ids"
+              ],
+              "title": "AnatomyNode",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "roles": {
+            "items": {
+              "enum": [
+                "primary",
+                "secondary",
+                "stabilizer"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "version": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "version",
+          "nodes",
+          "qualities",
+          "roles"
+        ],
+        "title": "AnatomyTaxonomy",
+        "type": "object"
+      },
       "AppointmentBooking": {
         "properties": {
           "allowance": {
@@ -10503,6 +10618,10 @@
             ],
             "type": "string"
           },
+          "felt_prompt_without_goals": {
+            "description": "ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it)",
+            "type": "boolean"
+          },
           "journal_sections": {
             "additionalProperties": false,
             "properties": {
@@ -10651,6 +10770,10 @@
                 ],
                 "type": "string"
               },
+              "felt_prompt_without_goals": {
+                "description": "ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it)",
+                "type": "boolean"
+              },
               "journal_sections": {
                 "additionalProperties": false,
                 "properties": {
@@ -10695,7 +10818,8 @@
               "measure_reminder_weeks",
               "default_visibility",
               "blur_photos",
-              "compare_mode"
+              "compare_mode",
+              "felt_prompt_without_goals"
             ],
             "type": "object"
           }
@@ -31622,6 +31746,280 @@
         "title": "GeocodePlace",
         "type": "object"
       },
+      "GoalFeedback": {
+        "additionalProperties": false,
+        "nullable": true,
+        "properties": {
+          "felt_muscles": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "felt_qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "felt_muscles",
+          "felt_qualities",
+          "updated_at"
+        ],
+        "title": "GoalFeedback",
+        "type": "object"
+      },
+      "GoalFeedbackCount": {
+        "additionalProperties": false,
+        "properties": {
+          "count": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "count"
+        ],
+        "title": "GoalFeedbackCount",
+        "type": "object"
+      },
+      "GoalFeedbackResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "entry_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "entry_kind": {
+            "enum": [
+              "execution",
+              "training_log"
+            ],
+            "type": "string"
+          },
+          "feedback": {
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "felt_muscles": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "felt_qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "felt_muscles",
+              "felt_qualities",
+              "updated_at"
+            ],
+            "title": "GoalFeedback",
+            "type": "object"
+          },
+          "goals": {
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "muscles": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group or head id",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": [
+                        "primary",
+                        "secondary",
+                        "stabilizer"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role"
+                  ],
+                  "title": "GoalMuscle",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "stimulus": {
+                "nullable": true,
+                "type": "string"
+              },
+              "taxonomy_version": {
+                "type": "integer"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "workout_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workout_id",
+              "muscles",
+              "qualities",
+              "stimulus",
+              "taxonomy_version",
+              "updated_at"
+            ],
+            "title": "MemberWorkoutGoals",
+            "type": "object"
+          },
+          "voided": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "entry_kind",
+          "entry_id",
+          "voided",
+          "goals",
+          "feedback"
+        ],
+        "title": "GoalFeedbackResponse",
+        "type": "object"
+      },
+      "GoalFeedbackSummary": {
+        "additionalProperties": false,
+        "description": "Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.",
+        "properties": {
+          "entries": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "felt_muscles": {
+            "description": "Muscle groups (heads rolled up), most felt first",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "count"
+              ],
+              "title": "GoalFeedbackCount",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "felt_qualities": {
+            "description": "Most felt first",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "count": {
+                  "minimum": 1,
+                  "type": "integer"
+                },
+                "id": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "count"
+              ],
+              "title": "GoalFeedbackCount",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "goals_not_felt": {
+            "description": "Groups of the goal's primary and secondary muscles nobody felt",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "scheduled_class_id": {
+            "description": "Only on the scheduled-class summary",
+            "format": "uuid",
+            "type": "string"
+          },
+          "shown": {
+            "type": "boolean"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "entries",
+          "shown",
+          "felt_muscles",
+          "felt_qualities",
+          "goals_not_felt"
+        ],
+        "title": "GoalFeedbackSummary",
+        "type": "object"
+      },
+      "GoalMuscle": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "description": "Taxonomy group or head id",
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "primary",
+              "secondary",
+              "stabilizer"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "role"
+        ],
+        "title": "GoalMuscle",
+        "type": "object"
+      },
       "HealthConsents": {
         "properties": {
           "consents": {
@@ -32968,6 +33366,29 @@
             ],
             "title": "DeviceMetrics",
             "type": "object"
+          },
+          "felt": {
+            "description": "ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none.",
+            "nullable": true,
+            "properties": {
+              "muscles": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "muscles",
+              "qualities"
+            ],
+            "type": "object"
           }
         },
         "title": "JournalFeedEntry",
@@ -33225,6 +33646,29 @@
                       "duration_seconds"
                     ],
                     "title": "DeviceMetrics",
+                    "type": "object"
+                  },
+                  "felt": {
+                    "description": "ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none.",
+                    "nullable": true,
+                    "properties": {
+                      "muscles": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "qualities": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "muscles",
+                      "qualities"
+                    ],
                     "type": "object"
                   }
                 },
@@ -33958,6 +34402,147 @@
           "hidden"
         ],
         "title": "MemberVisibility",
+        "type": "object"
+      },
+      "MemberWorkoutGoals": {
+        "additionalProperties": false,
+        "nullable": true,
+        "properties": {
+          "muscles": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "Taxonomy group or head id",
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "primary",
+                    "secondary",
+                    "stabilizer"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "role"
+              ],
+              "title": "GoalMuscle",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "stimulus": {
+            "nullable": true,
+            "type": "string"
+          },
+          "taxonomy_version": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "muscles",
+          "qualities",
+          "stimulus",
+          "taxonomy_version",
+          "updated_at"
+        ],
+        "title": "MemberWorkoutGoals",
+        "type": "object"
+      },
+      "MemberWorkoutGoalsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "goals": {
+            "additionalProperties": false,
+            "nullable": true,
+            "properties": {
+              "muscles": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group or head id",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": [
+                        "primary",
+                        "secondary",
+                        "stabilizer"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role"
+                  ],
+                  "title": "GoalMuscle",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "stimulus": {
+                "nullable": true,
+                "type": "string"
+              },
+              "taxonomy_version": {
+                "type": "integer"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "workout_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workout_id",
+              "muscles",
+              "qualities",
+              "stimulus",
+              "taxonomy_version",
+              "updated_at"
+            ],
+            "title": "MemberWorkoutGoals",
+            "type": "object"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "goals"
+        ],
+        "title": "MemberWorkoutGoalsResponse",
         "type": "object"
       },
       "MyInjuryWarningsAcknowledged": {
@@ -40240,6 +40825,81 @@
         "title": "SaveFilterRequest",
         "type": "object"
       },
+      "SaveGoalFeedbackRequest": {
+        "properties": {
+          "felt_muscles": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 40,
+            "type": "array"
+          },
+          "felt_qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "felt_muscles",
+          "felt_qualities"
+        ],
+        "title": "SaveGoalFeedbackRequest",
+        "type": "object"
+      },
+      "SaveWorkoutGoalsRequest": {
+        "properties": {
+          "muscles": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "Taxonomy group or head id",
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "primary",
+                    "secondary",
+                    "stabilizer"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "role"
+              ],
+              "title": "GoalMuscle",
+              "type": "object"
+            },
+            "maxItems": 40,
+            "type": "array"
+          },
+          "qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "stimulus": {
+            "maxLength": 280,
+            "nullable": true,
+            "type": "string"
+          },
+          "visible_to_members": {
+            "description": "Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "muscles",
+          "qualities"
+        ],
+        "title": "SaveWorkoutGoalsRequest",
+        "type": "object"
+      },
       "SavedFilter": {
         "properties": {
           "alert": {
@@ -44538,6 +45198,260 @@
           "trial"
         ],
         "title": "StaffTrialResponse",
+        "type": "object"
+      },
+      "StaffWorkoutGoals": {
+        "additionalProperties": false,
+        "properties": {
+          "inherited_from": {
+            "description": "The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "muscles": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "Taxonomy group or head id",
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "primary",
+                    "secondary",
+                    "stabilizer"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "role"
+              ],
+              "title": "GoalMuscle",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "saved": {
+            "description": "False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion",
+            "type": "boolean"
+          },
+          "source": {
+            "enum": [
+              "suggested",
+              "edited"
+            ],
+            "type": "string"
+          },
+          "stimulus": {
+            "nullable": true,
+            "type": "string"
+          },
+          "taxonomy_version": {
+            "type": "integer"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_by_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "visible_to_members": {
+            "type": "boolean"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "workout_id",
+          "saved",
+          "inherited_from",
+          "muscles",
+          "qualities",
+          "stimulus",
+          "visible_to_members",
+          "source",
+          "taxonomy_version",
+          "updated_by_id",
+          "updated_at"
+        ],
+        "title": "StaffWorkoutGoals",
+        "type": "object"
+      },
+      "StaffWorkoutGoalsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "goals": {
+            "additionalProperties": false,
+            "properties": {
+              "inherited_from": {
+                "description": "The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own",
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "muscles": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group or head id",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": [
+                        "primary",
+                        "secondary",
+                        "stabilizer"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role"
+                  ],
+                  "title": "GoalMuscle",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "saved": {
+                "description": "False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion",
+                "type": "boolean"
+              },
+              "source": {
+                "enum": [
+                  "suggested",
+                  "edited"
+                ],
+                "type": "string"
+              },
+              "stimulus": {
+                "nullable": true,
+                "type": "string"
+              },
+              "taxonomy_version": {
+                "type": "integer"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "updated_by_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "visible_to_members": {
+                "type": "boolean"
+              },
+              "workout_id": {
+                "format": "uuid",
+                "type": "string"
+              }
+            },
+            "required": [
+              "workout_id",
+              "saved",
+              "inherited_from",
+              "muscles",
+              "qualities",
+              "stimulus",
+              "visible_to_members",
+              "source",
+              "taxonomy_version",
+              "updated_by_id",
+              "updated_at"
+            ],
+            "title": "StaffWorkoutGoals",
+            "type": "object"
+          },
+          "suggestion": {
+            "additionalProperties": false,
+            "properties": {
+              "matched_exercises": {
+                "minimum": 0,
+                "type": "integer"
+              },
+              "muscles": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group or head id",
+                      "type": "string"
+                    },
+                    "role": {
+                      "enum": [
+                        "primary",
+                        "secondary",
+                        "stabilizer"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "role"
+                  ],
+                  "title": "GoalMuscle",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "taxonomy_version": {
+                "type": "integer"
+              },
+              "unmatched_exercises": {
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "required": [
+              "muscles",
+              "qualities",
+              "matched_exercises",
+              "unmatched_exercises",
+              "taxonomy_version"
+            ],
+            "title": "WorkoutGoalSuggestion",
+            "type": "object"
+          }
+        },
+        "required": [
+          "goals",
+          "suggestion"
+        ],
+        "title": "StaffWorkoutGoalsResponse",
         "type": "object"
       },
       "SubscriptionBeneficiary": {
@@ -50049,6 +50963,63 @@
         ],
         "title": "WorkoutDslVocabulary",
         "type": "object"
+      },
+      "WorkoutGoalSuggestion": {
+        "additionalProperties": false,
+        "properties": {
+          "matched_exercises": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "muscles": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "description": "Taxonomy group or head id",
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "primary",
+                    "secondary",
+                    "stabilizer"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "role"
+              ],
+              "title": "GoalMuscle",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "qualities": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "taxonomy_version": {
+            "type": "integer"
+          },
+          "unmatched_exercises": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "muscles",
+          "qualities",
+          "matched_exercises",
+          "unmatched_exercises",
+          "taxonomy_version"
+        ],
+        "title": "WorkoutGoalSuggestion",
+        "type": "object"
       }
     },
     "securitySchemes": {
@@ -50066,6 +51037,110 @@
   },
   "openapi": "3.0.0",
   "paths": {
+    "/api/anatomy/taxonomy": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AnatomyController.taxonomy",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "nodes": {
+                      "description": "Tree order: each region, then its groups, each followed by its heads",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "id": {
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "region",
+                              "group",
+                              "head"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "description": "English reference name",
+                            "type": "string"
+                          },
+                          "parent_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ta2_ids": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "parent_id",
+                          "name",
+                          "ta2_ids"
+                        ],
+                        "title": "AnatomyNode",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "qualities": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "roles": {
+                      "items": {
+                        "enum": [
+                          "primary",
+                          "secondary",
+                          "stabilizer"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "version": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "version",
+                    "nodes",
+                    "qualities",
+                    "roles"
+                  ],
+                  "title": "AnatomyTaxonomy",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Anatomy taxonomy"
+          },
+          "304": {
+            "description": "Unchanged since the given ETag"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The muscle taxonomy and fitness qualities used by WOD goals",
+        "tags": [
+          "Anatomy"
+        ]
+      }
+    },
     "/api/around/pins": {
       "post": {
         "callbacks": {},
@@ -61185,6 +62260,10 @@
                           ],
                           "type": "string"
                         },
+                        "felt_prompt_without_goals": {
+                          "description": "ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it)",
+                          "type": "boolean"
+                        },
                         "journal_sections": {
                           "additionalProperties": false,
                           "properties": {
@@ -61229,7 +62308,8 @@
                         "measure_reminder_weeks",
                         "default_visibility",
                         "blur_photos",
-                        "compare_mode"
+                        "compare_mode",
+                        "felt_prompt_without_goals"
                       ],
                       "type": "object"
                     }
@@ -61287,6 +62367,10 @@
                       "coach_full"
                     ],
                     "type": "string"
+                  },
+                  "felt_prompt_without_goals": {
+                    "description": "ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it)",
+                    "type": "boolean"
                   },
                   "journal_sections": {
                     "additionalProperties": false,
@@ -61444,6 +62528,10 @@
                           ],
                           "type": "string"
                         },
+                        "felt_prompt_without_goals": {
+                          "description": "ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it)",
+                          "type": "boolean"
+                        },
                         "journal_sections": {
                           "additionalProperties": false,
                           "properties": {
@@ -61488,7 +62576,8 @@
                         "measure_reminder_weeks",
                         "default_visibility",
                         "blur_photos",
-                        "compare_mode"
+                        "compare_mode",
+                        "felt_prompt_without_goals"
                       ],
                       "type": "object"
                     }
@@ -119678,6 +120767,148 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/goal-feedback-summary": {
+      "get": {
+        "callbacks": {},
+        "description": "Entries logged from the class or timed from its bookings, whatever workout version they followed; same rules as the workout summary.",
+        "operationId": "MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary",
+        "parameters": [
+          {
+            "description": "Scheduled class (slot) ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "description": "Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.",
+                  "properties": {
+                    "entries": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "felt_muscles": {
+                      "description": "Muscle groups (heads rolled up), most felt first",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "count": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "count"
+                        ],
+                        "title": "GoalFeedbackCount",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "felt_qualities": {
+                      "description": "Most felt first",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "count": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "count"
+                        ],
+                        "title": "GoalFeedbackCount",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "goals_not_felt": {
+                      "description": "Groups of the goal's primary and secondary muscles nobody felt",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_class_id": {
+                      "description": "Only on the scheduled-class summary",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "shown": {
+                      "type": "boolean"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "workout_id",
+                    "entries",
+                    "shown",
+                    "felt_muscles",
+                    "felt_qualities",
+                    "goals_not_felt"
+                  ],
+                  "title": "GoalFeedbackSummary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal feedback summary"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach totals of «τι ένιωσες» on a scheduled class",
+        "tags": [
+          "Workouts"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/injury-warnings": {
       "get": {
         "callbacks": {},
@@ -120297,6 +121528,19 @@
                         "default_booking_timeout_minutes"
                       ],
                       "type": "object"
+                    },
+                    "workouts": {
+                      "description": "ADR-163: workout-authoring defaults",
+                      "properties": {
+                        "wod_goals_visible_by_default": {
+                          "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "wod_goals_visible_by_default"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -120304,6 +121548,7 @@
                     "finance",
                     "notifications",
                     "scheduling",
+                    "workouts",
                     "provider"
                   ],
                   "type": "object"
@@ -120467,6 +121712,15 @@
                         "maximum": 500,
                         "minimum": 1,
                         "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "workouts": {
+                    "properties": {
+                      "wod_goals_visible_by_default": {
+                        "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
+                        "type": "boolean"
                       }
                     },
                     "type": "object"
@@ -120700,6 +121954,19 @@
                         "default_booking_timeout_minutes"
                       ],
                       "type": "object"
+                    },
+                    "workouts": {
+                      "description": "ADR-163: workout-authoring defaults",
+                      "properties": {
+                        "wod_goals_visible_by_default": {
+                          "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "wod_goals_visible_by_default"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -120707,6 +121974,7 @@
                     "finance",
                     "notifications",
                     "scheduling",
+                    "workouts",
                     "provider"
                   ],
                   "type": "object"
@@ -132461,6 +133729,663 @@
         "summary": "Duplicate a workout as a new draft",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/workouts/{id}/goal-feedback-summary": {
+      "get": {
+        "callbacks": {},
+        "description": "Counts only feedback on non-voided entries whose visibility reaches the caller as a coach; shown only from 3 entries.",
+        "operationId": "MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary",
+        "parameters": [
+          {
+            "description": "Workout ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "description": "Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.",
+                  "properties": {
+                    "entries": {
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "felt_muscles": {
+                      "description": "Muscle groups (heads rolled up), most felt first",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "count": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "count"
+                        ],
+                        "title": "GoalFeedbackCount",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "felt_qualities": {
+                      "description": "Most felt first",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "count": {
+                            "minimum": 1,
+                            "type": "integer"
+                          },
+                          "id": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "count"
+                        ],
+                        "title": "GoalFeedbackCount",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "goals_not_felt": {
+                      "description": "Groups of the goal's primary and secondary muscles nobody felt",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "scheduled_class_id": {
+                      "description": "Only on the scheduled-class summary",
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "shown": {
+                      "type": "boolean"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "workout_id",
+                    "entries",
+                    "shown",
+                    "felt_muscles",
+                    "felt_qualities",
+                    "goals_not_felt"
+                  ],
+                  "title": "GoalFeedbackSummary",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal feedback summary"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach totals of «τι ένιωσες» on a workout",
+        "tags": [
+          "Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/workouts/{id}/goals": {
+      "get": {
+        "callbacks": {},
+        "description": "Saved goals, or the suggestion from the workout's exercises (saved=false) when none are saved. Drafts included.",
+        "operationId": "MilosTrainingWeb.AdminWorkoutGoalsController.show",
+        "parameters": [
+          {
+            "description": "Workout ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "goals": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "inherited_from": {
+                          "description": "The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "saved": {
+                          "description": "False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion",
+                          "type": "boolean"
+                        },
+                        "source": {
+                          "enum": [
+                            "suggested",
+                            "edited"
+                          ],
+                          "type": "string"
+                        },
+                        "stimulus": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "visible_to_members": {
+                          "type": "boolean"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout_id",
+                        "saved",
+                        "inherited_from",
+                        "muscles",
+                        "qualities",
+                        "stimulus",
+                        "visible_to_members",
+                        "source",
+                        "taxonomy_version",
+                        "updated_by_id",
+                        "updated_at"
+                      ],
+                      "title": "StaffWorkoutGoals",
+                      "type": "object"
+                    },
+                    "suggestion": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "matched_exercises": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "unmatched_exercises": {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "muscles",
+                        "qualities",
+                        "matched_exercises",
+                        "unmatched_exercises",
+                        "taxonomy_version"
+                      ],
+                      "title": "WorkoutGoalSuggestion",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goals",
+                    "suggestion"
+                  ],
+                  "title": "StaffWorkoutGoalsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "WOD goals"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A workout's WOD goals and the live suggestion",
+        "tags": [
+          "Workouts"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminWorkoutGoalsController.update",
+        "parameters": [
+          {
+            "description": "Workout ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "muscles": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "description": "Taxonomy group or head id",
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "primary",
+                            "secondary",
+                            "stabilizer"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "role"
+                      ],
+                      "title": "GoalMuscle",
+                      "type": "object"
+                    },
+                    "maxItems": 40,
+                    "type": "array"
+                  },
+                  "qualities": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "stimulus": {
+                    "maxLength": 280,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "visible_to_members": {
+                    "description": "Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default",
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "muscles",
+                  "qualities"
+                ],
+                "title": "SaveWorkoutGoalsRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "goals": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "inherited_from": {
+                          "description": "The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own",
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "saved": {
+                          "description": "False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion",
+                          "type": "boolean"
+                        },
+                        "source": {
+                          "enum": [
+                            "suggested",
+                            "edited"
+                          ],
+                          "type": "string"
+                        },
+                        "stimulus": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "updated_by_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "visible_to_members": {
+                          "type": "boolean"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout_id",
+                        "saved",
+                        "inherited_from",
+                        "muscles",
+                        "qualities",
+                        "stimulus",
+                        "visible_to_members",
+                        "source",
+                        "taxonomy_version",
+                        "updated_by_id",
+                        "updated_at"
+                      ],
+                      "title": "StaffWorkoutGoals",
+                      "type": "object"
+                    },
+                    "suggestion": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "matched_exercises": {
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "unmatched_exercises": {
+                          "minimum": 0,
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "muscles",
+                        "qualities",
+                        "matched_exercises",
+                        "unmatched_exercises",
+                        "taxonomy_version"
+                      ],
+                      "title": "WorkoutGoalSuggestion",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "goals",
+                    "suggestion"
+                  ],
+                  "title": "StaffWorkoutGoalsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "WOD goals"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid goals"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save a workout's WOD goals",
+        "tags": [
+          "Workouts"
         ]
       }
     },
@@ -145239,6 +147164,432 @@
         "summary": "Withdraw an open form review; the review is given back",
         "tags": [
           "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/goal-feedback/{entry_kind}/{entry_id}": {
+      "get": {
+        "callbacks": {},
+        "description": "Only for the member's own entry. goals is null unless the coach made them visible; feedback is null until saved.",
+        "operationId": "MilosTrainingWeb.GoalFeedbackController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "execution",
+                "training_log"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "entry_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "entry_kind": {
+                      "enum": [
+                        "execution",
+                        "training_log"
+                      ],
+                      "type": "string"
+                    },
+                    "feedback": {
+                      "additionalProperties": false,
+                      "nullable": true,
+                      "properties": {
+                        "felt_muscles": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "felt_qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "felt_muscles",
+                        "felt_qualities",
+                        "updated_at"
+                      ],
+                      "title": "GoalFeedback",
+                      "type": "object"
+                    },
+                    "goals": {
+                      "additionalProperties": false,
+                      "nullable": true,
+                      "properties": {
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "stimulus": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout_id",
+                        "muscles",
+                        "qualities",
+                        "stimulus",
+                        "taxonomy_version",
+                        "updated_at"
+                      ],
+                      "title": "MemberWorkoutGoals",
+                      "type": "object"
+                    },
+                    "voided": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "entry_kind",
+                    "entry_id",
+                    "voided",
+                    "goals",
+                    "feedback"
+                  ],
+                  "title": "GoalFeedbackResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal feedback"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The goals of an entry's workout and what the member felt",
+        "tags": [
+          "Journal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.GoalFeedbackController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "execution",
+                "training_log"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "felt_muscles": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 40,
+                    "type": "array"
+                  },
+                  "felt_qualities": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "felt_muscles",
+                  "felt_qualities"
+                ],
+                "title": "SaveGoalFeedbackRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "entry_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "entry_kind": {
+                      "enum": [
+                        "execution",
+                        "training_log"
+                      ],
+                      "type": "string"
+                    },
+                    "feedback": {
+                      "additionalProperties": false,
+                      "nullable": true,
+                      "properties": {
+                        "felt_muscles": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "felt_qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "felt_muscles",
+                        "felt_qualities",
+                        "updated_at"
+                      ],
+                      "title": "GoalFeedback",
+                      "type": "object"
+                    },
+                    "goals": {
+                      "additionalProperties": false,
+                      "nullable": true,
+                      "properties": {
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "stimulus": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout_id",
+                        "muscles",
+                        "qualities",
+                        "stimulus",
+                        "taxonomy_version",
+                        "updated_at"
+                      ],
+                      "title": "MemberWorkoutGoals",
+                      "type": "object"
+                    },
+                    "voided": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "entry_kind",
+                    "entry_id",
+                    "voided",
+                    "goals",
+                    "feedback"
+                  ],
+                  "title": "GoalFeedbackResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Goal feedback"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid feedback"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Save what the member felt after one of their entries",
+        "tags": [
+          "Journal"
         ]
       }
     },
@@ -159518,6 +161869,139 @@
           }
         ],
         "summary": "Get a master workout",
+        "tags": [
+          "Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/workouts/{id}/goals": {
+      "get": {
+        "callbacks": {},
+        "description": "goals is null when none are saved or the coach keeps them hidden.",
+        "operationId": "MilosTrainingWeb.WorkoutGoalsController.show",
+        "parameters": [
+          {
+            "description": "Workout ID",
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "goals": {
+                      "additionalProperties": false,
+                      "nullable": true,
+                      "properties": {
+                        "muscles": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group or head id",
+                                "type": "string"
+                              },
+                              "role": {
+                                "enum": [
+                                  "primary",
+                                  "secondary",
+                                  "stabilizer"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "role"
+                            ],
+                            "title": "GoalMuscle",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "qualities": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "stimulus": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "taxonomy_version": {
+                          "type": "integer"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "workout_id",
+                        "muscles",
+                        "qualities",
+                        "stimulus",
+                        "taxonomy_version",
+                        "updated_at"
+                      ],
+                      "title": "MemberWorkoutGoals",
+                      "type": "object"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "workout_id",
+                    "goals"
+                  ],
+                  "title": "MemberWorkoutGoalsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "WOD goals"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A published workout's WOD goals, when the coach made them visible",
         "tags": [
           "Workouts"
         ]

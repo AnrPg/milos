@@ -57,7 +57,7 @@ defmodule MilosTraining.Application.JournalFeed do
   # One source: its rows after the cursor, as feed items.
   defp source(kind, user_id, cursor, limit, scope) do
     bound = Journal.feed_bound(kind, cursor)
-    kind |> rows(user_id, bound, limit, scope) |> items(kind)
+    kind |> rows(user_id, bound, limit, scope) |> items(kind, user_id)
   end
 
   defp rows("execution", user_id, bound, limit, scope),
@@ -109,6 +109,28 @@ defmodule MilosTraining.Application.JournalFeed do
   defp rows("device_activity", user_id, bound, limit, scope),
     do: DeviceImports.feed_entries(user_id, bound, limit, scope)
 
+  # ADR-163 «Ένιωσα: …»: the entry's felt muscles and qualities, read in the
+  # feed's own session so a coach sees them only where the entry reaches them.
+  defp attach_felt([], _kind, _user_id), do: []
+
+  defp attach_felt(entries, kind, user_id) do
+    by_entry = Journal.goal_feedback_by_entry(kind, Enum.map(entries, & &1.id), user_id)
+
+    Enum.map(entries, fn entry ->
+      felt =
+        case Map.get(by_entry, entry.id) do
+          %{felt_muscles: muscles, felt_qualities: qualities}
+          when muscles != [] or qualities != [] ->
+            %{muscles: muscles, qualities: qualities}
+
+          _none ->
+            nil
+        end
+
+      Map.put(entry, :felt, felt)
+    end)
+  end
+
   defp body_options(%{q: q}) when is_binary(q), do: :none
   defp body_options(%{sources?: true, freeform?: false}), do: :none
 
@@ -126,17 +148,24 @@ defmodule MilosTraining.Application.JournalFeed do
       else: :none
   end
 
-  defp items(executions, "execution") do
+  defp items(rows, kind, user_id) when kind in ["execution", "training_log"],
+    do: items(rows, kind, user_id, :felt)
+
+  defp items(rows, kind, _user_id), do: items(rows, kind)
+
+  defp items(executions, "execution", user_id, :felt) do
     executions
     |> ListWorkoutExecutions.summarize()
     |> DeviceImports.attach("execution")
+    |> attach_felt("execution", user_id)
     |> Enum.map(&Journal.feed_item("execution", &1, &1.completed_at_utc, tz: &1.completed_at_tz))
   end
 
-  defp items(entries, "training_log") do
+  defp items(entries, "training_log", user_id, :felt) do
     entries
     |> JournalComments.attach("training_log")
     |> DeviceImports.attach("training_log")
+    |> attach_felt("training_log", user_id)
     |> Enum.map(
       &Journal.feed_item("training_log", &1, &1.performed_at_utc, tz: &1.performed_at_tz)
     )

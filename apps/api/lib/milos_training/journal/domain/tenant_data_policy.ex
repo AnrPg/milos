@@ -19,6 +19,8 @@ defmodule MilosTraining.Journal.Domain.TenantDataPolicy do
               %{table: "journal_coach_audience_exclusions", rls: :user},
               %{table: "journal_coach_reads"},
               %{table: "journal_comments", rls: :user},
+              # ADR-163: «τι ένιωσες» rows follow their entry like comments.
+              %{table: "goal_feedback", rls: :user},
               %{table: "journal_notes", rls: :user}
             ]
           })

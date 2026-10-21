@@ -4,10 +4,13 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import type { ScaleLevel } from "@/api/workouts";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
+
+import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel";
 
 import { PreviewSection } from "./PreviewSection";
 
@@ -20,6 +23,18 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
   const i18n = useUiTranslations();
   const { sections, rightCollapsed, setRightCollapsed } = useWorkoutCreationStore();
   const [activeScale, setActiveScale] = useState<string | null>(null);
+  const goalsT = useTranslations("WodGoals");
+  const draftId = useWorkoutCreationStore((state) => state.draftId);
+  const [goalsOpen, setGoalsOpen] = useState(false);
+  // Counts finished draft autosaves; the goals panel re-reads its suggestion on each.
+  const [draftSaves, setDraftSaves] = useState(0);
+  useEffect(
+    () =>
+      useWorkoutCreationStore.subscribe((state, previous) => {
+        if (state.saveStatus === "saved" && previous.saveStatus !== "saved") setDraftSaves((count) => count + 1);
+      }),
+    [],
+  );
 
   if (!mobile && rightCollapsed) {
     return (
@@ -111,6 +126,24 @@ export function RightPanel({ scaleLevels, mobile = false }: Props) {
           ))
         )}
       </div>
+
+      <section className="flex max-h-[60%] shrink-0 flex-col border-t" style={{ borderColor: "var(--dim)" }}>
+        <button
+          type="button"
+          aria-expanded={goalsOpen}
+          onClick={() => setGoalsOpen((open) => !open)}
+          className="flex shrink-0 items-center justify-between px-4 py-3 text-xs font-bold uppercase tracking-widest"
+          style={{ color: "var(--muted)" }}
+        >
+          <span>{goalsT("title")}</span>
+          <span aria-hidden="true" style={{ color: "var(--primary)" }}>{goalsOpen ? "−" : "+"}</span>
+        </button>
+        {goalsOpen ? (
+          <div className="min-h-0 overflow-y-auto">
+            <WodGoalsEditorPanel workoutId={draftId} refreshKey={draftSaves} />
+          </div>
+        ) : null}
+      </section>
     </div>
   );
 }

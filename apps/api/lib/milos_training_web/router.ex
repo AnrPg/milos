@@ -329,6 +329,8 @@ defmodule MilosTrainingWeb.Router do
 
     get("/memberships", OrganizationAccessController, :memberships)
     post("/organizations", OwnerOrganizationController, :create)
+    # ADR-163: the static, code-owned muscle taxonomy (ETag-cached).
+    get("/anatomy/taxonomy", AnatomyController, :taxonomy)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -473,6 +475,22 @@ defmodule MilosTrainingWeb.Router do
 
     get("/injury-warnings", MyInjuryWarningController, :show)
     post("/injury-warnings/acknowledge", MyInjuryWarningController, :acknowledge)
+  end
+
+  # ADR-163: WOD goals on the workout card and «τι ένιωσες» on the member's
+  # own entries (athletes and members alike).
+  scope "/api/org/:organization_slug", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/workouts/:id/goals", WorkoutGoalsController, :show)
+    get("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :show)
+    put("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :update)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -726,6 +744,9 @@ defmodule MilosTrainingWeb.Router do
     get("/workouts/:id/dsl", AdminWorkoutDslController, :show_authoring)
     post("/workouts/:id/dsl/publish", AdminWorkoutDslController, :publish)
     get("/workouts/:id", AdminWorkoutController, :show)
+    get("/workouts/:id/goals", AdminWorkoutGoalsController, :show)
+    put("/workouts/:id/goals", AdminWorkoutGoalsController, :update)
+    get("/workouts/:id/goal-feedback-summary", AdminWorkoutGoalsController, :feedback_summary)
     patch("/workouts/:id/draft", AdminWorkoutController, :update_draft)
     patch("/workouts/:id/library", AdminWorkoutController, :update_library)
     post("/workouts/:id/publish", AdminWorkoutController, :publish)
@@ -810,6 +831,13 @@ defmodule MilosTrainingWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
+
+    get(
+      "/schedule/slots/:id/goal-feedback-summary",
+      AdminWorkoutGoalsController,
+      :class_feedback_summary
+    )
+
     patch("/bookings/:id/approve", AdminScheduleController, :approve_booking)
     patch("/bookings/:id/reject", AdminScheduleController, :reject_booking)
 

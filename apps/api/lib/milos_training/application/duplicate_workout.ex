@@ -7,7 +7,9 @@ defmodule MilosTraining.Application.DuplicateWorkout do
   def call(context, id, opts) do
     title_suffix = resolve_title_suffix(context, opts)
 
-    attrs = opts |> Keyword.take([:folder_id]) |> Map.new()
+    # ADR-163: `copy_goals: false` leaves the copy without goals of its own,
+    # so it inherits the original's (programming copies).
+    attrs = opts |> Keyword.take([:folder_id, :copy_goals]) |> Map.new()
 
     with {:ok, draft} <- duplicate_workout(context, id, title_suffix, attrs) do
       broadcast_admin_refresh(context, draft, "workout_duplicated")

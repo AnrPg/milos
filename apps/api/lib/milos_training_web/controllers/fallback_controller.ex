@@ -10,6 +10,17 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-163: WOD goals or «τι ένιωσες» feedback outside the taxonomy.
+  def call(conn, {:error, {:invalid_goals, details}}) when is_map(details) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_goals",
+      error: "Check the muscles and qualities",
+      errors: Map.new(details, fn {field, message} -> {to_string(field), [message]} end)
+    })
+  end
+
   def call(conn, {:error, errors}) when is_list(errors) do
     normalized_errors =
       errors

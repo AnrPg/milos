@@ -42,7 +42,9 @@ export type JournalEntryOf = {
 };
 
 /** ADR-161: the watch's numbers on an execution or training-log entry it matched. */
-export type DeviceAttachment = { device?: NonNullable<components["schemas"]["DeviceMetrics"]> | null };
+export type DeviceAttachment = { device?: NonNullable<components["schemas"]["DeviceMetrics"]> | null } & FeltAttachment;
+/** ADR-163 «Ένιωσα»: felt muscles and qualities on an execution or training-log entry. */
+export type FeltAttachment = { felt?: { muscles: string[]; qualities: string[] } | null };
 
 export type WellnessFeedDay = {
   id: string;

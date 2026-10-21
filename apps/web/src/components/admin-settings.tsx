@@ -44,6 +44,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
 import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
 import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting";
+import { WodGoalsDefaultSetting } from "@/components/wod-goals/WodGoalsDefaultSetting";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1324,6 +1325,15 @@ function ProviderKindSection({ token }: { token: string }) {
   );
 }
 
+function WorkoutDefaultsSection({ token }: { token: string }) {
+  const t = useTranslations("WodGoals");
+  return (
+    <CollapsibleSection id="workout-defaults" title={t("settings.sectionTitle")} description={t("settings.sectionDescription")}>
+      <WodGoalsDefaultSetting token={token} />
+    </CollapsibleSection>
+  );
+}
+
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
@@ -1441,6 +1451,8 @@ export function AdminSettingsHub() {
                 <OrganizationOwnerSettings token={token} slug={selectedOrganizationSlug} currentUserId={currentUser?.id} />
               </CollapsibleSection>
             ) : null}
+
+            <WorkoutDefaultsSection token={token} />
 
             <CollapsibleSection
               id="level-taxonomy"

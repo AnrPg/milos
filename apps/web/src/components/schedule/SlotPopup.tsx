@@ -32,6 +32,7 @@ import {
 } from "@/components/wellbeing/InjuryWarnings";
 import { warningLevelFor, warningLevelsByUser } from "@/lib/injury-warnings";
 import { AdminSlotRoster } from "@/components/schedule/AdminSlotRoster";
+import { FeltSummaryCard } from "@/components/wod-goals/FeltSummaryCard";
 import { GuestBookingPanel } from "@/components/schedule/GuestBookingPanel";
 import {
   isEventSlot,
@@ -760,6 +761,9 @@ export function SlotPopup({
               )}
             </section>
           ) : null}
+
+          {/* Admin: what members felt in this class (WOD goals, ADR-163) */}
+          {isAdmin && slot.workout && isPast ? <FeltSummaryCard source={{ kind: "slot", id: slot.id }} className="mt-4" /> : null}
 
           {/* Admin: bookings list */}
           {isAdmin ? (
