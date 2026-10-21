@@ -14,6 +14,8 @@ defmodule MilosTraining.Seasons.SeasonEnrollment do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "season_enrollments" do
     field :organization_id, :binary_id, read_after_writes: true
     field :season_offering_id, :binary_id

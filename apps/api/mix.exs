@@ -13,7 +13,19 @@ defmodule MilosTraining.MixProject do
       deps: deps(),
       dialyzer: [
         plt_add_deps: :apps_direct,
-        plt_add_apps: [:decimal, :ecto, :ex_unit, :mix, :phoenix_pubsub, :plug, :telemetry],
+        plt_add_apps: [
+          :crypto,
+          :decimal,
+          :ecto,
+          :ex_unit,
+          :jose,
+          :mix,
+          :phoenix_pubsub,
+          :plug,
+          :plug_crypto,
+          :public_key,
+          :telemetry
+        ],
         ignore_warnings: ".dialyzer_ignore.exs"
       ]
     ]

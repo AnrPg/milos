@@ -24,6 +24,8 @@ defmodule MilosTraining.Trials.TrialPolicy do
     :conversion_package_id
   ]
 
+  @type t :: %__MODULE__{}
+
   schema "scheduling_trial_policies" do
     field :organization_id, :binary_id
     field :enabled, :boolean, default: false

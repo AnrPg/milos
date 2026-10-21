@@ -13,6 +13,8 @@ defmodule MilosTraining.Trials.TrialRequest do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "scheduling_trial_requests" do
     field :organization_id, :binary_id
     field :user_id, :binary_id
