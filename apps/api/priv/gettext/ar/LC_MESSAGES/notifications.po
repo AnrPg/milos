@@ -544,6 +544,33 @@ msgstr "تصدير يومياتك جاهز"
 msgid "Download it within seven days from Settings."
 msgstr "نزّله خلال سبعة أيام من الإعدادات."
 
+msgid "Season request"
+msgstr "طلب موسم"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} يطلب مكانًا في %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} على قائمة الانتظار لـ %{season}."
+
+msgid "Your place is confirmed"
+msgstr "تم تأكيد مكانك"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "يبدأ %{season} في %{date}. البرنامج موجود في Box الخاص بك."
+
+msgid "Season request not confirmed"
+msgstr "لم يتم تأكيد طلب الموسم"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "لم يتمكن %{box} من تأكيد مكانك في %{season}."
+
+msgid "Season cancelled"
+msgstr "تم إلغاء الموسم"
+
+msgid "%{box} cancelled %{season}."
+msgstr "ألغى %{box} %{season}."
+
 msgid "You found a training partner"
 msgstr "وجدت شريك تدريب"
 

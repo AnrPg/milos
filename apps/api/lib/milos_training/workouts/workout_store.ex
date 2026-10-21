@@ -114,6 +114,12 @@ defmodule MilosTraining.Workouts.WorkoutStore do
   def delete_assigned_workout(context, id),
     do: within_tenant(context, fn -> delete_assigned_workout(id) end)
 
+  def remove_season_athlete(context, season_offering_id, athlete_id, from_date),
+    do:
+      within_tenant(context, fn ->
+        adapter().remove_season_athlete(season_offering_id, athlete_id, from_date)
+      end)
+
   def reject_assignment_for_athlete(context, assignment_id, athlete_id),
     do: within_tenant(context, fn -> reject_assignment_for_athlete(assignment_id, athlete_id) end)
 

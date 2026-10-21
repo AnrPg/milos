@@ -5643,6 +5643,96 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm a request: package, #season channel and programme */
+        post: operations["MilosTrainingWeb.AdminSeasonController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a request, with an optional reason the member sees */
+        post: operations["MilosTrainingWeb.AdminSeasonController.decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Take a member out of the season (their programme from today on goes) */
+        post: operations["MilosTrainingWeb.AdminSeasonController.remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's seasons with their place counts */
+        get: operations["MilosTrainingWeb.AdminSeasonController.index"];
+        put?: never;
+        /** Create a season (a draft unless published straight away) */
+        post: operations["MilosTrainingWeb.AdminSeasonController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/seasons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One season with every request and participant */
+        get: operations["MilosTrainingWeb.AdminSeasonController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change, publish or cancel a season
+         * @description Start date, weeks and programme are locked once a participant is confirmed. Cancelling closes every request and place and archives the season's channel.
+         */
+        patch: operations["MilosTrainingWeb.AdminSeasonController.update"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/settings": {
         parameters: {
             query?: never;
@@ -7756,6 +7846,60 @@ export interface paths {
         get: operations["MilosTrainingWeb.MeController.search_users"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's open seasons and the ones you hold a place in */
+        get: operations["MilosTrainingWeb.SeasonController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/seasons/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw your request or waitlist place
+         * @description A confirmed place is settled with the box.
+         */
+        post: operations["MilosTrainingWeb.SeasonController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/seasons/{id}/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask for a place (the waitlist when the season is full); staff confirm */
+        post: operations["MilosTrainingWeb.SeasonController.request"];
         delete?: never;
         options?: never;
         head?: never;
@@ -20511,6 +20655,122 @@ export interface components {
              */
             content_type: "image/jpeg" | "image/webp";
         };
+        /** MemberSeason */
+        MemberSeason: {
+            capacity: number;
+            coaches: {
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            currency: string;
+            description?: string | null;
+            /** Format: date */
+            ends_on: string;
+            /** Format: uuid */
+            id: string;
+            /** SeasonMyEnrollment */
+            mine: {
+                decline_reason?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                requested_at?: string;
+                /** @enum {string} */
+                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+            } | null;
+            places_left: number;
+            price_cents: number;
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Running and completed follow from the dates
+             * @enum {string}
+             */
+            status: "draft" | "published" | "running" | "completed" | "cancelled";
+            title: string;
+            weeks: number;
+            workout_count: number;
+        };
+        /** MemberSeasonList */
+        MemberSeasonList: {
+            seasons: {
+                capacity: number;
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                /** Format: uuid */
+                id: string;
+                /** SeasonMyEnrollment */
+                mine: {
+                    decline_reason?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    requested_at?: string;
+                    /** @enum {string} */
+                    status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                } | null;
+                places_left: number;
+                price_cents: number;
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                workout_count: number;
+            }[];
+        };
+        /** MemberSeasonResponse */
+        MemberSeasonResponse: {
+            /** MemberSeason */
+            season: {
+                capacity: number;
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                /** Format: uuid */
+                id: string;
+                /** SeasonMyEnrollment */
+                mine: {
+                    decline_reason?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    requested_at?: string;
+                    /** @enum {string} */
+                    status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                } | null;
+                places_left: number;
+                price_cents: number;
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                workout_count: number;
+            };
+        };
         /**
          * MemberVisibility
          * @description Whether you keep out of your clubs' «Μέλη» lists
@@ -23376,6 +23636,102 @@ export interface components {
             /** @enum {string} */
             surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
         };
+        /** SeasonCoach */
+        SeasonCoach: {
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** SeasonCreate */
+        SeasonCreate: {
+            capacity: number;
+            coach_ids?: string[];
+            currency?: string;
+            description?: string | null;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            price_cents: number;
+            programme?: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Publish to open requests; cancel to close the season
+             * @enum {string}
+             */
+            status?: "draft" | "published" | "cancelled";
+            title: string;
+            weeks: number;
+            welcome_message?: string | null;
+        };
+        /** SeasonDecline */
+        SeasonDecline: {
+            reason?: string | null;
+        };
+        /** SeasonEnrollment */
+        SeasonEnrollment: {
+            /** Format: date-time */
+            decided_at?: string | null;
+            decline_reason?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+            /** Format: uuid */
+            package_subscription_id?: string | null;
+            /** Format: date-time */
+            requested_at: string;
+            /** @enum {string} */
+            status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** SeasonMyEnrollment */
+        SeasonMyEnrollment: {
+            decline_reason?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            requested_at?: string;
+            /** @enum {string} */
+            status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+        } | null;
+        /** SeasonProgrammeItem */
+        SeasonProgrammeItem: {
+            /** @description Day 0 is the start date */
+            day: number;
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /** SeasonUpdate */
+        SeasonUpdate: {
+            capacity?: number;
+            coach_ids?: string[];
+            currency?: string;
+            description?: string | null;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            price_cents?: number;
+            programme?: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on?: string;
+            /**
+             * @description Publish to open requests; cancel to close the season
+             * @enum {string}
+             */
+            status?: "draft" | "published" | "cancelled";
+            title?: string;
+            weeks?: number;
+            welcome_message?: string | null;
+        };
         /** SelectProviderRequest */
         SelectProviderRequest: {
             /** Format: uuid */
@@ -24681,6 +25037,226 @@ export interface components {
             role: "owner" | "admin" | "coach";
             /** Format: uuid */
             user_id: string;
+        };
+        /** StaffSeason */
+        StaffSeason: {
+            capacity: number;
+            /** Format: uuid */
+            channel_id?: string | null;
+            coach_ids: string[];
+            coaches: {
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            counts: {
+                active: number;
+                requested: number;
+                waitlisted: number;
+            };
+            currency: string;
+            description?: string | null;
+            /** Format: date */
+            ends_on: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            places_left: number;
+            price_cents: number;
+            programme: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Running and completed follow from the dates
+             * @enum {string}
+             */
+            status: "draft" | "published" | "running" | "completed" | "cancelled";
+            title: string;
+            weeks: number;
+            welcome_message?: string | null;
+            workout_count: number;
+        };
+        /** StaffSeasonDetail */
+        StaffSeasonDetail: {
+            capacity: number;
+            /** Format: uuid */
+            channel_id?: string | null;
+            coach_ids: string[];
+            coaches: {
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            counts: {
+                active: number;
+                requested: number;
+                waitlisted: number;
+            };
+            currency: string;
+            description?: string | null;
+            /** Format: date */
+            ends_on: string;
+            enrollments: {
+                /** Format: date-time */
+                decided_at?: string | null;
+                decline_reason?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+                /** Format: uuid */
+                package_subscription_id?: string | null;
+                /** Format: date-time */
+                requested_at: string;
+                /** @enum {string} */
+                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                /** Format: uuid */
+                user_id: string;
+            }[];
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            places_left: number;
+            price_cents: number;
+            programme: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Running and completed follow from the dates
+             * @enum {string}
+             */
+            status: "draft" | "published" | "running" | "completed" | "cancelled";
+            title: string;
+            weeks: number;
+            welcome_message?: string | null;
+            workout_count: number;
+        };
+        /** StaffSeasonList */
+        StaffSeasonList: {
+            /** @description Staff who may be named as a season's coaches */
+            coach_candidates: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            seasons: {
+                capacity: number;
+                /** Format: uuid */
+                channel_id?: string | null;
+                coach_ids: string[];
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                counts: {
+                    active: number;
+                    requested: number;
+                    waitlisted: number;
+                };
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                membership_package_id?: string | null;
+                places_left: number;
+                price_cents: number;
+                programme: {
+                    /** @description Day 0 is the start date */
+                    day: number;
+                    /** Format: uuid */
+                    workout_id: string;
+                }[];
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                welcome_message?: string | null;
+                workout_count: number;
+            }[];
+        };
+        /** StaffSeasonResponse */
+        StaffSeasonResponse: {
+            /** StaffSeasonDetail */
+            season: {
+                capacity: number;
+                /** Format: uuid */
+                channel_id?: string | null;
+                coach_ids: string[];
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                counts: {
+                    active: number;
+                    requested: number;
+                    waitlisted: number;
+                };
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                enrollments: {
+                    /** Format: date-time */
+                    decided_at?: string | null;
+                    decline_reason?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                    /** Format: uuid */
+                    package_subscription_id?: string | null;
+                    /** Format: date-time */
+                    requested_at: string;
+                    /** @enum {string} */
+                    status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                membership_package_id?: string | null;
+                places_left: number;
+                price_cents: number;
+                programme: {
+                    /** @description Day 0 is the start date */
+                    day: number;
+                    /** Format: uuid */
+                    workout_id: string;
+                }[];
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                welcome_message?: string | null;
+                workout_count: number;
+            };
         };
         /** StaffTrial */
         StaffTrial: {
@@ -53886,6 +54462,797 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminSeasonController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Seasons */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Staff who may be named as a season's coaches */
+                        coach_candidates: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[];
+                        seasons: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    capacity: number;
+                    coach_ids?: string[];
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    membership_package_id?: string | null;
+                    price_cents: number;
+                    programme?: {
+                        /** @description Day 0 is the start date */
+                        day: number;
+                        /** Format: uuid */
+                        workout_id: string;
+                    }[];
+                    /** Format: date */
+                    starts_on: string;
+                    /**
+                     * @description Publish to open requests; cancel to close the season
+                     * @enum {string}
+                     */
+                    status?: "draft" | "published" | "cancelled";
+                    title: string;
+                    weeks: number;
+                    welcome_message?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Season */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    capacity?: number;
+                    coach_ids?: string[];
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    membership_package_id?: string | null;
+                    price_cents?: number;
+                    programme?: {
+                        /** @description Day 0 is the start date */
+                        day: number;
+                        /** Format: uuid */
+                        workout_id: string;
+                    }[];
+                    /** Format: date */
+                    starts_on?: string;
+                    /**
+                     * @description Publish to open requests; cancel to close the season
+                     * @enum {string}
+                     */
+                    status?: "draft" | "published" | "cancelled";
+                    title?: string;
+                    weeks?: number;
+                    welcome_message?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminSettingsController.show": {
         parameters: {
             query?: never;
@@ -64977,6 +66344,237 @@ export interface operations {
                             role?: string;
                         }[];
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SeasonController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Seasons */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        seasons: {
+                            capacity: number;
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** SeasonMyEnrollment */
+                            mine: {
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                requested_at?: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                            } | null;
+                            places_left: number;
+                            price_cents: number;
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            workout_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SeasonController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MemberSeason */
+                        season: {
+                            capacity: number;
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** SeasonMyEnrollment */
+                            mine: {
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                requested_at?: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                            } | null;
+                            places_left: number;
+                            price_cents: number;
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Not possible */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SeasonController.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MemberSeason */
+                        season: {
+                            capacity: number;
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** SeasonMyEnrollment */
+                            mine: {
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                requested_at?: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                            } | null;
+                            places_left: number;
+                            price_cents: number;
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Not possible */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

@@ -544,6 +544,33 @@ msgstr "Експортът на дневника ти е готов"
 msgid "Download it within seven days from Settings."
 msgstr "Изтегли го до седем дни от Настройки."
 
+msgid "Season request"
+msgstr "Заявка за сезон"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} иска място в %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} е в листата на чакащите за %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Мястото ти е потвърдено"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} започва на %{date}. Програмата е в твоя Box."
+
+msgid "Season request not confirmed"
+msgstr "Заявката за сезон не е потвърдена"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} не можа да потвърди мястото ти в %{season}."
+
+msgid "Season cancelled"
+msgstr "Сезонът е отменен"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} отмени %{season}."
+
 msgid "You found a training partner"
 msgstr "Намерихте партньор за тренировки"
 

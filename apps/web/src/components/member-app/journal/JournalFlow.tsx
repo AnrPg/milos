@@ -49,6 +49,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { buildExecutionDocument, renderText } from "@/lib/document-export";
 import { latestCommentBody, sortComments } from "@/lib/journal-comments";
 import { effectiveJournalFilter, journalFilterCount, journalFilterKey, parseJournalFilter } from "@/lib/journal-filter";
+import { SeasonTag } from "@/components/seasons/SeasonTag";
 
 const PAGE_SIZE = 30;
 
@@ -470,6 +471,7 @@ function ExecutionRow({
         <p className="break-words text-base font-semibold" style={{ color: "var(--text)" }}>
           {title}
         </p>
+        <SeasonTag season={entry.season} />
         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--dim)" }}>
           <time dateTime={entry.completed_at_utc}>{formatTime(entry.completed_at_utc, locale)}</time>
           {entry.workout_type ? <SemanticLabel value={entry.workout_type} /> : null}

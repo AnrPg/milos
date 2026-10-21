@@ -76,6 +76,7 @@ export function executionHistoryEntry(
     master_workout_id: execution.master_workout_id ?? "",
     workout_title: execution.workout_title ?? null,
     workout_type: execution.workout_type ?? null,
+    season: execution.season ?? null,
     day,
   } as HistoryEntry;
 }

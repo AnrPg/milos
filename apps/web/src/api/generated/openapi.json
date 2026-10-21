@@ -34809,6 +34809,396 @@
         "title": "MediaUploadRequest",
         "type": "object"
       },
+      "MemberSeason": {
+        "properties": {
+          "capacity": {
+            "type": "integer"
+          },
+          "coaches": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "SeasonCoach",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "ends_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mine": {
+            "nullable": true,
+            "properties": {
+              "decline_reason": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "requested_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "requested",
+                  "waitlisted",
+                  "active",
+                  "declined",
+                  "cancelled",
+                  "completed"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status"
+            ],
+            "title": "SeasonMyEnrollment",
+            "type": "object"
+          },
+          "places_left": {
+            "type": "integer"
+          },
+          "price_cents": {
+            "type": "integer"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "description": "Running and completed follow from the dates",
+            "enum": [
+              "draft",
+              "published",
+              "running",
+              "completed",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "weeks": {
+            "type": "integer"
+          },
+          "workout_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "starts_on",
+          "ends_on",
+          "weeks",
+          "capacity",
+          "places_left",
+          "price_cents",
+          "currency",
+          "status",
+          "workout_count",
+          "coaches",
+          "mine"
+        ],
+        "title": "MemberSeason",
+        "type": "object"
+      },
+      "MemberSeasonList": {
+        "properties": {
+          "seasons": {
+            "items": {
+              "properties": {
+                "capacity": {
+                  "type": "integer"
+                },
+                "coaches": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "nickname": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "title": "SeasonCoach",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ends_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "mine": {
+                  "nullable": true,
+                  "properties": {
+                    "decline_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "requested_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "requested",
+                        "waitlisted",
+                        "active",
+                        "declined",
+                        "cancelled",
+                        "completed"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status"
+                  ],
+                  "title": "SeasonMyEnrollment",
+                  "type": "object"
+                },
+                "places_left": {
+                  "type": "integer"
+                },
+                "price_cents": {
+                  "type": "integer"
+                },
+                "starts_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Running and completed follow from the dates",
+                  "enum": [
+                    "draft",
+                    "published",
+                    "running",
+                    "completed",
+                    "cancelled"
+                  ],
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "weeks": {
+                  "type": "integer"
+                },
+                "workout_count": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "starts_on",
+                "ends_on",
+                "weeks",
+                "capacity",
+                "places_left",
+                "price_cents",
+                "currency",
+                "status",
+                "workout_count",
+                "coaches",
+                "mine"
+              ],
+              "title": "MemberSeason",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "seasons"
+        ],
+        "title": "MemberSeasonList",
+        "type": "object"
+      },
+      "MemberSeasonResponse": {
+        "properties": {
+          "season": {
+            "properties": {
+              "capacity": {
+                "type": "integer"
+              },
+              "coaches": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "SeasonCoach",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "description": {
+                "nullable": true,
+                "type": "string"
+              },
+              "ends_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "mine": {
+                "nullable": true,
+                "properties": {
+                  "decline_reason": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "requested_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "status": {
+                    "enum": [
+                      "requested",
+                      "waitlisted",
+                      "active",
+                      "declined",
+                      "cancelled",
+                      "completed"
+                    ],
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "status"
+                ],
+                "title": "SeasonMyEnrollment",
+                "type": "object"
+              },
+              "places_left": {
+                "type": "integer"
+              },
+              "price_cents": {
+                "type": "integer"
+              },
+              "starts_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "status": {
+                "description": "Running and completed follow from the dates",
+                "enum": [
+                  "draft",
+                  "published",
+                  "running",
+                  "completed",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "weeks": {
+                "type": "integer"
+              },
+              "workout_count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "starts_on",
+              "ends_on",
+              "weeks",
+              "capacity",
+              "places_left",
+              "price_cents",
+              "currency",
+              "status",
+              "workout_count",
+              "coaches",
+              "mine"
+            ],
+            "title": "MemberSeason",
+            "type": "object"
+          }
+        },
+        "required": [
+          "season"
+        ],
+        "title": "MemberSeasonResponse",
+        "type": "object"
+      },
       "MemberVisibility": {
         "description": "Whether you keep out of your clubs' «Μέλη» lists",
         "properties": {
@@ -44410,6 +44800,323 @@
         "title": "SavedFilters",
         "type": "object"
       },
+      "SeasonCoach": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "SeasonCoach",
+        "type": "object"
+      },
+      "SeasonCreate": {
+        "properties": {
+          "capacity": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "coach_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "currency": {
+            "maxLength": 3,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "membership_package_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "price_cents": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "programme": {
+            "items": {
+              "properties": {
+                "day": {
+                  "description": "Day 0 is the start date",
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "day",
+                "workout_id"
+              ],
+              "title": "SeasonProgrammeItem",
+              "type": "object"
+            },
+            "maxItems": 400,
+            "type": "array"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "description": "Publish to open requests; cancel to close the season",
+            "enum": [
+              "draft",
+              "published",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 80,
+            "minLength": 2,
+            "type": "string"
+          },
+          "weeks": {
+            "maximum": 52,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "welcome_message": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "starts_on",
+          "weeks",
+          "capacity",
+          "price_cents"
+        ],
+        "title": "SeasonCreate",
+        "type": "object"
+      },
+      "SeasonDecline": {
+        "properties": {
+          "reason": {
+            "maxLength": 300,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "SeasonDecline",
+        "type": "object"
+      },
+      "SeasonEnrollment": {
+        "properties": {
+          "decided_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "decline_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "package_subscription_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "requested",
+              "waitlisted",
+              "active",
+              "declined",
+              "cancelled",
+              "completed"
+            ],
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "user_id",
+          "status",
+          "requested_at"
+        ],
+        "title": "SeasonEnrollment",
+        "type": "object"
+      },
+      "SeasonMyEnrollment": {
+        "nullable": true,
+        "properties": {
+          "decline_reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "requested",
+              "waitlisted",
+              "active",
+              "declined",
+              "cancelled",
+              "completed"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "SeasonMyEnrollment",
+        "type": "object"
+      },
+      "SeasonProgrammeItem": {
+        "properties": {
+          "day": {
+            "description": "Day 0 is the start date",
+            "minimum": 0,
+            "type": "integer"
+          },
+          "workout_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "day",
+          "workout_id"
+        ],
+        "title": "SeasonProgrammeItem",
+        "type": "object"
+      },
+      "SeasonUpdate": {
+        "properties": {
+          "capacity": {
+            "maximum": 500,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "coach_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "currency": {
+            "maxLength": 3,
+            "type": "string"
+          },
+          "description": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "membership_package_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "price_cents": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "programme": {
+            "items": {
+              "properties": {
+                "day": {
+                  "description": "Day 0 is the start date",
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "day",
+                "workout_id"
+              ],
+              "title": "SeasonProgrammeItem",
+              "type": "object"
+            },
+            "maxItems": 400,
+            "type": "array"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "description": "Publish to open requests; cancel to close the season",
+            "enum": [
+              "draft",
+              "published",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "maxLength": 80,
+            "minLength": 2,
+            "type": "string"
+          },
+          "weeks": {
+            "maximum": 52,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "welcome_message": {
+            "maxLength": 1000,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "SeasonUpdate",
+        "type": "object"
+      },
       "SelectProviderRequest": {
         "additionalProperties": false,
         "properties": {
@@ -48240,6 +48947,778 @@
           "role"
         ],
         "title": "StaffMember",
+        "type": "object"
+      },
+      "StaffSeason": {
+        "properties": {
+          "capacity": {
+            "type": "integer"
+          },
+          "channel_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "coach_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "coaches": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "SeasonCoach",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "counts": {
+            "properties": {
+              "active": {
+                "type": "integer"
+              },
+              "requested": {
+                "type": "integer"
+              },
+              "waitlisted": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "requested",
+              "waitlisted",
+              "active"
+            ],
+            "type": "object"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "ends_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "membership_package_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "places_left": {
+            "type": "integer"
+          },
+          "price_cents": {
+            "type": "integer"
+          },
+          "programme": {
+            "items": {
+              "properties": {
+                "day": {
+                  "description": "Day 0 is the start date",
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "day",
+                "workout_id"
+              ],
+              "title": "SeasonProgrammeItem",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "description": "Running and completed follow from the dates",
+            "enum": [
+              "draft",
+              "published",
+              "running",
+              "completed",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "weeks": {
+            "type": "integer"
+          },
+          "welcome_message": {
+            "nullable": true,
+            "type": "string"
+          },
+          "workout_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "starts_on",
+          "ends_on",
+          "weeks",
+          "capacity",
+          "places_left",
+          "price_cents",
+          "currency",
+          "status",
+          "workout_count",
+          "coaches",
+          "programme",
+          "coach_ids",
+          "counts"
+        ],
+        "title": "StaffSeason",
+        "type": "object"
+      },
+      "StaffSeasonDetail": {
+        "properties": {
+          "capacity": {
+            "type": "integer"
+          },
+          "channel_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "coach_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "coaches": {
+            "items": {
+              "properties": {
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "SeasonCoach",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "counts": {
+            "properties": {
+              "active": {
+                "type": "integer"
+              },
+              "requested": {
+                "type": "integer"
+              },
+              "waitlisted": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "requested",
+              "waitlisted",
+              "active"
+            ],
+            "type": "object"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "ends_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "enrollments": {
+            "items": {
+              "properties": {
+                "decided_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "decline_reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "package_subscription_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "requested_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "requested",
+                    "waitlisted",
+                    "active",
+                    "declined",
+                    "cancelled",
+                    "completed"
+                  ],
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "user_id",
+                "status",
+                "requested_at"
+              ],
+              "title": "SeasonEnrollment",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "membership_package_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "places_left": {
+            "type": "integer"
+          },
+          "price_cents": {
+            "type": "integer"
+          },
+          "programme": {
+            "items": {
+              "properties": {
+                "day": {
+                  "description": "Day 0 is the start date",
+                  "minimum": 0,
+                  "type": "integer"
+                },
+                "workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "day",
+                "workout_id"
+              ],
+              "title": "SeasonProgrammeItem",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "starts_on": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "description": "Running and completed follow from the dates",
+            "enum": [
+              "draft",
+              "published",
+              "running",
+              "completed",
+              "cancelled"
+            ],
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "weeks": {
+            "type": "integer"
+          },
+          "welcome_message": {
+            "nullable": true,
+            "type": "string"
+          },
+          "workout_count": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "starts_on",
+          "ends_on",
+          "weeks",
+          "capacity",
+          "places_left",
+          "price_cents",
+          "currency",
+          "status",
+          "workout_count",
+          "coaches",
+          "programme",
+          "coach_ids",
+          "counts",
+          "enrollments"
+        ],
+        "title": "StaffSeasonDetail",
+        "type": "object"
+      },
+      "StaffSeasonList": {
+        "properties": {
+          "coach_candidates": {
+            "description": "Staff who may be named as a season's coaches",
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "seasons": {
+            "items": {
+              "properties": {
+                "capacity": {
+                  "type": "integer"
+                },
+                "channel_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "coach_ids": {
+                  "items": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "coaches": {
+                  "items": {
+                    "properties": {
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "nickname": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "title": "SeasonCoach",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "counts": {
+                  "properties": {
+                    "active": {
+                      "type": "integer"
+                    },
+                    "requested": {
+                      "type": "integer"
+                    },
+                    "waitlisted": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "requested",
+                    "waitlisted",
+                    "active"
+                  ],
+                  "type": "object"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ends_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "membership_package_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "places_left": {
+                  "type": "integer"
+                },
+                "price_cents": {
+                  "type": "integer"
+                },
+                "programme": {
+                  "items": {
+                    "properties": {
+                      "day": {
+                        "description": "Day 0 is the start date",
+                        "minimum": 0,
+                        "type": "integer"
+                      },
+                      "workout_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "day",
+                      "workout_id"
+                    ],
+                    "title": "SeasonProgrammeItem",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "starts_on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "status": {
+                  "description": "Running and completed follow from the dates",
+                  "enum": [
+                    "draft",
+                    "published",
+                    "running",
+                    "completed",
+                    "cancelled"
+                  ],
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "weeks": {
+                  "type": "integer"
+                },
+                "welcome_message": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_count": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "starts_on",
+                "ends_on",
+                "weeks",
+                "capacity",
+                "places_left",
+                "price_cents",
+                "currency",
+                "status",
+                "workout_count",
+                "coaches",
+                "programme",
+                "coach_ids",
+                "counts"
+              ],
+              "title": "StaffSeason",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "seasons",
+          "coach_candidates"
+        ],
+        "title": "StaffSeasonList",
+        "type": "object"
+      },
+      "StaffSeasonResponse": {
+        "properties": {
+          "season": {
+            "properties": {
+              "capacity": {
+                "type": "integer"
+              },
+              "channel_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "coach_ids": {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "coaches": {
+                "items": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "SeasonCoach",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "counts": {
+                "properties": {
+                  "active": {
+                    "type": "integer"
+                  },
+                  "requested": {
+                    "type": "integer"
+                  },
+                  "waitlisted": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "requested",
+                  "waitlisted",
+                  "active"
+                ],
+                "type": "object"
+              },
+              "currency": {
+                "type": "string"
+              },
+              "description": {
+                "nullable": true,
+                "type": "string"
+              },
+              "ends_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "enrollments": {
+                "items": {
+                  "properties": {
+                    "decided_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "decline_reason": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "package_subscription_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "requested_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "requested",
+                        "waitlisted",
+                        "active",
+                        "declined",
+                        "cancelled",
+                        "completed"
+                      ],
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "user_id",
+                    "status",
+                    "requested_at"
+                  ],
+                  "title": "SeasonEnrollment",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "membership_package_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "places_left": {
+                "type": "integer"
+              },
+              "price_cents": {
+                "type": "integer"
+              },
+              "programme": {
+                "items": {
+                  "properties": {
+                    "day": {
+                      "description": "Day 0 is the start date",
+                      "minimum": 0,
+                      "type": "integer"
+                    },
+                    "workout_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "day",
+                    "workout_id"
+                  ],
+                  "title": "SeasonProgrammeItem",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "starts_on": {
+                "format": "date",
+                "type": "string"
+              },
+              "status": {
+                "description": "Running and completed follow from the dates",
+                "enum": [
+                  "draft",
+                  "published",
+                  "running",
+                  "completed",
+                  "cancelled"
+                ],
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "weeks": {
+                "type": "integer"
+              },
+              "welcome_message": {
+                "nullable": true,
+                "type": "string"
+              },
+              "workout_count": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "id",
+              "title",
+              "starts_on",
+              "ends_on",
+              "weeks",
+              "capacity",
+              "places_left",
+              "price_cents",
+              "currency",
+              "status",
+              "workout_count",
+              "coaches",
+              "programme",
+              "coach_ids",
+              "counts",
+              "enrollments"
+            ],
+            "title": "StaffSeasonDetail",
+            "type": "object"
+          }
+        },
+        "required": [
+          "season"
+        ],
+        "title": "StaffSeasonResponse",
         "type": "object"
       },
       "StaffTrial": {
@@ -127279,6 +128758,2127 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/confirm": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminSeasonController.confirm",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "channel_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "counts": {
+                          "properties": {
+                            "active": {
+                              "type": "integer"
+                            },
+                            "requested": {
+                              "type": "integer"
+                            },
+                            "waitlisted": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "requested",
+                            "waitlisted",
+                            "active"
+                          ],
+                          "type": "object"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "enrollments": {
+                          "items": {
+                            "properties": {
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "package_subscription_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "status",
+                              "requested_at"
+                            ],
+                            "title": "SeasonEnrollment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "programme": {
+                          "items": {
+                            "properties": {
+                              "day": {
+                                "description": "Day 0 is the start date",
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "day",
+                              "workout_id"
+                            ],
+                            "title": "SeasonProgrammeItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "welcome_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "programme",
+                        "coach_ids",
+                        "counts",
+                        "enrollments"
+                      ],
+                      "title": "StaffSeasonDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "StaffSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season or enrollment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid season"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Confirm a request: package, #season channel and programme",
+        "tags": [
+          "Admin Seasons"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/decline": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminSeasonController.decline",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "reason": {
+                    "maxLength": 300,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "SeasonDecline",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "channel_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "counts": {
+                          "properties": {
+                            "active": {
+                              "type": "integer"
+                            },
+                            "requested": {
+                              "type": "integer"
+                            },
+                            "waitlisted": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "requested",
+                            "waitlisted",
+                            "active"
+                          ],
+                          "type": "object"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "enrollments": {
+                          "items": {
+                            "properties": {
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "package_subscription_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "status",
+                              "requested_at"
+                            ],
+                            "title": "SeasonEnrollment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "programme": {
+                          "items": {
+                            "properties": {
+                              "day": {
+                                "description": "Day 0 is the start date",
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "day",
+                              "workout_id"
+                            ],
+                            "title": "SeasonProgrammeItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "welcome_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "programme",
+                        "coach_ids",
+                        "counts",
+                        "enrollments"
+                      ],
+                      "title": "StaffSeasonDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "StaffSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season or enrollment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid season"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Decline a request, with an optional reason the member sees",
+        "tags": [
+          "Admin Seasons"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/remove": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminSeasonController.remove",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "channel_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "counts": {
+                          "properties": {
+                            "active": {
+                              "type": "integer"
+                            },
+                            "requested": {
+                              "type": "integer"
+                            },
+                            "waitlisted": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "requested",
+                            "waitlisted",
+                            "active"
+                          ],
+                          "type": "object"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "enrollments": {
+                          "items": {
+                            "properties": {
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "package_subscription_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "status",
+                              "requested_at"
+                            ],
+                            "title": "SeasonEnrollment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "programme": {
+                          "items": {
+                            "properties": {
+                              "day": {
+                                "description": "Day 0 is the start date",
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "day",
+                              "workout_id"
+                            ],
+                            "title": "SeasonProgrammeItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "welcome_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "programme",
+                        "coach_ids",
+                        "counts",
+                        "enrollments"
+                      ],
+                      "title": "StaffSeasonDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "StaffSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season or enrollment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid season"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Take a member out of the season (their programme from today on goes)",
+        "tags": [
+          "Admin Seasons"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/seasons": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminSeasonController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "coach_candidates": {
+                      "description": "Staff who may be named as a season's coaches",
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "seasons": {
+                      "items": {
+                        "properties": {
+                          "capacity": {
+                            "type": "integer"
+                          },
+                          "channel_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "coach_ids": {
+                            "items": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "coaches": {
+                            "items": {
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "SeasonCoach",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "counts": {
+                            "properties": {
+                              "active": {
+                                "type": "integer"
+                              },
+                              "requested": {
+                                "type": "integer"
+                              },
+                              "waitlisted": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "requested",
+                              "waitlisted",
+                              "active"
+                            ],
+                            "type": "object"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ends_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "membership_package_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "places_left": {
+                            "type": "integer"
+                          },
+                          "price_cents": {
+                            "type": "integer"
+                          },
+                          "programme": {
+                            "items": {
+                              "properties": {
+                                "day": {
+                                  "description": "Day 0 is the start date",
+                                  "minimum": 0,
+                                  "type": "integer"
+                                },
+                                "workout_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "day",
+                                "workout_id"
+                              ],
+                              "title": "SeasonProgrammeItem",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "starts_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "status": {
+                            "description": "Running and completed follow from the dates",
+                            "enum": [
+                              "draft",
+                              "published",
+                              "running",
+                              "completed",
+                              "cancelled"
+                            ],
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "weeks": {
+                            "type": "integer"
+                          },
+                          "welcome_message": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout_count": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "starts_on",
+                          "ends_on",
+                          "weeks",
+                          "capacity",
+                          "places_left",
+                          "price_cents",
+                          "currency",
+                          "status",
+                          "workout_count",
+                          "coaches",
+                          "programme",
+                          "coach_ids",
+                          "counts"
+                        ],
+                        "title": "StaffSeason",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "seasons",
+                    "coach_candidates"
+                  ],
+                  "title": "StaffSeasonList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Seasons"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's seasons with their place counts",
+        "tags": [
+          "Admin Seasons"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminSeasonController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "capacity": {
+                    "maximum": 500,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "coach_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "currency": {
+                    "maxLength": 3,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "membership_package_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "price_cents": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "programme": {
+                    "items": {
+                      "properties": {
+                        "day": {
+                          "description": "Day 0 is the start date",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "day",
+                        "workout_id"
+                      ],
+                      "title": "SeasonProgrammeItem",
+                      "type": "object"
+                    },
+                    "maxItems": 400,
+                    "type": "array"
+                  },
+                  "starts_on": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Publish to open requests; cancel to close the season",
+                    "enum": [
+                      "draft",
+                      "published",
+                      "cancelled"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 80,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "weeks": {
+                    "maximum": 52,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "welcome_message": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "title",
+                  "starts_on",
+                  "weeks",
+                  "capacity",
+                  "price_cents"
+                ],
+                "title": "SeasonCreate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "channel_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "counts": {
+                          "properties": {
+                            "active": {
+                              "type": "integer"
+                            },
+                            "requested": {
+                              "type": "integer"
+                            },
+                            "waitlisted": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "requested",
+                            "waitlisted",
+                            "active"
+                          ],
+                          "type": "object"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "enrollments": {
+                          "items": {
+                            "properties": {
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "package_subscription_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "status",
+                              "requested_at"
+                            ],
+                            "title": "SeasonEnrollment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "programme": {
+                          "items": {
+                            "properties": {
+                              "day": {
+                                "description": "Day 0 is the start date",
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "day",
+                              "workout_id"
+                            ],
+                            "title": "SeasonProgrammeItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "welcome_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "programme",
+                        "coach_ids",
+                        "counts",
+                        "enrollments"
+                      ],
+                      "title": "StaffSeasonDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "StaffSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season or enrollment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid season"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Create a season (a draft unless published straight away)",
+        "tags": [
+          "Admin Seasons"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/seasons/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminSeasonController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "channel_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "counts": {
+                          "properties": {
+                            "active": {
+                              "type": "integer"
+                            },
+                            "requested": {
+                              "type": "integer"
+                            },
+                            "waitlisted": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "requested",
+                            "waitlisted",
+                            "active"
+                          ],
+                          "type": "object"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "enrollments": {
+                          "items": {
+                            "properties": {
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "package_subscription_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "status",
+                              "requested_at"
+                            ],
+                            "title": "SeasonEnrollment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "programme": {
+                          "items": {
+                            "properties": {
+                              "day": {
+                                "description": "Day 0 is the start date",
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "day",
+                              "workout_id"
+                            ],
+                            "title": "SeasonProgrammeItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "welcome_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "programme",
+                        "coach_ids",
+                        "counts",
+                        "enrollments"
+                      ],
+                      "title": "StaffSeasonDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "StaffSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season or enrollment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid season"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "One season with every request and participant",
+        "tags": [
+          "Admin Seasons"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "description": "Start date, weeks and programme are locked once a participant is confirmed. Cancelling closes every request and place and archives the season's channel.",
+        "operationId": "MilosTrainingWeb.AdminSeasonController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "capacity": {
+                    "maximum": 500,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "coach_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "currency": {
+                    "maxLength": 3,
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "membership_package_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "price_cents": {
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "programme": {
+                    "items": {
+                      "properties": {
+                        "day": {
+                          "description": "Day 0 is the start date",
+                          "minimum": 0,
+                          "type": "integer"
+                        },
+                        "workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "day",
+                        "workout_id"
+                      ],
+                      "title": "SeasonProgrammeItem",
+                      "type": "object"
+                    },
+                    "maxItems": 400,
+                    "type": "array"
+                  },
+                  "starts_on": {
+                    "format": "date",
+                    "type": "string"
+                  },
+                  "status": {
+                    "description": "Publish to open requests; cancel to close the season",
+                    "enum": [
+                      "draft",
+                      "published",
+                      "cancelled"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "maxLength": 80,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "weeks": {
+                    "maximum": 52,
+                    "minimum": 1,
+                    "type": "integer"
+                  },
+                  "welcome_message": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "SeasonUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "channel_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "counts": {
+                          "properties": {
+                            "active": {
+                              "type": "integer"
+                            },
+                            "requested": {
+                              "type": "integer"
+                            },
+                            "waitlisted": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "requested",
+                            "waitlisted",
+                            "active"
+                          ],
+                          "type": "object"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "enrollments": {
+                          "items": {
+                            "properties": {
+                              "decided_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "package_subscription_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "user_id",
+                              "status",
+                              "requested_at"
+                            ],
+                            "title": "SeasonEnrollment",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "membership_package_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "programme": {
+                          "items": {
+                            "properties": {
+                              "day": {
+                                "description": "Day 0 is the start date",
+                                "minimum": 0,
+                                "type": "integer"
+                              },
+                              "workout_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "day",
+                              "workout_id"
+                            ],
+                            "title": "SeasonProgrammeItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "welcome_message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "programme",
+                        "coach_ids",
+                        "counts",
+                        "enrollments"
+                      ],
+                      "title": "StaffSeasonDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "StaffSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season or enrollment"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid season"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change, publish or cancel a season",
+        "tags": [
+          "Admin Seasons"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/settings": {
       "get": {
         "callbacks": {},
@@ -157769,6 +161369,561 @@
         "summary": "Search visible users by nickname",
         "tags": [
           "Me"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/seasons": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SeasonController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "seasons": {
+                      "items": {
+                        "properties": {
+                          "capacity": {
+                            "type": "integer"
+                          },
+                          "coaches": {
+                            "items": {
+                              "properties": {
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "SeasonCoach",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ends_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "mine": {
+                            "nullable": true,
+                            "properties": {
+                              "decline_reason": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "requested_at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "requested",
+                                  "waitlisted",
+                                  "active",
+                                  "declined",
+                                  "cancelled",
+                                  "completed"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "status"
+                            ],
+                            "title": "SeasonMyEnrollment",
+                            "type": "object"
+                          },
+                          "places_left": {
+                            "type": "integer"
+                          },
+                          "price_cents": {
+                            "type": "integer"
+                          },
+                          "starts_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "status": {
+                            "description": "Running and completed follow from the dates",
+                            "enum": [
+                              "draft",
+                              "published",
+                              "running",
+                              "completed",
+                              "cancelled"
+                            ],
+                            "type": "string"
+                          },
+                          "title": {
+                            "type": "string"
+                          },
+                          "weeks": {
+                            "type": "integer"
+                          },
+                          "workout_count": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "title",
+                          "starts_on",
+                          "ends_on",
+                          "weeks",
+                          "capacity",
+                          "places_left",
+                          "price_cents",
+                          "currency",
+                          "status",
+                          "workout_count",
+                          "coaches",
+                          "mine"
+                        ],
+                        "title": "MemberSeason",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "seasons"
+                  ],
+                  "title": "MemberSeasonList",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Seasons"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's open seasons and the ones you hold a place in",
+        "tags": [
+          "Seasons"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/seasons/{id}/cancel": {
+      "post": {
+        "callbacks": {},
+        "description": "A confirmed place is settled with the box.",
+        "operationId": "MilosTrainingWeb.SeasonController.cancel",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "nullable": true,
+                          "properties": {
+                            "decline_reason": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "requested_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "requested",
+                                "waitlisted",
+                                "active",
+                                "declined",
+                                "cancelled",
+                                "completed"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "status"
+                          ],
+                          "title": "SeasonMyEnrollment",
+                          "type": "object"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "mine"
+                      ],
+                      "title": "MemberSeason",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "MemberSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not possible"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Withdraw your request or waitlist place",
+        "tags": [
+          "Seasons"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/seasons/{id}/request": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.SeasonController.request",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "season": {
+                      "properties": {
+                        "capacity": {
+                          "type": "integer"
+                        },
+                        "coaches": {
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "SeasonCoach",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "currency": {
+                          "type": "string"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "ends_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "nullable": true,
+                          "properties": {
+                            "decline_reason": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "requested_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "status": {
+                              "enum": [
+                                "requested",
+                                "waitlisted",
+                                "active",
+                                "declined",
+                                "cancelled",
+                                "completed"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "status"
+                          ],
+                          "title": "SeasonMyEnrollment",
+                          "type": "object"
+                        },
+                        "places_left": {
+                          "type": "integer"
+                        },
+                        "price_cents": {
+                          "type": "integer"
+                        },
+                        "starts_on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "description": "Running and completed follow from the dates",
+                          "enum": [
+                            "draft",
+                            "published",
+                            "running",
+                            "completed",
+                            "cancelled"
+                          ],
+                          "type": "string"
+                        },
+                        "title": {
+                          "type": "string"
+                        },
+                        "weeks": {
+                          "type": "integer"
+                        },
+                        "workout_count": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "title",
+                        "starts_on",
+                        "ends_on",
+                        "weeks",
+                        "capacity",
+                        "places_left",
+                        "price_cents",
+                        "currency",
+                        "status",
+                        "workout_count",
+                        "coaches",
+                        "mine"
+                      ],
+                      "title": "MemberSeason",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "season"
+                  ],
+                  "title": "MemberSeasonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Season"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such season"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The season can't take this step now"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not possible"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ask for a place (the waitlist when the season is full); staff confirm",
+        "tags": [
+          "Seasons"
         ]
       }
     },

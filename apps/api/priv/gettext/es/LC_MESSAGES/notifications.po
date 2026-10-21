@@ -544,6 +544,33 @@ msgstr "Tu exportación del diario está lista"
 msgid "Download it within seven days from Settings."
 msgstr "Descárgala en un plazo de siete días desde Ajustes."
 
+msgid "Season request"
+msgstr "Solicitud de temporada"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} pide una plaza en %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} está en la lista de espera de %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Tu plaza está confirmada"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} empieza el %{date}. El programa está en tu Box."
+
+msgid "Season request not confirmed"
+msgstr "Solicitud de temporada no confirmada"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} no pudo confirmar tu plaza en %{season}."
+
+msgid "Season cancelled"
+msgstr "Temporada cancelada"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} canceló %{season}."
+
 msgid "You found a training partner"
 msgstr "Has encontrado compañero de entrenamiento"
 
