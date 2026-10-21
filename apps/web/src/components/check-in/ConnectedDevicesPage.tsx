@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
 import { regenerateCalendarExportLinks } from "@/api/calendar";
-import { CONNECTED_DEVICES_KEY, fetchConnectedDevices, revokeWalletPass, type ConnectedDevices, type Integration, type WalletPass } from "@/api/check-in";
+import { revokeWalletPass, type ConnectedDevices, type Integration, type WalletPass } from "@/api/check-in";
+import { DEVICES_KEY as CONNECTED_DEVICES_KEY, fetchDevices } from "@/api/devices";
+import { GarminRowItem } from "@/components/devices/GarminRow";
+import { garminReturn, garminRowOf, returnReasonKey } from "@/components/devices/garmin-model";
 import { useSession } from "@/components/session-provider";
 
 import { ConfirmButton } from "./ConfirmButton";
@@ -14,25 +17,43 @@ import { checkInErrorKey } from "./errors";
 /**
  * Εγώ › Συνδεδεμένες συσκευές (ADR-155 §11, vision §7.11): the Wallet cards
  * at every box (revoking one resets that box's code), the calendar feed to
- * subscribe to, and the health integrations as they really are: Garmin is
- * not available yet, Apple Health and Health Connect need the phone app.
+ * subscribe to, and the health integrations as they really are: Garmin
+ * (ADR-161) connects here, Apple Health and Health Connect need the phone app.
  */
 export function ConnectedDevicesPage() {
   const t = useTranslations("CheckIn");
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
-  const devices = useQuery({ queryKey: CONNECTED_DEVICES_KEY, enabled: Boolean(token), queryFn: () => fetchConnectedDevices(token) });
+  const devices = useQuery({ queryKey: CONNECTED_DEVICES_KEY, enabled: Boolean(token), queryFn: () => fetchDevices(token) });
+  const toast = useGarminReturnToast();
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
       <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>{t("devicesTitle")}</h1>
+      {toast.message ? (
+        <div
+          role="status"
+          data-testid="garmin-return"
+          className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3 text-sm"
+          style={{
+            background: toast.ok ? "color-mix(in srgb, var(--success) 14%, var(--panel))" : "color-mix(in srgb, var(--danger) 12%, var(--panel))",
+            border: `1px solid ${toast.ok ? "var(--success)" : "var(--danger)"}`,
+            color: "var(--text)",
+          }}
+        >
+          <span>{toast.message}</span>
+          <button type="button" onClick={toast.dismiss} className="shrink-0 font-bold" style={{ color: "var(--primary)" }}>
+            {toast.dismissLabel}
+          </button>
+        </div>
+      ) : null}
       {devices.isPending ? <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
       {devices.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(devices.error))}</p> : null}
       {devices.data ? (
         <>
           <WalletSection token={token} wallet={devices.data.wallet} />
           <CalendarSection token={token} calendar={devices.data.calendar} />
-          <IntegrationsSection integrations={devices.data.integrations} />
+          <IntegrationsSection token={token} integrations={devices.data.integrations} />
         </>
       ) : null}
     </main>
@@ -168,18 +189,51 @@ function CalendarSection({ token, calendar }: { token: string; calendar: Connect
   );
 }
 
-function IntegrationsSection({ integrations }: { integrations: Integration[] }) {
+/**
+ * The OAuth return (`?garmin=connected|error&reason=…`, ADR-161): one toast,
+ * then the query leaves the address so a reload does not repeat it.
+ */
+function useGarminReturnToast() {
+  const t = useTranslations("Devices");
+  const [outcome, setOutcome] = useState<ReturnType<typeof garminReturn>>(null);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const found = garminReturn(params);
+    if (!found) return;
+    // Read once from the address on mount; the address is then cleaned.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setOutcome(found);
+    params.delete("garmin");
+    params.delete("reason");
+    const query = params.toString();
+    window.history.replaceState(window.history.state, "", `${window.location.pathname}${query ? `?${query}` : ""}`);
+  }, []);
+  const message = !outcome
+    ? null
+    : outcome.outcome === "connected"
+      ? t("returnConnected")
+      : t(["return", returnReasonKey(outcome.reason)].join("_"));
+  return { message, ok: outcome?.outcome === "connected", dismiss: () => setOutcome(null), dismissLabel: t("dismiss") };
+}
+
+function IntegrationsSection({ token, integrations }: { token: string; integrations: Integration[] }) {
   const t = useTranslations("CheckIn");
+  const [message, setMessage] = useState<string | null>(null);
+  const garmin = garminRowOf(integrations);
   const tone: Record<Integration["status"], { color: string; background: string }> = {
     connected: { color: "var(--success)", background: "color-mix(in srgb, var(--success) 16%, transparent)" },
     disconnected: { color: "var(--text-soft)", background: "var(--panel-raised)" },
     unavailable: { color: "var(--dim)", background: "var(--panel-raised)" },
     native_only: { color: "var(--text-soft)", background: "var(--panel-raised)" },
+    error: { color: "var(--danger)", background: "color-mix(in srgb, var(--danger) 16%, transparent)" },
   };
   return (
     <Card title={t("integrationsTitle")} hint={t("integrationsHint")} testId="devices-integrations">
       <ul className="flex flex-col gap-2">
-        {integrations.map((integration) => (
+        {integrations.map((integration) =>
+          integration.provider === "garmin" && garmin ? (
+            <GarminRowItem key="garmin" row={garmin} token={token} onMessage={setMessage} />
+          ) : (
           <li key={integration.provider} className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
             <span className="flex min-w-0 flex-col">
               <span className="text-sm font-bold" style={{ color: "var(--text)" }}>{t(["provider", integration.provider].join("_"))}</span>
@@ -189,8 +243,10 @@ function IntegrationsSection({ integrations }: { integrations: Integration[] }) 
               {t(["integrationStatus", integration.status].join("_"))}
             </span>
           </li>
-        ))}
+          ),
+        )}
       </ul>
+      {message ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{message}</p> : null}
     </Card>
   );
 }

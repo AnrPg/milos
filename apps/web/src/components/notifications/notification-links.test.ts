@@ -17,6 +17,11 @@ describe("notificationTargetUrl", () => {
     expect(notificationTargetUrl({ type: "around_new_matches", payload: {} }, "member")).toBe("/around");
   });
 
+  it("opens Συνδεδεμένες συσκευές on a Garmin sync error", () => {
+    expect(notificationTargetUrl({ type: "device_sync_error", payload: { url: "/me/devices" } }, "member")).toBe("/me/devices");
+    expect(notificationTargetUrl({ type: "device_sync_error", payload: {} }, "member")).toBe("/me/devices");
+  });
+
   it("normalizes legacy assignment links to the canonical admin route and query", () => {
     expect(
       notificationTargetUrl(

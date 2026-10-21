@@ -371,6 +371,15 @@ defmodule MilosTraining.Notifications do
         url: "/journal/wellbeing?craving=#{field(payload, :craving_id)}"
       })
 
+  # ADR-161 (board 16, Q6): a device stopped syncing; once per spell.
+  def process_event("device_sync_error", payload),
+    do:
+      enqueue_simple(:device_sync_error, payload, %{
+        provider: field(payload, :provider),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/devices"
+      })
+
   # ADR-159 (board 14, Q2): the opt-in afternoon water reminder.
   def process_event("water_reminder", payload),
     do:

@@ -88,7 +88,9 @@ export function SnapshotDetail({ snapshotId }: { snapshotId: string }) {
         <div>
           <Link href="/journal/body" className="text-sm font-semibold" style={{ color: "var(--primary)" }}>← {t("title")}</Link>
           <h2 className="mt-1 text-xl font-extrabold" style={{ color: "var(--text)" }}>{dates.dateTime(data.taken_at)}</h2>
-          <p className="text-sm" style={{ color: "var(--dim)" }}>{t(key("visibility", data.visibility))}</p>
+          <p className="text-sm" style={{ color: "var(--dim)" }}>
+            {data.source === "garmin" ? [t(key("visibility", data.visibility)), t("fromGarmin")].join(" · ") : t(key("visibility", data.visibility))}
+          </p>
         </div>
         {partner ? (
           <IconButton label={t("shareAria")} onClick={() => setSharing(true)}>

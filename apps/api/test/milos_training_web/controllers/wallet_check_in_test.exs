@@ -394,8 +394,14 @@ defmodule MilosTrainingWeb.WalletCheckInTest do
     assert devices["calendar"]["https_url"] =~ "http"
     assert devices["calendar"]["webcal_url"] =~ "webcal"
 
-    assert devices["integrations"] == [
-             %{"provider" => "garmin", "status" => "unavailable"},
+    # ADR-161: without Garmin credentials the row stays «Σύντομα».
+    assert [
+             %{"provider" => "garmin", "status" => "unavailable", "configured" => false},
+             %{"provider" => "apple_health", "status" => "native_only"},
+             %{"provider" => "health_connect", "status" => "native_only"}
+           ] = devices["integrations"]
+
+    assert Enum.drop(devices["integrations"], 1) == [
              %{"provider" => "apple_health", "status" => "native_only"},
              %{"provider" => "health_connect", "status" => "native_only"}
            ]

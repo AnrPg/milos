@@ -628,6 +628,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/integrations/garmin/callback": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Garmin's OAuth return; redirects to the devices page */
+        get: operations["MilosTrainingWeb.GarminIntegrationController.callback"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/integrations/garmin/deregistration": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Garmin tells Milos a person removed the app at Garmin */
+        post: operations["MilosTrainingWeb.GarminIntegrationController.deregistration"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/integrations/garmin/push": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Garmin's push endpoint (summaries or callback URLs); verified, idempotent */
+        post: operations["MilosTrainingWeb.GarminIntegrationController.push"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/journal/comments/batch": {
         parameters: {
             query?: never;
@@ -1416,6 +1467,160 @@ export interface paths {
         get: operations["MilosTrainingWeb.WalletController.devices"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/daily-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Πρόοδος: the member's own daily stats from a device (resting heart rate) */
+        get: operations["MilosTrainingWeb.DevicesController.daily_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/device-imports/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answer «Ήταν αυτό το …;»: merge into one candidate or keep as its own entry */
+        post: operations["MilosTrainingWeb.DevicesController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Wallet cards, calendar feed and health integrations, with Garmin's status */
+        get: operations["MilosTrainingWeb.DevicesController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/garmin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Disconnect Garmin, keeping or deleting what it brought in */
+        delete: operations["MilosTrainingWeb.DevicesController.disconnect"];
+        options?: never;
+        head?: never;
+        /** Change what Garmin syncs */
+        patch: operations["MilosTrainingWeb.DevicesController.update"];
+        trace?: never;
+    };
+    "/api/me/devices/garmin/connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start connecting Garmin: choose what syncs and how far back, get Garmin's sign-in */
+        post: operations["MilosTrainingWeb.DevicesController.connect"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/garmin/pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Garmin workouts that could be one of two classes or workouts */
+        get: operations["MilosTrainingWeb.DevicesController.pending"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/garmin/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Συγχρονισμός τώρα»: Garmin resends the last two days (at most every 5 minutes) */
+        post: operations["MilosTrainingWeb.DevicesController.sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The journal's device card: new imports since last seen, and what needs an answer */
+        get: operations["MilosTrainingWeb.DevicesController.summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/devices/summary/seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** The device card was seen: it hides until something new arrives */
+        post: operations["MilosTrainingWeb.DevicesController.seen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -16699,10 +16904,51 @@ export interface components {
                 webcal_url: string;
             };
             integrations: {
+                backfill_day_options?: number[];
+                /** @enum {string} */
+                capability?: "available" | "not_configured";
+                configured?: boolean;
+                /** GarminConnection */
+                connection?: {
+                    /** @enum {integer} */
+                    backfill_days: 0 | 30 | 90;
+                    /** @description «Εισαγωγή… 40%» while the history import runs */
+                    backfill_progress?: number | null;
+                    /** @enum {string} */
+                    backfill_status: "none" | "running" | "done" | "failed";
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    last_error?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    needs_reconnect: boolean;
+                    /** @enum {string} */
+                    status: "active" | "error";
+                    /**
+                     * DeviceSyncPrefs
+                     * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        weight?: boolean;
+                    };
+                } | null;
                 /** @enum {string} */
                 provider: "garmin" | "apple_health" | "health_connect";
                 /** @enum {string} */
-                status: "connected" | "disconnected" | "unavailable" | "native_only";
+                status: "connected" | "disconnected" | "unavailable" | "native_only" | "error";
+                /**
+                 * DeviceSyncPrefs
+                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                 */
+                sync_prefs?: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    weight?: boolean;
+                };
             }[];
             wallet: {
                 passes: {
@@ -16964,6 +17210,292 @@ export interface components {
                 /** Format: date-time */
                 updated_at?: string;
             };
+        };
+        /** DailyStatLatest */
+        DailyStatLatest: {
+            /** Format: date */
+            on: string;
+            /**
+             * @description The device that sent it («από Garmin»)
+             * @enum {string}
+             */
+            source: "garmin" | "apple_health" | "health_connect";
+            /** @description Beats per minute for resting_hr */
+            value: number;
+        } | null;
+        /** DailyStatPoint */
+        DailyStatPoint: {
+            /** Format: date */
+            on: string;
+            /**
+             * @description The device that sent it («από Garmin»)
+             * @enum {string}
+             */
+            source: "garmin" | "apple_health" | "health_connect";
+            /** @description Beats per minute for resting_hr */
+            value: number;
+        };
+        /**
+         * DailyStats
+         * @description Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data
+         */
+        DailyStats: {
+            average: number | null;
+            /** Format: date */
+            from: string;
+            /** DailyStatLatest */
+            latest: {
+                /** Format: date */
+                on: string;
+                /**
+                 * @description The device that sent it («από Garmin»)
+                 * @enum {string}
+                 */
+                source: "garmin" | "apple_health" | "health_connect";
+                /** @description Beats per minute for resting_hr */
+                value: number;
+            } | null;
+            /** @enum {string} */
+            metric: "resting_hr";
+            points: {
+                /** Format: date */
+                on: string;
+                /**
+                 * @description The device that sent it («από Garmin»)
+                 * @enum {string}
+                 */
+                source: "garmin" | "apple_health" | "health_connect";
+                /** @description Beats per minute for resting_hr */
+                value: number;
+            }[];
+            /** @enum {string} */
+            range: "1m" | "3m" | "1y";
+            sources: string[];
+            /** Format: date */
+            to: string;
+        };
+        /**
+         * DeviceActivity
+         * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
+         */
+        DeviceActivity: {
+            activity_type?: string | null;
+            avg_heart_rate?: number | null;
+            calories?: number | null;
+            candidates?: {
+                /** Format: date-time */
+                ends_at: string;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "training_log" | "execution" | "class";
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** Format: date-time */
+                starts_at: string;
+                title?: string | null;
+            }[];
+            /** Format: uuid */
+            class_id?: string | null;
+            distance_meters?: number | null;
+            duration_seconds: number;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            journal_visibility?: "private" | "coach_can_view";
+            max_heart_rate?: number | null;
+            /** Format: uuid */
+            organization_id?: string | null;
+            /** @enum {string} */
+            provider: "garmin" | "apple_health" | "health_connect";
+            /**
+             * @description Localized by the client; the raw type is `activity_type`
+             * @enum {string}
+             */
+            sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+            /** Format: date-time */
+            started_at: string;
+            started_tz?: string;
+            /** @enum {string} */
+            state: "own" | "merged" | "pending";
+            title: string;
+        };
+        /** DeviceActivityCandidate */
+        DeviceActivityCandidate: {
+            /** Format: date-time */
+            ends_at: string;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "training_log" | "execution" | "class";
+            /** Format: uuid */
+            organization_id?: string | null;
+            /** Format: date-time */
+            starts_at: string;
+            title?: string | null;
+        };
+        /** DeviceActivityResponse */
+        DeviceActivityResponse: {
+            /**
+             * DeviceActivity
+             * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
+             */
+            activity: {
+                activity_type?: string | null;
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                candidates?: {
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "training_log" | "execution" | "class";
+                    /** Format: uuid */
+                    organization_id?: string | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title?: string | null;
+                }[];
+                /** Format: uuid */
+                class_id?: string | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                journal_visibility?: "private" | "coach_can_view";
+                max_heart_rate?: number | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /**
+                 * @description Localized by the client; the raw type is `activity_type`
+                 * @enum {string}
+                 */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+                started_tz?: string;
+                /** @enum {string} */
+                state: "own" | "merged" | "pending";
+                title: string;
+            };
+        };
+        /**
+         * DeviceImportConfirmRequest
+         * @description Either one of the activity's candidates, or keep it as its own entry
+         */
+        DeviceImportConfirmRequest: {
+            as_new?: boolean;
+            /** Format: uuid */
+            target_id?: string;
+        };
+        /** DeviceMetrics */
+        DeviceMetrics: {
+            avg_heart_rate?: number | null;
+            calories?: number | null;
+            distance_meters?: number | null;
+            duration_seconds: number;
+            /** Format: uuid */
+            id: string;
+            max_heart_rate?: number | null;
+            /** @enum {string} */
+            provider: "garmin" | "apple_health" | "health_connect";
+            /** @enum {string} */
+            sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+            /** Format: date-time */
+            started_at: string;
+        } | null;
+        /** DevicePendingImports */
+        DevicePendingImports: {
+            imports: {
+                /**
+                 * DeviceActivity
+                 * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
+                 */
+                activity: {
+                    activity_type?: string | null;
+                    avg_heart_rate?: number | null;
+                    calories?: number | null;
+                    candidates?: {
+                        /** Format: date-time */
+                        ends_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        kind: "training_log" | "execution" | "class";
+                        /** Format: uuid */
+                        organization_id?: string | null;
+                        /** Format: date-time */
+                        starts_at: string;
+                        title?: string | null;
+                    }[];
+                    /** Format: uuid */
+                    class_id?: string | null;
+                    distance_meters?: number | null;
+                    duration_seconds: number;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    journal_visibility?: "private" | "coach_can_view";
+                    max_heart_rate?: number | null;
+                    /** Format: uuid */
+                    organization_id?: string | null;
+                    /** @enum {string} */
+                    provider: "garmin" | "apple_health" | "health_connect";
+                    /**
+                     * @description Localized by the client; the raw type is `activity_type`
+                     * @enum {string}
+                     */
+                    sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                    /** Format: date-time */
+                    started_at: string;
+                    started_tz?: string;
+                    /** @enum {string} */
+                    state: "own" | "merged" | "pending";
+                    title: string;
+                };
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "activity";
+                /** Format: date-time */
+                received_at: string;
+            }[];
+        };
+        /**
+         * DeviceSummary
+         * @description The journal's device card; show it only when `visible`
+         */
+        DeviceSummary: {
+            backfill_progress?: number | null;
+            connected: boolean;
+            /** Format: date-time */
+            latest_at?: string | null;
+            needs_confirmation: number;
+            new_counts: {
+                activity?: number;
+                sleep?: number;
+                weight?: number;
+            };
+            new_total: number;
+            provider: string;
+            /** Format: date-time */
+            seen_at?: string | null;
+            status?: string | null;
+            visible: boolean;
+        };
+        /**
+         * DeviceSyncPrefs
+         * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+         */
+        DeviceSyncPrefs: {
+            activities?: boolean;
+            resting_hr?: boolean;
+            sleep?: boolean;
+            weight?: boolean;
         };
         /** ExecutionInteractionBatch */
         ExecutionInteractionBatch: {
@@ -17776,6 +18308,199 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** GarminConnectRequest */
+        GarminConnectRequest: {
+            /**
+             * @description History to import; 30 when left out
+             * @enum {integer}
+             */
+            backfill_days?: 0 | 30 | 90;
+            /** @description Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync */
+            health_data_consent?: boolean;
+            /**
+             * DeviceSyncPrefs
+             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+             */
+            sync_prefs?: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** GarminConnectResponse */
+        GarminConnectResponse: {
+            /** @description Open it to sign in at Garmin */
+            authorize_url: string;
+            /** Format: date-time */
+            expires_at: string;
+        };
+        /** GarminConnection */
+        GarminConnection: {
+            /** @enum {integer} */
+            backfill_days: 0 | 30 | 90;
+            /** @description «Εισαγωγή… 40%» while the history import runs */
+            backfill_progress?: number | null;
+            /** @enum {string} */
+            backfill_status: "none" | "running" | "done" | "failed";
+            /** Format: date-time */
+            connected_at?: string | null;
+            last_error?: string | null;
+            /** Format: date-time */
+            last_synced_at?: string | null;
+            needs_reconnect: boolean;
+            /** @enum {string} */
+            status: "active" | "error";
+            /**
+             * DeviceSyncPrefs
+             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                weight?: boolean;
+            };
+        } | null;
+        /** GarminDeviceRow */
+        GarminDeviceRow: {
+            backfill_day_options?: number[];
+            /** @enum {string} */
+            capability: "available" | "not_configured";
+            configured: boolean;
+            /** GarminConnection */
+            connection?: {
+                /** @enum {integer} */
+                backfill_days: 0 | 30 | 90;
+                /** @description «Εισαγωγή… 40%» while the history import runs */
+                backfill_progress?: number | null;
+                /** @enum {string} */
+                backfill_status: "none" | "running" | "done" | "failed";
+                /** Format: date-time */
+                connected_at?: string | null;
+                last_error?: string | null;
+                /** Format: date-time */
+                last_synced_at?: string | null;
+                needs_reconnect: boolean;
+                /** @enum {string} */
+                status: "active" | "error";
+                /**
+                 * DeviceSyncPrefs
+                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    weight?: boolean;
+                };
+            } | null;
+            /** @enum {string} */
+            provider: "garmin";
+            /**
+             * @description `unavailable` is «Σύντομα»: this server has no Garmin credentials
+             * @enum {string}
+             */
+            status: "unavailable" | "disconnected" | "connected" | "error";
+            /**
+             * DeviceSyncPrefs
+             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                weight?: boolean;
+            };
+        };
+        /** GarminDeviceRowResponse */
+        GarminDeviceRowResponse: {
+            /** GarminDeviceRow */
+            garmin: {
+                backfill_day_options?: number[];
+                /** @enum {string} */
+                capability: "available" | "not_configured";
+                configured: boolean;
+                /** GarminConnection */
+                connection?: {
+                    /** @enum {integer} */
+                    backfill_days: 0 | 30 | 90;
+                    /** @description «Εισαγωγή… 40%» while the history import runs */
+                    backfill_progress?: number | null;
+                    /** @enum {string} */
+                    backfill_status: "none" | "running" | "done" | "failed";
+                    /** Format: date-time */
+                    connected_at?: string | null;
+                    last_error?: string | null;
+                    /** Format: date-time */
+                    last_synced_at?: string | null;
+                    needs_reconnect: boolean;
+                    /** @enum {string} */
+                    status: "active" | "error";
+                    /**
+                     * DeviceSyncPrefs
+                     * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        weight?: boolean;
+                    };
+                } | null;
+                /** @enum {string} */
+                provider: "garmin";
+                /**
+                 * @description `unavailable` is «Σύντομα»: this server has no Garmin credentials
+                 * @enum {string}
+                 */
+                status: "unavailable" | "disconnected" | "connected" | "error";
+                /**
+                 * DeviceSyncPrefs
+                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                 */
+                sync_prefs: {
+                    activities?: boolean;
+                    resting_hr?: boolean;
+                    sleep?: boolean;
+                    weight?: boolean;
+                };
+            };
+        };
+        /** GarminDisconnectResponse */
+        GarminDisconnectResponse: {
+            /** @description What was deleted, when delete_data=true */
+            deleted?: {
+                activities?: number;
+                daily_stats?: number;
+                imports?: number;
+                sleep?: number;
+                weight?: number;
+            } | null;
+            /** @enum {string} */
+            status: "revoked";
+        };
+        /** GarminPushResponse */
+        GarminPushResponse: {
+            deregistered?: number;
+            ignored?: number;
+            queued?: number;
+        };
+        /** GarminUpdateRequest */
+        GarminUpdateRequest: {
+            /** @description Grants the health-data consent when this change turns on sleep, weight or resting heart rate */
+            health_data_consent?: boolean;
+            /**
+             * DeviceSyncPrefs
+             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+             */
+            sync_prefs: {
+                activities?: boolean;
+                resting_hr?: boolean;
+                sleep?: boolean;
+                weight?: boolean;
+            };
+        };
         /** GeocodePlace */
         GeocodePlace: {
             address: string | null;
@@ -18079,18 +18804,98 @@ export interface components {
         JournalCommentsResponse: {
             comments: components["schemas"]["JournalComment"][];
         };
+        /** JournalFeedEntry */
+        JournalFeedEntry: {
+            /** DeviceMetrics */
+            device?: {
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                max_heart_rate?: number | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /** @enum {string} */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+            } | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** JournalFeedItem */
         JournalFeedItem: {
             choosable_visibilities: ("private" | "coach_can_view" | "coach_reply_requested")[];
+            /** @description The entry, chosen by `kind`. ADR-161: a `device_activity` entry is a DeviceActivity; an execution or training-log entry a watch matched carries its numbers as `device` (DeviceMetrics). */
             entry: {
+                activity_type?: string | null;
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                candidates?: {
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "training_log" | "execution" | "class";
+                    /** Format: uuid */
+                    organization_id?: string | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title?: string | null;
+                }[];
+                /** Format: uuid */
+                class_id?: string | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                journal_visibility?: "private" | "coach_can_view";
+                max_heart_rate?: number | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /**
+                 * @description Localized by the client; the raw type is `activity_type`
+                 * @enum {string}
+                 */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+                started_tz?: string;
+                /** @enum {string} */
+                state: "own" | "merged" | "pending";
+                title: string;
+            } | ({
+                /** DeviceMetrics */
+                device?: {
+                    avg_heart_rate?: number | null;
+                    calories?: number | null;
+                    distance_meters?: number | null;
+                    duration_seconds: number;
+                    /** Format: uuid */
+                    id: string;
+                    max_heart_rate?: number | null;
+                    /** @enum {string} */
+                    provider: "garmin" | "apple_health" | "health_connect";
+                    /** @enum {string} */
+                    sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                    /** Format: date-time */
+                    started_at: string;
+                } | null;
+            } & {
                 [key: string]: unknown;
-            };
+            });
             /** Format: uuid */
             id: string;
             /** @enum {string} */
             journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
             /** @enum {string} */
-            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving";
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving" | "device_activity";
             /** Format: date-time */
             occurred_at: string;
             /**
@@ -18181,7 +18986,7 @@ export interface components {
             /** @enum {string} */
             journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
             /** @enum {string} */
-            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving";
+            kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving" | "device_activity";
             /** @description The message sent to the coach, for coach_reply_requested. */
             reply_request?: {
                 /** Format: uuid */
@@ -26754,6 +27559,127 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.GarminIntegrationController.callback": {
+        parameters: {
+            query?: {
+                code?: string;
+                state?: string;
+                error?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Back to Συνδεδεμένες συσκευές */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/html": string;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.GarminIntegrationController.deregistration": {
+        parameters: {
+            query?: {
+                token?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deregistered?: number;
+                        ignored?: number;
+                        queued?: number;
+                    };
+                };
+            };
+            /** @description Not from Garmin for this app */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.GarminIntegrationController.push": {
+        parameters: {
+            query?: {
+                token?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Accepted */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        deregistered?: number;
+                        ignored?: number;
+                        queued?: number;
+                    };
+                };
+            };
+            /** @description Not from Garmin for this app */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Garmin isn't configured here */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.JournalCommentController.batch": {
         parameters: {
             query?: never;
@@ -31072,10 +31998,51 @@ export interface operations {
                             webcal_url: string;
                         };
                         integrations: {
+                            backfill_day_options?: number[];
+                            /** @enum {string} */
+                            capability?: "available" | "not_configured";
+                            configured?: boolean;
+                            /** GarminConnection */
+                            connection?: {
+                                /** @enum {integer} */
+                                backfill_days: 0 | 30 | 90;
+                                /** @description «Εισαγωγή… 40%» while the history import runs */
+                                backfill_progress?: number | null;
+                                /** @enum {string} */
+                                backfill_status: "none" | "running" | "done" | "failed";
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                last_error?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                needs_reconnect: boolean;
+                                /** @enum {string} */
+                                status: "active" | "error";
+                                /**
+                                 * DeviceSyncPrefs
+                                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
                             /** @enum {string} */
                             provider: "garmin" | "apple_health" | "health_connect";
                             /** @enum {string} */
-                            status: "connected" | "disconnected" | "unavailable" | "native_only";
+                            status: "connected" | "disconnected" | "unavailable" | "native_only" | "error";
+                            /**
+                             * DeviceSyncPrefs
+                             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                             */
+                            sync_prefs?: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                weight?: boolean;
+                            };
                         }[];
                         wallet: {
                             passes: {
@@ -31103,6 +32070,742 @@ export interface operations {
                                 google?: boolean;
                             };
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.daily_stats": {
+        parameters: {
+            query?: {
+                metric?: "resting_hr";
+                range?: "1m" | "1y" | "3m";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daily stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        average: number | null;
+                        /** Format: date */
+                        from: string;
+                        /** DailyStatLatest */
+                        latest: {
+                            /** Format: date */
+                            on: string;
+                            /**
+                             * @description The device that sent it («από Garmin»)
+                             * @enum {string}
+                             */
+                            source: "garmin" | "apple_health" | "health_connect";
+                            /** @description Beats per minute for resting_hr */
+                            value: number;
+                        } | null;
+                        /** @enum {string} */
+                        metric: "resting_hr";
+                        points: {
+                            /** Format: date */
+                            on: string;
+                            /**
+                             * @description The device that sent it («από Garmin»)
+                             * @enum {string}
+                             */
+                            source: "garmin" | "apple_health" | "health_connect";
+                            /** @description Beats per minute for resting_hr */
+                            value: number;
+                        }[];
+                        /** @enum {string} */
+                        range: "1m" | "3m" | "1y";
+                        sources: string[];
+                        /** Format: date */
+                        to: string;
+                    };
+                };
+            };
+            /** @description Unknown metric or range */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    as_new?: boolean;
+                    /** Format: uuid */
+                    target_id?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description The workout */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * DeviceActivity
+                         * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
+                         */
+                        activity: {
+                            activity_type?: string | null;
+                            avg_heart_rate?: number | null;
+                            calories?: number | null;
+                            candidates?: {
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "training_log" | "execution" | "class";
+                                /** Format: uuid */
+                                organization_id?: string | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                title?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            class_id?: string | null;
+                            distance_meters?: number | null;
+                            duration_seconds: number;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            journal_visibility?: "private" | "coach_can_view";
+                            max_heart_rate?: number | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            /** @enum {string} */
+                            provider: "garmin" | "apple_health" | "health_connect";
+                            /**
+                             * @description Localized by the client; the raw type is `activity_type`
+                             * @enum {string}
+                             */
+                            sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                            /** Format: date-time */
+                            started_at: string;
+                            started_tz?: string;
+                            /** @enum {string} */
+                            state: "own" | "merged" | "pending";
+                            title: string;
+                        };
+                    };
+                };
+            };
+            /** @description No such import */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid answer */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Connected devices */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        calendar: {
+                            download_url?: string;
+                            help?: {
+                                [key: string]: string;
+                            };
+                            https_url: string;
+                            webcal_url: string;
+                        };
+                        integrations: {
+                            backfill_day_options?: number[];
+                            /** @enum {string} */
+                            capability?: "available" | "not_configured";
+                            configured?: boolean;
+                            /** GarminConnection */
+                            connection?: {
+                                /** @enum {integer} */
+                                backfill_days: 0 | 30 | 90;
+                                /** @description «Εισαγωγή… 40%» while the history import runs */
+                                backfill_progress?: number | null;
+                                /** @enum {string} */
+                                backfill_status: "none" | "running" | "done" | "failed";
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                last_error?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                needs_reconnect: boolean;
+                                /** @enum {string} */
+                                status: "active" | "error";
+                                /**
+                                 * DeviceSyncPrefs
+                                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            provider: "garmin" | "apple_health" | "health_connect";
+                            /** @enum {string} */
+                            status: "connected" | "disconnected" | "unavailable" | "native_only" | "error";
+                            /**
+                             * DeviceSyncPrefs
+                             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                             */
+                            sync_prefs?: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                weight?: boolean;
+                            };
+                        }[];
+                        wallet: {
+                            passes: {
+                                active: boolean;
+                                /** Format: date-time */
+                                added_at: string;
+                                box?: {
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id?: string;
+                                    slug?: string | null;
+                                };
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                last_updated_at?: string;
+                                /** @enum {string} */
+                                platform: "apple" | "google";
+                                /** Format: date-time */
+                                revoked_at?: string | null;
+                            }[];
+                            /** @description Whether this server can issue cards per platform */
+                            platforms: {
+                                apple?: boolean;
+                                google?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.disconnect": {
+        parameters: {
+            query?: {
+                delete_data?: boolean;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Disconnected */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description What was deleted, when delete_data=true */
+                        deleted?: {
+                            activities?: number;
+                            daily_stats?: number;
+                            imports?: number;
+                            sleep?: number;
+                            weight?: number;
+                        } | null;
+                        /** @enum {string} */
+                        status: "revoked";
+                    };
+                };
+            };
+            /** @description Never connected */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Grants the health-data consent when this change turns on sleep, weight or resting heart rate */
+                    health_data_consent?: boolean;
+                    /**
+                     * DeviceSyncPrefs
+                     * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                     */
+                    sync_prefs: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        weight?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description The Garmin row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GarminDeviceRow */
+                        garmin: {
+                            backfill_day_options?: number[];
+                            /** @enum {string} */
+                            capability: "available" | "not_configured";
+                            configured: boolean;
+                            /** GarminConnection */
+                            connection?: {
+                                /** @enum {integer} */
+                                backfill_days: 0 | 30 | 90;
+                                /** @description «Εισαγωγή… 40%» while the history import runs */
+                                backfill_progress?: number | null;
+                                /** @enum {string} */
+                                backfill_status: "none" | "running" | "done" | "failed";
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                last_error?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                needs_reconnect: boolean;
+                                /** @enum {string} */
+                                status: "active" | "error";
+                                /**
+                                 * DeviceSyncPrefs
+                                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            provider: "garmin";
+                            /**
+                             * @description `unavailable` is «Σύντομα»: this server has no Garmin credentials
+                             * @enum {string}
+                             */
+                            status: "unavailable" | "disconnected" | "connected" | "error";
+                            /**
+                             * DeviceSyncPrefs
+                             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Not connected or invalid */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.connect": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /**
+                     * @description History to import; 30 when left out
+                     * @enum {integer}
+                     */
+                    backfill_days?: 0 | 30 | 90;
+                    /** @description Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync */
+                    health_data_consent?: boolean;
+                    /**
+                     * DeviceSyncPrefs
+                     * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                     */
+                    sync_prefs?: {
+                        activities?: boolean;
+                        resting_hr?: boolean;
+                        sleep?: boolean;
+                        weight?: boolean;
+                    };
+                };
+            };
+        };
+        responses: {
+            /** @description Garmin sign-in */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Open it to sign in at Garmin */
+                        authorize_url: string;
+                        /** Format: date-time */
+                        expires_at: string;
+                    };
+                };
+            };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Already connected */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Garmin isn't available on this server */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.pending": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Waiting for an answer */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        imports: {
+                            /**
+                             * DeviceActivity
+                             * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
+                             */
+                            activity: {
+                                activity_type?: string | null;
+                                avg_heart_rate?: number | null;
+                                calories?: number | null;
+                                candidates?: {
+                                    /** Format: date-time */
+                                    ends_at: string;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** @enum {string} */
+                                    kind: "training_log" | "execution" | "class";
+                                    /** Format: uuid */
+                                    organization_id?: string | null;
+                                    /** Format: date-time */
+                                    starts_at: string;
+                                    title?: string | null;
+                                }[];
+                                /** Format: uuid */
+                                class_id?: string | null;
+                                distance_meters?: number | null;
+                                duration_seconds: number;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                journal_visibility?: "private" | "coach_can_view";
+                                max_heart_rate?: number | null;
+                                /** Format: uuid */
+                                organization_id?: string | null;
+                                /** @enum {string} */
+                                provider: "garmin" | "apple_health" | "health_connect";
+                                /**
+                                 * @description Localized by the client; the raw type is `activity_type`
+                                 * @enum {string}
+                                 */
+                                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                                /** Format: date-time */
+                                started_at: string;
+                                started_tz?: string;
+                                /** @enum {string} */
+                                state: "own" | "merged" | "pending";
+                                title: string;
+                            };
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "activity";
+                            /** Format: date-time */
+                            received_at: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The Garmin row */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GarminDeviceRow */
+                        garmin: {
+                            backfill_day_options?: number[];
+                            /** @enum {string} */
+                            capability: "available" | "not_configured";
+                            configured: boolean;
+                            /** GarminConnection */
+                            connection?: {
+                                /** @enum {integer} */
+                                backfill_days: 0 | 30 | 90;
+                                /** @description «Εισαγωγή… 40%» while the history import runs */
+                                backfill_progress?: number | null;
+                                /** @enum {string} */
+                                backfill_status: "none" | "running" | "done" | "failed";
+                                /** Format: date-time */
+                                connected_at?: string | null;
+                                last_error?: string | null;
+                                /** Format: date-time */
+                                last_synced_at?: string | null;
+                                needs_reconnect: boolean;
+                                /** @enum {string} */
+                                status: "active" | "error";
+                                /**
+                                 * DeviceSyncPrefs
+                                 * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                                 */
+                                sync_prefs: {
+                                    activities?: boolean;
+                                    resting_hr?: boolean;
+                                    sleep?: boolean;
+                                    weight?: boolean;
+                                };
+                            } | null;
+                            /** @enum {string} */
+                            provider: "garmin";
+                            /**
+                             * @description `unavailable` is «Σύντομα»: this server has no Garmin credentials
+                             * @enum {string}
+                             */
+                            status: "unavailable" | "disconnected" | "connected" | "error";
+                            /**
+                             * DeviceSyncPrefs
+                             * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
+                             */
+                            sync_prefs: {
+                                activities?: boolean;
+                                resting_hr?: boolean;
+                                sleep?: boolean;
+                                weight?: boolean;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Asked too recently */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Device card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        backfill_progress?: number | null;
+                        connected: boolean;
+                        /** Format: date-time */
+                        latest_at?: string | null;
+                        needs_confirmation: number;
+                        new_counts: {
+                            activity?: number;
+                            sleep?: number;
+                            weight?: number;
+                        };
+                        new_total: number;
+                        provider: string;
+                        /** Format: date-time */
+                        seen_at?: string | null;
+                        status?: string | null;
+                        visible: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.DevicesController.seen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Device card */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        backfill_progress?: number | null;
+                        connected: boolean;
+                        /** Format: date-time */
+                        latest_at?: string | null;
+                        needs_confirmation: number;
+                        new_counts: {
+                            activity?: number;
+                            sleep?: number;
+                            weight?: number;
+                        };
+                        new_total: number;
+                        provider: string;
+                        /** Format: date-time */
+                        seen_at?: string | null;
+                        status?: string | null;
+                        visible: boolean;
                     };
                 };
             };
@@ -32946,7 +34649,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving" | "wellness_entry";
+                kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving" | "device_activity" | "wellness_entry";
                 id: string;
             };
             cookie?: never;
@@ -32980,7 +34683,7 @@ export interface operations {
                         /** @enum {string} */
                         journal_visibility: "private" | "coach_can_view" | "coach_reply_requested" | "rated" | "posted";
                         /** @enum {string} */
-                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving";
+                        kind: "execution" | "training_log" | "pr" | "injury" | "review" | "note" | "check_in" | "body" | "wellness" | "craving" | "device_activity";
                         /** @description The message sent to the coach, for coach_reply_requested. */
                         reply_request?: {
                             /** Format: uuid */

@@ -10,7 +10,8 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
 
   alias OpenApiSpex.Schema
 
-  @kinds ~w(execution training_log pr injury review note check_in body wellness craving)
+  @kinds ~w(execution training_log pr injury review note check_in body wellness craving
+            device_activity)
   @movable_kinds @kinds ++ ~w(wellness_entry)
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
   @topics ~w(technique thought mood goal)
@@ -39,7 +40,8 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
         properties: %{
           kind: %Schema{
             type: :string,
-            enum: ~w(execution training_log pr injury review note check_in body wellness craving)
+            enum: ~w(execution training_log pr injury review note check_in body wellness craving
+                     device_activity)
           },
           id: %Schema{type: :string, format: :uuid},
           occurred_at: %Schema{type: :string, format: :"date-time"},
@@ -62,7 +64,19 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
               enum: ~w(private coach_can_view coach_reply_requested)
             }
           },
-          entry: %Schema{type: :object, additionalProperties: true}
+          entry: %Schema{
+            description:
+              "The entry, chosen by `kind`. ADR-161: a `device_activity` entry is a DeviceActivity; an execution or training-log entry a watch matched carries its numbers as `device` (DeviceMetrics).",
+            anyOf: [
+              MilosTrainingWeb.Schemas.Devices.activity(),
+              %Schema{
+                title: "JournalFeedEntry",
+                type: :object,
+                additionalProperties: true,
+                properties: %{device: MilosTrainingWeb.Schemas.Devices.merged_metrics()}
+              }
+            ]
+          }
         }
       },
       struct?: false

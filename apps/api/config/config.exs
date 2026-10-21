@@ -48,7 +48,8 @@ config :milos_training, Oban,
        {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob},
        {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob},
        {"0,30 * * * *", MilosTraining.Workers.BuddyWeeklySummaryJob},
-       {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob}
+       {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
+       {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob}
      ]}
   ],
   queues: [

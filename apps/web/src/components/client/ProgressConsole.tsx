@@ -14,6 +14,7 @@ import { ClientCard, ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/
 import { FeatureGate } from "@/components/client/FeatureGate";
 import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
+import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { formatDay } from "@/components/client/format";
 import { scaleWeekly, sourceShares, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
@@ -22,6 +23,7 @@ import { useUiTranslations } from "@/i18n/ui";
 
 /**
  * Ημερολόγιο › Πρόοδος (ADR-137): streak, badges and scores for everyone,
+ * resting heart rate from a connected device (ADR-161, only with data),
  * then personal records, the history export and, with
  * `view_advanced_analytics`, the detailed statistics.
  */
@@ -30,6 +32,7 @@ export function ProgressConsole() {
   return (
     <ClientPage title={i18n("clProgressTitle")} intro={i18n("clProgressIntro")}>
       <ProgressOverview />
+      <RestingHeartRateCard />
       <PantheonSection />
       <HistoryExportCard />
       <FeatureGate feature="progress">

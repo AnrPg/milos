@@ -62,6 +62,12 @@ function NotificationCard({
   const tReferrals = useTranslations("Referrals");
   const tAround = useTranslations("Around");
   const tCheckIn = useTranslations("CheckIn");
+  const tDevices = useTranslations("Devices");
+  // ADR-161: Garmin stopped answering; the notice opens Συνδεδεμένες συσκευές.
+  function deviceText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "device_sync_error") return null;
+    return tDevices(["notif", "sync_error", part].join("_"));
+  }
   const tBuddy = useTranslations("Buddy");
   // ADR-160: buddy invitations, requests, replies and the weekly counts.
   function buddyText(notification: NotificationRecord, part: "title" | "body") {
@@ -164,6 +170,8 @@ function NotificationCard({
   function notificationBody(notification: NotificationRecord) {
     const buddy = buddyText(notification, "body");
     if (buddy !== null) return buddy;
+    const device = deviceText(notification, "body");
+    if (device !== null) return device;
     const checkIn = checkInText(notification, "body");
     if (checkIn !== null) return checkIn;
     const around = aroundText(notification, "body");
@@ -414,6 +422,8 @@ function NotificationCard({
   function titleFromPayload(notification: NotificationRecord) {
     const buddy = buddyText(notification, "title");
     if (buddy !== null) return buddy;
+    const device = deviceText(notification, "title");
+    if (device !== null) return device;
     const checkIn = checkInText(notification, "title");
     if (checkIn !== null) return checkIn;
     const around = aroundText(notification, "title");

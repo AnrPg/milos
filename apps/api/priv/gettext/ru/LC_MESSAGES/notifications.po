@@ -531,3 +531,9 @@ msgstr "%{nickname}: самочувствие за неделю"
 
 msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr "%{sleep} ночей с целью сна, %{water} дней с водой, %{meals} дней с записанными приёмами пищи."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin перестал синхронизироваться"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Подключите его снова в разделе «Подключённые устройства», чтобы тренировки снова поступали."

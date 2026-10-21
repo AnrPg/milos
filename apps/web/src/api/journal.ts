@@ -25,8 +25,8 @@ export type JournalNoteUpdate = components["schemas"]["JournalNoteUpdateRequest"
 
 /** The entry inside an item, as its own endpoint returns it, by kind. */
 export type JournalEntryOf = {
-  execution: WorkoutExecution & { workout_title?: string | null; workout_type?: string | null };
-  training_log: TrainingLogEntry;
+  execution: WorkoutExecution & { workout_title?: string | null; workout_type?: string | null } & DeviceAttachment;
+  training_log: TrainingLogEntry & DeviceAttachment;
   pr: PRRecord;
   injury: InjuryRecord;
   review: ReviewRecord;
@@ -37,7 +37,12 @@ export type JournalEntryOf = {
   /** ADR-159: a day of water, sleep and meals (the member's summary only in their own feed). */
   wellness: WellnessFeedDay;
   craving: Craving;
+  /** ADR-161: a watch workout that matched nothing (always the owner's). */
+  device_activity: components["schemas"]["DeviceActivity"];
 };
+
+/** ADR-161: the watch's numbers on an execution or training-log entry it matched. */
+export type DeviceAttachment = { device?: NonNullable<components["schemas"]["DeviceMetrics"]> | null };
 
 export type WellnessFeedDay = {
   id: string;
@@ -65,7 +70,7 @@ export type JournalFilter = "all" | "training" | "notes" | "wellbeing";
 /** The kinds each Ροή filter chip lists. */
 export const JOURNAL_FILTER_KINDS: Record<JournalFilter, JournalKind[] | null> = {
   all: null,
-  training: ["execution", "training_log", "pr"],
+  training: ["execution", "training_log", "pr", "device_activity"],
   notes: ["note"],
   wellbeing: ["check_in", "injury", "wellness", "craving"],
 };

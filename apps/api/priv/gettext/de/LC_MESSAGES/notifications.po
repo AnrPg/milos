@@ -531,3 +531,9 @@ msgstr "%{nickname}: Wellness der Woche"
 
 msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr "%{sleep} Nächte am Schlafziel, %{water} Tage mit genug Wasser, %{meals} Tage mit erfassten Mahlzeiten."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin synchronisiert nicht mehr"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Verbinde es unter Verbundene Geräte neu, damit deine Trainings wieder ankommen."

@@ -9,7 +9,8 @@ defmodule MilosTraining.Journal.Domain.Visibility do
   """
 
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
-  @kinds ~w(execution training_log pr injury review note check_in body wellness craving)
+  @kinds ~w(execution training_log pr injury review note check_in body wellness craving
+            device_activity)
   # What each kind may hold, and which of those the member picks by hand
   # (`posted` comes from attaching the entry to a post, ADR-138).
   @allowed %{
@@ -30,7 +31,11 @@ defmodule MilosTraining.Journal.Domain.Visibility do
     # post only through its own confirmation.
     "wellness" => ~w(private coach_can_view),
     "wellness_entry" => ~w(private coach_can_view coach_reply_requested),
-    "craving" => ~w(private coach_can_view coach_reply_requested)
+    "craving" => ~w(private coach_can_view coach_reply_requested),
+    # ADR-161 (board 16, Q3): a watch workout starts private whatever the
+    # member's default and is never posted from here; one tied to a booked
+    # class may be shown to that gym's coach.
+    "device_activity" => ~w(private coach_can_view)
   }
   @self_managed ~w(body wellness)
   @manual ~w(private coach_can_view coach_reply_requested)

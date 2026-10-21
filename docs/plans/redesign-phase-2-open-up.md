@@ -659,6 +659,23 @@ built and can still be changed (ADR-160).
    craving count and times only with the second toggle); coach reads are logged for the member.
 7. **Boundaries (Q7):** leave quietly, quiet hours, a rate limit; updates arrive in real time.
 
+### Garmin (2026-10-21, [board 16](https://claude.ai/artifact/2Rz72RpiPnHVmk3kTGvvUp))
+
+The board had no answers when M13 was finished, so every recommended option was built and can
+still be changed (ADR-161).
+
+1. **Connecting (Q1):** connect, then choose what syncs (workouts, sleep, weight, resting heart
+   rate, all on); health-data consent only when sleep, weight or resting heart rate is on.
+2. **Workouts (Q2):** an activity overlapping a class or logged workout merges into it; two
+   candidates ask once; anything else becomes its own entry.
+3. **Visibility (Q3):** imports start private and are never posted.
+4. **Sleep and weight (Q4):** sleep fills Ευεξία, a scale weigh-in becomes a Σώμα snapshot, manual
+   entries win; resting heart rate shows in Πρόοδος as an indicator.
+5. **Past data (Q5):** from today, 30 days (default) or 90 days, imported in the background.
+6. **Status (Q6):** last sync, sync now, reconnect warning and one notification; disconnect keeps
+   or deletes the imported data.
+7. **Journal card (Q7):** a small card above Ροή only when something new arrived or needs a choice.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [x] Weight as trend only option
@@ -681,4 +698,4 @@ built and can still be changed (ADR-160).
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
 - [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
-- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [x] P2-M12 (ADR-160) · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [x] P2-M12 (ADR-160) · [x] P2-M13 (ADR-161) · [ ] P2-M14
