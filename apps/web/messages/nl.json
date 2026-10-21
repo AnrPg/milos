@@ -4578,6 +4578,7 @@
     "errors": {
       "notConfigured": "De assistent is nog niet ingesteld op deze server. Je kunt de tekst nog steeds zo publiceren.",
       "unavailable": "De assistent is bezet of offline. Probeer het zo opnieuw. Je tekst is opgeslagen.",
+      "quotaExhausted": "De assistent heeft geen credits meer. Vraag de beheerder van de app om het AI-account op te laden. Je tekst is opgeslagen en je kunt hem nog steeds ongewijzigd publiceren.",
       "textRequired": "Schrijf eerst de training en controleer hem dan.",
       "textTooLong": "Deze tekst is te lang voor één controle. Splits hem op in aparte trainingen."
     },

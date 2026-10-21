@@ -4578,6 +4578,7 @@
     "errors": {
       "notConfigured": "El asistente aún no está configurado en este servidor. Puedes publicar el texto tal cual.",
       "unavailable": "El asistente está ocupado o sin conexión. Inténtalo en un momento. Tu texto está guardado.",
+      "quotaExhausted": "El asistente se ha quedado sin créditos. Pide al administrador de la app que recargue la cuenta de IA. Tu texto está guardado y aún puedes publicarlo tal como está.",
       "textRequired": "Escribe primero el entrenamiento y luego revísalo.",
       "textTooLong": "El texto es demasiado largo para revisarlo de una vez. Divídelo en entrenamientos separados."
     },

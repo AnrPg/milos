@@ -4578,6 +4578,7 @@
     "errors": {
       "notConfigured": "L’assistant n’est pas encore configuré sur ce serveur. Tu peux quand même publier le texte tel quel.",
       "unavailable": "L’assistant est occupé ou hors ligne. Réessaie dans un instant. Ton texte est enregistré.",
+      "quotaExhausted": "L’assistant n’a plus de crédits. Demande à l’administrateur de l’application de recharger le compte IA. Ton texte est enregistré et tu peux toujours le publier tel quel.",
       "textRequired": "Écris d’abord la séance, puis vérifie-la.",
       "textTooLong": "Ce texte est trop long pour une seule vérification. Découpe-le en plusieurs séances."
     },

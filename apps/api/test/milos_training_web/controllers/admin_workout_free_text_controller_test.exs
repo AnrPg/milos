@@ -61,6 +61,28 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextControllerTest do
     assert response["code"] == "analyzer_not_configured"
   end
 
+  # The edge gateway replaces upstream 502s with its own HTML page, which hides
+  # the JSON code from the browser. Provider failures answer 424 instead.
+  for reason <- [:analyzer_quota_exhausted, :analyzer_unavailable, :analyzer_invalid_response] do
+    test "#{reason} answers 424 with an explicit code", %{conn: conn} do
+      {conn, organization} =
+        authenticate(conn, "ft_ai_#{System.unique_integer([:positive])}", :owner)
+
+      Process.put(:fake_workout_text_analyzer, fn _text, _options ->
+        {:error, unquote(reason)}
+      end)
+
+      response =
+        conn
+        |> post("/api/org/#{organization.slug}/admin/workouts/free-text/analyze", %{
+          text: "Run 5k"
+        })
+        |> json_response(424)
+
+      assert response["code"] == Atom.to_string(unquote(reason))
+    end
+  end
+
   test "members cannot use the workout assistant", %{conn: conn} do
     {conn, organization} = authenticate(conn, "free_text_ai_member", :member)
 
