@@ -177,6 +177,10 @@ defmodule MilosTraining.Application.JournalAudience do
     if match?([source] when is_binary(source), sources), do: hd(sources)
   end
 
+  # ADR-161: a watch workout of its own is the device's entry.
+  defp device_source(%{kind: "device_activity", entry: entry}),
+    do: device(Map.get(entry, :provider))
+
   defp device_source(_item), do: nil
 
   defp device(source) when is_binary(source),

@@ -83,7 +83,8 @@ defmodule MilosTraining.Notifications.Notification do
     :coach_wellness_summary,
     :craving_follow_up,
     :water_reminder,
-    :journal_export_ready
+    :journal_export_ready,
+    :device_sync_error
   ]
 
   schema "notifications" do

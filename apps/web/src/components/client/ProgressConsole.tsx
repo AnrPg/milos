@@ -24,6 +24,7 @@ import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/Fil
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
+import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { formatDay } from "@/components/client/format";
 import { scaleWeekly, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
@@ -37,6 +38,7 @@ import { useTranslations } from "next-intl";
 
 /**
  * Ημερολόγιο › Πρόοδος (ADR-137): streak, badges and scores for everyone,
+ * resting heart rate from a connected device (ADR-161, only with data),
  * then personal records, the history export and the statistics across every
  * provider (ADR-162, board 17 Q4): «Όλοι» by default, a provider chip next to
  * the time range narrows it.
@@ -46,6 +48,7 @@ export function ProgressConsole() {
   return (
     <ClientPage title={i18n("clProgressTitle")} intro={i18n("clProgressIntro")}>
       <ProgressOverview />
+      <RestingHeartRateCard />
       <PantheonSection />
       <HistoryExportCard />
       <ProgressContent />

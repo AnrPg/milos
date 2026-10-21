@@ -17,7 +17,7 @@ defmodule MilosTraining.Application.SetJournalVisibility do
     RequestCoachReply
   }
 
-  alias MilosTraining.{Execution, Journal, Pantheon, Wellbeing, Wellness}
+  alias MilosTraining.{Devices, Execution, Journal, Pantheon, Wellbeing, Wellness}
 
   def call(%{user_id: user_id} = context, kind, id, params) do
     rung = param(params, "visibility")
@@ -81,6 +81,9 @@ defmodule MilosTraining.Application.SetJournalVisibility do
 
   defp move("craving", id, user_id, rung),
     do: Wellness.set_craving_visibility(Wellness.get_craving(id, user_id), rung)
+
+  defp move("device_activity", id, user_id, rung),
+    do: Devices.update_activity(Devices.get_activity(id, user_id), %{journal_visibility: rung})
 
   defp broadcast({:ok, result} = ok, user_id) do
     BroadcastUserSync.for_user(user_id, ["my_journal"],

@@ -2266,7 +2266,27 @@ defmodule MilosTrainingWeb.FallbackController do
     share_confirmation_required:
       {:unprocessable_entity, "Confirm that you want to post these photos"},
     share_needs_two_snapshots: {:unprocessable_entity, "Choose two different snapshots"},
-    share_photo_missing: {:unprocessable_entity, "Both snapshots need a ready photo of that pose"}
+    share_photo_missing:
+      {:unprocessable_entity, "Both snapshots need a ready photo of that pose"},
+    # ADR-161: Garmin and connected devices.
+    garmin_not_configured: {:service_unavailable, "Garmin isn't available on this server yet"},
+    garmin_unavailable:
+      {:service_unavailable, "Garmin isn't answering right now; try again later"},
+    device_already_connected: {:conflict, "Garmin is already connected"},
+    device_not_connected: {:unprocessable_entity, "Garmin isn't connected"},
+    device_reconnect_required: {:conflict, "Reconnect Garmin to sync again"},
+    sync_too_soon:
+      {:too_many_requests, "Garmin was synced a moment ago; try again in a few minutes"},
+    invalid_sync_prefs:
+      {:unprocessable_entity,
+       "Choose on or off for workouts, sleep, weight and resting heart rate"},
+    invalid_backfill_days: {:unprocessable_entity, "Choose 0, 30 or 90 days of history"},
+    import_already_settled: {:conflict, "This workout was already sorted out"},
+    unknown_device_candidate:
+      {:unprocessable_entity, "Choose one of the suggested classes or workouts"},
+    device_confirmation_required:
+      {:unprocessable_entity, "Choose a class or workout, or keep it as its own entry"},
+    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

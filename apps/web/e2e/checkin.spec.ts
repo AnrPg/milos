@@ -422,7 +422,7 @@ test.describe("QR check-in", () => {
     await common(page, "member");
     const pass = { id: "pass-1", active: true, platform: "apple", added_at: "2026-10-01T10:00:00Z", box: { name: "Box Kypseli", slug: "kypseli", organization_id: "org-1" } };
     const deletes: string[] = [];
-    await page.route("**/api/me/connected-devices", (route) =>
+    await page.route("**/api/me/devices", (route) =>
       route.fulfill(
         json({
           wallet: { passes: [pass], platforms: { apple: true, google: false } },
@@ -443,7 +443,7 @@ test.describe("QR check-in", () => {
     const wallet = page.getByTestId("devices-wallet");
     await expect(wallet).toContainText("Box Kypseli");
     await expect(page.getByTestId("devices-calendar").getByRole("link", { name: "Subscribe" })).toHaveAttribute("href", "webcal://example.com/cal.ics");
-    await expect(page.getByTestId("devices-integrations")).toContainText("Not available");
+    await expect(page.getByTestId("garmin-row")).toContainText("Coming soon");
     await expect(page.getByTestId("devices-integrations")).toContainText("With the app");
 
     await page.getByTestId("revoke-pass-1").click();

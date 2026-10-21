@@ -532,6 +532,12 @@ msgstr "%{nickname}: welzijn van de week"
 msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr "%{sleep} nachten op het slaapdoel, %{water} dagen genoeg water, %{meals} dagen met maaltijden genoteerd."
 
+msgid "Garmin stopped syncing"
+msgstr "Garmin synchroniseert niet meer"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Koppel het opnieuw via Verbonden apparaten om je trainingen weer binnen te halen."
+
 msgid "Your journal export is ready"
 msgstr "Je dagboekexport staat klaar"
 

@@ -22,6 +22,7 @@ export const JOURNAL_KINDS: JournalKind[] = [
   "body",
   "wellness",
   "craving",
+  "device_activity",
 ];
 
 export const JOURNAL_VISIBILITIES: JournalVisibility[] = [

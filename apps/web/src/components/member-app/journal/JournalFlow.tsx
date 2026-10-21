@@ -35,6 +35,9 @@ import { SourceLabel } from "@/components/providers/SourceLabel";
 import { useSourceDirectory } from "@/components/providers/use-providers";
 import { CHECK_IN_FACES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
 import { BodyFeedCard } from "@/components/body/BodyFeedCard";
+import type { DeviceMetrics } from "@/api/devices";
+import { DeviceActivityCard, DeviceActivityDetail, DeviceAttachmentLine } from "@/components/devices/DeviceActivityCard";
+import { DeviceJournalCard } from "@/components/devices/DeviceJournalCard";
 import { ReviewCard } from "@/components/my-reviews";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
@@ -91,6 +94,7 @@ export function JournalFlow() {
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const [editingNote, setEditingNote] = useState<Extract<TypedJournalItem, { kind: "note" }> | null>(null);
+  const [deviceDetail, setDeviceDetail] = useState<{ metrics: DeviceMetrics; title: string } | null>(null);
   const days = useMemo(() => journalFlow(feed.data?.pages ?? []), [feed.data]);
 
   function refresh() {
@@ -138,6 +142,8 @@ export function JournalFlow() {
         </Link>
       }
     >
+      <DeviceJournalCard token={token} locale={locale} />
+
       {filter ? <JournalFilters filter={filter} onChange={setFilter} /> : null}
 
       {error ? (
@@ -187,19 +193,27 @@ export function JournalFlow() {
                           />
                         </li>
                       );
-                    case "training_log":
+                    case "training_log": {
+                      const device = item.entry.device;
                       return (
                         <TrainingLogEntryCard
                           key={key}
                           entry={item.entry}
                           locale={locale}
                           badge={badge(item)}
+                          device={
+                            device ? (
+                              <DeviceAttachmentLine device={device} locale={locale} onOpen={() => setDeviceDetail({ metrics: device, title: item.entry.title })} />
+                            ) : null
+                          }
                           onEdit={() => setLogDialog({ mode: "edit", entry: item.entry })}
                           onVoid={() => setLogDialog({ mode: "void", entry: item.entry })}
                         />
                       );
+                    }
                     case "execution": {
                       const entry = executionHistoryEntry(item, day.day);
+                      const device = item.entry.device;
                       return (
                         <ExecutionRow
                           key={key}
@@ -211,9 +225,29 @@ export function JournalFlow() {
                           onShare={() => setSharingId(entry.id)}
                           repeating={pendingId === entry.id}
                           disabled={Boolean(pendingId)}
+                          device={
+                            device ? (
+                              <DeviceAttachmentLine
+                                device={device}
+                                locale={locale}
+                                onOpen={() => setDeviceDetail({ metrics: device, title: entry.workout_title ?? i18n("workout39463a5") })}
+                              />
+                            ) : null
+                          }
                         />
                       );
                     }
+                    case "device_activity":
+                      return (
+                        <DeviceActivityCard
+                          key={key}
+                          activity={item.entry}
+                          occurredAt={item.occurred_at}
+                          locale={locale}
+                          badge={badge(item)}
+                          onOpen={() => setDeviceDetail({ metrics: item.entry, title: item.entry.title })}
+                        />
+                      );
                     case "body":
                       return <BodyFeedCard key={key} item={item} locale={locale} badge={badge(item)} />;
                     default:
@@ -259,6 +293,9 @@ export function JournalFlow() {
           }}
         />
       ) : null}
+      {deviceDetail ? (
+        <DeviceActivityDetail activity={deviceDetail.metrics} title={deviceDetail.title} locale={locale} onClose={() => setDeviceDetail(null)} />
+      ) : null}
       {editingNote ? (
         <NoteSheet
           note={editingNote.entry}
@@ -280,7 +317,7 @@ function FeedCard({
   badge,
   onEditNote,
 }: {
-  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" | "body" }>;
+  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" | "body" | "device_activity" }>;
   locale: string;
   badge: ReactNode;
   onEditNote: (item: Extract<TypedJournalItem, { kind: "note" }>) => void;
@@ -402,10 +439,12 @@ function ExecutionRow({
   onShare,
   repeating,
   disabled,
+  device,
 }: {
   entry: HistoryEntry;
   locale: string;
   badge: ReactNode;
+  device?: ReactNode;
   onPerformance: () => void;
   onRepeat: () => void;
   onShare: () => void;
@@ -431,6 +470,7 @@ function ExecutionRow({
           {entry.scale_level_slug ? <SemanticLabel value={entry.scale_level_slug} /> : null}
           <SourceBadge source={entry.source} />
         </p>
+        {device}
         <div className="mt-2">{badge}</div>
       </div>
       <EntryActions

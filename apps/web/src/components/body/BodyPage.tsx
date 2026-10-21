@@ -264,7 +264,9 @@ export function snapshotSummary(
     t("summaryPart", { metric: t(key("metricShort", metric)), value: formatMetric(value, unitOf(metric, settings.catalog, snapshot.units), locale) }),
   );
   if (snapshot.photo_count) parts.push(t("photoCount", { count: snapshot.photo_count }));
-  return parts.join(" · ") || t("summaryEmpty");
+  const summary = parts.join(" · ") || t("summaryEmpty");
+  // ADR-161: a Garmin scale's weigh-in says where it came from.
+  return snapshot.source === "garmin" ? [summary, t("fromGarmin")].join(" · ") : summary;
 }
 
 function SnapshotRow({ snapshot, previous, settings }: { snapshot: BodySnapshot; previous?: BodySnapshot; settings: BodySettingsResponse }) {

@@ -532,6 +532,12 @@ msgstr "%{nickname}: εβδομαδιαία ευεξία"
 msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr "%{sleep} νύχτες στον στόχο ύπνου, %{water} μέρες με νερό, %{meals} μέρες με καταγραφή γευμάτων."
 
+msgid "Garmin stopped syncing"
+msgstr "Ο συγχρονισμός με το Garmin σταμάτησε"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Κάνε επανασύνδεση από τις Συνδεδεμένες συσκευές για να έρχονται ξανά οι προπονήσεις σου."
+
 msgid "Your journal export is ready"
 msgstr "Η εξαγωγή του ημερολογίου σου είναι έτοιμη"
 

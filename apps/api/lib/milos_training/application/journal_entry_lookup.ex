@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.JournalEntryLookup do
   @moduledoc "One of the member's journal entries by kind and id, as its own context reads it."
 
-  alias MilosTraining.{Execution, Journal, Pantheon, Wellbeing, Wellness}
+  alias MilosTraining.{Devices, Execution, Journal, Pantheon, Wellbeing, Wellness}
 
   def fetch(kind, id, user_id) do
     case Ecto.UUID.cast(id) do
@@ -25,6 +25,14 @@ defmodule MilosTraining.Application.JournalEntryLookup do
   defp owned("review", _id, _user_id), do: {:error, :visibility_not_allowed}
   # ADR-158: a snapshot's visibility is set on the snapshot (Σώμα).
   defp owned("body", _id, _user_id), do: {:error, :visibility_not_allowed}
+  # ADR-161: a watch workout of its own (merged numbers follow their entry).
+  defp owned("device_activity", id, user_id) do
+    case Devices.get_activity(id, user_id) do
+      %{state: "own"} = activity -> activity
+      _other -> nil
+    end
+  end
+
   defp owned(_kind, _id, _user_id), do: {:error, :unknown_kind}
 
   defp found({:error, _reason} = error), do: error

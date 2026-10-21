@@ -532,6 +532,12 @@ msgstr "%{nickname}: седмично благосъстояние"
 msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr "%{sleep} нощи с цел за сън, %{water} дни с вода, %{meals} дни със записани хранения."
 
+msgid "Garmin stopped syncing"
+msgstr "Garmin спря да се синхронизира"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Свържи го отново от Свързани устройства, за да идват пак тренировките ти."
+
 msgid "Your journal export is ready"
 msgstr "Експортът на дневника ти е готов"
 

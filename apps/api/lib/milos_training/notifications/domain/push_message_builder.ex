@@ -669,6 +669,16 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-161: names the provider, never what failed.
+  def build("device_sync_error", payload, localize) do
+    %{
+      title: localize.("Garmin stopped syncing", %{}),
+      body:
+        localize.("Reconnect it from Connected devices to bring your workouts in again.", %{}),
+      url: payload["url"] || "/me/devices"
+    }
+  end
+
   def build("water_reminder", payload, localize) do
     %{
       title: localize.("A glass of water?", %{}),

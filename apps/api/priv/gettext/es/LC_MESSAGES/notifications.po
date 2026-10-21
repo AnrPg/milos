@@ -532,6 +532,12 @@ msgstr "%{nickname}: bienestar semanal"
 msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr "%{sleep} noches en el objetivo de sueño, %{water} días con agua, %{meals} días con comidas registradas."
 
+msgid "Garmin stopped syncing"
+msgstr "Garmin ha dejado de sincronizar"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Vuelve a conectarlo desde Dispositivos conectados para que tus entrenamientos lleguen de nuevo."
+
 msgid "Your journal export is ready"
 msgstr "Tu exportación del diario está lista"
 
