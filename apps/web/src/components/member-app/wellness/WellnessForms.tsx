@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import {
@@ -24,6 +24,9 @@ import {
   type WellnessEntry,
   type WellnessPlan,
 } from "@/api/wellness";
+import { SUPPORT_REQUESTS_KEY } from "@/api/buddies";
+import { activeBuddies, recipientNames } from "@/components/buddy/buddy-model";
+import { useBuddies } from "@/components/buddy/use-buddies";
 import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
@@ -452,6 +455,10 @@ export function CravingSheet({
   const t = useTranslations("MemberApp.wellness");
   const errorText = useErrorText();
   const { tokens } = useSession();
+  const queryClient = useQueryClient();
+  const buddies = useBuddies();
+  const recipients = activeBuddies(buddies.data);
+  const tBuddy = useTranslations("Buddy");
   const [support, setSupport] = useState(Boolean(craving?.support_requested_at));
   const [intensity, setIntensity] = useState(craving?.intensity ?? 6);
   const [triggers, setTriggers] = useState<CravingTrigger[]>(craving?.triggers ?? []);
@@ -470,7 +477,11 @@ export function CravingSheet({
       };
       return craving ? updateCraving(tokens!.access_token, craving.id, body) : logCraving(tokens!.access_token, body);
     },
-    onSuccess: onSaved,
+    onSuccess: () => {
+      // ADR-160: the request the server sent shows on Ευεξία with its status.
+      if (support) void queryClient.invalidateQueries({ queryKey: SUPPORT_REQUESTS_KEY });
+      onSaved();
+    },
   });
 
   const remove = useMutation({
@@ -486,7 +497,13 @@ export function CravingSheet({
       >
         <span className="min-w-0">
           <span className="block text-sm font-bold" style={{ color: "var(--text)" }}>{t("craving.support")}</span>
-          <span className="block text-xs" style={{ color: "var(--dim)" }}>{t("craving.supportNoBuddy")}</span>
+          <span className="block text-xs" style={{ color: "var(--dim)" }} data-testid="craving-support-recipients">
+            {craving?.support_requested_at
+              ? tBuddy("cravingSupportSent")
+              : recipients.length > 0
+                ? tBuddy("cravingGoesTo", { names: recipientNames(recipients, tBuddy("someone")) })
+                : t("craving.supportNoBuddy")}
+          </span>
         </span>
         <button
           type="button"

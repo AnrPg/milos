@@ -26,6 +26,7 @@ import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
 import { notificationTargetUrl } from "@/components/notifications/notification-links";
+import { buddyNotificationText } from "@/components/buddy/buddy-links";
 import {
   notificationOrigin,
   type NotificationOrigin,
@@ -61,6 +62,11 @@ function NotificationCard({
   const tReferrals = useTranslations("Referrals");
   const tAround = useTranslations("Around");
   const tCheckIn = useTranslations("CheckIn");
+  const tBuddy = useTranslations("Buddy");
+  // ADR-160: buddy invitations, requests, replies and the weekly counts.
+  function buddyText(notification: NotificationRecord, part: "title" | "body") {
+    return buddyNotificationText(notification.type, notification.payload, part, (key, values) => tBuddy(key, values));
+  }
   // ADR-155: a visitor at the door names the person, the box and when, and whether trials are open.
   function checkInText(notification: NotificationRecord, part: "title" | "body") {
     if (notification.type !== "check_in_visitor") return null;
@@ -156,6 +162,8 @@ function NotificationCard({
   }
 
   function notificationBody(notification: NotificationRecord) {
+    const buddy = buddyText(notification, "body");
+    if (buddy !== null) return buddy;
     const checkIn = checkInText(notification, "body");
     if (checkIn !== null) return checkIn;
     const around = aroundText(notification, "body");
@@ -404,6 +412,8 @@ function NotificationCard({
   }
 
   function titleFromPayload(notification: NotificationRecord) {
+    const buddy = buddyText(notification, "title");
+    if (buddy !== null) return buddy;
     const checkIn = checkInText(notification, "title");
     if (checkIn !== null) return checkIn;
     const around = aroundText(notification, "title");

@@ -460,6 +460,57 @@ msgstr "Hora de uma nova medição"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Um novo registo ajuda-te a ver a tua tendência. Demora um minuto."
 
+msgid "A buddy invitation"
+msgstr "Um convite de buddy"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} pede-te para seres o seu buddy de apoio."
+
+msgid "You have a support buddy"
+msgstr "Tens um buddy de apoio"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} aceitou. Só terá notícias tuas quando pedires."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} está a passar um momento difícil"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Estou aqui · Vamos dar uma volta? · Liga-me"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Vamos dar uma volta?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Liga-me"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Estou aqui"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} respondeu"
+
+msgid "No one has replied yet"
+msgstr "Ainda ninguém respondeu"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Até lá, algo pequeno: dois minutos a respirar, um copo de água, uma caminhada curta."
+
+msgid "%{nickname}'s week"
+msgstr "A semana de %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} momentos difíceis, %{overcome} superados, %{requests} pedidos de apoio."
+
+msgid "I'm here"
+msgstr "Estou aqui"
+
+msgid "Shall we go for a walk?"
+msgstr "Vamos dar uma volta?"
+
+msgid "Call me"
+msgstr "Liga-me"
+
 msgid "How did it go?"
 msgstr "Como correu?"
 
@@ -471,3 +522,12 @@ msgstr "Um copo de água?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "A tarde é uma boa altura para pôr a água em dia."
+
+msgid "Buddy message"
+msgstr "Mensagem do buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: bem-estar semanal"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} noites no objetivo de sono, %{water} dias com água, %{meals} dias com refeições registadas."

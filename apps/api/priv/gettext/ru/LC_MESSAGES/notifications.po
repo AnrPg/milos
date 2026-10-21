@@ -460,6 +460,57 @@ msgstr "Время для нового замера"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Новый снимок поможет увидеть твою тенденцию. Это займёт минуту."
 
+msgid "A buddy invitation"
+msgstr "Приглашение стать бадди"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} просит тебя стать бадди поддержки."
+
+msgid "You have a support buddy"
+msgstr "У тебя есть бадди поддержки"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} принял(а) приглашение. Он(а) узнает о тебе, только когда ты попросишь."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} переживает трудный момент"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Я здесь · Пойдём прогуляемся? · Позвони мне"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Пойдём прогуляемся?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Позвони мне"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Я здесь"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} ответил(а)"
+
+msgid "No one has replied yet"
+msgstr "Пока никто не ответил"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "А пока что-то небольшое: две минуты дыхания, стакан воды, короткая прогулка."
+
+msgid "%{nickname}'s week"
+msgstr "Неделя %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "Трудных моментов: %{moments}, преодолено: %{overcome}, просьб о поддержке: %{requests}."
+
+msgid "I'm here"
+msgstr "Я здесь"
+
+msgid "Shall we go for a walk?"
+msgstr "Пойдём прогуляемся?"
+
+msgid "Call me"
+msgstr "Позвони мне"
+
 msgid "How did it go?"
 msgstr "Как всё прошло?"
 
@@ -471,3 +522,12 @@ msgstr "Стакан воды?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "День — хорошее время наверстать воду."
+
+msgid "Buddy message"
+msgstr "Сообщение от бадди"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: самочувствие за неделю"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} ночей с целью сна, %{water} дней с водой, %{meals} дней с записанными приёмами пищи."

@@ -74,15 +74,18 @@ export function HubListRow({
   onClick,
   label,
   detail,
+  badge,
 }: {
   href?: string;
   onClick?: () => void;
   label: string;
   detail?: string;
+  /** A count or marker shown before the chevron (e.g. unread buddy messages). */
+  badge?: ReactNode;
 }) {
   const body = (
     <>
-      <span className="flex min-w-0 flex-col">
+      <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
           {label}
         </span>
@@ -92,6 +95,7 @@ export function HubListRow({
           </span>
         ) : null}
       </span>
+      {badge ?? null}
       <span aria-hidden="true" style={{ color: "var(--dim)" }}>
         ›
       </span>

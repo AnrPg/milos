@@ -640,6 +640,25 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
    Extras: the first visit asks which items you want (with the health-data consent); delete-all
    and export per section (JSON with meal photos).
 
+### Buddy για στήριξη (2026-10-21, [board 15](https://claude.ai/artifact/J79JsyV4XiokoKG4HrMnjM))
+
+The board had no answers when ANR said to proceed with M12, so every recommended option was
+built and can still be changed (ADR-160).
+
+1. **Buddy page (Q1):** up to two buddies, each with what they receive; the same page lists the
+   people you support.
+2. **Who (Q2):** club mates, people you follow, your coach, or an invite link to someone not on
+   Milos (7 days); nothing starts until they accept.
+3. **Sending (Q3):** the Λιγούρα toggle plus a quick «Χρειάζομαι στήριξη» on Ευεξία and the + menu,
+   an optional line, 5-second undo; no craving details are sent.
+4. **Buddy side (Q4):** push and card with quick replies, then an account-level buddy chat; the
+   phone shows only if the sender shares it (off by default).
+5. **No answer (Q5):** after 10 minutes a calm card with breathing, water, a walk, «Στείλε ξανά» and
+   help lines as information.
+6. **Summaries (Q6):** buddies get counts only; the coach summary follows board 14 (wellness counts,
+   craving count and times only with the second toggle); coach reads are logged for the member.
+7. **Boundaries (Q7):** leave quietly, quiet hours, a rate limit; updates arrive in real time.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [x] Weight as trend only option
@@ -662,4 +681,4 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
 - [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
-- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [x] P2-M12 (ADR-160) · [ ] P2-M13 · [ ] P2-M14

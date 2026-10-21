@@ -21,7 +21,8 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
  * The kinds of entry a member can write today (brief §7.7), grouped as the
  * feature map groups them: Προπόνηση · Ευεξία · Coach · Σημείωση. Each kind
  * opens the flow that owns it. Μέτρηση (Σώμα, ADR-158) is here unless Σώμα
- * is switched off; Νερό · Ύπνος · Γεύμα and Λιγούρα (ADR-159) open Ευεξία.
+ * is switched off; Νερό · Ύπνος · Γεύμα and Λιγούρα (ADR-159) open Ευεξία,
+ * and «Χρειάζομαι στήριξη» (ADR-160) opens its quick send there.
  * A group with no kinds is not shown, so the sheet never shows a button
  * that leads nowhere.
  */
@@ -31,6 +32,7 @@ export type NewEntryKind =
   | "measure"
   | "wellness"
   | "craving"
+  | "support"
   | "checkIn"
   | "injury"
   | "formReview"
@@ -49,7 +51,7 @@ export function newEntryGroups(options: {
   const groups: { group: NewEntryGroup; kinds: NewEntryKind[] }[] = [
     { group: "training", kinds: ["workout", "pr"] },
     { group: "body", kinds: options.body === false ? [] : ["measure"] },
-    { group: "wellbeing", kinds: [...wellness, "checkIn", "craving", "injury"] },
+    { group: "wellbeing", kinds: [...wellness, "checkIn", "craving", "support", "injury"] },
     { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
     { group: "note", kinds: ["note"] },
   ];
@@ -60,6 +62,7 @@ const ROUTES: Partial<Record<NewEntryKind, string>> = {
   measure: "/journal/body/new",
   wellness: "/journal/wellbeing#today",
   craving: "/journal/wellbeing?craving=new",
+  support: "/journal/wellbeing?support=new#support",
   checkIn: "/journal/wellbeing#check-in",
   injury: "/journal/wellbeing#report-injury",
   formReview: "/box/coach",

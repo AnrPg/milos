@@ -460,6 +460,57 @@ msgstr "הגיע הזמן למדידה חדשה"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "תמונת מצב חדשה עוזרת לך לראות את המגמה שלך. זה לוקח דקה."
 
+msgid "A buddy invitation"
+msgstr "הזמנה להיות באדי"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} מבקש/ת שתהיה הבאדי התומך/ת שלו/ה."
+
+msgid "You have a support buddy"
+msgstr "יש לך באדי תומך/ת"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} אישר/ה. ישמע/תשמע ממך רק כשתבקש/י."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} עובר/ת רגע קשה"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "אני כאן · נצא להליכה? · תתקשר אליי"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: נצא להליכה?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: תתקשר אליי"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: אני כאן"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} ענה/תה"
+
+msgid "No one has replied yet"
+msgstr "אף אחד עוד לא ענה"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "בינתיים, משהו קטן: שתי דקות נשימה, כוס מים, הליכה קצרה."
+
+msgid "%{nickname}'s week"
+msgstr "השבוע של %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "רגעים קשים: %{moments}, התגברות: %{overcome}, בקשות תמיכה: %{requests}."
+
+msgid "I'm here"
+msgstr "אני כאן"
+
+msgid "Shall we go for a walk?"
+msgstr "נצא להליכה?"
+
+msgid "Call me"
+msgstr "תתקשר אליי"
+
 msgid "How did it go?"
 msgstr "איך זה הלך?"
 
@@ -471,3 +522,12 @@ msgstr "כוס מים?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "אחר הצהריים הוא זמן טוב להשלים מים."
+
+msgid "Buddy message"
+msgstr "הודעה מהבאדי"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: רווחה שבועית"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} לילות ביעד השינה, %{water} ימים עם מים, %{meals} ימים עם ארוחות מתועדות."

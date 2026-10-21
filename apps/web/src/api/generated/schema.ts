@@ -382,6 +382,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/buddy-invites/{token}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Preview of a buddy invite link (public) */
+        get: operations["MilosTrainingWeb.BuddyInviteController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/calendar/export-links": {
         parameters: {
             query?: never;
@@ -952,6 +969,196 @@ export interface paths {
         get: operations["MilosTrainingWeb.BoxConversationController.index"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your buddies, the people you support, invitations waiting for you, your settings */
+        get: operations["MilosTrainingWeb.MyBuddiesController.index"];
+        put?: never;
+        /** Invite someone you know here (they must accept; expires after 7 days) */
+        post: operations["MilosTrainingWeb.MyBuddiesController.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People you can invite: your coaches and follows; with q, people of a club in common */
+        get: operations["MilosTrainingWeb.MyBuddiesController.candidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/invite-links": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** An invite link for someone not on Milos yet (shown once; expires after 7 days) */
+        post: operations["MilosTrainingWeb.MyBuddiesController.create_invite_link"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your quiet hours and whether buddies may see your phone */
+        get: operations["MilosTrainingWeb.MyBuddiesController.settings"];
+        /** Change your quiet hours, zone or phone sharing (off by default) */
+        put: operations["MilosTrainingWeb.MyBuddiesController.update_settings"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** What your buddy receives: only what you send, or also the weekly counts summary */
+        patch: operations["MilosTrainingWeb.MyBuddiesController.update"];
+        trace?: never;
+    };
+    "/api/me/buddies/{id}/accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Accept an invitation to support someone */
+        post: operations["MilosTrainingWeb.MyBuddiesController.accept"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline an invitation (the other person is not notified) */
+        post: operations["MilosTrainingWeb.MyBuddiesController.decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/{id}/leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Stop, from either side, at any time (no push; the other sees it on their page) */
+        post: operations["MilosTrainingWeb.MyBuddiesController.leave"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The link's conversation, newest first (cursor paging) */
+        get: operations["MilosTrainingWeb.BuddyMessagesController.index"];
+        put?: never;
+        /** Write to your buddy (the link must be active) */
+        post: operations["MilosTrainingWeb.BuddyMessagesController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddies/{id}/messages/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the other person's messages read */
+        post: operations["MilosTrainingWeb.BuddyMessagesController.read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/buddy-invites/{token}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Claim an invite link: you become that person's buddy */
+        post: operations["MilosTrainingWeb.MyBuddiesController.claim"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1874,6 +2081,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/support-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your recent support requests, or the ones you received */
+        get: operations["MilosTrainingWeb.SupportRequestController.index"];
+        put?: never;
+        /** Ask your active buddies for support (optional message; nothing else is shared) */
+        post: operations["MilosTrainingWeb.SupportRequestController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/support-requests/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One support request: who received it, who replied, quiet hours, the no-reply card */
+        get: operations["MilosTrainingWeb.SupportRequestController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/support-requests/{id}/replies": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Answer as a buddy: here, walk, call (with the sender's phone if shared) or text */
+        post: operations["MilosTrainingWeb.SupportRequestController.reply"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/support-requests/{id}/undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Take a request back within 5 seconds (nobody is told) */
+        post: operations["MilosTrainingWeb.SupportRequestController.undo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/tours/{audience}/complete": {
         parameters: {
             query?: never;
@@ -1989,6 +2265,41 @@ export interface paths {
         post?: never;
         /** Delete every entry of a section (wellness, cravings); irreversible */
         delete: operations["MilosTrainingWeb.WellnessController.erase"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness-summary-sharing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether your coaches get a weekly wellness summary, and cravings in it */
+        get: operations["MilosTrainingWeb.WellnessSummarySharingController.show"];
+        /** Turn the coach's weekly wellness summary, or cravings in it, on or off */
+        put: operations["MilosTrainingWeb.WellnessSummarySharingController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/wellness-summary-sharing/access-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Which coaches read your weekly wellness summary, newest first */
+        get: operations["MilosTrainingWeb.WellnessSummarySharingController.access_log"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -7139,6 +7450,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/wellness-summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's weekly wellness summary (only when the client allowed it) */
+        get: operations["MilosTrainingWeb.ClientWellnessSummaryController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/staff/coach-notes/reads": {
         parameters: {
             query?: never;
@@ -12224,6 +12552,376 @@ export interface components {
             }[];
             services: ("personal_training" | "small_group_training" | "open_gym" | "nutrition_coaching" | "online_coaching" | "corporate")[];
         };
+        /** BuddyCandidates */
+        BuddyCandidates: {
+            candidates: {
+                /** @enum {string|null} */
+                link_status?: "pending" | "active" | null;
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                /** @enum {string} */
+                relation: "coach" | "club" | "follow";
+            }[];
+        };
+        /**
+         * BuddyInviteLinkResponse
+         * @description Shown once: share `url` yourself. Only a digest of the token is kept.
+         */
+        BuddyInviteLinkResponse: {
+            /** Format: date-time */
+            expires_at: string;
+            /**
+             * BuddyLink
+             * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+             */
+            link: {
+                /** Format: date-time */
+                created_at?: string;
+                /** Format: date-time */
+                ended_at?: string | null;
+                ended_by_me: boolean;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                receives_weekly_summary: boolean;
+                /** @enum {string} */
+                role: "requester" | "buddy";
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
+                via_link: boolean;
+            };
+            path: string;
+            token: string;
+            url: string;
+        };
+        /** BuddyInvitePreview */
+        BuddyInvitePreview: {
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** BuddyPerson */
+            inviter: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null;
+            /** @enum {string} */
+            status: "pending" | "expired" | "unavailable";
+        };
+        /** BuddyInviteRequest */
+        BuddyInviteRequest: {
+            /** Format: uuid */
+            user_id: string;
+        };
+        /**
+         * BuddyLink
+         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+         */
+        BuddyLink: {
+            /** Format: date-time */
+            created_at?: string;
+            /** Format: date-time */
+            ended_at?: string | null;
+            ended_by_me: boolean;
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** BuddyPerson */
+            person: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null;
+            receives_weekly_summary: boolean;
+            /** @enum {string} */
+            role: "requester" | "buddy";
+            /** Format: date-time */
+            started_at?: string | null;
+            /** @enum {string} */
+            status: "pending" | "active" | "declined" | "ended" | "expired";
+            /** @description Unread messages from the other person in this link's conversation */
+            unread_messages?: number;
+            via_link: boolean;
+        };
+        /** BuddyLinkResponse */
+        BuddyLinkResponse: {
+            /**
+             * BuddyLink
+             * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+             */
+            link: {
+                /** Format: date-time */
+                created_at?: string;
+                /** Format: date-time */
+                ended_at?: string | null;
+                ended_by_me: boolean;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                receives_weekly_summary: boolean;
+                /** @enum {string} */
+                role: "requester" | "buddy";
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
+                via_link: boolean;
+            };
+        };
+        /** BuddyLinkUpdateRequest */
+        BuddyLinkUpdateRequest: {
+            receives_weekly_summary: boolean;
+        };
+        /** BuddyMessage */
+        BuddyMessage: {
+            /** BuddyPerson */
+            author: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null;
+            body: string;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            link_id: string;
+            mine: boolean;
+            /** Format: date-time */
+            read_at?: string | null;
+        };
+        /**
+         * BuddyMessagePage
+         * @description A page of the link's conversation, newest first. `read_only` once the link ended: the thread stays readable, nobody can write.
+         */
+        BuddyMessagePage: {
+            messages: {
+                /** BuddyPerson */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                body: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                link_id: string;
+                mine: boolean;
+                /** Format: date-time */
+                read_at?: string | null;
+            }[];
+            next_cursor: string | null;
+            read_only: boolean;
+            unread: number;
+        };
+        /** BuddyMessageRequest */
+        BuddyMessageRequest: {
+            body: string;
+        };
+        /** BuddyMessageResponse */
+        BuddyMessageResponse: {
+            /** BuddyMessage */
+            message: {
+                /** BuddyPerson */
+                author: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                body: string;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                link_id: string;
+                mine: boolean;
+                /** Format: date-time */
+                read_at?: string | null;
+            };
+        };
+        /** BuddyMessagesReadResponse */
+        BuddyMessagesReadResponse: {
+            read: number;
+        };
+        /** BuddyOverview */
+        BuddyOverview: {
+            buddies: {
+                /** Format: date-time */
+                created_at?: string;
+                /** Format: date-time */
+                ended_at?: string | null;
+                ended_by_me: boolean;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                receives_weekly_summary: boolean;
+                /** @enum {string} */
+                role: "requester" | "buddy";
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
+                via_link: boolean;
+            }[];
+            invitations: {
+                /** Format: date-time */
+                created_at?: string;
+                /** Format: date-time */
+                ended_at?: string | null;
+                ended_by_me: boolean;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                receives_weekly_summary: boolean;
+                /** @enum {string} */
+                role: "requester" | "buddy";
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
+                via_link: boolean;
+            }[];
+            invite_days: number;
+            max_buddies: number;
+            /** BuddySettings */
+            settings: {
+                phone: string | null;
+                /** @description Local times in `tz`; requests still arrive, silently */
+                quiet_hours: {
+                    from: string;
+                    to: string;
+                } | null;
+                share_phone: boolean;
+                tz: string;
+            };
+            supporting: {
+                /** Format: date-time */
+                created_at?: string;
+                /** Format: date-time */
+                ended_at?: string | null;
+                ended_by_me: boolean;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                receives_weekly_summary: boolean;
+                /** @enum {string} */
+                role: "requester" | "buddy";
+                /** Format: date-time */
+                started_at?: string | null;
+                /** @enum {string} */
+                status: "pending" | "active" | "declined" | "ended" | "expired";
+                /** @description Unread messages from the other person in this link's conversation */
+                unread_messages?: number;
+                via_link: boolean;
+            }[];
+        };
+        /** BuddyPerson */
+        BuddyPerson: {
+            avatar_url?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname: string | null;
+        } | null;
+        /** BuddySettings */
+        BuddySettings: {
+            phone: string | null;
+            /** @description Local times in `tz`; requests still arrive, silently */
+            quiet_hours: {
+                from: string;
+                to: string;
+            } | null;
+            share_phone: boolean;
+            tz: string;
+        };
+        /** BuddySettingsRequest */
+        BuddySettingsRequest: {
+            phone?: string | null;
+            quiet_hours?: {
+                from?: string;
+                to?: string;
+            } | null;
+            share_phone?: boolean;
+            tz?: string;
+        };
+        /** BuddySettingsResponse */
+        BuddySettingsResponse: {
+            /** BuddySettings */
+            settings: {
+                phone: string | null;
+                /** @description Local times in `tz`; requests still arrive, silently */
+                quiet_hours: {
+                    from: string;
+                    to: string;
+                } | null;
+                share_phone: boolean;
+                tz: string;
+            };
+        };
         /** CheckInBooking */
         CheckInBooking: {
             duration_minutes?: number | null;
@@ -12843,6 +13541,38 @@ export interface components {
             tasks_done: string[];
             /** Format: uuid */
             user_id?: string | null;
+        };
+        /** ClientWellnessSummary */
+        ClientWellnessSummary: {
+            shared: boolean;
+            summary: {
+                /** Format: date-time */
+                allowed_since?: string | null;
+                /** @description Only when the member allowed cravings in the summary: count and times */
+                cravings: {
+                    count?: number;
+                    moments?: {
+                        /** Format: date */
+                        date?: string;
+                        time?: string;
+                    }[];
+                } | null;
+                meals: {
+                    days_logged?: number;
+                };
+                sleep: {
+                    nights_logged?: number;
+                    nights_on_goal?: number;
+                };
+                water: {
+                    days_logged?: number;
+                    days_on_goal?: number;
+                };
+                /** Format: date */
+                week_end: string;
+                /** Format: date */
+                week_start: string;
+            } | null;
         };
         /** CoachNote */
         CoachNote: {
@@ -20929,6 +21659,329 @@ export interface components {
             /** Format: date */
             starts_on: string;
         };
+        /** SupportReply */
+        SupportReply: {
+            /** @description Where the reply was posted in the pair's buddy conversation */
+            conversation?: {
+                /** Format: uuid */
+                link_id?: string;
+                /** Format: uuid */
+                message_id?: string;
+            } | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "here" | "walk" | "call" | "text";
+            /** BuddyPerson */
+            person: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null;
+            text?: string | null;
+        };
+        /** SupportReplyRequest */
+        SupportReplyRequest: {
+            /** @enum {string} */
+            kind: "here" | "walk" | "call" | "text";
+            text?: string | null;
+        };
+        /** SupportReplyResponse */
+        SupportReplyResponse: {
+            /** SupportReply */
+            reply: {
+                /** @description Where the reply was posted in the pair's buddy conversation */
+                conversation?: {
+                    /** Format: uuid */
+                    link_id?: string;
+                    /** Format: uuid */
+                    message_id?: string;
+                } | null;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "here" | "walk" | "call" | "text";
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                text?: string | null;
+            };
+            /** @description Only for `call`, and only when the sender shares their phone with buddies */
+            sender_phone: string | null;
+        };
+        /**
+         * SupportRequest
+         * @description One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.
+         */
+        SupportRequest: {
+            can_undo?: boolean;
+            /** Format: date-time */
+            created_at: string;
+            delivered_silently?: boolean;
+            /** Format: uuid */
+            id: string;
+            message: string | null;
+            /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+            nudge?: {
+                breathing_seconds?: number;
+                can_resend?: boolean;
+                due?: boolean;
+                /** Format: date-time */
+                due_at?: string;
+                help_lines?: {
+                    informational?: boolean;
+                    path?: string;
+                };
+                /** Format: date-time */
+                sent_at?: string | null;
+                suggestions?: string[];
+            };
+            quick_replies?: ("here" | "walk" | "call")[];
+            /** @description Buddies who got it silently (their quiet hours) */
+            quiet_hours?: ({
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null)[];
+            recipients?: {
+                /** BuddyPerson */
+                person?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                quiet_hours?: boolean;
+                /** Format: date-time */
+                replied_at?: string | null;
+            }[];
+            replies?: {
+                /** @description Where the reply was posted in the pair's buddy conversation */
+                conversation?: {
+                    /** Format: uuid */
+                    link_id?: string;
+                    /** Format: uuid */
+                    message_id?: string;
+                } | null;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "here" | "walk" | "call" | "text";
+                /** BuddyPerson */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                text?: string | null;
+            }[];
+            /** @enum {string} */
+            role: "sender" | "buddy";
+            /** BuddyPerson */
+            sender?: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            } | null;
+            /** @enum {string} */
+            source?: "craving" | "quick";
+            /** @enum {string} */
+            status: "sending" | "delivered" | "undone";
+            /** Format: date-time */
+            undo_until?: string;
+        };
+        /** SupportRequestCreateRequest */
+        SupportRequestCreateRequest: {
+            message?: string | null;
+        };
+        /** SupportRequestList */
+        SupportRequestList: {
+            support_requests: {
+                can_undo?: boolean;
+                /** Format: date-time */
+                created_at: string;
+                delivered_silently?: boolean;
+                /** Format: uuid */
+                id: string;
+                message: string | null;
+                /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+                nudge?: {
+                    breathing_seconds?: number;
+                    can_resend?: boolean;
+                    due?: boolean;
+                    /** Format: date-time */
+                    due_at?: string;
+                    help_lines?: {
+                        informational?: boolean;
+                        path?: string;
+                    };
+                    /** Format: date-time */
+                    sent_at?: string | null;
+                    suggestions?: string[];
+                };
+                quick_replies?: ("here" | "walk" | "call")[];
+                /** @description Buddies who got it silently (their quiet hours) */
+                quiet_hours?: ({
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null)[];
+                recipients?: {
+                    /** BuddyPerson */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname: string | null;
+                    } | null;
+                    quiet_hours?: boolean;
+                    /** Format: date-time */
+                    replied_at?: string | null;
+                }[];
+                replies?: {
+                    /** @description Where the reply was posted in the pair's buddy conversation */
+                    conversation?: {
+                        /** Format: uuid */
+                        link_id?: string;
+                        /** Format: uuid */
+                        message_id?: string;
+                    } | null;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "here" | "walk" | "call" | "text";
+                    /** BuddyPerson */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname: string | null;
+                    } | null;
+                    text?: string | null;
+                }[];
+                /** @enum {string} */
+                role: "sender" | "buddy";
+                /** BuddyPerson */
+                sender?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                /** @enum {string} */
+                source?: "craving" | "quick";
+                /** @enum {string} */
+                status: "sending" | "delivered" | "undone";
+                /** Format: date-time */
+                undo_until?: string;
+            }[];
+        };
+        /** SupportRequestResponse */
+        SupportRequestResponse: {
+            /**
+             * SupportRequest
+             * @description One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.
+             */
+            support_request: {
+                can_undo?: boolean;
+                /** Format: date-time */
+                created_at: string;
+                delivered_silently?: boolean;
+                /** Format: uuid */
+                id: string;
+                message: string | null;
+                /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+                nudge?: {
+                    breathing_seconds?: number;
+                    can_resend?: boolean;
+                    due?: boolean;
+                    /** Format: date-time */
+                    due_at?: string;
+                    help_lines?: {
+                        informational?: boolean;
+                        path?: string;
+                    };
+                    /** Format: date-time */
+                    sent_at?: string | null;
+                    suggestions?: string[];
+                };
+                quick_replies?: ("here" | "walk" | "call")[];
+                /** @description Buddies who got it silently (their quiet hours) */
+                quiet_hours?: ({
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null)[];
+                recipients?: {
+                    /** BuddyPerson */
+                    person?: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname: string | null;
+                    } | null;
+                    quiet_hours?: boolean;
+                    /** Format: date-time */
+                    replied_at?: string | null;
+                }[];
+                replies?: {
+                    /** @description Where the reply was posted in the pair's buddy conversation */
+                    conversation?: {
+                        /** Format: uuid */
+                        link_id?: string;
+                        /** Format: uuid */
+                        message_id?: string;
+                    } | null;
+                    /** Format: date-time */
+                    created_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "here" | "walk" | "call" | "text";
+                    /** BuddyPerson */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname: string | null;
+                    } | null;
+                    text?: string | null;
+                }[];
+                /** @enum {string} */
+                role: "sender" | "buddy";
+                /** BuddyPerson */
+                sender?: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                } | null;
+                /** @enum {string} */
+                source?: "craving" | "quick";
+                /** @enum {string} */
+                status: "sending" | "delivered" | "undone";
+                /** Format: date-time */
+                undo_until?: string;
+            };
+        };
         /** TrainingHistoryPage */
         TrainingHistoryPage: {
             entries: {
@@ -21559,6 +22612,29 @@ export interface components {
                 revoked_at?: string | null;
             };
         };
+        /** WellnessAccessLog */
+        WellnessAccessLog: {
+            entries: {
+                cravings_shown: boolean;
+                /** Format: uuid */
+                id: string;
+                organization?: {
+                    /** Format: uuid */
+                    id?: string;
+                    name?: string | null;
+                };
+                /** Format: date-time */
+                read_at: string;
+                reader: {
+                    /** Format: uuid */
+                    id?: string;
+                    nickname?: string | null;
+                };
+                shared: boolean;
+                /** Format: date */
+                week_start: string;
+            }[];
+        };
         /** WellnessEntryChangeRequest */
         WellnessEntryChangeRequest: {
             /**
@@ -21927,6 +23003,36 @@ export interface components {
                 water_goal_ml: number;
                 /** @description Opt-in afternoon reminder while the day is under half the goal */
                 water_reminder: boolean;
+            };
+        };
+        /** WellnessSummarySharing */
+        WellnessSummarySharing: {
+            /** @description Λιγούρες στη σύνοψη */
+            cravings: boolean;
+            /** Format: date-time */
+            cravings_since?: string | null;
+            /** @description Ευεξία · εβδομαδιαία σύνοψη */
+            wellness: boolean;
+            /** Format: date-time */
+            wellness_since?: string | null;
+        };
+        /** WellnessSummarySharingRequest */
+        WellnessSummarySharingRequest: {
+            cravings?: boolean;
+            wellness?: boolean;
+        };
+        /** WellnessSummarySharingResponse */
+        WellnessSummarySharingResponse: {
+            /** WellnessSummarySharing */
+            sharing: {
+                /** @description Λιγούρες στη σύνοψη */
+                cravings: boolean;
+                /** Format: date-time */
+                cravings_since?: string | null;
+                /** @description Ευεξία · εβδομαδιαία σύνοψη */
+                wellness: boolean;
+                /** Format: date-time */
+                wellness_since?: string | null;
             };
         };
         /** WodLeaderboardEntry */
@@ -24763,6 +25869,40 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.BuddyInviteController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at?: string | null;
+                        /** BuddyPerson */
+                        inviter: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string | null;
+                        } | null;
+                        /** @enum {string} */
+                        status: "pending" | "expired" | "unavailable";
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.CalendarFeedController.links": {
         parameters: {
             query?: never;
@@ -27269,6 +28409,756 @@ export interface operations {
                             thread_id: string;
                             unread: boolean;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Overview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        buddies: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        }[];
+                        invitations: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        }[];
+                        invite_days: number;
+                        max_buddies: number;
+                        /** BuddySettings */
+                        settings: {
+                            phone: string | null;
+                            /** @description Local times in `tz`; requests still arrive, silently */
+                            quiet_hours: {
+                                from: string;
+                                to: string;
+                            } | null;
+                            share_phone: boolean;
+                            tz: string;
+                        };
+                        supporting: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Buddy link */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.candidates": {
+        parameters: {
+            query?: {
+                q?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Candidates */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        candidates: {
+                            /** @enum {string|null} */
+                            link_status?: "pending" | "active" | null;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            /** @enum {string} */
+                            relation: "coach" | "club" | "follow";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.create_invite_link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Invite link */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
+                        path: string;
+                        token: string;
+                        url: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BuddySettings */
+                        settings: {
+                            phone: string | null;
+                            /** @description Local times in `tz`; requests still arrive, silently */
+                            quiet_hours: {
+                                from: string;
+                                to: string;
+                            } | null;
+                            share_phone: boolean;
+                            tz: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.update_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    phone?: string | null;
+                    quiet_hours?: {
+                        from?: string;
+                        to?: string;
+                    } | null;
+                    share_phone?: boolean;
+                    tz?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BuddySettings */
+                        settings: {
+                            phone: string | null;
+                            /** @description Local times in `tz`; requests still arrive, silently */
+                            quiet_hours: {
+                                from: string;
+                                to: string;
+                            } | null;
+                            share_phone: boolean;
+                            tz: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    receives_weekly_summary: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Buddy link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.accept": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buddy link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buddy link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buddy link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BuddyMessagesController.index": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Messages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        messages: {
+                            /** BuddyPerson */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            body: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            link_id: string;
+                            mine: boolean;
+                            /** Format: date-time */
+                            read_at?: string | null;
+                        }[];
+                        next_cursor: string | null;
+                        read_only: boolean;
+                        unread: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BuddyMessagesController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BuddyMessage */
+                        message: {
+                            /** BuddyPerson */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            body: string;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            link_id: string;
+                            mine: boolean;
+                            /** Format: date-time */
+                            read_at?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.BuddyMessagesController.read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        read: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyBuddiesController.claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                token: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Buddy link */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * BuddyLink
+                         * @description A buddy link seen from your side: `requester` (your buddy) or `buddy` (someone you support). `person` is null for an invite link nobody claimed yet.
+                         */
+                        link: {
+                            /** Format: date-time */
+                            created_at?: string;
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            ended_by_me: boolean;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            receives_weekly_summary: boolean;
+                            /** @enum {string} */
+                            role: "requester" | "buddy";
+                            /** Format: date-time */
+                            started_at?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "active" | "declined" | "ended" | "expired";
+                            /** @description Unread messages from the other person in this link's conversation */
+                            unread_messages?: number;
+                            via_link: boolean;
+                        };
                     };
                 };
             };
@@ -32062,6 +33952,499 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.SupportRequestController.index": {
+        parameters: {
+            query?: {
+                role?: "sent" | "received";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Support requests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        support_requests: {
+                            can_undo?: boolean;
+                            /** Format: date-time */
+                            created_at: string;
+                            delivered_silently?: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            message: string | null;
+                            /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+                            nudge?: {
+                                breathing_seconds?: number;
+                                can_resend?: boolean;
+                                due?: boolean;
+                                /** Format: date-time */
+                                due_at?: string;
+                                help_lines?: {
+                                    informational?: boolean;
+                                    path?: string;
+                                };
+                                /** Format: date-time */
+                                sent_at?: string | null;
+                                suggestions?: string[];
+                            };
+                            quick_replies?: ("here" | "walk" | "call")[];
+                            /** @description Buddies who got it silently (their quiet hours) */
+                            quiet_hours?: ({
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null)[];
+                            recipients?: {
+                                /** BuddyPerson */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                quiet_hours?: boolean;
+                                /** Format: date-time */
+                                replied_at?: string | null;
+                            }[];
+                            replies?: {
+                                /** @description Where the reply was posted in the pair's buddy conversation */
+                                conversation?: {
+                                    /** Format: uuid */
+                                    link_id?: string;
+                                    /** Format: uuid */
+                                    message_id?: string;
+                                } | null;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "here" | "walk" | "call" | "text";
+                                /** BuddyPerson */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                text?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            role: "sender" | "buddy";
+                            /** BuddyPerson */
+                            sender?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            /** @enum {string} */
+                            source?: "craving" | "quick";
+                            /** @enum {string} */
+                            status: "sending" | "delivered" | "undone";
+                            /** Format: date-time */
+                            undo_until?: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SupportRequestController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    message?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Support request */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * SupportRequest
+                         * @description One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.
+                         */
+                        support_request: {
+                            can_undo?: boolean;
+                            /** Format: date-time */
+                            created_at: string;
+                            delivered_silently?: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            message: string | null;
+                            /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+                            nudge?: {
+                                breathing_seconds?: number;
+                                can_resend?: boolean;
+                                due?: boolean;
+                                /** Format: date-time */
+                                due_at?: string;
+                                help_lines?: {
+                                    informational?: boolean;
+                                    path?: string;
+                                };
+                                /** Format: date-time */
+                                sent_at?: string | null;
+                                suggestions?: string[];
+                            };
+                            quick_replies?: ("here" | "walk" | "call")[];
+                            /** @description Buddies who got it silently (their quiet hours) */
+                            quiet_hours?: ({
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null)[];
+                            recipients?: {
+                                /** BuddyPerson */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                quiet_hours?: boolean;
+                                /** Format: date-time */
+                                replied_at?: string | null;
+                            }[];
+                            replies?: {
+                                /** @description Where the reply was posted in the pair's buddy conversation */
+                                conversation?: {
+                                    /** Format: uuid */
+                                    link_id?: string;
+                                    /** Format: uuid */
+                                    message_id?: string;
+                                } | null;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "here" | "walk" | "call" | "text";
+                                /** BuddyPerson */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                text?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            role: "sender" | "buddy";
+                            /** BuddyPerson */
+                            sender?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            /** @enum {string} */
+                            source?: "craving" | "quick";
+                            /** @enum {string} */
+                            status: "sending" | "delivered" | "undone";
+                            /** Format: date-time */
+                            undo_until?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SupportRequestController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Support request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * SupportRequest
+                         * @description One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.
+                         */
+                        support_request: {
+                            can_undo?: boolean;
+                            /** Format: date-time */
+                            created_at: string;
+                            delivered_silently?: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            message: string | null;
+                            /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+                            nudge?: {
+                                breathing_seconds?: number;
+                                can_resend?: boolean;
+                                due?: boolean;
+                                /** Format: date-time */
+                                due_at?: string;
+                                help_lines?: {
+                                    informational?: boolean;
+                                    path?: string;
+                                };
+                                /** Format: date-time */
+                                sent_at?: string | null;
+                                suggestions?: string[];
+                            };
+                            quick_replies?: ("here" | "walk" | "call")[];
+                            /** @description Buddies who got it silently (their quiet hours) */
+                            quiet_hours?: ({
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null)[];
+                            recipients?: {
+                                /** BuddyPerson */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                quiet_hours?: boolean;
+                                /** Format: date-time */
+                                replied_at?: string | null;
+                            }[];
+                            replies?: {
+                                /** @description Where the reply was posted in the pair's buddy conversation */
+                                conversation?: {
+                                    /** Format: uuid */
+                                    link_id?: string;
+                                    /** Format: uuid */
+                                    message_id?: string;
+                                } | null;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "here" | "walk" | "call" | "text";
+                                /** BuddyPerson */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                text?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            role: "sender" | "buddy";
+                            /** BuddyPerson */
+                            sender?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            /** @enum {string} */
+                            source?: "craving" | "quick";
+                            /** @enum {string} */
+                            status: "sending" | "delivered" | "undone";
+                            /** Format: date-time */
+                            undo_until?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SupportRequestController.reply": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    kind: "here" | "walk" | "call" | "text";
+                    text?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Reply */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** SupportReply */
+                        reply: {
+                            /** @description Where the reply was posted in the pair's buddy conversation */
+                            conversation?: {
+                                /** Format: uuid */
+                                link_id?: string;
+                                /** Format: uuid */
+                                message_id?: string;
+                            } | null;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "here" | "walk" | "call" | "text";
+                            /** BuddyPerson */
+                            person: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            text?: string | null;
+                        };
+                        /** @description Only for `call`, and only when the sender shares their phone with buddies */
+                        sender_phone: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SupportRequestController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Support request */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * SupportRequest
+                         * @description One «Χρειάζομαι στήριξη». The sender (`role: sender`) sees recipients, quiet hours, replies, the undo window and the no-reply card; a buddy (`role: buddy`) sees the message, who sent it and their own replies.
+                         */
+                        support_request: {
+                            can_undo?: boolean;
+                            /** Format: date-time */
+                            created_at: string;
+                            delivered_silently?: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            message: string | null;
+                            /** @description The calm card after ten minutes without a reply; help lines are information, not advice */
+                            nudge?: {
+                                breathing_seconds?: number;
+                                can_resend?: boolean;
+                                due?: boolean;
+                                /** Format: date-time */
+                                due_at?: string;
+                                help_lines?: {
+                                    informational?: boolean;
+                                    path?: string;
+                                };
+                                /** Format: date-time */
+                                sent_at?: string | null;
+                                suggestions?: string[];
+                            };
+                            quick_replies?: ("here" | "walk" | "call")[];
+                            /** @description Buddies who got it silently (their quiet hours) */
+                            quiet_hours?: ({
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null)[];
+                            recipients?: {
+                                /** BuddyPerson */
+                                person?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                quiet_hours?: boolean;
+                                /** Format: date-time */
+                                replied_at?: string | null;
+                            }[];
+                            replies?: {
+                                /** @description Where the reply was posted in the pair's buddy conversation */
+                                conversation?: {
+                                    /** Format: uuid */
+                                    link_id?: string;
+                                    /** Format: uuid */
+                                    message_id?: string;
+                                } | null;
+                                /** Format: date-time */
+                                created_at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "here" | "walk" | "call" | "text";
+                                /** BuddyPerson */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname: string | null;
+                                } | null;
+                                text?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            role: "sender" | "buddy";
+                            /** BuddyPerson */
+                            sender?: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            } | null;
+                            /** @enum {string} */
+                            source?: "craving" | "quick";
+                            /** @enum {string} */
+                            status: "sending" | "delivered" | "undone";
+                            /** Format: date-time */
+                            undo_until?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.complete_tour": {
         parameters: {
             query?: never;
@@ -32830,6 +35213,118 @@ export interface operations {
                         erased: {
                             [key: string]: number;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessSummarySharingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sharing */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** WellnessSummarySharing */
+                        sharing: {
+                            /** @description Λιγούρες στη σύνοψη */
+                            cravings: boolean;
+                            /** Format: date-time */
+                            cravings_since?: string | null;
+                            /** @description Ευεξία · εβδομαδιαία σύνοψη */
+                            wellness: boolean;
+                            /** Format: date-time */
+                            wellness_since?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessSummarySharingController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    cravings?: boolean;
+                    wellness?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Sharing */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** WellnessSummarySharing */
+                        sharing: {
+                            /** @description Λιγούρες στη σύνοψη */
+                            cravings: boolean;
+                            /** Format: date-time */
+                            cravings_since?: string | null;
+                            /** @description Ευεξία · εβδομαδιαία σύνοψη */
+                            wellness: boolean;
+                            /** Format: date-time */
+                            wellness_since?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WellnessSummarySharingController.access_log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Access log */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            cravings_shown: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            organization?: {
+                                /** Format: uuid */
+                                id?: string;
+                                name?: string | null;
+                            };
+                            /** Format: date-time */
+                            read_at: string;
+                            reader: {
+                                /** Format: uuid */
+                                id?: string;
+                                nickname?: string | null;
+                            };
+                            shared: boolean;
+                            /** Format: date */
+                            week_start: string;
+                        }[];
                     };
                 };
             };
@@ -57839,6 +60334,61 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ClientWellnessSummaryController.show": {
+        parameters: {
+            query?: {
+                /** @description Any date of the week; the last completed week when left out */
+                week?: string;
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Summary */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        shared: boolean;
+                        summary: {
+                            /** Format: date-time */
+                            allowed_since?: string | null;
+                            /** @description Only when the member allowed cravings in the summary: count and times */
+                            cravings: {
+                                count?: number;
+                                moments?: {
+                                    /** Format: date */
+                                    date?: string;
+                                    time?: string;
+                                }[];
+                            } | null;
+                            meals: {
+                                days_logged?: number;
+                            };
+                            sleep: {
+                                nights_logged?: number;
+                                nights_on_goal?: number;
+                            };
+                            water: {
+                                days_logged?: number;
+                                days_on_goal?: number;
+                            };
+                            /** Format: date */
+                            week_end: string;
+                            /** Format: date */
+                            week_start: string;
+                        } | null;
                     };
                 };
             };

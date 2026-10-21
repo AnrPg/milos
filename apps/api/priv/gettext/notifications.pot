@@ -458,6 +458,57 @@ msgstr ""
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr ""
 
+msgid "A buddy invitation"
+msgstr ""
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr ""
+
+msgid "You have a support buddy"
+msgstr ""
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr ""
+
+msgid "%{nickname} is having a hard moment"
+msgstr ""
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr ""
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr ""
+
+msgid "%{nickname}: Call me"
+msgstr ""
+
+msgid "%{nickname}: I'm here"
+msgstr ""
+
+msgid "%{nickname} replied"
+msgstr ""
+
+msgid "No one has replied yet"
+msgstr ""
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr ""
+
+msgid "%{nickname}'s week"
+msgstr ""
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr ""
+
+msgid "I'm here"
+msgstr ""
+
+msgid "Shall we go for a walk?"
+msgstr ""
+
+msgid "Call me"
+msgstr ""
+
 msgid "How did it go?"
 msgstr ""
 
@@ -468,4 +519,13 @@ msgid "A glass of water?"
 msgstr ""
 
 msgid "The afternoon is a good moment to catch up on water."
+msgstr ""
+
+msgid "Buddy message"
+msgstr ""
+
+msgid "%{nickname}: weekly wellness"
+msgstr ""
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 msgstr ""

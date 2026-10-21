@@ -13,6 +13,7 @@ import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { useClubRealtime, useMyClubs } from "@/components/community/use-community";
 import { WodCard } from "@/components/community/WodCard";
+import { SupportInbox } from "@/components/buddy/SupportRequestCard";
 import { MyEventsCard } from "@/components/events/MyEventsCard";
 import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { GreetingCard } from "@/components/member-app/home/GreetingCard";
@@ -65,6 +66,7 @@ export function HomeHub() {
       {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
       <ScopeToggle current="clubs" />
       <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
+      <SupportInbox />
       <WellnessStrip />
       <MyTrialsCard />
       {gymClub ? (

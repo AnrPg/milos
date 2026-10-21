@@ -39,7 +39,7 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
           :ok
 
         _notification ->
-          case maybe_enqueue_push(notification) do
+          case maybe_enqueue_push(notification, silent?(payload)) do
             :ok -> {:ok, notification}
             {:error, reason} -> {:error, {:push_enqueue_failed, notification, reason}}
           end
@@ -47,7 +47,14 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
     end
   end
 
-  defp maybe_enqueue_push(notification) do
+  # ADR-160: a support request inside a buddy's quiet hours lands in the
+  # inbox without a push.
+  defp silent?(payload),
+    do: Map.get(payload, :silent) == true or Map.get(payload, "silent") == true
+
+  defp maybe_enqueue_push(_notification, true), do: :ok
+
+  defp maybe_enqueue_push(notification, false) do
     if PushConfig.enabled?() do
       EnqueuePushDispatch.call(notification)
     else

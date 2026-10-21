@@ -76,6 +76,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     pantheon/pr_store
     journal/journal_store
     body/body_store
+    buddies/buddy_store
     wellness/wellness_store
     coaching/form_review_store
     coaching/relationship_store
