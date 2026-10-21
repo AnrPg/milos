@@ -234,6 +234,6 @@ All recommended options, with every recommended extra.
 4. Should seasons support card payment later, and through which processor?
 
 ## 8. Progress
-- [ ] Step 1 explore · [ ] Step 2 decisions · [x] Step 3 plan (draft)
-- [ ] P3-M1 · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
+- [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
+- [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
 - [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
