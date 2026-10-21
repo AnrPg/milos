@@ -2596,6 +2596,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/progress/depth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your muscle coverage, qualities radar and training load across every provider */
+        get: operations["MilosTrainingWeb.TrainingDepthController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/providers": {
         parameters: {
             query?: never;
@@ -8549,6 +8566,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.CoachingExtrasController.nutrition_plan"];
         /** Write a client's nutrition plan; the client is notified */
         put: operations["MilosTrainingWeb.CoachingExtrasController.save_nutrition_plan"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/progress-depth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's muscle coverage, qualities radar and training load, from shared entries */
+        get: operations["MilosTrainingWeb.TrainingDepthController.client"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -15187,6 +15221,111 @@ export interface components {
             /** Format: uuid */
             user_id?: string | null;
         };
+        /**
+         * ClientTrainingDepth
+         * @description Only from entries the client shares with this gym's coaches
+         */
+        ClientTrainingDepth: {
+            /** DepthCoverage */
+            coverage: {
+                /**
+                 * DepthBalance
+                 * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                 */
+                balance: {
+                    ham: number;
+                    pull: number;
+                    push: number;
+                    push_pull_ratio: number | null;
+                    quad: number;
+                    quad_ham_ratio: number | null;
+                };
+                /** DepthExerciseCounts */
+                exercises: {
+                    recognized: number;
+                    unrecognized: number;
+                };
+                felt_entries: number;
+                /** @description Up to three major groups at level none or low, lowest first */
+                least: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Up to three major groups with the most weighted sets */
+                most: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Workouts done in the range */
+                sessions: number;
+                /** DepthCoverageThresholds */
+                thresholds: {
+                    high: number;
+                    medium: number;
+                };
+            };
+            /** Format: date */
+            from: string;
+            /**
+             * DepthLoad
+             * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+             */
+            load: {
+                /** @description Load of the last 7 days */
+                acute: number;
+                /** @enum {string|null} */
+                band: "below" | "steady" | "above" | "well_above" | null;
+                /** DepthLoadBands */
+                bands: {
+                    above_to: number;
+                    below: number;
+                    steady_to: number;
+                };
+                /** @description Weekly average of the last 28 days */
+                chronic: number;
+                /** @description Last 28 days, with effort and time */
+                rated_sessions: number;
+                ratio: number | null;
+                sufficient: boolean;
+                /** @description Last 28 days, without effort or time (not counted) */
+                unrated_sessions: number;
+                weeks: {
+                    load: number;
+                    sessions: number;
+                    /** Format: date */
+                    week_start: string;
+                }[];
+            };
+            /** DepthQualities */
+            qualities: {
+                felt_entries: number;
+                /** @description All ten qualities, canonical order */
+                qualities: {
+                    felt: number;
+                    id: string;
+                    /** @description Share of the most-trained quality, 0..1 */
+                    score: number;
+                    sets: number;
+                }[];
+                /** @description Workouts with a recognised exercise */
+                sessions: number;
+            };
+            /** @enum {string} */
+            range: "4w" | "12w" | "6m" | "1y" | "all";
+            /** Format: date */
+            to: string;
+            weeks: number;
+        };
         /** ClientWellnessSummary */
         ClientWellnessSummary: {
             shared: boolean;
@@ -18747,6 +18886,151 @@ export interface components {
             to: string;
         };
         /**
+         * DepthBalance
+         * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+         */
+        DepthBalance: {
+            ham: number;
+            pull: number;
+            push: number;
+            push_pull_ratio: number | null;
+            quad: number;
+            quad_ham_ratio: number | null;
+        };
+        /** DepthCoverage */
+        DepthCoverage: {
+            /**
+             * DepthBalance
+             * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+             */
+            balance: {
+                ham: number;
+                pull: number;
+                push: number;
+                push_pull_ratio: number | null;
+                quad: number;
+                quad_ham_ratio: number | null;
+            };
+            /** DepthExerciseCounts */
+            exercises: {
+                recognized: number;
+                unrecognized: number;
+            };
+            felt_entries: number;
+            /** @description Up to three major groups at level none or low, lowest first */
+            least: {
+                /** @description Taxonomy group id */
+                id: string;
+                /** @enum {string} */
+                level: "none" | "low" | "medium" | "high";
+                per_week: number;
+                /** @description Weighted sets in the range */
+                sets: number;
+            }[];
+            /** @description Up to three major groups with the most weighted sets */
+            most: {
+                /** @description Taxonomy group id */
+                id: string;
+                /** @enum {string} */
+                level: "none" | "low" | "medium" | "high";
+                per_week: number;
+                /** @description Weighted sets in the range */
+                sets: number;
+            }[];
+            /** @description Workouts done in the range */
+            sessions: number;
+            /** DepthCoverageThresholds */
+            thresholds: {
+                high: number;
+                medium: number;
+            };
+        };
+        /** DepthCoverageGroup */
+        DepthCoverageGroup: {
+            /** @description Taxonomy group id */
+            id: string;
+            /** @enum {string} */
+            level: "none" | "low" | "medium" | "high";
+            per_week: number;
+            /** @description Weighted sets in the range */
+            sets: number;
+        };
+        /** DepthCoverageThresholds */
+        DepthCoverageThresholds: {
+            high: number;
+            medium: number;
+        };
+        /** DepthExerciseCounts */
+        DepthExerciseCounts: {
+            recognized: number;
+            unrecognized: number;
+        };
+        /**
+         * DepthLoad
+         * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+         */
+        DepthLoad: {
+            /** @description Load of the last 7 days */
+            acute: number;
+            /** @enum {string|null} */
+            band: "below" | "steady" | "above" | "well_above" | null;
+            /** DepthLoadBands */
+            bands: {
+                above_to: number;
+                below: number;
+                steady_to: number;
+            };
+            /** @description Weekly average of the last 28 days */
+            chronic: number;
+            /** @description Last 28 days, with effort and time */
+            rated_sessions: number;
+            ratio: number | null;
+            sufficient: boolean;
+            /** @description Last 28 days, without effort or time (not counted) */
+            unrated_sessions: number;
+            weeks: {
+                load: number;
+                sessions: number;
+                /** Format: date */
+                week_start: string;
+            }[];
+        };
+        /** DepthLoadBands */
+        DepthLoadBands: {
+            above_to: number;
+            below: number;
+            steady_to: number;
+        };
+        /** DepthLoadWeek */
+        DepthLoadWeek: {
+            load: number;
+            sessions: number;
+            /** Format: date */
+            week_start: string;
+        };
+        /** DepthQualities */
+        DepthQualities: {
+            felt_entries: number;
+            /** @description All ten qualities, canonical order */
+            qualities: {
+                felt: number;
+                id: string;
+                /** @description Share of the most-trained quality, 0..1 */
+                score: number;
+                sets: number;
+            }[];
+            /** @description Workouts with a recognised exercise */
+            sessions: number;
+        };
+        /** DepthQuality */
+        DepthQuality: {
+            felt: number;
+            id: string;
+            /** @description Share of the most-trained quality, 0..1 */
+            score: number;
+            sets: number;
+        };
+        /**
          * DeviceActivity
          * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
          */
@@ -21088,6 +21372,110 @@ export interface components {
             }[];
             partial: boolean;
             timezone: string;
+        };
+        /** MyTrainingDepth */
+        MyTrainingDepth: {
+            /** DepthCoverage */
+            coverage: {
+                /**
+                 * DepthBalance
+                 * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                 */
+                balance: {
+                    ham: number;
+                    pull: number;
+                    push: number;
+                    push_pull_ratio: number | null;
+                    quad: number;
+                    quad_ham_ratio: number | null;
+                };
+                /** DepthExerciseCounts */
+                exercises: {
+                    recognized: number;
+                    unrecognized: number;
+                };
+                felt_entries: number;
+                /** @description Up to three major groups at level none or low, lowest first */
+                least: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Up to three major groups with the most weighted sets */
+                most: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Workouts done in the range */
+                sessions: number;
+                /** DepthCoverageThresholds */
+                thresholds: {
+                    high: number;
+                    medium: number;
+                };
+            };
+            /** Format: date */
+            from: string;
+            /**
+             * DepthLoad
+             * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+             */
+            load: {
+                /** @description Load of the last 7 days */
+                acute: number;
+                /** @enum {string|null} */
+                band: "below" | "steady" | "above" | "well_above" | null;
+                /** DepthLoadBands */
+                bands: {
+                    above_to: number;
+                    below: number;
+                    steady_to: number;
+                };
+                /** @description Weekly average of the last 28 days */
+                chronic: number;
+                /** @description Last 28 days, with effort and time */
+                rated_sessions: number;
+                ratio: number | null;
+                sufficient: boolean;
+                /** @description Last 28 days, without effort or time (not counted) */
+                unrated_sessions: number;
+                weeks: {
+                    load: number;
+                    sessions: number;
+                    /** Format: date */
+                    week_start: string;
+                }[];
+            };
+            /** DepthQualities */
+            qualities: {
+                felt_entries: number;
+                /** @description All ten qualities, canonical order */
+                qualities: {
+                    felt: number;
+                    id: string;
+                    /** @description Share of the most-trained quality, 0..1 */
+                    score: number;
+                    sets: number;
+                }[];
+                /** @description Workouts with a recognised exercise */
+                sessions: number;
+            };
+            /** @enum {string} */
+            range: "4w" | "12w" | "6m" | "1y" | "all";
+            /** @description The source filter applied (none = every source) */
+            sources: string[];
+            /** Format: date */
+            to: string;
+            weeks: number;
         };
         /** MyTrial */
         MyTrial: {
@@ -40125,6 +40513,132 @@ export interface operations {
                                 [key: string]: unknown;
                             }[];
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrainingDepthController.show": {
+        parameters: {
+            query?: {
+                range?: "4w" | "12w" | "6m" | "1y" | "all";
+                /** @description Comma-separated provider ids, `freeform`, `device` (all when absent) */
+                sources?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training depth */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** DepthCoverage */
+                        coverage: {
+                            /**
+                             * DepthBalance
+                             * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                             */
+                            balance: {
+                                ham: number;
+                                pull: number;
+                                push: number;
+                                push_pull_ratio: number | null;
+                                quad: number;
+                                quad_ham_ratio: number | null;
+                            };
+                            /** DepthExerciseCounts */
+                            exercises: {
+                                recognized: number;
+                                unrecognized: number;
+                            };
+                            felt_entries: number;
+                            /** @description Up to three major groups at level none or low, lowest first */
+                            least: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Up to three major groups with the most weighted sets */
+                            most: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Workouts done in the range */
+                            sessions: number;
+                            /** DepthCoverageThresholds */
+                            thresholds: {
+                                high: number;
+                                medium: number;
+                            };
+                        };
+                        /** Format: date */
+                        from: string;
+                        /**
+                         * DepthLoad
+                         * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+                         */
+                        load: {
+                            /** @description Load of the last 7 days */
+                            acute: number;
+                            /** @enum {string|null} */
+                            band: "below" | "steady" | "above" | "well_above" | null;
+                            /** DepthLoadBands */
+                            bands: {
+                                above_to: number;
+                                below: number;
+                                steady_to: number;
+                            };
+                            /** @description Weekly average of the last 28 days */
+                            chronic: number;
+                            /** @description Last 28 days, with effort and time */
+                            rated_sessions: number;
+                            ratio: number | null;
+                            sufficient: boolean;
+                            /** @description Last 28 days, without effort or time (not counted) */
+                            unrated_sessions: number;
+                            weeks: {
+                                load: number;
+                                sessions: number;
+                                /** Format: date */
+                                week_start: string;
+                            }[];
+                        };
+                        /** DepthQualities */
+                        qualities: {
+                            felt_entries: number;
+                            /** @description All ten qualities, canonical order */
+                            qualities: {
+                                felt: number;
+                                id: string;
+                                /** @description Share of the most-trained quality, 0..1 */
+                                score: number;
+                                sets: number;
+                            }[];
+                            /** @description Workouts with a recognised exercise */
+                            sessions: number;
+                        };
+                        /** @enum {string} */
+                        range: "4w" | "12w" | "6m" | "1y" | "all";
+                        /** @description The source filter applied (none = every source) */
+                        sources: string[];
+                        /** Format: date */
+                        to: string;
+                        weeks: number;
                     };
                 };
             };
@@ -69414,6 +69928,152 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrainingDepthController.client": {
+        parameters: {
+            query?: {
+                range?: "4w" | "12w" | "6m" | "1y" | "all";
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Client training depth */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** DepthCoverage */
+                        coverage: {
+                            /**
+                             * DepthBalance
+                             * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                             */
+                            balance: {
+                                ham: number;
+                                pull: number;
+                                push: number;
+                                push_pull_ratio: number | null;
+                                quad: number;
+                                quad_ham_ratio: number | null;
+                            };
+                            /** DepthExerciseCounts */
+                            exercises: {
+                                recognized: number;
+                                unrecognized: number;
+                            };
+                            felt_entries: number;
+                            /** @description Up to three major groups at level none or low, lowest first */
+                            least: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Up to three major groups with the most weighted sets */
+                            most: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Workouts done in the range */
+                            sessions: number;
+                            /** DepthCoverageThresholds */
+                            thresholds: {
+                                high: number;
+                                medium: number;
+                            };
+                        };
+                        /** Format: date */
+                        from: string;
+                        /**
+                         * DepthLoad
+                         * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+                         */
+                        load: {
+                            /** @description Load of the last 7 days */
+                            acute: number;
+                            /** @enum {string|null} */
+                            band: "below" | "steady" | "above" | "well_above" | null;
+                            /** DepthLoadBands */
+                            bands: {
+                                above_to: number;
+                                below: number;
+                                steady_to: number;
+                            };
+                            /** @description Weekly average of the last 28 days */
+                            chronic: number;
+                            /** @description Last 28 days, with effort and time */
+                            rated_sessions: number;
+                            ratio: number | null;
+                            sufficient: boolean;
+                            /** @description Last 28 days, without effort or time (not counted) */
+                            unrated_sessions: number;
+                            weeks: {
+                                load: number;
+                                sessions: number;
+                                /** Format: date */
+                                week_start: string;
+                            }[];
+                        };
+                        /** DepthQualities */
+                        qualities: {
+                            felt_entries: number;
+                            /** @description All ten qualities, canonical order */
+                            qualities: {
+                                felt: number;
+                                id: string;
+                                /** @description Share of the most-trained quality, 0..1 */
+                                score: number;
+                                sets: number;
+                            }[];
+                            /** @description Workouts with a recognised exercise */
+                            sessions: number;
+                        };
+                        /** @enum {string} */
+                        range: "4w" | "12w" | "6m" | "1y" | "all";
+                        /** Format: date */
+                        to: string;
+                        weeks: number;
+                    };
+                };
+            };
+            /** @description Error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
                     };
                 };
             };

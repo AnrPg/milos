@@ -8673,6 +8673,60 @@
     "notFound": "Este squad não está disponível.",
     "backToClub": "Voltar ao clube"
   },
+  "Depth": {
+    "noData": "Não há treinos neste período.",
+    "coverage": {
+      "title": "Cobertura muscular",
+      "atlas": "Atlas ›",
+      "most": "Mais trabalho",
+      "least": "Menos trabalho",
+      "noneMost": "Nenhum exercício reconhecido neste período.",
+      "noneLeast": "Todos os grandes grupos musculares têm cobertura média ou alta.",
+      "pushPull": "Empurrar : Puxar",
+      "quadHam": "Quadríceps : Isquiotibiais",
+      "ratioMissing": "Faltam algumas séries",
+      "note": "Uma indicação do volume de treino, não um objetivo."
+    },
+    "qualities": {
+      "title": "Qualidades físicas",
+      "most": "Mais: {qualities}",
+      "felt": "«Senti»: {qualities}",
+      "row": "{quality}: {sets} séries",
+      "note": "A forma mostra para onde foi o treino, não uma nota.",
+      "short": {
+        "cardiorespiratory-endurance": "Cardio",
+        "stamina": "Resistência",
+        "strength": "Força",
+        "flexibility": "Flexibilidade",
+        "power": "Potência",
+        "speed": "Velocidade",
+        "coordination": "Coordenação",
+        "agility": "Agilidade",
+        "balance": "Equilíbrio",
+        "accuracy": "Precisão"
+      }
+    },
+    "load": {
+      "title": "Carga de treino",
+      "ratio": "Esta semana: {ratio}× a habitual",
+      "insufficient": "A comparação aparece após 3 semanas de treinos com RPE e duração.",
+      "weeks": "Carga por semana · 8 sem.",
+      "weekOf": "Semana de {date}: {load}",
+      "unrated": "{count, plural, one {# treino das últimas 4 semanas não tem RPE ou duração e não conta.} other {# treinos das últimas 4 semanas não têm RPE ou duração e não contam.}}",
+      "note": "Carga = RPE × minutos. Uma indicação face à tua semana habitual, não um conselho médico.",
+      "band": {
+        "below": "Mais leve",
+        "steady": "Perto do habitual",
+        "above": "Acima do habitual",
+        "well_above": "Bem acima do habitual"
+      }
+    },
+    "coach": {
+      "title": "Cobertura, qualidades, carga",
+      "range": "Período",
+      "sharedOnly": "Apenas das entradas que o cliente partilha com os coaches da box."
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "Ações do treinador",

@@ -8673,6 +8673,60 @@
     "notFound": "This squad isn't available.",
     "backToClub": "Back to the club"
   },
+  "Depth": {
+    "noData": "No workouts in this period.",
+    "coverage": {
+      "title": "Muscle coverage",
+      "atlas": "Atlas ›",
+      "most": "Most work",
+      "least": "Least work",
+      "noneMost": "No recognised exercise in this period.",
+      "noneLeast": "Every major muscle group has medium or high coverage.",
+      "pushPull": "Push : Pull",
+      "quadHam": "Quads : Hamstrings",
+      "ratioMissing": "A few more sets needed",
+      "note": "An indication of training volume, not a target."
+    },
+    "qualities": {
+      "title": "Fitness qualities",
+      "most": "Most: {qualities}",
+      "felt": "“Felt”: {qualities}",
+      "row": "{quality}: {sets} sets",
+      "note": "The shape shows where training went, not a grade.",
+      "short": {
+        "cardiorespiratory-endurance": "Cardio",
+        "stamina": "Stamina",
+        "strength": "Strength",
+        "flexibility": "Flexibility",
+        "power": "Power",
+        "speed": "Speed",
+        "coordination": "Coordination",
+        "agility": "Agility",
+        "balance": "Balance",
+        "accuracy": "Accuracy"
+      }
+    },
+    "load": {
+      "title": "Training load",
+      "ratio": "This week: {ratio}× your usual",
+      "insufficient": "The comparison appears after 3 weeks of workouts with RPE and duration.",
+      "weeks": "Load per week · 8 wks",
+      "weekOf": "Week of {date}: {load}",
+      "unrated": "{count, plural, one {# workout in the last 4 weeks has no RPE or duration and does not count.} other {# workouts in the last 4 weeks have no RPE or duration and do not count.}}",
+      "note": "Load = RPE × minutes. An indication against your usual week, not medical advice.",
+      "band": {
+        "below": "Lighter",
+        "steady": "Close to usual",
+        "above": "Above usual",
+        "well_above": "Well above usual"
+      }
+    },
+    "coach": {
+      "title": "Coverage, qualities, load",
+      "range": "Period",
+      "sharedOnly": "Only from entries the client shares with the box's coaches."
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "Coach actions",

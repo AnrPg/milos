@@ -78,4 +78,11 @@ defmodule MilosTraining.Analytics do
   defdelegate progress_filter_params(filter), to: ProgressFilter, as: :to_params
   defdelegate progress_filter_active_count(filter), to: ProgressFilter, as: :active_count
   defdelegate progress_since(filter, today), to: ProgressFilter, as: :since
+
+  # ADR-165: training load (session RPE, acute:chronic) as an indicator.
+  alias MilosTraining.Analytics.Domain.TrainingLoad
+
+  defdelegate training_load(sessions, today), to: TrainingLoad, as: :build
+  defdelegate training_load_window_start(today), to: TrainingLoad, as: :window_start
+  defdelegate training_load_bands(), to: TrainingLoad, as: :bands
 end

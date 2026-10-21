@@ -14,6 +14,8 @@ export const SECTION_TAB: Record<string, ProfileTab> = {
   box_message: "overview",
   schedule: "training",
   training_history: "training",
+  // ADR-165: the client's coverage, qualities and load (shared entries only).
+  training_depth: "training",
   prs: "training",
   training_notes: "training",
   health_incidents: "wellbeing",
