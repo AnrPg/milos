@@ -36,9 +36,6 @@ import { DEFAULT_VAULT_FILTER, parseVaultFilter, vaultFilterCount } from "@/lib/
 import { sourceOptions, sourceToken } from "@/lib/provider-sources";
 import { defaultHistoryKind } from "@/lib/training-history";
 
-/** An execution attempt that can be done again here: its workout lives at the provider Box shows. */
-type RepeatableAttempt = VaultAttempt & { master_workout_id?: string | null; organization_id?: string | null };
-
 /**
  * Ημερολόγιο › Vault across providers (ADR-162, board 17 Q4): the same
  * workout done anywhere (Fran at the box and Fran with the coach) is one
@@ -254,7 +251,7 @@ function VaultGroupCard({
 }: {
   group: VaultGroup;
   onPerformance: (attempt: VaultAttempt) => void;
-  onRepeat: (attempt: RepeatableAttempt) => void;
+  onRepeat: (attempt: VaultAttempt) => void;
   pendingId: string | null;
 }) {
   const t = useTranslations("Providers");
@@ -294,11 +291,12 @@ function VaultGroupCard({
       ) : null}
       <ol className="flex flex-col">
         {shown.map((attempt) => {
-          const repeatable = attempt as RepeatableAttempt;
+          // «Ξανά» starts the workout at the provider Box shows; an attempt
+          // from another provider is repeated after switching to it.
           const canRepeat =
             attempt.kind === "execution" &&
-            Boolean(repeatable.master_workout_id) &&
-            (!repeatable.organization_id || repeatable.organization_id === selected);
+            Boolean(attempt.master_workout_id) &&
+            (!attempt.organization_id || attempt.organization_id === selected);
           return (
             <li key={`${attempt.kind}:${attempt.id}`} className="flex flex-wrap items-center justify-between gap-2 border-t py-2 text-sm" style={{ borderColor: "var(--border)" }}>
               <span className="flex flex-wrap items-center gap-2" style={{ color: "var(--text-soft)" }}>
@@ -320,7 +318,7 @@ function VaultGroupCard({
                   {canRepeat ? (
                     <button
                       type="button"
-                      onClick={() => onRepeat(repeatable)}
+                      onClick={() => onRepeat(attempt)}
                       disabled={Boolean(pendingId)}
                       className="rounded-full px-3 py-1.5 text-xs font-semibold disabled:opacity-50"
                       style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
