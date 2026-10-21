@@ -12,9 +12,23 @@ defmodule MilosTraining.Community.Commands.Groups do
   def settings(context), do: CommunityStore.get_community_settings(context)
 
   def put_settings(context, attrs) do
-    if Map.get(attrs, :member_groups) in CommunitySettings.member_group_options(),
-      do: CommunityStore.put_community_settings(context, Map.take(attrs, [:member_groups])),
-      else: {:error, :invalid_member_groups}
+    attrs =
+      attrs |> Map.take(CommunitySettings.fields()) |> Map.reject(fn {_k, v} -> is_nil(v) end)
+
+    cond do
+      attrs == %{} ->
+        {:error, :invalid_member_groups}
+
+      Map.has_key?(attrs, :member_groups) and
+          attrs.member_groups not in CommunitySettings.member_group_options() ->
+        {:error, :invalid_member_groups}
+
+      Map.has_key?(attrs, :partners_enabled) and not is_boolean(attrs.partners_enabled) ->
+        {:error, :invalid_partners_enabled}
+
+      true ->
+        CommunityStore.put_community_settings(context, attrs)
+    end
   end
 
   def propose(%{user_id: user_id} = context, club, role, attrs) do

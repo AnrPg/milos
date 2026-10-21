@@ -76,7 +76,11 @@ defmodule MilosTrainingWeb.AdminSettingsControllerTest do
       |> get("/api/notifications/push-config")
       |> json_response(200)
 
-    assert push_config == %{"enabled" => true, "vapid_public_key" => "public-key"}
+    assert push_config == %{
+             "enabled" => true,
+             "vapid_public_key" => "public-key",
+             "native_providers" => []
+           }
   end
 
   test "a gym's first finance settings save is stored for that gym", %{conn: conn} do

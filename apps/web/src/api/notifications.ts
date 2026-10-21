@@ -87,6 +87,30 @@ export async function fetchPushSubscriptionStatus(token: string, endpoint: strin
   });
 }
 
+// ADR-171: push to the store apps (FCM on Android, APNs on iOS).
+export type NativePushTokenPayload = NonNullable<
+  operations["MilosTrainingWeb.NotificationController.create_native_push_token"]["requestBody"]
+>["content"]["application/json"];
+
+export type NativePushTokenRecord =
+  operations["MilosTrainingWeb.NotificationController.create_native_push_token"]["responses"][201]["content"]["application/json"]["native_push_token"];
+
+export async function registerNativePushToken(token: string, payload: NativePushTokenPayload) {
+  return apiRequest<{ native_push_token: NativePushTokenRecord }>("/notifications/native-push-tokens", {
+    method: "POST",
+    token,
+    body: payload,
+  });
+}
+
+export async function unregisterNativePushToken(token: string, deviceToken: string) {
+  return apiRequest<{ deleted: boolean }>("/notifications/native-push-tokens/unregister", {
+    method: "POST",
+    token,
+    body: { token: deviceToken },
+  });
+}
+
 export async function deletePushSubscription(token: string, payload: DeletePushSubscriptionPayload) {
   return apiRequest<{ deleted: boolean }>("/notifications/push-subscriptions", {
     method: "DELETE",

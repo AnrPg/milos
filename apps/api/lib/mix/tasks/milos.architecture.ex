@@ -73,12 +73,14 @@ defmodule Mix.Tasks.Milos.Architecture do
     execution/training_log_store
     wellbeing/wellbeing_store
     notifications/notification_store
+    notifications/native_push_token_store
     coaching/coaching_store
     pantheon/pr_store
     journal/journal_store
     journal/goal_feedback_store
     body/body_store
     buddies/buddy_store
+    partners/partner_store
     wellness/wellness_store
     devices/device_store
     coaching/form_review_store

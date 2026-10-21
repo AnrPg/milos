@@ -329,7 +329,8 @@ defmodule MilosTrainingWeb.NotificationControllerTest do
 
     assert response == %{
              "enabled" => true,
-             "vapid_public_key" => "public-key"
+             "vapid_public_key" => "public-key",
+             "native_providers" => []
            }
   end
 end

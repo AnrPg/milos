@@ -5,6 +5,7 @@
 
 
 import { BuddyThreads } from "@/components/buddy/BuddyThreads";
+import { PartnerThreads } from "@/components/partners/PartnerThreads";
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -177,6 +178,7 @@ export function ChatsPageContent() {
         </h1>
 
         <BuddyThreads />
+        <PartnerThreads />
 
         <div
           className="flex rounded-full p-0.5 gap-0.5"

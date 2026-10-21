@@ -33,6 +33,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     community_channel_memberships community_posts community_post_reactions
     community_post_comments community_reports community_settings
     community_events community_event_attendees
+    partner_profiles partner_swipes partner_matches partner_messages
     media_tenant_objects organization_public_profiles profile_tag_suggestions
     housekeeping_areas
     housekeeping_entries
@@ -75,8 +76,9 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
 
   @ready_personal_tables ~w(
     workout_executions execution_progress_operations notifications push_subscriptions
+    native_push_tokens
     community_follows community_profile_posts community_profile_post_reactions
-    community_profile_post_comments community_social_settings
+    community_profile_post_comments community_social_settings community_user_blocks
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
     journal_notes journal_comments goal_feedback wellbeing_check_ins wellbeing_check_in_answers

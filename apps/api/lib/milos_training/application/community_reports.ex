@@ -7,6 +7,10 @@ defmodule MilosTraining.Application.CommunityReports do
 
   ADR-157: a post's preview shows its photos and video poster (thumbnails),
   so staff judge what people reported without opening it.
+
+  ADR-169: a person's Partners profile can be reported too (`partner`).
+  Reporting someone also blocks them, so the reporter never meets them
+  again; staff hide the profile (suspended in that club) or dismiss.
   """
 
   alias MilosTraining.Application.{
@@ -14,7 +18,9 @@ defmodule MilosTraining.Application.CommunityReports do
     CommunityGroups,
     CommunityPeople,
     CommunityPosts,
-    MediaUrls
+    MediaUrls,
+    Partners,
+    PeopleBlocks
   }
 
   alias MilosTraining.{Community, Notifications, Organizations}
@@ -28,6 +34,7 @@ defmodule MilosTraining.Application.CommunityReports do
              note: params[:note]
            }) do
       if report != :already_reported, do: notify_staff(club, target, params[:reason])
+      if target.type == "partner", do: PeopleBlocks.block(context, target.author_id, "reported")
       {:ok, %{target_type: target.type, target_id: target.id, reported: true}}
     end
   end
@@ -105,6 +112,8 @@ defmodule MilosTraining.Application.CommunityReports do
     end
   end
 
+  defp target(context, "partner", id), do: Partners.report_target(context, id)
+
   defp target(_context, _type, _id), do: {:error, :invalid_target}
 
   defp apply_action(_context, _type, _id, "dismiss"), do: :ok
@@ -120,6 +129,8 @@ defmodule MilosTraining.Application.CommunityReports do
 
   defp apply_action(context, "channel", id, "archive"),
     do: done(CommunityGroups.archive(context, id))
+
+  defp apply_action(context, "partner", id, "hide"), do: done(Partners.suspend(context, id))
 
   defp done(:ok), do: :ok
   defp done({:ok, _result}), do: :ok
@@ -185,6 +196,8 @@ defmodule MilosTraining.Application.CommunityReports do
         nil
     end
   end
+
+  defp preview(context, "partner", id), do: Partners.report_preview(context, id)
 
   defp present_row(row, people) do
     row

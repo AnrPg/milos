@@ -166,3 +166,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-163 | WOD goals, «τι ένιωσες» feedback and the anatomy taxonomy | Accepted |
 | ADR-164 | Anatomy atlas, coverage weighting and the gym's exercises per muscle | Accepted |
 | ADR-165 | Muscle coverage, the qualities radar and training load in Πρόοδος | Accepted |
+| ADR-169 | Partners: training partners within a club, matches, «Κλείστε μαζί» and blocking | Accepted |
+| ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |

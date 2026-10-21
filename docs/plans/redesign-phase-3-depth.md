@@ -241,11 +241,40 @@ No board; decided for least clutter (owner's standing instruction), full list in
    unrated sessions are counted, never estimated; «όχι ιατρική συμβουλή» always.
 5. **Coach:** same cards in the client profile's Προπόνηση tab, from shared entries only, own clients (head coach: all).
 
+### Partners (2026-10-21, ADR-169)
+No board; decided for least clutter (owner's standing instruction), full list in ADR-169 «Decisions».
+1. **Where:** Club › Μέλη, a «Partners» card above the members list, only in clubs whose members the gym verified
+   (gym, PT squad, season, or an open club with approval or invite) and only while the gym's switch is on.
+2. **Opt-in:** a short card (members only, both must agree) → profile sheet: level, times, up to 3 goals, one line of
+   up to 140 characters; gender and a preference are optional, folded away, never shown to anyone.
+3. **Deck:** one card at a time, best fit first, «Κοινά: …» on top, ✕ / ✓ and drag; one «Φίλτρα» button for time,
+   level and goal; the last swipe can be undone unless it matched; 200 a day; no match score.
+4. **Match:** «Βρήκατε partner» sheet with «Πες γεια»; the conversation lives at `/partners/:id` and in Μηνύματα next
+   to Buddy's; «Κλείστε μαζί» offers the gym's classes in the next 7 days (booked by either first, then shared times).
+5. **Safety:** ⋯ ends the match, blocks (account-wide, ends buddy links too, the other side isn't told) or reports
+   (shared staff queue; «Απόκρυψη» suspends the profile in that club). Κοινοποίηση & ορατότητα: one switch pauses
+   every profile, and the blocked list with «Άρση».
+
+### Native wrapper (2026-10-21, ADR-171, no board: owner's standing instruction)
+1. **Shell:** Capacitor 8 in `apps/mobile`, app id `app.milos.member`, «Milos»; the app loads the deployed web app
+   (production `https://milos.4kq.net`, or `MILOS_APP_URL`), so web and apps ship together. Other hosts open in the
+   system browser (allow-list: the app host and `connect.garmin.com`). A local «Χωρίς σύνδεση» page covers a cold start
+   offline; after that the outbox and service worker behave as on the web.
+2. **Share links open the app:** `/c/`, `/join/`, `/b/`, `/r/`, `/events/`, `/trials/`, `/buddy/` through universal
+   links and App Links; `/.well-known` files come from env and answer 404 until the store ids exist.
+3. **Push:** the bell and profile switches use the OS push inside the app (APNs on iOS, FCM on Android), web push in a
+   browser; tapping a push opens its page. Off until the owner adds the keys.
+4. **No new screens, no clutter:** no install prompt (none exists on the web); in the app «Συνδεδεμένες συσκευές» shows
+   only this phone's health row, as «Σύντομα» until P3-M10; the web keeps both rows as «Με την εφαρμογή». The page draws
+   under the notch with safe-area padding, unchanged in browsers.
+5. **Owner actions:** Apple developer account and team id, APNs key, Firebase project and `google-services.json`, Play
+   Console and signing keys (fingerprints), icons and store listings (ADR-171 «Owner actions»).
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [x] Training load shown as an overload indicator, never a verdict (ADR-165)
-- [ ] Partners: club-verified only, mutual consent, report/block, optional gender preference, «training partner» copy
-- [ ] Partners hidden unless the member opts in, per club
+- [x] Partners: club-verified only, mutual consent, report/block, optional gender preference, «training partner» copy
+- [x] Partners hidden unless the member opts in, per club
 - [ ] AI suggestions never reach an athlete without coach approval
 - [ ] Voice recordings deleted after transcription
 - [ ] Phone health data follows D8/D11 of Phase 2 (consent, delete, export)
@@ -258,5 +287,5 @@ No board; decided for least clutter (owner's standing instruction), full list in
 
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
-- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [x] P3-M3 (ADR-165) · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
-- [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
+- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [x] P3-M3 (ADR-165) · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [x] P3-M7 (ADR-169)
+- [ ] P3-M8 · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13

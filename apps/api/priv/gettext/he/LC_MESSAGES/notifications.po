@@ -543,3 +543,12 @@ msgstr "ייצוא היומן שלך מוכן"
 
 msgid "Download it within seven days from Settings."
 msgstr "הורד אותו תוך שבעה ימים מההגדרות."
+
+msgid "You found a training partner"
+msgstr "מצאת שותף לאימונים"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "את/ה ו-%{nickname} רוצים להתאמן יחד. תגידו שלום."
+
+msgid "Training partner message"
+msgstr "הודעה משותף לאימונים"
