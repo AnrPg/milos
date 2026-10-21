@@ -79,7 +79,8 @@ defmodule MilosTraining.Application.BodyPresenter do
       measure_reminder_weeks: settings.measure_reminder_weeks,
       default_visibility: settings.default_visibility,
       blur_photos: settings.blur_photos,
-      compare_mode: settings.compare_mode
+      compare_mode: settings.compare_mode,
+      felt_prompt_without_goals: settings.felt_prompt_without_goals
     }
   end
 

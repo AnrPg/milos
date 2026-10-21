@@ -523,6 +523,27 @@ defmodule MilosTrainingWeb.BodyControllerTest do
              as.(member) |> get("/api/me/journal?kinds=body") |> json_response(200)
   end
 
+  test "«Τι ένιωσες;» without goals is on by default and can be switched off (ADR-163)",
+       %{as: as, member: member} do
+    assert %{"settings" => %{"felt_prompt_without_goals" => true}} =
+             as.(member) |> get("/api/me/body/settings") |> json_response(200)
+
+    assert %{"settings" => %{"felt_prompt_without_goals" => false, "units" => "metric"}} =
+             as.(member)
+             |> send_json(:put, "/api/me/body/settings", %{felt_prompt_without_goals: false})
+             |> json_response(200)
+
+    # Other saves keep it.
+    assert %{"settings" => %{"felt_prompt_without_goals" => false}} =
+             as.(member)
+             |> send_json(:put, "/api/me/body/settings", %{blur_photos: false})
+             |> json_response(200)
+
+    assert as.(member)
+           |> send_json(:put, "/api/me/body/settings", %{felt_prompt_without_goals: "no"})
+           |> json_response(422)
+  end
+
   test "the measure reminder is opt-in and sent once when due", %{as: as, member: member} do
     create!(as, member, %{metrics: %{waist: 80}})
     now = DateTime.utc_now()

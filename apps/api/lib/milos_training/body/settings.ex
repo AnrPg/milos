@@ -17,6 +17,8 @@ defmodule MilosTraining.Body.Settings do
     field :default_visibility, :string, default: "private"
     field :blur_photos, :boolean, default: true
     field :compare_mode, :string, default: "slider"
+    # ADR-163: offer «Τι ένιωσες;» after workouts without goals.
+    field :felt_prompt_without_goals, :boolean, default: true
 
     timestamps(type: :utc_datetime_usec)
   end
