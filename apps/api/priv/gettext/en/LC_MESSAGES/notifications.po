@@ -460,6 +460,57 @@ msgstr "Time for a new measurement"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "A new snapshot helps you see your trend. It takes a minute."
 
+msgid "A buddy invitation"
+msgstr "A buddy invitation"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} asks you to be their support buddy."
+
+msgid "You have a support buddy"
+msgstr "You have a support buddy"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} accepted. They hear from you only when you ask."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} is having a hard moment"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "I'm here · Shall we go for a walk? · Call me"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Shall we go for a walk?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Call me"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: I'm here"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} replied"
+
+msgid "No one has replied yet"
+msgstr "No one has replied yet"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+
+msgid "%{nickname}'s week"
+msgstr "%{nickname}'s week"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+
+msgid "I'm here"
+msgstr "I'm here"
+
+msgid "Shall we go for a walk?"
+msgstr "Shall we go for a walk?"
+
+msgid "Call me"
+msgstr "Call me"
+
 msgid "How did it go?"
 msgstr "How did it go?"
 
@@ -471,6 +522,15 @@ msgstr "A glass of water?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "The afternoon is a good moment to catch up on water."
+
+msgid "Buddy message"
+msgstr "Buddy message"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: weekly wellness"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
 
 msgid "Your journal export is ready"
 msgstr "Your journal export is ready"

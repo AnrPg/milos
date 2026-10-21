@@ -5,6 +5,7 @@ import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import { QueryProvider } from "@/components/query-provider";
+import { BuddyRealtimeBridge } from "@/components/buddy/BuddyRealtimeBridge";
 import { RealtimeSyncBridge } from "@/components/realtime-sync-bridge";
 import { OfflineMessageSyncBridge } from "@/components/offline-message-sync-bridge";
 import { OutboxStatusPanel } from "@/components/outbox/OutboxStatusPanel";
@@ -90,6 +91,7 @@ export default async function RootLayout({
               <SessionProvider>
                 <PersonalThemeBridge />
                 <RealtimeSyncBridge />
+                <BuddyRealtimeBridge />
                 <OfflineMessageSyncBridge />
                 <OutboxStatusPanel />
                 <ServiceWorkerBootstrap />

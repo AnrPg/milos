@@ -50,6 +50,7 @@ import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPa
 import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
 import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
 import { CoachBodyPanel } from "@/components/body/CoachBodyPanel";
+import { CoachWellnessPanel } from "@/components/buddy/CoachWellnessPanel";
 import {
   activeProfileTab,
   SECTION_TAB,
@@ -638,6 +639,8 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   // ADR-158: a client's coach sees the body snapshots the member shared.
   const showBody = isClient && actorCoaches && can(actor, "view_health");
   if (showBody) tabSections.add("body");
+  // ADR-160: and the weekly wellness summary, only when the member shares it.
+  if (showBody) tabSections.add("wellness_summary");
   const tabs = visibleProfileTabs(tabSections);
   const tab = activeProfileTab(tabs, searchParams.get("tab"), hashSection);
   const inTab = (section: string) => SECTION_TAB[section] === tab && tabSections.has(section);
@@ -799,6 +802,14 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             <Panel id="wellbeing_notes" title={i18n("rhCoachNotes")}>
               <CoachNotesPanel userId={userId} kinds={subjectKindsFor("wellbeing")} subjects={wellbeingSubjects} />
             </Panel>
+          ) : null}
+
+          {token && inTab("wellness_summary") ? (
+            <CoachWellnessPanel
+              userId={userId}
+              nickname={profile.identity.nickname}
+              frame={(content) => <Panel id="wellness_summary" title={i18n("mpWellnessSummary")}>{content}</Panel>}
+            />
           ) : null}
 
           {token && inTab("body") ? (

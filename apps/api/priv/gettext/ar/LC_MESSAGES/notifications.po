@@ -460,6 +460,57 @@ msgstr "حان وقت قياس جديد"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "لقطة جديدة تساعدك على رؤية اتجاهك. يستغرق الأمر دقيقة."
 
+msgid "A buddy invitation"
+msgstr "دعوة لتكون رفيق دعم"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "يطلب منك %{nickname} أن تكون رفيق الدعم له."
+
+msgid "You have a support buddy"
+msgstr "لديك رفيق دعم"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "وافق %{nickname}. لن يصله منك شيء إلا عندما تطلب."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} يمر بلحظة صعبة"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "أنا هنا · هل نتمشى؟ · اتصل بي"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: هل نتمشى؟"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: اتصل بي"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: أنا هنا"
+
+msgid "%{nickname} replied"
+msgstr "رد %{nickname}"
+
+msgid "No one has replied yet"
+msgstr "لم يرد أحد بعد"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "حتى ذلك الحين، شيء بسيط: دقيقتان من التنفس، كوب ماء، مشي قصير."
+
+msgid "%{nickname}'s week"
+msgstr "أسبوع %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "لحظات صعبة: %{moments}، تم تجاوز %{overcome}، طلبات دعم: %{requests}."
+
+msgid "I'm here"
+msgstr "أنا هنا"
+
+msgid "Shall we go for a walk?"
+msgstr "هل نتمشى؟"
+
+msgid "Call me"
+msgstr "اتصل بي"
+
 msgid "How did it go?"
 msgstr "كيف سارت الأمور؟"
 
@@ -471,6 +522,15 @@ msgstr "كوب ماء؟"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "فترة بعد الظهر وقت مناسب لتعويض شرب الماء."
+
+msgid "Buddy message"
+msgstr "رسالة من رفيقك"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: العافية الأسبوعية"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} ليالٍ عند هدف النوم، %{water} أيام مع الماء، %{meals} أيام مع تسجيل الوجبات."
 
 msgid "Your journal export is ready"
 msgstr "تصدير يومياتك جاهز"

@@ -13,6 +13,7 @@ defmodule MilosTrainingWeb.UserSocket do
   channel "class_timer:*", MilosTrainingWeb.ClassTimerChannel
   channel "community:*", MilosTrainingWeb.CommunityChannel
   channel "check_in:*", MilosTrainingWeb.CheckInChannel
+  channel "user:*", MilosTrainingWeb.UserChannel
 
   @impl true
   def connect(%{"token" => token} = params, socket, _connect_info) when is_binary(token) do

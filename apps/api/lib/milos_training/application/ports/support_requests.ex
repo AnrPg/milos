@@ -1,13 +1,20 @@
 defmodule MilosTraining.Application.Ports.SupportRequests do
   @moduledoc """
-  «Χρειάζομαι στήριξη» (vision §7.8): a member asks their buddy for support
-  from a Λιγούρα (ADR-159 §5). Wellness only says that the member asked and
-  when; who receives it, the quick replies and any summary belong to the
-  Buddy milestone (M12), which implements this port. No craving details
-  (intensity, causes, notes) are ever passed.
+  «Χρειάζομαι στήριξη» from Λιγούρα (ADR-159 §3, ADR-160). Wellness stamps
+  the craving and asks this port to tell the member's buddies; the buddy
+  side decides who receives it. Only the craving's id crosses, as an opaque
+  reference: intensity, causes, outcome and notes never leave Wellness.
+
+  Configured under `:support_requests`; the adapter is
+  `MilosTraining.Application.SupportRequests` (M12).
   """
 
-  @type request :: %{user_id: binary(), craving_id: binary(), at: DateTime.t()}
+  @type context :: map()
+  @type request :: %{
+          required(:user_id) => binary(),
+          optional(:craving_id) => binary() | nil,
+          optional(:at) => DateTime.t()
+        }
 
-  @callback request(context :: map(), request()) :: :ok | {:error, term()}
+  @callback request(context(), request()) :: :ok | {:error, term()}
 end
