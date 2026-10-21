@@ -154,7 +154,9 @@ organizations in their personal session, and coaches read through
   under the same rules.
 
 ## Implementation Notes
-- Migration `20261105100000_cross_org_journal`. Its timestamp sorts after
+- Migrations `20261105100000_cross_org_journal` and
+  `20261105100100_cross_org_journal_row_ids` (row ids for the ADR-117
+  export and purge). Their timestamps sort after
   the parallel M12 and M13 migrations.
 - `Visibility.validate_move/3` takes a reach (`:gym`, `:audience`, `:none`).
   A boolean still means gym or none.
