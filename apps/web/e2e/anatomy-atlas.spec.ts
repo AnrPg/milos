@@ -1,5 +1,7 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 
+import { requireWebgl } from "./support/webgl";
+
 // P3-M2 anatomy atlas (ADR-164): a member opens the atlas from the WOD goals
 // sheet on a muscle, reads what it does, their own sets and the gym's
 // exercises with videos, drills with the breadcrumb and the figure (3D
@@ -180,6 +182,7 @@ async function stubMember(page: Page, options: { sessions?: number } = {}) {
 }
 
 test("the goals sheet opens the atlas on a muscle; the panel, breadcrumb, figure and heat map work", async ({ page }) => {
+  await requireWebgl(page);
   const atlasRequests = await stubMember(page);
   await page.goto("/box");
   await page.getByTestId("wod-goals-strip").click();

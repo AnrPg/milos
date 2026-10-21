@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { requireWebgl } from "./support/webgl";
+
 // ADR-164 smoke test: the 3D anatomy figure renders (WebGL headless through
 // SwiftShader), loads three and the atlas lazily, answers taps (group, then
 // head) and focus, and a page with many thumbnails creates ONE WebGL context
@@ -10,7 +12,7 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 test.use({
   launchOptions: {
     ...(executablePath ? { executablePath } : {}),
-    args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+    args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-dev-shm-usage"],
   },
 });
 test.describe.configure({ timeout: 180_000 });
@@ -31,6 +33,7 @@ async function countWebglContexts(page: Page) {
 }
 
 test("renders the figure, picks, focuses and shares one context across thumbnails", async ({ page }) => {
+  await requireWebgl(page);
   await countWebglContexts(page);
   const glb: string[] = [];
   page.on("request", (request) => {
