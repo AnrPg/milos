@@ -90,15 +90,22 @@ defmodule MilosTraining.Journal.Domain.Visibility do
     do: Map.new(@default_kinds, fn {kind, rung} -> {kind, Map.get(stored, kind, rung)} end)
 
   @doc """
-  Validates a manual move. A reply request also needs a gym, because the
-  question goes to a coach of that gym.
+  Validates a manual move. `reach` says who a coach rung would reach
+  (`CoachAudience.reach/3`): `:gym` (the entry's provider), `:audience`
+  (ADR-162: a provider-less entry shared with the member's coaches) or
+  `:none`; a boolean stands for `:gym` / `:none`. A reply request needs a
+  gym, because the question goes to a coach of that gym.
   """
-  def validate_move(kind, rung, in_gym?) do
+  def validate_move(kind, rung, reach) when is_boolean(reach),
+    do: validate_move(kind, rung, if(reach, do: :gym, else: :none))
+
+  def validate_move(kind, rung, reach) do
     cond do
       not is_map_key(@allowed, kind) -> {:error, :unknown_kind}
       rung not in choosable(kind) -> {:error, :visibility_not_allowed}
-      rung != "private" and not in_gym? -> {:error, :no_gym_for_entry}
-      true -> :ok
+      rung == "private" or reach == :gym -> :ok
+      reach == :audience and rung == "coach_can_view" -> :ok
+      true -> {:error, :no_gym_for_entry}
     end
   end
 
