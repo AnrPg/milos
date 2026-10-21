@@ -8219,7 +8219,8 @@
       "save": "Guardar",
       "saving": "A guardar…",
       "error": "Não foi guardado. Tente novamente ou salte.",
-      "loading": "A carregar…"
+      "loading": "A carregar…",
+      "entryLine": "Senti: {list}"
     },
     "inherited": "Do treino base",
     "settings": {

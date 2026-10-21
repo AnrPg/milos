@@ -19625,6 +19625,11 @@ export interface components {
                 /** Format: date-time */
                 started_at: string;
             } | null;
+            /** @description ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none. */
+            felt?: {
+                muscles: string[];
+                qualities: string[];
+            } | null;
         } & {
             [key: string]: unknown;
         };
@@ -19697,6 +19702,11 @@ export interface components {
                     sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
                     /** Format: date-time */
                     started_at: string;
+                } | null;
+                /** @description ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none. */
+                felt?: {
+                    muscles: string[];
+                    qualities: string[];
                 } | null;
             } & {
                 [key: string]: unknown;

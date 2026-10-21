@@ -8219,7 +8219,8 @@
       "save": "Opslaan",
       "saving": "Opslaan…",
       "error": "Niet opgeslagen. Probeer opnieuw of sla over.",
-      "loading": "Laden…"
+      "loading": "Laden…",
+      "entryLine": "Gevoeld: {list}"
     },
     "inherited": "Uit de basistraining",
     "settings": {

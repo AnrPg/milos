@@ -41,6 +41,17 @@ defmodule MilosTraining.Infrastructure.Journal.EctoGoalFeedbackStore do
   end
 
   @impl true
+  def list_by_entries(_entry_kind, [], _user_id), do: []
+
+  def list_by_entries(entry_kind, entry_ids, user_id) do
+    GoalFeedback
+    |> where([feedback], feedback.entry_kind == ^entry_kind and feedback.entry_id in ^entry_ids)
+    |> where([feedback], feedback.user_id == ^user_id)
+    |> Repo.all()
+    |> Enum.map(&normalize/1)
+  end
+
+  @impl true
   def put_feedback(attrs) do
     existing = Repo.one(by_entry(attrs.entry_kind, attrs.entry_id, attrs.user_id))
 

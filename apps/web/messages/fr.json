@@ -8219,7 +8219,8 @@
       "save": "Enregistrer",
       "saving": "Enregistrement…",
       "error": "Non enregistré. Réessayez ou passez.",
-      "loading": "Chargement…"
+      "loading": "Chargement…",
+      "entryLine": "Ressenti : {list}"
     },
     "inherited": "De la séance de base",
     "settings": {

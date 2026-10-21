@@ -33366,6 +33366,29 @@
             ],
             "title": "DeviceMetrics",
             "type": "object"
+          },
+          "felt": {
+            "description": "ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none.",
+            "nullable": true,
+            "properties": {
+              "muscles": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "qualities": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "muscles",
+              "qualities"
+            ],
+            "type": "object"
           }
         },
         "title": "JournalFeedEntry",
@@ -33623,6 +33646,29 @@
                       "duration_seconds"
                     ],
                     "title": "DeviceMetrics",
+                    "type": "object"
+                  },
+                  "felt": {
+                    "description": "ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none.",
+                    "nullable": true,
+                    "properties": {
+                      "muscles": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      },
+                      "qualities": {
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "required": [
+                      "muscles",
+                      "qualities"
+                    ],
                     "type": "object"
                   }
                 },

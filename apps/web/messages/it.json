@@ -8219,7 +8219,8 @@
       "save": "Salva",
       "saving": "Salvataggio…",
       "error": "Non salvato. Riprova o salta.",
-      "loading": "Caricamento…"
+      "loading": "Caricamento…",
+      "entryLine": "Sentito: {list}"
     },
     "inherited": "Dall’allenamento base",
     "settings": {

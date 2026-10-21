@@ -8219,7 +8219,8 @@
       "save": "Guardar",
       "saving": "Guardando…",
       "error": "No se guardó. Reinténtalo u omítelo.",
-      "loading": "Cargando…"
+      "loading": "Cargando…",
+      "entryLine": "Lo sentí en: {list}"
     },
     "inherited": "Del entrenamiento base",
     "settings": {

@@ -8219,7 +8219,8 @@
       "save": "Save",
       "saving": "Saving…",
       "error": "Not saved. Try again or skip.",
-      "loading": "Loading…"
+      "loading": "Loading…",
+      "entryLine": "Felt: {list}"
     },
     "inherited": "From the base workout",
     "settings": {

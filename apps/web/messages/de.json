@@ -8219,7 +8219,8 @@
       "save": "Speichern",
       "saving": "Wird gespeichert…",
       "error": "Nicht gespeichert. Versuche es erneut oder überspringe.",
-      "loading": "Wird geladen…"
+      "loading": "Wird geladen…",
+      "entryLine": "Gespürt: {list}"
     },
     "inherited": "Aus dem Basistraining",
     "settings": {

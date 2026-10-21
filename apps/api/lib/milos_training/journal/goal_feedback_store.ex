@@ -18,6 +18,11 @@ defmodule MilosTraining.Journal.GoalFeedbackStore do
   def list_feedback_for(context, scope),
     do: RepoContext.run(context, fn -> adapter().list_feedback_for(scope) end)
 
+  # Called from inside a session the caller already opened (the journal
+  # feed), like `JournalStore.list_comments/2`.
+  def list_by_entries(entry_kind, entry_ids, user_id),
+    do: adapter().list_by_entries(entry_kind, entry_ids, user_id)
+
   def put_feedback(context, attrs),
     do: RepoContext.run(context, fn -> adapter().put_feedback(attrs) end)
 end

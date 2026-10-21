@@ -25,6 +25,17 @@ defmodule MilosTraining.Journal.Ports.GoalFeedbackStore do
   @callback put_feedback(attrs :: map()) :: {:ok, feedback()} | {:error, Ecto.Changeset.t()}
 
   @doc """
+  Feedback the current session may read on these entries of one kind,
+  written by `user_id` (the entries' owner). Runs in the caller's session,
+  so a coach reading a feed sees only rows on entries that reach them.
+  """
+  @callback list_by_entries(
+              entry_kind :: String.t(),
+              entry_ids :: [Ecto.UUID.t()],
+              user_id :: Ecto.UUID.t()
+            ) :: [feedback()]
+
+  @doc """
   The felt muscles and qualities of every feedback row the session may read
   (row security: the member's own rows and, for a coach, rows whose entry's
   rung reaches them) on non-voided entries of one workout or one scheduled

@@ -264,6 +264,17 @@ defmodule MilosTrainingWeb.WorkoutGoalsControllerTest do
       assert body["entry_kind"] == "training_log"
       assert body["goals"] == nil
       assert body["feedback"]["felt_muscles"] == ["latissimus-dorsi"]
+
+      # «Ένιωσα: …» rides on the entry in the journal feed.
+      feed =
+        conn
+        |> recycle()
+        |> put_bearer_token(ctx.member)
+        |> get("/api/me/journal")
+        |> json_response(200)
+
+      item = Enum.find(feed["items"], &(&1["id"] == entry.id))
+      assert item["entry"]["felt"] == %{"muscles" => ["latissimus-dorsi"], "qualities" => []}
     end
 
     test "another member cannot read or write someone's feedback", %{conn: conn} = ctx do

@@ -8219,7 +8219,8 @@
       "save": "שמירה",
       "saving": "שומר…",
       "error": "לא נשמר. נסו שוב או דלגו.",
-      "loading": "טוען…"
+      "loading": "טוען…",
+      "entryLine": "הרגשתי: {list}"
     },
     "inherited": "מהאימון הבסיסי",
     "settings": {

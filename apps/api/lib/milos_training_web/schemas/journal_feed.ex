@@ -73,7 +73,20 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
                 title: "JournalFeedEntry",
                 type: :object,
                 additionalProperties: true,
-                properties: %{device: MilosTrainingWeb.Schemas.Devices.merged_metrics()}
+                properties: %{
+                  device: MilosTrainingWeb.Schemas.Devices.merged_metrics(),
+                  felt: %Schema{
+                    description:
+                      "ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none.",
+                    type: :object,
+                    nullable: true,
+                    required: [:muscles, :qualities],
+                    properties: %{
+                      muscles: %Schema{type: :array, items: %Schema{type: :string}},
+                      qualities: %Schema{type: :array, items: %Schema{type: :string}}
+                    }
+                  }
+                }
               }
             ]
           },

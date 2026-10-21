@@ -38,6 +38,7 @@ import { BodyFeedCard } from "@/components/body/BodyFeedCard";
 import type { DeviceMetrics } from "@/api/devices";
 import { DeviceActivityCard, DeviceActivityDetail, DeviceAttachmentLine } from "@/components/devices/DeviceActivityCard";
 import { DeviceJournalCard } from "@/components/devices/DeviceJournalCard";
+import { FeltLine } from "@/components/wod-goals/FeltLine";
 import { ReviewCard } from "@/components/my-reviews";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
@@ -202,9 +203,12 @@ export function JournalFlow() {
                           locale={locale}
                           badge={badge(item)}
                           device={
-                            device ? (
-                              <DeviceAttachmentLine device={device} locale={locale} onOpen={() => setDeviceDetail({ metrics: device, title: item.entry.title })} />
-                            ) : null
+                            <>
+                              {device ? (
+                                <DeviceAttachmentLine device={device} locale={locale} onOpen={() => setDeviceDetail({ metrics: device, title: item.entry.title })} />
+                              ) : null}
+                              <FeltLine felt={item.entry.felt} />
+                            </>
                           }
                           onEdit={() => setLogDialog({ mode: "edit", entry: item.entry })}
                           onVoid={() => setLogDialog({ mode: "void", entry: item.entry })}
@@ -226,13 +230,16 @@ export function JournalFlow() {
                           repeating={pendingId === entry.id}
                           disabled={Boolean(pendingId)}
                           device={
-                            device ? (
-                              <DeviceAttachmentLine
-                                device={device}
-                                locale={locale}
-                                onOpen={() => setDeviceDetail({ metrics: device, title: entry.workout_title ?? i18n("workout39463a5") })}
-                              />
-                            ) : null
+                            <>
+                              {device ? (
+                                <DeviceAttachmentLine
+                                  device={device}
+                                  locale={locale}
+                                  onOpen={() => setDeviceDetail({ metrics: device, title: entry.workout_title ?? i18n("workout39463a5") })}
+                                />
+                              ) : null}
+                              <FeltLine felt={item.entry.felt} />
+                            </>
                           }
                         />
                       );

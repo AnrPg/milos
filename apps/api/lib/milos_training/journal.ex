@@ -91,6 +91,13 @@ defmodule MilosTraining.Journal do
 
   def put_goal_feedback(context, attrs), do: GoalFeedbackStore.put_feedback(context, attrs)
 
+  @doc "Felt feedback of each entry, keyed by entry id, in the caller's open session."
+  def goal_feedback_by_entry(entry_kind, entry_ids, user_id) do
+    entry_kind
+    |> GoalFeedbackStore.list_by_entries(entry_ids, user_id)
+    |> Map.new(&{&1.entry_id, &1})
+  end
+
   @doc """
   Feedback rows on the non-voided entries of `{:workout, id}` or
   `{:scheduled_class, id}` that the acting person may read: queried in their
