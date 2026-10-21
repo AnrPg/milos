@@ -218,6 +218,21 @@ All recommended options, with every recommended extra.
 6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
    entries; also lists goals nobody felt.
 
+### Seasons (2026-10-21, ADR-167)
+Built without a board (decisions recorded in ADR-167 «Decisions»); the least-clutter option each time.
+1. **Builder:** `Finance › Σεζόν`, next to Πακέτα: one list (dates, price, «x/y μέσα», open requests, status) and one
+   side panel that builds the season (title, description, start, weeks, places, price, optional package, coaches,
+   programme rows of day + published workout, welcome message) and answers requests (Επιβεβαίωση, Απόρριψη with an
+   optional reason, Αφαίρεση). Start, weeks and programme lock after the first confirmation.
+2. **Member:** one line inside the `Box › Συνδρομή` card, only while the gym has a season open or the member is in one;
+   it opens one sheet with the seasons and a season's detail («Ζήτα θέση», «Μπες σε αναμονή», «Απόσυρση αίτησης» and
+   where the request stands). Notifications open it at `/box?season=ID`.
+3. **Crew:** an invite-only `#season` channel in the gym club, visible to participants and staff, the gym's welcome
+   pinned, archived when the season ends.
+4. **Programme:** normal assigned workouts labelled «Σεζόν · <title>» in Box, the programme list and Ημερολόγιο.
+5. **Discovery:** no season card in Γύρω μου or the public box page (requests need gym membership; a card there would
+   be clutter without an action). Revisit if gyms ask.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
@@ -235,5 +250,5 @@ All recommended options, with every recommended extra.
 
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
-- [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
+- [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [x] P3-M5 (ADR-167) · [ ] P3-M6 · [ ] P3-M7
 - [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
