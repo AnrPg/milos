@@ -33,8 +33,8 @@ future-proof, modular option with the least clutter, and record it.
    - `partner_matches` (club, the pair ordered `user_a_id < user_b_id`,
      `status active|ended`, `ended_by_id`, `end_reason
      unmatched|blocked|reported|left|hidden`, read marks per side). At most
-     one active match per pair across every club (unique partial index), so
-     two people in two common clubs share one conversation.
+     one active match per pair in each gym (unique partial index on the gym
+     and the pair; see Implementation Notes).
    - `partner_messages` (match, author, `kind text|plan`, body of at most
      2000 characters; a plan carries the class id and a snapshot of its
      name and start so it renders without Scheduling and survives changes).
@@ -140,4 +140,27 @@ future-proof, modular option with the least clutter, and record it.
   be the place); a gym-level Partners statistics card is not built.
 
 ## Implementation Notes
-Filled in at the end of the milestone.
+- **Match uniqueness is per gym, not across every club.** The rows are the
+  gym's (tenant policy), so a unique index can only see one gym's rows. Two
+  people who share clubs in two gyms can match once in each; the matches
+  list shows both with their club name. A cross-gym index would need a
+  personal table or a definer function on every insert, for a rare case.
+- **Composite gym keys.** `partner_profiles`, `partner_swipes` and
+  `partner_matches` reference `community_clubs(id, organization_id)` and
+  `partner_messages` references `partner_matches(id, organization_id)`. The
+  tenant trigger stamps the session's gym on each row; without the composite
+  keys a session of gym B could write a row pointing at gym A's club. The
+  RLS test asserts the constraint fires.
+- **Reports name the profile.** The match carries `partner_profile_id` (the
+  other person's profile in that club) so the conversation's ⋯ menu can
+  report the person through the shared queue; a report also blocks.
+- **Live updates.** `partners:changed` rides the `user:<id>` topic Buddy
+  already joins; the web handles both events in one bridge, since a socket
+  holds one channel per topic.
+- **Web.** Club › Μέλη shows the Partners card above the members list only
+  where the club offers it to a member (intro, deck, paused or hidden by
+  staff); `/partners/[id]` is the conversation; matches sit in Μηνύματα next
+  to Buddy's; Κοινοποίηση & ορατότητα has the switch and blocked people;
+  staff get `partner` rows in the report queue and the gym's switch beside
+  member groups.
+- Follow-ups: TD-106.
