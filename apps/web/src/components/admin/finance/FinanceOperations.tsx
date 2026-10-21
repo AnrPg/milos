@@ -22,16 +22,18 @@ import { PackagesTab } from "@/components/admin/finance/tabs/PackagesTab";
 import { PromotionsTab } from "@/components/admin/finance/tabs/PromotionsTab";
 import { QueuesTab } from "@/components/admin/finance/tabs/QueuesTab";
 import { ReferralsTab } from "@/components/admin/finance/tabs/ReferralsTab";
+import { SeasonsTab } from "@/components/admin/finance/tabs/SeasonsTab";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
 
-type Tab = "members" | "packages" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
+type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
 
 export function FinanceOperations() {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const accountingT = useTranslations("FinanceAccounting");
+  const seasonsT = useTranslations("Seasons");
   const router = useRouter();
   const searchParams = useSearchParams();
   const { tokens } = useSession();
@@ -48,6 +50,8 @@ export function FinanceOperations() {
   const TABS: Array<{ id: Tab; label: string }> = [
     { id: "members", label: i18n("members1cb449c") },
     { id: "packages", label: i18n("packages0a99901") },
+    // ADR-167: seasons are sold next to packages.
+    { id: "seasons", label: seasonsT("tab") },
     { id: "promotions", label: i18n("promotions086e09b") },
     { id: "referrals", label: i18n("referrals2b0e3a3") },
     { id: "queues", label: i18n("queues83dbc32") },
@@ -164,6 +168,7 @@ export function FinanceOperations() {
         {/* Active tab */}
         {activeTab === "members" && <MembersTab />}
         {activeTab === "packages" && <PackagesTab />}
+        {activeTab === "seasons" && <SeasonsTab />}
         {activeTab === "promotions" && <PromotionsTab />}
         {activeTab === "referrals" && <ReferralsTab />}
         {activeTab === "queues" && <QueuesTab />}

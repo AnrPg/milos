@@ -18,6 +18,7 @@ defmodule MilosTraining.Community do
     Reports,
     ProfilePosts,
     ProvisionGymClub,
+    SeasonChannels,
     SetNotifyLevel,
     Squads
   }
@@ -59,6 +60,18 @@ defmodule MilosTraining.Community do
   defdelegate join_builtin_channel(context, kind, source), to: ClassGroups, as: :join_builtin
   def class_group_suggestion, do: ChannelPolicy.class_group_suggestion()
   def notify_level_options, do: ClubMembership.notify_levels()
+
+  # Season channels (ADR-167).
+  defdelegate ensure_season_channel(context, offering), to: SeasonChannels, as: :ensure
+  defdelegate add_season_participant(context, channel, user_id), to: SeasonChannels, as: :add
+
+  defdelegate remove_season_participant(context, channel, user_id),
+    to: SeasonChannels,
+    as: :remove
+
+  defdelegate archive_ended_season_channels(context, live_offering_ids),
+    to: SeasonChannels,
+    as: :archive_ended
 
   # Open clubs (ADR-143).
   defdelegate create_open_club(context, role, attrs), to: OpenClubs, as: :create

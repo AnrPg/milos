@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Suspense } from "react";
 
 import type { OrganizationMembership } from "@/api/organizations";
 import { entitledFeatures } from "@/components/client/entitlement";
@@ -15,6 +16,7 @@ import { CoachActions, NextCoachSession, SessionPackageSummary } from "@/compone
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
 import { ProviderTitle } from "@/components/providers/ProviderSwitcher";
 import { TodayAcrossCard } from "@/components/providers/TodayAcrossCard";
+import { SeasonsEntry } from "@/components/seasons/MySeasons";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { boxLayoutFor, boxTitle, type BoxLayout } from "@/lib/solo-coach";
 
@@ -22,7 +24,7 @@ import { boxLayoutFor, boxTitle, type BoxLayout } from "@/lib/solo-coach";
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
  * Fixed order: «Σήμερα» across providers (ADR-162, only with more than one)
  * · today's workout · next booking · actions · membership (with «Φέρε φίλο»,
- * ADR-156) · extensions (PT squads ADR-168, ADR-170) · announcements (the gym club's
+ * ADR-156, and the provider's seasons, ADR-167) · extensions (PT squads ADR-168, ADR-170) · announcements (the gym club's
  * #ανακοινώσεις, ADR-138). The title ▾ switches provider (board 17 Q1);
  * everything below it is that provider's.
  *
@@ -70,6 +72,9 @@ export function BoxHub() {
           ) : layout === "gym" ? (
             <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("membershipNone")}</p>
           ) : null}
+          <Suspense fallback={null}>
+            <SeasonsEntry />
+          </Suspense>
         </div>
         <div className="flex gap-2">
           <HubButton href="/me/payments">{t("membershipOpen")}</HubButton>

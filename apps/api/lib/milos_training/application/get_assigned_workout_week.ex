@@ -1,4 +1,5 @@
 defmodule MilosTraining.Application.GetAssignedWorkoutWeek do
+  alias MilosTraining.Application.Seasons
   alias MilosTraining.{Identity, Workouts}
 
   def call(context, user, params) do
@@ -25,7 +26,8 @@ defmodule MilosTraining.Application.GetAssignedWorkoutWeek do
        %{
          start_date: Date.to_iso8601(start_date),
          end_date: Date.to_iso8601(end_date),
-         assignments: assignments
+         # ADR-167: a season's workouts carry the season's title.
+         assignments: Seasons.label_assignments(context, assignments)
        }}
     end
   end

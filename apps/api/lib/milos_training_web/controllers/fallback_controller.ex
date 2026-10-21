@@ -2230,6 +2230,22 @@ defmodule MilosTrainingWeb.FallbackController do
     trial_already_open: {:conflict, "You already have a trial booked here"},
     invalid_trial_transition: {:conflict, "The trial can't take this step now"},
     class_not_found: {:not_found, "The class no longer exists"},
+    # ADR-167: seasons.
+    season_not_open: {:conflict, "This season isn't taking requests"},
+    season_full: {:conflict, "Every place in this season is taken"},
+    season_already_requested: {:conflict, "You already asked for a place in this season"},
+    season_place_confirmed: {:conflict, "Your place is confirmed; talk to the box to cancel it"},
+    invalid_season_transition: {:conflict, "This request can't take this step now"},
+    invalid_season_status: {:unprocessable_entity, "Choose draft, published or cancelled"},
+    season_closed: {:conflict, "This season has ended or was cancelled"},
+    season_schedule_locked:
+      {:conflict, "The dates and programme are fixed once a participant is confirmed"},
+    capacity_below_participants:
+      {:unprocessable_entity, "Capacity can't go below the confirmed participants"},
+    season_has_enrollments:
+      {:conflict, "Members already asked for this season; cancel it instead"},
+    programme_workout_unavailable:
+      {:unprocessable_entity, "Every programme workout must be a published workout of this box"},
     # ADR-143: member groups, open clubs and reports.
     member_groups_disabled: {:forbidden, "This box doesn't let members start groups"},
     group_not_open: {:unprocessable_entity, "This group isn't open to join"},

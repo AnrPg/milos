@@ -25,7 +25,12 @@ export type JournalNoteUpdate = components["schemas"]["JournalNoteUpdateRequest"
 
 /** The entry inside an item, as its own endpoint returns it, by kind. */
 export type JournalEntryOf = {
-  execution: WorkoutExecution & { workout_title?: string | null; workout_type?: string | null } & DeviceAttachment;
+  execution: WorkoutExecution & {
+    workout_title?: string | null;
+    workout_type?: string | null;
+    /** ADR-167: the season of the assigned workout this execution came from. */
+    season?: { id: string; title: string } | null;
+  } & DeviceAttachment;
   training_log: TrainingLogEntry & DeviceAttachment;
   pr: PRRecord;
   injury: InjuryRecord;

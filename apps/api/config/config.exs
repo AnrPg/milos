@@ -49,7 +49,8 @@ config :milos_training, Oban,
        {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob},
        {"0,30 * * * *", MilosTraining.Workers.BuddyWeeklySummaryJob},
        {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
-       {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob}
+       {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob},
+       {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob}
      ]}
   ],
   queues: [
@@ -130,6 +131,7 @@ config :milos_training,
        MilosTraining.Infrastructure.Finance.FinanceEventPayments
 
 config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
+config :milos_training, :season_store, MilosTraining.Infrastructure.Seasons.EctoSeasonStore
 config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
 
 config :milos_training,

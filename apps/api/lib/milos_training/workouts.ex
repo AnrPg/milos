@@ -65,6 +65,11 @@ defmodule MilosTraining.Workouts do
 
   defdelegate delete_assigned_workout(id), to: DeleteAssignedWorkout, as: :call
   def delete_assigned_workout(context, id), do: WorkoutStore.delete_assigned_workout(context, id)
+
+  @doc "ADR-167: removes an athlete from a season's programme from `from_date` on."
+  def remove_season_athlete(context, season_offering_id, athlete_id, from_date),
+    do: WorkoutStore.remove_season_athlete(context, season_offering_id, athlete_id, from_date)
+
   def update_draft(id, params), do: UpdateDraftWorkout.call(id, params)
   def publish_workout(id, params), do: PublishWorkout.call(id, params)
   def publish_workout(context, id, params), do: WorkoutStore.publish_workout(context, id, params)

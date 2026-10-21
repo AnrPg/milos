@@ -87,7 +87,11 @@ defmodule MilosTraining.Notifications.Notification do
     :craving_follow_up,
     :water_reminder,
     :journal_export_ready,
-    :device_sync_error
+    :device_sync_error,
+    :season_requested,
+    :season_confirmed,
+    :season_declined,
+    :season_cancelled
   ]
 
   schema "notifications" do
