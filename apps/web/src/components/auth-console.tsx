@@ -204,7 +204,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           <div className="mb-7 flex justify-center">
             <div
               className="inline-flex rounded-full p-1 text-sm"
-              style={{ background: "var(--border)", border: "1px solid var(--border-strong)" }}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
             >
               <button
                 className="rounded-full px-5 py-2 transition-colors"
@@ -411,7 +411,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                           }}
                           onClick={() => setRegisterForm((f) => ({ ...f, role: value }))}
                         >
-                          <p className="text-sm font-semibold" style={{ color: selected ? "var(--primary)" : "var(--text)" }}>
+                          <p className="text-sm font-semibold" style={{ color: selected ? "var(--primary-strong)" : "var(--text)" }}>
                             {label}
                           </p>
                           <p className="mt-1 text-xs leading-snug" style={{ color: "var(--dim)" }}>
