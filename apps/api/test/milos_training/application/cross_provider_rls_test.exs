@@ -19,7 +19,9 @@ defmodule MilosTraining.Application.CrossProviderRLSTest do
     GetAccountVault,
     GetClientJournal,
     GetJournalFeed,
+    GetTrainingHistory,
     JournalAudience,
+    JournalComments,
     JournalExports,
     JournalNotes,
     MyProviders,
@@ -159,6 +161,10 @@ defmodule MilosTraining.Application.CrossProviderRLSTest do
 
     assert length(coach_sees(ctx.box_coach, ctx.box, ctx.member)) == 2
     box_coach_ctx = tenant!(ctx.box_coach, ctx.box)
+    execution!(ctx.box, ctx.member, fran!(ctx.box_owner, ctx.box), -1, 240)
+
+    assert {:ok, %{total: 1}} =
+             GetTrainingHistory.call(box_coach_ctx, ctx.member.id, %{"kind" => "workouts"})
 
     revoke!(ctx.box_owner, ctx.box, ctx.box_membership)
 
@@ -167,6 +173,10 @@ defmodule MilosTraining.Application.CrossProviderRLSTest do
 
     # ...and row security hides even the entries recorded there.
     assert notes_visible_to(box_coach_ctx, ctx.member) == []
+
+    # The staff history read stops too (the box keeps its bookings).
+    assert {:ok, %{total: 0, entries: []}} =
+             GetTrainingHistory.call(box_coach_ctx, ctx.member.id, %{"kind" => "workouts"})
 
     # The member keeps everything, labelled «πρώην».
     assert {:ok, %{items: items}} = GetJournalFeed.call(ctx.member_ctx, %{})
@@ -199,6 +209,39 @@ defmodule MilosTraining.Application.CrossProviderRLSTest do
     end)
 
     assert {:ok, %{providers: [_, _], former: []}} = MyProviders.call(ctx.member_ctx)
+  end
+
+  test "a shared entry carries its comments to the other provider's coach", ctx do
+    execution = execution!(ctx.box, ctx.member, fran!(ctx.box_owner, ctx.box), -1, 270)
+
+    {:ok, _moved} =
+      SetJournalVisibility.call(ctx.member_ctx, "execution", execution.id, %{
+        "visibility" => "coach_can_view"
+      })
+
+    {:ok, comment} =
+      JournalComments.save(ctx.member_ctx, Ecto.UUID.generate(), %{
+        "entry_kind" => "execution",
+        "entry_id" => execution.id,
+        "body" => "Thrusters felt heavy"
+      })
+
+    nikos_ctx = tenant!(ctx.nikos_owner, ctx.nikos)
+    assert comments_visible_to(tenant!(ctx.box_coach, ctx.box), execution) == [comment.id]
+    assert comments_visible_to(nikos_ctx, execution) == []
+
+    {:ok, _audience} =
+      JournalAudience.put_entry(ctx.member_ctx, "execution", execution.id, [ctx.nikos.id])
+
+    assert comments_visible_to(nikos_ctx, execution) == [comment.id]
+
+    # Back to private: the comment leaves every coach with its entry.
+    {:ok, _moved} =
+      SetJournalVisibility.call(ctx.member_ctx, "execution", execution.id, %{
+        "visibility" => "private"
+      })
+
+    assert comments_visible_to(nikos_ctx, execution) == []
   end
 
   test "Vault, Πρόοδος and history merge providers by workout identity", ctx do
@@ -334,6 +377,17 @@ defmodule MilosTraining.Application.CrossProviderRLSTest do
     MilosTraining.Journal.with_context(context, fn ->
       Repo.all(
         from(n in "journal_notes", where: n.user_id == type(^member.id, :binary_id), select: n.id)
+      )
+    end)
+  end
+
+  defp comments_visible_to(context, entry) do
+    MilosTraining.Journal.with_context(context, fn ->
+      Repo.all(
+        from(c in "journal_comments",
+          where: c.entry_id == type(^entry.id, :binary_id),
+          select: type(c.id, :binary_id)
+        )
       )
     end)
   end

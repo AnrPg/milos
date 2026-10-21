@@ -93,5 +93,11 @@ defmodule MilosTraining.Application.SetJournalVisibility do
 
   defp broadcast(error, _user_id), do: error
 
-  defp param(params, key), do: Map.get(params, key, Map.get(params, String.to_existing_atom(key)))
+  # String or atom keys (cast params); never creates or demands an atom.
+  defp param(params, key) do
+    case Map.fetch(params, key) do
+      {:ok, value} -> value
+      :error -> Enum.find_value(params, fn {k, v} -> is_atom(k) and Atom.to_string(k) == key and v end)
+    end
+  end
 end
