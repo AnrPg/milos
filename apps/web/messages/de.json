@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "Portionen gehen von 0 bis 20, in Halben.",
     "stfMealSlots": "Mahlzeiten am Tag",
     "stfMealSlotsHint": "Die Mahlzeiten, zu denen das Mitglied einträgt. Leer lassen für Frühstück, Mittag, Abendessen und Snack.",
-    "mpWellnessSummary": "Wöchentliche Wohlbefinden-Übersicht"
+    "mpWellnessSummary": "Wöchentliche Wohlbefinden-Übersicht",
+    "apiErrorCoachPracticeExists": "Du betreibst mit diesem Konto bereits eine Coaching-Praxis.",
+    "apiErrorPlanLimitReached": "Dein Tarif hat keine freien Mitarbeiterplätze. Gib einen Platz frei oder bitte uns um einen Tarifwechsel.",
+    "apiErrorUnknownPlan": "Diesen Tarif gibt es nicht.",
+    "apiErrorTrialEndRequired": "Eine Testphase braucht ein Enddatum.",
+    "apiErrorInvalidName": "Der Name muss 2 bis 120 Zeichen lang sein."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -4742,6 +4747,26 @@
         "title": "Eine-Minute-Tour machen",
         "body": "Sieh, wo alles zu finden ist.",
         "cta": "Tour starten"
+      },
+      "profile": {
+        "title": "Veröffentliche dein Profil",
+        "body": "Dein Foto, was du coachst und wo. So finden dich Kunden.",
+        "cta": "Profil bearbeiten"
+      },
+      "sessions": {
+        "title": "Öffne Session-Zeiten",
+        "body": "Einzel- oder Kleingruppentermine, vor Ort oder online.",
+        "cta": "Sessions hinzufügen"
+      },
+      "team": {
+        "title": "Lerne dein Team kennen",
+        "body": "Der Club deiner Kunden: Ankündigungen, Chat und gemeinsames Training.",
+        "cta": "Team öffnen"
+      },
+      "bootcamp": {
+        "title": "Starte ein offenes Bootcamp",
+        "body": "Ein Outdoor- oder Online-Training für alle. Ein guter Weg, neue Kunden kennenzulernen.",
+        "cta": "Bootcamp erstellen"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "Deine Mitgliedschaft siehst du unter {billing}. Sprache und Benachrichtigungen änderst du im Profil."
         }
       }
-    }
+    },
+    "popupTitleCoach": "Willkommen, Coach! Richten wir deine Praxis ein",
+    "popupIntroCoach": "Sieben kurze Schritte. Hör jederzeit auf: Die Liste wartet unter {path} auf dich."
   },
   "MemberApp": {
     "journal": {
@@ -8698,6 +8725,123 @@
       "title": "Abdeckung, Qualitäten, Belastung",
       "range": "Zeitraum",
       "sharedOnly": "Nur aus Einträgen, die das Mitglied mit den Coaches der Box teilt."
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "Coach-Aktionen",
+      "sessions": "Sessions",
+      "nutrition": "Ernährung",
+      "messages": "Nachrichten",
+      "package": "Session-Paket",
+      "assessment": "Assessment",
+      "ptSession": "Personal-Session",
+      "online": "Online",
+      "inPerson": "Vor Ort",
+      "minutes": "{minutes} Min.",
+      "join": "Anruf beitreten",
+      "manage": "Verwalten",
+      "noSession": "Noch keine Session gebucht.",
+      "bookSession": "Session buchen",
+      "noPackage": "Noch kein Session-Paket. Frag deinen Coach.",
+      "sessionsLeft": "Noch {remaining} von {limit} Sessions",
+      "sessionsUnlimited": "Unbegrenzte Sessions"
+    },
+    "start": {
+      "title": "Als Coach starten",
+      "intro": "Betreue deine eigenen Kunden: Sessions, Programme, Ernährung und ein Team-Club, alles in Milos.",
+      "includes": "Das bekommst du",
+      "include": {
+        "clients": "Eigene Kundenliste und Programme",
+        "sessions": "Buchbare Sessions, vor Ort oder online",
+        "team": "Einen Team-Club für deine Kunden",
+        "bootcamps": "Offene Bootcamps für alle"
+      },
+      "trial": "{days} Tage kostenlos",
+      "price": "danach {price}/Monat",
+      "priceSoon": "Der Preis wird vor Ende der Testphase bekannt gegeben",
+      "nameLabel": "Name der Praxis",
+      "namePlaceholder": "z. B. Nikos Papadopoulos Coaching",
+      "nameHint": "Deine Kunden sehen diesen Namen. Du kannst ihn später ändern.",
+      "teamLabel": "Name des Team-Clubs",
+      "teamHint": "Der Club deiner Kunden. Du kannst ihn später umbenennen.",
+      "submit": "Meine Praxis starten",
+      "creating": "Wird gestartet…",
+      "alreadyOpen": "Du betreibst bereits eine Coaching-Praxis. Wechsle über das Anbietermenü dorthin."
+    },
+    "me": {
+      "row": "Eigene Kunden coachen",
+      "rowHint": "Eröffne deine Praxis als unabhängiger Coach"
+    },
+    "slot": {
+      "mode": "Wo",
+      "meetingUrl": "Anruf-Link"
+    },
+    "plan": {
+      "title": "Milos-Tarif",
+      "description": "Dein Tarif, seine Grenzen und deine Nutzung.",
+      "loading": "Tarif wird geladen…",
+      "status": {
+        "trialing": "Testphase",
+        "active": "Aktiv",
+        "past_due": "Zahlung fällig",
+        "cancelled": "Gekündigt",
+        "comped": "Kostenlos",
+        "trial_expired": "Testphase beendet"
+      },
+      "trialLeft": "Noch {days, plural, one {# Tag} other {# Tage}} Testphase",
+      "price": "{price}/Monat",
+      "priceSoon": "Preis wird bekannt gegeben",
+      "limit": {
+        "staff_seats": "Mitarbeiterplätze",
+        "active_clients": "Aktive Kunden"
+      },
+      "unlimited": "{used} · ohne Limit",
+      "used": "{used} von {limit}",
+      "contact": "Mehr Platz nötig? Kontaktiere uns, wir ändern deinen Tarif.",
+      "notice": {
+        "trial_ending": "Deine Testphase endet in {days, plural, one {# Tag} other {# Tagen}}.",
+        "trial_expired": "Deine Testphase ist beendet. Alles funktioniert weiter; wir melden uns wegen deines Tarifs.",
+        "past_due": "Eine Zahlung für deinen Milos-Tarif ist überfällig.",
+        "cancelled": "Dein Milos-Tarif ist gekündigt. Kontaktiere uns, um ihn neu zu starten.",
+        "staff_full": "Alle Mitarbeiterplätze deines Tarifs sind belegt."
+      }
+    },
+    "console": {
+      "back": "Organisationen",
+      "title": "Tarife",
+      "subtitle": "Limits, Testphasen und Preise der Tarife und der Tarif jeder Organisation. Ein Preis bleibt vorläufig, bis du ihn bestätigst; Kunden sehen nur bestätigte Preise.",
+      "forbidden": "Nur das Plattform-Team kann Tarife verwalten.",
+      "plans": "Katalog",
+      "audience": {
+        "gym": "Studios",
+        "coach": "Coaches"
+      },
+      "audienceLabel": "Für",
+      "placeholder": "Vorläufiger Preis",
+      "name": "Name",
+      "monthly": "Monatlich ({currency})",
+      "annual": "Jährlich ({currency})",
+      "trialDays": "Testtage",
+      "unlimitedHint": "Leer bedeutet ohne Limit",
+      "confirmed": "Preis bestätigt",
+      "default": "Standard für neue Organisationen",
+      "public": "Öffentlich sichtbar",
+      "active": "Aktiv",
+      "save": "Speichern",
+      "saved": "Gespeichert",
+      "newPlan": "Neuer Tarif",
+      "code": "Code",
+      "codeHint": "Kleinbuchstaben, Ziffern und _. Später nicht änderbar.",
+      "add": "Tarif hinzufügen",
+      "subscriptions": "Organisationen",
+      "noPlan": "Kein Tarif",
+      "plan": "Tarif",
+      "status": "Status",
+      "trialEnds": "Ende der Testphase",
+      "override": "Individueller Monatspreis",
+      "overrideHint": "Leer: Preis des Tarifs",
+      "notes": "Notizen"
     }
   },
   "Scaling": {

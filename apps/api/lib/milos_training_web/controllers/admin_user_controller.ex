@@ -636,7 +636,11 @@ defmodule MilosTrainingWeb.AdminUserController do
 
     # Role is a property of the membership, not of the account (F-29): this
     # only ever changes what the target is inside the acting organization.
-    case MilosTraining.Organizations.set_membership_role(conn.assigns.tenant_context, id, role) do
+    case MilosTraining.Application.ChangeMembershipRoles.set_role(
+           conn.assigns.tenant_context,
+           id,
+           role
+         ) do
       {:ok, membership} ->
         user = MilosTraining.Identity.find_by_id(membership.user_id)
 
@@ -694,7 +698,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     roles = Map.get(conn.body_params, :roles) || Map.get(conn.body_params, "roles")
 
     with {:ok, membership} <-
-           MilosTraining.Organizations.set_membership_roles(
+           MilosTraining.Application.ChangeMembershipRoles.set_roles(
              conn.assigns.tenant_context,
              id,
              roles

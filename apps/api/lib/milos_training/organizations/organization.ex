@@ -31,6 +31,19 @@ defmodule MilosTraining.Organizations.Organization do
     |> unique_constraint(:slug)
   end
 
+  @doc """
+  ADR-170: the kind an organization is created with (an independent coach's
+  practice starts as `coach`). Later changes go through
+  `Organizations.put_provider_kind/2`.
+  """
+  def put_initial_provider_kind(changeset, nil), do: changeset
+
+  def put_initial_provider_kind(changeset, kind) do
+    changeset
+    |> put_change(:provider_kind, kind)
+    |> validate_inclusion(:provider_kind, ["gym", "coach"])
+  end
+
   defp derive_slug(changeset) do
     case get_change(changeset, :slug) do
       nil ->

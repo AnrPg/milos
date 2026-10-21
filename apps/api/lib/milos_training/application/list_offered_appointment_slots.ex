@@ -44,8 +44,12 @@ defmodule MilosTraining.Application.ListOfferedAppointmentSlots do
         (booked? or (slot.spots_remaining > 0 and AppointmentPolicy.offered?(slot, terms)))
     end)
     |> Enum.map(fn slot ->
+      booked? = Enum.any?(slot.bookings, &(&1.user_id == user_id))
+
       slot
-      |> Map.put(:booked_by_me, Enum.any?(slot.bookings, &(&1.user_id == user_id)))
+      |> Map.put(:booked_by_me, booked?)
+      # ADR-170: the call link is for the people in the session only.
+      |> Map.put(:meeting_url, if(booked?, do: slot[:meeting_url]))
       |> Map.put(:bookings, [])
     end)
   end

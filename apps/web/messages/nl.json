@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "Porties gaan van 0 tot 20, per halve.",
     "stfMealSlots": "Maaltijden van de dag",
     "stfMealSlotsHint": "De maaltijden waarop het lid logt. Laat leeg voor ontbijt, lunch, avondeten en een snack.",
-    "mpWellnessSummary": "Wekelijks welzijnsoverzicht"
+    "mpWellnessSummary": "Wekelijks welzijnsoverzicht",
+    "apiErrorCoachPracticeExists": "Je hebt met dit account al een coachpraktijk.",
+    "apiErrorPlanLimitReached": "Je abonnement heeft geen vrije personeelsplaatsen. Maak een plaats vrij of vraag ons het abonnement te wijzigen.",
+    "apiErrorUnknownPlan": "Dit abonnement bestaat niet.",
+    "apiErrorTrialEndRequired": "Een proefperiode heeft een einddatum nodig.",
+    "apiErrorInvalidName": "De naam moet 2 tot 120 tekens lang zijn."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4742,6 +4747,26 @@
         "title": "Volg de rondleiding van 1 minuut",
         "body": "Zie waar alles staat.",
         "cta": "Rondleiding starten"
+      },
+      "profile": {
+        "title": "Publiceer je profiel",
+        "body": "Je foto, wat je coacht en waar. Zo vinden klanten je.",
+        "cta": "Profiel bewerken"
+      },
+      "sessions": {
+        "title": "Open sessietijden",
+        "body": "Individueel of in kleine groep, op locatie of online.",
+        "cta": "Sessies toevoegen"
+      },
+      "team": {
+        "title": "Maak kennis met je Team",
+        "body": "De club van je klanten: aankondigingen, chat en samen trainen.",
+        "cta": "Team openen"
+      },
+      "bootcamp": {
+        "title": "Organiseer een open bootcamp",
+        "body": "Een buiten- of onlinetraining voor iedereen. Een goede manier om nieuwe klanten te leren kennen.",
+        "cta": "Bootcamp maken"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "Bekijk je lidmaatschap onder {billing}. Wijzig taal en meldingen in je profiel."
         }
       }
-    }
+    },
+    "popupTitleCoach": "Welkom, coach! Laten we je praktijk inrichten",
+    "popupIntroCoach": "Zeven korte stappen. Stop wanneer je wilt: de lijst wacht op je in {path}."
   },
   "MemberApp": {
     "journal": {
@@ -8698,6 +8725,123 @@
       "title": "Dekking, kwaliteiten, belasting",
       "range": "Periode",
       "sharedOnly": "Alleen uit items die de klant met de coaches van de box deelt."
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "Coachacties",
+      "sessions": "Sessies",
+      "nutrition": "Voeding",
+      "messages": "Berichten",
+      "package": "Sessiepakket",
+      "assessment": "Intake",
+      "ptSession": "Persoonlijke sessie",
+      "online": "Online",
+      "inPerson": "Op locatie",
+      "minutes": "{minutes} min",
+      "join": "Deelnemen aan gesprek",
+      "manage": "Beheren",
+      "noSession": "Nog geen sessie geboekt.",
+      "bookSession": "Sessie boeken",
+      "noPackage": "Nog geen sessiepakket. Vraag het je coach.",
+      "sessionsLeft": "Nog {remaining} van {limit} sessies",
+      "sessionsUnlimited": "Onbeperkt sessies"
+    },
+    "start": {
+      "title": "Begin als coach",
+      "intro": "Coach je eigen klanten: sessies, programma’s, voeding en een Team-club, allemaal in Milos.",
+      "includes": "Wat je krijgt",
+      "include": {
+        "clients": "Je eigen klantenlijst en programma’s",
+        "sessions": "Boekbare sessies, op locatie of online",
+        "team": "Een Team-club voor je klanten",
+        "bootcamps": "Open bootcamps voor iedereen"
+      },
+      "trial": "{days} dagen gratis",
+      "price": "daarna {price}/maand",
+      "priceSoon": "De prijs wordt bekendgemaakt voor de proefperiode afloopt",
+      "nameLabel": "Naam van de praktijk",
+      "namePlaceholder": "bijv. Nikos Papadopoulos Coaching",
+      "nameHint": "Klanten zien deze naam. Je kunt hem later wijzigen.",
+      "teamLabel": "Naam van de Team-club",
+      "teamHint": "De club van je klanten. Je kunt hem later hernoemen.",
+      "submit": "Start mijn praktijk",
+      "creating": "Bezig met starten…",
+      "alreadyOpen": "Je hebt al een coachpraktijk. Schakel ernaar via het aanbiedersmenu."
+    },
+    "me": {
+      "row": "Coach je eigen klanten",
+      "rowHint": "Open je praktijk als onafhankelijke coach"
+    },
+    "slot": {
+      "mode": "Waar",
+      "meetingUrl": "Gesprekslink"
+    },
+    "plan": {
+      "title": "Milos-abonnement",
+      "description": "Je abonnement, de limieten en je gebruik.",
+      "loading": "Abonnement laden…",
+      "status": {
+        "trialing": "Proefperiode",
+        "active": "Actief",
+        "past_due": "Betaling achterstallig",
+        "cancelled": "Opgezegd",
+        "comped": "Gratis",
+        "trial_expired": "Proefperiode voorbij"
+      },
+      "trialLeft": "Nog {days, plural, one {# dag} other {# dagen}} proefperiode",
+      "price": "{price}/maand",
+      "priceSoon": "Prijs volgt",
+      "limit": {
+        "staff_seats": "Personeelsplaatsen",
+        "active_clients": "Actieve klanten"
+      },
+      "unlimited": "{used} · geen limiet",
+      "used": "{used} van {limit}",
+      "contact": "Meer ruimte nodig? Neem contact op en we passen je abonnement aan.",
+      "notice": {
+        "trial_ending": "Je proefperiode eindigt over {days, plural, one {# dag} other {# dagen}}.",
+        "trial_expired": "Je proefperiode is voorbij. Alles blijft werken; we nemen contact op over je abonnement.",
+        "past_due": "Een betaling voor je Milos-abonnement is achterstallig.",
+        "cancelled": "Je Milos-abonnement is opgezegd. Neem contact op om het opnieuw te starten.",
+        "staff_full": "Alle personeelsplaatsen van je abonnement zijn bezet."
+      }
+    },
+    "console": {
+      "back": "Organisaties",
+      "title": "Abonnementen",
+      "subtitle": "Limieten, proefperiodes en prijzen van abonnementen, en het abonnement van elke organisatie. Een prijs blijft voorlopig tot je hem bevestigt; klanten zien alleen bevestigde prijzen.",
+      "forbidden": "Alleen het platformteam kan abonnementen beheren.",
+      "plans": "Catalogus",
+      "audience": {
+        "gym": "Sportscholen",
+        "coach": "Coaches"
+      },
+      "audienceLabel": "Voor",
+      "placeholder": "Voorlopige prijs",
+      "name": "Naam",
+      "monthly": "Per maand ({currency})",
+      "annual": "Per jaar ({currency})",
+      "trialDays": "Proefdagen",
+      "unlimitedHint": "Leeg betekent geen limiet",
+      "confirmed": "Prijs bevestigd",
+      "default": "Standaard voor nieuwe organisaties",
+      "public": "Openbaar zichtbaar",
+      "active": "Actief",
+      "save": "Opslaan",
+      "saved": "Opgeslagen",
+      "newPlan": "Nieuw abonnement",
+      "code": "Code",
+      "codeHint": "Kleine letters, cijfers en _. Later niet te wijzigen.",
+      "add": "Abonnement toevoegen",
+      "subscriptions": "Organisaties",
+      "noPlan": "Geen abonnement",
+      "plan": "Abonnement",
+      "status": "Status",
+      "trialEnds": "Einde proefperiode",
+      "override": "Aangepaste maandprijs",
+      "overrideHint": "Leeg: prijs van het abonnement",
+      "notes": "Notities"
     }
   },
   "Scaling": {
