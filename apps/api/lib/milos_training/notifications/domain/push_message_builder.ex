@@ -540,6 +540,117 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-160: Buddy για στήριξη. Calm words; the message the member typed
+  # shows in the app, a craving's details never travel.
+  def build("buddy_invite", payload, localize) do
+    %{
+      title: localize.("A buddy invitation", %{}),
+      body:
+        localize.("%{nickname} asks you to be their support buddy.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("buddy_accepted", payload, localize) do
+    %{
+      title: localize.("You have a support buddy", %{}),
+      body:
+        localize.("%{nickname} accepted. They hear from you only when you ask.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("support_request", payload, localize) do
+    %{
+      title:
+        localize.("%{nickname} is having a hard moment", %{nickname: payload["nickname"] || ""}),
+      body: localize.("I'm here · Shall we go for a walk? · Call me", %{}),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("support_reply", payload, localize) do
+    bindings = %{nickname: payload["nickname"] || ""}
+
+    body =
+      case payload["kind"] do
+        "walk" -> localize.("%{nickname}: Shall we go for a walk?", bindings)
+        "call" -> localize.("%{nickname}: Call me", bindings)
+        "text" -> payload["text"] || localize.("%{nickname}: I'm here", bindings)
+        _here -> localize.("%{nickname}: I'm here", bindings)
+      end
+
+    %{
+      title: localize.("%{nickname} replied", bindings),
+      body: body,
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  def build("support_no_reply_nudge", payload, localize) do
+    %{
+      title: localize.("No one has replied yet", %{}),
+      body:
+        localize.(
+          "Until then, something small: two minutes of breathing, a glass of water, a short walk.",
+          %{}
+        ),
+      url: payload["url"] || "/journal/wellness"
+    }
+  end
+
+  def build("buddy_weekly_summary", payload, localize) do
+    bindings = %{
+      nickname: payload["nickname"] || "",
+      moments: payload["hard_moments"] || 0,
+      overcome: payload["overcome"] || 0,
+      requests: payload["support_requests"] || 0
+    }
+
+    %{
+      title: localize.("%{nickname}'s week", bindings),
+      body:
+        localize.(
+          "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support.",
+          bindings
+        ),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  # ADR-160 §2: who wrote, never what (lock-screen safe).
+  def build("buddy_message", payload, localize) do
+    %{
+      title: localize.("Buddy message", %{}),
+      body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
+      url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  # ADR-160 §4: counts only, never craving times.
+  def build("coach_wellness_summary", payload, localize) do
+    bindings = %{
+      nickname: payload["client_nickname"] || "",
+      sleep: payload["sleep_nights"] || 0,
+      water: payload["water_days"] || 0,
+      meals: payload["meal_days"] || 0
+    }
+
+    %{
+      title: localize.("%{nickname}: weekly wellness", bindings),
+      body:
+        localize.(
+          "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged.",
+          bindings
+        ),
+      url: payload["url"] || "/admin/users"
+    }
+  end
+
   # ADR-159: lock-screen safe, so neither push names a craving or a number.
   def build("craving_follow_up", payload, localize) do
     %{

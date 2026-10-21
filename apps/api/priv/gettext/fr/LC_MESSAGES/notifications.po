@@ -460,6 +460,57 @@ msgstr "C’est le moment d’une nouvelle mesure"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Un nouvel instantané t’aide à voir ta tendance. Cela prend une minute."
 
+msgid "A buddy invitation"
+msgstr "Une invitation de buddy"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} te demande d'être son buddy de soutien."
+
+msgid "You have a support buddy"
+msgstr "Tu as un buddy de soutien"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} a accepté. Il ou elle n'aura de tes nouvelles que si tu le demandes."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} traverse un moment difficile"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Je suis là · On va marcher ? · Appelle-moi"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname} : On va marcher ?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname} : Appelle-moi"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname} : Je suis là"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} a répondu"
+
+msgid "No one has replied yet"
+msgstr "Personne n'a encore répondu"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "En attendant, quelque chose de simple : deux minutes de respiration, un verre d'eau, une petite marche."
+
+msgid "%{nickname}'s week"
+msgstr "La semaine de %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} moments difficiles, %{overcome} surmontés, %{requests} demandes de soutien."
+
+msgid "I'm here"
+msgstr "Je suis là"
+
+msgid "Shall we go for a walk?"
+msgstr "On va marcher ?"
+
+msgid "Call me"
+msgstr "Appelle-moi"
+
 msgid "How did it go?"
 msgstr "Comment ça s'est passé ?"
 
@@ -471,6 +522,15 @@ msgstr "Un verre d'eau ?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "L'après-midi est un bon moment pour rattraper ton eau."
+
+msgid "Buddy message"
+msgstr "Message de ton buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname} : bien-être de la semaine"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} nuits à l'objectif de sommeil, %{water} jours d'eau, %{meals} jours avec repas notés."
 
 msgid "Garmin stopped syncing"
 msgstr "Garmin ne se synchronise plus"

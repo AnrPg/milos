@@ -160,4 +160,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-157 | Photos and video in posts | Accepted |
 | ADR-158 | Body snapshots, private photos and coach access | Accepted |
 | ADR-159 | Wellness (water, sleep, meals) and cravings | Accepted |
+| ADR-160 | Buddy για στήριξη and the coach's weekly wellness summary | Accepted |
 | ADR-161 | Garmin: OAuth, push ingest, matching and the devices row | Accepted |

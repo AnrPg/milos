@@ -6,6 +6,9 @@ import { useTranslations } from "next-intl";
 
 import { openOnboardingChecklist, openProductTour } from "@/components/onboarding/Onboarding";
 import { OrganizationSelector } from "@/components/organization-selector";
+import { CountBadge } from "@/components/buddy/BuddyBits";
+import { activeBuddies, recipientNames, unreadTotal } from "@/components/buddy/buddy-model";
+import { useBuddies } from "@/components/buddy/use-buddies";
 import { HubCard, HubList, HubListRow, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useSocialSummary } from "@/components/social/use-social";
@@ -19,8 +22,9 @@ import { setView } from "@/lib/view-mode";
  * everything secondary, so the app needs no "More" drawer (brief §4.8).
  * Under the name, «ακόλουθοι · ακολουθείς» opens the connections screen
  * (plan §5a Q12).
- * «Φέρε φίλο» (ADR-156) leads the list as in the mockup; Συνδεδεμένες
- * συσκευές (ADR-155) and Buddy join it when they exist.
+ * «Φέρε φίλο» (ADR-156) leads the list as in the mockup, then Buddy για
+ * στήριξη (ADR-160) with its unread messages; Συνδεδεμένες συσκευές (ADR-155)
+ * follows.
  */
 export function MeHub() {
   const t = useTranslations("MemberApp");
@@ -28,7 +32,11 @@ export function MeHub() {
   const tNav = useTranslations("Navigation");
   const tSocial = useTranslations("Social");
   const tCheckIn = useTranslations("CheckIn");
+  const tBuddy = useTranslations("Buddy");
   const summary = useSocialSummary();
+  const buddies = useBuddies();
+  const buddyNames = recipientNames(activeBuddies(buddies.data), tBuddy("someone"));
+  const buddyUnread = unreadTotal(buddies.data);
   const router = useRouter();
   const { currentUser, signOut } = useSession();
   const { membership, memberships, selectedOrganizationSlug } = useSelectedMembershipRole();
@@ -73,6 +81,12 @@ export function MeHub() {
 
       <HubList>
         <HubListRow href="/me/referrals" label={t("meReferrals")} detail={t("meReferralsHint")} />
+        <HubListRow
+          href="/me/buddy"
+          label={tBuddy("title")}
+          detail={buddyNames || tBuddy("rowHint")}
+          badge={<CountBadge count={buddyUnread} label={tBuddy("unreadCount", { count: buddyUnread })} />}
+        />
         <HubListRow href="/me/posts" label={t("mePosts")} detail={t("mePostsHint")} />
         <HubListRow href="/me/clubs" label={t("meClubs")} detail={t("meClubsHint")} />
         <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />

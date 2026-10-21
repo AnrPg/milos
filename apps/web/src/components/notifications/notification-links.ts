@@ -1,3 +1,4 @@
+import { buddyNotificationUrl } from "@/components/buddy/buddy-links";
 import { currentMemberPath } from "@/lib/member-routes";
 
 type LinkableNotification = {
@@ -104,6 +105,9 @@ export function notificationTargetUrl(
 ) {
   const phaseC = phaseCUrl(notification, role);
   if (phaseC) return phaseC;
+  // ADR-160: buddy notices open the buddy screens, the coach's the client page.
+  const buddy = buddyNotificationUrl(notification.type, notification.payload);
+  if (buddy) return buddy;
 
   const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
   const isAdmin = isStaffRole(role);

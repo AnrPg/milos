@@ -7,7 +7,7 @@ describe("newEntryGroups", () => {
     expect(newEntryGroups({ canRequestFormReview: false })).toEqual([
       { group: "training", kinds: ["workout", "pr"] },
       { group: "body", kinds: ["measure"] },
-      { group: "wellbeing", kinds: ["wellness", "checkIn", "craving", "injury"] },
+      { group: "wellbeing", kinds: ["wellness", "checkIn", "craving", "support", "injury"] },
       { group: "coach", kinds: ["review"] },
       { group: "note", kinds: ["note"] },
     ]);
@@ -17,7 +17,7 @@ describe("newEntryGroups", () => {
     expect(
       newEntryGroups({ canRequestFormReview: false, showWellness: false }).find((entry) => entry.group === "wellbeing")
         ?.kinds,
-    ).toEqual(["checkIn", "craving", "injury"]);
+    ).toEqual(["checkIn", "craving", "support", "injury"]);
   });
 
   it("leaves Μέτρηση out when Σώμα is switched off", () => {

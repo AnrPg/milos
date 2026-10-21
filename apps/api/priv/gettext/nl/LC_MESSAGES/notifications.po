@@ -460,6 +460,57 @@ msgstr "Tijd voor een nieuwe meting"
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Een nieuwe momentopname laat je je trend zien. Het kost een minuut."
 
+msgid "A buddy invitation"
+msgstr "Een buddy-uitnodiging"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} vraagt je om hun steunbuddy te zijn."
+
+msgid "You have a support buddy"
+msgstr "Je hebt een steunbuddy"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} heeft geaccepteerd. Ze horen alleen van je als je erom vraagt."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} heeft het even moeilijk"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Ik ben er · Zullen we gaan wandelen? · Bel me"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Zullen we gaan wandelen?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Bel me"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Ik ben er"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} heeft geantwoord"
+
+msgid "No one has replied yet"
+msgstr "Nog niemand heeft geantwoord"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Tot dan iets kleins: twee minuten ademen, een glas water, een korte wandeling."
+
+msgid "%{nickname}'s week"
+msgstr "De week van %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} moeilijke momenten, %{overcome} overwonnen, %{requests} verzoeken om steun."
+
+msgid "I'm here"
+msgstr "Ik ben er"
+
+msgid "Shall we go for a walk?"
+msgstr "Zullen we gaan wandelen?"
+
+msgid "Call me"
+msgstr "Bel me"
+
 msgid "How did it go?"
 msgstr "Hoe ging het?"
 
@@ -471,6 +522,15 @@ msgstr "Een glas water?"
 
 msgid "The afternoon is a good moment to catch up on water."
 msgstr "De middag is een goed moment om je water in te halen."
+
+msgid "Buddy message"
+msgstr "Bericht van je buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: welzijn van de week"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} nachten op het slaapdoel, %{water} dagen genoeg water, %{meals} dagen met maaltijden genoteerd."
 
 msgid "Garmin stopped syncing"
 msgstr "Garmin synchroniseert niet meer"

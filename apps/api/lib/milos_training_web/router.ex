@@ -85,6 +85,10 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "public-box")
   end
 
+  pipeline :public_invite_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "buddy-invite")
+  end
+
   # ADR-156: invite pages; 32^8 codes behind a tight budget make guessing moot.
   pipeline :public_referral_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "public-referral")
@@ -588,6 +592,8 @@ defmodule MilosTrainingWeb.Router do
     get("/clients/:user_id/body", ClientBodyController, :index)
     get("/clients/:user_id/body/snapshots/:id", ClientBodyController, :show)
     get("/clients/:user_id/body/series", ClientBodyController, :series)
+    # ADR-160: the weekly wellness summary, only with the client's grant.
+    get("/clients/:user_id/wellness-summary", ClientWellnessSummaryController, :show)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -1216,6 +1222,42 @@ defmodule MilosTrainingWeb.Router do
     delete("/me/body/consents/:scope", MyBodyController, :withdraw_consent)
     get("/me/body/access-log", MyBodyController, :access_log)
     post("/me/body/share", MyBodyController, :share)
+    # ADR-160: Buddy για στήριξη.
+    get("/me/buddies", MyBuddiesController, :index)
+    get("/me/buddies/candidates", MyBuddiesController, :candidates)
+    get("/me/buddies/settings", MyBuddiesController, :settings)
+    put("/me/buddies/settings", MyBuddiesController, :update_settings)
+    post("/me/buddies", MyBuddiesController, :invite)
+    post("/me/buddies/invite-links", MyBuddiesController, :create_invite_link)
+    post("/me/buddies/:id/accept", MyBuddiesController, :accept)
+    post("/me/buddies/:id/decline", MyBuddiesController, :decline)
+    post("/me/buddies/:id/leave", MyBuddiesController, :leave)
+    patch("/me/buddies/:id", MyBuddiesController, :update)
+    get("/me/buddies/:id/messages", BuddyMessagesController, :index)
+    post("/me/buddies/:id/messages", BuddyMessagesController, :create)
+    post("/me/buddies/:id/messages/read", BuddyMessagesController, :read)
+    post("/me/buddy-invites/:token/claim", MyBuddiesController, :claim)
+    get("/me/support-requests", SupportRequestController, :index)
+    post("/me/support-requests", SupportRequestController, :create)
+    get("/me/support-requests/:id", SupportRequestController, :show)
+    post("/me/support-requests/:id/undo", SupportRequestController, :undo)
+    post("/me/support-requests/:id/replies", SupportRequestController, :reply)
+    get("/me/wellness-summary-sharing", WellnessSummarySharingController, :show)
+
+    get(
+      "/me/wellness-summary-sharing/access-log",
+      WellnessSummarySharingController,
+      :access_log
+    )
+
+    put("/me/wellness-summary-sharing", WellnessSummarySharingController, :update)
+  end
+
+  # ADR-160: the public landing page of a buddy invite link.
+  scope "/api/buddy-invites", MilosTrainingWeb do
+    pipe_through([:api, :public_invite_rate_limited])
+
+    get("/:token", BuddyInviteController, :show)
   end
 
   # ADR-157: photos and videos for posts.

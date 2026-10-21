@@ -1934,6 +1934,51 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-160 Buddy για στήριξη.
+  @buddy_errors %{
+    buddy_limit_reached: {:conflict, "You can have up to two buddies or invitations"},
+    buddy_already_invited: {:conflict, "You already invited this person"},
+    buddy_invite_expired: {:conflict, "This invitation has expired"},
+    buddy_link_closed: {:conflict, "This buddy link has already ended"},
+    buddy_invite_unavailable: {:conflict, "This invitation link no longer works"},
+    cannot_buddy_self: {:unprocessable_entity, "You cannot be your own buddy"},
+    not_eligible_for_buddy:
+      {:forbidden,
+       "Invite your coach, someone from your clubs or someone you follow, or send a link"},
+    invalid_buddy_link: {:unprocessable_entity, "Check the invitation"},
+    invalid_receives_weekly_summary:
+      {:unprocessable_entity, "receives_weekly_summary must be true or false"},
+    message_too_long: {:unprocessable_entity, "The message is at most 280 characters"},
+    invalid_support_source: {:unprocessable_entity, "Use craving or quick"},
+    support_rate_limited:
+      {:too_many_requests, "You asked for support a few times this hour; your buddies have it"},
+    no_active_buddies: {:conflict, "Add a buddy first"},
+    already_undone: {:conflict, "This request was already taken back"},
+    undo_window_passed: {:conflict, "Your buddies have already been told"},
+    invalid_reply_kind: {:unprocessable_entity, "Use here, walk, call or text"},
+    reply_text_required: {:unprocessable_entity, "Write a few words"},
+    reply_too_long: {:unprocessable_entity, "A reply is at most 500 characters"},
+    invalid_reply_text: {:unprocessable_entity, "Check the reply"},
+    invalid_reply: {:unprocessable_entity, "Check the reply"},
+    invalid_quiet_hours: {:unprocessable_entity, "Quiet hours are two different times, HH:MM"},
+    invalid_phone: {:unprocessable_entity, "Check the phone number"},
+    invalid_share_phone: {:unprocessable_entity, "share_phone must be true or false"},
+    phone_required: {:unprocessable_entity, "Add a phone number to share it"},
+    summary_required: {:unprocessable_entity, "Turn on the weekly summary first"},
+    invalid_summary_sharing: {:unprocessable_entity, "Use true or false"},
+    message_body_required: {:unprocessable_entity, "Write a message"},
+    message_too_long_body: {:unprocessable_entity, "A message is at most 2000 characters"},
+    buddy_link_read_only: {:conflict, "This buddy link has ended; the conversation is read-only"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@buddy_errors, reason) do
+    {status, message} = Map.fetch!(@buddy_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
   # ADR-159 Ευεξία and Λιγούρα.
   def call(conn, {:error, {:invalid_wellness_value, errors}}) when is_map(errors) do
     conn

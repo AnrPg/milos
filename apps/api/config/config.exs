@@ -47,6 +47,7 @@ config :milos_training, Oban,
        {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
        {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob},
        {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob},
+       {"0,30 * * * *", MilosTraining.Workers.BuddyWeeklySummaryJob},
        {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
        {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob}
      ]}
@@ -236,6 +237,14 @@ config :milos_training,
 config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRStore
 config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.EctoJournalStore
 config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
+config :milos_training, :buddy_store, MilosTraining.Infrastructure.Buddies.EctoBuddyStore
+
+config :milos_training,
+       :support_scheduler,
+       MilosTraining.Infrastructure.Buddies.ObanSupportScheduler
+
+# ADR-160: «Χρειάζομαι στήριξη» from Λιγούρα (the port M11 calls).
+config :milos_training, :support_requests, MilosTraining.Application.SupportRequests
 
 config :milos_training,
        :push_subscription_store,
@@ -254,11 +263,6 @@ config :milos_training,
 config :milos_training,
        :wellness_store,
        MilosTraining.Infrastructure.Wellness.EctoWellnessStore
-
-# ADR-159: «Χρειάζομαι στήριξη» from a Λιγούρα; M12 (Buddy) replaces the adapter.
-config :milos_training,
-       :support_requests,
-       MilosTraining.Infrastructure.Wellness.NoSupportRequests
 
 config :milos_training,
        :messaging_thread_store,

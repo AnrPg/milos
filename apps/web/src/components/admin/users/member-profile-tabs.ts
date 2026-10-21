@@ -18,6 +18,8 @@ export const SECTION_TAB: Record<string, ProfileTab> = {
   training_notes: "training",
   health_incidents: "wellbeing",
   wellbeing_notes: "wellbeing",
+  // ADR-160: the weekly wellness summary the member chose to share.
+  wellness_summary: "wellbeing",
   body: "body",
   coaching_context: "coaching",
   coaching_relationships: "coaching",
