@@ -10,6 +10,8 @@ defmodule Palee.Finance.Domain.RefundReceiptDocument do
   every interpolated value is HTML-escaped.
   """
 
+  alias Palee.BrandPalette
+
   @label_keys [
     :title,
     :receipt_number,
@@ -172,15 +174,21 @@ defmodule Palee.Finance.Domain.RefundReceiptDocument do
   defp label(labels, key), do: Map.get(labels, key) || Atom.to_string(key)
 
   defp stylesheet do
-    "body{margin:0;background:#f4f4f5;color:#18181b;font:15px/1.5 system-ui,-apple-system," <>
-      "\"Segoe UI\",Roboto,sans-serif}.receipt{max-width:720px;margin:32px auto;background:#fff;" <>
-      "padding:40px;border:1px solid #e4e4e7;border-radius:12px}header{border-bottom:2px solid " <>
-      "#18181b;margin-bottom:24px}h1{margin:0 0 4px;font-size:26px}h2{font-size:15px;" <>
-      "text-transform:uppercase;letter-spacing:.08em;color:#52525b;margin:24px 0 8px}" <>
+    paper = BrandPalette.colour(:paper)
+    page = BrandPalette.colour(:bg)
+    text = BrandPalette.colour(:text)
+    muted = BrandPalette.colour(:text_soft)
+    border = BrandPalette.colour(:border)
+
+    "body{margin:0;background:#{page};color:#{text};font:15px/1.5 system-ui,-apple-system," <>
+      "\"Segoe UI\",Roboto,sans-serif}.receipt{max-width:720px;margin:32px auto;background:#{paper};" <>
+      "padding:40px;border:1px solid #{border};border-radius:12px}header{border-bottom:2px solid " <>
+      "#{text};margin-bottom:24px}h1{margin:0 0 4px;font-size:26px}h2{font-size:15px;" <>
+      "text-transform:uppercase;letter-spacing:.08em;color:#{muted};margin:24px 0 8px}" <>
       ".number{margin:0 0 16px}dl{display:grid;grid-template-columns:minmax(160px,1fr) 2fr;" <>
-      "gap:6px 16px;margin:0}dt{color:#52525b}dd{margin:0;font-weight:600;overflow-wrap:anywhere}" <>
-      "footer{margin-top:32px;border-top:1px solid #e4e4e7;padding-top:16px;font-size:12px;" <>
-      "color:#52525b}code{font-size:11px;overflow-wrap:anywhere}@media print{body{background:#fff}" <>
+      "gap:6px 16px;margin:0}dt{color:#{muted}}dd{margin:0;font-weight:600;overflow-wrap:anywhere}" <>
+      "footer{margin-top:32px;border-top:1px solid #{border};padding-top:16px;font-size:12px;" <>
+      "color:#{muted}}code{font-size:11px;overflow-wrap:anywhere}@media print{body{background:#{paper}}" <>
       ".receipt{margin:0;border:0;border-radius:0;max-width:none;padding:0}}"
   end
 end

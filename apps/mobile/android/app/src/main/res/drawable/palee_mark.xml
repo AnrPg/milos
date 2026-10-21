@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- The arms-up mark (docs/brand/logo/palee-mark.svg) in the theme colours. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="96dp"
+    android:height="96dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+    <path
+        android:pathData="M40,52 Q46,150 100,150 Q154,150 160,52"
+        android:strokeColor="@color/palee_text"
+        android:strokeWidth="26"
+        android:strokeLineCap="round" />
+    <path
+        android:pathData="M100,88 m-24,0 a24,24 0,1 0,48 0 a24,24 0,1 0,-48 0"
+        android:fillColor="@color/palee_primary" />
+</vector>

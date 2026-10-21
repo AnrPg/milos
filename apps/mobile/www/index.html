@@ -7,8 +7,9 @@
     <!-- ADR-171: the app loads the deployed web app (server.url). This page is only
          reached if that setting is missing; it forwards to the configured URL. -->
     <script src="app-config.js"></script>
+    <link rel="stylesheet" href="palee-theme.css" />
     <style>
-      html, body { margin: 0; height: 100%; background: #0b0d10; }
+      html, body { margin: 0; height: 100%; background: var(--background); }
     </style>
   </head>
   <body>

@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/palee_widget_loading"
-        android:textColor="#FF9AA3AE"
+        android:textColor="@color/palee_muted"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -25,7 +25,7 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="4"
-        android:textColor="#FFF5F7FA"
+        android:textColor="@color/palee_text"
         android:textSize="15sp" />
     <TextView
         android:id="@+id/widget_action"
@@ -34,7 +34,7 @@
         android:layout_marginTop="8dp"
         android:background="@drawable/palee_widget_button"
         android:gravity="center"
-        android:textColor="#FF0B0D10"
+        android:textColor="@color/palee_primary_contrast"
         android:textSize="15sp"
         android:textStyle="bold" />
 </LinearLayout>

@@ -5,6 +5,8 @@ defmodule Palee.Finance.Emails.CorporateInvoiceEmail do
   body; the PDF is downloaded from the admin screen.
   """
 
+  alias Palee.BrandPalette
+
   import Swoosh.Email
 
   @doc """
@@ -72,12 +74,12 @@ defmodule Palee.Finance.Emails.CorporateInvoiceEmail do
 
     table =
       Enum.map_join(rows, "", fn {label, value} ->
-        ~s(<tr><td style="padding:4px 12px 4px 0;color:#555;">#{escape(label)}</td>) <>
+        ~s(<tr><td style="padding:4px 12px 4px 0;color:#{BrandPalette.colour(:muted)};">#{escape(label)}</td>) <>
           ~s(<td style="padding:4px 0;font-weight:600;">#{escape(value)}</td></tr>)
       end)
 
     """
-    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 520px; margin: 0 auto; color: #1a1a1a;">
+    <div style="font-family: -apple-system, Segoe UI, sans-serif; max-width: 520px; margin: 0 auto; color: #{BrandPalette.colour(:text)};">
       #{paragraphs.(intro)}
       <table style="border-collapse: collapse; margin: 16px 0;">#{table}</table>
       #{paragraphs.(outro)}

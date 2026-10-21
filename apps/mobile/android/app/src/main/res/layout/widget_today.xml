@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/palee_widget_loading"
-        android:textColor="#FF9AA3AE"
+        android:textColor="@color/palee_muted"
         android:textSize="12sp"
         android:textStyle="bold" />
 
@@ -25,6 +25,6 @@
         android:layout_weight="1"
         android:ellipsize="end"
         android:maxLines="4"
-        android:textColor="#FFF5F7FA"
+        android:textColor="@color/palee_text"
         android:textSize="15sp" />
 </LinearLayout>
