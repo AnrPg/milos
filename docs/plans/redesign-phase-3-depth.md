@@ -218,6 +218,18 @@ All recommended options, with every recommended extra.
 6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
    entries; also lists goals nobody felt.
 
+### Solo-coach tier (2026-10-21, P3-M8, ADR-170; no board, per ANR's Phase 3 rule)
+1. **Box:** one layout switch, not a second app. Coach layout: «Name · Personal coach ▾», next session (online
+   ones with «Join call»), Sessions · Videos · Nutrition · Messages by entitlement, the session package, then
+   extensions and the Team club's announcements.
+2. **Start a practice:** a row in Εγώ («Coach your own clients») opens one screen: practice name, Team club name
+   (prefilled «Team <first name>»), what is included, the trial. Hidden once the account owns a practice.
+3. **Prices:** placeholder prices are never shown; «pricing to be announced» until the platform confirms them.
+4. **Plan in the console:** a collapsed «Milos plan» section in settings (status, trial days, seats used) and one
+   notice line above settings only when something needs attention.
+5. **Online sessions:** a «Where» select (in person / online) and a call link on the slot form; the link appears
+   only to the booked client.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
@@ -228,7 +240,8 @@ All recommended options, with every recommended extra.
 - [ ] Phone health data follows D8/D11 of Phase 2 (consent, delete, export)
 
 ## 7. Open questions
-1. Brief §10 Q2: prices for gym tiers and the solo-coach tier (ANR).
+1. Brief §10 Q2: prices for gym tiers and the solo-coach tier (ANR). Configurable in `/platform/plans`; seeded
+   values are placeholders (ADR-170).
 2. Brief §10 Q6: when to start the wrapper; Apple and Google developer accounts are owner actions.
 3. ~~Atlas asset licence~~ Decided: anatomy-models (D2).
 4. Should seasons support card payment later, and through which processor?
@@ -236,4 +249,4 @@ All recommended options, with every recommended extra.
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
 - [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
-- [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
+- [x] P3-M8 (ADR-170) · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
