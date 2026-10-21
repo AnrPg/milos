@@ -75,7 +75,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
     return () => {
       cancelled = true;
     };
-  }, [i18n, router, signOut, tokens?.access_token, workoutId]);
+  }, [i18n, organizationSlug, router, signOut, tokens?.access_token, workoutId]);
 
   useEffect(() => {
     if (!tokens?.access_token) return;
@@ -107,7 +107,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
       cancelled = true;
       window.clearTimeout(timeoutId);
     };
-  }, [i18n, query, router, signOut, tokens?.access_token]);
+  }, [i18n, organizationSlug, query, router, signOut, tokens?.access_token]);
 
   async function submitAssignment() {
     if (!tokens?.access_token) return;
