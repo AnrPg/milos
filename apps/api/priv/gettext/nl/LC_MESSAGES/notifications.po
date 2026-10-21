@@ -543,3 +543,12 @@ msgstr "Je dagboekexport staat klaar"
 
 msgid "Download it within seven days from Settings."
 msgstr "Download hem binnen zeven dagen via Instellingen."
+
+msgid "You found a training partner"
+msgstr "Je hebt een trainingsmaatje gevonden"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Jij en %{nickname} willen samen trainen. Zeg hallo."
+
+msgid "Training partner message"
+msgstr "Bericht van je trainingsmaatje"

@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 
 import { AroundVisibilitySetting } from "@/components/around/AroundSettings";
 import { WellnessSummarySharing } from "@/components/buddy/WellnessSummarySharing";
+import { BlockedPeople, PartnerVisibilitySetting } from "@/components/partners/PartnerSettings";
 import { LeaderboardSetting } from "@/components/member-app/me/LeaderboardSetting";
 import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
 import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
@@ -18,7 +19,8 @@ import { useUiTranslations } from "@/i18n/ui";
  * Εγώ › Κοινοποίηση & ορατότητα (brief §7.11, ADR-137): everything that
  * decides who sees what of me, in one place. ADR-139's default visibility for
  * new entries joins this page with the visibility ladder. ADR-160 adds the
- * coach's weekly wellness summary and who opened it.
+ * coach's weekly wellness summary and who opened it; ADR-169 the Partners
+ * switch and the people you blocked.
  */
 export function SharingPage() {
   const t = useTranslations("MemberApp");
@@ -27,6 +29,7 @@ export function SharingPage() {
   const tClubs = useTranslations("Clubs");
   const tAround = useTranslations("Around");
   const tBuddy = useTranslations("Buddy");
+  const tPartners = useTranslations("Partners");
   const i18n = useUiTranslations();
   const { currentUser } = useSession();
   const selfService = showsTenantSelfServiceSurfaces(currentUser);
@@ -49,6 +52,12 @@ export function SharingPage() {
         </CollapsibleSection>
         <CollapsibleSection id="wellness-summary" title={tBuddy("sharingSectionTitle")} description={tBuddy("sharingSectionHint")} defaultOpen>
           <WellnessSummarySharing />
+        </CollapsibleSection>
+        <CollapsibleSection id="partners" title={tPartners("settingsTitle")} description={tPartners("settingsHint")} defaultOpen>
+          <PartnerVisibilitySetting />
+        </CollapsibleSection>
+        <CollapsibleSection id="blocked" title={tPartners("blockedTitle")} description={tPartners("blockedHint")}>
+          <BlockedPeople />
         </CollapsibleSection>
         {selfService ? (
           <>
