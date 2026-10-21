@@ -8909,5 +8909,61 @@
       "overrideHint": "Vide : prix du forfait",
       "notes": "Notes"
     }
+  },
+  "Scaling": {
+    "loading": "Chargement…",
+    "settings": {
+      "title": "Assistant IA",
+      "description": "Suggestions d'adaptation pour les athlètes blessés, avec votre propre clé. Un coach approuve chaque suggestion.",
+      "enable": "Suggestions d'adaptation",
+      "enableHint": "Désactivées par défaut. Nécessitent une clé API.",
+      "key": "Clé API (Anthropic)",
+      "keySet": "Une clé se terminant par {last4} est définie.",
+      "keyRejected": "Le fournisseur a refusé la clé se terminant par {last4}. Ajoutez une nouvelle clé.",
+      "keyMissing": "Aucune clé définie.",
+      "keyPlaceholder": "Collez la clé",
+      "saveKey": "Enregistrer la clé",
+      "removeKey": "Supprimer la clé",
+      "model": "Modèle (facultatif)",
+      "saveModel": "Enregistrer le modèle",
+      "usage": "Ce mois-ci · suggestions : {count} · coût : ${cost}",
+      "privacy": "Seuls la séance et les blessures enregistrées par la salle sont envoyées, sans noms. La clé n'est plus jamais affichée."
+    },
+    "queue": {
+      "eyebrow": "Mes clients",
+      "title": "Suggestions d'adaptation · {count}",
+      "hint": "Suggestion assistée par IA. L'athlète ne voit rien avant votre approbation.",
+      "workout": "Séance",
+      "aiBadge": "IA",
+      "include": "Inclure : {movement}",
+      "editSuggested": "Suggestion pour {movement}",
+      "scaleLevel": "Niveau : {level}",
+      "notePlaceholder": "Message à l'athlète (facultatif)",
+      "approve": "Approuver",
+      "dismiss": "Rejeter"
+    },
+    "member": {
+      "title": "Adapté par ton coach",
+      "scaleLevel": "Niveau : {level}",
+      "disclosure": "Assisté par IA · approuvé par ton coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement} : {target}",
+      "skip": "{movement} : à sauter"
+    },
+    "regions": {
+      "shoulder": "épaule",
+      "elbow": "coude",
+      "wrist": "poignet",
+      "neck": "cou",
+      "back": "dos",
+      "hip": "hanche",
+      "knee": "genou",
+      "hamstring": "ischio-jambiers",
+      "ankle": "cheville",
+      "chest": "poitrine",
+      "core": "tronc"
+    }
   }
 }

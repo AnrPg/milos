@@ -3443,6 +3443,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/ai-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's AI settings and this month's usage */
+        get: operations["MilosTrainingWeb.AdminAiSettingsController.show"];
+        /** Update the gym's AI settings */
+        put: operations["MilosTrainingWeb.AdminAiSettingsController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/analytics/summary": {
         parameters: {
             query?: never;
@@ -8308,6 +8326,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/workouts/{workout_id}/scaling": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The current user's coach-approved adaptation of a workout */
+        get: operations["MilosTrainingWeb.MyScalingController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/my-workouts": {
         parameters: {
             query?: never;
@@ -9068,6 +9103,57 @@ export interface paths {
         get: operations["MilosTrainingWeb.CoachingExtrasController.reply_queue"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/scaling-suggestions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** AI scaling suggestions waiting for the coach (pending by default) */
+        get: operations["MilosTrainingWeb.StaffScalingController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/scaling-suggestions/{id}/approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a suggestion, optionally edited; it becomes the athlete's modifications */
+        post: operations["MilosTrainingWeb.StaffScalingController.approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/scaling-suggestions/{id}/dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dismiss a suggestion; nothing reaches the athlete */
+        post: operations["MilosTrainingWeb.StaffScalingController.dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -20628,6 +20714,61 @@ export interface components {
             /** @enum {string} */
             role: "primary" | "secondary" | "stabilizer";
         };
+        /** GymAiSettings */
+        GymAiSettings: {
+            default_model: string;
+            key_configured: boolean;
+            key_last4?: string | null;
+            /** @enum {string} */
+            key_status: "unknown" | "valid" | "rejected";
+            model?: string | null;
+            /** @enum {string} */
+            provider?: "anthropic";
+            scaling_enabled: boolean;
+            /** GymAiUsage */
+            usage: {
+                cost_usd: number;
+                /** Format: date-time */
+                since: string;
+                suggestions: number;
+            };
+        };
+        /** GymAiSettingsResponse */
+        GymAiSettingsResponse: {
+            /** GymAiSettings */
+            ai_settings: {
+                default_model: string;
+                key_configured: boolean;
+                key_last4?: string | null;
+                /** @enum {string} */
+                key_status: "unknown" | "valid" | "rejected";
+                model?: string | null;
+                /** @enum {string} */
+                provider?: "anthropic";
+                scaling_enabled: boolean;
+                /** GymAiUsage */
+                usage: {
+                    cost_usd: number;
+                    /** Format: date-time */
+                    since: string;
+                    suggestions: number;
+                };
+            };
+        };
+        /** GymAiSettingsUpdate */
+        GymAiSettingsUpdate: {
+            api_key?: string;
+            model?: string | null;
+            remove_key?: boolean;
+            scaling_enabled?: boolean;
+        };
+        /** GymAiUsage */
+        GymAiUsage: {
+            cost_usd: number;
+            /** Format: date-time */
+            since: string;
+            suggestions: number;
+        };
         /** HealthConsents */
         HealthConsents: {
             consents: {
@@ -22094,6 +22235,78 @@ export interface components {
             }[];
             /** Format: uuid */
             workout_id: string;
+        };
+        /** MyWorkoutScaling */
+        MyWorkoutScaling: {
+            /** MyWorkoutScalingDetail */
+            scaling: {
+                coach_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                items: {
+                    /**
+                     * @description substitute: another movement; load/reps/other: a new prescription; skip
+                     * @enum {string}
+                     */
+                    change: "substitute" | "load" | "reps" | "skip" | "other";
+                    exercise_id: string;
+                    exercise_name?: string | null;
+                    reason: string;
+                    section_id?: string | null;
+                    suggested?: string | null;
+                }[];
+                /** @description ADR-050 modification patches of the approved changes */
+                modifications: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: date-time */
+                reviewed_at?: string | null;
+                scale_level_label?: string | null;
+                scale_level_slug?: string | null;
+                /** Format: date */
+                scheduled_for?: string;
+            } | null;
+        };
+        /** MyWorkoutScalingDetail */
+        MyWorkoutScalingDetail: {
+            coach_note?: string | null;
+            /** Format: uuid */
+            id: string;
+            items: {
+                /**
+                 * @description substitute: another movement; load/reps/other: a new prescription; skip
+                 * @enum {string}
+                 */
+                change: "substitute" | "load" | "reps" | "skip" | "other";
+                exercise_id: string;
+                exercise_name?: string | null;
+                reason: string;
+                section_id?: string | null;
+                suggested?: string | null;
+            }[];
+            /** @description ADR-050 modification patches of the approved changes */
+            modifications: {
+                [key: string]: unknown;
+            }[];
+            /** Format: date-time */
+            reviewed_at?: string | null;
+            scale_level_label?: string | null;
+            scale_level_slug?: string | null;
+            /** Format: date */
+            scheduled_for?: string;
+        } | null;
+        /** MyWorkoutScalingItem */
+        MyWorkoutScalingItem: {
+            /**
+             * @description substitute: another movement; load/reps/other: a new prescription; skip
+             * @enum {string}
+             */
+            change: "substitute" | "load" | "reps" | "skip" | "other";
+            exercise_id: string;
+            exercise_name?: string | null;
+            reason: string;
+            section_id?: string | null;
+            suggested?: string | null;
         };
         /** Neighbourhood */
         Neighbourhood: {
@@ -24972,6 +25185,160 @@ export interface components {
             }[];
             /** @enum {string} */
             surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+        };
+        /** ScalingSuggestion */
+        ScalingSuggestion: {
+            /** Format: uuid */
+            assigned_workout_id?: string;
+            /** Format: uuid */
+            athlete_id: string;
+            athlete_nickname?: string | null;
+            coach_note?: string | null;
+            /** Format: uuid */
+            id: string;
+            injury_regions?: string[];
+            /** Format: date-time */
+            inserted_at?: string;
+            items: {
+                /**
+                 * @description substitute: another movement; load/reps/other: a new prescription; skip
+                 * @enum {string}
+                 */
+                change: "substitute" | "load" | "reps" | "skip" | "other";
+                exercise_id: string;
+                exercise_name?: string | null;
+                id: string;
+                prescribed?: string | null;
+                reason: string;
+                section_id?: string | null;
+                section_name?: string | null;
+                suggested?: string | null;
+            }[];
+            /** Format: uuid */
+            master_workout_id: string;
+            /** Format: date-time */
+            reviewed_at?: string | null;
+            scale_level_label?: string | null;
+            scale_level_slug?: string | null;
+            /** Format: date */
+            scheduled_for: string;
+            /** @enum {string} */
+            status: "pending" | "approved" | "dismissed" | "no_change" | "superseded";
+            summary?: string | null;
+            workout_title?: string | null;
+        };
+        /** ScalingSuggestionApproveRequest */
+        ScalingSuggestionApproveRequest: {
+            coach_note?: string | null;
+            items?: {
+                id: string;
+                include?: boolean;
+                suggested?: string;
+            }[];
+            scale_level_slug?: string | null;
+        };
+        /** ScalingSuggestionItem */
+        ScalingSuggestionItem: {
+            /**
+             * @description substitute: another movement; load/reps/other: a new prescription; skip
+             * @enum {string}
+             */
+            change: "substitute" | "load" | "reps" | "skip" | "other";
+            exercise_id: string;
+            exercise_name?: string | null;
+            id: string;
+            prescribed?: string | null;
+            reason: string;
+            section_id?: string | null;
+            section_name?: string | null;
+            suggested?: string | null;
+        };
+        /** ScalingSuggestionQueue */
+        ScalingSuggestionQueue: {
+            suggestions: {
+                /** Format: uuid */
+                assigned_workout_id?: string;
+                /** Format: uuid */
+                athlete_id: string;
+                athlete_nickname?: string | null;
+                coach_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                injury_regions?: string[];
+                /** Format: date-time */
+                inserted_at?: string;
+                items: {
+                    /**
+                     * @description substitute: another movement; load/reps/other: a new prescription; skip
+                     * @enum {string}
+                     */
+                    change: "substitute" | "load" | "reps" | "skip" | "other";
+                    exercise_id: string;
+                    exercise_name?: string | null;
+                    id: string;
+                    prescribed?: string | null;
+                    reason: string;
+                    section_id?: string | null;
+                    section_name?: string | null;
+                    suggested?: string | null;
+                }[];
+                /** Format: uuid */
+                master_workout_id: string;
+                /** Format: date-time */
+                reviewed_at?: string | null;
+                scale_level_label?: string | null;
+                scale_level_slug?: string | null;
+                /** Format: date */
+                scheduled_for: string;
+                /** @enum {string} */
+                status: "pending" | "approved" | "dismissed" | "no_change" | "superseded";
+                summary?: string | null;
+                workout_title?: string | null;
+            }[];
+        };
+        /** ScalingSuggestionResponse */
+        ScalingSuggestionResponse: {
+            /** ScalingSuggestion */
+            suggestion: {
+                /** Format: uuid */
+                assigned_workout_id?: string;
+                /** Format: uuid */
+                athlete_id: string;
+                athlete_nickname?: string | null;
+                coach_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                injury_regions?: string[];
+                /** Format: date-time */
+                inserted_at?: string;
+                items: {
+                    /**
+                     * @description substitute: another movement; load/reps/other: a new prescription; skip
+                     * @enum {string}
+                     */
+                    change: "substitute" | "load" | "reps" | "skip" | "other";
+                    exercise_id: string;
+                    exercise_name?: string | null;
+                    id: string;
+                    prescribed?: string | null;
+                    reason: string;
+                    section_id?: string | null;
+                    section_name?: string | null;
+                    suggested?: string | null;
+                }[];
+                /** Format: uuid */
+                master_workout_id: string;
+                /** Format: date-time */
+                reviewed_at?: string | null;
+                scale_level_label?: string | null;
+                scale_level_slug?: string | null;
+                /** Format: date */
+                scheduled_for: string;
+                /** @enum {string} */
+                status: "pending" | "approved" | "dismissed" | "no_change" | "superseded";
+                summary?: string | null;
+                workout_title?: string | null;
+            };
         };
         /** SeasonCoach */
         SeasonCoach: {
@@ -45116,6 +45483,106 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminAiSettingsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description AI settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GymAiSettings */
+                        ai_settings: {
+                            default_model: string;
+                            key_configured: boolean;
+                            key_last4?: string | null;
+                            /** @enum {string} */
+                            key_status: "unknown" | "valid" | "rejected";
+                            model?: string | null;
+                            /** @enum {string} */
+                            provider?: "anthropic";
+                            scaling_enabled: boolean;
+                            /** GymAiUsage */
+                            usage: {
+                                cost_usd: number;
+                                /** Format: date-time */
+                                since: string;
+                                suggestions: number;
+                            };
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminAiSettingsController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    api_key?: string;
+                    model?: string | null;
+                    remove_key?: boolean;
+                    scaling_enabled?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description AI settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** GymAiSettings */
+                        ai_settings: {
+                            default_model: string;
+                            key_configured: boolean;
+                            key_last4?: string | null;
+                            /** @enum {string} */
+                            key_status: "unknown" | "valid" | "rejected";
+                            model?: string | null;
+                            /** @enum {string} */
+                            provider?: "anthropic";
+                            scaling_enabled: boolean;
+                            /** GymAiUsage */
+                            usage: {
+                                cost_usd: number;
+                                /** Format: date-time */
+                                since: string;
+                                suggestions: number;
+                            };
+                        };
+                    };
+                };
+            };
+            /** @description Invalid settings */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };
@@ -69907,6 +70374,57 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.MyScalingController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                workout_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Adaptation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MyWorkoutScalingDetail */
+                        scaling: {
+                            coach_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            items: {
+                                /**
+                                 * @description substitute: another movement; load/reps/other: a new prescription; skip
+                                 * @enum {string}
+                                 */
+                                change: "substitute" | "load" | "reps" | "skip" | "other";
+                                exercise_id: string;
+                                exercise_name?: string | null;
+                                reason: string;
+                                section_id?: string | null;
+                                suggested?: string | null;
+                            }[];
+                            /** @description ADR-050 modification patches of the approved changes */
+                            modifications: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: date-time */
+                            reviewed_at?: string | null;
+                            scale_level_label?: string | null;
+                            scale_level_slug?: string | null;
+                            /** Format: date */
+                            scheduled_for?: string;
+                        } | null;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyWorkoutController.index": {
         parameters: {
             query?: {
@@ -73061,6 +73579,264 @@ export interface operations {
                             /** Format: uuid */
                             thread_id: string;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.StaffScalingController.index": {
+        parameters: {
+            query?: {
+                status?: "pending" | "approved" | "dismissed";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggestions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        suggestions: {
+                            /** Format: uuid */
+                            assigned_workout_id?: string;
+                            /** Format: uuid */
+                            athlete_id: string;
+                            athlete_nickname?: string | null;
+                            coach_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            injury_regions?: string[];
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            items: {
+                                /**
+                                 * @description substitute: another movement; load/reps/other: a new prescription; skip
+                                 * @enum {string}
+                                 */
+                                change: "substitute" | "load" | "reps" | "skip" | "other";
+                                exercise_id: string;
+                                exercise_name?: string | null;
+                                id: string;
+                                prescribed?: string | null;
+                                reason: string;
+                                section_id?: string | null;
+                                section_name?: string | null;
+                                suggested?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            /** Format: date-time */
+                            reviewed_at?: string | null;
+                            scale_level_label?: string | null;
+                            scale_level_slug?: string | null;
+                            /** Format: date */
+                            scheduled_for: string;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "dismissed" | "no_change" | "superseded";
+                            summary?: string | null;
+                            workout_title?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.StaffScalingController.approve": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    coach_note?: string | null;
+                    items?: {
+                        id: string;
+                        include?: boolean;
+                        suggested?: string;
+                    }[];
+                    scale_level_slug?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Suggestion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ScalingSuggestion */
+                        suggestion: {
+                            /** Format: uuid */
+                            assigned_workout_id?: string;
+                            /** Format: uuid */
+                            athlete_id: string;
+                            athlete_nickname?: string | null;
+                            coach_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            injury_regions?: string[];
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            items: {
+                                /**
+                                 * @description substitute: another movement; load/reps/other: a new prescription; skip
+                                 * @enum {string}
+                                 */
+                                change: "substitute" | "load" | "reps" | "skip" | "other";
+                                exercise_id: string;
+                                exercise_name?: string | null;
+                                id: string;
+                                prescribed?: string | null;
+                                reason: string;
+                                section_id?: string | null;
+                                section_name?: string | null;
+                                suggested?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            /** Format: date-time */
+                            reviewed_at?: string | null;
+                            scale_level_label?: string | null;
+                            scale_level_slug?: string | null;
+                            /** Format: date */
+                            scheduled_for: string;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "dismissed" | "no_change" | "superseded";
+                            summary?: string | null;
+                            workout_title?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Already reviewed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Invalid review */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.StaffScalingController.dismiss": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Suggestion */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ScalingSuggestion */
+                        suggestion: {
+                            /** Format: uuid */
+                            assigned_workout_id?: string;
+                            /** Format: uuid */
+                            athlete_id: string;
+                            athlete_nickname?: string | null;
+                            coach_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            injury_regions?: string[];
+                            /** Format: date-time */
+                            inserted_at?: string;
+                            items: {
+                                /**
+                                 * @description substitute: another movement; load/reps/other: a new prescription; skip
+                                 * @enum {string}
+                                 */
+                                change: "substitute" | "load" | "reps" | "skip" | "other";
+                                exercise_id: string;
+                                exercise_name?: string | null;
+                                id: string;
+                                prescribed?: string | null;
+                                reason: string;
+                                section_id?: string | null;
+                                section_name?: string | null;
+                                suggested?: string | null;
+                            }[];
+                            /** Format: uuid */
+                            master_workout_id: string;
+                            /** Format: date-time */
+                            reviewed_at?: string | null;
+                            scale_level_label?: string | null;
+                            scale_level_slug?: string | null;
+                            /** Format: date */
+                            scheduled_for: string;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "dismissed" | "no_change" | "superseded";
+                            summary?: string | null;
+                            workout_title?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Already reviewed */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

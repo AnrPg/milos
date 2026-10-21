@@ -26,6 +26,7 @@ import {
   type TrainingLogDialogState,
 } from "@/components/training-log/TrainingLog";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
@@ -225,6 +226,7 @@ export function BoxToday({
                 sourceContextId={selected.injuryContext.id}
               />
             ) : null}
+            {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
 
             {launcher.error ? (
               <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>

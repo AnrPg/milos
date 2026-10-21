@@ -8909,5 +8909,61 @@
       "overrideHint": "Leer: Preis des Tarifs",
       "notes": "Notizen"
     }
+  },
+  "Scaling": {
+    "loading": "Wird geladen…",
+    "settings": {
+      "title": "KI-Assistent",
+      "description": "Skalierungsvorschläge für verletzte Athleten, mit eurem eigenen Schlüssel. Ein Coach genehmigt jeden Vorschlag.",
+      "enable": "Skalierungsvorschläge",
+      "enableHint": "Standardmäßig aus. Braucht einen API-Schlüssel.",
+      "key": "API-Schlüssel (Anthropic)",
+      "keySet": "Ein Schlüssel mit Endung {last4} ist gesetzt.",
+      "keyRejected": "Der Anbieter hat den Schlüssel mit Endung {last4} abgelehnt. Neuen Schlüssel eingeben.",
+      "keyMissing": "Kein Schlüssel gesetzt.",
+      "keyPlaceholder": "Schlüssel einfügen",
+      "saveKey": "Schlüssel speichern",
+      "removeKey": "Schlüssel entfernen",
+      "model": "Modell (optional)",
+      "saveModel": "Modell speichern",
+      "usage": "Diesen Monat · Vorschläge: {count} · Kosten: ${cost}",
+      "privacy": "Gesendet werden nur das Training und die vom Studio erfassten Verletzungen, ohne Namen. Der Schlüssel wird nie wieder angezeigt."
+    },
+    "queue": {
+      "eyebrow": "Meine Kunden",
+      "title": "Skalierungsvorschläge · {count}",
+      "hint": "KI-gestützter Vorschlag. Der Athlet sieht nichts vor deiner Genehmigung.",
+      "workout": "Training",
+      "aiBadge": "KI",
+      "include": "Übernehmen: {movement}",
+      "editSuggested": "Vorschlag für {movement}",
+      "scaleLevel": "Stufe: {level}",
+      "notePlaceholder": "Nachricht an den Athleten (optional)",
+      "approve": "Genehmigen",
+      "dismiss": "Verwerfen"
+    },
+    "member": {
+      "title": "Von deinem Coach angepasst",
+      "scaleLevel": "Stufe: {level}",
+      "disclosure": "KI-gestützt · von deinem Coach genehmigt."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: auslassen"
+    },
+    "regions": {
+      "shoulder": "Schulter",
+      "elbow": "Ellbogen",
+      "wrist": "Handgelenk",
+      "neck": "Nacken",
+      "back": "Rücken",
+      "hip": "Hüfte",
+      "knee": "Knie",
+      "hamstring": "Oberschenkelrückseite",
+      "ankle": "Knöchel",
+      "chest": "Brust",
+      "core": "Rumpf"
+    }
   }
 }

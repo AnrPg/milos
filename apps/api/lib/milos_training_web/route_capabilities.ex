@@ -41,7 +41,10 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.AdminOnboardingController => [:manage_settings],
     # ADR-170: the platform plan card (owners and admins hold manage_settings).
     W.AdminPlanController => [:manage_settings],
-    W.TrainingHistoryController => [:view_client_training]
+    W.TrainingHistoryController => [:view_client_training],
+    # ADR-174: the queue also requires view_health per athlete (service).
+    W.StaffScalingController => [:manage_coaching],
+    W.AdminAiSettingsController => [:manage_settings]
   }
 
   @actions %{

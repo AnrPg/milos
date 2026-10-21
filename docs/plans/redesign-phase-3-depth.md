@@ -306,12 +306,21 @@ No board; decided for least clutter (owner's standing instruction), full list in
 5. **Online sessions:** a «Where» select (in person / online) and a call link on the slot form; the link appears
    only to the booked client.
 
+### AI scaling suggestions (2026-10-21, ADR-174)
+No board; decided for least clutter, full list in ADR-174 «Decisions».
+1. **Settings:** a collapsed «Βοηθός AI» section in Ρυθμίσεις: one switch (off by default, needs a key), the gym's own
+   key (write-only, «•••• last4», status when rejected), optional model, this month's count and cost, privacy note.
+2. **Coach:** «Προτάσεις κλιμάκωσης» in the staff home under «Πελάτες μου», only while something waits; per change a
+   tick and an editable suggestion, the scale level as a tick, a note, «Έγκριση» / «Απόρριψη».
+3. **Member:** one card «Προσαρμογή από τον coach» under the injury warnings in Box and the assigned workout, only
+   after approval, with the AI disclosure; nothing at all otherwise.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [x] Insights labelled as indicators, never medical advice; none before enough data (ADR-166)
 - [x] Training load shown as an overload indicator, never a verdict (ADR-165)
 - [x] Partners: club-verified only, mutual consent, report/block, optional gender preference, «training partner» copy
 - [x] Partners hidden unless the member opts in, per club
-- [ ] AI suggestions never reach an athlete without coach approval
+- [x] AI suggestions never reach an athlete without coach approval (ADR-174)
 - [ ] Voice recordings deleted after transcription
 - [x] Phone health data follows D8/D11 of Phase 2 (consent, delete, export; ADR-172)
 
@@ -325,4 +334,4 @@ No board; decided for least clutter (owner's standing instruction), full list in
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
 - [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [x] P3-M3 (ADR-165) · [x] P3-M4 (ADR-166) · [x] P3-M5 (ADR-167) · [x] P3-M6 (ADR-168) · [x] P3-M7 (ADR-169)
-- [x] P3-M8 (ADR-170) · [x] P3-M9 (ADR-171) · [x] P3-M10 (ADR-172) · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
+- [x] P3-M8 (ADR-170) · [x] P3-M9 (ADR-171) · [x] P3-M10 (ADR-172) · [ ] P3-M11 · [x] P3-M12 (ADR-174) · [ ] P3-M13

@@ -8909,5 +8909,61 @@
       "overrideHint": "ריק: מחיר התוכנית",
       "notes": "הערות"
     }
+  },
+  "Scaling": {
+    "loading": "טוען…",
+    "settings": {
+      "title": "עוזר AI",
+      "description": "הצעות התאמה למתאמנים פצועים, עם המפתח שלכם. מאמן מאשר כל הצעה.",
+      "enable": "הצעות התאמה",
+      "enableHint": "כבויות כברירת מחדל. נדרש מפתח API.",
+      "key": "מפתח API (Anthropic)",
+      "keySet": "הוגדר מפתח שמסתיים ב-{last4}.",
+      "keyRejected": "הספק דחה את המפתח שמסתיים ב-{last4}. הזינו מפתח חדש.",
+      "keyMissing": "לא הוגדר מפתח.",
+      "keyPlaceholder": "הדביקו את המפתח",
+      "saveKey": "שמירת מפתח",
+      "removeKey": "הסרת מפתח",
+      "model": "מודל (אופציונלי)",
+      "saveModel": "שמירת מודל",
+      "usage": "החודש · הצעות: {count} · עלות: ${cost}",
+      "privacy": "נשלחים רק האימון והפציעות שתיעד המכון, ללא שמות. המפתח לא יוצג שוב."
+    },
+    "queue": {
+      "eyebrow": "הלקוחות שלי",
+      "title": "הצעות התאמה · {count}",
+      "hint": "הצעה בעזרת AI. המתאמן לא רואה דבר לפני האישור שלך.",
+      "workout": "אימון",
+      "aiBadge": "AI",
+      "include": "לכלול: {movement}",
+      "editSuggested": "הצעה עבור {movement}",
+      "scaleLevel": "רמה: {level}",
+      "notePlaceholder": "הודעה למתאמן (אופציונלי)",
+      "approve": "אישור",
+      "dismiss": "דחייה"
+    },
+    "member": {
+      "title": "הותאם על ידי המאמן שלך",
+      "scaleLevel": "רמה: {level}",
+      "disclosure": "בעזרת AI · אושר על ידי המאמן שלך."
+    },
+    "change": {
+      "substitute": "{movement} ← {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: לדלג"
+    },
+    "regions": {
+      "shoulder": "כתף",
+      "elbow": "מרפק",
+      "wrist": "שורש כף היד",
+      "neck": "צוואר",
+      "back": "גב",
+      "hip": "ירך",
+      "knee": "ברך",
+      "hamstring": "שריר ירך אחורי",
+      "ankle": "קרסול",
+      "chest": "חזה",
+      "core": "ליבה"
+    }
   }
 }

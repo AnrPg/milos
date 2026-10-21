@@ -8909,5 +8909,61 @@
       "overrideHint": "Vuoto: prezzo del piano",
       "notes": "Note"
     }
+  },
+  "Scaling": {
+    "loading": "Caricamento…",
+    "settings": {
+      "title": "Assistente IA",
+      "description": "Suggerimenti di scaling per atleti infortunati, con la vostra chiave. Un coach approva ogni suggerimento.",
+      "enable": "Suggerimenti di scaling",
+      "enableHint": "Disattivati per impostazione predefinita. Serve una chiave API.",
+      "key": "Chiave API (Anthropic)",
+      "keySet": "È impostata una chiave che termina con {last4}.",
+      "keyRejected": "Il fornitore ha rifiutato la chiave che termina con {last4}. Inserisci una nuova chiave.",
+      "keyMissing": "Nessuna chiave impostata.",
+      "keyPlaceholder": "Incolla la chiave",
+      "saveKey": "Salva chiave",
+      "removeKey": "Rimuovi chiave",
+      "model": "Modello (facoltativo)",
+      "saveModel": "Salva modello",
+      "usage": "Questo mese · suggerimenti: {count} · costo: ${cost}",
+      "privacy": "Vengono inviati solo l'allenamento e gli infortuni registrati dalla palestra, senza nomi. La chiave non viene più mostrata."
+    },
+    "queue": {
+      "eyebrow": "I miei clienti",
+      "title": "Suggerimenti di scaling · {count}",
+      "hint": "Suggerimento assistito da IA. L'atleta non vede nulla prima della tua approvazione.",
+      "workout": "Allenamento",
+      "aiBadge": "IA",
+      "include": "Includi: {movement}",
+      "editSuggested": "Suggerimento per {movement}",
+      "scaleLevel": "Livello: {level}",
+      "notePlaceholder": "Messaggio all'atleta (facoltativo)",
+      "approve": "Approva",
+      "dismiss": "Scarta"
+    },
+    "member": {
+      "title": "Adattato dal tuo coach",
+      "scaleLevel": "Livello: {level}",
+      "disclosure": "Assistito da IA · approvato dal tuo coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: da saltare"
+    },
+    "regions": {
+      "shoulder": "spalla",
+      "elbow": "gomito",
+      "wrist": "polso",
+      "neck": "collo",
+      "back": "schiena",
+      "hip": "anca",
+      "knee": "ginocchio",
+      "hamstring": "femorali",
+      "ankle": "caviglia",
+      "chest": "petto",
+      "core": "core"
+    }
   }
 }

@@ -51,7 +51,8 @@ config :milos_training, Oban,
        {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
        {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob},
        {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob},
-       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob}
+       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob},
+       {"27 * * * *", MilosTraining.Workers.ScalingSuggestionScanJob}
      ]}
   ],
   queues: [
@@ -133,6 +134,9 @@ config :milos_training,
 
 config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
 config :milos_training, :season_store, MilosTraining.Infrastructure.Seasons.EctoSeasonStore
+# ADR-174: AI scaling suggestions (the advisor runs on the gym's own key).
+config :milos_training, :scaling_store, MilosTraining.Infrastructure.Scaling.EctoScalingStore
+config :milos_training, :scaling_advisor, MilosTraining.Infrastructure.Ai.AnthropicScalingAdvisor
 config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
 
 config :milos_training,
