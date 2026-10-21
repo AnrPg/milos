@@ -119,6 +119,8 @@ describe("sectionGroupFor", () => {
     const journal = sectionGroupFor("/journal/pantheon", { surface: "athlete", staffItems: [], features: [] });
     expect(journal?.tabs.map((tab) => tab.id)).toEqual(["flow", "vault", "body", "wellbeing", "progress"]);
     expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/pantheon");
+    // ADR-164: the anatomy atlas lives under Πρόοδος.
+    expect(journal?.tabs.find((tab) => tab.id === "progress")?.match).toContain("/journal/atlas");
     expect(sectionGroupFor("/box", { surface: "member", staffItems: [], features: ["videos"] })).toBeNull();
     const entitled = sectionGroupFor("/journal", { surface: "athlete", staffItems: [], features: ["progress", "coaching"] });
     expect(entitled?.tabs.map((tab) => tab.id)).toContain("progress");
