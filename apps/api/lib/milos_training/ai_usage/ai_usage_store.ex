@@ -19,4 +19,10 @@ defmodule MilosTraining.AiUsage.AiUsageStore do
 
   @impl true
   def summarize(context, params), do: tenant_call(context, :summarize, [params])
+
+  @impl true
+  def get_settings(context), do: tenant_call(context, :get_settings, [])
+
+  @impl true
+  def put_settings(context, changes), do: tenant_call(context, :put_settings, [changes])
 end

@@ -51,7 +51,8 @@ config :milos_training, Oban,
        {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
        {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob},
        {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob},
-       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob}
+       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob},
+       {"27 * * * *", MilosTraining.Workers.ScalingSuggestionScanJob}
      ]}
   ],
   queues: [
@@ -133,6 +134,18 @@ config :milos_training,
 
 config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
 config :milos_training, :season_store, MilosTraining.Infrastructure.Seasons.EctoSeasonStore
+# ADR-174: AI scaling suggestions (the advisor runs on the gym's own key).
+config :milos_training, :scaling_store, MilosTraining.Infrastructure.Scaling.EctoScalingStore
+config :milos_training, :scaling_advisor, MilosTraining.Infrastructure.Ai.AnthropicScalingAdvisor
+# ADR-175: voice logging (speech to text on the platform key, parsing on the gym's key).
+config :milos_training,
+       :speech_transcriber,
+       MilosTraining.Infrastructure.Ai.GeminiSpeechTranscriber
+
+config :milos_training,
+       :log_draft_parser,
+       MilosTraining.Infrastructure.Ai.AnthropicLogDraftParser
+
 config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
 
 config :milos_training,
@@ -397,6 +410,8 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+# Request parameters never logged: keys, and ADR-175 voice clips and transcripts.
+config :phoenix, :filter_parameters, ["password", "secret", "api_key", "audio", "transcript"]
 
 config :open_api_spex, :json_render_error_v2, true
 

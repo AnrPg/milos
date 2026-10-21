@@ -113,6 +113,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ADR-175: voice logging records in the web view (getUserMedia). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!-- ADR-173: the arrival reminder (opt-in in Box › Check-in) and writing NFC door tags. -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

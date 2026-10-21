@@ -5,7 +5,7 @@ defmodule MilosTraining.Infrastructure.AiUsage.EctoAiUsageStore do
 
   import Ecto.Query
 
-  alias MilosTraining.AiUsage.UsageRecord
+  alias MilosTraining.AiUsage.{GymAiSettings, UsageRecord}
   alias MilosTraining.Repo
 
   @impl true
@@ -51,6 +51,21 @@ defmodule MilosTraining.Infrastructure.AiUsage.EctoAiUsageStore do
     |> Enum.map(&integer_sums/1)
   end
 
+  @impl true
+  def get_settings(%{organization_id: organization_id}) do
+    GymAiSettings
+    |> where([s], s.organization_id == ^organization_id)
+    |> Repo.one()
+  end
+
+  # One row per gym: created on the first write.
+  @impl true
+  def put_settings(%{organization_id: organization_id} = context, changes) do
+    (get_settings(context) || %GymAiSettings{organization_id: organization_id})
+    |> GymAiSettings.changeset(changes)
+    |> Repo.insert_or_update()
+  end
+
   defp filter(query, params) do
     Enum.reduce(params, query, fn
       {:from, %DateTime{} = from}, query ->
@@ -61,6 +76,13 @@ defmodule MilosTraining.Infrastructure.AiUsage.EctoAiUsageStore do
 
       {:feature, feature}, query when is_binary(feature) ->
         where(query, [r], r.feature == ^feature)
+
+      # ADR-175: one member's calls by one agent (the voice-log daily cap).
+      {:user_id, user_id}, query when is_binary(user_id) ->
+        where(query, [r], r.user_id == ^user_id)
+
+      {:agent, agent}, query when is_binary(agent) ->
+        where(query, [r], r.agent == ^agent)
 
       _other, query ->
         query

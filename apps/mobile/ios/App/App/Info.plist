@@ -8,6 +8,8 @@
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
         <string>Milos</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Milos uses the microphone only while you record a workout by voice. The recording is not kept.</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>

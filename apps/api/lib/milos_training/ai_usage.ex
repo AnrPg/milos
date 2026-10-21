@@ -9,7 +9,7 @@ defmodule MilosTraining.AiUsage do
   """
 
   alias MilosTraining.AiUsage.Commands.RecordUsage
-  alias MilosTraining.AiUsage.Domain.{GenerationEvent, PriceList, TokenUsage}
+  alias MilosTraining.AiUsage.Domain.{AiSettingsPolicy, GenerationEvent, PriceList, TokenUsage}
   alias MilosTraining.AiUsage.Queries.{OperationUsage, UsageSummary}
 
   @doc """
@@ -30,10 +30,24 @@ defmodule MilosTraining.AiUsage do
   defdelegate metering_context(metering), to: GenerationEvent
   defdelegate record_attrs(measurements, metadata), to: GenerationEvent, as: :to_record_attrs
   defdelegate token_usage_from_gemini(usage_metadata), to: TokenUsage, as: :from_gemini
+  defdelegate token_usage_from_anthropic(usage), to: TokenUsage, as: :from_anthropic
   defdelegate cost(usage, model, date), to: PriceList
   defdelegate record_usage(context, attrs), to: RecordUsage, as: :call
   defdelegate operation_usage(context, operation_id), to: OperationUsage, as: :call
   defdelegate usage_summary(context, params \\ %{}), to: UsageSummary, as: :call
+
+  # ADR-174: the gym's AI settings (its own key, encrypted; never returned).
+  defdelegate get_settings(context), to: MilosTraining.AiUsage.AiUsageStore
+  defdelegate put_settings(context, changes), to: MilosTraining.AiUsage.AiUsageStore
+
+  defdelegate settings_update_changes(current, params, actor_id),
+    to: AiSettingsPolicy,
+    as: :update_changes
+
+  defdelegate scaling_ready?(settings), to: AiSettingsPolicy
+  defdelegate voice_ready?(settings), to: AiSettingsPolicy
+  defdelegate settings_model(settings, default), to: AiSettingsPolicy, as: :model
+  defdelegate public_settings(settings, default_model), to: AiSettingsPolicy, as: :public
 
   # ADR-117 reviewed tenant export/purge.
   def tenant_data_policy, do: MilosTraining.AiUsage.Domain.TenantDataPolicy.policy()

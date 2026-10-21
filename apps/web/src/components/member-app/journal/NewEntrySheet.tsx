@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { hasCapability } from "@/components/client/entitlement";
 import { JOURNAL_FEED_KEY } from "@/api/journal";
+import { fetchVoiceAvailability, VOICE_AVAILABILITY_KEY } from "@/api/voice-log";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { useBodySettings } from "@/components/body/use-body";
 import { NoteSheet } from "@/components/journal/NoteSheet";
@@ -15,7 +16,10 @@ import { useWellness, wellnessWindow } from "@/components/member-app/wellness/We
 import { NewPRFormModal } from "@/components/pantheon/PRFormModal";
 import { useSession } from "@/components/session-provider";
 import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/training-log/TrainingLog";
+import { VoiceLogSheet } from "@/components/voice-log/VoiceLogSheet";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { canRecordAudio } from "@/lib/platform/voice-recorder";
+import { formFromVoiceDraft } from "@/lib/voice-draft";
 
 /**
  * The kinds of entry a member can write today (brief §7.7), grouped as the
@@ -24,10 +28,12 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
  * is switched off; Νερό · Ύπνος · Γεύμα and Λιγούρα (ADR-159) open Ευεξία,
  * and «Χρειάζομαι στήριξη» (ADR-160) opens its quick send there.
  * A group with no kinds is not shown, so the sheet never shows a button
- * that leads nowhere.
+ * that leads nowhere. «Με φωνή» (ADR-175) joins Προπόνηση only when the gym
+ * switched voice logging on and this device can record.
  */
 export type NewEntryKind =
   | "workout"
+  | "voice"
   | "pr"
   | "measure"
   | "wellness"
@@ -46,10 +52,12 @@ export function newEntryGroups(options: {
   body?: boolean;
   /** False when the member turned water, sleep and meals all off in Ευεξία. */
   showWellness?: boolean;
+  /** True when voice logging is available here (gym switch, device, drafts left). */
+  voice?: boolean;
 }): { group: NewEntryGroup; kinds: NewEntryKind[] }[] {
   const wellness: NewEntryKind[] = options.showWellness === false ? [] : ["wellness"];
   const groups: { group: NewEntryGroup; kinds: NewEntryKind[] }[] = [
-    { group: "training", kinds: ["workout", "pr"] },
+    { group: "training", kinds: options.voice ? ["workout", "pr", "voice"] : ["workout", "pr"] },
     { group: "body", kinds: options.body === false ? [] : ["measure"] },
     { group: "wellbeing", kinds: [...wellness, "checkIn", "craving", "support", "injury"] },
     { group: "coach", kinds: [...(options.canRequestFormReview ? (["formReview"] as const) : []), "review"] },
@@ -93,9 +101,18 @@ export function NewEntryButton() {
 function NewEntrySheet({ onClose }: { onClose: () => void }) {
   const router = useRouter();
   const queryClient = useQueryClient();
+  const t = useTranslations("VoiceLog");
   const { tokens } = useSession();
   const { entitlement } = useClientEntitlement();
-  const [flow, setFlow] = useState<"menu" | "pr" | "note" | TrainingLogDialogState>("menu");
+  const [flow, setFlow] = useState<"menu" | "pr" | "note" | "voice" | TrainingLogDialogState>("menu");
+  const token = tokens?.access_token;
+  const deviceCanRecord = canRecordAudio();
+  const voice = useQuery({
+    queryKey: VOICE_AVAILABILITY_KEY,
+    queryFn: () => fetchVoiceAvailability(token ?? ""),
+    enabled: Boolean(token) && deviceCanRecord,
+    staleTime: 60_000,
+  });
   const bodySettings = useBodySettings();
   const today = localDate(new Date());
   const range = wellnessWindow(today, 0);
@@ -104,6 +121,7 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
     canRequestFormReview: hasCapability(entitlement, "request_form_reviews"),
     body: bodySettings.data?.settings?.journal_sections?.body !== false,
     showWellness: !(["water", "sleep", "meals"] as const).every((item) => hidden.includes(item)),
+    voice: deviceCanRecord && voice.data?.available === true,
   });
 
   function choose(kind: NewEntryKind) {
@@ -113,7 +131,7 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
       router.push(route);
       return;
     }
-    setFlow(kind === "pr" ? "pr" : kind === "note" ? "note" : { mode: "pick" });
+    setFlow(kind === "pr" ? "pr" : kind === "note" ? "note" : kind === "voice" ? "voice" : { mode: "pick" });
   }
 
   if (flow === "pr") return <NewPRFormModal onClose={onClose} />;
@@ -127,6 +145,28 @@ function NewEntrySheet({ onClose }: { onClose: () => void }) {
         }}
       />
     );
+  if (flow === "voice") {
+    if (!token) return null;
+    return (
+      <VoiceLogSheet
+        token={token}
+        maxSeconds={voice.data?.max_seconds ?? 60}
+        onClose={() => {
+          void queryClient.invalidateQueries({ queryKey: VOICE_AVAILABILITY_KEY });
+          onClose();
+        }}
+        onDraft={(result) => {
+          void queryClient.invalidateQueries({ queryKey: VOICE_AVAILABILITY_KEY });
+          setFlow({
+            mode: "create",
+            source: { sourceType: "freeform", referenceId: null, title: "", scoreableSections: [] },
+            draft: formFromVoiceDraft(result.draft, new Date(), t("defaultTitle")),
+            transcript: result.transcript,
+          });
+        }}
+      />
+    );
+  }
   if (flow !== "menu") {
     if (flow.mode === "closed" || !tokens?.access_token) return null;
     return (

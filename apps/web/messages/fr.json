@@ -4997,7 +4997,8 @@
       "measure": "Mesure",
       "wellness": "Eau · Sommeil · Repas",
       "craving": "Fringale",
-      "support": "J'ai besoin de soutien"
+      "support": "J'ai besoin de soutien",
+      "voice": "À la voix"
     },
     "entryKindHint": {
       "workout": "Résultat, RPE, remarques",
@@ -5010,7 +5011,8 @@
       "measure": "Poids, tours, photos",
       "wellness": "Un verre, la nuit dernière, un repas",
       "craving": "Note-la ou demande du soutien",
-      "support": "Un message rapide à ton buddy"
+      "support": "Un message rapide à ton buddy",
+      "voice": "Dis ce que tu as fait"
     },
     "homeTitle": "Accueil",
     "wodToday": "Le WOD du jour à la salle",
@@ -8944,5 +8946,89 @@
     "reminderToggleHint": "Quand tu arrives au box avec une réservation, ton téléphone te rappelle le check-in. Ta position reste sur ton téléphone.",
     "reminderNeedsAlways": "Pour que cela marche app fermée, choisis « Toujours » pour l'accès à la position dans les réglages du téléphone.",
     "reminderDenied": "Sans accès à la position, pas de rappel. Tu peux l'autoriser dans les réglages du téléphone."
+  },
+  "Scaling": {
+    "loading": "Chargement…",
+    "settings": {
+      "title": "Assistant IA",
+      "description": "Suggestions d'adaptation pour les athlètes blessés, avec votre propre clé. Un coach approuve chaque suggestion.",
+      "enable": "Suggestions d'adaptation",
+      "enableHint": "Désactivées par défaut. Nécessitent une clé API.",
+      "key": "Clé API (Anthropic)",
+      "keySet": "Une clé se terminant par {last4} est définie.",
+      "keyRejected": "Le fournisseur a refusé la clé se terminant par {last4}. Ajoutez une nouvelle clé.",
+      "keyMissing": "Aucune clé définie.",
+      "keyPlaceholder": "Collez la clé",
+      "saveKey": "Enregistrer la clé",
+      "removeKey": "Supprimer la clé",
+      "model": "Modèle (facultatif)",
+      "saveModel": "Enregistrer le modèle",
+      "usage": "Ce mois-ci · suggestions : {count} · coût : ${cost}",
+      "privacy": "Seuls la séance et les blessures enregistrées par la salle sont envoyées, sans noms. La clé n'est plus jamais affichée."
+    },
+    "queue": {
+      "eyebrow": "Mes clients",
+      "title": "Suggestions d'adaptation · {count}",
+      "hint": "Suggestion assistée par IA. L'athlète ne voit rien avant votre approbation.",
+      "workout": "Séance",
+      "aiBadge": "IA",
+      "include": "Inclure : {movement}",
+      "editSuggested": "Suggestion pour {movement}",
+      "scaleLevel": "Niveau : {level}",
+      "notePlaceholder": "Message à l'athlète (facultatif)",
+      "approve": "Approuver",
+      "dismiss": "Rejeter"
+    },
+    "member": {
+      "title": "Adapté par ton coach",
+      "scaleLevel": "Niveau : {level}",
+      "disclosure": "Assisté par IA · approuvé par ton coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement} : {target}",
+      "skip": "{movement} : à sauter"
+    },
+    "regions": {
+      "shoulder": "épaule",
+      "elbow": "coude",
+      "wrist": "poignet",
+      "neck": "cou",
+      "back": "dos",
+      "hip": "hanche",
+      "knee": "genou",
+      "hamstring": "ischio-jambiers",
+      "ankle": "cheville",
+      "chest": "poitrine",
+      "core": "tronc"
+    }
+  },
+  "VoiceLog": {
+    "title": "Saisie vocale",
+    "hint": "Dis ce que tu as fait, jusqu'à {seconds}″. Tu verras un brouillon avant tout enregistrement.",
+    "record": "Démarrer l'enregistrement",
+    "stop": "Arrêter l'enregistrement",
+    "tapToStart": "Touchez pour commencer",
+    "recording": "Enregistrement {elapsed} / {max}",
+    "working": "Création du brouillon…",
+    "privacy": "L'enregistrement n'est pas conservé. Seul ce que tu valides dans le formulaire est enregistré.",
+    "cancel": "Annuler",
+    "defaultTitle": "Entraînement",
+    "draftNotice": "Brouillon issu de ta voix. Vérifie et corrige-le avant d'enregistrer.",
+    "heard": "Ce qui a été entendu",
+    "errors": {
+      "unsupported": "L'enregistrement n'est pas pris en charge sur cet appareil.",
+      "permission": "Pas d'accès au micro. Autorise-le dans les réglages de l'appareil.",
+      "recordFailed": "L'enregistrement n'a pas abouti. Réessaie.",
+      "noSpeech": "Aucune parole détectée. Réessaie.",
+      "tooLong": "L'enregistrement est trop long.",
+      "dailyLimit": "Tu as atteint la limite d'enregistrements du jour.",
+      "off": "La saisie vocale n'est pas activée dans cette salle.",
+      "unavailable": "La transcription n'est pas disponible pour le moment. Réessaie plus tard."
+    },
+    "settings": {
+      "enable": "Saisie vocale",
+      "enableHint": "Les membres enregistrent leur séance et vérifient un brouillon avant de l'enregistrer. L'audio n'est pas conservé."
+    }
   }
 }

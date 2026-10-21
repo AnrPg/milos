@@ -33858,6 +33858,201 @@
         "title": "GoalMuscle",
         "type": "object"
       },
+      "GymAiSettings": {
+        "properties": {
+          "default_model": {
+            "type": "string"
+          },
+          "key_configured": {
+            "type": "boolean"
+          },
+          "key_last4": {
+            "nullable": true,
+            "type": "string"
+          },
+          "key_status": {
+            "enum": [
+              "unknown",
+              "valid",
+              "rejected"
+            ],
+            "type": "string"
+          },
+          "model": {
+            "nullable": true,
+            "type": "string"
+          },
+          "provider": {
+            "enum": [
+              "anthropic"
+            ],
+            "type": "string"
+          },
+          "scaling_enabled": {
+            "type": "boolean"
+          },
+          "usage": {
+            "properties": {
+              "cost_usd": {
+                "type": "number"
+              },
+              "since": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "suggestions": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "since",
+              "suggestions",
+              "cost_usd"
+            ],
+            "title": "GymAiUsage",
+            "type": "object"
+          },
+          "voice_enabled": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "scaling_enabled",
+          "voice_enabled",
+          "key_configured",
+          "key_status",
+          "default_model",
+          "usage"
+        ],
+        "title": "GymAiSettings",
+        "type": "object"
+      },
+      "GymAiSettingsResponse": {
+        "properties": {
+          "ai_settings": {
+            "properties": {
+              "default_model": {
+                "type": "string"
+              },
+              "key_configured": {
+                "type": "boolean"
+              },
+              "key_last4": {
+                "nullable": true,
+                "type": "string"
+              },
+              "key_status": {
+                "enum": [
+                  "unknown",
+                  "valid",
+                  "rejected"
+                ],
+                "type": "string"
+              },
+              "model": {
+                "nullable": true,
+                "type": "string"
+              },
+              "provider": {
+                "enum": [
+                  "anthropic"
+                ],
+                "type": "string"
+              },
+              "scaling_enabled": {
+                "type": "boolean"
+              },
+              "usage": {
+                "properties": {
+                  "cost_usd": {
+                    "type": "number"
+                  },
+                  "since": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "suggestions": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "since",
+                  "suggestions",
+                  "cost_usd"
+                ],
+                "title": "GymAiUsage",
+                "type": "object"
+              },
+              "voice_enabled": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "scaling_enabled",
+              "voice_enabled",
+              "key_configured",
+              "key_status",
+              "default_model",
+              "usage"
+            ],
+            "title": "GymAiSettings",
+            "type": "object"
+          }
+        },
+        "required": [
+          "ai_settings"
+        ],
+        "title": "GymAiSettingsResponse",
+        "type": "object"
+      },
+      "GymAiSettingsUpdate": {
+        "additionalProperties": false,
+        "properties": {
+          "api_key": {
+            "maxLength": 300,
+            "minLength": 20,
+            "type": "string",
+            "writeOnly": true
+          },
+          "model": {
+            "maxLength": 80,
+            "nullable": true,
+            "type": "string"
+          },
+          "remove_key": {
+            "type": "boolean"
+          },
+          "scaling_enabled": {
+            "type": "boolean"
+          },
+          "voice_enabled": {
+            "type": "boolean"
+          }
+        },
+        "title": "GymAiSettingsUpdate",
+        "type": "object"
+      },
+      "GymAiUsage": {
+        "properties": {
+          "cost_usd": {
+            "type": "number"
+          },
+          "since": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "suggestions": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "since",
+          "suggestions",
+          "cost_usd"
+        ],
+        "title": "GymAiUsage",
+        "type": "object"
+      },
       "HealthConsents": {
         "properties": {
           "consents": {
@@ -38810,6 +39005,231 @@
           "warnings"
         ],
         "title": "MyWorkoutInjuryWarnings",
+        "type": "object"
+      },
+      "MyWorkoutScaling": {
+        "properties": {
+          "scaling": {
+            "nullable": true,
+            "properties": {
+              "coach_note": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "properties": {
+                    "change": {
+                      "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                      "enum": [
+                        "substitute",
+                        "load",
+                        "reps",
+                        "skip",
+                        "other"
+                      ],
+                      "type": "string"
+                    },
+                    "exercise_id": {
+                      "type": "string"
+                    },
+                    "exercise_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string"
+                    },
+                    "section_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "suggested": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "exercise_id",
+                    "change",
+                    "reason"
+                  ],
+                  "title": "MyWorkoutScalingItem",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "modifications": {
+                "description": "ADR-050 modification patches of the approved changes",
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "reviewed_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "scale_level_label": {
+                "nullable": true,
+                "type": "string"
+              },
+              "scale_level_slug": {
+                "nullable": true,
+                "type": "string"
+              },
+              "scheduled_for": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "items",
+              "modifications"
+            ],
+            "title": "MyWorkoutScalingDetail",
+            "type": "object"
+          }
+        },
+        "required": [
+          "scaling"
+        ],
+        "title": "MyWorkoutScaling",
+        "type": "object"
+      },
+      "MyWorkoutScalingDetail": {
+        "nullable": true,
+        "properties": {
+          "coach_note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "change": {
+                  "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                  "enum": [
+                    "substitute",
+                    "load",
+                    "reps",
+                    "skip",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "exercise_id": {
+                  "type": "string"
+                },
+                "exercise_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "section_id": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "suggested": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "exercise_id",
+                "change",
+                "reason"
+              ],
+              "title": "MyWorkoutScalingItem",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "modifications": {
+            "description": "ADR-050 modification patches of the approved changes",
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "reviewed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "scale_level_label": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scale_level_slug": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scheduled_for": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "items",
+          "modifications"
+        ],
+        "title": "MyWorkoutScalingDetail",
+        "type": "object"
+      },
+      "MyWorkoutScalingItem": {
+        "properties": {
+          "change": {
+            "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+            "enum": [
+              "substitute",
+              "load",
+              "reps",
+              "skip",
+              "other"
+            ],
+            "type": "string"
+          },
+          "exercise_id": {
+            "type": "string"
+          },
+          "exercise_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "section_id": {
+            "nullable": true,
+            "type": "string"
+          },
+          "suggested": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "exercise_id",
+          "change",
+          "reason"
+        ],
+        "title": "MyWorkoutScalingItem",
         "type": "object"
       },
       "Neighbourhood": {
@@ -48215,6 +48635,534 @@
         "title": "SavedFilters",
         "type": "object"
       },
+      "ScalingSuggestion": {
+        "properties": {
+          "assigned_workout_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "athlete_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "athlete_nickname": {
+            "nullable": true,
+            "type": "string"
+          },
+          "coach_note": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "injury_regions": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "inserted_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "change": {
+                  "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                  "enum": [
+                    "substitute",
+                    "load",
+                    "reps",
+                    "skip",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "exercise_id": {
+                  "type": "string"
+                },
+                "exercise_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "prescribed": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reason": {
+                  "type": "string"
+                },
+                "section_id": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "section_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "suggested": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "exercise_id",
+                "change",
+                "reason"
+              ],
+              "title": "ScalingSuggestionItem",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "master_workout_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "reviewed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "scale_level_label": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scale_level_slug": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scheduled_for": {
+            "format": "date",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "approved",
+              "dismissed",
+              "no_change",
+              "superseded"
+            ],
+            "type": "string"
+          },
+          "summary": {
+            "nullable": true,
+            "type": "string"
+          },
+          "workout_title": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "athlete_id",
+          "master_workout_id",
+          "scheduled_for",
+          "status",
+          "items"
+        ],
+        "title": "ScalingSuggestion",
+        "type": "object"
+      },
+      "ScalingSuggestionApproveRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "coach_note": {
+            "maxLength": 500,
+            "nullable": true,
+            "type": "string"
+          },
+          "items": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "id": {
+                  "maxLength": 10,
+                  "type": "string"
+                },
+                "include": {
+                  "type": "boolean"
+                },
+                "suggested": {
+                  "maxLength": 120,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "maxItems": 20,
+            "type": "array"
+          },
+          "scale_level_slug": {
+            "maxLength": 40,
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "ScalingSuggestionApproveRequest",
+        "type": "object"
+      },
+      "ScalingSuggestionItem": {
+        "properties": {
+          "change": {
+            "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+            "enum": [
+              "substitute",
+              "load",
+              "reps",
+              "skip",
+              "other"
+            ],
+            "type": "string"
+          },
+          "exercise_id": {
+            "type": "string"
+          },
+          "exercise_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "prescribed": {
+            "nullable": true,
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "section_id": {
+            "nullable": true,
+            "type": "string"
+          },
+          "section_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "suggested": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "exercise_id",
+          "change",
+          "reason"
+        ],
+        "title": "ScalingSuggestionItem",
+        "type": "object"
+      },
+      "ScalingSuggestionQueue": {
+        "properties": {
+          "suggestions": {
+            "items": {
+              "properties": {
+                "assigned_workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "athlete_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "athlete_nickname": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "coach_note": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "injury_regions": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "inserted_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "items": {
+                  "items": {
+                    "properties": {
+                      "change": {
+                        "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                        "enum": [
+                          "substitute",
+                          "load",
+                          "reps",
+                          "skip",
+                          "other"
+                        ],
+                        "type": "string"
+                      },
+                      "exercise_id": {
+                        "type": "string"
+                      },
+                      "exercise_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "prescribed": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "reason": {
+                        "type": "string"
+                      },
+                      "section_id": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "section_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "suggested": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "exercise_id",
+                      "change",
+                      "reason"
+                    ],
+                    "title": "ScalingSuggestionItem",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "master_workout_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "reviewed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scale_level_label": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scale_level_slug": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scheduled_for": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "approved",
+                    "dismissed",
+                    "no_change",
+                    "superseded"
+                  ],
+                  "type": "string"
+                },
+                "summary": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "athlete_id",
+                "master_workout_id",
+                "scheduled_for",
+                "status",
+                "items"
+              ],
+              "title": "ScalingSuggestion",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "suggestions"
+        ],
+        "title": "ScalingSuggestionQueue",
+        "type": "object"
+      },
+      "ScalingSuggestionResponse": {
+        "properties": {
+          "suggestion": {
+            "properties": {
+              "assigned_workout_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "athlete_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "athlete_nickname": {
+                "nullable": true,
+                "type": "string"
+              },
+              "coach_note": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "injury_regions": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "inserted_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "items": {
+                "items": {
+                  "properties": {
+                    "change": {
+                      "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                      "enum": [
+                        "substitute",
+                        "load",
+                        "reps",
+                        "skip",
+                        "other"
+                      ],
+                      "type": "string"
+                    },
+                    "exercise_id": {
+                      "type": "string"
+                    },
+                    "exercise_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "prescribed": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string"
+                    },
+                    "section_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "section_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "suggested": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "exercise_id",
+                    "change",
+                    "reason"
+                  ],
+                  "title": "ScalingSuggestionItem",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "master_workout_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "reviewed_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "scale_level_label": {
+                "nullable": true,
+                "type": "string"
+              },
+              "scale_level_slug": {
+                "nullable": true,
+                "type": "string"
+              },
+              "scheduled_for": {
+                "format": "date",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "approved",
+                  "dismissed",
+                  "no_change",
+                  "superseded"
+                ],
+                "type": "string"
+              },
+              "summary": {
+                "nullable": true,
+                "type": "string"
+              },
+              "workout_title": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "athlete_id",
+              "master_workout_id",
+              "scheduled_for",
+              "status",
+              "items"
+            ],
+            "title": "ScalingSuggestion",
+            "type": "object"
+          }
+        },
+        "required": [
+          "suggestion"
+        ],
+        "title": "ScalingSuggestionResponse",
+        "type": "object"
+      },
       "SeasonCoach": {
         "properties": {
           "id": {
@@ -56825,6 +57773,299 @@
           "code",
           "errors"
         ],
+        "type": "object"
+      },
+      "VoiceLogAvailability": {
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "daily_limit": {
+            "type": "integer"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "max_seconds": {
+            "type": "integer"
+          },
+          "remaining_today": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available",
+          "enabled",
+          "max_seconds",
+          "daily_limit",
+          "remaining_today"
+        ],
+        "title": "VoiceLogAvailability",
+        "type": "object"
+      },
+      "VoiceLogAvailabilityResponse": {
+        "properties": {
+          "voice": {
+            "properties": {
+              "available": {
+                "type": "boolean"
+              },
+              "daily_limit": {
+                "type": "integer"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "max_seconds": {
+                "type": "integer"
+              },
+              "remaining_today": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "available",
+              "enabled",
+              "max_seconds",
+              "daily_limit",
+              "remaining_today"
+            ],
+            "title": "VoiceLogAvailability",
+            "type": "object"
+          }
+        },
+        "required": [
+          "voice"
+        ],
+        "title": "VoiceLogAvailabilityResponse",
+        "type": "object"
+      },
+      "VoiceLogDraft": {
+        "properties": {
+          "days_ago": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "exercises": {
+            "items": {
+              "properties": {
+                "load": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "load_unit": {
+                  "enum": [
+                    "kg",
+                    "lb"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "reps": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "sets": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name",
+                "sets",
+                "reps",
+                "load",
+                "load_unit"
+              ],
+              "title": "VoiceLogDraftExercise",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "perceived_effort": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "duration_minutes",
+          "perceived_effort",
+          "days_ago",
+          "notes",
+          "exercises"
+        ],
+        "title": "VoiceLogDraft",
+        "type": "object"
+      },
+      "VoiceLogDraftExercise": {
+        "properties": {
+          "load": {
+            "nullable": true,
+            "type": "number"
+          },
+          "load_unit": {
+            "enum": [
+              "kg",
+              "lb"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reps": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "sets": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "sets",
+          "reps",
+          "load",
+          "load_unit"
+        ],
+        "title": "VoiceLogDraftExercise",
+        "type": "object"
+      },
+      "VoiceLogDraftRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "audio_base64": {
+            "maxLength": 3400000,
+            "minLength": 100,
+            "type": "string"
+          },
+          "duration_ms": {
+            "maximum": 600000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "locale": {
+            "maxLength": 10,
+            "type": "string"
+          },
+          "mime_type": {
+            "maxLength": 80,
+            "type": "string"
+          }
+        },
+        "required": [
+          "audio_base64",
+          "mime_type"
+        ],
+        "title": "VoiceLogDraftRequest",
+        "type": "object"
+      },
+      "VoiceLogDraftResponse": {
+        "properties": {
+          "draft": {
+            "properties": {
+              "days_ago": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "duration_minutes": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "exercises": {
+                "items": {
+                  "properties": {
+                    "load": {
+                      "nullable": true,
+                      "type": "number"
+                    },
+                    "load_unit": {
+                      "enum": [
+                        "kg",
+                        "lb"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "reps": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "sets": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sets",
+                    "reps",
+                    "load",
+                    "load_unit"
+                  ],
+                  "title": "VoiceLogDraftExercise",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "notes": {
+                "nullable": true,
+                "type": "string"
+              },
+              "perceived_effort": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "title": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "duration_minutes",
+              "perceived_effort",
+              "days_ago",
+              "notes",
+              "exercises"
+            ],
+            "title": "VoiceLogDraft",
+            "type": "object"
+          },
+          "parsed": {
+            "type": "boolean"
+          },
+          "transcript": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "transcript",
+          "parsed",
+          "draft"
+        ],
+        "title": "VoiceLogDraftResponse",
         "type": "object"
       },
       "WalletAddRequest": {
@@ -103851,6 +105092,255 @@
         "summary": "Mark a single notification as read for the current user",
         "tags": [
           "Notifications"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/ai-settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminAiSettingsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ai_settings": {
+                      "properties": {
+                        "default_model": {
+                          "type": "string"
+                        },
+                        "key_configured": {
+                          "type": "boolean"
+                        },
+                        "key_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "key_status": {
+                          "enum": [
+                            "unknown",
+                            "valid",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "model": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "anthropic"
+                          ],
+                          "type": "string"
+                        },
+                        "scaling_enabled": {
+                          "type": "boolean"
+                        },
+                        "usage": {
+                          "properties": {
+                            "cost_usd": {
+                              "type": "number"
+                            },
+                            "since": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "suggestions": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "since",
+                            "suggestions",
+                            "cost_usd"
+                          ],
+                          "title": "GymAiUsage",
+                          "type": "object"
+                        },
+                        "voice_enabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "scaling_enabled",
+                        "voice_enabled",
+                        "key_configured",
+                        "key_status",
+                        "default_model",
+                        "usage"
+                      ],
+                      "title": "GymAiSettings",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "ai_settings"
+                  ],
+                  "title": "GymAiSettingsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "AI settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The gym's AI settings and this month's usage",
+        "tags": [
+          "Settings"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminAiSettingsController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "api_key": {
+                    "maxLength": 300,
+                    "minLength": 20,
+                    "type": "string",
+                    "writeOnly": true
+                  },
+                  "model": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "remove_key": {
+                    "type": "boolean"
+                  },
+                  "scaling_enabled": {
+                    "type": "boolean"
+                  },
+                  "voice_enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "title": "GymAiSettingsUpdate",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ai_settings": {
+                      "properties": {
+                        "default_model": {
+                          "type": "string"
+                        },
+                        "key_configured": {
+                          "type": "boolean"
+                        },
+                        "key_last4": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "key_status": {
+                          "enum": [
+                            "unknown",
+                            "valid",
+                            "rejected"
+                          ],
+                          "type": "string"
+                        },
+                        "model": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "anthropic"
+                          ],
+                          "type": "string"
+                        },
+                        "scaling_enabled": {
+                          "type": "boolean"
+                        },
+                        "usage": {
+                          "properties": {
+                            "cost_usd": {
+                              "type": "number"
+                            },
+                            "since": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "suggestions": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "since",
+                            "suggestions",
+                            "cost_usd"
+                          ],
+                          "title": "GymAiUsage",
+                          "type": "object"
+                        },
+                        "voice_enabled": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "scaling_enabled",
+                        "voice_enabled",
+                        "key_configured",
+                        "key_status",
+                        "default_model",
+                        "usage"
+                      ],
+                      "title": "GymAiSettings",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "ai_settings"
+                  ],
+                  "title": "GymAiSettingsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "AI settings"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Update the gym's AI settings",
+        "tags": [
+          "Settings"
         ]
       }
     },
@@ -170555,6 +172045,263 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/me/training-log/voice": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyVoiceLogController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "voice": {
+                      "properties": {
+                        "available": {
+                          "type": "boolean"
+                        },
+                        "daily_limit": {
+                          "type": "integer"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "max_seconds": {
+                          "type": "integer"
+                        },
+                        "remaining_today": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "available",
+                        "enabled",
+                        "max_seconds",
+                        "daily_limit",
+                        "remaining_today"
+                      ],
+                      "title": "VoiceLogAvailability",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "voice"
+                  ],
+                  "title": "VoiceLogAvailabilityResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Availability"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Whether the current user may log a workout by voice",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/training-log/voice/drafts": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyVoiceLogController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "audio_base64": {
+                    "maxLength": 3400000,
+                    "minLength": 100,
+                    "type": "string"
+                  },
+                  "duration_ms": {
+                    "maximum": 600000,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "locale": {
+                    "maxLength": 10,
+                    "type": "string"
+                  },
+                  "mime_type": {
+                    "maxLength": 80,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "audio_base64",
+                  "mime_type"
+                ],
+                "title": "VoiceLogDraftRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "draft": {
+                      "properties": {
+                        "days_ago": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "exercises": {
+                          "items": {
+                            "properties": {
+                              "load": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "load_unit": {
+                                "enum": [
+                                  "kg",
+                                  "lb"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "reps": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "sets": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "sets",
+                              "reps",
+                              "load",
+                              "load_unit"
+                            ],
+                            "title": "VoiceLogDraftExercise",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "perceived_effort": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "duration_minutes",
+                        "perceived_effort",
+                        "days_ago",
+                        "notes",
+                        "exercises"
+                      ],
+                      "title": "VoiceLogDraft",
+                      "type": "object"
+                    },
+                    "parsed": {
+                      "type": "boolean"
+                    },
+                    "transcript": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "transcript",
+                    "parsed",
+                    "draft"
+                  ],
+                  "title": "VoiceLogDraftResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Draft"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Voice logging is off"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unusable recording"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Daily limit reached"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Transcription unavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Transcribe one recording into a draft training-log entry (nothing is saved)",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/me/videos": {
       "get": {
         "callbacks": {},
@@ -171110,6 +172857,138 @@
         "summary": "Acknowledge the current user's injury safety warnings for a workout",
         "tags": [
           "Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/workouts/{workout_id}/scaling": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyScalingController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "workout_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "scaling": {
+                      "nullable": true,
+                      "properties": {
+                        "coach_note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "items": {
+                          "items": {
+                            "properties": {
+                              "change": {
+                                "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                                "enum": [
+                                  "substitute",
+                                  "load",
+                                  "reps",
+                                  "skip",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "exercise_id": {
+                                "type": "string"
+                              },
+                              "exercise_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reason": {
+                                "type": "string"
+                              },
+                              "section_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "suggested": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "exercise_id",
+                              "change",
+                              "reason"
+                            ],
+                            "title": "MyWorkoutScalingItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "modifications": {
+                          "description": "ADR-050 modification patches of the approved changes",
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "reviewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scale_level_label": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scale_level_slug": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduled_for": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "items",
+                        "modifications"
+                      ],
+                      "title": "MyWorkoutScalingDetail",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "scaling"
+                  ],
+                  "title": "MyWorkoutScaling",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Adaptation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The current user's coach-approved adaptation of a workout",
+        "tags": [
+          "Workouts"
         ]
       }
     },
@@ -179551,6 +181430,662 @@
           }
         ],
         "summary": "Client messages waiting for a staff reply, overdue first",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/scaling-suggestions": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.StaffScalingController.index",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "enum": [
+                "pending",
+                "approved",
+                "dismissed"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "suggestions": {
+                      "items": {
+                        "properties": {
+                          "assigned_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "athlete_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "athlete_nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "coach_note": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "injury_regions": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "inserted_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "items": {
+                            "items": {
+                              "properties": {
+                                "change": {
+                                  "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                                  "enum": [
+                                    "substitute",
+                                    "load",
+                                    "reps",
+                                    "skip",
+                                    "other"
+                                  ],
+                                  "type": "string"
+                                },
+                                "exercise_id": {
+                                  "type": "string"
+                                },
+                                "exercise_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "type": "string"
+                                },
+                                "prescribed": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "reason": {
+                                  "type": "string"
+                                },
+                                "section_id": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "section_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "suggested": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "exercise_id",
+                                "change",
+                                "reason"
+                              ],
+                              "title": "ScalingSuggestionItem",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "master_workout_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "reviewed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scale_level_label": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scale_level_slug": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scheduled_for": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "approved",
+                              "dismissed",
+                              "no_change",
+                              "superseded"
+                            ],
+                            "type": "string"
+                          },
+                          "summary": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout_title": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "athlete_id",
+                          "master_workout_id",
+                          "scheduled_for",
+                          "status",
+                          "items"
+                        ],
+                        "title": "ScalingSuggestion",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "suggestions"
+                  ],
+                  "title": "ScalingSuggestionQueue",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "AI scaling suggestions waiting for the coach (pending by default)",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/scaling-suggestions/{id}/approve": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.StaffScalingController.approve",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "coach_note": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "items": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "id": {
+                          "maxLength": 10,
+                          "type": "string"
+                        },
+                        "include": {
+                          "type": "boolean"
+                        },
+                        "suggested": {
+                          "maxLength": 120,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 20,
+                    "type": "array"
+                  },
+                  "scale_level_slug": {
+                    "maxLength": 40,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "ScalingSuggestionApproveRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "suggestion": {
+                      "properties": {
+                        "assigned_workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "athlete_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "athlete_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "injury_regions": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "items": {
+                          "items": {
+                            "properties": {
+                              "change": {
+                                "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                                "enum": [
+                                  "substitute",
+                                  "load",
+                                  "reps",
+                                  "skip",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "exercise_id": {
+                                "type": "string"
+                              },
+                              "exercise_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "prescribed": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reason": {
+                                "type": "string"
+                              },
+                              "section_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "section_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "suggested": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "exercise_id",
+                              "change",
+                              "reason"
+                            ],
+                            "title": "ScalingSuggestionItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "master_workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reviewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scale_level_label": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scale_level_slug": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduled_for": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "approved",
+                            "dismissed",
+                            "no_change",
+                            "superseded"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "athlete_id",
+                        "master_workout_id",
+                        "scheduled_for",
+                        "status",
+                        "items"
+                      ],
+                      "title": "ScalingSuggestion",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "suggestion"
+                  ],
+                  "title": "ScalingSuggestionResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestion"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already reviewed"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid review"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Approve a suggestion, optionally edited; it becomes the athlete's modifications",
+        "tags": [
+          "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/scaling-suggestions/{id}/dismiss": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.StaffScalingController.dismiss",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "suggestion": {
+                      "properties": {
+                        "assigned_workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "athlete_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "athlete_nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "coach_note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "injury_regions": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "inserted_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "items": {
+                          "items": {
+                            "properties": {
+                              "change": {
+                                "description": "substitute: another movement; load/reps/other: a new prescription; skip",
+                                "enum": [
+                                  "substitute",
+                                  "load",
+                                  "reps",
+                                  "skip",
+                                  "other"
+                                ],
+                                "type": "string"
+                              },
+                              "exercise_id": {
+                                "type": "string"
+                              },
+                              "exercise_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "prescribed": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "reason": {
+                                "type": "string"
+                              },
+                              "section_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "section_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "suggested": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "exercise_id",
+                              "change",
+                              "reason"
+                            ],
+                            "title": "ScalingSuggestionItem",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "master_workout_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "reviewed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scale_level_label": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scale_level_slug": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduled_for": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "approved",
+                            "dismissed",
+                            "no_change",
+                            "superseded"
+                          ],
+                          "type": "string"
+                        },
+                        "summary": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "workout_title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "athlete_id",
+                        "master_workout_id",
+                        "scheduled_for",
+                        "status",
+                        "items"
+                      ],
+                      "title": "ScalingSuggestion",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "suggestion"
+                  ],
+                  "title": "ScalingSuggestionResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Suggestion"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Already reviewed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Dismiss a suggestion; nothing reaches the athlete",
         "tags": [
           "Coaching"
         ]

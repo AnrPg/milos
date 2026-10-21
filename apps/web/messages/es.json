@@ -4997,7 +4997,8 @@
       "measure": "Medición",
       "wellness": "Agua · Sueño · Comida",
       "craving": "Antojo",
-      "support": "Necesito apoyo"
+      "support": "Necesito apoyo",
+      "voice": "Por voz"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
@@ -5010,7 +5011,8 @@
       "measure": "Peso, perímetros, fotos",
       "wellness": "Un vaso, anoche, una comida",
       "craving": "Anótalo o pide apoyo",
-      "support": "Un mensaje rápido a tu buddy"
+      "support": "Un mensaje rápido a tu buddy",
+      "voice": "Di lo que hiciste"
     },
     "homeTitle": "Inicio",
     "wodToday": "El WOD de hoy en el box",
@@ -8944,5 +8946,89 @@
     "reminderToggleHint": "Cuando llegas al box con una reserva, el móvil te recuerda el check-in. Tu ubicación se queda en el móvil.",
     "reminderNeedsAlways": "Para que funcione con la app cerrada, elige «Siempre» en el acceso a la ubicación en los ajustes del móvil.",
     "reminderDenied": "Sin acceso a la ubicación no hay aviso. Puedes permitirlo en los ajustes del móvil."
+  },
+  "Scaling": {
+    "loading": "Cargando…",
+    "settings": {
+      "title": "Asistente de IA",
+      "description": "Sugerencias de escalado para atletas lesionados, con vuestra propia clave. Un coach aprueba cada sugerencia.",
+      "enable": "Sugerencias de escalado",
+      "enableHint": "Desactivadas por defecto. Necesitan una clave API.",
+      "key": "Clave API (Anthropic)",
+      "keySet": "Hay una clave que termina en {last4}.",
+      "keyRejected": "El proveedor rechazó la clave que termina en {last4}. Añade una nueva.",
+      "keyMissing": "No hay clave.",
+      "keyPlaceholder": "Pega la clave",
+      "saveKey": "Guardar clave",
+      "removeKey": "Quitar clave",
+      "model": "Modelo (opcional)",
+      "saveModel": "Guardar modelo",
+      "usage": "Este mes · sugerencias: {count} · coste: ${cost}",
+      "privacy": "Solo se envían el entrenamiento y las lesiones registradas por el gimnasio, sin nombres. La clave no se vuelve a mostrar."
+    },
+    "queue": {
+      "eyebrow": "Mis clientes",
+      "title": "Sugerencias de escalado · {count}",
+      "hint": "Sugerencia asistida por IA. El atleta no ve nada antes de tu aprobación.",
+      "workout": "Entrenamiento",
+      "aiBadge": "IA",
+      "include": "Incluir: {movement}",
+      "editSuggested": "Sugerencia para {movement}",
+      "scaleLevel": "Nivel: {level}",
+      "notePlaceholder": "Mensaje para el atleta (opcional)",
+      "approve": "Aprobar",
+      "dismiss": "Descartar"
+    },
+    "member": {
+      "title": "Adaptado por tu coach",
+      "scaleLevel": "Nivel: {level}",
+      "disclosure": "Asistido por IA · aprobado por tu coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: omitir"
+    },
+    "regions": {
+      "shoulder": "hombro",
+      "elbow": "codo",
+      "wrist": "muñeca",
+      "neck": "cuello",
+      "back": "espalda",
+      "hip": "cadera",
+      "knee": "rodilla",
+      "hamstring": "isquiotibiales",
+      "ankle": "tobillo",
+      "chest": "pecho",
+      "core": "core"
+    }
+  },
+  "VoiceLog": {
+    "title": "Registrar por voz",
+    "hint": "Di lo que hiciste, hasta {seconds}″. Verás un borrador antes de guardar nada.",
+    "record": "Empezar a grabar",
+    "stop": "Detener grabación",
+    "tapToStart": "Toca para empezar",
+    "recording": "Grabando {elapsed} / {max}",
+    "working": "Creando el borrador…",
+    "privacy": "La grabación no se guarda. Solo se guarda lo que confirmes en el formulario.",
+    "cancel": "Cancelar",
+    "defaultTitle": "Entrenamiento",
+    "draftNotice": "Borrador a partir de tu voz. Revísalo y corrígelo antes de guardar.",
+    "heard": "Lo que se escuchó",
+    "errors": {
+      "unsupported": "La grabación no es compatible con este dispositivo.",
+      "permission": "No hay acceso al micrófono. Permítelo en los ajustes del dispositivo.",
+      "recordFailed": "La grabación no terminó. Inténtalo de nuevo.",
+      "noSpeech": "No se escuchó ninguna voz. Inténtalo de nuevo.",
+      "tooLong": "La grabación es demasiado larga.",
+      "dailyLimit": "Has llegado al límite de grabaciones de hoy.",
+      "off": "El registro por voz no está activo en este gimnasio.",
+      "unavailable": "La transcripción no está disponible ahora. Inténtalo más tarde."
+    },
+    "settings": {
+      "enable": "Registro por voz",
+      "enableHint": "Los miembros graban su entrenamiento y revisan un borrador antes de guardarlo. El audio no se guarda."
+    }
   }
 }

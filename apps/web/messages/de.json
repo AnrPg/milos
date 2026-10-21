@@ -4997,7 +4997,8 @@
       "measure": "Messung",
       "wellness": "Wasser · Schlaf · Mahlzeit",
       "craving": "Heißhunger",
-      "support": "Ich brauche Unterstützung"
+      "support": "Ich brauche Unterstützung",
+      "voice": "Per Sprache"
     },
     "entryKindHint": {
       "workout": "Ergebnis, RPE, Notizen",
@@ -5010,7 +5011,8 @@
       "measure": "Gewicht, Umfänge, Fotos",
       "wellness": "Ein Glas, die letzte Nacht, eine Mahlzeit",
       "craving": "Notieren oder Unterstützung holen",
-      "support": "Eine kurze Nachricht an deinen Buddy"
+      "support": "Eine kurze Nachricht an deinen Buddy",
+      "voice": "Sag, was du gemacht hast"
     },
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
@@ -8944,5 +8946,89 @@
     "reminderToggleHint": "Kommst du mit einer Buchung an der Box an, erinnert dich dein Handy an den Check-in. Dein Standort bleibt auf dem Handy.",
     "reminderNeedsAlways": "Damit es bei geschlossener App funktioniert, wähle in den Einstellungen des Handys „Immer“ für den Standortzugriff.",
     "reminderDenied": "Ohne Standortzugriff gibt es keine Erinnerung. Du kannst ihn in den Einstellungen des Handys erlauben."
+  },
+  "Scaling": {
+    "loading": "Wird geladen…",
+    "settings": {
+      "title": "KI-Assistent",
+      "description": "Skalierungsvorschläge für verletzte Athleten, mit eurem eigenen Schlüssel. Ein Coach genehmigt jeden Vorschlag.",
+      "enable": "Skalierungsvorschläge",
+      "enableHint": "Standardmäßig aus. Braucht einen API-Schlüssel.",
+      "key": "API-Schlüssel (Anthropic)",
+      "keySet": "Ein Schlüssel mit Endung {last4} ist gesetzt.",
+      "keyRejected": "Der Anbieter hat den Schlüssel mit Endung {last4} abgelehnt. Neuen Schlüssel eingeben.",
+      "keyMissing": "Kein Schlüssel gesetzt.",
+      "keyPlaceholder": "Schlüssel einfügen",
+      "saveKey": "Schlüssel speichern",
+      "removeKey": "Schlüssel entfernen",
+      "model": "Modell (optional)",
+      "saveModel": "Modell speichern",
+      "usage": "Diesen Monat · Vorschläge: {count} · Kosten: ${cost}",
+      "privacy": "Gesendet werden nur das Training und die vom Studio erfassten Verletzungen, ohne Namen. Der Schlüssel wird nie wieder angezeigt."
+    },
+    "queue": {
+      "eyebrow": "Meine Kunden",
+      "title": "Skalierungsvorschläge · {count}",
+      "hint": "KI-gestützter Vorschlag. Der Athlet sieht nichts vor deiner Genehmigung.",
+      "workout": "Training",
+      "aiBadge": "KI",
+      "include": "Übernehmen: {movement}",
+      "editSuggested": "Vorschlag für {movement}",
+      "scaleLevel": "Stufe: {level}",
+      "notePlaceholder": "Nachricht an den Athleten (optional)",
+      "approve": "Genehmigen",
+      "dismiss": "Verwerfen"
+    },
+    "member": {
+      "title": "Von deinem Coach angepasst",
+      "scaleLevel": "Stufe: {level}",
+      "disclosure": "KI-gestützt · von deinem Coach genehmigt."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: auslassen"
+    },
+    "regions": {
+      "shoulder": "Schulter",
+      "elbow": "Ellbogen",
+      "wrist": "Handgelenk",
+      "neck": "Nacken",
+      "back": "Rücken",
+      "hip": "Hüfte",
+      "knee": "Knie",
+      "hamstring": "Oberschenkelrückseite",
+      "ankle": "Knöchel",
+      "chest": "Brust",
+      "core": "Rumpf"
+    }
+  },
+  "VoiceLog": {
+    "title": "Per Sprache erfassen",
+    "hint": "Sag, was du gemacht hast, bis zu {seconds}″. Du siehst einen Entwurf, bevor etwas gespeichert wird.",
+    "record": "Aufnahme starten",
+    "stop": "Aufnahme beenden",
+    "tapToStart": "Zum Starten tippen",
+    "recording": "Aufnahme {elapsed} / {max}",
+    "working": "Entwurf wird erstellt…",
+    "privacy": "Die Aufnahme wird nicht gespeichert. Gespeichert wird nur, was du im Formular bestätigst.",
+    "cancel": "Abbrechen",
+    "defaultTitle": "Training",
+    "draftNotice": "Entwurf aus deiner Sprache. Prüfe und korrigiere ihn vor dem Speichern.",
+    "heard": "Was erkannt wurde",
+    "errors": {
+      "unsupported": "Aufnahmen werden auf diesem Gerät nicht unterstützt.",
+      "permission": "Kein Zugriff auf das Mikrofon. Erlaube ihn in den Geräteeinstellungen.",
+      "recordFailed": "Die Aufnahme wurde nicht abgeschlossen. Versuch es erneut.",
+      "noSpeech": "Es wurde keine Sprache erkannt. Versuch es erneut.",
+      "tooLong": "Die Aufnahme ist zu lang.",
+      "dailyLimit": "Du hast das heutige Aufnahmelimit erreicht.",
+      "off": "Spracherfassung ist in diesem Studio nicht aktiv.",
+      "unavailable": "Die Umwandlung ist gerade nicht verfügbar. Versuch es später."
+    },
+    "settings": {
+      "enable": "Spracherfassung",
+      "enableHint": "Mitglieder sprechen ihr Training ein und prüfen einen Entwurf vor dem Speichern. Audio wird nicht gespeichert."
+    }
   }
 }

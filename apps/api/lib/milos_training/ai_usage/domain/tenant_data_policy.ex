@@ -13,9 +13,10 @@ defmodule MilosTraining.AiUsage.Domain.TenantDataPolicy do
             purge_order: 3,
             disposition: :purge,
             basis:
-              "AI usage records are operational metering for the gym; anything invoiced from them lives in Finance, so they are deleted once exported.",
+              "AI usage records are operational metering for the gym and its AI settings hold the gym's own provider key (encrypted); anything invoiced from them lives in Finance, so they are deleted once exported.",
             tables: [
-              %{table: "ai_usage_records"}
+              %{table: "ai_usage_records"},
+              %{table: "organization_ai_settings"}
             ]
           })
 

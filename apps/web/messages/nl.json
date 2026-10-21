@@ -4997,7 +4997,8 @@
       "measure": "Meting",
       "wellness": "Water · Slaap · Maaltijd",
       "craving": "Trek",
-      "support": "Ik heb steun nodig"
+      "support": "Ik heb steun nodig",
+      "voice": "Inspreken"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
@@ -5010,7 +5011,8 @@
       "measure": "Gewicht, omtrekken, foto's",
       "wellness": "Een glas, afgelopen nacht, een maaltijd",
       "craving": "Noteer het of vraag om steun",
-      "support": "Een snel bericht aan je buddy"
+      "support": "Een snel bericht aan je buddy",
+      "voice": "Zeg wat je deed"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -8944,5 +8946,89 @@
     "reminderToggleHint": "Kom je met een boeking aan bij de box, dan herinnert je telefoon je aan de check-in. Je locatie blijft op je telefoon.",
     "reminderNeedsAlways": "Kies 'Altijd' voor locatietoegang in de instellingen van je telefoon, zodat het ook werkt als de app dicht is.",
     "reminderDenied": "Zonder locatietoegang is er geen herinnering. Je kunt het toestaan in de instellingen van je telefoon."
+  },
+  "Scaling": {
+    "loading": "Laden…",
+    "settings": {
+      "title": "AI-assistent",
+      "description": "Schaalvoorstellen voor geblesseerde atleten, met jullie eigen sleutel. Een coach keurt elk voorstel goed.",
+      "enable": "Schaalvoorstellen",
+      "enableHint": "Standaard uit. Vereist een API-sleutel.",
+      "key": "API-sleutel (Anthropic)",
+      "keySet": "Er is een sleutel ingesteld die eindigt op {last4}.",
+      "keyRejected": "De aanbieder heeft de sleutel die eindigt op {last4} geweigerd. Voer een nieuwe sleutel in.",
+      "keyMissing": "Geen sleutel ingesteld.",
+      "keyPlaceholder": "Plak de sleutel",
+      "saveKey": "Sleutel opslaan",
+      "removeKey": "Sleutel verwijderen",
+      "model": "Model (optioneel)",
+      "saveModel": "Model opslaan",
+      "usage": "Deze maand · voorstellen: {count} · kosten: ${cost}",
+      "privacy": "Alleen de training en de door de gym vastgelegde blessures worden verstuurd, zonder namen. De sleutel wordt nooit meer getoond."
+    },
+    "queue": {
+      "eyebrow": "Mijn klanten",
+      "title": "Schaalvoorstellen · {count}",
+      "hint": "Voorstel met hulp van AI. De atleet ziet niets voordat jij goedkeurt.",
+      "workout": "Training",
+      "aiBadge": "AI",
+      "include": "Opnemen: {movement}",
+      "editSuggested": "Voorstel voor {movement}",
+      "scaleLevel": "Niveau: {level}",
+      "notePlaceholder": "Bericht aan de atleet (optioneel)",
+      "approve": "Goedkeuren",
+      "dismiss": "Afwijzen"
+    },
+    "member": {
+      "title": "Aangepast door je coach",
+      "scaleLevel": "Niveau: {level}",
+      "disclosure": "Met hulp van AI · goedgekeurd door je coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: overslaan"
+    },
+    "regions": {
+      "shoulder": "schouder",
+      "elbow": "elleboog",
+      "wrist": "pols",
+      "neck": "nek",
+      "back": "rug",
+      "hip": "heup",
+      "knee": "knie",
+      "hamstring": "hamstrings",
+      "ankle": "enkel",
+      "chest": "borst",
+      "core": "romp"
+    }
+  },
+  "VoiceLog": {
+    "title": "Inspreken",
+    "hint": "Zeg wat je deed, tot {seconds}″. Je ziet een concept voordat er iets wordt opgeslagen.",
+    "record": "Opname starten",
+    "stop": "Opname stoppen",
+    "tapToStart": "Tik om te beginnen",
+    "recording": "Opname {elapsed} / {max}",
+    "working": "Concept wordt gemaakt…",
+    "privacy": "De opname wordt niet bewaard. Alleen wat je in het formulier bevestigt, wordt opgeslagen.",
+    "cancel": "Annuleren",
+    "defaultTitle": "Training",
+    "draftNotice": "Concept uit je stem. Controleer en verbeter het voor je opslaat.",
+    "heard": "Wat er gehoord is",
+    "errors": {
+      "unsupported": "Opnemen wordt op dit apparaat niet ondersteund.",
+      "permission": "Geen toegang tot de microfoon. Sta dit toe in de instellingen van je apparaat.",
+      "recordFailed": "De opname is niet voltooid. Probeer het opnieuw.",
+      "noSpeech": "Er is geen spraak gehoord. Probeer het opnieuw.",
+      "tooLong": "De opname is te lang.",
+      "dailyLimit": "Je hebt de opnamelimiet van vandaag bereikt.",
+      "off": "Inspreken staat niet aan in deze gym.",
+      "unavailable": "Omzetten is nu niet beschikbaar. Probeer het later."
+    },
+    "settings": {
+      "enable": "Inspreken",
+      "enableHint": "Leden spreken hun training in en controleren een concept voor het opslaan. Audio wordt niet bewaard."
+    }
   }
 }

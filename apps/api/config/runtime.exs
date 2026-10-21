@@ -40,7 +40,17 @@ config :milos_training, :gemini,
   # Workout library icons (ADR-136) use their own small, cheap model.
   icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite"),
   # ADR-157: alt text suggestions (vision).
-  vision_model: System.get_env("GEMINI_VISION_MODEL", "gemini-2.5-flash-lite")
+  vision_model: System.get_env("GEMINI_VISION_MODEL", "gemini-2.5-flash-lite"),
+  # ADR-175: voice logging speech to text (audio in, transcript out).
+  transcribe_model: System.get_env("GEMINI_TRANSCRIBE_MODEL", "gemini-2.5-flash")
+
+# ADR-174: AI scaling suggestions call the Claude API with each gym's own key
+# (set in the gym's AI settings); only the default model is configured here.
+config :milos_training, :anthropic,
+  req_options: gemini_req_options,
+  scaling_model: System.get_env("ANTHROPIC_SCALING_MODEL", "claude-sonnet-5-5"),
+  # ADR-175: voice logging turns the transcript into a draft entry.
+  voice_model: System.get_env("ANTHROPIC_VOICE_MODEL", "claude-sonnet-5-5")
 
 config :web_push_elixir,
   vapid_public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),

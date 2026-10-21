@@ -28,6 +28,7 @@ import { useSession } from "@/components/session-provider";
 import { CleaningLog } from "@/components/staff/CleaningLog";
 import { SquadsSection } from "@/components/community/squads/SquadsSection";
 import { FormReviewQueue } from "@/components/staff/FormReviewQueue";
+import { ScalingQueue } from "@/components/scaling/ScalingQueue";
 import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import {
   inputClass,
@@ -88,6 +89,7 @@ export function StaffHome() {
       {coach && has("manage_coaching") ? <ReplyQueue /> : null}
       {coach && has("manage_coaching") ? <FormReviewQueue /> : null}
       {coach ? <MemberPRsSection /> : null}
+      {coach && has("manage_coaching") ? <ScalingQueue /> : null}
       {frontDesk && (has("review_cleaning") || has("record_cleaning")) ? <CleaningStatus /> : null}
     </AdminDashboard>
   );
