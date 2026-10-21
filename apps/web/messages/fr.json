@@ -8220,6 +8220,21 @@
       "saving": "Enregistrement…",
       "error": "Non enregistré. Réessayez ou passez.",
       "loading": "Chargement…"
+    },
+    "inherited": "De la séance de base",
+    "settings": {
+      "sectionTitle": "Séances",
+      "sectionDescription": "Valeurs par défaut des nouvelles séances.",
+      "visibleByDefault": "Objectifs visibles par défaut",
+      "visibleByDefaultHint": "Valeur de départ de «Montrer les objectifs aux membres» pour les séances sans objectifs propres.",
+      "feltPrompt": "«Qu’avez-vous ressenti ?» même sans objectifs",
+      "feltPromptHint": "Après une séance sans objectifs, proposer de noter sur le corps ce que vous avez ressenti."
+    },
+    "summary": {
+      "title": "Ce qu’ils ont ressenti",
+      "entries": "{count, plural, one {# entrée} other {# entrées}}",
+      "notShown": "Affiché à partir de 3 entrées.",
+      "notFelt": "Objectifs que personne n’a ressentis : {muscles}"
     }
   }
 }

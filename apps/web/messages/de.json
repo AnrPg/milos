@@ -8220,6 +8220,21 @@
       "saving": "Wird gespeichert…",
       "error": "Nicht gespeichert. Versuche es erneut oder überspringe.",
       "loading": "Wird geladen…"
+    },
+    "inherited": "Aus dem Basistraining",
+    "settings": {
+      "sectionTitle": "Trainings",
+      "sectionDescription": "Voreinstellungen für neue Trainings.",
+      "visibleByDefault": "Ziele standardmäßig sichtbar",
+      "visibleByDefaultHint": "Startwert von «Ziele den Mitgliedern zeigen» bei Trainings ohne eigene Ziele.",
+      "feltPrompt": "«Wie hat es sich angefühlt?» auch ohne Ziele",
+      "feltPromptHint": "Nach einem Training ohne Ziele anbieten, am Körper zu markieren, was du gespürt hast."
+    },
+    "summary": {
+      "title": "Was sie gespürt haben",
+      "entries": "{count, plural, one {# Eintrag} other {# Einträge}}",
+      "notShown": "Wird ab 3 Einträgen angezeigt.",
+      "notFelt": "Ziele, die niemand gespürt hat: {muscles}"
     }
   }
 }

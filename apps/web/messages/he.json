@@ -8220,6 +8220,21 @@
       "saving": "שומר…",
       "error": "לא נשמר. נסו שוב או דלגו.",
       "loading": "טוען…"
+    },
+    "inherited": "מהאימון הבסיסי",
+    "settings": {
+      "sectionTitle": "אימונים",
+      "sectionDescription": "ברירות מחדל לאימונים חדשים.",
+      "visibleByDefault": "יעדים גלויים כברירת מחדל",
+      "visibleByDefaultHint": "הערך ההתחלתי של «הצגת היעדים לחברים» באימונים ללא יעדים משלהם.",
+      "feltPrompt": "«מה הרגשת?» גם ללא יעדים",
+      "feltPromptHint": "אחרי אימון ללא יעדים, להציע לסמן על הגוף מה הרגשתם."
+    },
+    "summary": {
+      "title": "מה הם הרגישו",
+      "entries": "{count, plural, one {רישום אחד} other {# רישומים}}",
+      "notShown": "יוצג החל מ־3 רישומים.",
+      "notFelt": "יעדים שאף אחד לא הרגיש: {muscles}"
     }
   }
 }

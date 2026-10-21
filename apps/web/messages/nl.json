@@ -8220,6 +8220,21 @@
       "saving": "Opslaan…",
       "error": "Niet opgeslagen. Probeer opnieuw of sla over.",
       "loading": "Laden…"
+    },
+    "inherited": "Uit de basistraining",
+    "settings": {
+      "sectionTitle": "Trainingen",
+      "sectionDescription": "Standaardwaarden voor nieuwe trainingen.",
+      "visibleByDefault": "Doelen standaard zichtbaar",
+      "visibleByDefaultHint": "Beginwaarde van «Doelen tonen aan leden» bij trainingen zonder eigen doelen.",
+      "feltPrompt": "«Wat voelde je?» ook zonder doelen",
+      "feltPromptHint": "Na een training zonder doelen voorstellen om op het lichaam te markeren wat je voelde."
+    },
+    "summary": {
+      "title": "Wat ze voelden",
+      "entries": "{count, plural, one {# registratie} other {# registraties}}",
+      "notShown": "Zichtbaar vanaf 3 registraties.",
+      "notFelt": "Doelen die niemand voelde: {muscles}"
     }
   }
 }

@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 
 import type { GoalFeedbackEntryKind, GoalFeedbackResponse, MemberWorkoutGoals } from "@/api/wod-goals";
 import { AnatomyFigure } from "@/components/anatomy/AnatomyFigure";
+import { useBodySettings } from "@/components/body/use-body";
 import { useUiTranslations } from "@/i18n/ui";
 import { feltHighlights, goalHighlights, toggleValue } from "@/lib/wod-goals/goals";
 
@@ -35,13 +36,18 @@ export function FeltStep({
 }) {
   const t = useTranslations("WodGoals");
   const feedback = useGoalFeedback(entryKind, entryId);
-  const voided = feedback.data?.voided === true;
+  const noGoals = feedback.isSuccess && feedback.data.goals === null;
+  // Without goals the step follows the member's «Τι ένιωσες; και χωρίς στόχους» setting.
+  const bodySettings = useBodySettings(noGoals);
+  const optedOut = noGoals && bodySettings.data?.settings.felt_prompt_without_goals === false;
+  const skip = feedback.data?.voided === true || optedOut;
+  const waiting = feedback.isPending || (noGoals && bodySettings.isPending);
 
   useEffect(() => {
-    if (voided) onDone(false);
-  }, [voided, onDone]);
+    if (skip) onDone(false);
+  }, [skip, onDone]);
 
-  if (feedback.isPending || voided) {
+  if (waiting || skip) {
     return (
       <Frame layout={layout} onBack={onBack} onSkip={() => onDone(false)}>
         <p className="py-8 text-center text-sm" style={{ color: "var(--dim)" }}>{t("felt.loading")}</p>

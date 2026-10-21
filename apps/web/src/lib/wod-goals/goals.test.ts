@@ -30,6 +30,7 @@ function response(overrides: {
     goals: {
       workout_id: "w-1",
       saved: false,
+      inherited_from: null,
       muscles,
       qualities: ["stamina"],
       stimulus: null,

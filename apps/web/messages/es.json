@@ -8220,6 +8220,21 @@
       "saving": "Guardando…",
       "error": "No se guardó. Reinténtalo u omítelo.",
       "loading": "Cargando…"
+    },
+    "inherited": "Del entrenamiento base",
+    "settings": {
+      "sectionTitle": "Entrenamientos",
+      "sectionDescription": "Valores predeterminados para entrenamientos nuevos.",
+      "visibleByDefault": "Objetivos visibles por defecto",
+      "visibleByDefaultHint": "Valor inicial de «Mostrar objetivos a los miembros» en entrenamientos sin objetivos propios.",
+      "feltPrompt": "«¿Qué sentiste?» también sin objetivos",
+      "feltPromptHint": "Tras un entrenamiento sin objetivos, ofrecer marcar en el cuerpo lo que sentiste."
+    },
+    "summary": {
+      "title": "Qué sintieron",
+      "entries": "{count, plural, one {# registro} other {# registros}}",
+      "notShown": "Se muestra a partir de 3 registros.",
+      "notFelt": "Objetivos que nadie sintió: {muscles}"
     }
   }
 }

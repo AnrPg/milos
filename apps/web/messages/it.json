@@ -8220,6 +8220,21 @@
       "saving": "Salvataggio…",
       "error": "Non salvato. Riprova o salta.",
       "loading": "Caricamento…"
+    },
+    "inherited": "Dall’allenamento base",
+    "settings": {
+      "sectionTitle": "Allenamenti",
+      "sectionDescription": "Impostazioni predefinite per i nuovi allenamenti.",
+      "visibleByDefault": "Obiettivi visibili per impostazione predefinita",
+      "visibleByDefaultHint": "Valore iniziale di «Mostra gli obiettivi ai membri» negli allenamenti senza obiettivi propri.",
+      "feltPrompt": "«Cosa hai sentito?» anche senza obiettivi",
+      "feltPromptHint": "Dopo un allenamento senza obiettivi, proponi di segnare sul corpo cosa hai sentito."
+    },
+    "summary": {
+      "title": "Cosa hanno sentito",
+      "entries": "{count, plural, one {# registrazione} other {# registrazioni}}",
+      "notShown": "Compare da 3 registrazioni.",
+      "notFelt": "Obiettivi che nessuno ha sentito: {muscles}"
     }
   }
 }

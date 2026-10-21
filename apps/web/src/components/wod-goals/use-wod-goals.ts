@@ -6,6 +6,9 @@ import {
   adminWorkoutGoalsKey,
   fetchAdminWorkoutGoals,
   fetchGoalFeedback,
+  fetchGoalFeedbackSummary,
+  goalFeedbackSummaryKey,
+  type GoalFeedbackSummarySource,
   fetchWorkoutGoals,
   goalFeedbackKey,
   saveAdminWorkoutGoals,
@@ -56,6 +59,18 @@ export function useWorkoutGoals(workoutId: string | null | undefined) {
     enabled: Boolean(token && workoutId),
     queryFn: () => fetchWorkoutGoals(token!, workoutId!),
     staleTime: 5 * 60_000,
+    retry: false,
+  });
+}
+
+/** Coach totals («Τι ένιωσαν») for a workout or a class. */
+export function useGoalFeedbackSummary(source: GoalFeedbackSummarySource | null) {
+  const token = useGoalsToken();
+  return useQuery({
+    queryKey: goalFeedbackSummaryKey(source ?? { kind: "workout", id: "" }),
+    enabled: Boolean(token && source?.id),
+    queryFn: () => fetchGoalFeedbackSummary(token!, source!),
+    staleTime: 60_000,
     retry: false,
   });
 }

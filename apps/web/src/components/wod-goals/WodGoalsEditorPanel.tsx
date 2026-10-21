@@ -18,6 +18,7 @@ import {
   timeDomainLabel,
 } from "@/lib/wod-goals/goals";
 
+import { FeltSummaryCard } from "./FeltSummaryCard";
 import { MuscleChip, RoleLegend, ToggleChip } from "./GoalChips";
 import { MusclePickerSheet, type PickerEntry } from "./MusclePickerSheet";
 import { StimulusField } from "./StimulusField";
@@ -115,9 +116,12 @@ function GoalsPanel({ workoutId, refreshKey, timeDomainSeconds = null }: { worko
           {t("showToMembers")}
         </label>
         <p className="text-xs" style={{ color: "var(--muted)" }}>{t("showToMembersHint")}</p>
+        {state.inheritedFrom ? (
+          <p className="text-xs font-semibold" style={{ color: "var(--text-soft, var(--muted))" }}>{t("inherited")}</p>
+        ) : null}
         <SaveLine
           status={saveStatus}
-          saved={state.saved}
+          saved={state.saved || Boolean(state.inheritedFrom)}
           onKeep={() => dispatch({ type: "setVisible", visible: draft.visible })}
           onRetry={() => setRetry((value) => value + 1)}
         />
@@ -198,6 +202,8 @@ function GoalsPanel({ workoutId, refreshKey, timeDomainSeconds = null }: { worko
           </button>
         </div>
       ) : null}
+
+      <FeltSummaryCard source={{ kind: "workout", id: workoutId }} />
 
       {pickerOpen ? (
         <MusclePickerSheet

@@ -98,6 +98,8 @@ export type GoalPanelState = {
   suggestion: GoalSuggestionTarget | null;
   /** Whether anything is stored server side. */
   saved: boolean;
+  /** The base workout these goals come from, until this workout saves its own. */
+  inheritedFrom: string | null;
   /** Muscles and qualities track the suggestion until the coach edits them. */
   following: boolean;
   /** Bumped on every change that should be saved; compared with savedRevision. */
@@ -121,6 +123,7 @@ export const initialGoalPanelState: GoalPanelState = {
   draft: { muscles: [], qualities: [], stimulus: "", visible: false },
   suggestion: null,
   saved: false,
+  inheritedFrom: null,
   following: true,
   revision: 0,
   savedRevision: 0,
@@ -141,11 +144,14 @@ export function goalPanelReducer(state: GoalPanelState, action: GoalPanelAction)
         unmatched: suggestion.unmatched_exercises,
       };
       if (!state.loaded) {
-        const following = !goals.saved || goals.source === "suggested";
+        // Inherited goals are the base workout's choice: they never follow the suggestion.
+        const inheritedFrom = goals.saved ? null : goals.inherited_from ?? null;
+        const following = !inheritedFrom && (!goals.saved || goals.source === "suggested");
         const loaded: GoalPanelState = {
           ...state,
           loaded: true,
           saved: goals.saved,
+          inheritedFrom,
           following,
           suggestion: target,
           draft: { muscles: goals.muscles, qualities: goals.qualities, stimulus: goals.stimulus ?? "", visible: goals.visible_to_members },
@@ -160,6 +166,7 @@ export function goalPanelReducer(state: GoalPanelState, action: GoalPanelAction)
         const adopted: GoalPanelState = {
           ...state,
           saved: true,
+          inheritedFrom: null,
           following,
           suggestion: target,
           draft: { muscles: goals.muscles, qualities: goals.qualities, stimulus: goals.stimulus ?? "", visible: goals.visible_to_members },
@@ -185,7 +192,7 @@ export function goalPanelReducer(state: GoalPanelState, action: GoalPanelAction)
       if (!state.suggestion) return state;
       return edit(state, { muscles: state.suggestion.muscles, qualities: state.suggestion.qualities }, true);
     case "savedRevision":
-      return { ...state, saved: true, savedRevision: Math.max(state.savedRevision, action.revision) };
+      return { ...state, saved: true, inheritedFrom: null, savedRevision: Math.max(state.savedRevision, action.revision) };
   }
 }
 

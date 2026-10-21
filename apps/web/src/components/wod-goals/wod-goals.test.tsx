@@ -7,6 +7,8 @@ import en from "../../../messages/en.json";
 import type { MemberWorkoutGoals, StaffWorkoutGoalsResponse } from "@/api/wod-goals";
 
 import { FeltStep } from "./FeltStep";
+import { FeltSummaryView } from "./FeltSummaryCard";
+import { WodGoalsDefaultSetting } from "./WodGoalsDefaultSetting";
 import { applyPick, cycleEntry } from "./MusclePickerSheet";
 import { WodGoalsEditorPanel } from "./WodGoalsEditorPanel";
 import { WodGoalsStripView } from "./WodGoalsStrip";
@@ -41,6 +43,7 @@ function staffResponse(saved = false): StaffWorkoutGoalsResponse {
     goals: {
       workout_id: "w-1",
       saved,
+      inherited_from: null,
       muscles,
       qualities: ["stamina"],
       stimulus: null,
@@ -157,14 +160,87 @@ describe("FeltStep", () => {
     expect(saved).toEqual([["/me/goal-feedback/execution/e-1", { felt_muscles: ["glutes"], felt_qualities: ["stamina"] }]]);
   });
 
+  function noGoals(feltPrompt: boolean) {
+    apiRequest.mockImplementation(async (path: string) =>
+      path === "/me/body/settings"
+        ? { settings: { felt_prompt_without_goals: feltPrompt }, catalog: [] }
+        : { entry_kind: "training_log", entry_id: "l-1", voided: false, goals: null, feedback: null },
+    );
+  }
+
   it("offers the body alone when the workout has no goals, and skips", async () => {
-    apiRequest.mockResolvedValue({ entry_kind: "training_log", entry_id: "l-1", voided: false, goals: null, feedback: null });
+    noGoals(true);
     const onDone = vi.fn();
     wrap(<FeltStep entryKind="training_log" entryId="l-1" layout="inline" onDone={onDone} />);
     expect(await screen.findByText("Optional: mark on the body where you felt it.")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "+ Something else" })).toBeInTheDocument();
     fireEvent.click(screen.getByRole("button", { name: "Skip" }));
     expect(onDone).toHaveBeenCalledWith(false);
+  });
+
+  it("skips a workout without goals when the member turned the prompt off", async () => {
+    noGoals(false);
+    const onDone = vi.fn();
+    wrap(<FeltStep entryKind="training_log" entryId="l-1" layout="inline" onDone={onDone} />);
+    await waitFor(() => expect(onDone).toHaveBeenCalledWith(false));
+    expect(screen.queryByText("Optional: mark on the body where you felt it.")).not.toBeInTheDocument();
+  });
+});
+
+describe("FeltSummaryView", () => {
+  const base = { workout_id: "w-1", entries: 2, shown: false, felt_muscles: [], felt_qualities: [], goals_not_felt: [] };
+
+  it("keeps counts back below three entries", () => {
+    wrap(<FeltSummaryView summary={base} />);
+    expect(screen.getByText("2 entries")).toBeInTheDocument();
+    expect(screen.getByText("Shown from 3 entries.")).toBeInTheDocument();
+  });
+
+  it("lists felt groups and qualities with counts and the goals nobody felt", () => {
+    wrap(
+      <FeltSummaryView
+        summary={{
+          ...base,
+          entries: 12,
+          shown: true,
+          felt_muscles: [{ id: "latissimus-dorsi", count: 9 }],
+          felt_qualities: [{ id: "stamina", count: 4 }],
+          goals_not_felt: ["glutes", "hamstrings"],
+        }}
+      />,
+    );
+    const card = screen.getByRole("region", { name: "What they felt" });
+    expect(card).toHaveTextContent("12 entries");
+    expect(card).toHaveTextContent("Latissimus dorsi9");
+    expect(card).toHaveTextContent("Stamina4");
+    expect(card).toHaveTextContent("Goals nobody felt: Glutes and Hamstrings");
+  });
+});
+
+describe("inherited goals", () => {
+  it("notes goals from the base workout and keeps them off the suggestion", async () => {
+    apiRequest.mockImplementation(async () => ({
+      ...staffResponse(false),
+      goals: { ...staffResponse(false).goals, inherited_from: "base-1", visible_to_members: true },
+    }));
+    wrap(<WodGoalsEditorPanel workoutId="variant-1" />);
+    expect(await screen.findByText("From the base workout")).toBeInTheDocument();
+    expect(screen.queryByText("Suggestion · not saved yet")).not.toBeInTheDocument();
+    expect(screen.getByRole("checkbox", { name: "Show goals to members" })).toBeChecked();
+  });
+});
+
+describe("WodGoalsDefaultSetting", () => {
+  it("saves the gym default", async () => {
+    apiRequest.mockImplementation(async (_path: string, options?: { method?: string; body?: { workouts: { wod_goals_visible_by_default: boolean } } }) => ({
+      workouts: { wod_goals_visible_by_default: options?.method === "PATCH" ? options.body!.workouts.wod_goals_visible_by_default : false },
+    }));
+    wrap(<WodGoalsDefaultSetting token="token" />);
+    const toggle = await screen.findByRole("switch", { name: /Goals visible by default/ });
+    expect(toggle).not.toBeChecked();
+    fireEvent.click(toggle);
+    await waitFor(() => expect(toggle).toBeChecked());
+    expect(apiRequest).toHaveBeenCalledWith("/admin/settings", { method: "PATCH", token: "token", body: { workouts: { wod_goals_visible_by_default: true } } });
   });
 });
 

@@ -50,6 +50,17 @@ export function fetchGoalFeedback(token: string, kind: GoalFeedbackEntryKind, en
   return apiRequest<GoalFeedbackResponse>(`/me/goal-feedback/${kind}/${id(entryId)}`, { token });
 }
 
+export type GoalFeedbackSummary = components["schemas"]["GoalFeedbackSummary"];
+export type GoalFeedbackSummarySource = { kind: "workout" | "slot"; id: string };
+
+export const goalFeedbackSummaryKey = (source: GoalFeedbackSummarySource) => ["admin", "goal-feedback-summary", source.kind, source.id] as const;
+
+/** «Τι ένιωσαν»: what members felt on a workout or on one class (counts only from 3 entries). */
+export function fetchGoalFeedbackSummary(token: string, source: GoalFeedbackSummarySource) {
+  const path = source.kind === "workout" ? `/admin/workouts/${id(source.id)}` : `/admin/schedule/slots/${id(source.id)}`;
+  return apiRequest<GoalFeedbackSummary>(`${path}/goal-feedback-summary`, { token });
+}
+
 export function saveGoalFeedback(token: string, kind: GoalFeedbackEntryKind, entryId: string, body: SaveGoalFeedbackRequest) {
   return apiRequest<GoalFeedbackResponse>(`/me/goal-feedback/${kind}/${id(entryId)}`, { method: "PUT", token, body });
 }

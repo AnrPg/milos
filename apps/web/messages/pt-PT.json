@@ -8220,6 +8220,21 @@
       "saving": "A guardar…",
       "error": "Não foi guardado. Tente novamente ou salte.",
       "loading": "A carregar…"
+    },
+    "inherited": "Do treino base",
+    "settings": {
+      "sectionTitle": "Treinos",
+      "sectionDescription": "Predefinições para novos treinos.",
+      "visibleByDefault": "Objetivos visíveis por predefinição",
+      "visibleByDefaultHint": "Valor inicial de «Mostrar objetivos aos membros» em treinos sem objetivos próprios.",
+      "feltPrompt": "«O que sentiu?» também sem objetivos",
+      "feltPromptHint": "Depois de um treino sem objetivos, sugerir marcar no corpo o que sentiu."
+    },
+    "summary": {
+      "title": "O que sentiram",
+      "entries": "{count, plural, one {# registo} other {# registos}}",
+      "notShown": "Aparece a partir de 3 registos.",
+      "notFelt": "Objetivos que ninguém sentiu: {muscles}"
     }
   }
 }
