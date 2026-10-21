@@ -6906,7 +6906,9 @@
     "integrationHint_unavailable": "Ainda não há ligação.",
     "integrationHint_native_only": "Precisa da app do telemóvel; não é possível no navegador.",
     "integrationStatus_error": "Precisa de nova ligação",
-    "integrationHint_error": "O Garmin deixou de responder; volta a ligá-lo."
+    "integrationHint_error": "O Garmin deixou de responder; volta a ligá-lo.",
+    "integrationStatus_native_soon": "Em breve",
+    "integrationHint_native_soon": "Chega numa próxima versão da app."
   },
   "Media": {
     "add": "Adicionar fotografias ou um vídeo",

@@ -73,5 +73,11 @@ config :milos_training, :wallet_pass_updaters, %{
 
 config :milos_training, :wallet_image_source, MilosTraining.FakeWalletImageSource
 
+# ADR-171: native push goes to recording fakes; tests switch providers on.
+config :milos_training, :native_push_senders, %{
+  fcm: MilosTraining.FakeNativePushSender.Fcm,
+  apns: MilosTraining.FakeNativePushSender.Apns
+}
+
 # ADR-161: Garmin is faked; tests turn it on and script its answers.
 config :milos_training, :garmin_client, MilosTraining.FakeGarminClient

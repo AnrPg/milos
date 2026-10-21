@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Milos</string>
+    <string name="title_activity_main">Milos</string>
+    <string name="package_name">app.milos.member</string>
+    <string name="custom_url_scheme">app.milos.member</string>
+</resources>

@@ -39,6 +39,12 @@ services:
       OTEL_SERVICE_NAMESPACE: ${OTEL_SERVICE_NAMESPACE:-milos-training}
       METRICS_PORT: ${METRICS_PORT:-}
       METRICS_TOKEN: ${METRICS_TOKEN:-}
+      # Push to the store apps (ADR-171). Empty = that provider is off.
+      FCM_SERVICE_ACCOUNT_JSON: ${FCM_SERVICE_ACCOUNT_JSON:-}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-}
+      APNS_KEY_ID: ${APNS_KEY_ID:-}
+      APNS_PRIVATE_KEY: ${APNS_PRIVATE_KEY:-}
+      APNS_TOPIC: ${APNS_TOPIC:-}
     command: sh -lc "./bin/milos_training eval \"MilosTraining.Release.migrate()\" && exec ./bin/milos_training start"
     depends_on:
       postgres:
@@ -101,6 +107,11 @@ services:
       NEXT_PUBLIC_MEDIA_ORIGIN: ${NEXT_PUBLIC_MEDIA_ORIGIN:-${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}}
       NEXT_PUBLIC_MAP_STYLE_URL: ${NEXT_PUBLIC_MAP_STYLE_URL:-}
       NEXT_PUBLIC_MAP_ORIGINS: ${NEXT_PUBLIC_MAP_ORIGINS:-}
+      # Universal links / App Links for the store apps (ADR-171). Empty = 404.
+      APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
+      IOS_BUNDLE_ID: ${IOS_BUNDLE_ID:-}
+      ANDROID_PACKAGE_NAME: ${ANDROID_PACKAGE_NAME:-}
+      ANDROID_SHA256_CERT_FINGERPRINTS: ${ANDROID_SHA256_CERT_FINGERPRINTS:-}
       PORT: 3000
     depends_on:
       api:
