@@ -3,9 +3,11 @@ defmodule MilosTraining.Application.ManageCoachingRelationships do
   Starts and ends coaching relationships (ADR-100). Owners and admins assign
   any coach to any client; a coach may take an athlete as their own client,
   which notifies the gym's owners and admins; a coach's invitation makes the
-  redeemed client theirs.
+  redeemed client theirs. Ending one takes the client out of that coach's
+  PT squads (ADR-168).
   """
 
+  alias MilosTraining.Application.PtSquads
   alias MilosTraining.{Coaching, Identity, Notifications, Organizations}
   alias MilosTraining.Coaching.Domain.CoachingRelationshipPolicy
 
@@ -50,7 +52,17 @@ defmodule MilosTraining.Application.ManageCoachingRelationships do
 
       Organizations.can?(context, :assign_coaches) or
           relationship.coach_user_id == context.user_id ->
-        Coaching.end_relationship(context, relationship_id, context.user_id)
+        with {:ok, ended} <- Coaching.end_relationship(context, relationship_id, context.user_id) do
+          # ADR-168: squad membership follows coaching.
+          :ok =
+            PtSquads.coaching_ended(
+              context,
+              relationship.coach_user_id,
+              relationship.client_user_id
+            )
+
+          {:ok, ended}
+        end
 
       true ->
         {:error, :forbidden}

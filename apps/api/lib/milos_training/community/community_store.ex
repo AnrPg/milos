@@ -140,6 +140,26 @@ defmodule MilosTraining.Community.CommunityStore do
   @impl true
   def quiet_groups(context, cutoff), do: tenant_call(context, :quiet_groups, [cutoff])
 
+  # PT squads (ADR-168).
+  @impl true
+  def list_squads(context, club_id, filter \\ %{}),
+    do: tenant_call(context, :list_squads, [club_id, filter])
+
+  @impl true
+  def squad_memberships_of(context, user_id),
+    do: tenant_call(context, :squad_memberships_of, [user_id])
+
+  @impl true
+  def update_squad(context, id, attrs), do: tenant_call(context, :update_squad, [id, attrs])
+
+  @impl true
+  def set_squad_archived(context, id, archived_at),
+    do: tenant_call(context, :set_squad_archived, [id, archived_at])
+
+  @impl true
+  def dismiss_from_coach_squads(context, coach_id, user_id),
+    do: tenant_call(context, :dismiss_from_coach_squads, [coach_id, user_id])
+
   # Reports.
   @impl true
   def create_report(context, attrs), do: tenant_call(context, :create_report, [attrs])

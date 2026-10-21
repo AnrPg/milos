@@ -380,6 +380,19 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-168: PT squads.
+  def build("community_squad_invited", payload, localize) do
+    %{
+      title: localize.("Squad invitation", %{}),
+      body:
+        localize.("%{nickname} invited you to the squad «%{group}».", %{
+          nickname: payload["person_nickname"],
+          group: payload["group_name"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
   # ADR-153: club events.
   def build("community_event_waitlist_promoted", payload, localize) do
     %{

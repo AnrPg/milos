@@ -17528,7 +17528,8 @@
               "season",
               "custom",
               "member_group",
-              "general"
+              "general",
+              "pt_squad"
             ],
             "type": "string"
           },
@@ -17665,7 +17666,8 @@
                     "season",
                     "custom",
                     "member_group",
-                    "general"
+                    "general",
+                    "pt_squad"
                   ],
                   "type": "string"
                 },
@@ -17899,7 +17901,8 @@
                           "season",
                           "custom",
                           "member_group",
-                          "general"
+                          "general",
+                          "pt_squad"
                         ],
                         "type": "string"
                       },
@@ -40254,6 +40257,974 @@
           "pr_timeline"
         ],
         "title": "ProgressStats",
+        "type": "object"
+      },
+      "PtSquad": {
+        "properties": {
+          "archived_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "can_manage": {
+            "type": "boolean"
+          },
+          "club_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "coach": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityAuthor",
+            "type": "object"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "invite_count": {
+            "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+            "type": "integer"
+          },
+          "member_count": {
+            "description": "Members besides the coach",
+            "type": "integer"
+          },
+          "members": {
+            "items": {
+              "properties": {
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "since": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "member",
+                    "invited"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "person",
+                "status",
+                "since"
+              ],
+              "title": "PtSquadMember",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "name": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "coach",
+              "member",
+              "invited"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "club_id",
+          "name",
+          "coach",
+          "member_count",
+          "invite_count",
+          "role",
+          "can_manage"
+        ],
+        "title": "PtSquad",
+        "type": "object"
+      },
+      "PtSquadAnswerRequest": {
+        "properties": {
+          "accept": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "accept"
+        ],
+        "title": "PtSquadAnswerRequest",
+        "type": "object"
+      },
+      "PtSquadCreateRequest": {
+        "properties": {
+          "client_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "description": {
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 60,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "PtSquadCreateRequest",
+        "type": "object"
+      },
+      "PtSquadInviteRequest": {
+        "properties": {
+          "user_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "user_ids"
+        ],
+        "title": "PtSquadInviteRequest",
+        "type": "object"
+      },
+      "PtSquadLimits": {
+        "properties": {
+          "max_live_squads": {
+            "type": "integer"
+          },
+          "max_members": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "max_members",
+          "max_live_squads"
+        ],
+        "title": "PtSquadLimits",
+        "type": "object"
+      },
+      "PtSquadMember": {
+        "properties": {
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id"
+            ],
+            "title": "CommunityAuthor",
+            "type": "object"
+          },
+          "since": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "member",
+              "invited"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "person",
+          "status",
+          "since"
+        ],
+        "title": "PtSquadMember",
+        "type": "object"
+      },
+      "PtSquadOutcome": {
+        "properties": {
+          "outcome": {
+            "enum": [
+              "declined",
+              "left",
+              "archived"
+            ],
+            "type": "string"
+          },
+          "squad_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "squad_id",
+          "outcome"
+        ],
+        "title": "PtSquadOutcome",
+        "type": "object"
+      },
+      "PtSquadResponse": {
+        "properties": {
+          "squad": {
+            "properties": {
+              "archived_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "can_manage": {
+                "type": "boolean"
+              },
+              "club_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "coach": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id"
+                ],
+                "title": "CommunityAuthor",
+                "type": "object"
+              },
+              "description": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "invite_count": {
+                "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                "type": "integer"
+              },
+              "member_count": {
+                "description": "Members besides the coach",
+                "type": "integer"
+              },
+              "members": {
+                "items": {
+                  "properties": {
+                    "person": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id"
+                      ],
+                      "title": "CommunityAuthor",
+                      "type": "object"
+                    },
+                    "since": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "member",
+                        "invited"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "person",
+                    "status",
+                    "since"
+                  ],
+                  "title": "PtSquadMember",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "name": {
+                "type": "string"
+              },
+              "role": {
+                "enum": [
+                  "coach",
+                  "member",
+                  "invited"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "club_id",
+              "name",
+              "coach",
+              "member_count",
+              "invite_count",
+              "role",
+              "can_manage"
+            ],
+            "title": "PtSquad",
+            "type": "object"
+          }
+        },
+        "required": [
+          "squad"
+        ],
+        "title": "PtSquadResponse",
+        "type": "object"
+      },
+      "PtSquadUpdateRequest": {
+        "properties": {
+          "description": {
+            "maxLength": 200,
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 60,
+            "minLength": 2,
+            "type": "string"
+          }
+        },
+        "title": "PtSquadUpdateRequest",
+        "type": "object"
+      },
+      "PtSquadsOverview": {
+        "properties": {
+          "archived": {
+            "items": {
+              "properties": {
+                "archived_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_manage": {
+                  "type": "boolean"
+                },
+                "club_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "coach": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "invite_count": {
+                  "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                  "type": "integer"
+                },
+                "member_count": {
+                  "description": "Members besides the coach",
+                  "type": "integer"
+                },
+                "members": {
+                  "items": {
+                    "properties": {
+                      "person": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "title": "CommunityAuthor",
+                        "type": "object"
+                      },
+                      "since": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "member",
+                          "invited"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "person",
+                      "status",
+                      "since"
+                    ],
+                    "title": "PtSquadMember",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "coach",
+                    "member",
+                    "invited"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "club_id",
+                "name",
+                "coach",
+                "member_count",
+                "invite_count",
+                "role",
+                "can_manage"
+              ],
+              "title": "PtSquad",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "can_create": {
+            "description": "Whether you coach here",
+            "type": "boolean"
+          },
+          "clients": {
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "CommunityAuthor",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "coached": {
+            "items": {
+              "properties": {
+                "archived_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_manage": {
+                  "type": "boolean"
+                },
+                "club_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "coach": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "invite_count": {
+                  "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                  "type": "integer"
+                },
+                "member_count": {
+                  "description": "Members besides the coach",
+                  "type": "integer"
+                },
+                "members": {
+                  "items": {
+                    "properties": {
+                      "person": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "title": "CommunityAuthor",
+                        "type": "object"
+                      },
+                      "since": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "member",
+                          "invited"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "person",
+                      "status",
+                      "since"
+                    ],
+                    "title": "PtSquadMember",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "coach",
+                    "member",
+                    "invited"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "club_id",
+                "name",
+                "coach",
+                "member_count",
+                "invite_count",
+                "role",
+                "can_manage"
+              ],
+              "title": "PtSquad",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "invites": {
+            "items": {
+              "properties": {
+                "archived_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_manage": {
+                  "type": "boolean"
+                },
+                "club_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "coach": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "invite_count": {
+                  "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                  "type": "integer"
+                },
+                "member_count": {
+                  "description": "Members besides the coach",
+                  "type": "integer"
+                },
+                "members": {
+                  "items": {
+                    "properties": {
+                      "person": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "title": "CommunityAuthor",
+                        "type": "object"
+                      },
+                      "since": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "member",
+                          "invited"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "person",
+                      "status",
+                      "since"
+                    ],
+                    "title": "PtSquadMember",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "coach",
+                    "member",
+                    "invited"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "club_id",
+                "name",
+                "coach",
+                "member_count",
+                "invite_count",
+                "role",
+                "can_manage"
+              ],
+              "title": "PtSquad",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "joined": {
+            "items": {
+              "properties": {
+                "archived_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "can_manage": {
+                  "type": "boolean"
+                },
+                "club_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "coach": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id"
+                  ],
+                  "title": "CommunityAuthor",
+                  "type": "object"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "invite_count": {
+                  "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                  "type": "integer"
+                },
+                "member_count": {
+                  "description": "Members besides the coach",
+                  "type": "integer"
+                },
+                "members": {
+                  "items": {
+                    "properties": {
+                      "person": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "title": "CommunityAuthor",
+                        "type": "object"
+                      },
+                      "since": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "status": {
+                        "enum": [
+                          "member",
+                          "invited"
+                        ],
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "person",
+                      "status",
+                      "since"
+                    ],
+                    "title": "PtSquadMember",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "coach",
+                    "member",
+                    "invited"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "club_id",
+                "name",
+                "coach",
+                "member_count",
+                "invite_count",
+                "role",
+                "can_manage"
+              ],
+              "title": "PtSquad",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "limits": {
+            "properties": {
+              "max_live_squads": {
+                "type": "integer"
+              },
+              "max_members": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "max_members",
+              "max_live_squads"
+            ],
+            "title": "PtSquadLimits",
+            "type": "object"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "can_create",
+          "limits",
+          "coached",
+          "archived",
+          "joined",
+          "invites",
+          "clients"
+        ],
+        "title": "PtSquadsOverview",
         "type": "object"
       },
       "PublicBox": {
@@ -70412,7 +71383,8 @@
                                     "season",
                                     "custom",
                                     "member_group",
-                                    "general"
+                                    "general",
+                                    "pt_squad"
                                   ],
                                   "type": "string"
                                 },
@@ -151041,6 +152013,1990 @@
           }
         ],
         "summary": "Staff: pin or unpin an announcement",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "archived": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_manage": {
+                            "type": "boolean"
+                          },
+                          "club_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "invite_count": {
+                            "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                            "type": "integer"
+                          },
+                          "member_count": {
+                            "description": "Members besides the coach",
+                            "type": "integer"
+                          },
+                          "members": {
+                            "items": {
+                              "properties": {
+                                "person": {
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "title": "CommunityAuthor",
+                                  "type": "object"
+                                },
+                                "since": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "member",
+                                    "invited"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "person",
+                                "status",
+                                "since"
+                              ],
+                              "title": "PtSquadMember",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "coach",
+                              "member",
+                              "invited"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club_id",
+                          "name",
+                          "coach",
+                          "member_count",
+                          "invite_count",
+                          "role",
+                          "can_manage"
+                        ],
+                        "title": "PtSquad",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "can_create": {
+                      "description": "Whether you coach here",
+                      "type": "boolean"
+                    },
+                    "clients": {
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "title": "CommunityAuthor",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "coached": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_manage": {
+                            "type": "boolean"
+                          },
+                          "club_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "invite_count": {
+                            "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                            "type": "integer"
+                          },
+                          "member_count": {
+                            "description": "Members besides the coach",
+                            "type": "integer"
+                          },
+                          "members": {
+                            "items": {
+                              "properties": {
+                                "person": {
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "title": "CommunityAuthor",
+                                  "type": "object"
+                                },
+                                "since": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "member",
+                                    "invited"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "person",
+                                "status",
+                                "since"
+                              ],
+                              "title": "PtSquadMember",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "coach",
+                              "member",
+                              "invited"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club_id",
+                          "name",
+                          "coach",
+                          "member_count",
+                          "invite_count",
+                          "role",
+                          "can_manage"
+                        ],
+                        "title": "PtSquad",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "invites": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_manage": {
+                            "type": "boolean"
+                          },
+                          "club_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "invite_count": {
+                            "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                            "type": "integer"
+                          },
+                          "member_count": {
+                            "description": "Members besides the coach",
+                            "type": "integer"
+                          },
+                          "members": {
+                            "items": {
+                              "properties": {
+                                "person": {
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "title": "CommunityAuthor",
+                                  "type": "object"
+                                },
+                                "since": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "member",
+                                    "invited"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "person",
+                                "status",
+                                "since"
+                              ],
+                              "title": "PtSquadMember",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "coach",
+                              "member",
+                              "invited"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club_id",
+                          "name",
+                          "coach",
+                          "member_count",
+                          "invite_count",
+                          "role",
+                          "can_manage"
+                        ],
+                        "title": "PtSquad",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "joined": {
+                      "items": {
+                        "properties": {
+                          "archived_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "can_manage": {
+                            "type": "boolean"
+                          },
+                          "club_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "coach": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id"
+                            ],
+                            "title": "CommunityAuthor",
+                            "type": "object"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "invite_count": {
+                            "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                            "type": "integer"
+                          },
+                          "member_count": {
+                            "description": "Members besides the coach",
+                            "type": "integer"
+                          },
+                          "members": {
+                            "items": {
+                              "properties": {
+                                "person": {
+                                  "properties": {
+                                    "avatar_url": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "nickname": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id"
+                                  ],
+                                  "title": "CommunityAuthor",
+                                  "type": "object"
+                                },
+                                "since": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "enum": [
+                                    "member",
+                                    "invited"
+                                  ],
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "person",
+                                "status",
+                                "since"
+                              ],
+                              "title": "PtSquadMember",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "coach",
+                              "member",
+                              "invited"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club_id",
+                          "name",
+                          "coach",
+                          "member_count",
+                          "invite_count",
+                          "role",
+                          "can_manage"
+                        ],
+                        "title": "PtSquad",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "limits": {
+                      "properties": {
+                        "max_live_squads": {
+                          "type": "integer"
+                        },
+                        "max_members": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "max_members",
+                        "max_live_squads"
+                      ],
+                      "title": "PtSquadLimits",
+                      "type": "object"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "can_create",
+                    "limits",
+                    "coached",
+                    "archived",
+                    "joined",
+                    "invites",
+                    "clients"
+                  ],
+                  "title": "PtSquadsOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squads"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Squads you coach or are in, invitations waiting for you, and clients to invite",
+        "tags": [
+          "Community"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "client_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "description": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 60,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "title": "PtSquadCreateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "squad": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_manage": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invite_count": {
+                          "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                          "type": "integer"
+                        },
+                        "member_count": {
+                          "description": "Members besides the coach",
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityAuthor",
+                                "type": "object"
+                              },
+                              "since": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "member",
+                                  "invited"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "person",
+                              "status",
+                              "since"
+                            ],
+                            "title": "PtSquadMember",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "coach",
+                            "member",
+                            "invited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "name",
+                        "coach",
+                        "member_count",
+                        "invite_count",
+                        "role",
+                        "can_manage"
+                      ],
+                      "title": "PtSquad",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "squad"
+                  ],
+                  "title": "PtSquadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squad"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coaches: start a squad, optionally inviting some of your clients",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.show",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "squad": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_manage": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invite_count": {
+                          "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                          "type": "integer"
+                        },
+                        "member_count": {
+                          "description": "Members besides the coach",
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityAuthor",
+                                "type": "object"
+                              },
+                              "since": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "member",
+                                  "invited"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "person",
+                              "status",
+                              "since"
+                            ],
+                            "title": "PtSquadMember",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "coach",
+                            "member",
+                            "invited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "name",
+                        "coach",
+                        "member_count",
+                        "invite_count",
+                        "role",
+                        "can_manage"
+                      ],
+                      "title": "PtSquad",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "squad"
+                  ],
+                  "title": "PtSquadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squad"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A squad with its people (its coach also sees open invitations)",
+        "tags": [
+          "Community"
+        ]
+      },
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "description": {
+                    "maxLength": 200,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 60,
+                    "minLength": 2,
+                    "type": "string"
+                  }
+                },
+                "title": "PtSquadUpdateRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "squad": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_manage": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invite_count": {
+                          "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                          "type": "integer"
+                        },
+                        "member_count": {
+                          "description": "Members besides the coach",
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityAuthor",
+                                "type": "object"
+                              },
+                              "since": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "member",
+                                  "invited"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "person",
+                              "status",
+                              "since"
+                            ],
+                            "title": "PtSquadMember",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "coach",
+                            "member",
+                            "invited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "name",
+                        "coach",
+                        "member_count",
+                        "invite_count",
+                        "role",
+                        "can_manage"
+                      ],
+                      "title": "PtSquad",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "squad"
+                  ],
+                  "title": "PtSquadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squad"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach: rename or describe the squad",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}/archive": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.archive",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "outcome": {
+                      "enum": [
+                        "declined",
+                        "left",
+                        "archived"
+                      ],
+                      "type": "string"
+                    },
+                    "squad_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "squad_id",
+                    "outcome"
+                  ],
+                  "title": "PtSquadOutcome",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Outcome"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach (or the gym's managers): archive the squad",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}/invite": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.answer",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "accept": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "accept"
+                ],
+                "title": "PtSquadAnswerRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "properties": {
+                        "squad": {
+                          "properties": {
+                            "archived_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "can_manage": {
+                              "type": "boolean"
+                            },
+                            "club_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "coach": {
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "CommunityAuthor",
+                              "type": "object"
+                            },
+                            "description": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "invite_count": {
+                              "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                              "type": "integer"
+                            },
+                            "member_count": {
+                              "description": "Members besides the coach",
+                              "type": "integer"
+                            },
+                            "members": {
+                              "items": {
+                                "properties": {
+                                  "person": {
+                                    "properties": {
+                                      "avatar_url": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "id": {
+                                        "format": "uuid",
+                                        "type": "string"
+                                      },
+                                      "nickname": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      }
+                                    },
+                                    "required": [
+                                      "id"
+                                    ],
+                                    "title": "CommunityAuthor",
+                                    "type": "object"
+                                  },
+                                  "since": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  },
+                                  "status": {
+                                    "enum": [
+                                      "member",
+                                      "invited"
+                                    ],
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "person",
+                                  "status",
+                                  "since"
+                                ],
+                                "title": "PtSquadMember",
+                                "type": "object"
+                              },
+                              "type": "array"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "role": {
+                              "enum": [
+                                "coach",
+                                "member",
+                                "invited"
+                              ],
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "club_id",
+                            "name",
+                            "coach",
+                            "member_count",
+                            "invite_count",
+                            "role",
+                            "can_manage"
+                          ],
+                          "title": "PtSquad",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "squad"
+                      ],
+                      "title": "PtSquadResponse",
+                      "type": "object"
+                    },
+                    {
+                      "properties": {
+                        "outcome": {
+                          "enum": [
+                            "declined",
+                            "left",
+                            "archived"
+                          ],
+                          "type": "string"
+                        },
+                        "squad_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "squad_id",
+                        "outcome"
+                      ],
+                      "title": "PtSquadOutcome",
+                      "type": "object"
+                    }
+                  ]
+                }
+              }
+            },
+            "description": "Squad or outcome"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Accept or decline an invitation to a squad",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}/invites": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.invite",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "user_ids"
+                ],
+                "title": "PtSquadInviteRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "squad": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_manage": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invite_count": {
+                          "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                          "type": "integer"
+                        },
+                        "member_count": {
+                          "description": "Members besides the coach",
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityAuthor",
+                                "type": "object"
+                              },
+                              "since": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "member",
+                                  "invited"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "person",
+                              "status",
+                              "since"
+                            ],
+                            "title": "PtSquadMember",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "coach",
+                            "member",
+                            "invited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "name",
+                        "coach",
+                        "member_count",
+                        "invite_count",
+                        "role",
+                        "can_manage"
+                      ],
+                      "title": "PtSquad",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "squad"
+                  ],
+                  "title": "PtSquadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squad"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach: invite some of your active clients",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}/members/{user_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.remove_member",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "squad": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_manage": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invite_count": {
+                          "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                          "type": "integer"
+                        },
+                        "member_count": {
+                          "description": "Members besides the coach",
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityAuthor",
+                                "type": "object"
+                              },
+                              "since": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "member",
+                                  "invited"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "person",
+                              "status",
+                              "since"
+                            ],
+                            "title": "PtSquadMember",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "coach",
+                            "member",
+                            "invited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "name",
+                        "coach",
+                        "member_count",
+                        "invite_count",
+                        "role",
+                        "can_manage"
+                      ],
+                      "title": "PtSquad",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "squad"
+                  ],
+                  "title": "PtSquadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squad"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach: remove a member, or withdraw an invitation",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}/membership": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.leave",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "outcome": {
+                      "enum": [
+                        "declined",
+                        "left",
+                        "archived"
+                      ],
+                      "type": "string"
+                    },
+                    "squad_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "squad_id",
+                    "outcome"
+                  ],
+                  "title": "PtSquadOutcome",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Outcome"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Leave a squad",
+        "tags": [
+          "Community"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/community/squads/{id}/reopen": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PtSquadController.reopen",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "squad": {
+                      "properties": {
+                        "archived_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "can_manage": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "coach": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id"
+                          ],
+                          "title": "CommunityAuthor",
+                          "type": "object"
+                        },
+                        "description": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "invite_count": {
+                          "description": "Invitations nobody answered yet (the coach's view; 0 for others)",
+                          "type": "integer"
+                        },
+                        "member_count": {
+                          "description": "Members besides the coach",
+                          "type": "integer"
+                        },
+                        "members": {
+                          "items": {
+                            "properties": {
+                              "person": {
+                                "properties": {
+                                  "avatar_url": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "nickname": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "id"
+                                ],
+                                "title": "CommunityAuthor",
+                                "type": "object"
+                              },
+                              "since": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "status": {
+                                "enum": [
+                                  "member",
+                                  "invited"
+                                ],
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "person",
+                              "status",
+                              "since"
+                            ],
+                            "title": "PtSquadMember",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "role": {
+                          "enum": [
+                            "coach",
+                            "member",
+                            "invited"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "name",
+                        "coach",
+                        "member_count",
+                        "invite_count",
+                        "role",
+                        "can_manage"
+                      ],
+                      "title": "PtSquad",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "squad"
+                  ],
+                  "title": "PtSquadResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Squad"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Coach: bring back an archived squad",
         "tags": [
           "Community"
         ]

@@ -60,6 +60,7 @@ defmodule MilosTraining.Notifications.Notification do
     :community_report_created,
     :community_club_join_requested,
     :community_club_join_approved,
+    :community_squad_invited,
     :community_event_waitlist_promoted,
     :community_event_cancelled,
     :community_event_changed,

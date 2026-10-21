@@ -1,8 +1,8 @@
 defmodule MilosTraining.Community.Ports.CommunityStore do
   @moduledoc """
   Persistence port for clubs, channels, posts and their reactions and
-  comments (ADR-138), and for open clubs, member groups, the gym's community
-  rules and reports (ADR-143).
+  comments (ADR-138), for open clubs, member groups, the gym's community
+  rules and reports (ADR-143), and for PT squads (ADR-168).
   """
 
   @type context :: map()
@@ -49,6 +49,14 @@ defmodule MilosTraining.Community.Ports.CommunityStore do
   @callback list_channel_memberships(context(), id()) :: [map()]
   @callback put_channel_membership(context(), map(), id(), map()) :: :ok | {:error, term()}
   @callback quiet_groups(context(), DateTime.t()) :: [map()]
+
+  # PT squads (ADR-168).
+  @callback list_squads(context(), id(), map()) :: [map()]
+  @callback squad_memberships_of(context(), id()) :: [map()]
+  @callback update_squad(context(), id(), map()) :: {:ok, map()} | {:error, term()}
+  @callback set_squad_archived(context(), id(), DateTime.t() | nil) ::
+              {:ok, map()} | {:error, term()}
+  @callback dismiss_from_coach_squads(context(), id(), id()) :: non_neg_integer()
 
   # Reports (ADR-143).
   @callback create_report(context(), map()) :: {:ok, map()} | {:error, term()}

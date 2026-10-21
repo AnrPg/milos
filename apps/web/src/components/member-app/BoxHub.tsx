@@ -22,7 +22,7 @@ import { boxLayoutFor, boxTitle, type BoxLayout } from "@/lib/solo-coach";
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
  * Fixed order: «Σήμερα» across providers (ADR-162, only with more than one)
  * · today's workout · next booking · actions · membership (with «Φέρε φίλο»,
- * ADR-156) · extensions (ADR-170) · announcements (the gym club's
+ * ADR-156) · extensions (PT squads ADR-168, ADR-170) · announcements (the gym club's
  * #ανακοινώσεις, ADR-138). The title ▾ switches provider (board 17 Q1);
  * everything below it is that provider's.
  *

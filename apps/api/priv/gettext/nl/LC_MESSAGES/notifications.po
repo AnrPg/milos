@@ -552,3 +552,9 @@ msgstr "Jij en %{nickname} willen samen trainen. Zeg hallo."
 
 msgid "Training partner message"
 msgstr "Bericht van je trainingsmaatje"
+
+msgid "Squad invitation"
+msgstr "Uitnodiging voor een squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} heeft je uitgenodigd voor de squad «%{group}»."
