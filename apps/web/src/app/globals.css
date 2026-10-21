@@ -38,6 +38,14 @@
   --workout-aerobics: #D9A441;
   --workout-flexibility: #78BFA6;
   --workout-recovery: #9C8CC8;
+
+  /* Anatomy figure (ADR-164): role colours and the neutral muscle/bone base. */
+  --anatomy-primary: #D9743D;
+  --anatomy-secondary: #EFA36F;
+  --anatomy-stabilizer: #F3CDB0;
+  --anatomy-felt: #3FA37A;
+  --anatomy-base: #8E7A75;
+  --anatomy-bone: #E3DACB;
 }
 
 @theme inline {
@@ -66,6 +74,8 @@ html[data-theme="paper"],
 html[data-theme="lagoon"],
 html[data-theme="sunset"] {
   color-scheme: light;
+  --anatomy-base: #B9A49D;
+  --anatomy-bone: #D8CDBB;
 }
 
 html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {
