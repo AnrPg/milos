@@ -1,4 +1,5 @@
 import { buddyNotificationUrl } from "@/components/buddy/buddy-links";
+import { seasonNotificationUrl } from "@/components/seasons/season-links";
 import { currentMemberPath } from "@/lib/member-routes";
 
 type LinkableNotification = {
@@ -108,6 +109,9 @@ export function notificationTargetUrl(
   // ADR-160: buddy notices open the buddy screens, the coach's the client page.
   const buddy = buddyNotificationUrl(notification.type, notification.payload);
   if (buddy) return buddy;
+  // ADR-167: a season request opens the builder on it, an answer the season in Box.
+  const season = seasonNotificationUrl(notification.type, notification.payload);
+  if (season) return season;
 
   const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
   const isAdmin = isStaffRole(role);

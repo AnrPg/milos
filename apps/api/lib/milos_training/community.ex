@@ -18,7 +18,9 @@ defmodule MilosTraining.Community do
     Reports,
     ProfilePosts,
     ProvisionGymClub,
-    SetNotifyLevel
+    SeasonChannels,
+    SetNotifyLevel,
+    Squads
   }
 
   alias MilosTraining.Community.Queries.Feed
@@ -33,6 +35,7 @@ defmodule MilosTraining.Community do
     FeedCursor,
     FollowPolicy,
     GroupPolicy,
+    SquadPolicy,
     PostMediaPolicy,
     ReportPolicy,
     TenantDataPolicy
@@ -56,6 +59,18 @@ defmodule MilosTraining.Community do
   defdelegate join_builtin_channel(context, kind, source), to: ClassGroups, as: :join_builtin
   def class_group_suggestion, do: ChannelPolicy.class_group_suggestion()
   def notify_level_options, do: ClubMembership.notify_levels()
+
+  # Season channels (ADR-167).
+  defdelegate ensure_season_channel(context, offering), to: SeasonChannels, as: :ensure
+  defdelegate add_season_participant(context, channel, user_id), to: SeasonChannels, as: :add
+
+  defdelegate remove_season_participant(context, channel, user_id),
+    to: SeasonChannels,
+    as: :remove
+
+  defdelegate archive_ended_season_channels(context, live_offering_ids),
+    to: SeasonChannels,
+    as: :archive_ended
 
   # Open clubs (ADR-143).
   defdelegate create_open_club(context, role, attrs), to: OpenClubs, as: :create
@@ -111,6 +126,34 @@ defmodule MilosTraining.Community do
   def group_lifecycle, do: GroupPolicy.lifecycle()
   def member_group_options, do: MilosTraining.Community.CommunitySettings.member_group_options()
   def group_join_policies, do: MilosTraining.Community.Channel.join_policies()
+
+  # PT squads (ADR-168).
+  defdelegate create_squad(context, club, coach_roles, attrs), to: Squads, as: :create
+  defdelegate list_squads(context, club_id, filter \\ %{}), to: Squads, as: :list
+  defdelegate squad_members(context, squad_id), to: Squads, as: :members
+  defdelegate squad_memberships_of(context, user_id), to: Squads, as: :memberships_of
+  defdelegate invite_to_squad(context, squad, user_ids, client_ids), to: Squads, as: :invite
+  defdelegate answer_squad_invite(context, squad, membership, accept?), to: Squads, as: :answer
+  defdelegate leave_squad(context, squad, membership), to: Squads, as: :leave
+  defdelegate remove_from_squad(context, squad, user_id), to: Squads, as: :remove
+  defdelegate update_squad(context, squad, attrs), to: Squads, as: :update
+  defdelegate archive_squad(context, squad, manager?, now), to: Squads, as: :archive
+  defdelegate reopen_squad(context, squad), to: Squads, as: :reopen
+  defdelegate squad_coaching_ended(context, coach_id, client_id), to: Squads, as: :coaching_ended
+  defdelegate squad_member?(membership), to: SquadPolicy, as: :member?
+  defdelegate squad_invited?(membership), to: SquadPolicy, as: :invited?
+
+  defdelegate squad_visible?(squad, user_id, membership, coach_ids),
+    to: SquadPolicy,
+    as: :visible?
+
+  defdelegate can_coach_squads?(roles), to: SquadPolicy, as: :can_coach?
+
+  defdelegate squad_invitees(user_ids, client_ids, memberships, coach_id),
+    to: SquadPolicy,
+    as: :invitees
+
+  def squad_limits, do: SquadPolicy.limits()
 
   # Reports (ADR-143).
   defdelegate report(context, target, attrs), to: Reports

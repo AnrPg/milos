@@ -76,6 +76,8 @@ export type AssignedWorkoutRecord = {
   assignment_kind?: "personal" | "class_variant";
   /** ADR-125: the class occurrence a class variant belongs to. */
   source_slot_id?: string | null;
+  /** ADR-167: the season this workout belongs to, when it is part of one. */
+  season?: { id: string; title: string } | null;
 };
 
 export type AssignedWorkoutWeek = {

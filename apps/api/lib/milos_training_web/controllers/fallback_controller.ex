@@ -2218,6 +2218,22 @@ defmodule MilosTrainingWeb.FallbackController do
     trial_already_open: {:conflict, "You already have a trial booked here"},
     invalid_trial_transition: {:conflict, "The trial can't take this step now"},
     class_not_found: {:not_found, "The class no longer exists"},
+    # ADR-167: seasons.
+    season_not_open: {:conflict, "This season isn't taking requests"},
+    season_full: {:conflict, "Every place in this season is taken"},
+    season_already_requested: {:conflict, "You already asked for a place in this season"},
+    season_place_confirmed: {:conflict, "Your place is confirmed; talk to the box to cancel it"},
+    invalid_season_transition: {:conflict, "This request can't take this step now"},
+    invalid_season_status: {:unprocessable_entity, "Choose draft, published or cancelled"},
+    season_closed: {:conflict, "This season has ended or was cancelled"},
+    season_schedule_locked:
+      {:conflict, "The dates and programme are fixed once a participant is confirmed"},
+    capacity_below_participants:
+      {:unprocessable_entity, "Capacity can't go below the confirmed participants"},
+    season_has_enrollments:
+      {:conflict, "Members already asked for this season; cancel it instead"},
+    programme_workout_unavailable:
+      {:unprocessable_entity, "Every programme workout must be a published workout of this box"},
     # ADR-143: member groups, open clubs and reports.
     member_groups_disabled: {:forbidden, "This box doesn't let members start groups"},
     group_not_open: {:unprocessable_entity, "This group isn't open to join"},
@@ -2230,6 +2246,11 @@ defmodule MilosTrainingWeb.FallbackController do
     invalid_target: {:unprocessable_entity, "That can't be reported"},
     invalid_action: {:unprocessable_entity, "That action doesn't apply here"},
     package_not_found: {:unprocessable_entity, "Choose an active package of this box"},
+    # ADR-168: PT squads.
+    too_many_squads: {:unprocessable_entity, "You already run the most squads you can"},
+    squad_full: {:unprocessable_entity, "This squad is full"},
+    squad_archived: {:conflict, "This squad is archived"},
+    coach_archives_instead: {:unprocessable_entity, "Archive the squad instead of leaving it"},
     # ADR-153: club events.
     event_cancelled: {:conflict, "This event was cancelled"},
     event_started: {:conflict, "This event has already started"},

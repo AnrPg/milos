@@ -19,6 +19,7 @@ import { ClubBar } from "@/components/community/ClubBar";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { FeedList } from "@/components/community/FeedList";
 import { GroupsCard } from "@/components/community/GroupsCard";
+import { ClubSquadsCard } from "@/components/community/squads/ClubSquadsCard";
 import { MembersTab } from "@/components/community/MembersTab";
 import { OpenClubLanding } from "@/components/community/OpenClubLanding";
 import { MoreMenu } from "@/components/community/PostCard";
@@ -110,6 +111,7 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
         <>
           <ChannelList club={club} onOpen={showChannel} />
           {club.kind === "gym" ? <GroupsCard club={club} /> : null}
+          {club.kind === "gym" ? <ClubSquadsCard club={club} /> : null}
         </>
       ) : tab === "events" ? (
         <ClubEventsTab club={club} />

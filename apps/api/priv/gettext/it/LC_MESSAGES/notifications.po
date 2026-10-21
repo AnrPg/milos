@@ -544,6 +544,33 @@ msgstr "L’esportazione del tuo diario è pronta"
 msgid "Download it within seven days from Settings."
 msgstr "Scaricala entro sette giorni dalle Impostazioni."
 
+msgid "Season request"
+msgstr "Richiesta di stagione"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} chiede un posto in %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} è in lista d'attesa per %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Il tuo posto è confermato"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} inizia il %{date}. Il programma è nella tua Box."
+
+msgid "Season request not confirmed"
+msgstr "Richiesta di stagione non confermata"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} non ha potuto confermare il tuo posto in %{season}."
+
+msgid "Season cancelled"
+msgstr "Stagione annullata"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} ha annullato %{season}."
+
 msgid "You found a training partner"
 msgstr "Hai trovato un compagno di allenamento"
 
@@ -552,3 +579,9 @@ msgstr "Tu e %{nickname} volete allenarvi insieme. Saluta."
 
 msgid "Training partner message"
 msgstr "Messaggio dal tuo compagno di allenamento"
+
+msgid "Squad invitation"
+msgstr "Invito in una squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} ti ha invitato nella squad «%{group}»."

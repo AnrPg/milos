@@ -95,11 +95,12 @@ describe("club page helpers", async () => {
 describe("open clubs and member groups (ADR-143)", async () => {
   const { channelSections, initialComposeTarget } = await import("./community");
 
-  it("lists #γενικά with the club's own channels and leaves member groups to their card", () => {
+  it("lists #γενικά with the club's own channels and leaves member groups and squads to their cards", () => {
     const sections = channelSections([
       channel("a", "announcements", false),
       channel("g", "general", true),
       { ...channel("m", "member_group", true), name: "Τρέξιμο" },
+      { ...channel("q", "pt_squad", true), name: "Hyrox squad" },
       channel("s", "season", false),
     ]);
     expect(sections.box.map((c) => c.id)).toEqual(["a", "g"]);

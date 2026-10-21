@@ -394,6 +394,10 @@ defmodule MilosTrainingWeb.Router do
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
     put("/home-location", HomeLocationController, :update_mine)
+    # ADR-167: Box › Συνδρομή › seasons.
+    get("/seasons", SeasonController, :index)
+    post("/seasons/:id/request", SeasonController, :request)
+    post("/seasons/:id/cancel", SeasonController, :cancel)
     # ADR-156: «Φέρε φίλο».
     get("/referrals", ReferralController, :mine)
     post("/referrals/code", ReferralController, :rotate_code)
@@ -442,6 +446,17 @@ defmodule MilosTrainingWeb.Router do
     delete("/groups/:id/members/:user_id", CommunityGroupController, :remove_member)
     post("/groups/:id/archive", CommunityGroupController, :archive)
     post("/groups/:id/reopen", CommunityGroupController, :reopen)
+    # ADR-168: PT squads.
+    get("/squads", PtSquadController, :index)
+    post("/squads", PtSquadController, :create)
+    get("/squads/:id", PtSquadController, :show)
+    patch("/squads/:id", PtSquadController, :update)
+    post("/squads/:id/invites", PtSquadController, :invite)
+    put("/squads/:id/invite", PtSquadController, :answer)
+    delete("/squads/:id/membership", PtSquadController, :leave)
+    delete("/squads/:id/members/:user_id", PtSquadController, :remove_member)
+    post("/squads/:id/archive", PtSquadController, :archive)
+    post("/squads/:id/reopen", PtSquadController, :reopen)
   end
 
   # ADR-118: standalone training log (class / offline workouts).
@@ -856,6 +871,14 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
+    # ADR-167: seasons.
+    get("/seasons", AdminSeasonController, :index)
+    post("/seasons", AdminSeasonController, :create)
+    get("/seasons/:id", AdminSeasonController, :show)
+    patch("/seasons/:id", AdminSeasonController, :update)
+    post("/season-enrollments/:id/confirm", AdminSeasonController, :confirm)
+    post("/season-enrollments/:id/decline", AdminSeasonController, :decline)
+    post("/season-enrollments/:id/remove", AdminSeasonController, :remove)
     get("/finance/packages", AdminFinanceController, :packages)
     get("/finance/package-catalog", AdminFinanceController, :package_catalog)
     get("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :beneficiaries)

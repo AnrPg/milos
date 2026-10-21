@@ -343,7 +343,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         "package_code_snapshot" => package_identity_snapshot(package),
         "package_family_snapshot" => package.family,
         "billing_period_snapshot" => package.billing_period,
-        "price_cents_snapshot" => package.base_price_cents,
+        "price_cents_snapshot" => price_snapshot(params, package),
         "params_snapshot" => package.params || %{}
       })
 
@@ -355,6 +355,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       {:error, reason} -> Repo.rollback(reason)
     end
   end
+
+  # ADR-167: a season sells its package at the season's price; every other
+  # assignment takes the package's own price.
+  defp price_snapshot(%{"price_cents_snapshot" => price}, _package)
+       when is_integer(price) and price >= 0,
+       do: price
+
+  defp price_snapshot(_params, package), do: package.base_price_cents
 
   # ADR-098: add-ons attach to a compatible base and follow it; corporate
   # seats are created only by enrollment, never assigned directly.

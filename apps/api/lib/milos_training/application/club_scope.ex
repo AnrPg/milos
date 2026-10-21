@@ -7,10 +7,13 @@ defmodule MilosTraining.Application.ClubScope do
   and the realtime join.
 
   Member groups show to their members and to staff; a proposed one also to
-  whoever proposed it. Declined groups never show here.
+  whoever proposed it. Declined groups never show here. A PT squad (ADR-168)
+  shows only to its coach and to members whose coaching with that coach is
+  still active, re-checked on every read; other invite-only channels to
+  their participants and staff.
   """
 
-  alias MilosTraining.{Community, Organizations}
+  alias MilosTraining.{Coaching, Community, Organizations}
 
   def call(%{user_id: user_id} = context) do
     memberships = Organizations.list_memberships(user_id)
@@ -29,19 +32,21 @@ defmodule MilosTraining.Application.ClubScope do
       channel_memberships = Community.channel_memberships_of(context, user_id, channel_ids)
       levels = Community.notify_levels(context, user_id, Enum.map(clubs, & &1.id))
       boxes = boxes(open_clubs, by_organization)
+      coaches = squad_coaches(context, gym_clubs, channel_memberships)
+      seen = {user_id, channel_memberships, coaches}
 
       presented =
         Enum.map(gym_clubs, fn club ->
           membership = by_organization[club.organization_id]
           role = Community.club_role(membership.membership)
-          present(club, role, gym_face(club, membership), {user_id, channel_memberships}, levels)
+          present(club, role, gym_face(club, membership), seen, levels)
         end) ++
           Enum.map(open_clubs, fn club ->
             present(
               club,
               club.role,
               open_face(club, by_organization, boxes),
-              {user_id, channel_memberships},
+              seen,
               levels
             )
           end)
@@ -210,9 +215,39 @@ defmodule MilosTraining.Application.ClubScope do
     end
   end
 
-  defp present(club, role, face, {user_id, channel_memberships}, levels) do
+  # The active coaches of the person in each gym where they are in a squad
+  # someone else coaches: membership follows coaching (ADR-168).
+  defp squad_coaches(context, gym_clubs, channel_memberships) do
+    for club <- gym_clubs,
+        Enum.any?(club.channels, fn channel ->
+          channel.kind == "pt_squad" and channel.created_by_id != context.user_id and
+            Community.squad_member?(Map.get(channel_memberships, channel.id))
+        end),
+        into: %{} do
+      coach_ids =
+        club
+        |> write_context(context)
+        |> Coaching.list_relationships(%{client_user_id: context.user_id})
+        |> Enum.map(& &1.coach_user_id)
+
+      {club.organization_id, coach_ids}
+    end
+  end
+
+  defp present(club, role, face, {user_id, channel_memberships, coaches}, levels) do
+    coach_ids = Map.get(coaches, club.organization_id, [])
+
     channels =
       club.channels
+      |> Enum.filter(fn channel ->
+        channel.kind != "pt_squad" or
+          Community.squad_visible?(
+            channel,
+            user_id,
+            Map.get(channel_memberships, channel.id),
+            coach_ids
+          )
+      end)
       |> Enum.map(&present_channel(&1, role, Map.get(channel_memberships, &1.id)))
       |> Enum.filter(&visible?(&1, role, user_id))
 
@@ -235,6 +270,12 @@ defmodule MilosTraining.Application.ClubScope do
       _declined -> false
     end
   end
+
+  defp visible?(%{kind: "pt_squad"}, _role, _user_id), do: true
+
+  # Invite-only channels (e.g. a season, ADR-167) are for participants and staff.
+  defp visible?(%{membership: "invite"} = channel, role, _user_id),
+    do: channel.participant or role == "staff"
 
   defp visible?(_channel, _role, _user_id), do: true
 

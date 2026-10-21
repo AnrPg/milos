@@ -539,11 +539,20 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           Map.get(params, :source_scheduled_class_id) ||
             Map.get(params, "source_scheduled_class_id")
 
+        season_id =
+          Map.get(params, :season_offering_id) || Map.get(params, "season_offering_id")
+
         # ADR-125: an assignment only absorbs a new one with the same workout,
         # date and notes when both share the same source slot, so a class
-        # variant never silently loses (or gains) its class link.
+        # variant never silently loses (or gains) its class link. ADR-167: the
+        # same holds for a season's programme, which is part of the key.
         existing =
-          case find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, instructions) do
+          case find_assignment_by_workout_date_and_notes(
+                 workout_id,
+                 scheduled_for,
+                 instructions,
+                 season_id
+               ) do
             %AssignedWorkout{source_scheduled_class_id: ^source_slot_id} = assignment ->
               assignment
 
@@ -591,7 +600,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
                assignment.master_workout_id,
                scheduled_for,
                instructions,
-               assignment.id
+               assignment
              ) do
           nil ->
             assignment
@@ -606,6 +615,46 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
             |> consolidate_assigned_workouts(conflicting_assignment, athlete_ids)
         end
     end
+  end
+
+  # ADR-167: a member leaves a season; their programme from `from_date` on goes,
+  # and a season workout nobody is left on goes with it.
+  @impl true
+  def remove_season_athlete(season_offering_id, athlete_id, from_date) do
+    Repo.transaction(fn ->
+      assignment_ids =
+        from(assignment in scoped_to_tenant(AssignedWorkout),
+          where: assignment.season_offering_id == ^season_offering_id,
+          select: assignment.id
+        )
+        |> Repo.all()
+
+      {removed, _} =
+        from(link in AssignedWorkoutAthlete,
+          where:
+            link.assigned_workout_id in ^assignment_ids and link.athlete_id == ^athlete_id and
+              link.scheduled_for >= ^from_date
+        )
+        |> Repo.delete_all()
+
+      empty =
+        from(assignment in AssignedWorkout,
+          as: :assignment,
+          where:
+            assignment.id in ^assignment_ids and
+              not exists(
+                from link in AssignedWorkoutAthlete,
+                  where: link.assigned_workout_id == parent_as(:assignment).id
+              ),
+          select: assignment.id
+        )
+        |> Repo.all()
+
+      if empty != [],
+        do: Repo.delete_all(from(assignment in AssignedWorkout, where: assignment.id in ^empty))
+
+      removed
+    end)
   end
 
   @impl true
@@ -1072,6 +1121,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       inserted_at: assignment.inserted_at,
       athlete_ids: Enum.map(assignment.athlete_links, & &1.athlete_id),
       source_slot_id: assignment.source_scheduled_class_id,
+      season_offering_id: assignment.season_offering_id,
       assignment_kind: AssignmentAudiencePolicy.kind(assignment.source_scheduled_class_id),
       workout: normalize_assigned_workout(assignment.master_workout)
     }
@@ -1696,10 +1746,13 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
     |> Enum.map(& &1.athlete_id)
   end
 
-  defp find_assignment_by_workout_date_and_notes(nil, _scheduled_for, _instructions), do: nil
-  defp find_assignment_by_workout_date_and_notes(_workout_id, nil, _instructions), do: nil
+  defp find_assignment_by_workout_date_and_notes(nil, _scheduled_for, _instructions, _season),
+    do: nil
 
-  defp find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, instructions) do
+  defp find_assignment_by_workout_date_and_notes(_workout_id, nil, _instructions, _season),
+    do: nil
+
+  defp find_assignment_by_workout_date_and_notes(workout_id, scheduled_for, instructions, season) do
     AssignedWorkout
     |> scoped_to_tenant()
     |> where(
@@ -1707,12 +1760,21 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
       assignment.master_workout_id == ^workout_id and assignment.scheduled_for == ^scheduled_for
     )
     |> maybe_scope_by_instructions(instructions)
+    |> scope_by_season(season)
     |> Repo.one()
   end
 
-  defp find_conflicting_assignment(_master_workout_id, nil, _instructions, _current_id), do: nil
+  defp scope_by_season(query, nil),
+    do: where(query, [assignment], is_nil(assignment.season_offering_id))
 
-  defp find_conflicting_assignment(master_workout_id, scheduled_for, instructions, current_id) do
+  defp scope_by_season(query, season_id),
+    do: where(query, [assignment], assignment.season_offering_id == ^season_id)
+
+  defp find_conflicting_assignment(_master_workout_id, nil, _instructions, _current), do: nil
+
+  defp find_conflicting_assignment(master_workout_id, scheduled_for, instructions, current) do
+    current_id = current.id
+
     base_query =
       AssignedWorkout
       |> scoped_to_tenant()
@@ -1724,6 +1786,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
 
     base_query
     |> maybe_scope_by_instructions(instructions)
+    |> scope_by_season(current.season_offering_id)
     |> Repo.one()
   end
 

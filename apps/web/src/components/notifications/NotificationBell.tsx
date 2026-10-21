@@ -27,6 +27,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
 import { notificationTargetUrl } from "@/components/notifications/notification-links";
 import { buddyNotificationText } from "@/components/buddy/buddy-links";
+import { seasonNotificationText } from "@/components/seasons/season-links";
 import {
   notificationOrigin,
   type NotificationOrigin,
@@ -77,6 +78,11 @@ function NotificationCard({
     return tPartners(["notif", notification.type, part].join("_"), { name });
   }
   const tBuddy = useTranslations("Buddy");
+  const tSeasons = useTranslations("Seasons");
+  // ADR-167: season requests (staff) and their answers (members).
+  function seasonText(notification: NotificationRecord, part: "title" | "body") {
+    return seasonNotificationText(notification.type, notification.payload, part, (key, values) => tSeasons(key, values));
+  }
   // ADR-160: buddy invitations, requests, replies and the weekly counts.
   function buddyText(notification: NotificationRecord, part: "title" | "body") {
     return buddyNotificationText(notification.type, notification.payload, part, (key, values) => tBuddy(key, values));
@@ -178,6 +184,8 @@ function NotificationCard({
   function notificationBody(notification: NotificationRecord) {
     const buddy = buddyText(notification, "body");
     if (buddy !== null) return buddy;
+    const season = seasonText(notification, "body");
+    if (season !== null) return season;
     const partner = partnerText(notification, "body");
     if (partner !== null) return partner;
     const device = deviceText(notification, "body");
@@ -432,6 +440,8 @@ function NotificationCard({
   function titleFromPayload(notification: NotificationRecord) {
     const buddy = buddyText(notification, "title");
     if (buddy !== null) return buddy;
+    const season = seasonText(notification, "title");
+    if (season !== null) return season;
     const partner = partnerText(notification, "title");
     if (partner !== null) return partner;
     const device = deviceText(notification, "title");
@@ -701,6 +711,7 @@ const COMMUNITY_NOTICES = [
   "community_report_created",
   "community_club_join_requested",
   "community_club_join_approved",
+  "community_squad_invited",
   "community_event_waitlist_promoted",
   "community_event_cancelled",
   "community_event_changed",
