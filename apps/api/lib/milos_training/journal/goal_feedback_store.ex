@@ -15,6 +15,9 @@ defmodule MilosTraining.Journal.GoalFeedbackStore do
   def get_feedback(context, entry_kind, entry_id, user_id),
     do: RepoContext.run(context, fn -> adapter().get_feedback(entry_kind, entry_id, user_id) end)
 
+  def list_feedback_for(context, scope),
+    do: RepoContext.run(context, fn -> adapter().list_feedback_for(scope) end)
+
   def put_feedback(context, attrs),
     do: RepoContext.run(context, fn -> adapter().put_feedback(attrs) end)
 end

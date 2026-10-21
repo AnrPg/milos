@@ -746,6 +746,7 @@ defmodule MilosTrainingWeb.Router do
     get("/workouts/:id", AdminWorkoutController, :show)
     get("/workouts/:id/goals", AdminWorkoutGoalsController, :show)
     put("/workouts/:id/goals", AdminWorkoutGoalsController, :update)
+    get("/workouts/:id/goal-feedback-summary", AdminWorkoutGoalsController, :feedback_summary)
     patch("/workouts/:id/draft", AdminWorkoutController, :update_draft)
     patch("/workouts/:id/library", AdminWorkoutController, :update_library)
     post("/workouts/:id/publish", AdminWorkoutController, :publish)
@@ -830,6 +831,13 @@ defmodule MilosTrainingWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
+
+    get(
+      "/schedule/slots/:id/goal-feedback-summary",
+      AdminWorkoutGoalsController,
+      :class_feedback_summary
+    )
+
     patch("/bookings/:id/approve", AdminScheduleController, :approve_booking)
     patch("/bookings/:id/reject", AdminScheduleController, :reject_booking)
 

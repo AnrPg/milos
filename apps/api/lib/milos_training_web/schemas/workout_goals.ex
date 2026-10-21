@@ -172,6 +172,44 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
     required: [:felt_muscles, :felt_qualities]
   }
 
+  @count %Schema{
+    title: "GoalFeedbackCount",
+    type: :object,
+    properties: %{id: %Schema{type: :string}, count: %Schema{type: :integer, minimum: 1}},
+    required: [:id, :count],
+    additionalProperties: false
+  }
+
+  @feedback_summary %Schema{
+    title: "GoalFeedbackSummary",
+    type: :object,
+    description:
+      "Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.",
+    properties: %{
+      workout_id: %Schema{type: :string, format: :uuid, nullable: true},
+      scheduled_class_id: %Schema{
+        type: :string,
+        format: :uuid,
+        description: "Only on the scheduled-class summary"
+      },
+      entries: %Schema{type: :integer, minimum: 0},
+      shown: %Schema{type: :boolean},
+      felt_muscles: %Schema{
+        type: :array,
+        items: @count,
+        description: "Muscle groups (heads rolled up), most felt first"
+      },
+      felt_qualities: %Schema{type: :array, items: @count, description: "Most felt first"},
+      goals_not_felt: %Schema{
+        type: :array,
+        items: %Schema{type: :string},
+        description: "Groups of the goal's primary and secondary muscles nobody felt"
+      }
+    },
+    required: [:workout_id, :entries, :shown, :felt_muscles, :felt_qualities, :goals_not_felt],
+    additionalProperties: false
+  }
+
   @node %Schema{
     title: "AnatomyNode",
     type: :object,
@@ -209,4 +247,5 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
   def feedback_response, do: @feedback_response
   def feedback_request, do: @feedback_request
   def taxonomy, do: @taxonomy
+  def feedback_summary, do: @feedback_summary
 end

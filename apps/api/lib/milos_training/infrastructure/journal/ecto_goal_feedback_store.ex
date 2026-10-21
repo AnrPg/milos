@@ -53,6 +53,40 @@ defmodule MilosTraining.Infrastructure.Journal.EctoGoalFeedbackStore do
     end
   end
 
+  @impl true
+  def list_feedback_for({kind, id}) when kind in [:workout, :scheduled_class] do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} ->
+        GoalFeedback
+        |> join(
+          :inner_lateral,
+          [feedback],
+          entry in fragment(
+            "SELECT master_workout_id, scheduled_class_id, voided FROM milos_goal_feedback_entry_scope(?, ?)",
+            feedback.entry_kind,
+            feedback.entry_id
+          ),
+          on: true
+        )
+        |> where([_feedback, entry], entry.voided == false)
+        |> scope_to(kind, id)
+        |> select([feedback], %{
+          felt_muscles: feedback.felt_muscles,
+          felt_qualities: feedback.felt_qualities
+        })
+        |> Repo.all()
+
+      :error ->
+        []
+    end
+  end
+
+  defp scope_to(query, :workout, id),
+    do: where(query, [_feedback, entry], entry.master_workout_id == type(^id, Ecto.UUID))
+
+  defp scope_to(query, :scheduled_class, id),
+    do: where(query, [_feedback, entry], entry.scheduled_class_id == type(^id, Ecto.UUID))
+
   defp by_entry(entry_kind, entry_id, user_id) do
     GoalFeedback
     |> where([feedback], feedback.entry_kind == ^entry_kind and feedback.entry_id == ^entry_id)
