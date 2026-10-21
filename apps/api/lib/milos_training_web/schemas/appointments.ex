@@ -42,6 +42,8 @@ defmodule MilosTrainingWeb.Schemas.Appointments do
         spots_remaining: %Schema{type: :integer, nullable: true},
         location_id: @nullable_uuid,
         notes: %Schema{type: :string, nullable: true},
+        mode: %Schema{type: :string, enum: ["in_person", "online"]},
+        meeting_url: %Schema{type: :string, nullable: true},
         cancelled_at: %Schema{type: :string, format: :"date-time", nullable: true},
         booked_by_me: %Schema{type: :boolean},
         bookings: %Schema{type: :array, items: booking_schema()}
@@ -62,7 +64,9 @@ defmodule MilosTrainingWeb.Schemas.Appointments do
         duration_minutes: %Schema{type: :integer, minimum: 15, maximum: 240},
         capacity: %Schema{type: :integer, minimum: 1, maximum: 4},
         location_id: @nullable_uuid,
-        notes: %Schema{type: :string, maxLength: 1000, nullable: true}
+        notes: %Schema{type: :string, maxLength: 1000, nullable: true},
+        mode: %Schema{type: :string, enum: ["in_person", "online"]},
+        meeting_url: %Schema{type: :string, maxLength: 500, nullable: true}
       },
       required: [:kind, :format, :starts_at, :duration_minutes]
     }

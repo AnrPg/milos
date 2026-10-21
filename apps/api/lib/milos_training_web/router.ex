@@ -254,6 +254,13 @@ defmodule MilosTrainingWeb.Router do
     get("/:slug", PublicBoxController, :show)
   end
 
+  # ADR-170: the public platform plan catalog (pricing, coach onboarding).
+  scope "/api/public/platform-plans", MilosTrainingWeb do
+    pipe_through([:api, :public_box_rate_limited])
+
+    get("/", PlatformPlanController, :index_public)
+  end
+
   scope "/api/public/referrals", MilosTrainingWeb do
     pipe_through([:api, :public_referral_rate_limited])
 
@@ -329,6 +336,8 @@ defmodule MilosTrainingWeb.Router do
 
     get("/memberships", OrganizationAccessController, :memberships)
     post("/organizations", OwnerOrganizationController, :create)
+    # ADR-170: an account opens its practice as an independent coach.
+    post("/coach-practices", CoachPracticeController, :create)
     # ADR-163: the static, code-owned muscle taxonomy (ETag-cached).
     get("/anatomy/taxonomy", AnatomyController, :taxonomy)
   end
@@ -793,6 +802,7 @@ defmodule MilosTrainingWeb.Router do
     delete("/challenges/:id", AdminChallengeController, :delete)
     get("/settings", AdminSettingsController, :show)
     get("/onboarding", AdminOnboardingController, :show)
+    get("/plan", AdminPlanController, :show)
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
     # ADR-174: the gym's AI settings (own key, scaling switch, usage).
@@ -1077,6 +1087,12 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    # ADR-170: platform plans, prices and each organization's plan.
+    get("/plans", PlatformPlanController, :index)
+    post("/plans", PlatformPlanController, :create)
+    patch("/plans/:code", PlatformPlanController, :update)
+    get("/subscriptions", PlatformPlanController, :subscriptions)
+    put("/organizations/:id/plan", PlatformPlanController, :assign)
     patch("/tag-suggestions/:id", PlatformTagSuggestionController, :resolve)
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)
@@ -1219,6 +1235,10 @@ defmodule MilosTrainingWeb.Router do
     get("/me/progress", AccountTrainingController, :progress)
     # ADR-165: coverage summary, qualities radar and training load.
     get("/me/progress/depth", TrainingDepthController, :show)
+    # ADR-166: the Πρόοδος insights slot.
+    get("/me/insights", InsightsController, :show)
+    post("/me/insights/restore", InsightsController, :restore)
+    post("/me/insights/:rule/dismiss", InsightsController, :dismiss)
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)

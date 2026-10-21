@@ -46,6 +46,7 @@ import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
 import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting";
 import { WodGoalsDefaultSetting } from "@/components/wod-goals/WodGoalsDefaultSetting";
 import { AiScalingSettings } from "@/components/scaling/AiScalingSettings";
+import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1335,6 +1336,16 @@ function AiAssistantSection({ token }: { token: string }) {
   );
 }
 
+// ADR-170: the organization's Milos plan (owners and admins).
+function PlanSection({ token }: { token: string }) {
+  const t = useTranslations("SoloCoach");
+  return (
+    <CollapsibleSection id="plan" title={t("plan.title")} description={t("plan.description")} defaultOpen={false}>
+      <PlanCard token={token} />
+    </CollapsibleSection>
+  );
+}
+
 function WorkoutDefaultsSection({ token }: { token: string }) {
   const t = useTranslations("WodGoals");
   return (
@@ -1357,9 +1368,12 @@ export function AdminSettingsHub() {
         <PageHeader title={i18n("appConfigurationse0effaa")} />
         <AdminOnboardingPanel />
         <ClientAccessPanel />
+        {token ? <PlanNotice token={token} /> : null}
 
         {token ? (
           <>
+            <PlanSection token={token} />
+
             <CollapsibleSection
               id="appearance"
               title={i18n("appearance41def7a")}

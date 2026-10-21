@@ -191,6 +191,8 @@ defmodule MilosTraining.Infrastructure.Appointments.EctoAppointmentStore do
       :capacity,
       :location_id,
       :notes,
+      :mode,
+      :meeting_url,
       :cancelled_at
     ])
     |> Map.merge(%{

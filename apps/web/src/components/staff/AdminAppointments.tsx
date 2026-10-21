@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 
 import { listAdminLocations } from "@/api/facility";
 import {
@@ -49,6 +50,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 type View = "week" | "day";
 type Kind = AppointmentSlot["kind"];
 type Format = AppointmentSlot["format"];
+type Mode = NonNullable<AppointmentSlot["mode"]>;
 
 const SLOTS_KEY = ["staff", "appointment-slots"] as const;
 
@@ -69,6 +71,7 @@ function CreateSlotForm({
   onCreated: () => void;
 }) {
   const i18n = useUiTranslations();
+  const tCoach = useTranslations("SoloCoach");
   const { tokens, currentUser } = useSession();
   const queryClient = useQueryClient();
   const baseId = useId();
@@ -80,11 +83,17 @@ function CreateSlotForm({
   const [capacity, setCapacity] = useState(1);
   const [locationId, setLocationId] = useState("");
   const [notes, setNotes] = useState("");
+  const [mode, setMode] = useState<Mode>("in_person");
+  const [meetingUrl, setMeetingUrl] = useState("");
 
   const durationValue = Number(duration);
   const startsIso = fromDateTimeLocal(startsAt);
   const valid =
-    Boolean(startsIso) && Number.isInteger(durationValue) && durationValue >= 15 && durationValue <= 240;
+    Boolean(startsIso) &&
+    Number.isInteger(durationValue) &&
+    durationValue >= 15 &&
+    durationValue <= 240 &&
+    (mode === "in_person" || !meetingUrl.trim() || meetingUrl.trim().startsWith("https://"));
 
   const mutation = useMutation({
     mutationFn: () =>
@@ -95,8 +104,10 @@ function CreateSlotForm({
         kind,
         format,
         capacity,
-        location_id: locationId || null,
+        location_id: mode === "online" ? null : locationId || null,
         notes: notes.trim() || null,
+        mode,
+        meeting_url: mode === "online" ? meetingUrl.trim() || null : null,
       }),
     onSuccess: async () => {
       setNotes("");
@@ -220,6 +231,39 @@ function CreateSlotForm({
         </select>
       </div>
       <div className="space-y-1">
+        <label className={captionClass} htmlFor={`${baseId}-mode`} style={captionStyle}>
+          {tCoach("slot.mode")}
+        </label>
+        <select
+          id={`${baseId}-mode`}
+          className={inputClass}
+          onChange={(event) => setMode(event.target.value as Mode)}
+          style={inputStyle}
+          value={mode}
+        >
+          <option value="in_person">{tCoach("box.inPerson")}</option>
+          <option value="online">{tCoach("box.online")}</option>
+        </select>
+      </div>
+      {mode === "online" ? (
+        <div className="space-y-1">
+          <label className={captionClass} htmlFor={`${baseId}-meeting`} style={captionStyle}>
+            {tCoach("slot.meetingUrl")}
+          </label>
+          <input
+            id={`${baseId}-meeting`}
+            className={inputClass}
+            inputMode="url"
+            maxLength={500}
+            onChange={(event) => setMeetingUrl(event.target.value)}
+            placeholder="https://"
+            style={inputStyle}
+            type="url"
+            value={meetingUrl}
+          />
+        </div>
+      ) : (
+      <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-location`} style={captionStyle}>
           {i18n("stfLocation")}
         </label>
@@ -238,6 +282,7 @@ function CreateSlotForm({
           ))}
         </select>
       </div>
+      )}
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-notes`} style={captionStyle}>
           {i18n("notesOptional4d56ca9")}
@@ -280,6 +325,7 @@ function SlotCard({
   now: number;
 }) {
   const i18n = useUiTranslations();
+  const tCoach = useTranslations("SoloCoach");
   const uiLocale = useUiLocale();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -342,7 +388,7 @@ function SlotCard({
             {[
               coachName,
               slot.format === "one_to_one" ? i18n("stfFormatOneToOne") : i18n("stfFormatSemiPrivate"),
-              locationName,
+              slot.mode === "online" ? tCoach("box.online") : locationName,
               i18n("stfSpotsTaken", { taken, capacity: slot.capacity }),
             ]
               .filter(Boolean)
