@@ -749,6 +749,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/atlas": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your muscle coverage across every provider, for the anatomy atlas */
+        get: operations["MilosTrainingWeb.AnatomyAtlasController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/avatar": {
         parameters: {
             query?: never;
@@ -6333,6 +6350,23 @@ export interface paths {
         put?: never;
         /** Reopen a published workout for editing */
         post: operations["MilosTrainingWeb.AdminWorkoutController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/anatomy/nodes/{node_id}/exercises": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Exercises that train an atlas node, with the gym's videos */
+        get: operations["MilosTrainingWeb.AnatomyAtlasController.exercises"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -12280,6 +12314,85 @@ export interface components {
             user_ids: string[];
             /** Format: uuid */
             workout_id: string;
+        };
+        /** AtlasExerciseCounts */
+        AtlasExerciseCounts: {
+            recognized: number;
+            unrecognized: number;
+        };
+        /** AtlasExerciseVideo */
+        AtlasExerciseVideo: {
+            duration_minutes: number | null;
+            /** Format: uuid */
+            id: string;
+            title: string;
+            video_url: string;
+        };
+        /** AtlasNodeCoverage */
+        AtlasNodeCoverage: {
+            /** @description Entries in the range the member felt it in */
+            felt: number;
+            /** @description Taxonomy node id (region, group or head) */
+            id: string;
+            /** @enum {string} */
+            kind: "region" | "group" | "head";
+            /** @enum {string} */
+            level: "none" | "low" | "medium" | "high";
+            per_week: number;
+            /** @description Weighted sets in the range: primary 1, secondary 0.5, stabilizer 0 */
+            sets: number;
+            top_exercises: {
+                exercise_ref: string;
+                label: string;
+                sets: number;
+            }[];
+        };
+        /** AtlasNodeExercise */
+        AtlasNodeExercise: {
+            exercise_ref: string;
+            label: string;
+            /** @enum {string} */
+            role: "primary" | "secondary";
+            videos: {
+                duration_minutes: number | null;
+                /** Format: uuid */
+                id: string;
+                title: string;
+                video_url: string;
+            }[];
+        };
+        /** AtlasNodeExercises */
+        AtlasNodeExercises: {
+            exercises: {
+                exercise_ref: string;
+                label: string;
+                /** @enum {string} */
+                role: "primary" | "secondary";
+                videos: {
+                    duration_minutes: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    title: string;
+                    video_url: string;
+                }[];
+            }[];
+            node_id: string;
+            /** @description False when the member's package does not include on-demand videos */
+            videos_included: boolean;
+        };
+        /**
+         * AtlasThresholds
+         * @description Weighted sets per week from which medium and high start; any set is low
+         */
+        AtlasThresholds: {
+            high: number;
+            medium: number;
+        };
+        /** AtlasTopExercise */
+        AtlasTopExercise: {
+            exercise_ref: string;
+            label: string;
+            sets: number;
         };
         /** BodyAccessLog */
         BodyAccessLog: {
@@ -19979,6 +20092,52 @@ export interface components {
             } | null;
             /** Format: uuid */
             workout_id: string;
+        };
+        /** MyAtlas */
+        MyAtlas: {
+            /** AtlasExerciseCounts */
+            exercises: {
+                recognized: number;
+                unrecognized: number;
+            };
+            felt_entries: number;
+            /** Format: date */
+            from: string;
+            /** @description Only nodes with sets or felt entries, in tree order */
+            nodes: {
+                /** @description Entries in the range the member felt it in */
+                felt: number;
+                /** @description Taxonomy node id (region, group or head) */
+                id: string;
+                /** @enum {string} */
+                kind: "region" | "group" | "head";
+                /** @enum {string} */
+                level: "none" | "low" | "medium" | "high";
+                per_week: number;
+                /** @description Weighted sets in the range: primary 1, secondary 0.5, stabilizer 0 */
+                sets: number;
+                top_exercises: {
+                    exercise_ref: string;
+                    label: string;
+                    sets: number;
+                }[];
+            }[];
+            /** @enum {string} */
+            range: "1w" | "4w" | "12w";
+            /** @description Workouts done in the range */
+            sessions: number;
+            taxonomy_version: number;
+            /**
+             * AtlasThresholds
+             * @description Weighted sets per week from which medium and high start; any set is low
+             */
+            thresholds: {
+                high: number;
+                medium: number;
+            };
+            /** Format: date */
+            to: string;
+            weeks: number;
         };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
@@ -28959,6 +29118,72 @@ export interface operations {
                             name_en: string;
                             slug: string;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AnatomyAtlasController.show": {
+        parameters: {
+            query?: {
+                range?: "1w" | "4w" | "12w";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Atlas coverage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** AtlasExerciseCounts */
+                        exercises: {
+                            recognized: number;
+                            unrecognized: number;
+                        };
+                        felt_entries: number;
+                        /** Format: date */
+                        from: string;
+                        /** @description Only nodes with sets or felt entries, in tree order */
+                        nodes: {
+                            /** @description Entries in the range the member felt it in */
+                            felt: number;
+                            /** @description Taxonomy node id (region, group or head) */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "region" | "group" | "head";
+                            /** @enum {string} */
+                            level: "none" | "low" | "medium" | "high";
+                            per_week: number;
+                            /** @description Weighted sets in the range: primary 1, secondary 0.5, stabilizer 0 */
+                            sets: number;
+                            top_exercises: {
+                                exercise_ref: string;
+                                label: string;
+                                sets: number;
+                            }[];
+                        }[];
+                        /** @enum {string} */
+                        range: "1w" | "4w" | "12w";
+                        /** @description Workouts done in the range */
+                        sessions: number;
+                        taxonomy_version: number;
+                        /**
+                         * AtlasThresholds
+                         * @description Weighted sets per week from which medium and high start; any set is low
+                         */
+                        thresholds: {
+                            high: number;
+                            medium: number;
+                        };
+                        /** Format: date */
+                        to: string;
+                        weeks: number;
                     };
                 };
             };
@@ -57515,6 +57740,57 @@ export interface operations {
                 content: {
                     "application/json": {
                         error: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AnatomyAtlasController.exercises": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Taxonomy node id (region, group or head) */
+                node_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Node exercises */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        exercises: {
+                            exercise_ref: string;
+                            label: string;
+                            /** @enum {string} */
+                            role: "primary" | "secondary";
+                            videos: {
+                                duration_minutes: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                title: string;
+                                video_url: string;
+                            }[];
+                        }[];
+                        node_id: string;
+                        /** @description False when the member's package does not include on-demand videos */
+                        videos_included: boolean;
+                    };
+                };
+            };
+            /** @description Not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
                     };
                 };
             };
