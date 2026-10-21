@@ -8,6 +8,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     class_attendance_records class_timers
     master_workouts workout_folders workout_sections workout_exercises
     exercise_variations assigned_workouts assigned_workout_athletes scale_levels
+    workout_goals
     membership_packages memberships membership_package_subscriptions
     membership_payments promotion_campaigns promotion_codes promotion_redemptions
     referral_programs referral_events referral_rewards finance_invoices
@@ -78,7 +79,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     community_profile_post_comments community_social_settings
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
-    journal_notes journal_comments wellbeing_check_ins wellbeing_check_in_answers
+    journal_notes journal_comments goal_feedback wellbeing_check_ins wellbeing_check_in_answers
     wellness_entries craving_entries wellness_preferences
     media_account_objects saved_filters user_home_areas
     body_snapshots body_snapshot_photos user_health_consents body_settings

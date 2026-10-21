@@ -8,6 +8,7 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
   alias MilosTraining.{
     Execution.WorkoutExecution,
     Infrastructure.Tenancy.RepoContext,
+    Infrastructure.Workouts.EctoGoalStore,
     Repo,
     ScaleLevel,
     Workouts.AssignedWorkout,
@@ -2080,14 +2081,19 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoWorkoutStore do
           draft_data: draft_data
         }
 
-        # Copies keep the original's icon, whoever chose it.
-        %MasterWorkout{icon: source.icon, icon_source: source.icon_source}
-        |> MasterWorkout.draft_changeset(params)
-        |> Repo.insert()
-        |> case do
-          {:ok, new_workout} -> {:ok, %{id: new_workout.id, status: "draft", title: title}}
-          {:error, changeset} -> {:error, changeset}
-        end
+        # Copies keep the original's icon, whoever chose it, and its WOD
+        # goals (ADR-163), in one transaction.
+        Repo.transaction(fn ->
+          with {:ok, new_workout} <-
+                 %MasterWorkout{icon: source.icon, icon_source: source.icon_source}
+                 |> MasterWorkout.draft_changeset(params)
+                 |> Repo.insert(),
+               :ok <- EctoGoalStore.copy_goals(source.id, new_workout.id) do
+            %{id: new_workout.id, status: "draft", title: title}
+          else
+            {:error, changeset} -> Repo.rollback(changeset)
+          end
+        end)
     end
   end
 

@@ -62,6 +62,7 @@ defmodule Mix.Tasks.Milos.Architecture do
   @tenant_scoped_stores ~w(
     scheduling/scheduling_store
     workouts/workout_store
+    workouts/goal_store
     messaging/thread_store
     feedback/feedback_store
     analytics/analytics_store
@@ -75,6 +76,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     coaching/coaching_store
     pantheon/pr_store
     journal/journal_store
+    journal/goal_feedback_store
     body/body_store
     buddies/buddy_store
     wellness/wellness_store

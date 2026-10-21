@@ -223,6 +223,10 @@ config :milos_training,
 config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
 
 config :milos_training,
+       :workout_goal_store,
+       MilosTraining.Infrastructure.Workouts.EctoGoalStore
+
+config :milos_training,
        :workout_text_analyzer,
        MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer
 
@@ -236,6 +240,10 @@ config :milos_training,
 
 config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRStore
 config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.EctoJournalStore
+
+config :milos_training,
+       :goal_feedback_store,
+       MilosTraining.Infrastructure.Journal.EctoGoalFeedbackStore
 config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
 config :milos_training, :buddy_store, MilosTraining.Infrastructure.Buddies.EctoBuddyStore
 

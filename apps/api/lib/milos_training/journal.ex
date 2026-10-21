@@ -78,6 +78,19 @@ defmodule MilosTraining.Journal do
   def comments_by_entry(entry_kind, entry_ids),
     do: entry_kind |> list_comments(entry_ids) |> Enum.group_by(& &1.entry_id)
 
+  # «Τι ένιωσες» (ADR-163): felt muscles and qualities on an entry.
+  alias MilosTraining.Journal.{GoalFeedback, GoalFeedbackStore}
+
+  def goal_feedback_entry_kinds, do: GoalFeedback.entry_kinds()
+
+  def goal_feedback_entry(context, entry_kind, entry_id),
+    do: GoalFeedbackStore.feedback_entry(context, entry_kind, entry_id)
+
+  def get_goal_feedback(context, entry_kind, entry_id, user_id),
+    do: GoalFeedbackStore.get_feedback(context, entry_kind, entry_id, user_id)
+
+  def put_goal_feedback(context, attrs), do: GoalFeedbackStore.put_feedback(context, attrs)
+
   # ADR-162: one journal across providers.
   alias MilosTraining.Journal.Domain.{CoachAudience, EntrySource, JournalFilter}
 
