@@ -218,6 +218,18 @@ All recommended options, with every recommended extra.
 6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
    entries; also lists goals nobody felt.
 
+### Anatomy atlas (2026-10-21, ADR-164)
+No board; decided for least clutter (owner's standing instruction), full list in ADR-164 «Decisions».
+1. **Home:** `/journal/atlas` under the Πρόοδος tab, `?node=` deep link (`atlasHref`); P3-M3's Μυϊκή κάλυψη links there.
+2. **One screen:** figure (front and back), breadcrumb Σώμα › Περιοχή › Ομάδα › Κεφαλή, node panel; segmented
+   «Εξερεύνηση | Η κάλυψή μου»; range chips 1 / 4 / 12 εβδ. (4 default).
+3. **Counting:** primary 1 set, secondary ½, stabilizer 0, once per node; unknown set count = 1; levels by sets per
+   week (low > 0, medium ≥ 3, high ≥ 8), labelled as an indication, not a target.
+4. **Heat map:** groups by level; heads only inside the selected group.
+5. **Panel:** what it does (one sentence, i18n), your sets with level and per week, «Κυρίως από» top 3, felt count
+   when > 0, gym exercises (first 5, «Όλες (n)») with on-demand videos matched by tag/title behind the package gate.
+6. **Entry from goals:** «Άτλαντας ›» in the goals sheet and tappable muscle chips; the strip is unchanged.
+
 ### Native wrapper (2026-10-21, ADR-171, no board: owner's standing instruction)
 1. **Shell:** Capacitor 8 in `apps/mobile`, app id `app.milos.member`, «Milos»; the app loads the deployed web app
    (production `https://milos.4kq.net`, or `MILOS_APP_URL`), so web and apps ship together. Other hosts open in the
@@ -250,5 +262,5 @@ All recommended options, with every recommended extra.
 
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
-- [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
+- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
 - [ ] P3-M8 · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13

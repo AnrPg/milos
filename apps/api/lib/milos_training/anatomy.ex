@@ -6,12 +6,15 @@ defmodule MilosTraining.Anatomy do
   """
 
   alias MilosTraining.Anatomy.Domain.{
+    Coverage,
+    CoverageWeighting,
     ExerciseTargets,
     FeedbackSummary,
     FitnessQualities,
     GoalSet,
     GoalSuggestion,
-    MuscleTaxonomy
+    MuscleTaxonomy,
+    NodeExercises
   }
 
   def taxonomy_version, do: MuscleTaxonomy.version()
@@ -49,4 +52,24 @@ defmodule MilosTraining.Anatomy do
 
   def normalize_goals(params), do: GoalSet.normalize_goals(params)
   def normalize_feedback(params), do: GoalSet.normalize_feedback(params)
+
+  # -- Anatomy atlas and coverage (ADR-164) ------------------------------------
+
+  @doc "`{:ok, range, weeks}` for an atlas range (`1w`, `4w`, `12w`; nil = 4w)."
+  def parse_coverage_range(range), do: CoverageWeighting.parse_range(range)
+
+  def coverage_ranges, do: CoverageWeighting.ranges()
+  def coverage_thresholds, do: CoverageWeighting.thresholds()
+  def coverage_levels, do: CoverageWeighting.levels()
+
+  @doc """
+  Muscle coverage of performed workouts: weighted sets, per-week level,
+  felt count and top exercises per node (`CoverageWeighting` policy).
+  """
+  def coverage(performances, felt, weeks), do: Coverage.build(performances, felt, weeks)
+
+  @doc "Catalog exercises that train a node, strongest role first; `:error` when unknown."
+  def exercises_for_node(node_id), do: NodeExercises.for_node(node_id)
+
+  def known_node?(node_id), do: MuscleTaxonomy.known?(node_id)
 end

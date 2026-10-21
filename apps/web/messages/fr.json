@@ -8033,7 +8033,10 @@
       "primary": "Principal",
       "secondary": "Secondaire",
       "stabilizer": "Stabilisateur",
-      "felt": "Ressenti"
+      "felt": "Ressenti",
+      "heat-low": "Couverture faible",
+      "heat-medium": "Couverture moyenne",
+      "heat-high": "Couverture élevée"
     },
     "quality": {
       "cardiorespiratory-endurance": "Endurance cardiorespiratoire",
@@ -8139,6 +8142,43 @@
       "soleus": "Soléaire",
       "tibialis-anterior": "Tibial antérieur",
       "fibularis": "Fibulaires"
+    },
+    "about": {
+      "sternocleidomastoid": "Tourne et incline la tête et aide quand la respiration s’accélère.",
+      "scalenes": "Inclinent le cou sur le côté et soulèvent les côtes hautes à l’inspiration.",
+      "splenius": "Étend et tourne la tête et la maintient droite.",
+      "deltoid": "Lève le bras vers l’avant, le côté et l’arrière ; il dessine l’épaule.",
+      "rotator-cuff": "Quatre petits muscles qui centrent l’épaule et font tourner le bras.",
+      "pectoralis-major": "Ramène le bras devant le corps et pousse vers l’avant, comme en pompe.",
+      "pectoralis-minor": "Tire l’omoplate vers l’avant et le bas.",
+      "serratus-anterior": "Plaque l’omoplate contre les côtes et la fait pivoter vers le haut.",
+      "trapezius": "Élève, rapproche et abaisse les omoplates et soutient le cou.",
+      "rhomboids": "Rapprochent les omoplates, comme en tirage.",
+      "levator-scapulae": "Élève l’omoplate et incline le cou.",
+      "latissimus-dorsi": "Tire le bras vers le bas et l’arrière, comme en traction ; le plus large du dos.",
+      "teres-major": "Aide le grand dorsal à tirer le bras vers le bas et l’intérieur.",
+      "erector-spinae": "Redresse la colonne et la maintient droite quand vous soulevez.",
+      "multifidus": "Petits muscles profonds qui stabilisent chaque vertèbre.",
+      "quadratus-lumborum": "Incline le tronc sur le côté et stabilise le bassin et le bas du dos.",
+      "biceps-brachii": "Fléchit le coude et tourne la paume vers le haut.",
+      "brachialis": "Le principal fléchisseur du coude, quelle que soit la position de la main.",
+      "triceps-brachii": "Tend le coude, comme en développé ou en pompe.",
+      "brachioradialis": "Fléchit le coude pouce vers le haut, comme en curl marteau.",
+      "forearm-flexors": "Fléchissent le poignet et les doigts et donnent la prise.",
+      "forearm-extensors": "Étendent le poignet et les doigts et équilibrent la prise.",
+      "rectus-abdominis": "Fléchit le tronc vers l’avant et gaine l’avant de la sangle abdominale.",
+      "obliques": "Tournent et inclinent le tronc et résistent à la rotation.",
+      "transversus-abdominis": "Le plus profond des abdominaux ; il serre la taille comme une ceinture.",
+      "diaphragm": "Le principal muscle de la respiration ; il aide aussi à gainer le tronc sous charge.",
+      "glutes": "Étendent et ouvrent la hanche et gardent le bassin à niveau ; essentiels en squat et en saut.",
+      "hip-flexors": "Montent le genou vers la poitrine et fléchissent le tronc à la hanche.",
+      "hip-rotators": "Tournent la cuisse vers l’extérieur et stabilisent la hanche.",
+      "quadriceps": "Tendent le genou ; ils propulsent squats, fentes et sauts.",
+      "hamstrings": "Fléchissent le genou et étendent la hanche, comme au soulevé de terre.",
+      "adductors": "Rapprochent les jambes et aident la hanche en squat profond.",
+      "calves": "Soulèvent le talon ; ils poussent quand vous courez et sautez.",
+      "tibialis-anterior": "Relève les orteils et contrôle le pied à la réception.",
+      "fibularis": "Tourne la plante du pied vers l’extérieur et stabilise la cheville."
     }
   },
   "WodGoals": {
@@ -8210,7 +8250,9 @@
     },
     "sheet": {
       "title": "Objectifs de la séance",
-      "close": "Fermer"
+      "close": "Fermer",
+      "atlas": "Atlas ›",
+      "openInAtlas": "Ouvrir {muscle} dans l’atlas"
     },
     "felt": {
       "title": "Qu’avez-vous ressenti ?",
@@ -8238,6 +8280,60 @@
       "entries": "{count, plural, one {# entrée} other {# entrées}}",
       "notShown": "Affiché à partir de 3 entrées.",
       "notFelt": "Objectifs que personne n’a ressentis : {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Atlas anatomique",
+    "back": "Progrès",
+    "mode": {
+      "label": "Vue",
+      "explore": "Explorer",
+      "heat": "Ma couverture"
+    },
+    "range": {
+      "label": "Période",
+      "1w": "1 sem.",
+      "4w": "4 sem.",
+      "12w": "12 sem."
+    },
+    "crumbs": {
+      "label": "Niveau",
+      "body": "Corps"
+    },
+    "body": {
+      "title": "Corps entier",
+      "hint": "Touchez une région ou directement un muscle sur la figure. Touchez-le à nouveau pour son chef."
+    },
+    "regions": "Régions",
+    "groups": "Groupes musculaires",
+    "heads": "Chefs",
+    "level": {
+      "none": "Aucune",
+      "low": "Faible",
+      "medium": "Moyenne",
+      "high": "Élevée"
+    },
+    "levelLine": "Couverture {level}",
+    "sets": "{sets} séries",
+    "perWeek": "{perWeek} séries/sem.",
+    "yours": "Vos données · {range}",
+    "from": "Surtout grâce à : {exercises}",
+    "felt": "{count, plural, one {Ressenti lors de # séance} other {Ressenti lors de # séances}}",
+    "noData": "Aucune séance sur cette période pour l’instant.",
+    "noneHere": "Aucune série ici sur cette période.",
+    "legendNote": "Une indication de votre volume d’entraînement, pas un objectif.",
+    "unrecognized": "{count, plural, one {# exercice n’a pas été reconnu et ne compte pas.} other {# exercices n’ont pas été reconnus et ne comptent pas.}}",
+    "exercises": {
+      "title": "Exercices de la bibliothèque de la box",
+      "empty": "Aucun exercice pour ce muscle.",
+      "unavailable": "Les exercices apparaissent quand une box est sélectionnée.",
+      "more": "Tous ({count})",
+      "less": "Moins",
+      "video": "Vidéo : {title}",
+      "role": {
+        "primary": "Principal",
+        "secondary": "Secondaire"
+      }
     }
   }
 }
