@@ -4,6 +4,7 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
   import Ecto.Query
 
   alias MilosTraining.Infrastructure.Journal.{FeedBound, FeedScope}
+
   alias MilosTraining.Journal.{
     AudienceExclusion,
     CoachRead,
@@ -13,6 +14,7 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
     Note,
     VisibilityDefault
   }
+
   alias MilosTraining.Repo
 
   @impl true
@@ -335,7 +337,13 @@ defmodule MilosTraining.Infrastructure.Journal.EctoJournalStore do
         EntryAudience,
         Enum.map(
           ids || [],
-          &%{entry_kind: kind, entry_id: id, organization_id: &1, user_id: user_id, inserted_at: now}
+          &%{
+            entry_kind: kind,
+            entry_id: id,
+            organization_id: &1,
+            user_id: user_id,
+            inserted_at: now
+          }
         )
       )
     end)

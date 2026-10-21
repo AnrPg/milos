@@ -10,7 +10,13 @@ defmodule MilosTraining.Application.SetJournalVisibility do
   Reviews are their own rung and do not move.
   """
 
-  alias MilosTraining.Application.{BroadcastUserSync, JournalAudience, JournalEntryLookup, RequestCoachReply}
+  alias MilosTraining.Application.{
+    BroadcastUserSync,
+    JournalAudience,
+    JournalEntryLookup,
+    RequestCoachReply
+  }
+
   alias MilosTraining.{Execution, Journal, Pantheon, Wellbeing, Wellness}
 
   def call(%{user_id: user_id} = context, kind, id, params) do

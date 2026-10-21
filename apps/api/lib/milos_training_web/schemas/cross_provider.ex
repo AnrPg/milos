@@ -42,7 +42,10 @@ defmodule MilosTrainingWeb.Schemas.CrossProvider do
       description:
         "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
       required: [:custom, :organization_ids],
-      properties: %{custom: %Schema{type: :boolean}, organization_ids: %Schema{type: :array, items: @uuid}}
+      properties: %{
+        custom: %Schema{type: :boolean},
+        organization_ids: %Schema{type: :array, items: @uuid}
+      }
     }
   end
 

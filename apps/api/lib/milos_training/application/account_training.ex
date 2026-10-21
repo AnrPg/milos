@@ -48,6 +48,7 @@ defmodule MilosTraining.Application.AccountTraining do
     Map.merge(execution, %{
       status: to_string(execution.status),
       source_label: source,
+      section_scores: Enum.map(execution.section_scores || [], &section_key/1),
       workout_key:
         Execution.workout_identity(%{
           title: execution.workout_title,
@@ -106,6 +107,18 @@ defmodule MilosTraining.Application.AccountTraining do
       duration_seconds: div(execution.total_elapsed_ms || 0, 1000),
       scores: scores(execution.section_scores)
     }
+  end
+
+  # Sections of one workout identity match across providers by name.
+  defp section_key(score) do
+    name = field(score, :section_name)
+
+    key =
+      if is_binary(name) and name != "",
+        do: "name:" <> String.downcase(String.trim(name)),
+        else: field(score, :section_id)
+
+    Map.put(score, :section_key, key)
   end
 
   @doc "The filter token of a source label."

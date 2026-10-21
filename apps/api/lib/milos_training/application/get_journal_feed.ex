@@ -20,7 +20,7 @@ defmodule MilosTraining.Application.GetJournalFeed do
   def call(%{user_id: user_id} = context, params) when is_map(params) do
     params = Map.new(params, fn {key, value} -> {to_string(key), value} end)
 
-    with {:ok, filter} <- Journal.parse_filter(Map.take(params, @filter_keys)),
+    with {:ok, filter} <- parse(Map.take(params, @filter_keys)),
          :ok <- remember(context, filter, params["remember"]) do
       providers = Organizations.list_my_providers(context)
       member = JournalAudience.member(context, providers)
@@ -39,6 +39,14 @@ defmodule MilosTraining.Application.GetJournalFeed do
            |> Map.put(:active_filter_count, Journal.filter_active_count(filter))}
         end
       end)
+    end
+  end
+
+  # An unknown kind keeps the feed's own error code (ADR-139).
+  defp parse(params) do
+    case Journal.parse_filter(params) do
+      {:error, [kinds: _message]} -> {:error, :unknown_kind}
+      result -> result
     end
   end
 

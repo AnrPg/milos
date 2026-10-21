@@ -81,7 +81,10 @@ defmodule MilosTraining.Organizations do
 
   @doc "The provider Box ▾ last opened on (may no longer be active)."
   def get_provider_selection(%{user_id: user_id}) when is_binary(user_id),
-    do: RepoContext.run(%{user_id: user_id}, fn -> OrganizationStore.get_provider_selection(user_id) end)
+    do:
+      RepoContext.run(%{user_id: user_id}, fn ->
+        OrganizationStore.get_provider_selection(user_id)
+      end)
 
   def put_provider_selection(%{user_id: user_id}, organization_id) when is_binary(user_id),
     do:
