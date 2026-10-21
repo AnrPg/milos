@@ -54,6 +54,19 @@ describe("buildTodayTraining", () => {
     expect(result.resumeExecutionId).toBeNull();
   });
 
+  it("carries a season's title on its programme workouts (ADR-167)", () => {
+    const result = buildTodayTraining({
+      now,
+      scheduleSlots: [],
+      assignments: [
+        assignment("s1", "2026-10-15", { season: { id: "season-1", title: "Hyrox prep" } }),
+        assignment("p1", "2026-10-15"),
+      ],
+      executions: [],
+    });
+    expect(result.items.map((item) => item.seasonTitle)).toEqual(["Hyrox prep", undefined]);
+  });
+
   it("skips classes without an approved booking or a workout", () => {
     const result = buildTodayTraining({
       now,

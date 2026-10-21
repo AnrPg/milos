@@ -1,6 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { Suspense } from "react";
 
 import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
@@ -12,13 +13,14 @@ import { BoxToday } from "@/components/member-app/box/BoxToday";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
 import { ProviderTitle } from "@/components/providers/ProviderSwitcher";
 import { TodayAcrossCard } from "@/components/providers/TodayAcrossCard";
+import { SeasonsEntry } from "@/components/seasons/MySeasons";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
  * Fixed order: «Σήμερα» across providers (ADR-162, only with more than one)
  * · today's workout · next booking · actions · membership (with «Φέρε φίλο»,
- * ADR-156) · announcements (the gym club's #ανακοινώσεις, ADR-138). The title
+ * ADR-156, and the gym's seasons, ADR-167) · announcements (the gym club's #ανακοινώσεις, ADR-138). The title
  * ▾ switches provider (board 17 Q1); everything below it is that provider's.
  */
 export function BoxHub() {
@@ -55,6 +57,9 @@ export function BoxHub() {
           ) : (
             <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("membershipNone")}</p>
           )}
+          <Suspense fallback={null}>
+            <SeasonsEntry />
+          </Suspense>
         </div>
         <div className="flex gap-2">
           <HubButton href="/me/payments">{t("membershipOpen")}</HubButton>

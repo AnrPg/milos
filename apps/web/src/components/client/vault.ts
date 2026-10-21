@@ -5,6 +5,8 @@ export type HistoryEntry = VaultEntry & {
   master_workout_id: string;
   workout_title: string | null;
   workout_type: string | null;
+  /** ADR-167: the season the workout belonged to, when it was a season's. */
+  season?: { id: string; title: string } | null;
   /** Calendar day the workout was completed on, `YYYY-MM-DD`. */
   day: string;
 };

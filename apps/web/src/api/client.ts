@@ -122,6 +122,7 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/progress",
   "/me/reviews",
   "/me/search/users",
+  "/me/seasons",
   "/me/threads",
   "/me/training-log",
   "/me/workouts",

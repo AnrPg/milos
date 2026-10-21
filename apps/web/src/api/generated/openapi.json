@@ -45915,6 +45915,30 @@
       },
       "StaffSeasonList": {
         "properties": {
+          "coach_candidates": {
+            "description": "Staff who may be named as a season's coaches",
+            "items": {
+              "properties": {
+                "avatar_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "nickname": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
           "seasons": {
             "items": {
               "properties": {
@@ -46073,7 +46097,8 @@
           }
         },
         "required": [
-          "seasons"
+          "seasons",
+          "coach_candidates"
         ],
         "title": "StaffSeasonList",
         "type": "object"
@@ -123636,6 +123661,30 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "coach_candidates": {
+                      "description": "Staff who may be named as a season's coaches",
+                      "items": {
+                        "properties": {
+                          "avatar_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "nickname": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "seasons": {
                       "items": {
                         "properties": {
@@ -123794,7 +123843,8 @@
                     }
                   },
                   "required": [
-                    "seasons"
+                    "seasons",
+                    "coach_candidates"
                   ],
                   "title": "StaffSeasonList",
                   "type": "object"

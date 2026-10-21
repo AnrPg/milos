@@ -27,6 +27,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
 import { notificationTargetUrl } from "@/components/notifications/notification-links";
 import { buddyNotificationText } from "@/components/buddy/buddy-links";
+import { seasonNotificationText } from "@/components/seasons/season-links";
 import {
   notificationOrigin,
   type NotificationOrigin,
@@ -69,6 +70,11 @@ function NotificationCard({
     return tDevices(["notif", "sync_error", part].join("_"));
   }
   const tBuddy = useTranslations("Buddy");
+  const tSeasons = useTranslations("Seasons");
+  // ADR-167: season requests (staff) and their answers (members).
+  function seasonText(notification: NotificationRecord, part: "title" | "body") {
+    return seasonNotificationText(notification.type, notification.payload, part, (key, values) => tSeasons(key, values));
+  }
   // ADR-160: buddy invitations, requests, replies and the weekly counts.
   function buddyText(notification: NotificationRecord, part: "title" | "body") {
     return buddyNotificationText(notification.type, notification.payload, part, (key, values) => tBuddy(key, values));
@@ -170,6 +176,8 @@ function NotificationCard({
   function notificationBody(notification: NotificationRecord) {
     const buddy = buddyText(notification, "body");
     if (buddy !== null) return buddy;
+    const season = seasonText(notification, "body");
+    if (season !== null) return season;
     const device = deviceText(notification, "body");
     if (device !== null) return device;
     const checkIn = checkInText(notification, "body");
@@ -422,6 +430,8 @@ function NotificationCard({
   function titleFromPayload(notification: NotificationRecord) {
     const buddy = buddyText(notification, "title");
     if (buddy !== null) return buddy;
+    const season = seasonText(notification, "title");
+    if (season !== null) return season;
     const device = deviceText(notification, "title");
     if (device !== null) return device;
     const checkIn = checkInText(notification, "title");

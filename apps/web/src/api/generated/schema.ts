@@ -23761,6 +23761,13 @@ export interface components {
         };
         /** StaffSeasonList */
         StaffSeasonList: {
+            /** @description Staff who may be named as a season's coaches */
+            coach_candidates: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
             seasons: {
                 capacity: number;
                 /** Format: uuid */
@@ -52514,6 +52521,13 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description Staff who may be named as a season's coaches */
+                        coach_candidates: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[];
                         seasons: {
                             capacity: number;
                             /** Format: uuid */
