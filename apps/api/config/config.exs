@@ -265,6 +265,17 @@ config :milos_training,
        :notification_store,
        MilosTraining.Infrastructure.Notifications.EctoNotificationStore
 
+# ADR-171: push to the store apps. Credentials come from runtime config
+# (runtime.exs); without them a provider is off and registration answers 503.
+config :milos_training,
+       :native_push_token_store,
+       MilosTraining.Infrastructure.Notifications.EctoNativePushTokenStore
+
+config :milos_training, :native_push_senders, %{
+  fcm: MilosTraining.Infrastructure.Notifications.FcmSender,
+  apns: MilosTraining.Infrastructure.Notifications.ApnsSender
+}
+
 config :milos_training, :feedback_store, MilosTraining.Infrastructure.Feedback.EctoFeedbackStore
 
 config :milos_training,

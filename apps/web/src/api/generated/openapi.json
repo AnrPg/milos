@@ -91589,6 +91589,264 @@
         ]
       }
     },
+    "/api/notifications/native-push-tokens": {
+      "post": {
+        "callbacks": {},
+        "description": "ADR-171: FCM tokens come from the Android app, APNs tokens from the iOS app. Answers 503 native_push_not_configured while the provider has no credentials.",
+        "operationId": "MilosTrainingWeb.NotificationController.create_native_push_token",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "apns_environment": {
+                    "enum": [
+                      "production",
+                      "sandbox"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "app_id": {
+                    "maxLength": 255,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "app_version": {
+                    "maxLength": 64,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "platform": {
+                    "enum": [
+                      "android",
+                      "ios"
+                    ],
+                    "type": "string"
+                  },
+                  "provider": {
+                    "enum": [
+                      "fcm",
+                      "apns"
+                    ],
+                    "type": "string"
+                  },
+                  "token": {
+                    "maxLength": 4096,
+                    "minLength": 16,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "provider",
+                  "platform",
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "native_push_token": {
+                      "properties": {
+                        "apns_environment": {
+                          "enum": [
+                            "production",
+                            "sandbox"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "app_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "app_version": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_registered_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "platform": {
+                          "enum": [
+                            "android",
+                            "ios"
+                          ],
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "fcm",
+                            "apns"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "platform",
+                        "last_registered_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "native_push_token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Native push token"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "native_push_token": {
+                      "properties": {
+                        "apns_environment": {
+                          "enum": [
+                            "production",
+                            "sandbox"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "app_id": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "app_version": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "last_registered_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "platform": {
+                          "enum": [
+                            "android",
+                            "ios"
+                          ],
+                          "type": "string"
+                        },
+                        "provider": {
+                          "enum": [
+                            "fcm",
+                            "apns"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "provider",
+                        "platform",
+                        "last_registered_at"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "native_push_token"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Native push token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Register a store app install's push token for the current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
+    "/api/notifications/native-push-tokens/unregister": {
+      "post": {
+        "callbacks": {},
+        "description": "ADR-171: the token travels in the body so it never lands in URLs or logs.",
+        "operationId": "MilosTrainingWeb.NotificationController.delete_native_push_token",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "token": {
+                    "maxLength": 4096,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "token"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "deleted": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "deleted"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Delete result"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stop push to a store app install of the current user",
+        "tags": [
+          "Notifications"
+        ]
+      }
+    },
     "/api/notifications/push-config": {
       "get": {
         "callbacks": {},
@@ -91603,6 +91861,17 @@
                     "enabled": {
                       "type": "boolean"
                     },
+                    "native_providers": {
+                      "description": "Store app push providers this server can deliver to (ADR-171)",
+                      "items": {
+                        "enum": [
+                          "fcm",
+                          "apns"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
                     "vapid_public_key": {
                       "nullable": true,
                       "type": "string"
@@ -91610,7 +91879,8 @@
                   },
                   "required": [
                     "enabled",
-                    "vapid_public_key"
+                    "vapid_public_key",
+                    "native_providers"
                   ],
                   "type": "object"
                 }

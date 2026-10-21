@@ -6907,7 +6907,9 @@
     "integrationHint_unavailable": "Подключения пока нет.",
     "integrationHint_native_only": "Нужно мобильное приложение; из браузера это невозможно.",
     "integrationStatus_error": "Нужно переподключить",
-    "integrationHint_error": "Garmin перестал отвечать; подключите его заново."
+    "integrationHint_error": "Garmin перестал отвечать; подключите его заново.",
+    "integrationStatus_native_soon": "Скоро",
+    "integrationHint_native_soon": "Появится в следующей версии приложения."
   },
   "Media": {
     "add": "Добавить фото или видео",
