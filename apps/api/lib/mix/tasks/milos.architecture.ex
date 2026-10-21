@@ -96,6 +96,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     community/social_store
     community/event_store
     trials/trial_store
+    seasons/season_store
     media/media_store
     identity/saved_filter_store
     organizations/public_profile_store

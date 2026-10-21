@@ -2648,6 +2648,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/progress/depth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your muscle coverage, qualities radar and training load across every provider */
+        get: operations["MilosTrainingWeb.TrainingDepthController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/providers": {
         parameters: {
             query?: never;
@@ -5712,6 +5729,96 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Confirm a request: package, #season channel and programme */
+        post: operations["MilosTrainingWeb.AdminSeasonController.confirm"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Decline a request, with an optional reason the member sees */
+        post: operations["MilosTrainingWeb.AdminSeasonController.decline"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/season-enrollments/{id}/remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Take a member out of the season (their programme from today on goes) */
+        post: operations["MilosTrainingWeb.AdminSeasonController.remove"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's seasons with their place counts */
+        get: operations["MilosTrainingWeb.AdminSeasonController.index"];
+        put?: never;
+        /** Create a season (a draft unless published straight away) */
+        post: operations["MilosTrainingWeb.AdminSeasonController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/seasons/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One season with every request and participant */
+        get: operations["MilosTrainingWeb.AdminSeasonController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change, publish or cancel a season
+         * @description Start date, weeks and programme are locked once a participant is confirmed. Cancelling closes every request and place and archives the season's channel.
+         */
+        patch: operations["MilosTrainingWeb.AdminSeasonController.update"];
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/settings": {
         parameters: {
             query?: never;
@@ -7831,6 +7938,60 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/seasons": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The gym's open seasons and the ones you hold a place in */
+        get: operations["MilosTrainingWeb.SeasonController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/seasons/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Withdraw your request or waitlist place
+         * @description A confirmed place is settled with the box.
+         */
+        post: operations["MilosTrainingWeb.SeasonController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/seasons/{id}/request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask for a place (the waitlist when the season is full); staff confirm */
+        post: operations["MilosTrainingWeb.SeasonController.request"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads": {
         parameters: {
             query?: never;
@@ -8440,6 +8601,23 @@ export interface paths {
         get: operations["MilosTrainingWeb.CoachingExtrasController.nutrition_plan"];
         /** Write a client's nutrition plan; the client is notified */
         put: operations["MilosTrainingWeb.CoachingExtrasController.save_nutrition_plan"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/clients/{user_id}/progress-depth": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A client's muscle coverage, qualities radar and training load, from shared entries */
+        get: operations["MilosTrainingWeb.TrainingDepthController.client"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -14987,6 +15165,111 @@ export interface components {
             /** Format: uuid */
             user_id?: string | null;
         };
+        /**
+         * ClientTrainingDepth
+         * @description Only from entries the client shares with this gym's coaches
+         */
+        ClientTrainingDepth: {
+            /** DepthCoverage */
+            coverage: {
+                /**
+                 * DepthBalance
+                 * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                 */
+                balance: {
+                    ham: number;
+                    pull: number;
+                    push: number;
+                    push_pull_ratio: number | null;
+                    quad: number;
+                    quad_ham_ratio: number | null;
+                };
+                /** DepthExerciseCounts */
+                exercises: {
+                    recognized: number;
+                    unrecognized: number;
+                };
+                felt_entries: number;
+                /** @description Up to three major groups at level none or low, lowest first */
+                least: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Up to three major groups with the most weighted sets */
+                most: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Workouts done in the range */
+                sessions: number;
+                /** DepthCoverageThresholds */
+                thresholds: {
+                    high: number;
+                    medium: number;
+                };
+            };
+            /** Format: date */
+            from: string;
+            /**
+             * DepthLoad
+             * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+             */
+            load: {
+                /** @description Load of the last 7 days */
+                acute: number;
+                /** @enum {string|null} */
+                band: "below" | "steady" | "above" | "well_above" | null;
+                /** DepthLoadBands */
+                bands: {
+                    above_to: number;
+                    below: number;
+                    steady_to: number;
+                };
+                /** @description Weekly average of the last 28 days */
+                chronic: number;
+                /** @description Last 28 days, with effort and time */
+                rated_sessions: number;
+                ratio: number | null;
+                sufficient: boolean;
+                /** @description Last 28 days, without effort or time (not counted) */
+                unrated_sessions: number;
+                weeks: {
+                    load: number;
+                    sessions: number;
+                    /** Format: date */
+                    week_start: string;
+                }[];
+            };
+            /** DepthQualities */
+            qualities: {
+                felt_entries: number;
+                /** @description All ten qualities, canonical order */
+                qualities: {
+                    felt: number;
+                    id: string;
+                    /** @description Share of the most-trained quality, 0..1 */
+                    score: number;
+                    sets: number;
+                }[];
+                /** @description Workouts with a recognised exercise */
+                sessions: number;
+            };
+            /** @enum {string} */
+            range: "4w" | "12w" | "6m" | "1y" | "all";
+            /** Format: date */
+            to: string;
+            weeks: number;
+        };
         /** ClientWellnessSummary */
         ClientWellnessSummary: {
             shared: boolean;
@@ -18565,6 +18848,151 @@ export interface components {
             to: string;
         };
         /**
+         * DepthBalance
+         * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+         */
+        DepthBalance: {
+            ham: number;
+            pull: number;
+            push: number;
+            push_pull_ratio: number | null;
+            quad: number;
+            quad_ham_ratio: number | null;
+        };
+        /** DepthCoverage */
+        DepthCoverage: {
+            /**
+             * DepthBalance
+             * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+             */
+            balance: {
+                ham: number;
+                pull: number;
+                push: number;
+                push_pull_ratio: number | null;
+                quad: number;
+                quad_ham_ratio: number | null;
+            };
+            /** DepthExerciseCounts */
+            exercises: {
+                recognized: number;
+                unrecognized: number;
+            };
+            felt_entries: number;
+            /** @description Up to three major groups at level none or low, lowest first */
+            least: {
+                /** @description Taxonomy group id */
+                id: string;
+                /** @enum {string} */
+                level: "none" | "low" | "medium" | "high";
+                per_week: number;
+                /** @description Weighted sets in the range */
+                sets: number;
+            }[];
+            /** @description Up to three major groups with the most weighted sets */
+            most: {
+                /** @description Taxonomy group id */
+                id: string;
+                /** @enum {string} */
+                level: "none" | "low" | "medium" | "high";
+                per_week: number;
+                /** @description Weighted sets in the range */
+                sets: number;
+            }[];
+            /** @description Workouts done in the range */
+            sessions: number;
+            /** DepthCoverageThresholds */
+            thresholds: {
+                high: number;
+                medium: number;
+            };
+        };
+        /** DepthCoverageGroup */
+        DepthCoverageGroup: {
+            /** @description Taxonomy group id */
+            id: string;
+            /** @enum {string} */
+            level: "none" | "low" | "medium" | "high";
+            per_week: number;
+            /** @description Weighted sets in the range */
+            sets: number;
+        };
+        /** DepthCoverageThresholds */
+        DepthCoverageThresholds: {
+            high: number;
+            medium: number;
+        };
+        /** DepthExerciseCounts */
+        DepthExerciseCounts: {
+            recognized: number;
+            unrecognized: number;
+        };
+        /**
+         * DepthLoad
+         * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+         */
+        DepthLoad: {
+            /** @description Load of the last 7 days */
+            acute: number;
+            /** @enum {string|null} */
+            band: "below" | "steady" | "above" | "well_above" | null;
+            /** DepthLoadBands */
+            bands: {
+                above_to: number;
+                below: number;
+                steady_to: number;
+            };
+            /** @description Weekly average of the last 28 days */
+            chronic: number;
+            /** @description Last 28 days, with effort and time */
+            rated_sessions: number;
+            ratio: number | null;
+            sufficient: boolean;
+            /** @description Last 28 days, without effort or time (not counted) */
+            unrated_sessions: number;
+            weeks: {
+                load: number;
+                sessions: number;
+                /** Format: date */
+                week_start: string;
+            }[];
+        };
+        /** DepthLoadBands */
+        DepthLoadBands: {
+            above_to: number;
+            below: number;
+            steady_to: number;
+        };
+        /** DepthLoadWeek */
+        DepthLoadWeek: {
+            load: number;
+            sessions: number;
+            /** Format: date */
+            week_start: string;
+        };
+        /** DepthQualities */
+        DepthQualities: {
+            felt_entries: number;
+            /** @description All ten qualities, canonical order */
+            qualities: {
+                felt: number;
+                id: string;
+                /** @description Share of the most-trained quality, 0..1 */
+                score: number;
+                sets: number;
+            }[];
+            /** @description Workouts with a recognised exercise */
+            sessions: number;
+        };
+        /** DepthQuality */
+        DepthQuality: {
+            felt: number;
+            id: string;
+            /** @description Share of the most-trained quality, 0..1 */
+            score: number;
+            sets: number;
+        };
+        /**
          * DeviceActivity
          * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
          */
@@ -20705,6 +21133,122 @@ export interface components {
              */
             content_type: "image/jpeg" | "image/webp";
         };
+        /** MemberSeason */
+        MemberSeason: {
+            capacity: number;
+            coaches: {
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            currency: string;
+            description?: string | null;
+            /** Format: date */
+            ends_on: string;
+            /** Format: uuid */
+            id: string;
+            /** SeasonMyEnrollment */
+            mine: {
+                decline_reason?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                requested_at?: string;
+                /** @enum {string} */
+                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+            } | null;
+            places_left: number;
+            price_cents: number;
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Running and completed follow from the dates
+             * @enum {string}
+             */
+            status: "draft" | "published" | "running" | "completed" | "cancelled";
+            title: string;
+            weeks: number;
+            workout_count: number;
+        };
+        /** MemberSeasonList */
+        MemberSeasonList: {
+            seasons: {
+                capacity: number;
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                /** Format: uuid */
+                id: string;
+                /** SeasonMyEnrollment */
+                mine: {
+                    decline_reason?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    requested_at?: string;
+                    /** @enum {string} */
+                    status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                } | null;
+                places_left: number;
+                price_cents: number;
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                workout_count: number;
+            }[];
+        };
+        /** MemberSeasonResponse */
+        MemberSeasonResponse: {
+            /** MemberSeason */
+            season: {
+                capacity: number;
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                /** Format: uuid */
+                id: string;
+                /** SeasonMyEnrollment */
+                mine: {
+                    decline_reason?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    requested_at?: string;
+                    /** @enum {string} */
+                    status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                } | null;
+                places_left: number;
+                price_cents: number;
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                workout_count: number;
+            };
+        };
         /**
          * MemberVisibility
          * @description Whether you keep out of your clubs' «Μέλη» lists
@@ -20888,6 +21432,110 @@ export interface components {
             }[];
             partial: boolean;
             timezone: string;
+        };
+        /** MyTrainingDepth */
+        MyTrainingDepth: {
+            /** DepthCoverage */
+            coverage: {
+                /**
+                 * DepthBalance
+                 * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                 */
+                balance: {
+                    ham: number;
+                    pull: number;
+                    push: number;
+                    push_pull_ratio: number | null;
+                    quad: number;
+                    quad_ham_ratio: number | null;
+                };
+                /** DepthExerciseCounts */
+                exercises: {
+                    recognized: number;
+                    unrecognized: number;
+                };
+                felt_entries: number;
+                /** @description Up to three major groups at level none or low, lowest first */
+                least: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Up to three major groups with the most weighted sets */
+                most: {
+                    /** @description Taxonomy group id */
+                    id: string;
+                    /** @enum {string} */
+                    level: "none" | "low" | "medium" | "high";
+                    per_week: number;
+                    /** @description Weighted sets in the range */
+                    sets: number;
+                }[];
+                /** @description Workouts done in the range */
+                sessions: number;
+                /** DepthCoverageThresholds */
+                thresholds: {
+                    high: number;
+                    medium: number;
+                };
+            };
+            /** Format: date */
+            from: string;
+            /**
+             * DepthLoad
+             * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+             */
+            load: {
+                /** @description Load of the last 7 days */
+                acute: number;
+                /** @enum {string|null} */
+                band: "below" | "steady" | "above" | "well_above" | null;
+                /** DepthLoadBands */
+                bands: {
+                    above_to: number;
+                    below: number;
+                    steady_to: number;
+                };
+                /** @description Weekly average of the last 28 days */
+                chronic: number;
+                /** @description Last 28 days, with effort and time */
+                rated_sessions: number;
+                ratio: number | null;
+                sufficient: boolean;
+                /** @description Last 28 days, without effort or time (not counted) */
+                unrated_sessions: number;
+                weeks: {
+                    load: number;
+                    sessions: number;
+                    /** Format: date */
+                    week_start: string;
+                }[];
+            };
+            /** DepthQualities */
+            qualities: {
+                felt_entries: number;
+                /** @description All ten qualities, canonical order */
+                qualities: {
+                    felt: number;
+                    id: string;
+                    /** @description Share of the most-trained quality, 0..1 */
+                    score: number;
+                    sets: number;
+                }[];
+                /** @description Workouts with a recognised exercise */
+                sessions: number;
+            };
+            /** @enum {string} */
+            range: "4w" | "12w" | "6m" | "1y" | "all";
+            /** @description The source filter applied (none = every source) */
+            sources: string[];
+            /** Format: date */
+            to: string;
+            weeks: number;
         };
         /** MyTrial */
         MyTrial: {
@@ -23874,6 +24522,102 @@ export interface components {
             /** @enum {string} */
             surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
         };
+        /** SeasonCoach */
+        SeasonCoach: {
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+        };
+        /** SeasonCreate */
+        SeasonCreate: {
+            capacity: number;
+            coach_ids?: string[];
+            currency?: string;
+            description?: string | null;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            price_cents: number;
+            programme?: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Publish to open requests; cancel to close the season
+             * @enum {string}
+             */
+            status?: "draft" | "published" | "cancelled";
+            title: string;
+            weeks: number;
+            welcome_message?: string | null;
+        };
+        /** SeasonDecline */
+        SeasonDecline: {
+            reason?: string | null;
+        };
+        /** SeasonEnrollment */
+        SeasonEnrollment: {
+            /** Format: date-time */
+            decided_at?: string | null;
+            decline_reason?: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname?: string | null;
+            /** Format: uuid */
+            package_subscription_id?: string | null;
+            /** Format: date-time */
+            requested_at: string;
+            /** @enum {string} */
+            status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** SeasonMyEnrollment */
+        SeasonMyEnrollment: {
+            decline_reason?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            requested_at?: string;
+            /** @enum {string} */
+            status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+        } | null;
+        /** SeasonProgrammeItem */
+        SeasonProgrammeItem: {
+            /** @description Day 0 is the start date */
+            day: number;
+            /** Format: uuid */
+            workout_id: string;
+        };
+        /** SeasonUpdate */
+        SeasonUpdate: {
+            capacity?: number;
+            coach_ids?: string[];
+            currency?: string;
+            description?: string | null;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            price_cents?: number;
+            programme?: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on?: string;
+            /**
+             * @description Publish to open requests; cancel to close the season
+             * @enum {string}
+             */
+            status?: "draft" | "published" | "cancelled";
+            title?: string;
+            weeks?: number;
+            welcome_message?: string | null;
+        };
         /** SelectProviderRequest */
         SelectProviderRequest: {
             /** Format: uuid */
@@ -25179,6 +25923,226 @@ export interface components {
             role: "owner" | "admin" | "coach";
             /** Format: uuid */
             user_id: string;
+        };
+        /** StaffSeason */
+        StaffSeason: {
+            capacity: number;
+            /** Format: uuid */
+            channel_id?: string | null;
+            coach_ids: string[];
+            coaches: {
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            counts: {
+                active: number;
+                requested: number;
+                waitlisted: number;
+            };
+            currency: string;
+            description?: string | null;
+            /** Format: date */
+            ends_on: string;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            places_left: number;
+            price_cents: number;
+            programme: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Running and completed follow from the dates
+             * @enum {string}
+             */
+            status: "draft" | "published" | "running" | "completed" | "cancelled";
+            title: string;
+            weeks: number;
+            welcome_message?: string | null;
+            workout_count: number;
+        };
+        /** StaffSeasonDetail */
+        StaffSeasonDetail: {
+            capacity: number;
+            /** Format: uuid */
+            channel_id?: string | null;
+            coach_ids: string[];
+            coaches: {
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            counts: {
+                active: number;
+                requested: number;
+                waitlisted: number;
+            };
+            currency: string;
+            description?: string | null;
+            /** Format: date */
+            ends_on: string;
+            enrollments: {
+                /** Format: date-time */
+                decided_at?: string | null;
+                decline_reason?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+                /** Format: uuid */
+                package_subscription_id?: string | null;
+                /** Format: date-time */
+                requested_at: string;
+                /** @enum {string} */
+                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                /** Format: uuid */
+                user_id: string;
+            }[];
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            membership_package_id?: string | null;
+            places_left: number;
+            price_cents: number;
+            programme: {
+                /** @description Day 0 is the start date */
+                day: number;
+                /** Format: uuid */
+                workout_id: string;
+            }[];
+            /** Format: date */
+            starts_on: string;
+            /**
+             * @description Running and completed follow from the dates
+             * @enum {string}
+             */
+            status: "draft" | "published" | "running" | "completed" | "cancelled";
+            title: string;
+            weeks: number;
+            welcome_message?: string | null;
+            workout_count: number;
+        };
+        /** StaffSeasonList */
+        StaffSeasonList: {
+            /** @description Staff who may be named as a season's coaches */
+            coach_candidates: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            seasons: {
+                capacity: number;
+                /** Format: uuid */
+                channel_id?: string | null;
+                coach_ids: string[];
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                counts: {
+                    active: number;
+                    requested: number;
+                    waitlisted: number;
+                };
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                membership_package_id?: string | null;
+                places_left: number;
+                price_cents: number;
+                programme: {
+                    /** @description Day 0 is the start date */
+                    day: number;
+                    /** Format: uuid */
+                    workout_id: string;
+                }[];
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                welcome_message?: string | null;
+                workout_count: number;
+            }[];
+        };
+        /** StaffSeasonResponse */
+        StaffSeasonResponse: {
+            /** StaffSeasonDetail */
+            season: {
+                capacity: number;
+                /** Format: uuid */
+                channel_id?: string | null;
+                coach_ids: string[];
+                coaches: {
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                }[];
+                counts: {
+                    active: number;
+                    requested: number;
+                    waitlisted: number;
+                };
+                currency: string;
+                description?: string | null;
+                /** Format: date */
+                ends_on: string;
+                enrollments: {
+                    /** Format: date-time */
+                    decided_at?: string | null;
+                    decline_reason?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                    /** Format: uuid */
+                    package_subscription_id?: string | null;
+                    /** Format: date-time */
+                    requested_at: string;
+                    /** @enum {string} */
+                    status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                membership_package_id?: string | null;
+                places_left: number;
+                price_cents: number;
+                programme: {
+                    /** @description Day 0 is the start date */
+                    day: number;
+                    /** Format: uuid */
+                    workout_id: string;
+                }[];
+                /** Format: date */
+                starts_on: string;
+                /**
+                 * @description Running and completed follow from the dates
+                 * @enum {string}
+                 */
+                status: "draft" | "published" | "running" | "completed" | "cancelled";
+                title: string;
+                weeks: number;
+                welcome_message?: string | null;
+                workout_count: number;
+            };
         };
         /** StaffTrial */
         StaffTrial: {
@@ -40295,6 +41259,132 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.TrainingDepthController.show": {
+        parameters: {
+            query?: {
+                range?: "4w" | "12w" | "6m" | "1y" | "all";
+                /** @description Comma-separated provider ids, `freeform`, `device` (all when absent) */
+                sources?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Training depth */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** DepthCoverage */
+                        coverage: {
+                            /**
+                             * DepthBalance
+                             * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                             */
+                            balance: {
+                                ham: number;
+                                pull: number;
+                                push: number;
+                                push_pull_ratio: number | null;
+                                quad: number;
+                                quad_ham_ratio: number | null;
+                            };
+                            /** DepthExerciseCounts */
+                            exercises: {
+                                recognized: number;
+                                unrecognized: number;
+                            };
+                            felt_entries: number;
+                            /** @description Up to three major groups at level none or low, lowest first */
+                            least: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Up to three major groups with the most weighted sets */
+                            most: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Workouts done in the range */
+                            sessions: number;
+                            /** DepthCoverageThresholds */
+                            thresholds: {
+                                high: number;
+                                medium: number;
+                            };
+                        };
+                        /** Format: date */
+                        from: string;
+                        /**
+                         * DepthLoad
+                         * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+                         */
+                        load: {
+                            /** @description Load of the last 7 days */
+                            acute: number;
+                            /** @enum {string|null} */
+                            band: "below" | "steady" | "above" | "well_above" | null;
+                            /** DepthLoadBands */
+                            bands: {
+                                above_to: number;
+                                below: number;
+                                steady_to: number;
+                            };
+                            /** @description Weekly average of the last 28 days */
+                            chronic: number;
+                            /** @description Last 28 days, with effort and time */
+                            rated_sessions: number;
+                            ratio: number | null;
+                            sufficient: boolean;
+                            /** @description Last 28 days, without effort or time (not counted) */
+                            unrated_sessions: number;
+                            weeks: {
+                                load: number;
+                                sessions: number;
+                                /** Format: date */
+                                week_start: string;
+                            }[];
+                        };
+                        /** DepthQualities */
+                        qualities: {
+                            felt_entries: number;
+                            /** @description All ten qualities, canonical order */
+                            qualities: {
+                                felt: number;
+                                id: string;
+                                /** @description Share of the most-trained quality, 0..1 */
+                                score: number;
+                                sets: number;
+                            }[];
+                            /** @description Workouts with a recognised exercise */
+                            sessions: number;
+                        };
+                        /** @enum {string} */
+                        range: "4w" | "12w" | "6m" | "1y" | "all";
+                        /** @description The source filter applied (none = every source) */
+                        sources: string[];
+                        /** Format: date */
+                        to: string;
+                        weeks: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyProvidersController.index": {
         parameters: {
             query?: never;
@@ -54943,6 +56033,797 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminSeasonController.confirm": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.decline": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.remove": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Seasons */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Staff who may be named as a season's coaches */
+                        coach_candidates: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[];
+                        seasons: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    capacity: number;
+                    coach_ids?: string[];
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    membership_package_id?: string | null;
+                    price_cents: number;
+                    programme?: {
+                        /** @description Day 0 is the start date */
+                        day: number;
+                        /** Format: uuid */
+                        workout_id: string;
+                    }[];
+                    /** Format: date */
+                    starts_on: string;
+                    /**
+                     * @description Publish to open requests; cancel to close the season
+                     * @enum {string}
+                     */
+                    status?: "draft" | "published" | "cancelled";
+                    title: string;
+                    weeks: number;
+                    welcome_message?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Season */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminSeasonController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    capacity?: number;
+                    coach_ids?: string[];
+                    currency?: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    membership_package_id?: string | null;
+                    price_cents?: number;
+                    programme?: {
+                        /** @description Day 0 is the start date */
+                        day: number;
+                        /** Format: uuid */
+                        workout_id: string;
+                    }[];
+                    /** Format: date */
+                    starts_on?: string;
+                    /**
+                     * @description Publish to open requests; cancel to close the season
+                     * @enum {string}
+                     */
+                    status?: "draft" | "published" | "cancelled";
+                    title?: string;
+                    weeks?: number;
+                    welcome_message?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** StaffSeasonDetail */
+                        season: {
+                            capacity: number;
+                            /** Format: uuid */
+                            channel_id?: string | null;
+                            coach_ids: string[];
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            counts: {
+                                active: number;
+                                requested: number;
+                                waitlisted: number;
+                            };
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            enrollments: {
+                                /** Format: date-time */
+                                decided_at?: string | null;
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                                /** Format: uuid */
+                                package_subscription_id?: string | null;
+                                /** Format: date-time */
+                                requested_at: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: uuid */
+                            membership_package_id?: string | null;
+                            places_left: number;
+                            price_cents: number;
+                            programme: {
+                                /** @description Day 0 is the start date */
+                                day: number;
+                                /** Format: uuid */
+                                workout_id: string;
+                            }[];
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            welcome_message?: string | null;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season or enrollment */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Invalid season */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminSettingsController.show": {
         parameters: {
             query?: never;
@@ -66038,6 +67919,237 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.SeasonController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Seasons */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        seasons: {
+                            capacity: number;
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** SeasonMyEnrollment */
+                            mine: {
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                requested_at?: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                            } | null;
+                            places_left: number;
+                            price_cents: number;
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            workout_count: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SeasonController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MemberSeason */
+                        season: {
+                            capacity: number;
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** SeasonMyEnrollment */
+                            mine: {
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                requested_at?: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                            } | null;
+                            places_left: number;
+                            price_cents: number;
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Not possible */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.SeasonController.request": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Season */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** MemberSeason */
+                        season: {
+                            capacity: number;
+                            coaches: {
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            }[];
+                            currency: string;
+                            description?: string | null;
+                            /** Format: date */
+                            ends_on: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** SeasonMyEnrollment */
+                            mine: {
+                                decline_reason?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                requested_at?: string;
+                                /** @enum {string} */
+                                status: "requested" | "waitlisted" | "active" | "declined" | "cancelled" | "completed";
+                            } | null;
+                            places_left: number;
+                            price_cents: number;
+                            /** Format: date */
+                            starts_on: string;
+                            /**
+                             * @description Running and completed follow from the dates
+                             * @enum {string}
+                             */
+                            status: "draft" | "published" | "running" | "completed" | "cancelled";
+                            title: string;
+                            weeks: number;
+                            workout_count: number;
+                        };
+                    };
+                };
+            };
+            /** @description No such season */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description The season can't take this step now */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Not possible */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
@@ -68464,6 +70576,152 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.TrainingDepthController.client": {
+        parameters: {
+            query?: {
+                range?: "4w" | "12w" | "6m" | "1y" | "all";
+            };
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Client training depth */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** DepthCoverage */
+                        coverage: {
+                            /**
+                             * DepthBalance
+                             * @description Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together
+                             */
+                            balance: {
+                                ham: number;
+                                pull: number;
+                                push: number;
+                                push_pull_ratio: number | null;
+                                quad: number;
+                                quad_ham_ratio: number | null;
+                            };
+                            /** DepthExerciseCounts */
+                            exercises: {
+                                recognized: number;
+                                unrecognized: number;
+                            };
+                            felt_entries: number;
+                            /** @description Up to three major groups at level none or low, lowest first */
+                            least: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Up to three major groups with the most weighted sets */
+                            most: {
+                                /** @description Taxonomy group id */
+                                id: string;
+                                /** @enum {string} */
+                                level: "none" | "low" | "medium" | "high";
+                                per_week: number;
+                                /** @description Weighted sets in the range */
+                                sets: number;
+                            }[];
+                            /** @description Workouts done in the range */
+                            sessions: number;
+                            /** DepthCoverageThresholds */
+                            thresholds: {
+                                high: number;
+                                medium: number;
+                            };
+                        };
+                        /** Format: date */
+                        from: string;
+                        /**
+                         * DepthLoad
+                         * @description Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice
+                         */
+                        load: {
+                            /** @description Load of the last 7 days */
+                            acute: number;
+                            /** @enum {string|null} */
+                            band: "below" | "steady" | "above" | "well_above" | null;
+                            /** DepthLoadBands */
+                            bands: {
+                                above_to: number;
+                                below: number;
+                                steady_to: number;
+                            };
+                            /** @description Weekly average of the last 28 days */
+                            chronic: number;
+                            /** @description Last 28 days, with effort and time */
+                            rated_sessions: number;
+                            ratio: number | null;
+                            sufficient: boolean;
+                            /** @description Last 28 days, without effort or time (not counted) */
+                            unrated_sessions: number;
+                            weeks: {
+                                load: number;
+                                sessions: number;
+                                /** Format: date */
+                                week_start: string;
+                            }[];
+                        };
+                        /** DepthQualities */
+                        qualities: {
+                            felt_entries: number;
+                            /** @description All ten qualities, canonical order */
+                            qualities: {
+                                felt: number;
+                                id: string;
+                                /** @description Share of the most-trained quality, 0..1 */
+                                score: number;
+                                sets: number;
+                            }[];
+                            /** @description Workouts with a recognised exercise */
+                            sessions: number;
+                        };
+                        /** @enum {string} */
+                        range: "4w" | "12w" | "6m" | "1y" | "all";
+                        /** Format: date */
+                        to: string;
+                        weeks: number;
+                    };
+                };
+            };
+            /** @description Error */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
+                    };
+                };
+            };
+            /** @description Error */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        error?: string;
                     };
                 };
             };

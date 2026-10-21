@@ -5312,7 +5312,8 @@
         "invalid_wellness_value": "Prüfe die Werte und versuch es noch einmal.",
         "invalid_media": "Das Foto ist nicht bereit. Wähle es noch einmal."
       }
-    }
+    },
+    "seasonChip": "{title} · {season}"
   },
   "Community": {
     "all": "Alle",
@@ -8372,6 +8373,124 @@
       }
     }
   },
+  "Seasons": {
+    "tab": "Saisons",
+    "title": "Saisons",
+    "eyebrow": "Saison",
+    "season": "Saison",
+    "entry": "{count, plural, one {# Saison offen} other {# Saisons offen}}",
+    "tag": "Saison · {title}",
+    "back": "Zurück",
+    "close": "Schließen",
+    "withdraw": "Anfrage zurückziehen",
+    "joinWaitlist": "Auf die Warteliste",
+    "request": "Platz anfragen",
+    "dates": "Zeitraum",
+    "weeksLabel": "Wochen",
+    "weeks": "{count, plural, one {# Woche} other {# Wochen}}",
+    "price": "Preis",
+    "places": "Plätze",
+    "placesLeft": "{count, plural, one {Noch # Platz frei} other {Noch # Plätze frei}}",
+    "placesFull": "Voll · Warteliste",
+    "coaches": "Coaches",
+    "programme": "Programm",
+    "workouts": "{count, plural, one {# Workout} other {# Workouts}}",
+    "requestHint": "Deine Anfrage geht an die Box. Dein Platz gilt, sobald sie ihn bestätigt; bezahlt wird direkt bei der Box.",
+    "mine_requested": "Anfrage offen",
+    "mine_waitlisted": "Auf der Warteliste",
+    "mine_active": "Du bist dabei",
+    "mine_declined": "Nicht bestätigt",
+    "mine_cancelled": "Storniert",
+    "mine_completed": "Abgeschlossen",
+    "mineHint_requested": "Die Box bestätigt deinen Platz bald.",
+    "mineHint_waitlisted": "Die Saison ist voll. Wird ein Platz frei, ist deine Anfrage zuerst dran.",
+    "mineHint_active": "Das Programm ist in deiner Box, die Saison-Crew im Club. Für Änderungen sprich mit der Box.",
+    "mineHint_declined": "Die Box konnte deinen Platz nicht bestätigen.",
+    "mineHint_cancelled": "Die Anfrage oder die Saison wurde storniert.",
+    "mineHint_completed": "Die Saison ist vorbei. Ihre Workouts bleiben in deinem Journal.",
+    "adminHint": "Programme mit Datum und Plätzen. Mitglieder fragen einen Platz an, du bestätigst.",
+    "newSeason": "Neue Saison",
+    "loading": "Wird geladen…",
+    "adminEmpty": "Noch keine Saisons.",
+    "filled": "{active}/{capacity} dabei",
+    "waiting": "{count, plural, one {# Anfrage} other {# Anfragen}}",
+    "status_draft": "Entwurf",
+    "status_published": "Offen",
+    "status_running": "Läuft",
+    "status_completed": "Abgeschlossen",
+    "status_cancelled": "Storniert",
+    "fieldTitle": "Titel",
+    "fieldDescription": "Beschreibung",
+    "fieldStartsOn": "Beginn",
+    "fieldCapacity": "Plätze",
+    "scheduleLocked": "Beginn, Wochen und Programm sind gesperrt, sobald jemand bestätigt ist.",
+    "fieldPackage": "Paket",
+    "fieldPackageHint": "Optional: wird allen Bestätigten zum Saisonpreis zugewiesen.",
+    "noPackage": "Kein Paket",
+    "programmeHint": "Veröffentlichte Workouts pro Tag. Sie landen in der Box jedes bestätigten Mitglieds.",
+    "programmeDay": "Tag",
+    "programmeWorkout": "Workout",
+    "dayOption": "Tag {day}",
+    "dayOptionDate": "Tag {day} · {date}",
+    "pickWorkout": "Workout wählen",
+    "removeRow": "Entfernen",
+    "addWorkout": "Workout hinzufügen",
+    "fieldWelcome": "Willkommensnachricht",
+    "fieldWelcomeHint": "Wird im Saison-Kanal angeheftet, sobald das erste Mitglied dabei ist.",
+    "save": "Speichern",
+    "saveDraft": "Entwurf speichern",
+    "publish": "Veröffentlichen",
+    "cancelSeason": "Saison stornieren",
+    "cancelSeasonConfirm": "Ja, Saison stornieren",
+    "participants": "Teilnehmende · {active}/{capacity}",
+    "noRequests": "Noch keine Anfragen.",
+    "enrollment_requested": "Anfrage",
+    "enrollment_waitlisted": "Warteliste",
+    "enrollment_active": "Dabei",
+    "enrollment_declined": "Abgelehnt",
+    "enrollment_cancelled": "Storniert",
+    "enrollment_completed": "Abgeschlossen",
+    "confirm": "Bestätigen",
+    "decline": "Ablehnen",
+    "remove": "Entfernen",
+    "declineReason": "Grund (optional, das Mitglied sieht ihn)",
+    "declineSend": "Senden",
+    "error_generic": "Etwas ist schiefgelaufen. Bitte versuch es noch einmal.",
+    "error_season_not_open": "Diese Saison nimmt gerade keine Anfragen an.",
+    "error_season_full": "Die Saison ist voll.",
+    "error_season_already_requested": "Du hast für diese Saison schon angefragt.",
+    "error_season_place_confirmed": "Dein Platz ist bestätigt; für Änderungen sprich mit der Box.",
+    "error_invalid_season_transition": "Die Anfrage hat sich inzwischen geändert. Aktualisiere und versuch es erneut.",
+    "error_invalid_season_status": "Diese Statusänderung ist nicht erlaubt.",
+    "error_season_closed": "Die Saison ist abgeschlossen und kann nicht mehr geändert werden.",
+    "error_season_schedule_locked": "Beginn, Wochen und Programm sind nach der ersten Bestätigung gesperrt.",
+    "error_capacity_below_participants": "Es kann nicht weniger Plätze als Teilnehmende geben.",
+    "error_season_has_enrollments": "Die Saison hat Anfragen und kann kein Entwurf mehr werden.",
+    "error_programme_workout_unavailable": "Ein Workout im Programm ist nicht veröffentlicht.",
+    "error_not_a_coach": "Coaches können nur Teammitglieder sein.",
+    "notif": {
+      "aSeason": "eine Saison",
+      "someone": "Jemand",
+      "theBox": "Die Box",
+      "season_requested": {
+        "title": "Anfrage für „{season}“",
+        "body": "{person} fragt einen Platz an.",
+        "bodyWaitlist": "{person} steht auf der Warteliste."
+      },
+      "season_confirmed": {
+        "title": "Du bist bei „{season}“ dabei",
+        "body": "Das Programm ist in deiner Box."
+      },
+      "season_declined": {
+        "title": "„{season}“: Platz nicht bestätigt",
+        "body": "{box} konnte deinen Platz nicht bestätigen."
+      },
+      "season_cancelled": {
+        "title": "„{season}“ wurde storniert",
+        "body": "{box} hat die Saison storniert."
+      }
+    }
+  },
   "Partners": {
     "title": "Trainingspartner",
     "introTitle": "Finde einen Trainingspartner",
@@ -8555,5 +8674,59 @@
     "tabMembers": "Leute",
     "notFound": "Dieser Squad ist nicht verfügbar.",
     "backToClub": "Zurück zum Club"
+  },
+  "Depth": {
+    "noData": "Keine Trainings in diesem Zeitraum.",
+    "coverage": {
+      "title": "Muskelabdeckung",
+      "atlas": "Atlas ›",
+      "most": "Am meisten trainiert",
+      "least": "Am wenigsten trainiert",
+      "noneMost": "Keine erkannte Übung in diesem Zeitraum.",
+      "noneLeast": "Alle großen Muskelgruppen haben mittlere oder hohe Abdeckung.",
+      "pushPull": "Drücken : Ziehen",
+      "quadHam": "Quadrizeps : Beinbeuger",
+      "ratioMissing": "Noch ein paar Sätze nötig",
+      "note": "Ein Hinweis auf das Trainingsvolumen, kein Ziel."
+    },
+    "qualities": {
+      "title": "Fitnessqualitäten",
+      "most": "Am meisten: {qualities}",
+      "felt": "„Gespürt“: {qualities}",
+      "row": "{quality}: {sets} Sätze",
+      "note": "Die Form zeigt, wohin das Training ging, keine Note.",
+      "short": {
+        "cardiorespiratory-endurance": "Ausdauer",
+        "stamina": "Kraftausd.",
+        "strength": "Kraft",
+        "flexibility": "Beweglichk.",
+        "power": "Schnellkraft",
+        "speed": "Tempo",
+        "coordination": "Koordination",
+        "agility": "Agilität",
+        "balance": "Balance",
+        "accuracy": "Präzision"
+      }
+    },
+    "load": {
+      "title": "Trainingsbelastung",
+      "ratio": "Diese Woche: {ratio}× deiner üblichen",
+      "insufficient": "Der Vergleich erscheint nach 3 Wochen Training mit RPE und Dauer.",
+      "weeks": "Belastung pro Woche · 8 Wo.",
+      "weekOf": "Woche vom {date}: {load}",
+      "unrated": "{count, plural, one {# Training der letzten 4 Wochen hat kein RPE oder keine Dauer und zählt nicht.} other {# Trainings der letzten 4 Wochen haben kein RPE oder keine Dauer und zählen nicht.}}",
+      "note": "Belastung = RPE × Minuten. Ein Hinweis im Vergleich zu deiner üblichen Woche, kein medizinischer Rat.",
+      "band": {
+        "below": "Leichter",
+        "steady": "Nahe am Üblichen",
+        "above": "Über dem Üblichen",
+        "well_above": "Deutlich über dem Üblichen"
+      }
+    },
+    "coach": {
+      "title": "Abdeckung, Qualitäten, Belastung",
+      "range": "Zeitraum",
+      "sharedOnly": "Nur aus Einträgen, die das Mitglied mit den Coaches der Box teilt."
+    }
   }
 }

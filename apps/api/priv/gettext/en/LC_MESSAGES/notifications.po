@@ -544,6 +544,33 @@ msgstr "Your journal export is ready"
 msgid "Download it within seven days from Settings."
 msgstr "Download it within seven days from Settings."
 
+msgid "Season request"
+msgstr "Season request"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} asks for a place in %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} joined the waitlist of %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Your place is confirmed"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} starts on %{date}. The programme is in your Box."
+
+msgid "Season request not confirmed"
+msgstr "Season request not confirmed"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} could not confirm your place in %{season}."
+
+msgid "Season cancelled"
+msgstr "Season cancelled"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} cancelled %{season}."
+
 msgid "You found a training partner"
 msgstr "You found a training partner"
 

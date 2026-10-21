@@ -189,6 +189,14 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFinanceController, :cleanup_records} => [:manage_billing],
     {W.AdminFinanceController, :purge_record} => [:manage_billing],
     {W.AdminFinanceController, :packages} => [:view_package_catalog],
+    # ADR-167: seasons are sold like packages; places are answered like payments.
+    {W.AdminSeasonController, :index} => [:view_package_catalog, :take_payments],
+    {W.AdminSeasonController, :show} => [:view_package_catalog, :take_payments],
+    {W.AdminSeasonController, :create} => [:manage_packages],
+    {W.AdminSeasonController, :update} => [:manage_packages],
+    {W.AdminSeasonController, :confirm} => [:take_payments, :manage_memberships],
+    {W.AdminSeasonController, :decline} => [:take_payments, :manage_memberships],
+    {W.AdminSeasonController, :remove} => [:take_payments, :manage_memberships],
     {W.AdminFinanceController, :package_catalog} => [:view_package_catalog],
     {W.AdminFinanceController, :package} => [:view_package_catalog],
     {W.AdminFinanceController, :create_package} => [:manage_packages],
@@ -250,6 +258,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     # ADR-160: the weekly wellness summary; the use case also requires the
     # coach role and the client's grant.
     {W.ClientWellnessSummaryController, :show} => [:view_health],
+    # ADR-165: coverage, qualities and load from shared entries; the use
+    # case also requires the coach role and the client in scope.
+    {W.TrainingDepthController, :client} => [:view_client_training],
 
     # Private coach notes (ADR-101)
     {W.CoachNotesController, :index} => [:write_coach_notes, :read_coach_notes],

@@ -119,7 +119,9 @@ export function BoxToday() {
   function chipLabel(item: TodayTrainingItem) {
     return item.kind === "class" && item.scheduledAt
       ? t("classChip", { time: time(item.scheduledAt) })
-      : t("programmeChip", { title: item.sourceName });
+      : item.seasonTitle
+        ? t("seasonChip", { title: item.sourceName, season: item.seasonTitle })
+        : t("programmeChip", { title: item.sourceName });
   }
 
   function openLog(item: TodayTrainingItem) {

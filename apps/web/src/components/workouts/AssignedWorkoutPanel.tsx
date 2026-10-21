@@ -24,6 +24,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
+import { SeasonTag } from "@/components/seasons/SeasonTag";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -185,6 +186,7 @@ export function AssignedWorkoutPanel({
             >
               {assignment.workout.title}
             </h2>
+            <SeasonTag season={assignment.season} />
             {scaleLevels.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <button

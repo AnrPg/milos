@@ -38,6 +38,8 @@ defmodule MilosTraining.Notifications do
 
   @referral_types ~w(referral_progress referral_reward referral_review)
 
+  @season_types ~w(season_requested season_confirmed season_declined season_cancelled)
+
   def create_notification(params), do: create_and_broadcast_notification(params)
 
   # ADR-123: push dispatch result -> {outcome, reason_class} for analytics.
@@ -304,6 +306,16 @@ defmodule MilosTraining.Notifications do
         String.to_existing_atom(type),
         payload,
         referral_payload(type, payload)
+      )
+
+  # ADR-167: seasons. Each event names its one recipient; the use case fans a
+  # request out to the staff who confirm places and the season's coaches.
+  def process_event(type, payload) when type in @season_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        season_payload(type, payload)
       )
 
   # ADR-154: a saved Γύρω μου filter found something new (at most daily).
@@ -1076,6 +1088,28 @@ defmodule MilosTraining.Notifications do
       target_type: field(payload, :target_type),
       reason: field(payload, :reason),
       dedupe_key: "#{type}:#{dedupe}",
+      url: url
+    }
+  end
+
+  defp season_payload(type, payload) do
+    season_id = field(payload, :season_id)
+
+    url =
+      if type == "season_requested",
+        do: "/admin/finance?tab=seasons&season=#{season_id}",
+        else: "/box?season=#{season_id}"
+
+    %{
+      organization_id: field(payload, :organization_id),
+      season_id: season_id,
+      season_title: field(payload, :season_title),
+      starts_on: field(payload, :starts_on),
+      person_nickname: field(payload, :person_nickname),
+      box_name: field(payload, :box_name),
+      enrollment_status: field(payload, :enrollment_status),
+      reason: field(payload, :reason),
+      dedupe_key: "#{type}:#{season_id}:#{field(payload, :enrollment_id)}:#{field(payload, :at)}",
       url: url
     }
   end

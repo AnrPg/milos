@@ -5312,7 +5312,8 @@
         "invalid_wellness_value": "تحقق من القيم وحاول مجددًا.",
         "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
       }
-    }
+    },
+    "seasonChip": "{title} · {season}"
   },
   "Community": {
     "all": "الكل",
@@ -8372,6 +8373,124 @@
       }
     }
   },
+  "Seasons": {
+    "tab": "المواسم",
+    "title": "المواسم",
+    "eyebrow": "موسم",
+    "season": "موسم",
+    "entry": "{count, plural, zero {لا مواسم مفتوحة} one {موسم واحد مفتوح} two {موسمان مفتوحان} few {# مواسم مفتوحة} many {# موسمًا مفتوحًا} other {# موسم مفتوح}}",
+    "tag": "موسم · {title}",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "withdraw": "سحب الطلب",
+    "joinWaitlist": "الانضمام إلى قائمة الانتظار",
+    "request": "اطلب مكانًا",
+    "dates": "التواريخ",
+    "weeksLabel": "الأسابيع",
+    "weeks": "{count, plural, zero {لا أسابيع} one {أسبوع واحد} two {أسبوعان} few {# أسابيع} many {# أسبوعًا} other {# أسبوع}}",
+    "price": "السعر",
+    "places": "الأماكن",
+    "placesLeft": "{count, plural, zero {لا أماكن متبقية} one {يتبقى مكان واحد} two {يتبقى مكانان} few {تتبقى # أماكن} many {يتبقى # مكانًا} other {يتبقى # مكان}}",
+    "placesFull": "مكتمل · قائمة انتظار",
+    "coaches": "المدربون",
+    "programme": "البرنامج",
+    "workouts": "{count, plural, zero {لا تمارين} one {تمرين واحد} two {تمرينان} few {# تمارين} many {# تمرينًا} other {# تمرين}}",
+    "requestHint": "يذهب طلبك إلى الصالة. يصبح مكانك مؤكدًا عندما يؤكدونه، والدفع يتم مباشرة مع الصالة.",
+    "mine_requested": "الطلب قيد الانتظار",
+    "mine_waitlisted": "في قائمة الانتظار",
+    "mine_active": "أنت مشترك",
+    "mine_declined": "لم يُؤكَّد",
+    "mine_cancelled": "أُلغي",
+    "mine_completed": "اكتمل",
+    "mineHint_requested": "ستؤكد الصالة مكانك قريبًا.",
+    "mineHint_waitlisted": "الموسم مكتمل. إذا شغر مكان، فطلبك هو الأول.",
+    "mineHint_active": "البرنامج في Box الخاص بك ومجموعة الموسم في النادي. للتغييرات تحدث مع الصالة.",
+    "mineHint_declined": "لم تتمكن الصالة من تأكيد مكانك.",
+    "mineHint_cancelled": "أُلغي الطلب أو الموسم.",
+    "mineHint_completed": "انتهى الموسم. تبقى تمارينه في يومياتك.",
+    "adminHint": "برامج بتواريخ وأماكن. يطلب الأعضاء مكانًا وأنت تؤكد.",
+    "newSeason": "موسم جديد",
+    "loading": "جارٍ التحميل…",
+    "adminEmpty": "لا توجد مواسم بعد.",
+    "filled": "{active}/{capacity} مشتركون",
+    "waiting": "{count, plural, zero {لا طلبات} one {طلب واحد} two {طلبان} few {# طلبات} many {# طلبًا} other {# طلب}}",
+    "status_draft": "مسودة",
+    "status_published": "مفتوح",
+    "status_running": "جارٍ",
+    "status_completed": "مكتمل",
+    "status_cancelled": "ملغى",
+    "fieldTitle": "العنوان",
+    "fieldDescription": "الوصف",
+    "fieldStartsOn": "البداية",
+    "fieldCapacity": "الأماكن",
+    "scheduleLocked": "تُقفَل البداية والأسابيع والبرنامج بمجرد تأكيد أي شخص.",
+    "fieldPackage": "الباقة",
+    "fieldPackageHint": "اختياري: تُمنح بسعر الموسم لكل من يُؤكَّد.",
+    "noPackage": "بدون باقة",
+    "programmeHint": "تمارين منشورة لكل يوم. تُضاف إلى Box كل عضو مؤكَّد.",
+    "programmeDay": "اليوم",
+    "programmeWorkout": "التمرين",
+    "dayOption": "اليوم {day}",
+    "dayOptionDate": "اليوم {day} · {date}",
+    "pickWorkout": "اختر تمرينًا",
+    "removeRow": "إزالة",
+    "addWorkout": "إضافة تمرين",
+    "fieldWelcome": "رسالة ترحيب",
+    "fieldWelcomeHint": "تُثبَّت في قناة الموسم عند انضمام أول عضو.",
+    "save": "حفظ",
+    "saveDraft": "حفظ المسودة",
+    "publish": "نشر",
+    "cancelSeason": "إلغاء الموسم",
+    "cancelSeasonConfirm": "نعم، ألغِ الموسم",
+    "participants": "المشاركون · {active}/{capacity}",
+    "noRequests": "لا توجد طلبات بعد.",
+    "enrollment_requested": "طلب",
+    "enrollment_waitlisted": "انتظار",
+    "enrollment_active": "مشترك",
+    "enrollment_declined": "مرفوض",
+    "enrollment_cancelled": "ملغى",
+    "enrollment_completed": "أكمل",
+    "confirm": "تأكيد",
+    "decline": "رفض",
+    "remove": "إزالة",
+    "declineReason": "السبب (اختياري، يراه العضو)",
+    "declineSend": "إرسال",
+    "error_generic": "حدث خطأ ما. حاول مرة أخرى.",
+    "error_season_not_open": "هذا الموسم لا يقبل طلبات الآن.",
+    "error_season_full": "الموسم مكتمل.",
+    "error_season_already_requested": "لديك طلب بالفعل لهذا الموسم.",
+    "error_season_place_confirmed": "مكانك مؤكد؛ للتغييرات تحدث مع الصالة.",
+    "error_invalid_season_transition": "تغيّر الطلب في الأثناء. حدّث الصفحة وحاول مجددًا.",
+    "error_invalid_season_status": "تغيير الحالة هذا غير مسموح.",
+    "error_season_closed": "الموسم مغلق ولم يعد قابلًا للتغيير.",
+    "error_season_schedule_locked": "قُفلت البداية والأسابيع والبرنامج بعد أول تأكيد.",
+    "error_capacity_below_participants": "لا يمكن أن تكون الأماكن أقل من عدد المشاركين.",
+    "error_season_has_enrollments": "للموسم طلبات؛ لا يمكن إعادته إلى مسودة.",
+    "error_programme_workout_unavailable": "أحد تمارين البرنامج غير منشور.",
+    "error_not_a_coach": "يمكن أن يكون المدرب من الطاقم فقط.",
+    "notif": {
+      "aSeason": "موسم",
+      "someone": "شخص ما",
+      "theBox": "الصالة",
+      "season_requested": {
+        "title": "طلب لـ«{season}»",
+        "body": "{person} يطلب مكانًا.",
+        "bodyWaitlist": "انضم {person} إلى قائمة الانتظار."
+      },
+      "season_confirmed": {
+        "title": "أنت مشترك في «{season}»",
+        "body": "البرنامج في Box الخاص بك."
+      },
+      "season_declined": {
+        "title": "«{season}»: لم يُؤكَّد المكان",
+        "body": "لم تتمكن {box} من تأكيد مكانك."
+      },
+      "season_cancelled": {
+        "title": "أُلغي «{season}»",
+        "body": "ألغت {box} الموسم."
+      }
+    }
+  },
   "Partners": {
     "title": "شركاء التمرين",
     "introTitle": "اعثر على شريك تمرين",
@@ -8555,5 +8674,59 @@
     "tabMembers": "الأشخاص",
     "notFound": "هذا الفريق غير متاح.",
     "backToClub": "العودة إلى النادي"
+  },
+  "Depth": {
+    "noData": "لا توجد تمارين في هذه الفترة.",
+    "coverage": {
+      "title": "تغطية العضلات",
+      "atlas": "الأطلس ›",
+      "most": "أكثر عمل",
+      "least": "أقل عمل",
+      "noneMost": "لا يوجد تمرين معروف في هذه الفترة.",
+      "noneLeast": "جميع المجموعات العضلية الكبيرة لها تغطية متوسطة أو عالية.",
+      "pushPull": "دفع : سحب",
+      "quadHam": "الرباعية : الخلفية",
+      "ratioMissing": "تحتاج إلى بضع مجموعات أخرى",
+      "note": "مؤشر على حجم التمرين، وليس هدفًا."
+    },
+    "qualities": {
+      "title": "الصفات البدنية",
+      "most": "الأكثر: {qualities}",
+      "felt": "«شعرت»: {qualities}",
+      "row": "{quality}: {sets} مجموعات",
+      "note": "الشكل يبين أين ذهب التمرين، وليس درجة.",
+      "short": {
+        "cardiorespiratory-endurance": "قلبي",
+        "stamina": "تحمل",
+        "strength": "قوة",
+        "flexibility": "مرونة",
+        "power": "قدرة",
+        "speed": "سرعة",
+        "coordination": "تناسق",
+        "agility": "رشاقة",
+        "balance": "توازن",
+        "accuracy": "دقة"
+      }
+    },
+    "load": {
+      "title": "حمل التمرين",
+      "ratio": "هذا الأسبوع: {ratio}× من المعتاد",
+      "insufficient": "تظهر المقارنة بعد 3 أسابيع من التمارين مع RPE والمدة.",
+      "weeks": "الحمل لكل أسبوع · 8 أسابيع",
+      "weekOf": "أسبوع {date}: {load}",
+      "unrated": "{count, plural, one {تمرين واحد في آخر 4 أسابيع بلا RPE أو مدة ولا يُحتسب.} other {# تمارين في آخر 4 أسابيع بلا RPE أو مدة ولا تُحتسب.}}",
+      "note": "الحمل = RPE × الدقائق. مؤشر مقارنة بأسبوعك المعتاد، وليس نصيحة طبية.",
+      "band": {
+        "below": "أخف",
+        "steady": "قريب من المعتاد",
+        "above": "أعلى من المعتاد",
+        "well_above": "أعلى بكثير من المعتاد"
+      }
+    },
+    "coach": {
+      "title": "التغطية والصفات والحمل",
+      "range": "الفترة",
+      "sharedOnly": "فقط من الإدخالات التي يشاركها العميل مع مدربي الصالة."
+    }
   }
 }

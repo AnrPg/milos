@@ -394,6 +394,10 @@ defmodule MilosTrainingWeb.Router do
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
     put("/home-location", HomeLocationController, :update_mine)
+    # ADR-167: Box › Συνδρομή › seasons.
+    get("/seasons", SeasonController, :index)
+    post("/seasons/:id/request", SeasonController, :request)
+    post("/seasons/:id/cancel", SeasonController, :cancel)
     # ADR-156: «Φέρε φίλο».
     get("/referrals", ReferralController, :mine)
     post("/referrals/code", ReferralController, :rotate_code)
@@ -625,6 +629,8 @@ defmodule MilosTrainingWeb.Router do
     get("/clients/:user_id/body/series", ClientBodyController, :series)
     # ADR-160: the weekly wellness summary, only with the client's grant.
     get("/clients/:user_id/wellness-summary", ClientWellnessSummaryController, :show)
+    # ADR-165: a client's coverage, qualities and load from shared entries.
+    get("/clients/:user_id/progress-depth", TrainingDepthController, :client)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -865,6 +871,14 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
+    # ADR-167: seasons.
+    get("/seasons", AdminSeasonController, :index)
+    post("/seasons", AdminSeasonController, :create)
+    get("/seasons/:id", AdminSeasonController, :show)
+    patch("/seasons/:id", AdminSeasonController, :update)
+    post("/season-enrollments/:id/confirm", AdminSeasonController, :confirm)
+    post("/season-enrollments/:id/decline", AdminSeasonController, :decline)
+    post("/season-enrollments/:id/remove", AdminSeasonController, :remove)
     get("/finance/packages", AdminFinanceController, :packages)
     get("/finance/package-catalog", AdminFinanceController, :package_catalog)
     get("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :beneficiaries)
@@ -1191,6 +1205,8 @@ defmodule MilosTrainingWeb.Router do
     get("/me/today", MyProvidersController, :today)
     get("/me/history", AccountTrainingController, :history)
     get("/me/progress", AccountTrainingController, :progress)
+    # ADR-165: coverage summary, qualities radar and training load.
+    get("/me/progress/depth", TrainingDepthController, :show)
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)

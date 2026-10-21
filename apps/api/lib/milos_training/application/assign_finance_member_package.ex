@@ -3,7 +3,17 @@ defmodule MilosTraining.Application.AssignFinanceMemberPackage do
   alias MilosTraining.Finance.Domain.PackageAssignmentPolicy
   alias MilosTraining.{Finance, Identity}
 
-  def call(context, user_id, params) do
+  @doc """
+  `opts`: `:price_cents` sets the subscription's price instead of the
+  package's (ADR-167: a season sells its package at the season's price).
+  The request body can never set it.
+  """
+  def call(context, user_id, params, opts \\ []) do
+    params =
+      params
+      |> Map.drop(["price_cents_snapshot", :price_cents_snapshot])
+      |> put_price(opts[:price_cents])
+
     with user when not is_nil(user) <- Identity.find_by_id(user_id),
          package_id when is_binary(package_id) <- package_id(params),
          package when not is_nil(package) <- Finance.get_package(package_id),
@@ -29,6 +39,11 @@ defmodule MilosTraining.Application.AssignFinanceMemberPackage do
         })
     end
   end
+
+  defp put_price(params, price) when is_integer(price) and price >= 0,
+    do: Map.put(params, "price_cents_snapshot", price)
+
+  defp put_price(params, _price), do: params
 
   defp package_id(params),
     do: params["membership_package_id"] || params[:membership_package_id]

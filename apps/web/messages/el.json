@@ -5312,7 +5312,8 @@
         "invalid_wellness_value": "Έλεγξε τις τιμές και δοκίμασε ξανά.",
         "invalid_media": "Η φωτογραφία δεν είναι έτοιμη. Διάλεξέ τη ξανά."
       }
-    }
+    },
+    "seasonChip": "{title} · {season}"
   },
   "Community": {
     "all": "Όλα",
@@ -8372,6 +8373,124 @@
       }
     }
   },
+  "Seasons": {
+    "tab": "Σεζόν",
+    "title": "Σεζόν",
+    "eyebrow": "Σεζόν",
+    "season": "Σεζόν",
+    "entry": "{count, plural, one {# σεζόν ανοιχτή} other {# σεζόν ανοιχτές}}",
+    "tag": "Σεζόν · {title}",
+    "back": "Πίσω",
+    "close": "Κλείσιμο",
+    "withdraw": "Απόσυρση αίτησης",
+    "joinWaitlist": "Μπες σε αναμονή",
+    "request": "Ζήτα θέση",
+    "dates": "Ημερομηνίες",
+    "weeksLabel": "Εβδομάδες",
+    "weeks": "{count, plural, one {# εβδομάδα} other {# εβδομάδες}}",
+    "price": "Τιμή",
+    "places": "Θέσεις",
+    "placesLeft": "{count, plural, one {Μένει # θέση} other {Μένουν # θέσεις}}",
+    "placesFull": "Γεμάτο · λίστα αναμονής",
+    "coaches": "Coaches",
+    "programme": "Πρόγραμμα",
+    "workouts": "{count, plural, one {# προπόνηση} other {# προπονήσεις}}",
+    "requestHint": "Η αίτηση πάει στο box. Η θέση σου ισχύει όταν την επιβεβαιώσουν· η πληρωμή γίνεται με το box.",
+    "mine_requested": "Αίτηση σε αναμονή",
+    "mine_waitlisted": "Σε λίστα αναμονής",
+    "mine_active": "Είσαι μέσα",
+    "mine_declined": "Δεν έγινε δεκτή",
+    "mine_cancelled": "Ακυρώθηκε",
+    "mine_completed": "Ολοκληρώθηκε",
+    "mineHint_requested": "Το box θα επιβεβαιώσει τη θέση σου σύντομα.",
+    "mineHint_waitlisted": "Η σεζόν είναι γεμάτη. Αν ανοίξει θέση, η αίτησή σου πάει πρώτη.",
+    "mineHint_active": "Το πρόγραμμα είναι στο Box και η ομάδα της σεζόν στο club. Για αλλαγές, μίλα με το box.",
+    "mineHint_declined": "Το box δεν μπόρεσε να επιβεβαιώσει τη θέση σου.",
+    "mineHint_cancelled": "Η αίτηση ή η σεζόν ακυρώθηκε.",
+    "mineHint_completed": "Η σεζόν τελείωσε. Οι προπονήσεις μένουν στο Ημερολόγιο.",
+    "adminHint": "Προγράμματα με ημερομηνίες και θέσεις. Τα μέλη ζητούν θέση και εσύ επιβεβαιώνεις.",
+    "newSeason": "Νέα σεζόν",
+    "loading": "Φόρτωση…",
+    "adminEmpty": "Δεν υπάρχει ακόμη σεζόν.",
+    "filled": "{active}/{capacity} μέσα",
+    "waiting": "{count, plural, one {# αίτηση} other {# αιτήσεις}}",
+    "status_draft": "Πρόχειρο",
+    "status_published": "Ανοιχτή",
+    "status_running": "Σε εξέλιξη",
+    "status_completed": "Ολοκληρώθηκε",
+    "status_cancelled": "Ακυρώθηκε",
+    "fieldTitle": "Τίτλος",
+    "fieldDescription": "Περιγραφή",
+    "fieldStartsOn": "Έναρξη",
+    "fieldCapacity": "Θέσεις",
+    "scheduleLocked": "Η έναρξη, οι εβδομάδες και το πρόγραμμα κλειδώνουν μόλις επιβεβαιωθεί κάποιος.",
+    "fieldPackage": "Πακέτο",
+    "fieldPackageHint": "Προαιρετικό: δίνεται με την τιμή της σεζόν σε όποιον επιβεβαιώνεται.",
+    "noPackage": "Χωρίς πακέτο",
+    "programmeHint": "Δημοσιευμένες προπονήσεις ανά μέρα. Μπαίνουν στο Box κάθε μέλους που επιβεβαιώνεται.",
+    "programmeDay": "Μέρα",
+    "programmeWorkout": "Προπόνηση",
+    "dayOption": "Μέρα {day}",
+    "dayOptionDate": "Μέρα {day} · {date}",
+    "pickWorkout": "Διάλεξε προπόνηση",
+    "removeRow": "Αφαίρεση",
+    "addWorkout": "Προσθήκη προπόνησης",
+    "fieldWelcome": "Μήνυμα καλωσορίσματος",
+    "fieldWelcomeHint": "Καρφιτσώνεται στο κανάλι της σεζόν όταν μπει το πρώτο μέλος.",
+    "save": "Αποθήκευση",
+    "saveDraft": "Αποθήκευση πρόχειρου",
+    "publish": "Δημοσίευση",
+    "cancelSeason": "Ακύρωση σεζόν",
+    "cancelSeasonConfirm": "Ναι, ακύρωση σεζόν",
+    "participants": "Συμμετέχοντες · {active}/{capacity}",
+    "noRequests": "Καμία αίτηση ακόμη.",
+    "enrollment_requested": "Αίτηση",
+    "enrollment_waitlisted": "Αναμονή",
+    "enrollment_active": "Μέσα",
+    "enrollment_declined": "Απορρίφθηκε",
+    "enrollment_cancelled": "Ακυρώθηκε",
+    "enrollment_completed": "Ολοκλήρωσε",
+    "confirm": "Επιβεβαίωση",
+    "decline": "Απόρριψη",
+    "remove": "Αφαίρεση",
+    "declineReason": "Λόγος (προαιρετικά, τον βλέπει το μέλος)",
+    "declineSend": "Αποστολή",
+    "error_generic": "Κάτι πήγε στραβά. Δοκίμασε ξανά.",
+    "error_season_not_open": "Η σεζόν δεν δέχεται αιτήσεις τώρα.",
+    "error_season_full": "Η σεζόν είναι γεμάτη.",
+    "error_season_already_requested": "Έχεις ήδη αίτηση για αυτή τη σεζόν.",
+    "error_season_place_confirmed": "Η θέση σου είναι επιβεβαιωμένη· για αλλαγές μίλα με το box.",
+    "error_invalid_season_transition": "Η αίτηση άλλαξε στο μεταξύ. Ανανέωσε και δοκίμασε ξανά.",
+    "error_invalid_season_status": "Αυτή η αλλαγή κατάστασης δεν επιτρέπεται.",
+    "error_season_closed": "Η σεζόν έκλεισε και δεν αλλάζει πια.",
+    "error_season_schedule_locked": "Η έναρξη, οι εβδομάδες και το πρόγραμμα κλείδωσαν μετά την πρώτη επιβεβαίωση.",
+    "error_capacity_below_participants": "Οι θέσεις δεν μπορούν να είναι λιγότερες από τους συμμετέχοντες.",
+    "error_season_has_enrollments": "Η σεζόν έχει αιτήσεις· δεν γίνεται ξανά πρόχειρη.",
+    "error_programme_workout_unavailable": "Μια προπόνηση του προγράμματος δεν είναι δημοσιευμένη.",
+    "error_not_a_coach": "Coach μπορεί να είναι μόνο κάποιος από το staff.",
+    "notif": {
+      "aSeason": "μια σεζόν",
+      "someone": "Κάποιος",
+      "theBox": "Το box",
+      "season_requested": {
+        "title": "Αίτηση για «{season}»",
+        "body": "{person} ζητά θέση.",
+        "bodyWaitlist": "{person} μπήκε σε λίστα αναμονής."
+      },
+      "season_confirmed": {
+        "title": "Είσαι μέσα στο «{season}»",
+        "body": "Το πρόγραμμα είναι στο Box σου."
+      },
+      "season_declined": {
+        "title": "«{season}»: η θέση δεν επιβεβαιώθηκε",
+        "body": "{box} δεν μπόρεσε να επιβεβαιώσει τη θέση σου."
+      },
+      "season_cancelled": {
+        "title": "«{season}» ακυρώθηκε",
+        "body": "{box} ακύρωσε τη σεζόν."
+      }
+    }
+  },
   "Partners": {
     "title": "Partners",
     "introTitle": "Βρες partner για προπόνηση",
@@ -8555,5 +8674,59 @@
     "tabMembers": "Μέλη",
     "notFound": "Αυτό το squad δεν είναι διαθέσιμο.",
     "backToClub": "Πίσω στο club"
+  },
+  "Depth": {
+    "noData": "Δεν υπάρχουν προπονήσεις σε αυτό το διάστημα.",
+    "coverage": {
+      "title": "Μυϊκή κάλυψη",
+      "atlas": "Άτλαντας ›",
+      "most": "Περισσότερη δουλειά",
+      "least": "Λιγότερη δουλειά",
+      "noneMost": "Καμία αναγνωρισμένη άσκηση σε αυτό το διάστημα.",
+      "noneLeast": "Όλες οι μεγάλες μυϊκές ομάδες έχουν μέτρια ή υψηλή κάλυψη.",
+      "pushPull": "Ώθηση : Έλξη",
+      "quadHam": "Τετρακέφαλοι : Οπίσθιοι μηριαίοι",
+      "ratioMissing": "Λίγα σετ ακόμα",
+      "note": "Ένδειξη του όγκου των προπονήσεων, όχι στόχος."
+    },
+    "qualities": {
+      "title": "Ποιότητες φυσικής κατάστασης",
+      "most": "Περισσότερο: {qualities}",
+      "felt": "«Ένιωσα»: {qualities}",
+      "row": "{quality}: {sets} σετ",
+      "note": "Το σχήμα δείχνει πού πήγε η προπόνηση, όχι βαθμό.",
+      "short": {
+        "cardiorespiratory-endurance": "Καρδιο",
+        "stamina": "Αντοχή",
+        "strength": "Δύναμη",
+        "flexibility": "Ευλυγισία",
+        "power": "Ισχύς",
+        "speed": "Ταχύτητα",
+        "coordination": "Συντονισμός",
+        "agility": "Ευκινησία",
+        "balance": "Ισορροπία",
+        "accuracy": "Ακρίβεια"
+      }
+    },
+    "load": {
+      "title": "Φορτίο προπόνησης",
+      "ratio": "Αυτή την εβδομάδα: {ratio}× της συνηθισμένης",
+      "insufficient": "Η σύγκριση εμφανίζεται μετά από 3 εβδομάδες προπονήσεων με RPE και διάρκεια.",
+      "weeks": "Φορτίο ανά εβδομάδα · 8 εβδ.",
+      "weekOf": "Εβδομάδα {date}: {load}",
+      "unrated": "{count, plural, one {# προπόνηση των τελευταίων 4 εβδομάδων δεν έχει RPE ή διάρκεια και δεν μετράει.} other {# προπονήσεις των τελευταίων 4 εβδομάδων δεν έχουν RPE ή διάρκεια και δεν μετράνε.}}",
+      "note": "Φορτίο = RPE × λεπτά. Ένδειξη σε σχέση με τη συνηθισμένη εβδομάδα, όχι ιατρική συμβουλή.",
+      "band": {
+        "below": "Πιο ελαφριά",
+        "steady": "Κοντά στο συνηθισμένο",
+        "above": "Πάνω από το συνηθισμένο",
+        "well_above": "Αρκετά πάνω από το συνηθισμένο"
+      }
+    },
+    "coach": {
+      "title": "Κάλυψη, ποιότητες, φορτίο",
+      "range": "Διάστημα",
+      "sharedOnly": "Μόνο από καταχωρήσεις που ο πελάτης μοιράζεται με τους coach του box."
+    }
   }
 }

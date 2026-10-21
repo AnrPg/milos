@@ -5312,7 +5312,8 @@
         "invalid_wellness_value": "Verifica os valores e tenta de novo.",
         "invalid_media": "A foto não está pronta. Escolhe-a de novo."
       }
-    }
+    },
+    "seasonChip": "{title} · {season}"
   },
   "Community": {
     "all": "Tudo",
@@ -8372,6 +8373,124 @@
       }
     }
   },
+  "Seasons": {
+    "tab": "Temporadas",
+    "title": "Temporadas",
+    "eyebrow": "Temporada",
+    "season": "Temporada",
+    "entry": "{count, plural, one {# temporada aberta} other {# temporadas abertas}}",
+    "tag": "Temporada · {title}",
+    "back": "Voltar",
+    "close": "Fechar",
+    "withdraw": "Retirar pedido",
+    "joinWaitlist": "Entrar na lista de espera",
+    "request": "Pedir lugar",
+    "dates": "Datas",
+    "weeksLabel": "Semanas",
+    "weeks": "{count, plural, one {# semana} other {# semanas}}",
+    "price": "Preço",
+    "places": "Lugares",
+    "placesLeft": "{count, plural, one {Resta # lugar} other {Restam # lugares}}",
+    "placesFull": "Esgotada · lista de espera",
+    "coaches": "Treinadores",
+    "programme": "Programa",
+    "workouts": "{count, plural, one {# treino} other {# treinos}}",
+    "requestHint": "O pedido vai para a box. O seu lugar conta quando o confirmarem; o pagamento é feito diretamente com a box.",
+    "mine_requested": "Pedido pendente",
+    "mine_waitlisted": "Na lista de espera",
+    "mine_active": "Está dentro",
+    "mine_declined": "Não confirmado",
+    "mine_cancelled": "Cancelado",
+    "mine_completed": "Concluído",
+    "mineHint_requested": "A box vai confirmar o seu lugar em breve.",
+    "mineHint_waitlisted": "A temporada está esgotada. Se abrir um lugar, o seu pedido passa primeiro.",
+    "mineHint_active": "O programa está na sua Box e o grupo da temporada no clube. Para alterações, fale com a box.",
+    "mineHint_declined": "A box não conseguiu confirmar o seu lugar.",
+    "mineHint_cancelled": "O pedido ou a temporada foi cancelado.",
+    "mineHint_completed": "A temporada terminou. Os treinos ficam no seu Diário.",
+    "adminHint": "Programas com datas e lugares. Os membros pedem lugar e você confirma.",
+    "newSeason": "Nova temporada",
+    "loading": "A carregar…",
+    "adminEmpty": "Ainda não há temporadas.",
+    "filled": "{active}/{capacity} dentro",
+    "waiting": "{count, plural, one {# pedido} other {# pedidos}}",
+    "status_draft": "Rascunho",
+    "status_published": "Aberta",
+    "status_running": "A decorrer",
+    "status_completed": "Concluída",
+    "status_cancelled": "Cancelada",
+    "fieldTitle": "Título",
+    "fieldDescription": "Descrição",
+    "fieldStartsOn": "Início",
+    "fieldCapacity": "Lugares",
+    "scheduleLocked": "O início, as semanas e o programa ficam bloqueados assim que alguém é confirmado.",
+    "fieldPackage": "Pacote",
+    "fieldPackageHint": "Opcional: atribuído ao preço da temporada a cada pessoa confirmada.",
+    "noPackage": "Sem pacote",
+    "programmeHint": "Treinos publicados por dia. Entram na Box de cada membro confirmado.",
+    "programmeDay": "Dia",
+    "programmeWorkout": "Treino",
+    "dayOption": "Dia {day}",
+    "dayOptionDate": "Dia {day} · {date}",
+    "pickWorkout": "Escolha um treino",
+    "removeRow": "Remover",
+    "addWorkout": "Adicionar treino",
+    "fieldWelcome": "Mensagem de boas-vindas",
+    "fieldWelcomeHint": "Fixada no canal da temporada quando entra o primeiro membro.",
+    "save": "Guardar",
+    "saveDraft": "Guardar rascunho",
+    "publish": "Publicar",
+    "cancelSeason": "Cancelar temporada",
+    "cancelSeasonConfirm": "Sim, cancelar a temporada",
+    "participants": "Participantes · {active}/{capacity}",
+    "noRequests": "Ainda não há pedidos.",
+    "enrollment_requested": "Pedido",
+    "enrollment_waitlisted": "Em espera",
+    "enrollment_active": "Dentro",
+    "enrollment_declined": "Recusado",
+    "enrollment_cancelled": "Cancelado",
+    "enrollment_completed": "Concluído",
+    "confirm": "Confirmar",
+    "decline": "Recusar",
+    "remove": "Remover",
+    "declineReason": "Motivo (opcional, o membro vê-o)",
+    "declineSend": "Enviar",
+    "error_generic": "Algo correu mal. Tente novamente.",
+    "error_season_not_open": "Esta temporada não aceita pedidos neste momento.",
+    "error_season_full": "A temporada está esgotada.",
+    "error_season_already_requested": "Já pediu lugar nesta temporada.",
+    "error_season_place_confirmed": "O seu lugar está confirmado; para alterações, fale com a box.",
+    "error_invalid_season_transition": "O pedido mudou entretanto. Atualize e tente novamente.",
+    "error_invalid_season_status": "Essa mudança de estado não é permitida.",
+    "error_season_closed": "A temporada está fechada e já não pode ser alterada.",
+    "error_season_schedule_locked": "O início, as semanas e o programa ficaram bloqueados após a primeira confirmação.",
+    "error_capacity_below_participants": "Não pode haver menos lugares do que participantes.",
+    "error_season_has_enrollments": "A temporada tem pedidos; não pode voltar a rascunho.",
+    "error_programme_workout_unavailable": "Um treino do programa não está publicado.",
+    "error_not_a_coach": "Só a equipa pode ser treinador.",
+    "notif": {
+      "aSeason": "uma temporada",
+      "someone": "Alguém",
+      "theBox": "A box",
+      "season_requested": {
+        "title": "Pedido para «{season}»",
+        "body": "{person} pede um lugar.",
+        "bodyWaitlist": "{person} entrou na lista de espera."
+      },
+      "season_confirmed": {
+        "title": "Está dentro de «{season}»",
+        "body": "O programa está na sua Box."
+      },
+      "season_declined": {
+        "title": "«{season}»: lugar não confirmado",
+        "body": "{box} não conseguiu confirmar o seu lugar."
+      },
+      "season_cancelled": {
+        "title": "«{season}» foi cancelada",
+        "body": "{box} cancelou a temporada."
+      }
+    }
+  },
   "Partners": {
     "title": "Parceiros de treino",
     "introTitle": "Encontra um parceiro de treino",
@@ -8555,5 +8674,59 @@
     "tabMembers": "Pessoas",
     "notFound": "Este squad não está disponível.",
     "backToClub": "Voltar ao clube"
+  },
+  "Depth": {
+    "noData": "Não há treinos neste período.",
+    "coverage": {
+      "title": "Cobertura muscular",
+      "atlas": "Atlas ›",
+      "most": "Mais trabalho",
+      "least": "Menos trabalho",
+      "noneMost": "Nenhum exercício reconhecido neste período.",
+      "noneLeast": "Todos os grandes grupos musculares têm cobertura média ou alta.",
+      "pushPull": "Empurrar : Puxar",
+      "quadHam": "Quadríceps : Isquiotibiais",
+      "ratioMissing": "Faltam algumas séries",
+      "note": "Uma indicação do volume de treino, não um objetivo."
+    },
+    "qualities": {
+      "title": "Qualidades físicas",
+      "most": "Mais: {qualities}",
+      "felt": "«Senti»: {qualities}",
+      "row": "{quality}: {sets} séries",
+      "note": "A forma mostra para onde foi o treino, não uma nota.",
+      "short": {
+        "cardiorespiratory-endurance": "Cardio",
+        "stamina": "Resistência",
+        "strength": "Força",
+        "flexibility": "Flexibilidade",
+        "power": "Potência",
+        "speed": "Velocidade",
+        "coordination": "Coordenação",
+        "agility": "Agilidade",
+        "balance": "Equilíbrio",
+        "accuracy": "Precisão"
+      }
+    },
+    "load": {
+      "title": "Carga de treino",
+      "ratio": "Esta semana: {ratio}× a habitual",
+      "insufficient": "A comparação aparece após 3 semanas de treinos com RPE e duração.",
+      "weeks": "Carga por semana · 8 sem.",
+      "weekOf": "Semana de {date}: {load}",
+      "unrated": "{count, plural, one {# treino das últimas 4 semanas não tem RPE ou duração e não conta.} other {# treinos das últimas 4 semanas não têm RPE ou duração e não contam.}}",
+      "note": "Carga = RPE × minutos. Uma indicação face à tua semana habitual, não um conselho médico.",
+      "band": {
+        "below": "Mais leve",
+        "steady": "Perto do habitual",
+        "above": "Acima do habitual",
+        "well_above": "Bem acima do habitual"
+      }
+    },
+    "coach": {
+      "title": "Cobertura, qualidades, carga",
+      "range": "Período",
+      "sharedOnly": "Apenas das entradas que o cliente partilha com os coaches da box."
+    }
   }
 }

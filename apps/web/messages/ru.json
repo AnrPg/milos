@@ -5312,7 +5312,8 @@
         "invalid_wellness_value": "Проверь значения и попробуй ещё раз.",
         "invalid_media": "Фото не готово. Выбери его снова."
       }
-    }
+    },
+    "seasonChip": "{title} · {season}"
   },
   "Community": {
     "all": "Все",
@@ -8372,6 +8373,124 @@
       }
     }
   },
+  "Seasons": {
+    "tab": "Сезоны",
+    "title": "Сезоны",
+    "eyebrow": "Сезон",
+    "season": "Сезон",
+    "entry": "{count, plural, one {# сезон открыт} few {# сезона открыто} many {# сезонов открыто} other {# сезона открыто}}",
+    "tag": "Сезон · {title}",
+    "back": "Назад",
+    "close": "Закрыть",
+    "withdraw": "Отозвать заявку",
+    "joinWaitlist": "Встать в лист ожидания",
+    "request": "Запросить место",
+    "dates": "Даты",
+    "weeksLabel": "Недели",
+    "weeks": "{count, plural, one {# неделя} few {# недели} many {# недель} other {# недели}}",
+    "price": "Цена",
+    "places": "Места",
+    "placesLeft": "{count, plural, one {Осталось # место} few {Осталось # места} many {Осталось # мест} other {Осталось # места}}",
+    "placesFull": "Мест нет · лист ожидания",
+    "coaches": "Тренеры",
+    "programme": "Программа",
+    "workouts": "{count, plural, one {# тренировка} few {# тренировки} many {# тренировок} other {# тренировки}}",
+    "requestHint": "Заявка уходит в зал. Место ваше, когда его подтвердят; оплата — напрямую залу.",
+    "mine_requested": "Заявка на рассмотрении",
+    "mine_waitlisted": "В листе ожидания",
+    "mine_active": "Вы участвуете",
+    "mine_declined": "Не подтверждено",
+    "mine_cancelled": "Отменено",
+    "mine_completed": "Завершено",
+    "mineHint_requested": "Зал скоро подтвердит ваше место.",
+    "mineHint_waitlisted": "Мест нет. Если место освободится, ваша заявка будет первой.",
+    "mineHint_active": "Программа — в вашем Box, группа сезона — в клубе. По изменениям обращайтесь в зал.",
+    "mineHint_declined": "Зал не смог подтвердить ваше место.",
+    "mineHint_cancelled": "Заявка или сезон отменены.",
+    "mineHint_completed": "Сезон завершён. Тренировки остаются в вашем дневнике.",
+    "adminHint": "Программы с датами и местами. Участники запрашивают место, а вы подтверждаете.",
+    "newSeason": "Новый сезон",
+    "loading": "Загрузка…",
+    "adminEmpty": "Сезонов пока нет.",
+    "filled": "{active}/{capacity} участвуют",
+    "waiting": "{count, plural, one {# заявка} few {# заявки} many {# заявок} other {# заявки}}",
+    "status_draft": "Черновик",
+    "status_published": "Открыт",
+    "status_running": "Идёт",
+    "status_completed": "Завершён",
+    "status_cancelled": "Отменён",
+    "fieldTitle": "Название",
+    "fieldDescription": "Описание",
+    "fieldStartsOn": "Начало",
+    "fieldCapacity": "Места",
+    "scheduleLocked": "Начало, недели и программа блокируются после первого подтверждения.",
+    "fieldPackage": "Пакет",
+    "fieldPackageHint": "Необязательно: выдаётся по цене сезона каждому подтверждённому участнику.",
+    "noPackage": "Без пакета",
+    "programmeHint": "Опубликованные тренировки по дням. Они попадают в Box каждого подтверждённого участника.",
+    "programmeDay": "День",
+    "programmeWorkout": "Тренировка",
+    "dayOption": "День {day}",
+    "dayOptionDate": "День {day} · {date}",
+    "pickWorkout": "Выберите тренировку",
+    "removeRow": "Убрать",
+    "addWorkout": "Добавить тренировку",
+    "fieldWelcome": "Приветствие",
+    "fieldWelcomeHint": "Закрепляется в канале сезона, когда приходит первый участник.",
+    "save": "Сохранить",
+    "saveDraft": "Сохранить черновик",
+    "publish": "Опубликовать",
+    "cancelSeason": "Отменить сезон",
+    "cancelSeasonConfirm": "Да, отменить сезон",
+    "participants": "Участники · {active}/{capacity}",
+    "noRequests": "Заявок пока нет.",
+    "enrollment_requested": "Заявка",
+    "enrollment_waitlisted": "Ожидание",
+    "enrollment_active": "Участвует",
+    "enrollment_declined": "Отклонена",
+    "enrollment_cancelled": "Отменена",
+    "enrollment_completed": "Завершил",
+    "confirm": "Подтвердить",
+    "decline": "Отклонить",
+    "remove": "Убрать",
+    "declineReason": "Причина (необязательно, участник её увидит)",
+    "declineSend": "Отправить",
+    "error_generic": "Что-то пошло не так. Попробуйте ещё раз.",
+    "error_season_not_open": "Сейчас этот сезон не принимает заявки.",
+    "error_season_full": "Мест в сезоне нет.",
+    "error_season_already_requested": "Вы уже подали заявку на этот сезон.",
+    "error_season_place_confirmed": "Ваше место подтверждено; по изменениям обращайтесь в зал.",
+    "error_invalid_season_transition": "Заявка изменилась. Обновите страницу и попробуйте снова.",
+    "error_invalid_season_status": "Такое изменение статуса недопустимо.",
+    "error_season_closed": "Сезон закрыт и больше не меняется.",
+    "error_season_schedule_locked": "Начало, недели и программа заблокированы после первого подтверждения.",
+    "error_capacity_below_participants": "Мест не может быть меньше, чем участников.",
+    "error_season_has_enrollments": "У сезона есть заявки; его нельзя вернуть в черновик.",
+    "error_programme_workout_unavailable": "Одна из тренировок программы не опубликована.",
+    "error_not_a_coach": "Тренером может быть только сотрудник.",
+    "notif": {
+      "aSeason": "сезон",
+      "someone": "Кто-то",
+      "theBox": "Зал",
+      "season_requested": {
+        "title": "Заявка на «{season}»",
+        "body": "{person} запрашивает место.",
+        "bodyWaitlist": "{person} в листе ожидания."
+      },
+      "season_confirmed": {
+        "title": "Вы участвуете в «{season}»",
+        "body": "Программа уже в вашем Box."
+      },
+      "season_declined": {
+        "title": "«{season}»: место не подтверждено",
+        "body": "{box} не смог подтвердить ваше место."
+      },
+      "season_cancelled": {
+        "title": "«{season}» отменён",
+        "body": "{box} отменил сезон."
+      }
+    }
+  },
   "Partners": {
     "title": "Партнёры по тренировкам",
     "introTitle": "Найди партнёра по тренировкам",
@@ -8555,5 +8674,59 @@
     "tabMembers": "Участники",
     "notFound": "Этот сквад недоступен.",
     "backToClub": "Назад в клуб"
+  },
+  "Depth": {
+    "noData": "Нет тренировок за этот период.",
+    "coverage": {
+      "title": "Охват мышц",
+      "atlas": "Атлас ›",
+      "most": "Больше всего работы",
+      "least": "Меньше всего работы",
+      "noneMost": "Нет распознанных упражнений за этот период.",
+      "noneLeast": "У всех крупных групп мышц средний или высокий охват.",
+      "pushPull": "Жим : Тяга",
+      "quadHam": "Квадрицепсы : Бицепсы бедра",
+      "ratioMissing": "Нужно ещё несколько подходов",
+      "note": "Показатель объёма тренировок, а не цель."
+    },
+    "qualities": {
+      "title": "Физические качества",
+      "most": "Больше всего: {qualities}",
+      "felt": "«Почувствовал(а)»: {qualities}",
+      "row": "{quality}: подходов {sets}",
+      "note": "Форма показывает, куда шли тренировки, а не оценку.",
+      "short": {
+        "cardiorespiratory-endurance": "Кардио",
+        "stamina": "Выносл.",
+        "strength": "Сила",
+        "flexibility": "Гибкость",
+        "power": "Мощность",
+        "speed": "Скорость",
+        "coordination": "Координация",
+        "agility": "Ловкость",
+        "balance": "Баланс",
+        "accuracy": "Точность"
+      }
+    },
+    "load": {
+      "title": "Тренировочная нагрузка",
+      "ratio": "На этой неделе: {ratio}× от обычной",
+      "insufficient": "Сравнение появится после 3 недель тренировок с RPE и длительностью.",
+      "weeks": "Нагрузка по неделям · 8 нед.",
+      "weekOf": "Неделя с {date}: {load}",
+      "unrated": "{count, plural, one {# тренировка за последние 4 недели без RPE или длительности и не учитывается.} few {# тренировки за последние 4 недели без RPE или длительности и не учитываются.} many {# тренировок за последние 4 недели без RPE или длительности и не учитываются.} other {# тренировки за последние 4 недели без RPE или длительности и не учитываются.}}",
+      "note": "Нагрузка = RPE × минуты. Показатель относительно вашей обычной недели, не медицинский совет.",
+      "band": {
+        "below": "Легче",
+        "steady": "Близко к обычной",
+        "above": "Выше обычной",
+        "well_above": "Заметно выше обычной"
+      }
+    },
+    "coach": {
+      "title": "Охват, качества, нагрузка",
+      "range": "Период",
+      "sharedOnly": "Только из записей, которыми клиент делится с тренерами зала."
+    }
   }
 }
