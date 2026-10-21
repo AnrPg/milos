@@ -4,6 +4,7 @@
 
 
 
+import { PaleeMark } from "@/components/branding/PaleeMark";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
@@ -233,6 +234,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           </div>
 
           <div className="mb-6 text-center">
+            <PaleeMark className="mx-auto mb-3 h-12 w-12" />
             <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
               {i18n("brandName")}
             </p>

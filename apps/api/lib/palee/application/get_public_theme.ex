@@ -11,7 +11,7 @@ defmodule Palee.Application.GetPublicTheme do
 
   alias Palee.Gamification
 
-  @default_theme "ember"
+  @default_theme Palee.Themes.default()
 
   def call(organization_slug \\ nil)
 

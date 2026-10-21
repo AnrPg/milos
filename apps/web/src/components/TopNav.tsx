@@ -1,5 +1,6 @@
 "use client";
 
+import { PaleeMark } from "@/components/branding/PaleeMark";
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -233,7 +234,9 @@ export function TopNav() {
               unoptimized
               width={28}
             />
-          ) : null}
+          ) : (
+            <PaleeMark className="h-6 w-6 shrink-0" />
+          )}
           <span className="min-w-0">{brandName}</span>
         </Link>
 

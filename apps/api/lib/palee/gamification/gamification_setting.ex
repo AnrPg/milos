@@ -11,7 +11,7 @@ defmodule Palee.Gamification.GamificationSetting do
     field :weekly_workout_target, :integer, default: 2
     field :streak_shield_reset_day, :integer
     field :leaderboard_enabled, :boolean, default: true
-    field :theme_slug, :string, default: "ember"
+    field :theme_slug, :string, default: Palee.Themes.default()
 
     timestamps(type: :utc_datetime_usec)
   end

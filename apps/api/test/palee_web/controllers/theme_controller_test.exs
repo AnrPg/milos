@@ -32,9 +32,9 @@ defmodule PaleeWeb.ThemeControllerTest do
   end
 
   test "falls back to the default theme without a known gym", %{conn: conn} do
-    assert %{"theme_slug" => "ember"} = conn |> get("/api/theme") |> json_response(200)
+    assert %{"theme_slug" => "frost"} = conn |> get("/api/theme") |> json_response(200)
 
-    assert %{"theme_slug" => "ember"} =
+    assert %{"theme_slug" => "frost"} =
              conn
              |> put_req_header("x-organization-slug", "no-such-gym")
              |> get("/api/theme")

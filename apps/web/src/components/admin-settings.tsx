@@ -28,7 +28,7 @@ import { adminLogoApi, fetchAdminBranding } from "@/api/organization-branding";
 import { TenantLogoUploader } from "@/components/branding/TenantLogoUploader";
 import { useSession } from "@/components/session-provider";
 import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
-import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
+import { APP_THEMES, DEFAULT_THEME_SLUG, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { LocationSettings } from "@/components/admin/LocationSettings";
 import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
@@ -197,7 +197,7 @@ function CollapsibleSection({
 function AppearanceSection({ token }: { token: string }) {
   const i18n = useUiTranslations();
   const queryClient = useQueryClient();
-  const [themeSlug, setThemeSlug] = useState<ThemeSlug>("ember");
+  const [themeSlug, setThemeSlug] = useState<ThemeSlug>(DEFAULT_THEME_SLUG);
   const [initialized, setInitialized] = useState(false);
 
   const settingsQuery = useQuery({
@@ -223,7 +223,7 @@ function AppearanceSection({ token }: { token: string }) {
 
   const serverSlug = settingsQuery.data?.gamification
     ? normalizeThemeSlug(settingsQuery.data.gamification.theme_slug)
-    : "ember";
+    : DEFAULT_THEME_SLUG;
   const dirty = initialized && themeSlug !== serverSlug;
 
   return (

@@ -1,4 +1,6 @@
 export const THEME_SLUGS = [
+  "frost",
+  "graphite",
   "ember",
   "sage",
   "steel",
@@ -48,6 +50,83 @@ export type AppTheme = {
 };
 
 export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
+  // Palee brand palette (docs/brand/BRAND.md, Frost Graphite): Frost page,
+  // Graphite text, Dojo blue primary, Heat red for emotion.
+  frost: {
+    slug: "frost",
+    label: "theme_frost_label",
+    description: "theme_frost_description",
+    colors: {
+      background: "#F4F5F7",
+      panel: "#FFFFFF",
+      panelRaised: "#FFFFFF",
+      panelMuted: "#ECEEF2",
+      card: "#FFFFFF",
+      border: "#DFE2E8",
+      borderStrong: "#A2A8B3",
+      text: "#17181C",
+      textSoft: "#3A3D45",
+      muted: "#5E6470",
+      dim: "#6B717C",
+      primary: "#2F5BFF",
+      primaryStrong: "#1F45E0",
+      primaryContrast: "#FFFFFF",
+      success: "#1F8A4C",
+      warning: "#B26B00",
+      danger: "#E0203F",
+      info: "#0B7FA8",
+      scaleBase: "#17181C",
+      scaleScaled: "#1F8A4C",
+      scaleRx: "#B26B00",
+      scaleAdvanced: "#E0203F",
+    },
+    workoutTypes: {
+      crossfit: "#E0203F",
+      strength: "#2F5BFF",
+      gymnastics: "#B26B00",
+      aerobics: "#C2410C",
+      flexibility: "#1F8A4C",
+      recovery: "#0B7FA8",
+    },
+  },
+  // The brand's dark mode, "Graphite Night": Graphite page, glow tones.
+  graphite: {
+    slug: "graphite",
+    label: "theme_graphite_label",
+    description: "theme_graphite_description",
+    colors: {
+      background: "#17181C",
+      panel: "#1D1F24",
+      panelRaised: "#22242A",
+      panelMuted: "#131418",
+      card: "#22242A",
+      border: "#2C2F37",
+      borderStrong: "#4A4F5A",
+      text: "#F4F5F7",
+      textSoft: "#D2D5DB",
+      muted: "#A2A8B3",
+      dim: "#8A909B",
+      primary: "#5B7CFF",
+      primaryStrong: "#8FA4FF",
+      primaryContrast: "#0E0F12",
+      success: "#4CC27E",
+      warning: "#F0A63A",
+      danger: "#FF4D6A",
+      info: "#6FB8FF",
+      scaleBase: "#F4F5F7",
+      scaleScaled: "#4CC27E",
+      scaleRx: "#F0A63A",
+      scaleAdvanced: "#FF4D6A",
+    },
+    workoutTypes: {
+      crossfit: "#FF4D6A",
+      strength: "#5B7CFF",
+      gymnastics: "#F0A63A",
+      aerobics: "#E4FF6E",
+      flexibility: "#4CC27E",
+      recovery: "#8FA4FF",
+    },
+  },
   ember: {
     slug: "ember",
     label: "theme_ember_label",
@@ -457,7 +536,7 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
   },
 };
 
-export const DEFAULT_THEME_SLUG: ThemeSlug = "ember";
+export const DEFAULT_THEME_SLUG: ThemeSlug = "frost";
 export const THEME_STORAGE_KEY = "palee:theme-slug";
 
 export function themeBySlug(slug: string | null | undefined): AppTheme {

@@ -42752,7 +42752,7 @@ export interface operations {
                      * @description Your own theme; null follows your gym's
                      * @enum {string|null}
                      */
-                    preferred_theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset" | null;
+                    preferred_theme_slug?: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset" | null;
                 };
             };
         };
@@ -58906,7 +58906,7 @@ export interface operations {
                             leaderboard_enabled: boolean;
                             streak_shield_reset_day?: number | null;
                             /** @enum {string} */
-                            theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                            theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
@@ -58976,7 +58976,7 @@ export interface operations {
                         leaderboard_enabled?: boolean;
                         streak_shield_reset_day?: number | null;
                         /** @enum {string} */
-                        theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                        theme_slug?: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                         weekly_workout_target?: number;
                     };
                     notifications?: {
@@ -59036,7 +59036,7 @@ export interface operations {
                             leaderboard_enabled: boolean;
                             streak_shield_reset_day?: number | null;
                             /** @enum {string} */
-                            theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                            theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
@@ -68300,7 +68300,7 @@ export interface operations {
                                 leaderboard_enabled: boolean;
                                 streak_shield_reset_day?: number | null;
                                 /** @enum {string} */
-                                theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                                theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                                 weekly_workout_target: number;
                             };
                         } & {
@@ -79617,7 +79617,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         /** @enum {string} */
-                        theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
+                        theme_slug: "frost" | "graphite" | "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                     };
                 };
             };

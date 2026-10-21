@@ -96834,6 +96834,8 @@
                   "preferred_theme_slug": {
                     "description": "Your own theme; null follows your gym's",
                     "enum": [
+                      "frost",
+                      "graphite",
                       "ember",
                       "sage",
                       "steel",
@@ -139810,6 +139812,8 @@
                         },
                         "theme_slug": {
                           "enum": [
+                            "frost",
+                            "graphite",
                             "ember",
                             "sage",
                             "steel",
@@ -140054,6 +140058,8 @@
                       },
                       "theme_slug": {
                         "enum": [
+                          "frost",
+                          "graphite",
                           "ember",
                           "sage",
                           "steel",
@@ -140236,6 +140242,8 @@
                         },
                         "theme_slug": {
                           "enum": [
+                            "frost",
+                            "graphite",
                             "ember",
                             "sage",
                             "steel",
@@ -166093,6 +166101,8 @@
                             },
                             "theme_slug": {
                               "enum": [
+                                "frost",
+                                "graphite",
                                 "ember",
                                 "sage",
                                 "steel",
@@ -196449,6 +196459,8 @@
                   "properties": {
                     "theme_slug": {
                       "enum": [
+                        "frost",
+                        "graphite",
                         "ember",
                         "sage",
                         "steel",

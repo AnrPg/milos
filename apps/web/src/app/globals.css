@@ -1,30 +1,31 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #0B0807;
-  --panel: #150F0D;
-  --panel-raised: #1E1512;
-  --panel-muted: #110C0A;
-  --card: #1A1210;
-  --border: #2C201B;
-  --border-strong: #9C7E68;
-  --text: #FBF3EE;
-  --text-soft: #E0CFC5;
-  --muted: #A0897C;
-  --dim: #9C8778;
-  --primary: #D9743D;
-  --primary-strong: #F0985C;
-  --success: #6FCB8B;
-  --warning: #F0B94C;
-  --danger: #F2604D;
-  --info: #6EC6D9;
+  /* Default theme "frost" (Palee brand palette, see src/lib/theme.ts). */
+  --bg: #F4F5F7;
+  --panel: #FFFFFF;
+  --panel-raised: #FFFFFF;
+  --panel-muted: #ECEEF2;
+  --card: #FFFFFF;
+  --border: #DFE2E8;
+  --border-strong: #A2A8B3;
+  --text: #17181C;
+  --text-soft: #3A3D45;
+  --muted: #5E6470;
+  --dim: #6B717C;
+  --primary: #2F5BFF;
+  --primary-strong: #1F45E0;
+  --success: #1F8A4C;
+  --warning: #B26B00;
+  --danger: #E0203F;
+  --info: #0B7FA8;
 
   --background: var(--bg);
   --foreground: var(--text);
   --surface: var(--panel);
   --accent: var(--primary);
   --accent-strong: var(--primary-strong);
-  --primary-contrast: var(--bg);
+  --primary-contrast: #FFFFFF;
   --amber: var(--warning);
   --lime: var(--success);
   --red: var(--danger);
@@ -32,12 +33,12 @@
   --scale-scaled: var(--success);
   --scale-rx: var(--warning);
   --scale-advanced: var(--danger);
-  --workout-crossfit: #D94D3D;
+  --workout-crossfit: #E0203F;
   --workout-strength: var(--primary);
-  --workout-gymnastics: #E08A4B;
-  --workout-aerobics: #D9A441;
-  --workout-flexibility: #78BFA6;
-  --workout-recovery: #9C8CC8;
+  --workout-gymnastics: #B26B00;
+  --workout-aerobics: #C2410C;
+  --workout-flexibility: #1F8A4C;
+  --workout-recovery: #0B7FA8;
 
   /* Anatomy figure (ADR-164): role colours and the neutral muscle/bone base. */
   --anatomy-primary: #D9743D;
@@ -73,6 +74,8 @@ html {
   scrollbar-width: thin;
 }
 
+html:not([data-theme]),
+html[data-theme="frost"],
 html[data-theme="daybreak"],
 html[data-theme="paper"],
 html[data-theme="lagoon"],
@@ -85,7 +88,7 @@ html[data-theme="sunset"] {
   --anatomy-heat-high: #A82A17;
 }
 
-html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {
+html[data-theme]:not([data-theme="frost"]):not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {
   color-scheme: dark;
 }
 

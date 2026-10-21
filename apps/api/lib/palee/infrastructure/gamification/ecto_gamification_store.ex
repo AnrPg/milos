@@ -47,7 +47,7 @@ defmodule Palee.Infrastructure.Gamification.EctoGamificationStore do
           weekly_workout_target: 2,
           streak_shield_reset_day: nil,
           leaderboard_enabled: true,
-          theme_slug: "ember"
+          theme_slug: Palee.Themes.default()
         }
 
       settings ->

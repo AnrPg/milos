@@ -1,6 +1,7 @@
 
 
 
+import { PaleeMark } from "@/components/branding/PaleeMark";
 import {getUiTranslations} from "@/i18n/ui-server";
 
 import {useUiTranslations} from "@/i18n/ui";
@@ -22,7 +23,10 @@ export default function AboutPage() {
       <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>
         {i18n("trainWithIntent94cee47")}
       </p>
-      <h1 className="mt-3 text-4xl font-bold tracking-tight sm:text-6xl">{i18n("brandName")}</h1>
+      <h1 className="mt-3 flex items-center gap-4 text-4xl font-bold tracking-tight sm:text-6xl">
+        <PaleeMark className="h-12 w-12 shrink-0 sm:h-16 sm:w-16" />
+        {i18n("brandName")}
+      </h1>
       <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: "var(--muted)" }}>
         {i18n("onePrivateSelfHostedHomeForGroupClasses89e3bcd")}
       </p>
