@@ -9,6 +9,7 @@ defmodule MilosTraining.Application.Buddies do
   leaving are quiet: the other side sees it on their page.
   """
 
+  alias MilosTraining.Application.BuddyRealtime
   alias MilosTraining.{Buddies, Identity, Notifications, Wellness}
 
   @recently_closed_days 30
@@ -101,6 +102,8 @@ defmodule MilosTraining.Application.Buddies do
         dedupe_key: "buddy_invite:#{link.id}"
       })
 
+      BuddyRealtime.link_changed(link)
+
       {:ok, present(link, user_id, %{invitee.id => invitee}, now)}
     end
   end
@@ -159,6 +162,7 @@ defmodule MilosTraining.Application.Buddies do
            Buddies.claim_invite(context, digest, now) || {:error, :buddy_invite_unavailable},
          %{} = link <- Buddies.get_link(context, id) do
       notify_accepted(context, link)
+      BuddyRealtime.link_changed(link)
       {:ok, present(link, user_id, people([link], user_id), now)}
     else
       nil -> {:error, :not_found}
@@ -187,8 +191,9 @@ defmodule MilosTraining.Application.Buddies do
     |> Buddies.open_links_between(user_id, other_id)
     |> Enum.each(fn link ->
       with {:ok, changes} <-
-             Buddies.transition(link, :block, Buddies.link_role(link, user_id), now) do
-        Buddies.update_link(context, link, changes)
+             Buddies.transition(link, :block, Buddies.link_role(link, user_id), now),
+           {:ok, link} <- Buddies.update_link(context, link, changes) do
+        BuddyRealtime.link_changed(link)
       end
     end)
 
@@ -201,6 +206,7 @@ defmodule MilosTraining.Application.Buddies do
          {:ok, changes} <- Buddies.transition(link, action, role, now),
          {:ok, link} <- Buddies.update_link(context, link, changes) do
       if action == :accept, do: notify_accepted(context, link)
+      BuddyRealtime.link_changed(link)
       {:ok, present(link, user_id, people([link], user_id), now)}
     end
   end
@@ -221,6 +227,7 @@ defmodule MilosTraining.Application.Buddies do
          true <- Buddies.can_set_summary?(link, user_id, now) || {:error, :forbidden},
          {:ok, flag} <- boolean(param(params, "receives_weekly_summary")),
          {:ok, link} <- Buddies.update_link(context, link, %{receives_weekly_summary: flag}) do
+      BuddyRealtime.link_changed(link)
       {:ok, present(link, user_id, people([link], user_id), now)}
     end
   end

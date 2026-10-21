@@ -11,6 +11,7 @@ defmodule MilosTraining.Application.BuddyMessages do
   """
 
   alias MilosTraining.Application.Buddies, as: BuddyPages
+  alias MilosTraining.Application.BuddyRealtime
   alias MilosTraining.{Buddies, Identity, Notifications}
 
   @doc "A page of the link's messages, newest first, with the next (older) cursor."
@@ -40,6 +41,7 @@ defmodule MilosTraining.Application.BuddyMessages do
          {:ok, body} <- Buddies.normalize_message_body(param(params, "body")),
          {:ok, message} <- insert(context, link, body) do
       notify(context, link, message)
+      BuddyRealtime.message_created(link)
       {:ok, present(message, user_id, people(link))}
     end
   end
@@ -47,13 +49,20 @@ defmodule MilosTraining.Application.BuddyMessages do
   @doc "Marks the other person's messages read; answers how many changed."
   def mark_read(%{user_id: user_id} = context, link_id, now \\ DateTime.utc_now()) do
     with {:ok, link} <- fetch_link(context, link_id) do
-      {:ok, %{read: Buddies.mark_messages_read(context, link.id, user_id, now)}}
+      read = Buddies.mark_messages_read(context, link.id, user_id, now)
+      if read > 0, do: BuddyRealtime.messages_read(link)
+      {:ok, %{read: read}}
     end
   end
 
   @doc false
   # A support reply's message: no notification of its own (the reply sends one).
-  def post_reply(context, link, body), do: insert(context, link, body)
+  def post_reply(context, link, body) do
+    with {:ok, message} <- insert(context, link, body) do
+      BuddyRealtime.message_created(link)
+      {:ok, message}
+    end
+  end
 
   defp insert(%{user_id: user_id} = context, link, body) do
     Buddies.insert_message(context, %{

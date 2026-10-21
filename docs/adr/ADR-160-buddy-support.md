@@ -197,3 +197,12 @@ in SQL.
   `/clients/:user_id/wellness-summary`.
 - Tables are registered as personal tables in the tenancy audit; the store
   is in the architecture task's RepoContext list.
+- Live updates: `Application.BuddyRealtime` publishes one `buddy:changed`
+  event (kind plus ids, never words or phone numbers) through the
+  `RealtimePublisher` port to each concerned person's own `user:<id>`
+  topic (`UserChannel`, joinable only with that user's token, no gym
+  context). Requests sent, undone or nudged go to the sender; delivered to
+  the sender and buddies; replies to sender and buddy; messages, reads and
+  link changes to both people. The web subscribes once per session
+  (`BuddyRealtimeBridge`) and invalidates the caches each event concerns;
+  a 2-minute refetch, window focus and reconnect are the safety net.

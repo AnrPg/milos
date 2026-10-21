@@ -11,6 +11,7 @@ import { useUiTranslations } from "@/i18n/ui";
 
 import { BackLink } from "./BuddyBits";
 import { overviewLists, personName } from "./buddy-model";
+import { BUDDY_FALLBACK_REFETCH_MS } from "./buddy-realtime";
 import { buddyErrorMessage } from "./errors";
 import { useBuddies, useBuddyToken } from "./use-buddies";
 
@@ -38,7 +39,8 @@ export function BuddyChat({ linkId }: { linkId: string }) {
     initialPageParam: null as string | null,
     queryFn: ({ pageParam }) => fetchBuddyMessages(token!, linkId, pageParam),
     getNextPageParam: (last) => last.next_cursor ?? undefined,
-    refetchInterval: 10_000,
+    // New messages and read receipts arrive live; this is the safety net.
+    refetchInterval: BUDDY_FALLBACK_REFETCH_MS,
   });
 
   const { buddies, supporting, invitations } = overviewLists(overview.data);

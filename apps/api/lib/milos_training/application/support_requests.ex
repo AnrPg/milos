@@ -23,7 +23,7 @@ defmodule MilosTraining.Application.SupportRequests do
 
   require Logger
 
-  alias MilosTraining.Application.BuddyMessages
+  alias MilosTraining.Application.{BuddyMessages, BuddyRealtime}
   alias MilosTraining.Application.Buddies, as: BuddyPages
   alias MilosTraining.{Buddies, Identity, Localization, Notifications}
 
@@ -93,6 +93,7 @@ defmodule MilosTraining.Application.SupportRequests do
         nudge: Buddies.nudge_at(request)
       )
 
+      BuddyRealtime.request_sent(request)
       show(context, request.id, now)
     end
   end
@@ -112,6 +113,7 @@ defmodule MilosTraining.Application.SupportRequests do
            Buddies.get_request(context, id) || {:error, :not_found},
          :ok <- Buddies.can_undo?(request, now),
          1 <- Buddies.undo_request(context, request.id, now) do
+      BuddyRealtime.request_undone(request)
       show(context, request.id, now)
     else
       %{} -> {:error, :not_found}
@@ -179,9 +181,9 @@ defmodule MilosTraining.Application.SupportRequests do
          true <- Buddies.deliverable?(request) || :skip,
          1 <- Buddies.mark_delivered(context, request.id, now) do
       sender = Identity.find_by_id(user_id)
+      deliveries = Buddies.list_deliveries(context, [request.id])
 
-      context
-      |> Buddies.list_deliveries([request.id])
+      deliveries
       |> Enum.each(fn delivery ->
         Notifications.dispatch_event(:support_request, %{
           user_id: delivery.buddy_user_id,
@@ -195,6 +197,7 @@ defmodule MilosTraining.Application.SupportRequests do
         })
       end)
 
+      BuddyRealtime.request_delivered(request, Enum.map(deliveries, & &1.buddy_user_id))
       :ok
     else
       %{} -> {:error, :not_found}
@@ -217,6 +220,7 @@ defmodule MilosTraining.Application.SupportRequests do
         dedupe_key: "support_no_reply_nudge:#{request.id}"
       })
 
+      BuddyRealtime.request_nudged(request)
       :ok
     else
       %{} -> {:error, :not_found}
@@ -267,6 +271,8 @@ defmodule MilosTraining.Application.SupportRequests do
         text: text,
         dedupe_key: "support_reply:#{reply.id}"
       })
+
+      BuddyRealtime.reply_created(request, reply)
 
       phone = if kind == "call", do: Buddies.shared_phone(context, request.user_id)
 

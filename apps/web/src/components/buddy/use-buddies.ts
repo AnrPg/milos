@@ -16,6 +16,7 @@ import {
 import { useSession } from "@/components/session-provider";
 
 import { msUntilNudge } from "./buddy-model";
+import { BUDDY_FALLBACK_REFETCH_MS } from "./buddy-realtime";
 
 export function useBuddyToken() {
   const { tokens } = useSession();
@@ -30,24 +31,29 @@ export function useBuddies(enabled = true) {
     enabled: Boolean(token) && enabled,
     queryFn: () => fetchBuddies(token!),
     staleTime: 30_000,
+    refetchInterval: BUDDY_FALLBACK_REFETCH_MS,
   });
 }
 
-/** Requests I sent or received; received ones refresh every minute so a new one shows. */
+/**
+ * Requests I sent or received. Live updates (BuddyRealtimeBridge) refresh
+ * them; the slow refetch is only a safety net.
+ */
 export function useSupportRequests(role: "sent" | "received", enabled = true) {
   const token = useBuddyToken();
   return useQuery({
     queryKey: [...SUPPORT_REQUESTS_KEY, role],
     enabled: Boolean(token) && enabled,
     queryFn: () => fetchSupportRequests(token!, role),
-    refetchInterval: role === "received" ? 60_000 : false,
+    refetchInterval: BUDDY_FALLBACK_REFETCH_MS,
   });
 }
 
 /**
- * One request, polled while it waits for a reply (every 15 s), and once more
- * when the undo window or the ten minutes run out, so the status card moves on
- * without a reload.
+ * One request. Delivery, replies and the no-reply card arrive as live
+ * updates; while it waits there is a slow safety-net refetch, and one more
+ * when the undo window or the ten minutes run out, so the status card moves
+ * on without a reload even if an event was missed.
  */
 export function useSupportRequest(requestId: string | null, initial?: SupportRequest | null) {
   const token = useBuddyToken();
@@ -59,7 +65,7 @@ export function useSupportRequest(requestId: string | null, initial?: SupportReq
     refetchInterval: (current) => {
       const data = current.state.data;
       if (!data || data.status === "undone" || (data.replies?.length ?? 0) > 0) return false;
-      return 15_000;
+      return BUDDY_FALLBACK_REFETCH_MS;
     },
   });
   const data = query.data;
