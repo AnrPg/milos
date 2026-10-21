@@ -27,6 +27,7 @@ import { CheckInPanel } from "@/components/member-app/wellbeing/CheckInPanel";
 import { InjuryTimeline, InjuryUpdateForm } from "@/components/member-app/wellbeing/InjuryTimeline";
 import { useWellness, wellnessWindow, WellnessPanel } from "@/components/member-app/wellness/WellnessPanel";
 import { localDate } from "@/components/member-app/wellness/wellness-model";
+import { WellnessSupportCard } from "@/components/buddy/WellnessSupportCard";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
@@ -37,7 +38,10 @@ export function MyWellbeing() {
   const [limitations, setLimitations] = useState("");
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   // «Πώς πήγε;» and Νέα καταχώρηση › Λιγούρα arrive as ?craving=<id|new>.
-  const craving = useSearchParams().get("craving");
+  const search = useSearchParams();
+  const craving = search.get("craving");
+  // Νέα καταχώρηση › Χρειάζομαι στήριξη arrives as ?support=new (ADR-160).
+  const support = search.get("support") === "new";
   const today = localDate(new Date());
   const range = wellnessWindow(today, 0);
   const wellness = useWellness(range.from, range.to);
@@ -89,6 +93,8 @@ export function MyWellbeing() {
         <PageHeader title={i18n("myWellbeing1916377")} />
 
         <WellnessPanel key={craving ?? "panel"} initialCraving={craving} />
+
+        <WellnessSupportCard key={support ? "support-new" : "support"} initialOpen={support} />
 
         <section id="check-in" className="scroll-mt-24">
           <CheckInPanel skipQuestions={sleepLogged ? ["sleep"] : []} />

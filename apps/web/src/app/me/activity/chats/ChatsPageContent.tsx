@@ -4,6 +4,7 @@
 
 
 
+import { BuddyThreads } from "@/components/buddy/BuddyThreads";
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -174,6 +175,8 @@ export function ChatsPageContent() {
         <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
           {i18n("conversationHistory0f18fb3")}
         </h1>
+
+        <BuddyThreads />
 
         <div
           className="flex rounded-full p-0.5 gap-0.5"
