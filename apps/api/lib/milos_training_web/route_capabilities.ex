@@ -39,7 +39,10 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.HomeLocationController => [:manage_memberships],
     W.AdminWorkoutFreeTextController => [:manage_workouts],
     W.AdminOnboardingController => [:manage_settings],
-    W.TrainingHistoryController => [:view_client_training]
+    W.TrainingHistoryController => [:view_client_training],
+    # ADR-174: the queue also requires view_health per athlete (service).
+    W.StaffScalingController => [:manage_coaching],
+    W.AdminAiSettingsController => [:manage_settings]
   }
 
   @actions %{

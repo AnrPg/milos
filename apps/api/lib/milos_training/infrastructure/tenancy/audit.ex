@@ -52,7 +52,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     push_dispatch_attempts
     user_pr_history
     training_log_entries
-    ai_usage_records
+    ai_usage_records organization_ai_settings scaling_suggestions
   )
 
   @transitional_tenant_tables []

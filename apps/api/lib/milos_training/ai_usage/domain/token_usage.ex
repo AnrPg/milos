@@ -48,6 +48,26 @@ defmodule MilosTraining.AiUsage.Domain.TokenUsage do
 
   def from_gemini(_missing), do: nil
 
+  @doc """
+  Reads an Anthropic Messages API `usage` object (ADR-174).
+  `input_tokens` excludes cached tokens; `cache_read_input_tokens` are billed
+  at the cache rate; `cache_creation_input_tokens` (cache writes) are billed
+  here at the input rate, a slight under-count we accept since the advisor
+  sends no cache breakpoints. Thinking is part of `output_tokens` and billed
+  at the output rate, so `thinking_tokens` stays 0. Returns `nil` when the
+  response carried no usage report.
+  """
+  def from_anthropic(%{} = usage) do
+    %__MODULE__{
+      input_tokens: count(usage, "input_tokens") + count(usage, "cache_creation_input_tokens"),
+      cached_input_tokens: count(usage, "cache_read_input_tokens"),
+      output_tokens: count(usage, "output_tokens"),
+      thinking_tokens: 0
+    }
+  end
+
+  def from_anthropic(_missing), do: nil
+
   def total(%__MODULE__{} = usage),
     do:
       usage.input_tokens + usage.cached_input_tokens + usage.output_tokens + usage.thinking_tokens

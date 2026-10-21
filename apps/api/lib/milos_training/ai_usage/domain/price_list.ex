@@ -9,7 +9,10 @@ defmodule MilosTraining.AiUsage.Domain.PriceList do
 
   Source: https://ai.google.dev/gemini-api/docs/pricing (Standard tier, text
   input, read 2026-10-16). None of these models has prompt-length tiers.
-  Update this table whenever Google changes a price: add a new dated entry,
+  Claude models (ADR-174): https://platform.claude.com/docs/en/about-claude/pricing
+  (standard tier, read 2026-10-21); cached input is the cache-read rate.
+
+  Update this table whenever a provider changes a price: add a new dated entry,
   never edit a past one, so stored costs stay reproducible.
   """
 
@@ -43,6 +46,15 @@ defmodule MilosTraining.AiUsage.Domain.PriceList do
     ],
     "gemini-2.5-flash-lite" => [
       {~D[2000-01-01], %{input: 100, cached_input: 10, output: 400}}
+    ],
+    "claude-sonnet-5-5" => [
+      {~D[2000-01-01], %{input: 2_000, cached_input: 200, output: 10_000}}
+    ],
+    "claude-opus-5-5" => [
+      {~D[2000-01-01], %{input: 4_000, cached_input: 200, output: 20_000}}
+    ],
+    "claude-haiku-5-5" => [
+      {~D[2000-01-01], %{input: 100, cached_input: 10, output: 500}}
     ]
   }
 
