@@ -1,7 +1,7 @@
 defmodule MilosTrainingWeb.PlatformPlanJSON do
   @moduledoc "Renders platform plans and subscriptions (ADR-170)."
 
-  alias MilosTraining.PlatformPlans.Domain.SubscriptionPolicy
+  alias MilosTraining.PlatformPlans
 
   @plan_fields [
     :code,
@@ -27,7 +27,7 @@ defmodule MilosTrainingWeb.PlatformPlanJSON do
     %{
       organization_id: subscription.organization_id,
       plan_code: subscription.plan_code,
-      status: SubscriptionPolicy.effective_status(subscription, now),
+      status: PlatformPlans.effective_status(subscription, now),
       stored_status: subscription.status,
       trial_ends_at: subscription.trial_ends_at,
       price_override_cents: subscription.price_override_cents,

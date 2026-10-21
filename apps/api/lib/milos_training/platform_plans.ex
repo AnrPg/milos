@@ -89,6 +89,10 @@ defmodule MilosTraining.PlatformPlans do
     end
   end
 
+  @doc "The status people see: a trial past its end reads `trial_expired`."
+  def effective_status(subscription, now),
+    do: SubscriptionPolicy.effective_status(subscription, now)
+
   @doc """
   The plan card: the plan, the effective status, the one notice to show,
   and every limit with what is used (`usage` keyed like the limits).
