@@ -160,3 +160,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-157 | Photos and video in posts | Accepted |
 | ADR-158 | Body snapshots, private photos and coach access | Accepted |
 | ADR-159 | Wellness (water, sleep, meals) and cravings | Accepted |
+| ADR-162 | One journal across providers and the Box ▾ provider switch | Accepted |

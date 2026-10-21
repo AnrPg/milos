@@ -81,6 +81,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     wellness_entries craving_entries wellness_preferences
     media_account_objects saved_filters user_home_areas
     body_snapshots body_snapshot_photos user_health_consents body_settings
+    account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
   )
 
   def report do

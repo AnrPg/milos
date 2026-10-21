@@ -8841,8 +8841,18 @@ export interface components {
                     id: string;
                     /** @enum {string} */
                     kind: "execution" | "training_log";
+                    /**
+                     * Format: uuid
+                     * @description Workout to repeat, when the attempt has one.
+                     */
+                    master_workout_id: string | null;
                     /** Format: date */
                     on?: string;
+                    /**
+                     * Format: uuid
+                     * @description Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first.
+                     */
+                    organization_id: string | null;
                     scale_level_slug?: string | null;
                     scores?: {
                         section_id?: string | null;
@@ -33925,8 +33935,18 @@ export interface operations {
                                 id: string;
                                 /** @enum {string} */
                                 kind: "execution" | "training_log";
+                                /**
+                                 * Format: uuid
+                                 * @description Workout to repeat, when the attempt has one.
+                                 */
+                                master_workout_id: string | null;
                                 /** Format: date */
                                 on?: string;
+                                /**
+                                 * Format: uuid
+                                 * @description Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first.
+                                 */
+                                organization_id: string | null;
                                 scale_level_slug?: string | null;
                                 scores?: {
                                     section_id?: string | null;

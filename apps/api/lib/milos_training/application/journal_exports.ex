@@ -114,10 +114,12 @@ defmodule MilosTraining.Application.JournalExports do
 
       case MediaStorage.put(owner, @bucket, key, body, type) do
         {:ok, _stored} ->
-          {:cont, {:ok, acc ++ [%{name: name, key: key, content_type: type, bytes: byte_size(body)}]}}
+          {:cont,
+           {:ok, acc ++ [%{name: name, key: key, content_type: type, bytes: byte_size(body)}]}}
 
         :ok ->
-          {:cont, {:ok, acc ++ [%{name: name, key: key, content_type: type, bytes: byte_size(body)}]}}
+          {:cont,
+           {:ok, acc ++ [%{name: name, key: key, content_type: type, bytes: byte_size(body)}]}}
 
         error ->
           {:halt, error}

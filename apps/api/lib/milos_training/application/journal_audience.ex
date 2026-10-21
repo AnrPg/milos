@@ -97,7 +97,8 @@ defmodule MilosTraining.Application.JournalAudience do
     case {entry.organization_id, Journal.shareable_kind?(kind)} do
       {nil, true} ->
         if reach(context, kind, entry) == :audience,
-          do: Enum.filter(Journal.choosable_visibilities(kind), &(&1 in ~w(private coach_can_view))),
+          do:
+            Enum.filter(Journal.choosable_visibilities(kind), &(&1 in ~w(private coach_can_view))),
           else: Journal.choosable_visibilities(kind, nil)
 
       {organization_id, _shareable} ->
@@ -132,7 +133,11 @@ defmodule MilosTraining.Application.JournalAudience do
 
         choosable =
           if is_nil(item.organization_id) and audience.organization_ids != [],
-            do: Enum.filter(Journal.choosable_visibilities(item.kind), &(&1 in ~w(private coach_can_view))),
+            do:
+              Enum.filter(
+                Journal.choosable_visibilities(item.kind),
+                &(&1 in ~w(private coach_can_view))
+              ),
             else: item.choosable_visibilities
 
         %{item | choosable_visibilities: choosable} |> Map.put(:audience, audience)
@@ -177,7 +182,9 @@ defmodule MilosTraining.Application.JournalAudience do
   defp device(source) when is_binary(source),
     do: if(Journal.device_source?(source), do: source)
 
-  defp device(source) when is_atom(source) and not is_nil(source), do: device(Atom.to_string(source))
+  defp device(source) when is_atom(source) and not is_nil(source),
+    do: device(Atom.to_string(source))
+
   defp device(_source), do: nil
 
   defp broadcast(user_id, reason),

@@ -218,11 +218,11 @@ defmodule MilosTraining.Application.BodySnapshots do
   end
 
   @doc "Snapshots for the journal feed (owner only), as feed entries."
-  def feed_entries(%{user_id: user_id} = context, bound, limit) do
+  def feed_entries(%{user_id: user_id} = context, bound, limit, opts \\ []) do
     settings = Body.settings(context, user_id)
 
     if Body.section_on?(settings, "body") do
-      rows = Body.list_snapshots(context, user_id, bound: bound, limit: limit)
+      rows = Body.list_snapshots(context, user_id, [bound: bound, limit: limit] ++ opts)
       photos = photos_by_snapshot(context, rows)
 
       rows

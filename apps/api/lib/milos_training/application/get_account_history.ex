@@ -32,9 +32,14 @@ defmodule MilosTraining.Application.GetAccountHistory do
       filter = %{sources: sources, from: from, to: to}
 
       case params["kind"] || "workouts" do
-        "workouts" -> {:ok, page("workouts", workouts(context, filter), offset, limit)}
-        "classes" -> {:ok, page("classes", classes(context, filter, offset + limit), offset, limit)}
-        _other -> {:error, :invalid_history_kind}
+        "workouts" ->
+          {:ok, page("workouts", workouts(context, filter), offset, limit)}
+
+        "classes" ->
+          {:ok, page("classes", classes(context, filter, offset + limit), offset, limit)}
+
+        _other ->
+          {:error, :invalid_history_kind}
       end
     end
   end

@@ -26,7 +26,9 @@ defmodule MilosTraining.Application.GetAccountProgress do
         loaded.executions
         |> Enum.filter(&source?(filter.sources, &1.source_label))
         |> Enum.filter(&in_range?(&1, since))
-        |> Enum.filter(&Execution.exercise_matches?(filter.exercise, Map.get(&1, :exercise_names)))
+        |> Enum.filter(
+          &Execution.exercise_matches?(filter.exercise, Map.get(&1, :exercise_names))
+        )
 
       labels = Map.new(executions, &{&1.id, &1.source_label})
 
@@ -71,7 +73,11 @@ defmodule MilosTraining.Application.GetAccountProgress do
       records
       |> then(&ProgressStats.pr_timeline(Pantheon.list_user_record_history(user_id), &1))
       |> Enum.map(fn entry ->
-        Map.put(entry, :source, Journal.entry_source(Map.get(origin, entry.pr_record_id), nil, directory))
+        Map.put(
+          entry,
+          :source,
+          Journal.entry_source(Map.get(origin, entry.pr_record_id), nil, directory)
+        )
       end)
       |> Enum.filter(&source?(filter.sources, &1.source))
       |> Enum.filter(&Execution.exercise_matches?(filter.exercise, [&1.name]))

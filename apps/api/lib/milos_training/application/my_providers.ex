@@ -20,7 +20,9 @@ defmodule MilosTraining.Application.MyProviders do
   def call(context, now \\ DateTime.utc_now()) do
     providers = Organizations.list_my_providers(context)
     {active, former} = Organizations.split_providers(providers)
-    selected = Organizations.selected_provider(active, Organizations.get_provider_selection(context))
+
+    selected =
+      Organizations.selected_provider(active, Organizations.get_provider_selection(context))
 
     {:ok,
      %{
@@ -32,7 +34,8 @@ defmodule MilosTraining.Application.MyProviders do
 
   @doc "`PUT /api/me/providers/selected`: remembers the provider Box opens on."
   def select(context, organization_id) do
-    {active, _former} = context |> Organizations.list_my_providers() |> Organizations.split_providers()
+    {active, _former} =
+      context |> Organizations.list_my_providers() |> Organizations.split_providers()
 
     if is_binary(organization_id) and Enum.any?(active, &(&1.organization_id == organization_id)) do
       :ok = Organizations.put_provider_selection(context, organization_id)
@@ -75,7 +78,11 @@ defmodule MilosTraining.Application.MyProviders do
 
   defp facts(context, provider, now) do
     with {:ok, tenant} <- tenant_context(context, provider.organization_id) do
-      %{next: next(tenant, context.user_id, now), unread: unread(tenant, context.user_id), partial: false}
+      %{
+        next: next(tenant, context.user_id, now),
+        unread: unread(tenant, context.user_id),
+        partial: false
+      }
     else
       _error -> %{next: nil, unread: 0, partial: true}
     end

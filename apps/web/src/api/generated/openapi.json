@@ -664,8 +664,20 @@
                         ],
                         "type": "string"
                       },
+                      "master_workout_id": {
+                        "description": "Workout to repeat, when the attempt has one.",
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
                       "on": {
                         "format": "date",
+                        "type": "string"
+                      },
+                      "organization_id": {
+                        "description": "Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first.",
+                        "format": "uuid",
+                        "nullable": true,
                         "type": "string"
                       },
                       "scale_level_slug": {
@@ -744,6 +756,8 @@
                     "required": [
                       "kind",
                       "id",
+                      "organization_id",
+                      "master_workout_id",
                       "at",
                       "source"
                     ],
@@ -75451,8 +75465,20 @@
                                   ],
                                   "type": "string"
                                 },
+                                "master_workout_id": {
+                                  "description": "Workout to repeat, when the attempt has one.",
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
                                 "on": {
                                   "format": "date",
+                                  "type": "string"
+                                },
+                                "organization_id": {
+                                  "description": "Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first.",
+                                  "format": "uuid",
+                                  "nullable": true,
                                   "type": "string"
                                 },
                                 "scale_level_slug": {
@@ -75531,6 +75557,8 @@
                               "required": [
                                 "kind",
                                 "id",
+                                "organization_id",
+                                "master_workout_id",
                                 "at",
                                 "source"
                               ],

@@ -20,7 +20,9 @@ defmodule MilosTraining.Infrastructure.Body.EctoBodyStore do
     |> where([s], s.user_id == ^user_id)
     |> shared_only(Keyword.get(opts, :shared_only, false))
     |> after_cursor(Keyword.get(opts, :cursor))
+    |> private_only(Keyword.get(opts, :private_only, false))
     |> taken_since(Keyword.get(opts, :since))
+    |> taken_before(Keyword.get(opts, :before))
     |> feed_bound(Keyword.get(opts, :bound, :none))
     |> order_by([s], desc: s.taken_at, desc: s.id)
     |> limit(^Keyword.get(opts, :limit, 21))
@@ -30,6 +32,9 @@ defmodule MilosTraining.Infrastructure.Body.EctoBodyStore do
 
   defp shared_only(query, false), do: query
   defp shared_only(query, true), do: where(query, [s], s.visibility in @shared)
+
+  defp private_only(query, false), do: query
+  defp private_only(query, true), do: where(query, [s], s.visibility not in @shared)
 
   defp after_cursor(query, nil), do: query
 
@@ -43,6 +48,9 @@ defmodule MilosTraining.Infrastructure.Body.EctoBodyStore do
 
   defp taken_since(query, nil), do: query
   defp taken_since(query, %DateTime{} = at), do: where(query, [s], s.taken_at >= ^at)
+
+  defp taken_before(query, nil), do: query
+  defp taken_before(query, %DateTime{} = at), do: where(query, [s], s.taken_at < ^at)
 
   # A journal feed bound (`Journal.feed_bound/2`).
   defp feed_bound(query, :none), do: query

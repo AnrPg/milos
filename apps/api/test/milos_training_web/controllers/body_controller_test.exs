@@ -490,6 +490,18 @@ defmodule MilosTrainingWeb.BodyControllerTest do
 
     assert id == snapshot["id"]
 
+    # The Ροή filter (ADR-162): a snapshot is freeform, shared, without text.
+    for {query, count} <- [
+          {"visibilities=private", 0},
+          {"visibilities=coach_can_view&sources=freeform", 1},
+          {"q=waist", 0}
+        ] do
+      assert %{"items" => items} =
+               as.(member) |> get("/api/me/journal?kinds=body&#{query}") |> json_response(200)
+
+      assert length(items) == count, query
+    end
+
     assert %{"items" => items} =
              as.(coach) |> get("#{staff}/clients/#{member.id}/journal") |> json_response(200)
 

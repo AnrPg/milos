@@ -83,7 +83,8 @@ defmodule MilosTraining.Application.MyToday do
 
   defp timezone(_timezone), do: {:error, :invalid_timezone}
 
-  defp date(nil, timezone, now), do: {:ok, now |> DateTime.shift_zone!(timezone) |> DateTime.to_date()}
+  defp date(nil, timezone, now),
+    do: {:ok, now |> DateTime.shift_zone!(timezone) |> DateTime.to_date()}
 
   defp date(value, _timezone, _now) when is_binary(value) do
     case Date.from_iso8601(value) do
