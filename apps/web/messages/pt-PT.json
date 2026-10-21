@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "Tibial anterior",
       "fibularis": "Peroniais"
     }
+  },
+  "WodGoals": {
+    "title": "Objetivos",
+    "showToMembers": "Mostrar objetivos aos membros",
+    "showToMembersHint": "Os membros veem os objetivos no cartão do treino.",
+    "notSavedYet": "Sugestão · ainda não guardada",
+    "keepSuggestion": "Manter a sugestão",
+    "needsDraft": "Os objetivos aparecem quando o rascunho for guardado.",
+    "legend": {
+      "primary": "Principais",
+      "secondary": "Secundários",
+      "stabilizer": "Estabilização",
+      "felt": "Senti"
+    },
+    "role": {
+      "primary": "Principal",
+      "secondary": "Secundário",
+      "stabilizer": "Estabilização",
+      "off": "Remover"
+    },
+    "muscles": "Músculos",
+    "noMuscles": "Ainda sem músculos definidos.",
+    "qualities": "Capacidades",
+    "stimulus": "Estímulo",
+    "stimulusPlaceholder": "p. ex. rápido, sem pausas",
+    "stimulusPhrases": "Adicionar rápido",
+    "phrase": {
+      "unbroken": "sem pausas",
+      "steady": "ritmo constante",
+      "heavy": "pesado",
+      "technique": "técnica"
+    },
+    "suggestionFrom": "{count, plural, =0 {Nenhum exercício reconhecido} one {Sugestão a partir de # exercício} other {Sugestão a partir de # exercícios}}",
+    "unmatched": "{count, plural, one {# exercício sem correspondência} other {# exercícios sem correspondência}}",
+    "resetSuggestion": "Repor sugestão",
+    "editOnBody": "Editar no corpo",
+    "removeMuscle": "Remover: {muscle}",
+    "changeRole": "{muscle}, {role}. Toque para mudar o papel.",
+    "status": {
+      "saving": "A guardar…",
+      "saved": "Guardados",
+      "error": "Não guardados"
+    },
+    "retry": "Tentar novamente",
+    "loadError": "Não foi possível carregar os objetivos.",
+    "invalid": "Alguns objetivos não são válidos.",
+    "picker": {
+      "title": "Músculos-alvo",
+      "feltTitle": "Onde sentiu?",
+      "body": "Corpo",
+      "list": "Lista",
+      "front": "Frente",
+      "back": "Costas",
+      "search": "Procurar músculo",
+      "noResults": "Sem resultados",
+      "done": "Concluído",
+      "hint": "Toque num grupo muscular; toque de novo para uma cabeça. Um toque longo muda o papel.",
+      "feltHint": "Toque onde sentiu.",
+      "resetZoom": "Corpo inteiro",
+      "roleFor": "Papel: {muscle}",
+      "felt": "Senti",
+      "close": "Fechar",
+      "selectedNone": "Escolha um músculo no corpo ou na lista.",
+      "add": "Adicionar"
+    },
+    "strip": {
+      "summary": "Objetivos: {muscles}",
+      "open": "Ver os objetivos",
+      "qualities": "Capacidades: {qualities}"
+    },
+    "sheet": {
+      "title": "Objetivos do treino",
+      "close": "Fechar"
+    },
+    "felt": {
+      "title": "O que sentiu?",
+      "subtitle": "Opcional: marque o que sentiu dos objetivos.",
+      "noGoalsSubtitle": "Opcional: marque no corpo onde sentiu.",
+      "somethingElse": "+ Outra coisa",
+      "skip": "Saltar",
+      "save": "Guardar",
+      "saving": "A guardar…",
+      "error": "Não foi guardado. Tente novamente ou salte.",
+      "loading": "A carregar…",
+      "feltMark": "{muscle}: senti",
+      "extra": "Outros músculos"
+    }
   }
 }

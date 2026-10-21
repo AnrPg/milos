@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "Tibial antérieur",
       "fibularis": "Fibulaires"
     }
+  },
+  "WodGoals": {
+    "title": "Objectifs",
+    "showToMembers": "Montrer les objectifs aux membres",
+    "showToMembersHint": "Les membres voient les objectifs sur la carte de la séance.",
+    "notSavedYet": "Suggestion · pas encore enregistrée",
+    "keepSuggestion": "Garder la suggestion",
+    "needsDraft": "Les objectifs apparaissent dès que le brouillon est enregistré.",
+    "legend": {
+      "primary": "Principaux",
+      "secondary": "Secondaires",
+      "stabilizer": "Stabilisation",
+      "felt": "Ressenti"
+    },
+    "role": {
+      "primary": "Principal",
+      "secondary": "Secondaire",
+      "stabilizer": "Stabilisation",
+      "off": "Retirer"
+    },
+    "muscles": "Muscles",
+    "noMuscles": "Aucun muscle défini.",
+    "qualities": "Qualités",
+    "stimulus": "Stimulus",
+    "stimulusPlaceholder": "p. ex. rapide, sans pause",
+    "stimulusPhrases": "Ajout rapide",
+    "phrase": {
+      "unbroken": "sans pause",
+      "steady": "rythme régulier",
+      "heavy": "lourd",
+      "technique": "technique"
+    },
+    "suggestionFrom": "{count, plural, =0 {Aucun exercice reconnu} one {Suggestion à partir de # exercice} other {Suggestion à partir de # exercices}}",
+    "unmatched": "{count, plural, one {# exercice non reconnu} other {# exercices non reconnus}}",
+    "resetSuggestion": "Rétablir la suggestion",
+    "editOnBody": "Modifier sur le corps",
+    "removeMuscle": "Retirer : {muscle}",
+    "changeRole": "{muscle}, {role}. Touchez pour changer le rôle.",
+    "status": {
+      "saving": "Enregistrement…",
+      "saved": "Enregistrés",
+      "error": "Non enregistrés"
+    },
+    "retry": "Réessayer",
+    "loadError": "Impossible de charger les objectifs.",
+    "invalid": "Certains objectifs ne sont pas valides.",
+    "picker": {
+      "title": "Muscles ciblés",
+      "feltTitle": "Où l’avez-vous ressenti ?",
+      "body": "Corps",
+      "list": "Liste",
+      "front": "Devant",
+      "back": "Derrière",
+      "search": "Rechercher un muscle",
+      "noResults": "Aucun résultat",
+      "done": "Terminé",
+      "hint": "Touchez un groupe musculaire, puis à nouveau pour un chef. Un appui long change le rôle.",
+      "feltHint": "Touchez là où vous l’avez ressenti.",
+      "resetZoom": "Corps entier",
+      "roleFor": "Rôle : {muscle}",
+      "felt": "Ressenti",
+      "close": "Fermer",
+      "selectedNone": "Choisissez un muscle sur le corps ou dans la liste.",
+      "add": "Ajouter"
+    },
+    "strip": {
+      "summary": "Objectifs : {muscles}",
+      "open": "Voir les objectifs",
+      "qualities": "Qualités : {qualities}"
+    },
+    "sheet": {
+      "title": "Objectifs de la séance",
+      "close": "Fermer"
+    },
+    "felt": {
+      "title": "Qu’avez-vous ressenti ?",
+      "subtitle": "Facultatif : notez ce que vous avez ressenti parmi les objectifs.",
+      "noGoalsSubtitle": "Facultatif : notez sur le corps où vous l’avez ressenti.",
+      "somethingElse": "+ Autre chose",
+      "skip": "Passer",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "error": "Non enregistré. Réessayez ou passez.",
+      "loading": "Chargement…",
+      "feltMark": "{muscle} : ressenti",
+      "extra": "Autres muscles"
+    }
   }
 }

@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "Vorderer Schienbeinmuskel",
       "fibularis": "Wadenbeinmuskeln"
     }
+  },
+  "WodGoals": {
+    "title": "Ziele",
+    "showToMembers": "Ziele den Mitgliedern zeigen",
+    "showToMembersHint": "Mitglieder sehen die Ziele auf der Trainingskarte.",
+    "notSavedYet": "Vorschlag · noch nicht gespeichert",
+    "keepSuggestion": "Vorschlag behalten",
+    "needsDraft": "Ziele erscheinen, sobald der Entwurf gespeichert ist.",
+    "legend": {
+      "primary": "Primär",
+      "secondary": "Unterstützend",
+      "stabilizer": "Stabilisierung",
+      "felt": "Gespürt"
+    },
+    "role": {
+      "primary": "Primär",
+      "secondary": "Unterstützend",
+      "stabilizer": "Stabilisierung",
+      "off": "Entfernen"
+    },
+    "muscles": "Muskeln",
+    "noMuscles": "Noch keine Muskeln festgelegt.",
+    "qualities": "Fähigkeiten",
+    "stimulus": "Reiz",
+    "stimulusPlaceholder": "z. B. schnell, ohne Pause",
+    "stimulusPhrases": "Schnell hinzufügen",
+    "phrase": {
+      "unbroken": "ohne Pause",
+      "steady": "gleichmäßiges Tempo",
+      "heavy": "schwer",
+      "technique": "Technik"
+    },
+    "suggestionFrom": "{count, plural, =0 {Keine Übung erkannt} one {Vorschlag aus # Übung} other {Vorschlag aus # Übungen}}",
+    "unmatched": "{count, plural, one {# Übung nicht zugeordnet} other {# Übungen nicht zugeordnet}}",
+    "resetSuggestion": "Vorschlag wiederherstellen",
+    "editOnBody": "Am Körper bearbeiten",
+    "removeMuscle": "Entfernen: {muscle}",
+    "changeRole": "{muscle}, {role}. Tippen, um die Rolle zu ändern.",
+    "status": {
+      "saving": "Wird gespeichert…",
+      "saved": "Gespeichert",
+      "error": "Nicht gespeichert"
+    },
+    "retry": "Erneut versuchen",
+    "loadError": "Die Ziele konnten nicht geladen werden.",
+    "invalid": "Einige Ziele sind ungültig.",
+    "picker": {
+      "title": "Zielmuskeln",
+      "feltTitle": "Wo hast du es gespürt?",
+      "body": "Körper",
+      "list": "Liste",
+      "front": "Vorne",
+      "back": "Hinten",
+      "search": "Muskel suchen",
+      "noResults": "Keine Treffer",
+      "done": "Fertig",
+      "hint": "Tippe auf eine Muskelgruppe, erneut für einen Muskelkopf. Langes Drücken ändert die Rolle.",
+      "feltHint": "Tippe dort, wo du es gespürt hast.",
+      "resetZoom": "Ganzer Körper",
+      "roleFor": "Rolle: {muscle}",
+      "felt": "Gespürt",
+      "close": "Schließen",
+      "selectedNone": "Wähle einen Muskel am Körper oder in der Liste.",
+      "add": "Hinzufügen"
+    },
+    "strip": {
+      "summary": "Ziele: {muscles}",
+      "open": "Ziele ansehen",
+      "qualities": "Fähigkeiten: {qualities}"
+    },
+    "sheet": {
+      "title": "Trainingsziele",
+      "close": "Schließen"
+    },
+    "felt": {
+      "title": "Wie hat es sich angefühlt?",
+      "subtitle": "Optional: Markiere, was du von den Zielen gespürt hast.",
+      "noGoalsSubtitle": "Optional: Markiere am Körper, wo du es gespürt hast.",
+      "somethingElse": "+ Etwas anderes",
+      "skip": "Überspringen",
+      "save": "Speichern",
+      "saving": "Wird gespeichert…",
+      "error": "Nicht gespeichert. Versuche es erneut oder überspringe.",
+      "loading": "Wird geladen…",
+      "feltMark": "{muscle}: gespürt",
+      "extra": "Weitere Muskeln"
+    }
   }
 }

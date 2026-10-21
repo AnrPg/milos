@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "Tibiale anteriore",
       "fibularis": "Peronieri"
     }
+  },
+  "WodGoals": {
+    "title": "Obiettivi",
+    "showToMembers": "Mostra gli obiettivi ai membri",
+    "showToMembersHint": "I membri vedono gli obiettivi nella scheda dell’allenamento.",
+    "notSavedYet": "Suggerimento · non ancora salvato",
+    "keepSuggestion": "Tieni il suggerimento",
+    "needsDraft": "Gli obiettivi compaiono quando la bozza è salvata.",
+    "legend": {
+      "primary": "Principali",
+      "secondary": "Secondari",
+      "stabilizer": "Stabilizzazione",
+      "felt": "Sentito"
+    },
+    "role": {
+      "primary": "Principale",
+      "secondary": "Secondario",
+      "stabilizer": "Stabilizzazione",
+      "off": "Rimuovi"
+    },
+    "muscles": "Muscoli",
+    "noMuscles": "Nessun muscolo impostato.",
+    "qualities": "Capacità",
+    "stimulus": "Stimolo",
+    "stimulusPlaceholder": "es. veloce, senza pause",
+    "stimulusPhrases": "Aggiunta rapida",
+    "phrase": {
+      "unbroken": "senza pause",
+      "steady": "ritmo costante",
+      "heavy": "pesante",
+      "technique": "tecnica"
+    },
+    "suggestionFrom": "{count, plural, =0 {Nessun esercizio riconosciuto} one {Suggerimento da # esercizio} other {Suggerimento da # esercizi}}",
+    "unmatched": "{count, plural, one {# esercizio non abbinato} other {# esercizi non abbinati}}",
+    "resetSuggestion": "Ripristina suggerimento",
+    "editOnBody": "Modifica sul corpo",
+    "removeMuscle": "Rimuovi: {muscle}",
+    "changeRole": "{muscle}, {role}. Tocca per cambiare ruolo.",
+    "status": {
+      "saving": "Salvataggio…",
+      "saved": "Salvati",
+      "error": "Non salvati"
+    },
+    "retry": "Riprova",
+    "loadError": "Impossibile caricare gli obiettivi.",
+    "invalid": "Alcuni obiettivi non sono validi.",
+    "picker": {
+      "title": "Muscoli obiettivo",
+      "feltTitle": "Dove l’hai sentito?",
+      "body": "Corpo",
+      "list": "Elenco",
+      "front": "Davanti",
+      "back": "Dietro",
+      "search": "Cerca muscolo",
+      "noResults": "Nessun risultato",
+      "done": "Fatto",
+      "hint": "Tocca un gruppo muscolare; tocca di nuovo per un capo. Una pressione lunga cambia il ruolo.",
+      "feltHint": "Tocca dove l’hai sentito.",
+      "resetZoom": "Corpo intero",
+      "roleFor": "Ruolo: {muscle}",
+      "felt": "Sentito",
+      "close": "Chiudi",
+      "selectedNone": "Scegli un muscolo sul corpo o nell’elenco.",
+      "add": "Aggiungi"
+    },
+    "strip": {
+      "summary": "Obiettivi: {muscles}",
+      "open": "Vedi gli obiettivi",
+      "qualities": "Capacità: {qualities}"
+    },
+    "sheet": {
+      "title": "Obiettivi dell’allenamento",
+      "close": "Chiudi"
+    },
+    "felt": {
+      "title": "Cosa hai sentito?",
+      "subtitle": "Facoltativo: segna cosa hai sentito tra gli obiettivi.",
+      "noGoalsSubtitle": "Facoltativo: segna sul corpo dove l’hai sentito.",
+      "somethingElse": "+ Altro",
+      "skip": "Salta",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "error": "Non salvato. Riprova o salta.",
+      "loading": "Caricamento…",
+      "feltMark": "{muscle}: sentito",
+      "extra": "Altri muscoli"
+    }
   }
 }

@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "العضلة الظنبوبية الأمامية",
       "fibularis": "العضلات الشظوية"
     }
+  },
+  "WodGoals": {
+    "title": "الأهداف",
+    "showToMembers": "إظهار الأهداف للأعضاء",
+    "showToMembersHint": "يرى الأعضاء الأهداف في بطاقة التمرين.",
+    "notSavedYet": "اقتراح · لم يُحفظ بعد",
+    "keepSuggestion": "الإبقاء على الاقتراح",
+    "needsDraft": "تظهر الأهداف بعد حفظ المسودة.",
+    "legend": {
+      "primary": "أساسية",
+      "secondary": "مساعدة",
+      "stabilizer": "تثبيت",
+      "felt": "شعرت به"
+    },
+    "role": {
+      "primary": "أساسية",
+      "secondary": "مساعدة",
+      "stabilizer": "تثبيت",
+      "off": "إزالة"
+    },
+    "muscles": "العضلات",
+    "noMuscles": "لم تُحدَّد عضلات بعد.",
+    "qualities": "القدرات",
+    "stimulus": "المحفّز",
+    "stimulusPlaceholder": "مثلًا: سريع، دون توقف",
+    "stimulusPhrases": "إضافة سريعة",
+    "phrase": {
+      "unbroken": "دون توقف",
+      "steady": "وتيرة ثابتة",
+      "heavy": "ثقيل",
+      "technique": "تقنية"
+    },
+    "suggestionFrom": "{count, plural, =0 {لم يُتعرّف على أي تمرين} one {اقتراح من تمرين واحد} two {اقتراح من تمرينين} few {اقتراح من # تمارين} many {اقتراح من # تمرينًا} other {اقتراح من # تمرين}}",
+    "unmatched": "{count, plural, one {تمرين واحد دون مطابقة} two {تمرينان دون مطابقة} few {# تمارين دون مطابقة} many {# تمرينًا دون مطابقة} other {# تمرين دون مطابقة}}",
+    "resetSuggestion": "استعادة الاقتراح",
+    "editOnBody": "التعديل على الجسم",
+    "removeMuscle": "إزالة: {muscle}",
+    "changeRole": "{muscle}، {role}. اضغط لتغيير الدور.",
+    "status": {
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ",
+      "error": "لم يُحفظ"
+    },
+    "retry": "حاول مجددًا",
+    "loadError": "تعذّر تحميل الأهداف.",
+    "invalid": "بعض الأهداف غير صالحة.",
+    "picker": {
+      "title": "العضلات المستهدفة",
+      "feltTitle": "أين شعرت به؟",
+      "body": "الجسم",
+      "list": "القائمة",
+      "front": "أمام",
+      "back": "خلف",
+      "search": "ابحث عن عضلة",
+      "noResults": "لا نتائج",
+      "done": "تم",
+      "hint": "اضغط على مجموعة عضلية، ثم مجددًا لاختيار رأس. الضغط المطوّل يغيّر الدور.",
+      "feltHint": "اضغط حيث شعرت به.",
+      "resetZoom": "الجسم كله",
+      "roleFor": "الدور: {muscle}",
+      "felt": "شعرت به",
+      "close": "إغلاق",
+      "selectedNone": "اختر عضلة على الجسم أو من القائمة.",
+      "add": "إضافة"
+    },
+    "strip": {
+      "summary": "الأهداف: {muscles}",
+      "open": "عرض الأهداف",
+      "qualities": "القدرات: {qualities}"
+    },
+    "sheet": {
+      "title": "أهداف التمرين",
+      "close": "إغلاق"
+    },
+    "felt": {
+      "title": "بماذا شعرت؟",
+      "subtitle": "اختياري: حدّد ما شعرت به من الأهداف.",
+      "noGoalsSubtitle": "اختياري: حدّد على الجسم أين شعرت به.",
+      "somethingElse": "+ شيء آخر",
+      "skip": "تخطٍّ",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "error": "لم يُحفظ. حاول مجددًا أو تخطَّ.",
+      "loading": "جارٍ التحميل…",
+      "feltMark": "{muscle}: شعرت به",
+      "extra": "عضلات أخرى"
+    }
   }
 }

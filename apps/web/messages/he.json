@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "שריר השוקה הקדמי",
       "fibularis": "שרירי השוקית"
     }
+  },
+  "WodGoals": {
+    "title": "יעדים",
+    "showToMembers": "הצגת היעדים לחברים",
+    "showToMembersHint": "החברים רואים את היעדים בכרטיס האימון.",
+    "notSavedYet": "הצעה · עדיין לא נשמרה",
+    "keepSuggestion": "לשמור את ההצעה",
+    "needsDraft": "היעדים יופיעו לאחר שמירת הטיוטה.",
+    "legend": {
+      "primary": "עיקריים",
+      "secondary": "משניים",
+      "stabilizer": "ייצוב",
+      "felt": "הרגשתי"
+    },
+    "role": {
+      "primary": "עיקרי",
+      "secondary": "משני",
+      "stabilizer": "ייצוב",
+      "off": "הסרה"
+    },
+    "muscles": "שרירים",
+    "noMuscles": "עדיין לא הוגדרו שרירים.",
+    "qualities": "יכולות",
+    "stimulus": "גירוי",
+    "stimulusPlaceholder": "למשל: מהיר, ללא הפסקה",
+    "stimulusPhrases": "הוספה מהירה",
+    "phrase": {
+      "unbroken": "ללא הפסקה",
+      "steady": "קצב קבוע",
+      "heavy": "כבד",
+      "technique": "טכניקה"
+    },
+    "suggestionFrom": "{count, plural, =0 {לא זוהה תרגיל} one {הצעה מתרגיל אחד} other {הצעה מ־# תרגילים}}",
+    "unmatched": "{count, plural, one {תרגיל אחד ללא התאמה} other {# תרגילים ללא התאמה}}",
+    "resetSuggestion": "שחזור ההצעה",
+    "editOnBody": "עריכה על הגוף",
+    "removeMuscle": "הסרה: {muscle}",
+    "changeRole": "{muscle}, {role}. הקישו לשינוי התפקיד.",
+    "status": {
+      "saving": "שומר…",
+      "saved": "נשמרו",
+      "error": "לא נשמרו"
+    },
+    "retry": "לנסות שוב",
+    "loadError": "לא ניתן לטעון את היעדים.",
+    "invalid": "חלק מהיעדים אינם תקינים.",
+    "picker": {
+      "title": "שרירי יעד",
+      "feltTitle": "איפה הרגשת את זה?",
+      "body": "גוף",
+      "list": "רשימה",
+      "front": "מלפנים",
+      "back": "מאחור",
+      "search": "חיפוש שריר",
+      "noResults": "אין תוצאות",
+      "done": "סיום",
+      "hint": "הקישו על קבוצת שרירים; הקישו שוב לבחירת ראש. לחיצה ארוכה משנה תפקיד.",
+      "feltHint": "הקישו איפה שהרגשתם.",
+      "resetZoom": "כל הגוף",
+      "roleFor": "תפקיד: {muscle}",
+      "felt": "הרגשתי",
+      "close": "סגירה",
+      "selectedNone": "בחרו שריר על הגוף או ברשימה.",
+      "add": "הוספה"
+    },
+    "strip": {
+      "summary": "יעדים: {muscles}",
+      "open": "לצפייה ביעדים",
+      "qualities": "יכולות: {qualities}"
+    },
+    "sheet": {
+      "title": "יעדי האימון",
+      "close": "סגירה"
+    },
+    "felt": {
+      "title": "מה הרגשת?",
+      "subtitle": "רשות: סמנו מה הרגשתם מתוך היעדים.",
+      "noGoalsSubtitle": "רשות: סמנו על הגוף איפה הרגשתם.",
+      "somethingElse": "+ משהו אחר",
+      "skip": "דילוג",
+      "save": "שמירה",
+      "saving": "שומר…",
+      "error": "לא נשמר. נסו שוב או דלגו.",
+      "loading": "טוען…",
+      "feltMark": "{muscle}: הרגשתי",
+      "extra": "שרירים אחרים"
+    }
   }
 }

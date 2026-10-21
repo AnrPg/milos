@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "Tibialis anterior",
       "fibularis": "Fibularis"
     }
+  },
+  "WodGoals": {
+    "title": "Goals",
+    "showToMembers": "Show goals to members",
+    "showToMembersHint": "Members see the goals on the workout card.",
+    "notSavedYet": "Suggestion · not saved yet",
+    "keepSuggestion": "Keep the suggestion",
+    "needsDraft": "Goals appear once the draft is saved.",
+    "legend": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "stabilizer": "Stabilizing",
+      "felt": "Felt"
+    },
+    "role": {
+      "primary": "Primary",
+      "secondary": "Secondary",
+      "stabilizer": "Stabilizing",
+      "off": "Remove"
+    },
+    "muscles": "Muscles",
+    "noMuscles": "No muscles set yet.",
+    "qualities": "Qualities",
+    "stimulus": "Stimulus",
+    "stimulusPlaceholder": "e.g. fast, unbroken",
+    "stimulusPhrases": "Quick add",
+    "phrase": {
+      "unbroken": "unbroken",
+      "steady": "steady pace",
+      "heavy": "heavy",
+      "technique": "technique"
+    },
+    "suggestionFrom": "{count, plural, =0 {No exercise recognised} one {Suggested from # exercise} other {Suggested from # exercises}}",
+    "unmatched": "{count, plural, one {# exercise not matched} other {# exercises not matched}}",
+    "resetSuggestion": "Reset to suggestion",
+    "editOnBody": "Edit on the body",
+    "removeMuscle": "Remove: {muscle}",
+    "changeRole": "{muscle}, {role}. Tap to change the role.",
+    "status": {
+      "saving": "Saving…",
+      "saved": "Saved",
+      "error": "Not saved"
+    },
+    "retry": "Try again",
+    "loadError": "Could not load the goals.",
+    "invalid": "Some goals are not valid.",
+    "picker": {
+      "title": "Target muscles",
+      "feltTitle": "Where did you feel it?",
+      "body": "Body",
+      "list": "List",
+      "front": "Front",
+      "back": "Back",
+      "search": "Search muscles",
+      "noResults": "No results",
+      "done": "Done",
+      "hint": "Tap a muscle group; tap again for a head. Long press changes the role.",
+      "feltHint": "Tap where you felt it.",
+      "resetZoom": "Whole body",
+      "roleFor": "Role: {muscle}",
+      "felt": "Felt it",
+      "close": "Close",
+      "selectedNone": "Pick a muscle on the body or in the list.",
+      "add": "Add"
+    },
+    "strip": {
+      "summary": "Goals: {muscles}",
+      "open": "See the goals",
+      "qualities": "Qualities: {qualities}"
+    },
+    "sheet": {
+      "title": "Workout goals",
+      "close": "Close"
+    },
+    "felt": {
+      "title": "How did it feel?",
+      "subtitle": "Optional: mark what you felt from the goals.",
+      "noGoalsSubtitle": "Optional: mark on the body where you felt it.",
+      "somethingElse": "+ Something else",
+      "skip": "Skip",
+      "save": "Save",
+      "saving": "Saving…",
+      "error": "Not saved. Try again or skip.",
+      "loading": "Loading…",
+      "feltMark": "{muscle}: felt it",
+      "extra": "Other muscles"
+    }
   }
 }

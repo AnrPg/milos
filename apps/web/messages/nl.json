@@ -8138,5 +8138,92 @@
       "tibialis-anterior": "Voorste scheenbeenspier",
       "fibularis": "Kuitbeenspieren"
     }
+  },
+  "WodGoals": {
+    "title": "Doelen",
+    "showToMembers": "Doelen tonen aan leden",
+    "showToMembersHint": "Leden zien de doelen op de trainingskaart.",
+    "notSavedYet": "Voorstel · nog niet opgeslagen",
+    "keepSuggestion": "Voorstel behouden",
+    "needsDraft": "Doelen verschijnen zodra het concept is opgeslagen.",
+    "legend": {
+      "primary": "Primair",
+      "secondary": "Ondersteunend",
+      "stabilizer": "Stabilisatie",
+      "felt": "Gevoeld"
+    },
+    "role": {
+      "primary": "Primair",
+      "secondary": "Ondersteunend",
+      "stabilizer": "Stabilisatie",
+      "off": "Verwijderen"
+    },
+    "muscles": "Spieren",
+    "noMuscles": "Nog geen spieren ingesteld.",
+    "qualities": "Vaardigheden",
+    "stimulus": "Prikkel",
+    "stimulusPlaceholder": "bijv. snel, zonder pauze",
+    "stimulusPhrases": "Snel toevoegen",
+    "phrase": {
+      "unbroken": "zonder pauze",
+      "steady": "gelijkmatig tempo",
+      "heavy": "zwaar",
+      "technique": "techniek"
+    },
+    "suggestionFrom": "{count, plural, =0 {Geen oefening herkend} one {Voorstel op basis van # oefening} other {Voorstel op basis van # oefeningen}}",
+    "unmatched": "{count, plural, one {# oefening niet herkend} other {# oefeningen niet herkend}}",
+    "resetSuggestion": "Voorstel herstellen",
+    "editOnBody": "Bewerken op het lichaam",
+    "removeMuscle": "Verwijderen: {muscle}",
+    "changeRole": "{muscle}, {role}. Tik om de rol te wijzigen.",
+    "status": {
+      "saving": "Opslaan…",
+      "saved": "Opgeslagen",
+      "error": "Niet opgeslagen"
+    },
+    "retry": "Opnieuw proberen",
+    "loadError": "De doelen konden niet worden geladen.",
+    "invalid": "Sommige doelen zijn ongeldig.",
+    "picker": {
+      "title": "Doelspieren",
+      "feltTitle": "Waar voelde je het?",
+      "body": "Lichaam",
+      "list": "Lijst",
+      "front": "Voorkant",
+      "back": "Achterkant",
+      "search": "Spier zoeken",
+      "noResults": "Geen resultaten",
+      "done": "Klaar",
+      "hint": "Tik op een spiergroep; tik nogmaals voor een spierkop. Lang drukken wijzigt de rol.",
+      "feltHint": "Tik waar je het voelde.",
+      "resetZoom": "Hele lichaam",
+      "roleFor": "Rol: {muscle}",
+      "felt": "Gevoeld",
+      "close": "Sluiten",
+      "selectedNone": "Kies een spier op het lichaam of in de lijst.",
+      "add": "Toevoegen"
+    },
+    "strip": {
+      "summary": "Doelen: {muscles}",
+      "open": "Doelen bekijken",
+      "qualities": "Vaardigheden: {qualities}"
+    },
+    "sheet": {
+      "title": "Trainingsdoelen",
+      "close": "Sluiten"
+    },
+    "felt": {
+      "title": "Wat voelde je?",
+      "subtitle": "Optioneel: markeer wat je van de doelen voelde.",
+      "noGoalsSubtitle": "Optioneel: markeer op het lichaam waar je het voelde.",
+      "somethingElse": "+ Iets anders",
+      "skip": "Overslaan",
+      "save": "Opslaan",
+      "saving": "Opslaan…",
+      "error": "Niet opgeslagen. Probeer opnieuw of sla over.",
+      "loading": "Laden…",
+      "feltMark": "{muscle}: gevoeld",
+      "extra": "Andere spieren"
+    }
   }
 }
