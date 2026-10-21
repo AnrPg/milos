@@ -250,6 +250,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     # ADR-160: the weekly wellness summary; the use case also requires the
     # coach role and the client's grant.
     {W.ClientWellnessSummaryController, :show} => [:view_health],
+    # ADR-165: coverage, qualities and load from shared entries; the use
+    # case also requires the coach role and the client in scope.
+    {W.TrainingDepthController, :client} => [:view_client_training],
 
     # Private coach notes (ADR-101)
     {W.CoachNotesController, :index} => [:write_coach_notes, :read_coach_notes],

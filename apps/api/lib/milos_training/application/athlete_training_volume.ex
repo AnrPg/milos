@@ -15,7 +15,15 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
     * the felt feedback written on those same entries.
 
   Every exercise is resolved to its Quick Text catalog id (`exercise_ref`,
-  nil when not recognised). A workout is read once per window, in its own
+  nil when not recognised). Each performance also carries its `source`
+  token (the organization id, `freeform` or `device`, as the Πρόοδος source
+  filter takes it), its `minutes` and its perceived effort `rpe` (training
+  log only; executions record no effort), for training load (ADR-165).
+
+  A coach of one gym reads a client through `scope: {:coach, organization_id}`
+  in the coach's tenant session (ADR-165): only the client's executions and
+  log entries on a rung that reaches that gym's coaches, shared with it
+  (ADR-139, ADR-162), and only the felt feedback row security admits. A workout is read once per window, in its own
   organization's context (like `ListWorkoutExecutions`); one that cannot be
   read any more contributes nothing.
   """
@@ -29,6 +37,9 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
           id: Ecto.UUID.t(),
           organization_id: Ecto.UUID.t() | nil,
           at: DateTime.t(),
+          source: String.t(),
+          minutes: float() | nil,
+          rpe: 1..10 | nil,
           exercises: [
             %{exercise_ref: String.t() | nil, name: String.t() | nil, sets: pos_integer()}
           ]
@@ -36,19 +47,26 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
 
   @doc """
   `%{performances: [performance], felt: [%{entry_kind, entry_id, felt_muscles,
-  felt_qualities}]}` for everything done at or after `since` (a `DateTime`).
+  felt_qualities}]}` for everything done at or after `since` (a `DateTime`,
+  or nil for everything).
+
+  Options: `:user_id` (whose training; the caller by default) and `:scope`
+  (`:owner`, the default, or `{:coach, organization_id}`).
   """
-  def load(%{user_id: user_id} = context, %DateTime{} = since) do
+  def load(context, since, opts \\ []) do
+    user_id = Keyword.get(opts, :user_id, context.user_id)
+    scope = Keyword.get(opts, :scope, :owner)
+
     {executions, logs, felt} =
       Execution.with_execution_context(context, fn ->
         executions =
           user_id
-          |> Execution.list_executions_for_user()
+          |> list_executions(scope)
           |> Enum.filter(&completed_since?(&1, since))
 
         logs =
           user_id
-          |> Execution.list_training_log_items(:none, @log_limit, :owner)
+          |> Execution.list_training_log_items(:none, @log_limit, scope)
           |> Enum.filter(&logged_since?(&1, since))
 
         felt =
@@ -67,15 +85,23 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
     }
   end
 
+  defp list_executions(user_id, :owner), do: Execution.list_executions_for_user(user_id)
+
+  defp list_executions(user_id, scope),
+    do: Execution.list_execution_items(user_id, :none, @log_limit, scope)
+
   defp completed_since?(execution, since) do
     to_string(execution.status) == "completed" and match?(%DateTime{}, execution.completed_at_utc) and
-      DateTime.compare(execution.completed_at_utc, since) != :lt
+      on_or_after?(execution.completed_at_utc, since)
   end
 
   defp logged_since?(entry, since) do
     Map.get(entry, :status, "logged") == "logged" and match?(%DateTime{}, entry.performed_at_utc) and
-      DateTime.compare(entry.performed_at_utc, since) != :lt
+      on_or_after?(entry.performed_at_utc, since)
   end
+
+  defp on_or_after?(_at, nil), do: true
+  defp on_or_after?(at, since), do: DateTime.compare(at, since) != :lt
 
   defp feedback(_kind, [], _user_id), do: []
 
@@ -99,6 +125,9 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
       id: execution.id,
       organization_id: execution.organization_id,
       at: execution.completed_at_utc,
+      source: source(execution.organization_id, nil),
+      minutes: minutes_from_ms(Map.get(execution, :total_elapsed_ms)),
+      rpe: nil,
       exercises: workout_exercises(execution, workouts)
     }
   end
@@ -115,6 +144,9 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
       id: entry.id,
       organization_id: entry.organization_id,
       at: entry.performed_at_utc,
+      source: source(entry.organization_id, Map.get(entry, :source_type)),
+      minutes: minutes_from_seconds(Map.get(entry, :duration_seconds)),
+      rpe: rpe(Map.get(entry, :perceived_effort)),
       exercises: exercises
     }
   end
@@ -184,6 +216,25 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
 
   defp sets(sets) when is_integer(sets) and sets > 0, do: sets
   defp sets(_sets), do: 1
+
+  # The Πρόοδος source token (ADR-162, `EntrySource`): a device first, then
+  # the provider, else freeform.
+  defp source(organization_id, source_type) do
+    cond do
+      Journal.device_source?(source_type) -> "device"
+      is_binary(organization_id) -> organization_id
+      true -> "freeform"
+    end
+  end
+
+  defp minutes_from_ms(ms) when is_integer(ms) and ms > 0, do: ms / 60_000
+  defp minutes_from_ms(_ms), do: nil
+
+  defp minutes_from_seconds(seconds) when is_integer(seconds) and seconds > 0, do: seconds / 60
+  defp minutes_from_seconds(_seconds), do: nil
+
+  defp rpe(effort) when is_integer(effort) and effort in 1..10, do: effort
+  defp rpe(_effort), do: nil
 
   defp field(map, key), do: Map.get(map, key, Map.get(map, Atom.to_string(key)))
 end
