@@ -69,7 +69,8 @@
     "coach": "Coach",
     "memberTabs": "Sezioni principali",
     "trials": "Lezioni di prova",
-    "community": "Comunità"
+    "community": "Comunità",
+    "body": "Corpo"
   },
   "Profile": {
     "eyebrow": "Profilo",
@@ -4333,7 +4334,14 @@
     "apiErrorAttendanceAlreadyRecorded": "La tua presenza è già registrata.",
     "apiErrorAttendanceRequiresApprovedBooking": "Solo una prenotazione approvata permette il check-in.",
     "coachProgrammeTitle": "Il mio programma",
-    "coachProgrammeHint": "Cambia un giorno, rifiuta un allenamento o chiedine uno al tuo coach."
+    "coachProgrammeHint": "Cambia un giorno, rifiuta un allenamento o chiedine uno al tuo coach.",
+    "mpTabBody": "Corpo",
+    "stfPortionsTitle": "Porzioni giornaliere a mano",
+    "stfPortionsHint": "Ciò che il membro vede in Benessere al posto dei numeri. Vanno bene anche le mezze.",
+    "stfPortionsFromGrams": "Compila dai grammi",
+    "stfInvalidPortions": "Le porzioni vanno da 0 a 20, a metà.",
+    "stfMealSlots": "Pasti della giornata",
+    "stfMealSlotsHint": "I pasti su cui registra il membro. Lascia vuoto per colazione, pranzo, cena e spuntino."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -4857,7 +4865,9 @@
         "review": "Valutazione",
         "note": "Nota",
         "check_in": "Come mi sento",
-        "body": "Corpo"
+        "body": "Corpo",
+        "wellness": "Benessere",
+        "craving": "Voglia di cibo"
       },
       "loadMore": "Voci precedenti",
       "loadingMore": "Caricamento…",
@@ -4954,7 +4964,10 @@
       "formReview": "Video della tecnica",
       "review": "Recensione",
       "checkIn": "Come mi sento",
-      "note": "Nota o pensiero"
+      "note": "Nota o pensiero",
+      "measure": "Misurazione",
+      "wellness": "Acqua · Sonno · Pasto",
+      "craving": "Voglia di cibo"
     },
     "entryKindHint": {
       "workout": "Punteggio, RPE, note",
@@ -4963,7 +4976,10 @@
       "formReview": "Chiedi un parere al tuo coach",
       "review": "Valuta una lezione o un allenamento",
       "checkIn": "Poche domande rapide",
-      "note": "Tecnica, obiettivo, umore"
+      "note": "Tecnica, obiettivo, umore",
+      "measure": "Peso, circonferenze, foto",
+      "wellness": "Un bicchiere, la notte scorsa, un pasto",
+      "craving": "Annotala o chiedi supporto"
     },
     "homeTitle": "Home",
     "wodToday": "Il WOD di oggi in palestra",
@@ -4974,7 +4990,8 @@
       "training": "Allenamento",
       "wellbeing": "Benessere",
       "coach": "Coach",
-      "note": "Nota"
+      "note": "Nota",
+      "body": "Corpo"
     },
     "checkIn": {
       "eyebrow": "Come mi sento",
@@ -5075,7 +5092,223 @@
     "checkedIn": "Check-in fatto ✓",
     "followClassTimer": "Timer della classe dal vivo",
     "classCheckIn": "Check-in",
-    "programmeManage": "Cambia giorno o rifiuta"
+    "programmeManage": "Cambia giorno o rifiuta",
+    "meReferrals": "Porta un amico",
+    "meReferralsHint": "Il tuo link, QR e inviti",
+    "membershipReferral": "Porta un amico",
+    "wellness": {
+      "eyebrow": "Benessere",
+      "today": "Oggi",
+      "yesterday": "Ieri",
+      "loading": "Caricamento…",
+      "customize": "Personalizza",
+      "previousDay": "Giorno precedente",
+      "nextDay": "Giorno successivo",
+      "close": "Chiudi",
+      "save": "Salva",
+      "saving": "Salvataggio…",
+      "delete": "Elimina",
+      "cancel": "Annulla",
+      "undo": "Annulla aggiunta",
+      "open": "Apri",
+      "onlyMe": "Lo vedi solo tu. Puoi condividere singole voci più avanti.",
+      "whoSees": "Chi lo vede:",
+      "less": "Meno {what}",
+      "more": "Più {what}",
+      "item": {
+        "water": "Acqua",
+        "sleep": "Sonno",
+        "meals": "Pasti",
+        "plan": "Piano del coach",
+        "mood": "Umore",
+        "cravings": "Voglia di cibo"
+      },
+      "water": {
+        "add": "+1 bicchiere",
+        "glasses": "{filled} di {goal} bicchieri",
+        "added": "Bicchiere aggiunto ({ml} ml)",
+        "dropsLabel": "Bicchieri di oggi",
+        "remove": "Togli questo bicchiere"
+      },
+      "sleep": {
+        "title": "Sonno",
+        "night": "Notte",
+        "nap": "Pisolino",
+        "bed": "Sono andato a letto",
+        "wake": "Mi sono svegliato",
+        "napMinutes": "Minuti",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Qualità (da 1 a 5)",
+        "qualityValue": "Qualità {quality}/5",
+        "napValue": "Pisolino {minutes} min",
+        "empty": "Non registrato",
+        "tap": "Tocca per registrare la notte",
+        "fromDevice": "da {source}",
+        "corrected": "da {source}, corretto da te"
+      },
+      "source": {
+        "manual": "te",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Pasto",
+        "slot": "Quale pasto",
+        "logged": "Registrato",
+        "addSnack": "+ Spuntino",
+        "fitLabel": {
+          "plan": "E il piano?",
+          "own": "Come volevi?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Nel piano",
+            "off_plan": "Fuori piano"
+          },
+          "own": {
+            "in_plan": "Come volevo",
+            "off_plan": "Diversamente"
+          }
+        },
+        "photo": "Foto (facoltativa)",
+        "photoAdd": "Aggiungi una foto",
+        "photoChange": "Cambia foto",
+        "photoRemove": "Togli",
+        "photoUploading": "Caricamento…",
+        "photoFailed": "La foto non è stata caricata. Riprova o salva senza.",
+        "photoPrivate": "Privata, come le foto del corpo. Non finisce mai in un post senza chiedertelo.",
+        "note": "Una riga al riguardo (facoltativa)",
+        "portions": "Porzioni a mano (facoltative)",
+        "portionsHint": "Palmo, mano a coppa, pugno, pollice. Vanno bene le metà. Niente bilancia, niente calorie.",
+        "hungerLabel": "Fame e sazietà (facoltative)",
+        "hunger": "Quanta fame prima (da 1 a 5)",
+        "fullness": "Quanto sazio dopo (da 1 a 5)"
+      },
+      "slot": {
+        "breakfast": "Colazione",
+        "morning_snack": "Spuntino di metà mattina",
+        "lunch": "Pranzo",
+        "afternoon_snack": "Merenda",
+        "dinner": "Cena",
+        "evening_snack": "Spuntino serale",
+        "snack": "Spuntino",
+        "pre_workout": "Prima dell'allenamento",
+        "post_workout": "Dopo l'allenamento"
+      },
+      "portion": {
+        "protein": "Proteine (palmo)",
+        "carbs": "Carboidrati (mano a coppa)",
+        "veg": "Verdure (pugno)",
+        "fat": "Grassi (pollice)"
+      },
+      "plan": {
+        "title": "Alimentazione · {title}",
+        "showNumbers": "Mostra i numeri",
+        "hideNumbers": "Nascondi i numeri",
+        "of": "{logged} di {target}",
+        "noPortions": "Il piano del tuo coach non ha ancora porzioni giornaliere."
+      },
+      "mood": {
+        "mood": "Umore {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Come ti senti?",
+        "open": "Rispondi a «Come mi sento»"
+      },
+      "craving": {
+        "title": "Voglia di cibo",
+        "tileTitle": "Registrala o chiedi supporto",
+        "tileHint": "Sul momento; com'è andata può arrivare dopo",
+        "count": "{count, plural, one {# oggi} other {# oggi}}",
+        "edit": "Modifica",
+        "support": "Ho bisogno di supporto",
+        "supportNoBuddy": "Quando sceglierai un buddy, riceverà un breve messaggio. Mai i dettagli.",
+        "intensity": "Quanto è forte?",
+        "trigger": "Cosa l'ha scatenata?",
+        "outcome": "Cosa è successo?",
+        "note": "Cosa volevo (facoltativo)",
+        "notePlaceholder": "es. qualcosa di dolce dopo cena",
+        "tryNow": "Prova ora",
+        "tryWater": "Un bicchiere d'acqua",
+        "tryWalk": "Una passeggiata di 10 minuti",
+        "tryWait": "Aspetta 10 minuti e respira lentamente",
+        "waterCounted": "Contato",
+        "private": "La vedi solo tu. Ti chiederemo una volta, tra 20 minuti, com'è andata.",
+        "howDidItGo": "Com'è andata?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Stanchezza",
+        "boredom": "Noia",
+        "social": "Sociale",
+        "hunger": "Fame",
+        "other": "Altro"
+      },
+      "outcome": {
+        "resisted": "L'ho superata",
+        "ate_off_plan": "Ho mangiato qualcosa fuori piano",
+        "ongoing": "Ce l'ho ancora"
+      },
+      "week": {
+        "title": "Questa settimana",
+        "range": "{from} – {to}",
+        "previous": "Settimana precedente",
+        "next": "Settimana successiva",
+        "item": "Voce",
+        "line": "Sonno all'obiettivo {nights} notti su {days} · acqua all'obiettivo {water} giorni su {days}",
+        "dot": {
+          "full": "All'obiettivo",
+          "half": "In parte",
+          "empty": "Niente registrato",
+          "warm": "Voglia registrata"
+        }
+      },
+      "consent": {
+        "title": "La tua acqua, il sonno, i pasti e le voglie",
+        "body": "Ciò che registri qui sono dati sanitari. Restano tuoi e privati: il coach vede una voce solo se la condividi, e puoi esportare o eliminare tutto in qualsiasi momento.",
+        "items": "Cosa vuoi vedere?",
+        "later": "Puoi cambiarlo quando vuoi da «Personalizza».",
+        "agree": "Accetto e inizio"
+      },
+      "settings": {
+        "items": "Voci e ordine",
+        "hiddenKeeps": "Una voce che spegni sparisce dalla scheda, dalla settimana e da Nuova voce. I suoi dati restano finché non li elimini.",
+        "moveUp": "Sposta su {item}",
+        "moveDown": "Sposta giù {item}",
+        "water": "Acqua",
+        "glass": "Il tuo bicchiere",
+        "ml": "{ml} ml",
+        "goalGlasses": "Obiettivo giornaliero (bicchieri)",
+        "reminder": "Promemoria pomeridiano",
+        "reminderHint": "Una volta, dopo le 15:00, se sei sotto metà dell'obiettivo",
+        "goalYours": "Gli obiettivi sono tuoi. Un coach può suggerirne uno, mai imporlo.",
+        "sleep": "Sonno",
+        "sleepGoal": "Obiettivo di sonno (ore)",
+        "data": "I tuoi dati",
+        "section": {
+          "wellness": "Acqua, sonno e pasti",
+          "cravings": "Voglie"
+        },
+        "export": "Esporta (JSON)",
+        "erase": "Elimina tutto",
+        "eraseConfirm": "Sì, elimina per sempre",
+        "eraseWarning": "Elimina per sempre ogni voce di questa sezione, con le foto dei pasti.",
+        "erased": "Eliminato."
+      },
+      "feed": {
+        "water": "{count, plural, one {# bicchiere} other {# bicchieri}}",
+        "meals": "{count, plural, one {# pasto} other {# pasti}}",
+        "craving": "Voglia · {intensity}/10",
+        "empty": "Benessere"
+      },
+      "error": {
+        "health_data_consent_required": "Accetta prima che conserviamo dati sanitari.",
+        "occurred_in_future": "Quell'ora è nel futuro.",
+        "occurred_too_long_ago": "Puoi completare o correggere fino a 7 giorni prima.",
+        "invalid_wellness_value": "Controlla i valori e riprova.",
+        "invalid_media": "La foto non è pronta. Sceglila di nuovo."
+      }
+    }
   },
   "Community": {
     "all": "Tutti",
@@ -5963,7 +6196,8 @@
     "notif_event_guest_joined_body": "{person} viene a «{event}» con il tuo pass ospite.",
     "notif_event_trial_offer_title": "Prova una lezione",
     "notif_event_trial_offer_body": "Ti è piaciuto «{event}»? {box} ti invita a una lezione di prova.",
-    "notif_event_message_title": "Messaggio su «{event}»"
+    "notif_event_message_title": "Messaggio su «{event}»",
+    "findNearbyLater": "I club vicino a te arriveranno con Intorno a me."
   },
   "CommunityAdmin": {
     "title": "Comunità",
@@ -6196,7 +6430,9 @@
     "err_nobody_to_offer": "Nessuno di quelli venuti aspetta un'offerta di prova.",
     "err_trials_disabled": "Il box non accetta lezioni di prova in questo momento.",
     "eventsSegments": "Quali eventi",
-    "nearMe": "Vicino a me"
+    "nearMe": "Vicino a me",
+    "fieldGoodForFriends": "Adatto agli amici",
+    "goodForFriendsHint": "Compare per primo quando i membri invitano amici a un evento."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Nessun evento in arrivo. Creane uno con «+ Nuovo evento».",
@@ -6752,5 +6988,506 @@
     "prSavedBody": "Vuoi condividerlo con il tuo box? Aggiungi una foto o un video, se vuoi.",
     "prShare": "Condividi",
     "prNotNow": "Non ora"
+  },
+  "Body": {
+    "title": "Corpo",
+    "settingsLink": "Impostazioni",
+    "newMeasure": "Nuova misurazione",
+    "editMeasure": "Modifica misurazione",
+    "older": "Misurazioni precedenti",
+    "loading": "Caricamento…",
+    "offTitle": "Corpo è disattivato",
+    "offBody": "Hai disattivato la sezione Corpo, quindi è nascosta nel tuo diario. Le tue misurazioni restano salvate.",
+    "turnOn": "Riattiva Corpo",
+    "emptyTitle": "Il tuo corpo, in privato",
+    "emptyBody": "Corpo conserva misurazioni e, se vuoi, foto nel tempo, per vedere i tuoi progressi. Ogni campo è facoltativo.",
+    "emptyPrivacy": "Privato per impostazione predefinita: lo vedi solo tu, a meno che non condivida una misurazione con il tuo coach.",
+    "chartLabel": "Grafico",
+    "chartEyebrow": "{metric} · {range}",
+    "chartTrendEyebrow": "{metric} · andamento · {range}",
+    "chartTrendNote": "Senza numeri · si cambia nelle Impostazioni",
+    "chartTrendAria": "{metric}: {trend}",
+    "chartAria": "{metric}: {value}, variazione {change}",
+    "chartAriaOne": "{metric}: {value}",
+    "chartHiddenTitle": "{metric} è nascosto",
+    "chartHiddenBody": "Hai scelto di non vederlo. Puoi comunque registrarlo per il tuo coach.",
+    "chartNoData": "Nessuna misurazione in questo periodo.",
+    "changeInSettings": "Cambia nelle Impostazioni",
+    "metricsLabel": "Misura",
+    "rangeLabel": "Periodo",
+    "compareTitle": "Confronto",
+    "compareRange": "{from} ↔ {to}",
+    "compareNoPhotos": "Nessuna foto della stessa posa in entrambe le date.",
+    "compareNeedTwo": "Servono due misurazioni per un confronto.",
+    "compareNoMetrics": "Nessuna misura è presente in entrambe le date.",
+    "compareFrom": "Dal",
+    "compareTo": "Al",
+    "compareChanges": "Variazioni",
+    "compareModeLabel": "Vista",
+    "compareWith": "Confronta",
+    "modeSlider": "Cursore",
+    "modeSideBySide": "Affiancate",
+    "openCompare": "Apri il confronto",
+    "photosPrivate": "Foto private · nessun altro le vede",
+    "photosCoach": "Il tuo coach vede queste foto",
+    "snapshotsTitle": "Istantanee",
+    "summaryPart": "{metric} {value}",
+    "summaryEmpty": "Misurazione",
+    "photoCount": "{count, plural, one {# foto} other {# foto}}",
+    "photoProcessing": "Elaborazione…",
+    "photoFailed": "Non elaborata",
+    "tapToShow": "Tocca per vedere",
+    "revealPhoto": "Mostra la foto {label}",
+    "revealCompare": "Mostra le foto",
+    "dividerLabel": "Divisore tra le due foto",
+    "trendOnly": "Solo andamento",
+    "trendNotYet": "Non ci sono ancora abbastanza misurazioni",
+    "shareAria": "Condividi un prima e dopo",
+    "shareTitle": "Condividi un prima e dopo",
+    "shareExplain": "Crea un post con due foto della stessa posa, prima e dopo. Non viene aggiunta nessuna misura; scrivila tu se vuoi.",
+    "shareBefore": "Prima",
+    "posesLabel": "Posa",
+    "shareNoPose": "Queste due date non hanno una foto pronta della stessa posa.",
+    "shareText": "Testo (facoltativo)",
+    "shareTextPlaceholder": "Qualche parola sui tuoi progressi",
+    "shareAudience": "Chi vede il post",
+    "shareConfirmTitle": "Pubblicare queste foto?",
+    "shareConfirmBody": "Le tue foto «{pose}» del {from} e del {to} saranno pubblicate per: {audience}.",
+    "shareNoNumbers": "Le tue misure restano private. Puoi eliminare il post in qualsiasi momento.",
+    "shareConfirmAction": "Sì, pubblicale",
+    "sharing": "Pubblicazione…",
+    "shareDoneTitle": "Pubblicato",
+    "shareDoneBody": "Il tuo prima e dopo è tra i tuoi post.",
+    "channelLabel": "{club} › {channel}",
+    "next": "Avanti",
+    "back": "Indietro",
+    "close": "Chiudi",
+    "cancel": "Annulla",
+    "photosLabel": "Foto",
+    "optional": "facoltativo",
+    "photosHint": "La fotocamera mostra in trasparenza la tua foto precedente, per la stessa posa e distanza.",
+    "photosDeclined": "Senza foto questa volta.",
+    "photosAddAnyway": "Aggiungi foto",
+    "addPose": "Aggiungi foto: {pose}",
+    "retakePose": "Rifai la foto: {pose}",
+    "removePose": "Rimuovi foto: {pose}",
+    "poseAdd": "+ {pose}",
+    "poseDone": "✓ {pose}",
+    "uploading": "Caricamento…",
+    "uploadFailed": "Non riuscito",
+    "uploadFailedLong": "Una foto non è stata caricata. Rimuovila o rifalla.",
+    "measurementsLabel": "Misure",
+    "howToMeasure": "Come mi misuro?",
+    "hintsExplain": "I valori chiari sono dell'ultima volta.",
+    "otherMeasure": "+ Altra misura",
+    "lastTimeHint": "L'ultima volta: {value} {unit}",
+    "hiddenFieldNote": "Nascosto per te; il tuo coach lo vede solo se lo condividi.",
+    "whenLabel": "Data e ora",
+    "notesLabel": "Note",
+    "notesPlaceholder": "Le vedi solo tu",
+    "whoSees": "Chi la vede",
+    "needOne": "Aggiungi almeno una misura o una foto.",
+    "saving": "Salvataggio…",
+    "waitUploads": "In attesa delle foto…",
+    "saveSnapshot": "Salva istantanea",
+    "saveChanges": "Salva modifiche",
+    "edit": "Modifica",
+    "delete": "Elimina",
+    "deleteTitle": "Eliminare questa misurazione?",
+    "deleteBody": "I suoi valori e le sue foto vengono eliminati definitivamente.",
+    "deleteConfirm": "Elimina definitivamente",
+    "cameraTitle": "Foto: {pose}",
+    "cameraPreview": "Fotocamera",
+    "cameraPreviewAlt": "La foto che hai scattato: {pose}",
+    "cameraUnavailable": "La fotocamera non è disponibile. Scegli una foto dalla galleria.",
+    "ghostOpacity": "Foto precedente",
+    "fromGallery": "Dalla galleria",
+    "takePhoto": "Scatta la foto",
+    "cancelTimer": "Ferma il timer",
+    "timerOn": "Timer {seconds} s",
+    "timerOff": "Senza timer",
+    "switchCamera": "Cambia fotocamera",
+    "retake": "Rifai",
+    "keep": "Tienila",
+    "consentTitle": "Foto del corpo",
+    "consentLead": "Le vedi solo tu.",
+    "consentStored": "Sono salvate in privato, senza link pubblico, e i loro dati di posizione vengono rimossi.",
+    "consentWho": "Il tuo coach le vede solo se lo scegli in una misurazione.",
+    "consentDelete": "Puoi eliminarle tutte quando vuoi.",
+    "consentAgree": "Accetto",
+    "consentDecline": "Senza foto",
+    "weightDisplayQuestion": "Come vuoi vedere il tuo peso?",
+    "weightDisplayIntro": "La massa grassa segue la stessa scelta. Puoi cambiarla nelle Impostazioni.",
+    "saveChoice": "Salva",
+    "helpTitle": "Come mi misuro?",
+    "helpIntro": "Con un metro morbido, sulla pelle, aderente ma non stretto. Misurati alla stessa ora del giorno, meglio al mattino.",
+    "helpPhotos": "Per le foto: stesso posto, stessa luce, stessa distanza. Il timer ti dà 10 secondi per allontanarti.",
+    "settingsTitle": "Impostazioni Corpo",
+    "settingsHubHint": "Unità, peso, foto, promemoria",
+    "settingsIntro": "I tuoi dati corporei sono privati per impostazione predefinita. Qui scegli come appaiono e chi li vede.",
+    "unitsLabel": "Unità",
+    "sectionsLabel": "Sezioni del diario",
+    "sectionsHint": "Una sezione disattivata sparisce dal diario; non viene eliminato nulla.",
+    "reminderLabel": "Promemoria di misurazione",
+    "reminderOff": "Disattivato",
+    "reminderEvery": "Ogni {weeks} settimane",
+    "reminderHint": "Una breve notifica, senza numeri.",
+    "blurLabel": "Sfoca le foto finché non le tocco",
+    "blurHint": "Utile in palestra",
+    "consentStatusLabel": "Consenso per le foto del corpo",
+    "consentActive": "Dato il {date}.",
+    "consentWithdrawn": "Revocato il {date}. Il tuo coach non vede foto.",
+    "consentNone": "Non ancora dato. Viene chiesto con la tua prima foto.",
+    "withdrawHint": "Revocandolo, tutte le foto vengono subito nascoste ai coach. Le foto restano tue finché non le elimini.",
+    "withdraw": "Revoca il consenso",
+    "deleteAll": "Elimina tutte le foto",
+    "deleteAllTitle": "Eliminare tutte le foto del corpo?",
+    "deleteAllBody": "Ogni foto del corpo viene eliminata definitivamente. Vengono eliminate anche le misurazioni che avevano solo foto.",
+    "deleteAllConfirm": "Sì, elimina tutto",
+    "deleteAllDone": "{count, plural, one {# foto eliminata.} other {# foto eliminate.}}",
+    "defaultVisibilityLabel": "Chi vede una nuova misurazione",
+    "accessLogLabel": "Chi ha guardato",
+    "accessLogHint": "Ogni volta che un coach ha aperto misurazioni che hai condiviso.",
+    "accessLogEmpty": "Nessun coach ha aperto le tue misurazioni.",
+    "accessLogPhotos": "con foto",
+    "aCoach": "Un coach",
+    "coachNotice": "{name} vede quando hai aperto questa pagina.",
+    "coachEmpty": "{name} non ha condiviso nessuna misurazione con te.",
+    "coachLoadError": "Impossibile caricare le misurazioni.",
+    "coachNoNumbers": "Le misurazioni condivise non hanno numeri che puoi vedere.",
+    "coachNoPhotos": "Nessuna foto condivisa della stessa posa in entrambe le date.",
+    "coachShared": "Misurazioni condivise",
+    "coachWithPhotos": "con foto",
+    "coachWithoutPhotos": "senza foto",
+    "coachWeightChoice": "{name} ha scelto di non vedere il peso come numero, quindi non lo vedi nemmeno tu.",
+    "metric": {
+      "weight": "Peso",
+      "body_fat": "Massa grassa",
+      "waist": "Vita",
+      "hips": "Fianchi",
+      "chest": "Petto",
+      "arm": "Braccio",
+      "thigh": "Coscia",
+      "neck": "Collo",
+      "calf": "Polpaccio",
+      "arm_left": "Braccio sinistro",
+      "arm_right": "Braccio destro",
+      "thigh_left": "Coscia sinistra",
+      "thigh_right": "Coscia destra"
+    },
+    "metricShort": {
+      "weight": "peso",
+      "body_fat": "massa grassa",
+      "waist": "vita",
+      "hips": "fianchi",
+      "chest": "petto",
+      "arm": "braccio",
+      "thigh": "coscia",
+      "neck": "collo",
+      "calf": "polpaccio",
+      "arm_left": "braccio sx",
+      "arm_right": "braccio dx",
+      "thigh_left": "coscia sx",
+      "thigh_right": "coscia dx"
+    },
+    "pose": {
+      "front": "Fronte",
+      "side": "Profilo",
+      "back": "Retro",
+      "other": "Altra"
+    },
+    "range": {
+      "1m": "1M",
+      "3m": "3M",
+      "1y": "1A",
+      "all": "Tutto"
+    },
+    "rangeLong": {
+      "1m": "1 mese",
+      "3m": "3 mesi",
+      "1y": "1 anno",
+      "all": "tutto"
+    },
+    "trend": {
+      "steady": "Stabile",
+      "slightly_down": "In lieve calo",
+      "down": "In calo",
+      "slightly_up": "In lieve aumento",
+      "up": "In aumento"
+    },
+    "visibility": {
+      "private": "Solo io",
+      "coach_numbers": "Il mio coach (senza foto)",
+      "coach_full": "Il mio coach (con foto)"
+    },
+    "visibilityShort": {
+      "private": "Solo io",
+      "coach_numbers": "Coach · senza foto",
+      "coach_full": "Coach · con foto"
+    },
+    "visibilityHint": {
+      "private": "Nessun altro la vede",
+      "coach_numbers": "Il tuo coach vede le misure, non le foto",
+      "coach_full": "Il tuo coach vede le misure e le foto"
+    },
+    "weightDisplay": {
+      "number": "Numero",
+      "trend": "Solo andamento",
+      "hidden": "Nascosto"
+    },
+    "weightDisplayHint": {
+      "number": "Il valore e la sua variazione",
+      "trend": "Una linea smussata e parole, mai un numero",
+      "hidden": "Puoi comunque registrarlo per il tuo coach"
+    },
+    "weightDisplayFormNote": {
+      "trend": "Peso e massa grassa appaiono solo come andamento; i numeri che scrivi vengono salvati ma non mostrati.",
+      "hidden": "Peso e massa grassa sono nascosti per te; registrali solo se servono al tuo coach."
+    },
+    "units": {
+      "metric": "Metrico (kg, cm)",
+      "imperial": "Imperiale (lb, in)"
+    },
+    "section": {
+      "body": "Corpo",
+      "wellness": "Benessere",
+      "cravings": "Voglie"
+    },
+    "audience": {
+      "followers": "I miei follower",
+      "public": "Tutti"
+    },
+    "audienceHint": {
+      "followers": "Le persone che ti seguono",
+      "public": "Chiunque su Milos"
+    },
+    "accessLogEntry": {
+      "list": "{coach} ha visto le tue misurazioni · {date}",
+      "snapshot": "{coach} ha aperto una misurazione · {date}",
+      "series": "{coach} ha visto un grafico delle tue misurazioni · {date}"
+    },
+    "fieldError": {
+      "invalid": "Scrivi un numero",
+      "range": "Controlla questo valore"
+    },
+    "help": {
+      "waist": "Nel punto più stretto, di solito appena sopra l'ombelico, dopo aver espirato.",
+      "hips": "Nel punto più largo dei glutei, piedi uniti.",
+      "chest": "Nel punto più ampio del petto, braccia rilassate.",
+      "arm": "A metà del braccio, rilassato.",
+      "thigh": "Nel punto più spesso della coscia, in piedi.",
+      "neck": "Appena sotto il pomo d'Adamo.",
+      "calf": "Nel punto più largo del polpaccio, in piedi."
+    },
+    "errors": {
+      "invalid_metric": "Controlla questa misura.",
+      "snapshot_empty": "Aggiungi almeno una misura o una foto.",
+      "invalid_body_visibility": "Scegli chi vede questa misurazione.",
+      "body_notes_too_long": "Le note hanno al massimo 2000 caratteri.",
+      "invalid_pose": "Scegli fronte, profilo o retro.",
+      "too_many_body_photos": "Una misurazione ha al massimo quattro foto.",
+      "pose_taken": "Questa misurazione ha già una foto di quella posa.",
+      "body_photo_consent_required": "Prima accetta che conserviamo foto del corpo; restano private se non le condividi.",
+      "invalid_taken_at": "Controlla la data della misurazione.",
+      "share_confirmation_required": "Conferma che vuoi pubblicare queste foto.",
+      "share_needs_two_snapshots": "Scegli due misurazioni diverse.",
+      "share_photo_missing": "Entrambe le misurazioni devono avere una foto pronta di quella posa.",
+      "media_not_ready": "Una foto è ancora in elaborazione. Riprova tra poco."
+    }
+  },
+  "Referrals": {
+    "title": "Porta un amico",
+    "pickBox": "Quale box",
+    "noBox": "Iscriviti a un box per invitarci degli amici.",
+    "loading": "Caricamento…",
+    "loadFailed": "Impossibile caricare i tuoi inviti. Riprova tra un momento.",
+    "shareLink": "Condividi link",
+    "showQr": "Mostra QR",
+    "copied": "Link copiato",
+    "shareText": "Vieni ad allenarti con me da {box}",
+    "offer": {
+      "friend": "Il tuo amico: {gift}",
+      "friendNothing": "Invita un amico ad allenarsi con te",
+      "you": "Tu: {reward}, {when}",
+      "cap": "{count, plural, one {Fino a # amico all'anno} other {Fino a # amici all'anno}}",
+      "staff": "Condividi il link con chi vuoi. I premi sono per i membri.",
+      "noProgram": "Il tuo box al momento non ha un programma di referral. Il tuo link funziona comunque e i tuoi amici compaiono qui."
+    },
+    "events": {
+      "title": "Invita a un evento",
+      "shareText": "Vieni con me a {title}",
+      "free": "gratis",
+      "invite": "Invita",
+      "goodForFriends": "Adatto agli amici"
+    },
+    "list": {
+      "title": "I tuoi inviti",
+      "empty": "Ancora nessuno. Condividi il tuo link o invita un amico a un evento: è l'inizio più facile.",
+      "totals": "{invited} invitati · {trials} prove · {paid} abbonamenti",
+      "someone": "Qualcuno",
+      "earned": "Hai ricevuto {reward}"
+    },
+    "newLink": {
+      "action": "Nuovo link",
+      "confirm": "Il link e il QR attuali smetteranno di funzionare. Gli amici che hai già invitato restano tuoi.",
+      "yes": "Crea un nuovo link",
+      "no": "Tieni questo"
+    },
+    "qr": {
+      "title": "Il tuo QR di invito",
+      "close": "Chiudi",
+      "alt": "Codice QR del tuo link di invito",
+      "hint": "Il tuo amico lo inquadra con la fotocamera del telefono."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# giorno gratis} other {# giorni gratis}}",
+      "credit": "{amount} di credito"
+    },
+    "reward": {
+      "credit": "{amount} di credito",
+      "discount": "−{percent}% sul rinnovo",
+      "freePeriod": "{days, plural, one {# giorno gratis} other {# giorni gratis}}",
+      "manual": "un regalo dal box"
+    },
+    "when": {
+      "trial": "quando viene a una prova",
+      "paid": "quando si abbona"
+    },
+    "stage": {
+      "signed_up": "Registrato",
+      "event": "Venuto a un evento",
+      "trial": "Venuto a una prova",
+      "joined": "Entrato nel box",
+      "paid": "Abbonato"
+    },
+    "status": {
+      "open": "In corso",
+      "qualified": "Conta",
+      "capped": "Oltre il limite annuale",
+      "expired": "Scaduto",
+      "void": "Non conta"
+    },
+    "rewardStatus": {
+      "upcoming": "Non ancora",
+      "pending": "In attesa di approvazione",
+      "approved": "Approvato",
+      "given": "Consegnato",
+      "rejected": "Non approvato",
+      "capped": "Oltre il limite",
+      "none": "Nessun premio"
+    },
+    "channel": {
+      "link": "Link",
+      "qr": "QR",
+      "event": "Evento",
+      "guest_pass": "Pass ospite",
+      "staff": "Staff"
+    },
+    "invite": {
+      "heading": "Invito",
+      "title": "{name} ti invita a {box}",
+      "titleNoName": "Sei invitato a {box}",
+      "preview": "Allenati con un amico da {box} su Milos.",
+      "from": "{name} ti invita ad allenarti da {box}",
+      "fromMember": "Un membro ti invita ad allenarti da {box}",
+      "toEvent": "…e a un evento lì.",
+      "gift": "Per te: {gift}",
+      "giftWhen": "Te lo dà il box con il tuo primo pacchetto.",
+      "signUp": "Crea un account",
+      "signIn": "Ho già un account",
+      "seeBox": "Vedi il box",
+      "consent": "{name} vedrà il tuo nome e a che punto sei (registrazione, prova, abbonamento). Nient'altro.",
+      "consentNoName": "Il membro che ti ha invitato vedrà il tuo nome e a che punto sei (registrazione, prova, abbonamento). Nient'altro.",
+      "claiming": "Salvataggio dell'invito…",
+      "failed": "Non siamo riusciti a salvare l'invito ora. Riproveremo la prossima volta che apri Milos.",
+      "alreadyMember": "Sei già da {box}, quindi questo invito non vale.",
+      "alreadyInvited": "L’invito di un altro membro conta già per te.",
+      "self": "Questo è il tuo link di invito.",
+      "claimed": "Fatto. Il tuo invito a {box} è salvato.",
+      "openMine": "Apri Porta un amico",
+      "openEvent": "Vedi l'evento",
+      "bookTrial": "Prenota una prova",
+      "gone": "Questo invito non è più attivo",
+      "goneHint": "Forse il link è stato sostituito. Chiedi al tuo amico quello nuovo.",
+      "home": "Vai su Milos"
+    },
+    "notif": {
+      "progressTitle": "Il tuo invito",
+      "progress": {
+        "signed_up": "{person} si è registrato con il tuo invito.",
+        "event": "{person} è venuto all'evento a cui l'hai invitato.",
+        "trial": "{person} è venuto a una prova.",
+        "joined": "{person} è entrato nel box.",
+        "paid": "{person} si è abbonato."
+      },
+      "rewardTitle": "Premio referral",
+      "reward": {
+        "approved": "Il tuo premio referral è stato approvato.",
+        "given": "Il tuo premio referral è stato consegnato.",
+        "rejected": "Il tuo referral non è stato approvato."
+      },
+      "reviewTitle": "Referral da approvare",
+      "reviewBody": "{person} si è abbonato, invitato da {referrer}."
+    },
+    "staff": {
+      "title": "Inviti dai membri",
+      "filter": "Quali inviti",
+      "filter_review": "Da approvare",
+      "filter_all": "Tutti",
+      "stats": "Ultimi 90 giorni: {open} in corso · {qualified} contano · {expired} scaduti",
+      "emptyReview": "Niente da approvare.",
+      "empty": "Ancora nessun invito. I membri condividono il loro link da Io › Porta un amico.",
+      "noReferrer": "un ex membro",
+      "row": "{friend} ← {referrer}",
+      "panel": "Invito",
+      "approve": "Approva",
+      "reject": "Rifiuta",
+      "given": "Consegnato",
+      "applyGift": "Applica il regalo dell'amico",
+      "reassign": "Assegna a un altro membro",
+      "status": "Stato",
+      "void_staff": "lo staff non riceve premi",
+      "void_other": "non conta",
+      "channel": "Come",
+      "newAccount": "nuovo account",
+      "window": "Valido",
+      "until": "fino al {date}",
+      "program": "Programma",
+      "reward": "Premio del membro",
+      "gift": "Regalo dell'amico",
+      "giftApplied": "applicato il {date}",
+      "previous": "Prima",
+      "notes": "Note",
+      "newReferrer": "Nuovo membro",
+      "reassignSave": "Salva",
+      "cancel": "Annulla",
+      "note": "Nota (facoltativa)",
+      "discountOnRenewal": "«Consegnato» lo scala dalla prossima fattura di rinnovo del membro."
+    },
+    "rules": {
+      "rewardNote": "Cosa riceve il membro (a parole)",
+      "friendGift": "Regalo dell'amico",
+      "gift_free_days": "Giorni gratis sul primo pacchetto",
+      "gift_credit": "Credito",
+      "gift_custom": "Altro",
+      "gift_none": "Niente",
+      "giftDays": "Giorni",
+      "giftEuros": "Importo (€)",
+      "giftNote": "Cosa riceve l'amico",
+      "counts": "L'invito conta",
+      "counts_paid": "Al primo pagamento",
+      "counts_trial": "Alla prima prova",
+      "approval": "Premi",
+      "approval_manual": "Approvati dallo staff",
+      "approval_auto": "Approvati automaticamente",
+      "window": "L'invito vale (giorni)",
+      "cap": "Amici premiati per membro all'anno",
+      "capNone": "Nessun limite",
+      "hint": "Un solo programma è attivo per box: attivare questo ritira l'altro. Gli inviti mantengono le condizioni con cui sono stati fatti."
+    },
+    "tabs": {
+      "invite": "Invita",
+      "invites": "I tuoi inviti · {count}"
+    }
   }
 }

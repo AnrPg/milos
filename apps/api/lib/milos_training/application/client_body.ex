@@ -13,6 +13,8 @@ defmodule MilosTraining.Application.ClientBody do
     consent is active; withdrawing it hides them at once.
   - The client's display choice applies: under `trend` or `hidden` a coach
     never sees weight or body-fat numbers either. Notes stay the client's.
+  - `series` gives one metric over a range from the shared snapshots, under
+    the same display rules (under `trend`: the word and a 0..1 shape only).
   - Every read is written to the client's access log; the client sees it
     (no notification).
   """
@@ -57,6 +59,41 @@ defmodule MilosTraining.Application.ClientBody do
             log(context, client_id, "snapshot", [snapshot], photos_shown?)
             {:ok, presented}
         end
+      end)
+    end
+  end
+
+  @doc """
+  One metric of a client over a range, from the snapshots they shared, as
+  the client's display choice allows: numbers, the trend word with a
+  normalized shape (no values), or nothing. The read is logged.
+  """
+  def series(context, client_id, params, now \\ DateTime.utc_now()) do
+    metric = param(params, "metric")
+    range = param(params, "range") || "3m"
+
+    with {:ok, client_id} <- authorize(context, client_id),
+         true <- Body.known_metric?(metric || "") || {:error, :unknown_metric},
+         {:ok, since} <- Body.range_since(range, now) do
+      Body.with_context(context, fn ->
+        settings = Body.settings(context, client_id)
+        points = Body.list_metric_points(context, client_id, metric, since, shared_only: true)
+        shown = Body.shown_series(metric, points, settings)
+
+        read =
+          if shown.display == "hidden",
+            do: [],
+            else: points |> Enum.map(&%{id: &1.snapshot_id}) |> Enum.uniq()
+
+        log(context, client_id, "series", read, false)
+
+        {:ok,
+         Map.merge(shown, %{
+           metric: metric,
+           range: range,
+           units: settings.units,
+           unit: Body.metric_unit(metric, settings.units)
+         })}
       end)
     end
   end

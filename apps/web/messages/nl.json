@@ -69,7 +69,8 @@
     "coach": "Coach",
     "memberTabs": "Hoofdonderdelen",
     "trials": "Proeflessen",
-    "community": "Community"
+    "community": "Community",
+    "body": "Lichaam"
   },
   "Profile": {
     "eyebrow": "Profiel",
@@ -4333,7 +4334,14 @@
     "apiErrorAttendanceAlreadyRecorded": "Je aanwezigheid is al geregistreerd.",
     "apiErrorAttendanceRequiresApprovedBooking": "Alleen met een goedgekeurde boeking kun je inchecken.",
     "coachProgrammeTitle": "Mijn programma",
-    "coachProgrammeHint": "Wijzig een dag, weiger een training of vraag je coach om een training."
+    "coachProgrammeHint": "Wijzig een dag, weiger een training of vraag je coach om een training.",
+    "mpTabBody": "Lichaam",
+    "stfPortionsTitle": "Dagelijkse handporties",
+    "stfPortionsHint": "Wat het lid op de Welzijn-pagina ziet in plaats van getallen. Halve mogen ook.",
+    "stfPortionsFromGrams": "Invullen vanuit de grammen",
+    "stfInvalidPortions": "Porties gaan van 0 tot 20, per halve.",
+    "stfMealSlots": "Maaltijden van de dag",
+    "stfMealSlotsHint": "De maaltijden waarop het lid logt. Laat leeg voor ontbijt, lunch, avondeten en een snack."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4857,7 +4865,9 @@
         "review": "Beoordeling",
         "note": "Notitie",
         "check_in": "Hoe ik me voel",
-        "body": "Lichaam"
+        "body": "Lichaam",
+        "wellness": "Welzijn",
+        "craving": "Trek"
       },
       "loadMore": "Oudere invoer",
       "loadingMore": "Laden…",
@@ -4954,7 +4964,10 @@
       "formReview": "Techniekvideo",
       "review": "Beoordeling",
       "checkIn": "Hoe ik me voel",
-      "note": "Notitie of gedachte"
+      "note": "Notitie of gedachte",
+      "measure": "Meting",
+      "wellness": "Water · Slaap · Maaltijd",
+      "craving": "Trek"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
@@ -4963,7 +4976,10 @@
       "formReview": "Vraag je coach om feedback",
       "review": "Beoordeel een les of training",
       "checkIn": "Een paar snelle vragen",
-      "note": "Techniek, doel, stemming"
+      "note": "Techniek, doel, stemming",
+      "measure": "Gewicht, omtrekken, foto's",
+      "wellness": "Een glas, afgelopen nacht, een maaltijd",
+      "craving": "Noteer het of vraag om steun"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -4974,7 +4990,8 @@
       "training": "Training",
       "wellbeing": "Welzijn",
       "coach": "Coach",
-      "note": "Notitie"
+      "note": "Notitie",
+      "body": "Lichaam"
     },
     "checkIn": {
       "eyebrow": "Hoe ik me voel",
@@ -5075,7 +5092,223 @@
     "checkedIn": "Ingecheckt ✓",
     "followClassTimer": "Live lestimer",
     "classCheckIn": "Inchecken",
-    "programmeManage": "Dag wijzigen of weigeren"
+    "programmeManage": "Dag wijzigen of weigeren",
+    "meReferrals": "Neem een vriend mee",
+    "meReferralsHint": "Je link, QR en uitnodigingen",
+    "membershipReferral": "Neem een vriend mee",
+    "wellness": {
+      "eyebrow": "Welzijn",
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "loading": "Laden…",
+      "customize": "Aanpassen",
+      "previousDay": "Vorige dag",
+      "nextDay": "Volgende dag",
+      "close": "Sluiten",
+      "save": "Opslaan",
+      "saving": "Opslaan…",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "undo": "Ongedaan maken",
+      "open": "Openen",
+      "onlyMe": "Alleen jij ziet dit. Losse items kun je later delen.",
+      "whoSees": "Wie het ziet:",
+      "less": "Minder {what}",
+      "more": "Meer {what}",
+      "item": {
+        "water": "Water",
+        "sleep": "Slaap",
+        "meals": "Maaltijden",
+        "plan": "Plan van de coach",
+        "mood": "Stemming",
+        "cravings": "Trek"
+      },
+      "water": {
+        "add": "+1 glas",
+        "glasses": "{filled} van {goal} glazen",
+        "added": "Glas toegevoegd ({ml} ml)",
+        "dropsLabel": "Glazen vandaag",
+        "remove": "Dit glas verwijderen"
+      },
+      "sleep": {
+        "title": "Slaap",
+        "night": "Nacht",
+        "nap": "Dutje",
+        "bed": "Naar bed gegaan",
+        "wake": "Wakker geworden",
+        "napMinutes": "Minuten",
+        "duration": "{hours} u {minutes} min",
+        "quality": "Kwaliteit (1 tot 5)",
+        "qualityValue": "Kwaliteit {quality}/5",
+        "napValue": "Dutje {minutes} min",
+        "empty": "Niet vastgelegd",
+        "tap": "Tik om de nacht vast te leggen",
+        "fromDevice": "van {source}",
+        "corrected": "van {source}, door jou gecorrigeerd"
+      },
+      "source": {
+        "manual": "jou",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Maaltijd",
+        "slot": "Welke maaltijd",
+        "logged": "Vastgelegd",
+        "addSnack": "+ Tussendoortje",
+        "fitLabel": {
+          "plan": "En het plan?",
+          "own": "Zoals je wilde?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Binnen het plan",
+            "off_plan": "Buiten het plan"
+          },
+          "own": {
+            "in_plan": "Zoals ik wilde",
+            "off_plan": "Anders"
+          }
+        },
+        "photo": "Foto (optioneel)",
+        "photoAdd": "Foto toevoegen",
+        "photoChange": "Foto wijzigen",
+        "photoRemove": "Verwijderen",
+        "photoUploading": "Uploaden…",
+        "photoFailed": "De foto is niet geüpload. Probeer het opnieuw of sla op zonder.",
+        "photoPrivate": "Privé, net als lichaamsfoto's. Hij komt nooit in een bericht zonder dat je het vraagt.",
+        "note": "Een regel erover (optioneel)",
+        "portions": "Handporties (optioneel)",
+        "portionsHint": "Handpalm, holle hand, vuist, duim. Halve mag ook. Niet wegen, geen calorieën.",
+        "hungerLabel": "Honger en verzadiging (optioneel)",
+        "hunger": "Hoeveel honger vooraf (1 tot 5)",
+        "fullness": "Hoe vol daarna (1 tot 5)"
+      },
+      "slot": {
+        "breakfast": "Ontbijt",
+        "morning_snack": "Ochtendsnack",
+        "lunch": "Lunch",
+        "afternoon_snack": "Middagsnack",
+        "dinner": "Avondeten",
+        "evening_snack": "Avondsnack",
+        "snack": "Tussendoortje",
+        "pre_workout": "Voor de training",
+        "post_workout": "Na de training"
+      },
+      "portion": {
+        "protein": "Eiwit (handpalm)",
+        "carbs": "Koolhydraten (holle hand)",
+        "veg": "Groenten (vuist)",
+        "fat": "Vetten (duim)"
+      },
+      "plan": {
+        "title": "Voeding · {title}",
+        "showNumbers": "Getallen tonen",
+        "hideNumbers": "Getallen verbergen",
+        "of": "{logged} van {target}",
+        "noPortions": "Het plan van je coach heeft nog geen dagporties."
+      },
+      "mood": {
+        "mood": "Stemming {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Hoe voel je je?",
+        "open": "Beantwoord «Hoe voel ik me»"
+      },
+      "craving": {
+        "title": "Trek",
+        "tileTitle": "Leg het vast of vraag om steun",
+        "tileHint": "Op het moment zelf; hoe het afliep kan later",
+        "count": "{count, plural, one {# vandaag} other {# vandaag}}",
+        "edit": "Bewerken",
+        "support": "Ik heb steun nodig",
+        "supportNoBuddy": "Zodra je een buddy kiest, krijgt die een kort bericht. Nooit de details.",
+        "intensity": "Hoe sterk?",
+        "trigger": "Wat zette het in gang?",
+        "outcome": "Wat gebeurde er?",
+        "note": "Waar ik zin in had (optioneel)",
+        "notePlaceholder": "bv. iets zoets na het eten",
+        "tryNow": "Probeer nu",
+        "tryWater": "Een glas water",
+        "tryWalk": "Een wandeling van 10 minuten",
+        "tryWait": "Wacht 10 minuten en adem rustig",
+        "waterCounted": "Geteld",
+        "private": "Alleen jij ziet dit. We vragen één keer, over 20 minuten, hoe het ging.",
+        "howDidItGo": "Hoe ging het?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Vermoeidheid",
+        "boredom": "Verveling",
+        "social": "Sociaal",
+        "hunger": "Honger",
+        "other": "Iets anders"
+      },
+      "outcome": {
+        "resisted": "Ik ben eroverheen gekomen",
+        "ate_off_plan": "Ik heb iets buiten het plan gegeten",
+        "ongoing": "Ik heb het nog"
+      },
+      "week": {
+        "title": "Deze week",
+        "range": "{from} – {to}",
+        "previous": "Vorige week",
+        "next": "Volgende week",
+        "item": "Item",
+        "line": "Slaap op je doel {nights} van {days} nachten · water op je doel {water} van {days} dagen",
+        "dot": {
+          "full": "Op je doel",
+          "half": "Gedeeltelijk",
+          "empty": "Niets vastgelegd",
+          "warm": "Trek vastgelegd"
+        }
+      },
+      "consent": {
+        "title": "Je water, slaap, maaltijden en trek",
+        "body": "Wat je hier vastlegt, zijn gezondheidsgegevens. Ze blijven van jou en privé: je coach ziet een item alleen als je het deelt, en je kunt alles altijd exporteren of verwijderen.",
+        "items": "Wat wil je zien?",
+        "later": "Je kunt dit altijd wijzigen via «Aanpassen».",
+        "agree": "Akkoord, beginnen"
+      },
+      "settings": {
+        "items": "Items en volgorde",
+        "hiddenKeeps": "Een item dat je uitzet, verdwijnt uit de kaart, de week en Nieuw item. De gegevens blijven tot je ze verwijdert.",
+        "moveUp": "{item} omhoog",
+        "moveDown": "{item} omlaag",
+        "water": "Water",
+        "glass": "Je glas",
+        "ml": "{ml} ml",
+        "goalGlasses": "Dagdoel (glazen)",
+        "reminder": "Herinnering in de middag",
+        "reminderHint": "Eén keer, na 15:00, als je onder de helft van je doel zit",
+        "goalYours": "De doelen zijn van jou. Een coach kan er een voorstellen, maar nooit vastleggen.",
+        "sleep": "Slaap",
+        "sleepGoal": "Slaapdoel (uren)",
+        "data": "Je gegevens",
+        "section": {
+          "wellness": "Water, slaap en maaltijden",
+          "cravings": "Trek"
+        },
+        "export": "Exporteren (JSON)",
+        "erase": "Alles verwijderen",
+        "eraseConfirm": "Ja, definitief verwijderen",
+        "eraseWarning": "Dit verwijdert elk item van dit onderdeel definitief, met de maaltijdfoto's.",
+        "erased": "Verwijderd."
+      },
+      "feed": {
+        "water": "{count, plural, one {# glas} other {# glazen}}",
+        "meals": "{count, plural, one {# maaltijd} other {# maaltijden}}",
+        "craving": "Trek · {intensity}/10",
+        "empty": "Welzijn"
+      },
+      "error": {
+        "health_data_consent_required": "Ga eerst akkoord met het bewaren van gezondheidsgegevens.",
+        "occurred_in_future": "Dat tijdstip ligt in de toekomst.",
+        "occurred_too_long_ago": "Je kunt tot 7 dagen terug aanvullen of corrigeren.",
+        "invalid_wellness_value": "Controleer de waarden en probeer het opnieuw.",
+        "invalid_media": "De foto is niet klaar. Kies hem opnieuw."
+      }
+    }
   },
   "Community": {
     "all": "Alles",
@@ -5963,7 +6196,8 @@
     "notif_event_guest_joined_body": "{person} komt naar «{event}» met je gastenpas.",
     "notif_event_trial_offer_title": "Probeer een les",
     "notif_event_trial_offer_body": "Vond je «{event}» leuk? {box} nodigt je uit voor een proefles.",
-    "notif_event_message_title": "Bericht over «{event}»"
+    "notif_event_message_title": "Bericht over «{event}»",
+    "findNearbyLater": "Clubs bij jou in de buurt komen met In de buurt."
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6196,7 +6430,9 @@
     "err_nobody_to_offer": "Niemand die er was wacht op een proeflesaanbod.",
     "err_trials_disabled": "De box neemt op dit moment geen proeflessen aan.",
     "eventsSegments": "Welke events",
-    "nearMe": "Dichtbij"
+    "nearMe": "Dichtbij",
+    "fieldGoodForFriends": "Leuk voor vrienden",
+    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",
@@ -6752,5 +6988,506 @@
     "prSavedBody": "Wil je het delen met je box? Voeg gerust een foto of video toe.",
     "prShare": "Delen",
     "prNotNow": "Niet nu"
+  },
+  "Body": {
+    "title": "Lichaam",
+    "settingsLink": "Instellingen",
+    "newMeasure": "Nieuwe meting",
+    "editMeasure": "Meting bewerken",
+    "older": "Oudere metingen",
+    "loading": "Laden…",
+    "offTitle": "Lichaam staat uit",
+    "offBody": "Je hebt het onderdeel Lichaam uitgezet, dus het is verborgen in je dagboek. Je metingen blijven bewaard.",
+    "turnOn": "Lichaam weer aanzetten",
+    "emptyTitle": "Je lichaam, privé",
+    "emptyBody": "In Lichaam bewaar je metingen en, als je wilt, foto's door de tijd, zodat je je eigen vooruitgang ziet. Elk veld is optioneel.",
+    "emptyPrivacy": "Standaard privé: alleen jij ziet het, tenzij je een meting deelt met je coach.",
+    "chartLabel": "Grafiek",
+    "chartEyebrow": "{metric} · {range}",
+    "chartTrendEyebrow": "{metric} · trend · {range}",
+    "chartTrendNote": "Zonder getallen · wijzig in Instellingen",
+    "chartTrendAria": "{metric}: {trend}",
+    "chartAria": "{metric}: {value}, verandering {change}",
+    "chartAriaOne": "{metric}: {value}",
+    "chartHiddenTitle": "{metric} is verborgen",
+    "chartHiddenBody": "Je hebt gekozen het niet te zien. Je kunt het nog steeds vastleggen voor je coach.",
+    "chartNoData": "Geen metingen in deze periode.",
+    "changeInSettings": "Wijzig in Instellingen",
+    "metricsLabel": "Maat",
+    "rangeLabel": "Periode",
+    "compareTitle": "Vergelijken",
+    "compareRange": "{from} ↔ {to}",
+    "compareNoPhotos": "Geen foto's van dezelfde houding op beide data.",
+    "compareNeedTwo": "Je hebt twee metingen nodig om te vergelijken.",
+    "compareNoMetrics": "Geen enkele maat staat op beide data.",
+    "compareFrom": "Van",
+    "compareTo": "Tot",
+    "compareChanges": "Veranderingen",
+    "compareModeLabel": "Weergave",
+    "compareWith": "Vergelijken",
+    "modeSlider": "Schuifregelaar",
+    "modeSideBySide": "Naast elkaar",
+    "openCompare": "Vergelijking openen",
+    "photosPrivate": "Privéfoto's · niemand anders ziet ze",
+    "photosCoach": "Je coach ziet deze foto's",
+    "snapshotsTitle": "Momentopnames",
+    "summaryPart": "{metric} {value}",
+    "summaryEmpty": "Meting",
+    "photoCount": "{count, plural, one {# foto} other {# foto's}}",
+    "photoProcessing": "Verwerken…",
+    "photoFailed": "Niet verwerkt",
+    "tapToShow": "Tik om te tonen",
+    "revealPhoto": "Foto {label} tonen",
+    "revealCompare": "Foto's tonen",
+    "dividerLabel": "Scheidingslijn tussen de twee foto's",
+    "trendOnly": "Alleen trend",
+    "trendNotYet": "Nog niet genoeg metingen",
+    "shareAria": "Een voor en na delen",
+    "shareTitle": "Een voor en na delen",
+    "shareExplain": "Dit maakt een bericht met twee foto's van dezelfde houding, voor en na. Er wordt geen maat toegevoegd; schrijf er zelf een als je wilt.",
+    "shareBefore": "Voor",
+    "posesLabel": "Houding",
+    "shareNoPose": "Deze twee data hebben geen klare foto van dezelfde houding.",
+    "shareText": "Tekst (optioneel)",
+    "shareTextPlaceholder": "Een paar woorden over je vooruitgang",
+    "shareAudience": "Wie het bericht ziet",
+    "shareConfirmTitle": "Deze foto's plaatsen?",
+    "shareConfirmBody": "Je foto's „{pose}” van {from} en {to} worden geplaatst voor: {audience}.",
+    "shareNoNumbers": "Je maten blijven privé. Je kunt het bericht altijd verwijderen.",
+    "shareConfirmAction": "Ja, plaatsen",
+    "sharing": "Plaatsen…",
+    "shareDoneTitle": "Geplaatst",
+    "shareDoneBody": "Je voor en na staat bij je berichten.",
+    "channelLabel": "{club} › {channel}",
+    "next": "Volgende",
+    "back": "Terug",
+    "close": "Sluiten",
+    "cancel": "Annuleren",
+    "photosLabel": "Foto's",
+    "optional": "optioneel",
+    "photosHint": "De camera toont je vorige foto doorzichtig over het beeld, voor dezelfde houding en afstand.",
+    "photosDeclined": "Deze keer zonder foto's.",
+    "photosAddAnyway": "Foto's toevoegen",
+    "addPose": "Foto toevoegen: {pose}",
+    "retakePose": "Foto opnieuw maken: {pose}",
+    "removePose": "Foto verwijderen: {pose}",
+    "poseAdd": "+ {pose}",
+    "poseDone": "✓ {pose}",
+    "uploading": "Uploaden…",
+    "uploadFailed": "Mislukt",
+    "uploadFailedLong": "Een foto is niet geüpload. Verwijder hem of maak hem opnieuw.",
+    "measurementsLabel": "Maten",
+    "howToMeasure": "Hoe meet ik?",
+    "hintsExplain": "Vage waarden zijn van de vorige keer.",
+    "otherMeasure": "+ Andere maat",
+    "lastTimeHint": "Vorige keer: {value} {unit}",
+    "hiddenFieldNote": "Verborgen voor jou; je coach ziet het alleen als je het deelt.",
+    "whenLabel": "Datum en tijd",
+    "notesLabel": "Notities",
+    "notesPlaceholder": "Alleen jij ziet ze",
+    "whoSees": "Wie het ziet",
+    "needOne": "Voeg minstens één maat of één foto toe.",
+    "saving": "Opslaan…",
+    "waitUploads": "Wachten op de foto's…",
+    "saveSnapshot": "Momentopname opslaan",
+    "saveChanges": "Wijzigingen opslaan",
+    "edit": "Bewerken",
+    "delete": "Verwijderen",
+    "deleteTitle": "Deze meting verwijderen?",
+    "deleteBody": "De waarden en foto's worden definitief verwijderd.",
+    "deleteConfirm": "Definitief verwijderen",
+    "cameraTitle": "Foto: {pose}",
+    "cameraPreview": "Camera",
+    "cameraPreviewAlt": "De foto die je maakte: {pose}",
+    "cameraUnavailable": "De camera is niet beschikbaar. Kies een foto uit je galerij.",
+    "ghostOpacity": "Vorige foto",
+    "fromGallery": "Uit de galerij",
+    "takePhoto": "Foto maken",
+    "cancelTimer": "Timer stoppen",
+    "timerOn": "Timer {seconds} s",
+    "timerOff": "Geen timer",
+    "switchCamera": "Camera wisselen",
+    "retake": "Opnieuw",
+    "keep": "Bewaren",
+    "consentTitle": "Lichaamsfoto's",
+    "consentLead": "Alleen jij ziet ze.",
+    "consentStored": "Ze worden privé bewaard, zonder openbare link, en hun locatiegegevens worden verwijderd.",
+    "consentWho": "Je coach ziet ze alleen als je dat bij een meting kiest.",
+    "consentDelete": "Je kunt ze allemaal verwijderen wanneer je wilt.",
+    "consentAgree": "Ik ga akkoord",
+    "consentDecline": "Zonder foto's",
+    "weightDisplayQuestion": "Hoe wil je je gewicht zien?",
+    "weightDisplayIntro": "Vetpercentage volgt dezelfde keuze. Je kunt het wijzigen in Instellingen.",
+    "saveChoice": "Opslaan",
+    "helpTitle": "Hoe meet ik?",
+    "helpIntro": "Met een zacht meetlint, op de huid, nauwsluitend maar niet strak. Meet op hetzelfde moment van de dag, liefst 's ochtends.",
+    "helpPhotos": "Voor foto's: dezelfde plek, hetzelfde licht, dezelfde afstand. De timer geeft je 10 seconden om achteruit te stappen.",
+    "settingsTitle": "Lichaam-instellingen",
+    "settingsHubHint": "Eenheden, gewicht, foto's, herinnering",
+    "settingsIntro": "Je lichaamsgegevens zijn standaard privé. Hier kies je hoe ze worden getoond en wie ze ziet.",
+    "unitsLabel": "Eenheden",
+    "sectionsLabel": "Onderdelen van het dagboek",
+    "sectionsHint": "Een onderdeel dat uitstaat verdwijnt uit je dagboek; er wordt niets verwijderd.",
+    "reminderLabel": "Herinnering om te meten",
+    "reminderOff": "Uit",
+    "reminderEvery": "Elke {weeks} weken",
+    "reminderHint": "Een korte melding, zonder getallen.",
+    "blurLabel": "Foto's wazig tot ik tik",
+    "blurHint": "Handig in de sportschool",
+    "consentStatusLabel": "Toestemming voor lichaamsfoto's",
+    "consentActive": "Gegeven op {date}.",
+    "consentWithdrawn": "Ingetrokken op {date}. Je coach ziet geen foto's.",
+    "consentNone": "Nog niet gegeven. Dit wordt gevraagd bij je eerste foto.",
+    "withdrawHint": "Intrekken verbergt meteen alle foto's voor coaches. Je foto's blijven van jou tot je ze verwijdert.",
+    "withdraw": "Toestemming intrekken",
+    "deleteAll": "Alle foto's verwijderen",
+    "deleteAllTitle": "Alle lichaamsfoto's verwijderen?",
+    "deleteAllBody": "Elke lichaamsfoto wordt definitief verwijderd. Metingen die alleen foto's hadden worden ook verwijderd.",
+    "deleteAllConfirm": "Ja, alles verwijderen",
+    "deleteAllDone": "{count, plural, one {# foto verwijderd.} other {# foto's verwijderd.}}",
+    "defaultVisibilityLabel": "Wie een nieuwe meting ziet",
+    "accessLogLabel": "Wie heeft gekeken",
+    "accessLogHint": "Elke keer dat een coach gedeelde metingen opende.",
+    "accessLogEmpty": "Geen enkele coach heeft je metingen geopend.",
+    "accessLogPhotos": "met foto's",
+    "aCoach": "Een coach",
+    "coachNotice": "{name} ziet wanneer je deze pagina opende.",
+    "coachEmpty": "{name} heeft nog geen meting met je gedeeld.",
+    "coachLoadError": "De metingen konden niet worden geladen.",
+    "coachNoNumbers": "De gedeelde metingen hebben geen getallen die je kunt zien.",
+    "coachNoPhotos": "Geen gedeelde foto's van dezelfde houding op beide data.",
+    "coachShared": "Gedeelde metingen",
+    "coachWithPhotos": "met foto's",
+    "coachWithoutPhotos": "zonder foto's",
+    "coachWeightChoice": "{name} koos ervoor gewicht niet als getal te zien, dus jij ziet het ook niet.",
+    "metric": {
+      "weight": "Gewicht",
+      "body_fat": "Vetpercentage",
+      "waist": "Taille",
+      "hips": "Heupen",
+      "chest": "Borst",
+      "arm": "Arm",
+      "thigh": "Dij",
+      "neck": "Nek",
+      "calf": "Kuit",
+      "arm_left": "Linkerarm",
+      "arm_right": "Rechterarm",
+      "thigh_left": "Linkerdij",
+      "thigh_right": "Rechterdij"
+    },
+    "metricShort": {
+      "weight": "gewicht",
+      "body_fat": "vet",
+      "waist": "taille",
+      "hips": "heupen",
+      "chest": "borst",
+      "arm": "arm",
+      "thigh": "dij",
+      "neck": "nek",
+      "calf": "kuit",
+      "arm_left": "linkerarm",
+      "arm_right": "rechterarm",
+      "thigh_left": "linkerdij",
+      "thigh_right": "rechterdij"
+    },
+    "pose": {
+      "front": "Voor",
+      "side": "Zij",
+      "back": "Achter",
+      "other": "Andere"
+    },
+    "range": {
+      "1m": "1M",
+      "3m": "3M",
+      "1y": "1J",
+      "all": "Alles"
+    },
+    "rangeLong": {
+      "1m": "1 maand",
+      "3m": "3 maanden",
+      "1y": "1 jaar",
+      "all": "alles"
+    },
+    "trend": {
+      "steady": "Stabiel",
+      "slightly_down": "Licht dalend",
+      "down": "Dalend",
+      "slightly_up": "Licht stijgend",
+      "up": "Stijgend"
+    },
+    "visibility": {
+      "private": "Alleen ik",
+      "coach_numbers": "Mijn coach (zonder foto's)",
+      "coach_full": "Mijn coach (met foto's)"
+    },
+    "visibilityShort": {
+      "private": "Alleen ik",
+      "coach_numbers": "Coach · zonder foto's",
+      "coach_full": "Coach · met foto's"
+    },
+    "visibilityHint": {
+      "private": "Niemand anders ziet het",
+      "coach_numbers": "Je coach ziet de maten, niet de foto's",
+      "coach_full": "Je coach ziet de maten en de foto's"
+    },
+    "weightDisplay": {
+      "number": "Getal",
+      "trend": "Alleen trend",
+      "hidden": "Verborgen"
+    },
+    "weightDisplayHint": {
+      "number": "De waarde en de verandering",
+      "trend": "Een afgevlakte lijn en woorden, nooit een getal",
+      "hidden": "Je kunt het nog steeds vastleggen voor je coach"
+    },
+    "weightDisplayFormNote": {
+      "trend": "Gewicht en vetpercentage verschijnen alleen als trend; getallen die je typt worden bewaard maar niet getoond.",
+      "hidden": "Gewicht en vetpercentage zijn voor jou verborgen; leg ze alleen vast als je coach ze nodig heeft."
+    },
+    "units": {
+      "metric": "Metrisch (kg, cm)",
+      "imperial": "Imperiaal (lb, in)"
+    },
+    "section": {
+      "body": "Lichaam",
+      "wellness": "Welzijn",
+      "cravings": "Trek"
+    },
+    "audience": {
+      "followers": "Mijn volgers",
+      "public": "Iedereen"
+    },
+    "audienceHint": {
+      "followers": "Mensen die jou volgen",
+      "public": "Iedereen op Milos"
+    },
+    "accessLogEntry": {
+      "list": "{coach} bekeek je metingen · {date}",
+      "snapshot": "{coach} opende een meting · {date}",
+      "series": "{coach} bekeek een grafiek van je metingen · {date}"
+    },
+    "fieldError": {
+      "invalid": "Typ een getal",
+      "range": "Controleer deze waarde"
+    },
+    "help": {
+      "waist": "Rond het smalste punt, meestal net boven de navel, na het uitademen.",
+      "hips": "Rond het breedste punt van de billen, voeten tegen elkaar.",
+      "chest": "Rond het breedste punt van de borst, armen ontspannen.",
+      "arm": "Rond het midden van de bovenarm, ontspannen.",
+      "thigh": "Rond het dikste deel van de dij, staand.",
+      "neck": "Net onder de adamsappel.",
+      "calf": "Rond het breedste deel van de kuit, staand."
+    },
+    "errors": {
+      "invalid_metric": "Controleer deze maat.",
+      "snapshot_empty": "Voeg minstens één maat of één foto toe.",
+      "invalid_body_visibility": "Kies wie deze meting ziet.",
+      "body_notes_too_long": "Notities zijn hoogstens 2000 tekens.",
+      "invalid_pose": "Kies voor, zij of achter.",
+      "too_many_body_photos": "Een meting heeft hoogstens vier foto's.",
+      "pose_taken": "Deze meting heeft al een foto van die houding.",
+      "body_photo_consent_required": "Ga eerst akkoord met het bewaren van lichaamsfoto's; ze blijven privé tenzij je ze deelt.",
+      "invalid_taken_at": "Controleer de datum van de meting.",
+      "share_confirmation_required": "Bevestig dat je deze foto's wilt plaatsen.",
+      "share_needs_two_snapshots": "Kies twee verschillende metingen.",
+      "share_photo_missing": "Beide metingen hebben een klare foto van die houding nodig.",
+      "media_not_ready": "Een foto wordt nog verwerkt. Probeer het zo opnieuw."
+    }
+  },
+  "Referrals": {
+    "title": "Neem een vriend mee",
+    "pickBox": "Welke box",
+    "noBox": "Word lid van een box om er vrienden voor uit te nodigen.",
+    "loading": "Laden…",
+    "loadFailed": "Je uitnodigingen konden niet worden geladen. Probeer het zo opnieuw.",
+    "shareLink": "Link delen",
+    "showQr": "QR tonen",
+    "copied": "Link gekopieerd",
+    "shareText": "Kom met me trainen bij {box}",
+    "offer": {
+      "friend": "Je vriend: {gift}",
+      "friendNothing": "Nodig een vriend uit om samen te trainen",
+      "you": "Jij: {reward}, {when}",
+      "cap": "{count, plural, one {Tot # vriend per jaar} other {Tot # vrienden per jaar}}",
+      "staff": "Deel de link met wie je wilt. Beloningen zijn voor leden.",
+      "noProgram": "Je box heeft nu geen verwijsprogramma. Je link werkt nog steeds en je vrienden verschijnen hier."
+    },
+    "events": {
+      "title": "Uitnodigen voor een event",
+      "shareText": "Ga met me mee naar {title}",
+      "free": "gratis",
+      "invite": "Uitnodigen",
+      "goodForFriends": "Leuk voor vrienden"
+    },
+    "list": {
+      "title": "Je uitnodigingen",
+      "empty": "Nog niemand. Deel je link of nodig een vriend uit voor een event: de makkelijkste start.",
+      "totals": "{invited} uitgenodigd · {trials} proeflessen · {paid} abonnementen",
+      "someone": "Iemand",
+      "earned": "Je kreeg {reward}"
+    },
+    "newLink": {
+      "action": "Nieuwe link",
+      "confirm": "Je huidige link en QR werken dan niet meer. Vrienden die je al uitnodigde blijven van jou.",
+      "yes": "Nieuwe link maken",
+      "no": "Deze houden"
+    },
+    "qr": {
+      "title": "Je uitnodigings-QR",
+      "close": "Sluiten",
+      "alt": "QR-code van je uitnodigingslink",
+      "hint": "Je vriend scant hem met de camera van zijn telefoon."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# dag gratis} other {# dagen gratis}}",
+      "credit": "{amount} tegoed"
+    },
+    "reward": {
+      "credit": "{amount} tegoed",
+      "discount": "−{percent}% op je verlenging",
+      "freePeriod": "{days, plural, one {# dag gratis} other {# dagen gratis}}",
+      "manual": "een cadeau van de box"
+    },
+    "when": {
+      "trial": "als hij naar een proefles komt",
+      "paid": "als hij een abonnement neemt"
+    },
+    "stage": {
+      "signed_up": "Aangemeld",
+      "event": "Kwam naar een event",
+      "trial": "Kwam naar een proefles",
+      "joined": "Lid van de box",
+      "paid": "Abonnement genomen"
+    },
+    "status": {
+      "open": "Onderweg",
+      "qualified": "Telt",
+      "capped": "Boven de jaarlimiet",
+      "expired": "Verlopen",
+      "void": "Telt niet"
+    },
+    "rewardStatus": {
+      "upcoming": "Nog niet",
+      "pending": "Wacht op goedkeuring",
+      "approved": "Goedgekeurd",
+      "given": "Gegeven",
+      "rejected": "Niet goedgekeurd",
+      "capped": "Boven de limiet",
+      "none": "Geen beloning"
+    },
+    "channel": {
+      "link": "Link",
+      "qr": "QR",
+      "event": "Event",
+      "guest_pass": "Gastenpas",
+      "staff": "Team"
+    },
+    "invite": {
+      "heading": "Uitnodiging",
+      "title": "{name} nodigt je uit bij {box}",
+      "titleNoName": "Je bent uitgenodigd bij {box}",
+      "preview": "Train met een vriend bij {box} op Milos.",
+      "from": "{name} nodigt je uit om te trainen bij {box}",
+      "fromMember": "Een lid nodigt je uit om te trainen bij {box}",
+      "toEvent": "…en voor een event daar.",
+      "gift": "Voor jou: {gift}",
+      "giftWhen": "De box geeft het je bij je eerste pakket.",
+      "signUp": "Account aanmaken",
+      "signIn": "Ik heb al een account",
+      "seeBox": "Bekijk de box",
+      "consent": "{name} ziet je voornaam en hoe ver je bent (aanmelding, proefles, abonnement). Verder niets.",
+      "consentNoName": "Het lid dat je uitnodigde ziet je voornaam en hoe ver je bent (aanmelding, proefles, abonnement). Verder niets.",
+      "claiming": "Uitnodiging opslaan…",
+      "failed": "Je uitnodiging kon nu niet worden opgeslagen. We proberen het opnieuw wanneer je Milos weer opent.",
+      "alreadyMember": "Je bent al bij {box}, dus deze uitnodiging geldt niet.",
+      "alreadyInvited": "De uitnodiging van een ander lid telt al voor jou.",
+      "self": "Dit is je eigen uitnodigingslink.",
+      "claimed": "Klaar. Je uitnodiging voor {box} is opgeslagen.",
+      "openMine": "Open Neem een vriend mee",
+      "openEvent": "Bekijk het event",
+      "bookTrial": "Proefles boeken",
+      "gone": "Deze uitnodiging is niet meer actief",
+      "goneHint": "Misschien is de link vervangen. Vraag je vriend om de nieuwe.",
+      "home": "Naar Milos"
+    },
+    "notif": {
+      "progressTitle": "Je uitnodiging",
+      "progress": {
+        "signed_up": "{person} meldde zich aan met je uitnodiging.",
+        "event": "{person} kwam naar het event waarvoor je uitnodigde.",
+        "trial": "{person} kwam naar een proefles.",
+        "joined": "{person} is lid geworden van de box.",
+        "paid": "{person} heeft een abonnement genomen."
+      },
+      "rewardTitle": "Verwijsbeloning",
+      "reward": {
+        "approved": "Je verwijsbeloning is goedgekeurd.",
+        "given": "Je verwijsbeloning is gegeven.",
+        "rejected": "Je verwijzing is niet goedgekeurd."
+      },
+      "reviewTitle": "Verwijzing om goed te keuren",
+      "reviewBody": "{person} nam een abonnement, uitgenodigd door {referrer}."
+    },
+    "staff": {
+      "title": "Uitnodigingen van leden",
+      "filter": "Welke uitnodigingen",
+      "filter_review": "Goed te keuren",
+      "filter_all": "Alle",
+      "stats": "Laatste 90 dagen: {open} onderweg · {qualified} tellen · {expired} verlopen",
+      "emptyReview": "Niets goed te keuren.",
+      "empty": "Nog geen uitnodigingen. Leden delen hun link via Ik › Neem een vriend mee.",
+      "noReferrer": "een voormalig lid",
+      "row": "{friend} ← {referrer}",
+      "panel": "Uitnodiging",
+      "approve": "Goedkeuren",
+      "reject": "Afwijzen",
+      "given": "Gegeven",
+      "applyGift": "Cadeau van de vriend toepassen",
+      "reassign": "Aan ander lid geven",
+      "status": "Status",
+      "void_staff": "het team krijgt geen beloningen",
+      "void_other": "telt niet",
+      "channel": "Hoe",
+      "newAccount": "nieuw account",
+      "window": "Geldig",
+      "until": "tot {date}",
+      "program": "Programma",
+      "reward": "Beloning van het lid",
+      "gift": "Cadeau van de vriend",
+      "giftApplied": "toegepast {date}",
+      "previous": "Eerder",
+      "notes": "Notities",
+      "newReferrer": "Nieuw lid",
+      "reassignSave": "Opslaan",
+      "cancel": "Annuleren",
+      "note": "Notitie (optioneel)",
+      "discountOnRenewal": "«Gegeven» trekt het af van de volgende verlengingsfactuur van het lid."
+    },
+    "rules": {
+      "rewardNote": "Wat het lid krijgt (in woorden)",
+      "friendGift": "Cadeau van de vriend",
+      "gift_free_days": "Gratis dagen op het eerste pakket",
+      "gift_credit": "Tegoed",
+      "gift_custom": "Iets anders",
+      "gift_none": "Niets",
+      "giftDays": "Dagen",
+      "giftEuros": "Bedrag (€)",
+      "giftNote": "Wat de vriend krijgt",
+      "counts": "De uitnodiging telt",
+      "counts_paid": "Bij de eerste betaling",
+      "counts_trial": "Bij de eerste proefles",
+      "approval": "Beloningen",
+      "approval_manual": "Goedgekeurd door het team",
+      "approval_auto": "Automatisch goedgekeurd",
+      "window": "Uitnodiging geldig (dagen)",
+      "cap": "Beloonde vrienden per lid per jaar",
+      "capNone": "Geen limiet",
+      "hint": "Per box is één programma actief: als je dit activeert, stopt het andere. Uitnodigingen houden de voorwaarden waarmee ze zijn gemaakt."
+    },
+    "tabs": {
+      "invite": "Uitnodigen",
+      "invites": "Je uitnodigingen · {count}"
+    }
   }
 }

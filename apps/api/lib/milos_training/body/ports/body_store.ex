@@ -24,9 +24,10 @@ defmodule MilosTraining.Body.Ports.BodyStore do
               context(),
               binary(),
               key :: String.t(),
-              since :: DateTime.t() | nil
+              since :: DateTime.t() | nil,
+              opts :: keyword()
             ) ::
-              [%{at: DateTime.t(), value: number()}]
+              [%{at: DateTime.t(), value: number(), snapshot_id: binary()}]
   @callback latest_taken_at(context(), user_id :: binary()) :: DateTime.t() | nil
 
   @callback list_photos(context(), snapshot_ids :: [binary()]) :: [photo()]

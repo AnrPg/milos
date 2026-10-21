@@ -89,7 +89,7 @@ defmodule MilosTraining.Body do
   defdelegate update_snapshot(context, user_id, id, attrs), to: BodyStore
   defdelegate delete_snapshot(context, user_id, id), to: BodyStore
   defdelegate delete_empty_snapshots(context, user_id), to: BodyStore
-  defdelegate list_metric_points(context, user_id, key, since), to: BodyStore
+  defdelegate list_metric_points(context, user_id, key, since, opts \\ []), to: BodyStore
   defdelegate latest_taken_at(context, user_id), to: BodyStore
   defdelegate list_photos(context, snapshot_ids), to: BodyStore
   defdelegate insert_photo(context, attrs), to: BodyStore

@@ -552,6 +552,54 @@ Apostolos picked the recommended option on Q1–Q4 and Q6, and B on Q5, with the
    almost hidden line-icon button.
 6. **PR (Q6):** «Μοιράσου το» after a PR opens compose with the PR card and the media picker first.
 
+### Member referral (2026-10-20, [board 11](https://claude.ai/artifact/Mx77PrVYo8dfH2wT34Mbos))
+
+ANR picked the recommendation on every question except Q2, with the extras and notes below
+(ADR-156).
+
+1. **Where the friend lands (Q1 A):** a personal invite page `/r/<code>` with who invites, the
+   friend's gift, «Κλείσε δοκιμαστικό», «Γίνε μέλος» and «Δες το box». Extras: a link preview with
+   the inviter's first name over the box cover, a consent line, and the invite kept on the phone
+   for **30 days** (ANR's note), after which the member can send it again.
+2. **Εγώ › Φέρε φίλο (Q2 B):** two tabs, «Κάλεσε» (offer, share, QR, events) and «Οι προσκλήσεις
+   σου · N» (friends, stages, rewards); notices open the second tab. Extras: «Φέρε φίλο» in
+   Box › Συνδρομή and in the Εγώ list, the phone's share sheet with a ready message, and the link
+   still shown when the box has no programme.
+3. **Inviting to an event (Q3 A):** the upcoming events a friend can come to (open, or with guest
+   passes the member is going to), with the referral attached. Extras: «Κάλεσε φίλο» on every such
+   event page, and staff tag events «Καλό για φίλους» so they come first.
+4. **Who gets the credit (Q4, ANR's note):** order doesn't matter, only whose link was used: each
+   link is personal, and the member whose link the friend used to sign up or open the box's page
+   owns the invite. Using another member's link moves it while it hasn't counted; it holds for
+   **30 days** (the programme's default window). Extras: a yearly cap, staff and coaches share without earning, and
+   self-invites are blocked. Staff can reassign with a note.
+5. **What the member sees (Q5 A):** the friend's first name, stage and reward state; notices on
+   sign-up, trial or event, subscription, and reward.
+6. **Reward and approval (Q6 A):** made on the first payment, approved with one tap in Finance ›
+   Συστάσεις; an approved credit lands in the member's credit. Extra: «Δόθηκε» on a discount
+   applies it to the next renewal.
+7. **The owner's programme (Q7 A):** two-sided (what the member gets, what the friend gets), when
+   it counts, the window, the cap, and a live preview. Extras: «Εφάρμοσε» for the friend's gift on
+   their first package, and members keep the programme their invite was made under.
+
+### Σώμα (2026-10-20, [board 13](https://claude.ai/artifact/3CTeEJNf5ytAjToMSA8fTS))
+
+ANR picked the recommended option on every question, with these extras and notes.
+
+1. **Σώμα page (Q1):** chart with metric chips and range, compare card, snapshots with the change
+   since the previous one, «Νέα μέτρηση».
+2. **Weight display (Q2):** «Αριθμός», «Μόνο τάση» (a normalized trend line and words, never a
+   number) or «Κρυφό»; body fat follows the same choice, for the coach too.
+3. **Form (Q3):** every field optional, last fields first with faded hints, «+ Άλλη μέτρηση».
+   Extras: opt-in measure reminder; weight from a connected device (Garmin, M13).
+4. **Photos (Q4):** in-app camera with the previous photo as a ghost; picking from the gallery too.
+5. **Compare (Q5):** slider by default and side by side, remembered per member.
+6. **Privacy (Q6):** consent on the first body photo, visibility per snapshot, an access log of
+   coach reads, delete all photos. Extras: photos blurred until tapped; share a before/after as a
+   post from a subtle icon button with no text, with a second separate confirmation and no numbers
+   unless the member adds them.
+7. **Coach (Q7):** a «Σώμα» tab on the client page with shared snapshots only, logged.
+
 ### Ευεξία and Λιγούρα (2026-10-20, [board 14](https://claude.ai/artifact/TFB9oaaefQXoxwhHi5BGEV))
 
 Apostolos picked the recommended option everywhere except the page layout (Q1: B, tiles), left
@@ -563,7 +611,7 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
    days can be filled in or corrected up to 7 days back; tiles can be reordered and hidden.
 2. **Water (Q2, A):** glasses of your own size (250 ml default), goal in glasses, stored in ml;
    undo in the toast, tap a drop to remove a glass. Extras: the goal is yours (a coach only
-   suggests); an opt-in afternoon reminder when under half; no automatic extra on training days.
+   suggests); an afternoon reminder when under half, on by default once a goal is set (ANR's note), switchable off; no automatic extra on training days.
 3. **Sleep (Q3, built as A):** «Έπεσα» and «Ξύπνησα» prefilled from usual times, hours worked
    out, quality 1–5. Extras: «από Garmin» with «διορθώθηκε» after an edit; naps as separate short
    entries; Πώς νιώθω stops asking about sleep on a day sleep is logged.
@@ -594,12 +642,12 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
 
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
-- [ ] Weight as trend only option
+- [x] Weight as trend only option
 - [ ] Neutral copy: «εκτός πλάνου», «λιγούρα»
-- [ ] No leaderboard or public comparison for weight, body or diet
+- [x] No leaderboard or public comparison for weight, body or diet
 - [ ] Body, wellness and cravings sections can each be switched off
 - [ ] Insights labelled as indicators, never medical advice
-- [ ] Photos never posted without a separate confirmation
+- [x] Photos never posted without a separate confirmation
 
 ## 7. Open questions
 1. Brief §10 Q5 (GDPR for photos and health-like data): defaults in D8/D11; a legal review should
@@ -613,5 +661,5 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
 
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
-- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [ ] P2-M8
-- [x] P2-M9 (ADR-157) · [ ] P2-M10 · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
+- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

@@ -14,6 +14,7 @@ import {
   type JournalFilter,
   type JournalVisibilityResult,
   type TypedJournalItem,
+  type WellnessFeedDay,
 } from "@/api/journal";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -29,6 +30,7 @@ import { NoteSheet } from "@/components/journal/NoteSheet";
 import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
 import { executionHistoryEntry, journalFlow, withVisibility } from "@/components/member-app/journal/journal-flow";
 import { CHECK_IN_FACES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
+import { BodyFeedCard } from "@/components/body/BodyFeedCard";
 import { ReviewCard } from "@/components/my-reviews";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
@@ -181,6 +183,8 @@ export function JournalFlow() {
                         />
                       );
                     }
+                    case "body":
+                      return <BodyFeedCard key={key} item={item} locale={locale} badge={badge(item)} />;
                     default:
                       return (
                         <FeedCard key={key} item={item} locale={locale} badge={badge(item)} onEditNote={setEditingNote} />
@@ -245,13 +249,14 @@ function FeedCard({
   badge,
   onEditNote,
 }: {
-  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" }>;
+  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" | "body" }>;
   locale: string;
   badge: ReactNode;
   onEditNote: (item: Extract<TypedJournalItem, { kind: "note" }>) => void;
 }) {
   const t = useTranslations("MemberApp.journal");
   const tCheckIn = useTranslations("MemberApp.checkIn");
+  const tWellness = useTranslations("MemberApp.wellness");
   const time = item.occurred_on ? null : formatTime(item.occurred_at, locale);
   let title: ReactNode;
   let detail: ReactNode = null;
@@ -300,6 +305,24 @@ function FeedCard({
         )
         .join(" · ");
       break;
+    case "wellness":
+      title = wellnessDayLine(item.entry, tWellness);
+      actions = (
+        <Link href="/journal/wellbeing#today" className="rounded-full px-3 py-1.5 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          {tWellness("open")}
+        </Link>
+      );
+      break;
+    case "craving":
+      title = tWellness("feed.craving", { intensity: item.entry.intensity });
+      detail = [
+        ...item.entry.triggers.map((trigger) => tWellness(`trigger.${trigger}`)),
+        tWellness(`outcome.${item.entry.outcome ?? "ongoing"}`),
+        item.entry.note,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      break;
   }
 
   return (
@@ -323,6 +346,20 @@ function FeedCard({
       </div>
     </li>
   );
+}
+
+/** «Ευεξία · Τρίτη»: one line for the day, plain counts, no grading words. */
+function wellnessDayLine(day: WellnessFeedDay, t: ReturnType<typeof useTranslations>) {
+  const kinds = (kind: string) => day.entries.filter((entry) => entry.kind === kind);
+  const parts: string[] = [];
+  const water = kinds("water");
+  if (water.length) parts.push(t("feed.water", { count: water.length }));
+  const night = kinds("sleep").find((entry) => !entry.value.nap);
+  const minutes = day.summary?.sleep.minutes ?? (night?.value.minutes as number | undefined);
+  if (typeof minutes === "number") parts.push(t("sleep.duration", { hours: Math.floor(minutes / 60), minutes: minutes % 60 }));
+  const meals = kinds("meal");
+  if (meals.length) parts.push(t("feed.meals", { count: meals.length }));
+  return parts.join(" · ") || t("feed.empty");
 }
 
 function ExecutionRow({

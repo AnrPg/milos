@@ -52,6 +52,30 @@ defmodule MilosTraining.Body.Domain.TrendPolicy do
     |> elem(0)
   end
 
+  @doc """
+  The shape of a series for the trend-only view: the smoothed values
+  normalized to 0..1 over the shown range, oldest first, as
+  `[%{at: DateTime, y: float}]`. No units, no absolute values, no scale;
+  a flat series gives 0.5 throughout.
+  """
+  def shape(points) when is_list(points) do
+    smoothed = smooth(points)
+
+    case Enum.map(smoothed, & &1.smoothed) do
+      [] ->
+        []
+
+      values ->
+        {min, max} = Enum.min_max(values)
+        span = max - min
+
+        Enum.map(smoothed, fn point ->
+          y = if span == 0, do: 0.5, else: Float.round((point.smoothed - min) / span, 3)
+          %{at: point.at, y: y}
+        end)
+    end
+  end
+
   @doc "The word for a series of points (smoothed first)."
   def word(points) when is_list(points) do
     case smooth(points) do

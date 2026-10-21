@@ -61,6 +61,14 @@ defmodule MilosTraining.Finance.Ports.FinanceStore do
   @callback create_referral_program(map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_referral_program(Ecto.UUID.t(), map()) :: {:ok, map()} | {:error, term()}
   @callback list_referral_programs() :: [map()]
+  @callback get_active_referral_program() :: map() | nil
+  @callback get_referral_program(Ecto.UUID.t()) :: map() | nil
+  @doc "ADR-156: a qualified invite opens a pending referral under its own programme."
+  @callback open_attributed_referral(map()) :: {:ok, map()} | {:error, term()}
+  @callback count_referral_events_since(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
+  @callback referral_outcomes([Ecto.UUID.t()]) :: %{Ecto.UUID.t() => map()}
+  @callback extend_current_subscription(Ecto.UUID.t(), pos_integer()) ::
+              {:ok, map()} | {:error, term()}
   @callback create_referral_event(map()) :: {:ok, map()} | {:error, term()}
   @callback update_referral_status(Ecto.UUID.t(), String.t()) :: {:ok, map()} | {:error, term()}
   @callback list_referral_events() :: [map()]

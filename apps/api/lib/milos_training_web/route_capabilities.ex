@@ -224,6 +224,13 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFinanceController, :referral_rewards} => [:manage_promotions, :view_promotions],
     {W.AdminFinanceController, :create_referral_reward} => [:manage_promotions],
     {W.AdminFinanceController, :update_referral_reward_status} => [:manage_promotions],
+    # ADR-156: invites.
+    {W.AdminReferralController, :index} => [:manage_promotions, :view_promotions],
+    {W.AdminReferralController, :approve} => [:manage_promotions],
+    {W.AdminReferralController, :reject} => [:manage_promotions],
+    {W.AdminReferralController, :given} => [:manage_promotions],
+    {W.AdminReferralController, :reassign} => [:manage_promotions],
+    {W.AdminReferralController, :friend_gift} => [:manage_promotions],
 
     # Staff appointments: front desk books and cancels for clients.
     {W.AppointmentsController, :slots} => [:manage_appointments, :book_for_clients],
@@ -235,6 +242,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     # ADR-158: health data; the use case also requires the coach role.
     {W.ClientBodyController, :index} => [:view_health],
     {W.ClientBodyController, :show} => [:view_health],
+    {W.ClientBodyController, :series} => [:view_health],
     # ADR-160: the weekly wellness summary; the use case also requires the
     # coach role and the client's grant.
     {W.ClientWellnessSummaryController, :show} => [:view_health],

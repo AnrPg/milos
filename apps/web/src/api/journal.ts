@@ -5,6 +5,7 @@ import type { PRRecord } from "@/api/gamification";
 import type { ReviewRecord } from "@/api/reviews";
 import type { TrainingLogEntry } from "@/api/training-log";
 import type { CheckInRecord, InjuryRecord } from "@/api/wellbeing";
+import type { Craving, MealPhoto, WellnessDay, WellnessEntry } from "@/api/wellness";
 
 /**
  * Ημερολόγιο (ADR-139): the feed of every entry kind, moving an entry on the
@@ -33,7 +34,23 @@ export type JournalEntryOf = {
   check_in: CheckInRecord;
   /** ADR-158: only ever in your own feed. */
   body: components["schemas"]["BodySnapshot"];
+  /** ADR-159: a day of water, sleep and meals (the member's summary only in their own feed). */
+  wellness: WellnessFeedDay;
+  craving: Craving;
 };
+
+export type WellnessFeedDay = {
+  id: string;
+  date: string;
+  organization_id: string | null;
+  journal_visibility: JournalVisibility;
+  summary: Omit<WellnessDay, "cravings" | "mood"> | null;
+  entries: WellnessEntry[];
+  photos: Record<string, MealPhoto>;
+};
+
+/** Kinds whose entries move on the ladder: feed kinds plus single wellness entries. */
+export type JournalMoveKind = JournalKind | "wellness_entry";
 
 export type TypedJournalItem = {
   [K in JournalKind]: Omit<JournalFeedItem, "kind" | "entry"> & { kind: K; entry: JournalEntryOf[K] };
@@ -50,7 +67,7 @@ export const JOURNAL_FILTER_KINDS: Record<JournalFilter, JournalKind[] | null> =
   all: null,
   training: ["execution", "training_log", "pr"],
   notes: ["note"],
-  wellbeing: ["check_in", "injury"],
+  wellbeing: ["check_in", "injury", "wellness", "craving"],
 };
 
 export function typedItem(item: JournalFeedItem): TypedJournalItem {
@@ -83,7 +100,7 @@ export function fetchClientJournalPage(
 
 export function setJournalVisibility(
   token: string,
-  kind: JournalKind,
+  kind: JournalMoveKind,
   id: string,
   body: JournalVisibilityRequest,
 ) {

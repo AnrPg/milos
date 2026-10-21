@@ -6,6 +6,7 @@ describe("member profile tabs", () => {
   it("shows only the tabs whose sections the viewer has, in order", () => {
     expect(visibleProfileTabs(["finance", "prs", "admin_actions"])).toEqual(["overview", "training", "finance", "account"]);
     expect(visibleProfileTabs([])).toEqual(["overview"]);
+    expect(visibleProfileTabs(["health_incidents", "body", "coach_notes"])).toEqual(["overview", "wellbeing", "body", "coaching"]);
   });
 
   it("opens the URL's tab, falls back to the section's tab, then Επισκόπηση", () => {

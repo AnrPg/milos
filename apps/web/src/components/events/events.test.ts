@@ -47,6 +47,7 @@ function event(overrides: Partial<CommunityEvent> = {}): CommunityEvent {
     open_to_non_members: false,
     guest_pass_allowed: false,
     guests_per_member: 0,
+    good_for_friends: false,
     cancelled: false,
     can_rsvp: true,
     can_manage: false,
@@ -170,6 +171,7 @@ describe("the create form", () => {
     openToAll: true,
     guestPass: true,
     guestsPerMember: 2,
+    goodForFriends: true,
     repeatWeekly: true,
     repeatUntil: "2026-12-20",
     coverMediaId: null,
@@ -213,8 +215,15 @@ describe("the create form", () => {
       open_to_non_members: true,
       guest_pass_allowed: true,
       guests_per_member: 2,
+      good_for_friends: true,
       repeat_until: "2026-12-20",
     });
+  });
+
+  it("tags «Καλό για φίλους» only where a friend can come", () => {
+    expect(eventRequest({ ...form, openToAll: false, guestPass: false }).good_for_friends).toBe(false);
+    expect(eventRequest({ ...form, openToAll: false }).good_for_friends).toBe(true);
+    expect(eventRequest(form, { group: true }).good_for_friends).toBe(false);
   });
 
   it("keeps a member group's event free, for its members and without guests", () => {
@@ -223,8 +232,8 @@ describe("the create form", () => {
   });
 
   it("fills the form from an event for editing", () => {
-    const filled = formFromEvent(event({ price_cents: 1500, capacity: null, guest_pass_allowed: true, guests_per_member: 2 }));
-    expect(filled).toMatchObject({ paid: true, price: "15", capacity: "", guestPass: true, guestsPerMember: 2, durationMinutes: 60 });
+    const filled = formFromEvent(event({ price_cents: 1500, capacity: null, guest_pass_allowed: true, guests_per_member: 2, good_for_friends: true }));
+    expect(filled).toMatchObject({ paid: true, price: "15", capacity: "", guestPass: true, guestsPerMember: 2, goodForFriends: true, durationMinutes: 60 });
     expect(filled.place).toEqual({ kind: "location", locationId: "loc-1" });
   });
 });

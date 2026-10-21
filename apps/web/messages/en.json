@@ -69,7 +69,8 @@
     "coach": "Coach",
     "memberTabs": "Main sections",
     "trials": "Trials",
-    "community": "Community"
+    "community": "Community",
+    "body": "Body"
   },
   "Profile": {
     "eyebrow": "Profile",
@@ -4333,7 +4334,14 @@
     "apiErrorAttendanceAlreadyRecorded": "Your attendance was already recorded.",
     "apiErrorAttendanceRequiresApprovedBooking": "Only an approved booking can check in.",
     "coachProgrammeTitle": "My programme",
-    "coachProgrammeHint": "Change a day, decline a workout or ask your coach for one."
+    "coachProgrammeHint": "Change a day, decline a workout or ask your coach for one.",
+    "mpTabBody": "Body",
+    "stfPortionsTitle": "Daily hand portions",
+    "stfPortionsHint": "What the member sees on the Wellness page instead of numbers. Halves are fine.",
+    "stfPortionsFromGrams": "Fill from the grams",
+    "stfInvalidPortions": "Portions go from 0 to 20, in halves.",
+    "stfMealSlots": "Meals in the day",
+    "stfMealSlotsHint": "The meals the member logs against. Leave empty for breakfast, lunch, dinner and a snack."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4857,7 +4865,9 @@
         "review": "Rating",
         "note": "Note",
         "check_in": "How I feel",
-        "body": "Body"
+        "body": "Body",
+        "wellness": "Wellness",
+        "craving": "Craving"
       },
       "loadMore": "Older entries",
       "loadingMore": "Loading…",
@@ -4954,7 +4964,10 @@
       "formReview": "Technique video",
       "review": "Review",
       "checkIn": "How I feel",
-      "note": "Note or thought"
+      "note": "Note or thought",
+      "measure": "Measurement",
+      "wellness": "Water · Sleep · Meal",
+      "craving": "Craving"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notes",
@@ -4963,7 +4976,10 @@
       "formReview": "Ask your coach for feedback",
       "review": "Rate a class or workout",
       "checkIn": "A few quick questions",
-      "note": "Technique, goal, mood"
+      "note": "Technique, goal, mood",
+      "measure": "Weight, measurements, photos",
+      "wellness": "A glass, last night, a meal",
+      "craving": "Note it or ask for support"
     },
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
@@ -4974,7 +4990,8 @@
       "training": "Training",
       "wellbeing": "Wellbeing",
       "coach": "Coach",
-      "note": "Note"
+      "note": "Note",
+      "body": "Body"
     },
     "checkIn": {
       "eyebrow": "How I feel",
@@ -5075,7 +5092,223 @@
     "checkedIn": "Checked in ✓",
     "followClassTimer": "Live class timer",
     "classCheckIn": "Check in",
-    "programmeManage": "Change the day or decline"
+    "programmeManage": "Change the day or decline",
+    "meReferrals": "Bring a friend",
+    "meReferralsHint": "Your link, QR and invites",
+    "membershipReferral": "Bring a friend",
+    "wellness": {
+      "eyebrow": "Wellness",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "loading": "Loading…",
+      "customize": "Customise",
+      "previousDay": "Previous day",
+      "nextDay": "Next day",
+      "close": "Close",
+      "save": "Save",
+      "saving": "Saving…",
+      "delete": "Delete",
+      "cancel": "Cancel",
+      "undo": "Undo",
+      "open": "Open",
+      "onlyMe": "Only you see this. You can share single entries later.",
+      "whoSees": "Who sees it:",
+      "less": "Less {what}",
+      "more": "More {what}",
+      "item": {
+        "water": "Water",
+        "sleep": "Sleep",
+        "meals": "Meals",
+        "plan": "Coach's plan",
+        "mood": "Mood",
+        "cravings": "Craving"
+      },
+      "water": {
+        "add": "+1 glass",
+        "glasses": "{filled} of {goal} glasses",
+        "added": "Added a glass ({ml} ml)",
+        "dropsLabel": "Glasses today",
+        "remove": "Remove this glass"
+      },
+      "sleep": {
+        "title": "Sleep",
+        "night": "Night",
+        "nap": "Nap",
+        "bed": "Went to bed",
+        "wake": "Woke up",
+        "napMinutes": "Minutes",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Quality (1 to 5)",
+        "qualityValue": "Quality {quality}/5",
+        "napValue": "Nap {minutes} min",
+        "empty": "Not logged",
+        "tap": "Tap to log the night",
+        "fromDevice": "from {source}",
+        "corrected": "from {source}, corrected by you"
+      },
+      "source": {
+        "manual": "you",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Meal",
+        "slot": "Which meal",
+        "logged": "Logged",
+        "addSnack": "+ Snack",
+        "fitLabel": {
+          "plan": "And the plan?",
+          "own": "As you meant it?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "In plan",
+            "off_plan": "Off plan"
+          },
+          "own": {
+            "in_plan": "As I meant it",
+            "off_plan": "Differently"
+          }
+        },
+        "photo": "Photo (optional)",
+        "photoAdd": "Add a photo",
+        "photoChange": "Change photo",
+        "photoRemove": "Remove",
+        "photoUploading": "Uploading…",
+        "photoFailed": "The photo didn't upload. Try again or save without it.",
+        "photoPrivate": "Private, like body photos. It never goes to a post without asking you.",
+        "note": "A line about it (optional)",
+        "portions": "Hand portions (optional)",
+        "portionsHint": "Palm, cupped hand, fist, thumb. Halves are fine. No weighing, no calories.",
+        "hungerLabel": "Hunger and fullness (optional)",
+        "hunger": "How hungry before (1 to 5)",
+        "fullness": "How full after (1 to 5)"
+      },
+      "slot": {
+        "breakfast": "Breakfast",
+        "morning_snack": "Morning snack",
+        "lunch": "Lunch",
+        "afternoon_snack": "Afternoon snack",
+        "dinner": "Dinner",
+        "evening_snack": "Evening snack",
+        "snack": "Snack",
+        "pre_workout": "Before training",
+        "post_workout": "After training"
+      },
+      "portion": {
+        "protein": "Protein (palm)",
+        "carbs": "Carbs (cupped hand)",
+        "veg": "Vegetables (fist)",
+        "fat": "Fats (thumb)"
+      },
+      "plan": {
+        "title": "Nutrition · {title}",
+        "showNumbers": "Show numbers",
+        "hideNumbers": "Hide numbers",
+        "of": "{logged} of {target}",
+        "noPortions": "Your coach's plan has no daily portions yet."
+      },
+      "mood": {
+        "mood": "Mood {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "How do you feel?",
+        "open": "Answer «How I feel»"
+      },
+      "craving": {
+        "title": "Craving",
+        "tileTitle": "Log it, or ask for support",
+        "tileHint": "In the moment; the outcome can come later",
+        "count": "{count, plural, one {# today} other {# today}}",
+        "edit": "Edit",
+        "support": "I need support",
+        "supportNoBuddy": "Once you set a buddy, they get a short message. Never the details.",
+        "intensity": "How strong?",
+        "trigger": "What set it off?",
+        "outcome": "What happened?",
+        "note": "What I wanted (optional)",
+        "notePlaceholder": "e.g. something sweet after dinner",
+        "tryNow": "Try now",
+        "tryWater": "A glass of water",
+        "tryWalk": "A 10-minute walk",
+        "tryWait": "Wait 10 minutes and breathe slowly",
+        "waterCounted": "Counted",
+        "private": "Only you see this. We'll ask once, in 20 minutes, how it went.",
+        "howDidItGo": "How did it go?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Tiredness",
+        "boredom": "Boredom",
+        "social": "Social",
+        "hunger": "Hunger",
+        "other": "Something else"
+      },
+      "outcome": {
+        "resisted": "I got past it",
+        "ate_off_plan": "I ate something off plan",
+        "ongoing": "I still have it"
+      },
+      "week": {
+        "title": "This week",
+        "range": "{from} – {to}",
+        "previous": "Previous week",
+        "next": "Next week",
+        "item": "Item",
+        "line": "Sleep on your goal {nights} of {days} nights · water on your goal {water} of {days} days",
+        "dot": {
+          "full": "On your goal",
+          "half": "Partly",
+          "empty": "Nothing logged",
+          "warm": "Craving logged"
+        }
+      },
+      "consent": {
+        "title": "Your water, sleep, meals and cravings",
+        "body": "What you log here is health data. It stays yours and private: your coach sees an entry only if you share it, and you can export or delete everything at any time.",
+        "items": "What do you want to see?",
+        "later": "You can change this any time from «Customise».",
+        "agree": "Agree and start"
+      },
+      "settings": {
+        "items": "Items and order",
+        "hiddenKeeps": "An item you turn off disappears from the card, the week and New entry. Its data stays until you delete it.",
+        "moveUp": "Move {item} up",
+        "moveDown": "Move {item} down",
+        "water": "Water",
+        "glass": "Your glass",
+        "ml": "{ml} ml",
+        "goalGlasses": "Daily goal (glasses)",
+        "reminder": "Afternoon reminder",
+        "reminderHint": "Once, after 15:00, if you're under half your goal",
+        "goalYours": "The goals are yours. A coach can suggest one but never sets it.",
+        "sleep": "Sleep",
+        "sleepGoal": "Sleep goal (hours)",
+        "data": "Your data",
+        "section": {
+          "wellness": "Water, sleep and meals",
+          "cravings": "Cravings"
+        },
+        "export": "Export (JSON)",
+        "erase": "Delete all",
+        "eraseConfirm": "Yes, delete for good",
+        "eraseWarning": "This removes every entry of this section for good, with meal photos.",
+        "erased": "Deleted."
+      },
+      "feed": {
+        "water": "{count, plural, one {# glass} other {# glasses}}",
+        "meals": "{count, plural, one {# meal} other {# meals}}",
+        "craving": "Craving · {intensity}/10",
+        "empty": "Wellness"
+      },
+      "error": {
+        "health_data_consent_required": "Agree to keep health data first.",
+        "occurred_in_future": "That time is in the future.",
+        "occurred_too_long_ago": "You can fill in or correct up to 7 days back.",
+        "invalid_wellness_value": "Check the values and try again.",
+        "invalid_media": "The photo isn't ready. Pick it again."
+      }
+    }
   },
   "Community": {
     "all": "All",
@@ -5963,7 +6196,8 @@
     "notif_event_guest_joined_body": "{person} is coming to «{event}» with your guest pass.",
     "notif_event_trial_offer_title": "Try a class",
     "notif_event_trial_offer_body": "Liked «{event}»? {box} invites you to a trial class.",
-    "notif_event_message_title": "Message about «{event}»"
+    "notif_event_message_title": "Message about «{event}»",
+    "findNearbyLater": "Clubs near you are coming with Around me."
   },
   "CommunityAdmin": {
     "title": "Community",
@@ -6196,7 +6430,9 @@
     "err_nobody_to_offer": "Nobody who came is waiting for a trial offer.",
     "err_trials_disabled": "The box isn't taking trials right now.",
     "eventsSegments": "Which events",
-    "nearMe": "Near me"
+    "nearMe": "Near me",
+    "fieldGoodForFriends": "Good for friends",
+    "goodForFriendsHint": "Comes first when members invite friends to an event."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No upcoming events. Create one with «+ New event».",
@@ -6752,5 +6988,506 @@
     "prSavedBody": "Want to share it with your box? Add a photo or video if you like.",
     "prShare": "Share it",
     "prNotNow": "Not now"
+  },
+  "Body": {
+    "title": "Body",
+    "settingsLink": "Settings",
+    "newMeasure": "New measurement",
+    "editMeasure": "Edit measurement",
+    "older": "Older measurements",
+    "loading": "Loading…",
+    "offTitle": "Body is switched off",
+    "offBody": "You switched the Body section off, so it is hidden from your journal. Your measurements are kept.",
+    "turnOn": "Switch Body back on",
+    "emptyTitle": "Track your body, privately",
+    "emptyBody": "Body keeps measurements and, if you want, photos over time, so you can see your own progress. Every field is optional.",
+    "emptyPrivacy": "Private by default: only you see it unless you share a measurement with your coach.",
+    "chartLabel": "Chart",
+    "chartEyebrow": "{metric} · {range}",
+    "chartTrendEyebrow": "{metric} · trend · {range}",
+    "chartTrendNote": "No numbers · change this in Settings",
+    "chartTrendAria": "{metric}: {trend}",
+    "chartAria": "{metric}: {value}, change {change}",
+    "chartAriaOne": "{metric}: {value}",
+    "chartHiddenTitle": "{metric} is hidden",
+    "chartHiddenBody": "You chose not to see it. You can still log it for your coach.",
+    "chartNoData": "No measurements in this period.",
+    "changeInSettings": "Change in Settings",
+    "metricsLabel": "Measurement",
+    "rangeLabel": "Period",
+    "compareTitle": "Compare",
+    "compareRange": "{from} ↔ {to}",
+    "compareNoPhotos": "No photos of the same pose on both dates.",
+    "compareNeedTwo": "You need two measurements to compare.",
+    "compareNoMetrics": "No measurement appears on both dates.",
+    "compareFrom": "From",
+    "compareTo": "To",
+    "compareChanges": "Changes",
+    "compareModeLabel": "View",
+    "compareWith": "Compare",
+    "modeSlider": "Slider",
+    "modeSideBySide": "Side by side",
+    "openCompare": "Open the comparison",
+    "photosPrivate": "Private photos · nobody else sees them",
+    "photosCoach": "Your coach sees these photos",
+    "snapshotsTitle": "Snapshots",
+    "summaryPart": "{metric} {value}",
+    "summaryEmpty": "Measurement",
+    "photoCount": "{count, plural, one {# photo} other {# photos}}",
+    "photoProcessing": "Processing…",
+    "photoFailed": "Not processed",
+    "tapToShow": "Tap to show",
+    "revealPhoto": "Show photo {label}",
+    "revealCompare": "Show the photos",
+    "dividerLabel": "Divider between the two photos",
+    "trendOnly": "Trend only",
+    "trendNotYet": "Not enough measurements yet",
+    "shareAria": "Share a before and after",
+    "shareTitle": "Share a before and after",
+    "shareExplain": "This makes a post with two photos of the same pose, before and after. No measurement is added; write one yourself if you want.",
+    "shareBefore": "Before",
+    "posesLabel": "Pose",
+    "shareNoPose": "These two dates have no ready photo of the same pose.",
+    "shareText": "Text (optional)",
+    "shareTextPlaceholder": "A few words about your progress",
+    "shareAudience": "Who sees the post",
+    "shareConfirmTitle": "Post these photos?",
+    "shareConfirmBody": "Your {pose} photos from {from} and {to} will be posted for: {audience}.",
+    "shareNoNumbers": "Your measurements stay private. You can delete the post at any time.",
+    "shareConfirmAction": "Yes, post them",
+    "sharing": "Posting…",
+    "shareDoneTitle": "Posted",
+    "shareDoneBody": "Your before and after is in your posts.",
+    "channelLabel": "{club} › {channel}",
+    "next": "Next",
+    "back": "Back",
+    "close": "Close",
+    "cancel": "Cancel",
+    "photosLabel": "Photos",
+    "optional": "optional",
+    "photosHint": "The camera shows your previous photo faintly over the picture, for the same pose and distance.",
+    "photosDeclined": "Without photos this time.",
+    "photosAddAnyway": "Add photos",
+    "addPose": "Add photo: {pose}",
+    "retakePose": "Retake photo: {pose}",
+    "removePose": "Remove photo: {pose}",
+    "poseAdd": "+ {pose}",
+    "poseDone": "✓ {pose}",
+    "uploading": "Uploading…",
+    "uploadFailed": "Failed",
+    "uploadFailedLong": "A photo did not upload. Remove it or take it again.",
+    "measurementsLabel": "Measurements",
+    "howToMeasure": "How do I measure?",
+    "hintsExplain": "Faded values are from last time.",
+    "otherMeasure": "+ Another measurement",
+    "lastTimeHint": "Last time: {value} {unit}",
+    "hiddenFieldNote": "Hidden from you; your coach sees it only if you share it.",
+    "whenLabel": "Date and time",
+    "notesLabel": "Notes",
+    "notesPlaceholder": "Only you see these",
+    "whoSees": "Who sees it",
+    "needOne": "Add at least one measurement or one photo.",
+    "saving": "Saving…",
+    "waitUploads": "Waiting for photos…",
+    "saveSnapshot": "Save snapshot",
+    "saveChanges": "Save changes",
+    "edit": "Edit",
+    "delete": "Delete",
+    "deleteTitle": "Delete this measurement?",
+    "deleteBody": "Its values and photos are removed for good.",
+    "deleteConfirm": "Delete for good",
+    "cameraTitle": "Photo: {pose}",
+    "cameraPreview": "Camera",
+    "cameraPreviewAlt": "The photo you took: {pose}",
+    "cameraUnavailable": "The camera is not available. Choose a photo from your gallery.",
+    "ghostOpacity": "Previous photo",
+    "fromGallery": "From the gallery",
+    "takePhoto": "Take the photo",
+    "cancelTimer": "Stop the timer",
+    "timerOn": "Timer {seconds} s",
+    "timerOff": "No timer",
+    "switchCamera": "Switch camera",
+    "retake": "Retake",
+    "keep": "Keep",
+    "consentTitle": "Body photos",
+    "consentLead": "Only you see them.",
+    "consentStored": "They are stored privately, without a public link, and their location data is removed.",
+    "consentWho": "Your coach sees them only if you choose so on a measurement.",
+    "consentDelete": "You can delete all of them whenever you want.",
+    "consentAgree": "I agree",
+    "consentDecline": "Without photos",
+    "weightDisplayQuestion": "How do you want to see your weight?",
+    "weightDisplayIntro": "Body fat follows the same choice. You can change it in Settings.",
+    "saveChoice": "Save",
+    "helpTitle": "How do I measure?",
+    "helpIntro": "Use a soft tape, on bare skin, snug but not tight. Measure at the same time of day, ideally in the morning.",
+    "helpPhotos": "For photos: same place, same light, same distance. The timer gives you 10 seconds to step back.",
+    "settingsTitle": "Body settings",
+    "settingsHubHint": "Units, weight display, photos, reminder",
+    "settingsIntro": "Your body data is private by default. Here you choose how it shows and who sees it.",
+    "unitsLabel": "Units",
+    "sectionsLabel": "Journal sections",
+    "sectionsHint": "A section switched off disappears from your journal; nothing is deleted.",
+    "reminderLabel": "Measurement reminder",
+    "reminderOff": "Off",
+    "reminderEvery": "Every {weeks} weeks",
+    "reminderHint": "A short notification, with no numbers.",
+    "blurLabel": "Blur photos until I tap",
+    "blurHint": "Useful at the gym",
+    "consentStatusLabel": "Consent for body photos",
+    "consentActive": "Given on {date}.",
+    "consentWithdrawn": "Withdrawn on {date}. Your coach cannot see photos.",
+    "consentNone": "Not given yet. It is asked with your first photo.",
+    "withdrawHint": "Withdrawing hides every photo from coaches at once. Your photos stay yours until you delete them.",
+    "withdraw": "Withdraw consent",
+    "deleteAll": "Delete all photos",
+    "deleteAllTitle": "Delete all body photos?",
+    "deleteAllBody": "Every body photo is removed for good. Measurements that had only photos are removed too.",
+    "deleteAllConfirm": "Yes, delete all",
+    "deleteAllDone": "{count, plural, one {# photo deleted.} other {# photos deleted.}}",
+    "defaultVisibilityLabel": "Who sees a new measurement",
+    "accessLogLabel": "Who looked",
+    "accessLogHint": "Every time a coach opened measurements you shared.",
+    "accessLogEmpty": "No coach has opened your measurements.",
+    "accessLogPhotos": "with photos",
+    "aCoach": "A coach",
+    "coachNotice": "{name} sees when you opened this page.",
+    "coachEmpty": "{name} has not shared any measurement with you.",
+    "coachLoadError": "The measurements could not be loaded.",
+    "coachNoNumbers": "The shared measurements have no numbers you can see.",
+    "coachNoPhotos": "No shared photos of the same pose on both dates.",
+    "coachShared": "Shared measurements",
+    "coachWithPhotos": "with photos",
+    "coachWithoutPhotos": "without photos",
+    "coachWeightChoice": "{name} chose not to see weight as a number, so you do not see it either.",
+    "metric": {
+      "weight": "Weight",
+      "body_fat": "Body fat",
+      "waist": "Waist",
+      "hips": "Hips",
+      "chest": "Chest",
+      "arm": "Arm",
+      "thigh": "Thigh",
+      "neck": "Neck",
+      "calf": "Calf",
+      "arm_left": "Left arm",
+      "arm_right": "Right arm",
+      "thigh_left": "Left thigh",
+      "thigh_right": "Right thigh"
+    },
+    "metricShort": {
+      "weight": "weight",
+      "body_fat": "body fat",
+      "waist": "waist",
+      "hips": "hips",
+      "chest": "chest",
+      "arm": "arm",
+      "thigh": "thigh",
+      "neck": "neck",
+      "calf": "calf",
+      "arm_left": "left arm",
+      "arm_right": "right arm",
+      "thigh_left": "left thigh",
+      "thigh_right": "right thigh"
+    },
+    "pose": {
+      "front": "Front",
+      "side": "Side",
+      "back": "Back",
+      "other": "Other"
+    },
+    "range": {
+      "1m": "1M",
+      "3m": "3M",
+      "1y": "1Y",
+      "all": "All"
+    },
+    "rangeLong": {
+      "1m": "1 month",
+      "3m": "3 months",
+      "1y": "1 year",
+      "all": "all"
+    },
+    "trend": {
+      "steady": "Steady",
+      "slightly_down": "Slightly down",
+      "down": "Down",
+      "slightly_up": "Slightly up",
+      "up": "Up"
+    },
+    "visibility": {
+      "private": "Only me",
+      "coach_numbers": "My coach (without photos)",
+      "coach_full": "My coach (with photos)"
+    },
+    "visibilityShort": {
+      "private": "Only me",
+      "coach_numbers": "Coach · without photos",
+      "coach_full": "Coach · with photos"
+    },
+    "visibilityHint": {
+      "private": "Nobody else sees it",
+      "coach_numbers": "Your coach sees the measurements, not the photos",
+      "coach_full": "Your coach sees the measurements and the photos"
+    },
+    "weightDisplay": {
+      "number": "Number",
+      "trend": "Trend only",
+      "hidden": "Hidden"
+    },
+    "weightDisplayHint": {
+      "number": "The value and its change",
+      "trend": "A smoothed line and words, never a number",
+      "hidden": "You can still log it for your coach"
+    },
+    "weightDisplayFormNote": {
+      "trend": "Weight and body fat show as a trend only; the numbers you type are kept but not shown.",
+      "hidden": "Weight and body fat are hidden from you; log them only if your coach needs them."
+    },
+    "units": {
+      "metric": "Metric (kg, cm)",
+      "imperial": "Imperial (lb, in)"
+    },
+    "section": {
+      "body": "Body",
+      "wellness": "Wellness",
+      "cravings": "Cravings"
+    },
+    "audience": {
+      "followers": "My followers",
+      "public": "Everyone"
+    },
+    "audienceHint": {
+      "followers": "People who follow you",
+      "public": "Anyone on Milos"
+    },
+    "accessLogEntry": {
+      "list": "{coach} looked at your measurements · {date}",
+      "snapshot": "{coach} opened a measurement · {date}",
+      "series": "{coach} looked at a chart of your measurements · {date}"
+    },
+    "fieldError": {
+      "invalid": "Type a number",
+      "range": "Check this value"
+    },
+    "help": {
+      "waist": "Around the narrowest point, usually just above the navel, after breathing out.",
+      "hips": "Around the widest point of the buttocks, feet together.",
+      "chest": "Around the fullest part of the chest, arms relaxed.",
+      "arm": "Around the middle of the upper arm, relaxed.",
+      "thigh": "Around the thickest part of the thigh, standing.",
+      "neck": "Just below the Adam's apple.",
+      "calf": "Around the widest part of the calf, standing."
+    },
+    "errors": {
+      "invalid_metric": "Check this measurement.",
+      "snapshot_empty": "Add at least one measurement or one photo.",
+      "invalid_body_visibility": "Choose who sees this measurement.",
+      "body_notes_too_long": "Notes are at most 2000 characters.",
+      "invalid_pose": "Choose front, side or back.",
+      "too_many_body_photos": "A measurement holds up to four photos.",
+      "pose_taken": "This measurement already has a photo of that pose.",
+      "body_photo_consent_required": "Agree to keep body photos first; they stay private unless you share them.",
+      "invalid_taken_at": "Check the date of the measurement.",
+      "share_confirmation_required": "Confirm that you want to post these photos.",
+      "share_needs_two_snapshots": "Choose two different measurements.",
+      "share_photo_missing": "Both measurements need a ready photo of that pose.",
+      "media_not_ready": "A photo is still processing. Try again in a moment."
+    }
+  },
+  "Referrals": {
+    "title": "Bring a friend",
+    "pickBox": "Which box",
+    "noBox": "Join a box to invite friends there.",
+    "loading": "Loading…",
+    "loadFailed": "Couldn't load your invites. Try again in a moment.",
+    "shareLink": "Share link",
+    "showQr": "Show QR",
+    "copied": "Link copied",
+    "shareText": "Come train with me at {box}",
+    "offer": {
+      "friend": "Your friend: {gift}",
+      "friendNothing": "Invite a friend to train with you",
+      "you": "You: {reward}, {when}",
+      "cap": "{count, plural, one {Up to # friend a year} other {Up to # friends a year}}",
+      "staff": "Share the link with anyone. Rewards are for members.",
+      "noProgram": "Your box has no referral programme right now. Your link still works and your friends still show up here."
+    },
+    "events": {
+      "title": "Invite to an event",
+      "shareText": "Come with me to {title}",
+      "free": "free",
+      "invite": "Invite",
+      "goodForFriends": "Good for friends"
+    },
+    "list": {
+      "title": "Your invites",
+      "empty": "Nobody yet. Share your link, or invite a friend to an event: it's the easiest start.",
+      "totals": "{invited} invited · {trials} trials · {paid} joined",
+      "someone": "Someone",
+      "earned": "You got {reward}"
+    },
+    "newLink": {
+      "action": "New link",
+      "confirm": "Your current link and QR will stop working. Friends you already invited stay yours.",
+      "yes": "Make a new link",
+      "no": "Keep this one"
+    },
+    "qr": {
+      "title": "Your invite QR",
+      "close": "Close",
+      "alt": "QR code of your invite link",
+      "hint": "Your friend scans it with their phone camera."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {# day free} other {# days free}}",
+      "credit": "{amount} credit"
+    },
+    "reward": {
+      "credit": "{amount} credit",
+      "discount": "−{percent}% on your renewal",
+      "freePeriod": "{days, plural, one {# day free} other {# days free}}",
+      "manual": "a gift from the box"
+    },
+    "when": {
+      "trial": "when they come to a trial",
+      "paid": "when they subscribe"
+    },
+    "stage": {
+      "signed_up": "Signed up",
+      "event": "Came to an event",
+      "trial": "Came to a trial",
+      "joined": "Joined the box",
+      "paid": "Subscribed"
+    },
+    "status": {
+      "open": "On the way",
+      "qualified": "Counted",
+      "capped": "Over the yearly limit",
+      "expired": "Expired",
+      "void": "Doesn't count"
+    },
+    "rewardStatus": {
+      "upcoming": "Not yet",
+      "pending": "Awaiting approval",
+      "approved": "Approved",
+      "given": "Given",
+      "rejected": "Not approved",
+      "capped": "Over the limit",
+      "none": "No reward"
+    },
+    "channel": {
+      "link": "Link",
+      "qr": "QR",
+      "event": "Event",
+      "guest_pass": "Guest pass",
+      "staff": "Staff"
+    },
+    "invite": {
+      "heading": "Invite",
+      "title": "{name} invites you to {box}",
+      "titleNoName": "You're invited to {box}",
+      "preview": "Train with a friend at {box} on Milos.",
+      "from": "{name} invites you to train at {box}",
+      "fromMember": "A member invites you to train at {box}",
+      "toEvent": "…and to an event there.",
+      "gift": "For you: {gift}",
+      "giftWhen": "Given by the box with your first package.",
+      "signUp": "Create an account",
+      "signIn": "I already have an account",
+      "seeBox": "See the box",
+      "consent": "{name} will see your first name and how far you got (sign-up, trial, subscription). Nothing else.",
+      "consentNoName": "The member who invited you will see your first name and how far you got (sign-up, trial, subscription). Nothing else.",
+      "claiming": "Saving your invite…",
+      "failed": "We couldn't save your invite right now. We'll try again next time you open Milos.",
+      "alreadyMember": "You're already at {box}, so this invite doesn't apply.",
+      "alreadyInvited": "Another member’s invite already counted for you.",
+      "self": "This is your own invite link.",
+      "claimed": "Done. Your invite to {box} is saved.",
+      "openMine": "Open Bring a friend",
+      "openEvent": "See the event",
+      "bookTrial": "Book a trial",
+      "gone": "This invite isn't active any more",
+      "goneHint": "The link may have been replaced. Ask your friend for a new one.",
+      "home": "Go to Milos"
+    },
+    "notif": {
+      "progressTitle": "Your invite",
+      "progress": {
+        "signed_up": "{person} signed up with your invite.",
+        "event": "{person} came to the event you invited them to.",
+        "trial": "{person} came to a trial.",
+        "joined": "{person} joined the box.",
+        "paid": "{person} subscribed."
+      },
+      "rewardTitle": "Referral reward",
+      "reward": {
+        "approved": "Your referral reward was approved.",
+        "given": "Your referral reward was given.",
+        "rejected": "Your referral was not approved."
+      },
+      "reviewTitle": "Referral to approve",
+      "reviewBody": "{person} subscribed, invited by {referrer}."
+    },
+    "staff": {
+      "title": "Invites from members",
+      "filter": "Which invites",
+      "filter_review": "To approve",
+      "filter_all": "All",
+      "stats": "Last 90 days: {open} on the way · {qualified} counted · {expired} expired",
+      "emptyReview": "Nothing to approve.",
+      "empty": "No invites yet. Members share their link from Me › Bring a friend.",
+      "noReferrer": "a former member",
+      "row": "{friend} ← {referrer}",
+      "panel": "Invite",
+      "approve": "Approve",
+      "reject": "Reject",
+      "given": "Given",
+      "applyGift": "Apply friend's gift",
+      "reassign": "Give to another member",
+      "status": "Status",
+      "void_staff": "staff don't earn rewards",
+      "void_other": "doesn't count",
+      "channel": "How",
+      "newAccount": "new account",
+      "window": "Holds",
+      "until": "until {date}",
+      "program": "Programme",
+      "reward": "Member's reward",
+      "gift": "Friend's gift",
+      "giftApplied": "applied {date}",
+      "previous": "Was",
+      "notes": "Notes",
+      "newReferrer": "New member",
+      "reassignSave": "Save",
+      "cancel": "Cancel",
+      "note": "Note (optional)",
+      "discountOnRenewal": "«Given» takes it off the member’s next renewal invoice."
+    },
+    "rules": {
+      "rewardNote": "What the member gets (in words)",
+      "friendGift": "Friend's gift",
+      "gift_free_days": "Free days on the first package",
+      "gift_credit": "Credit",
+      "gift_custom": "Something else",
+      "gift_none": "Nothing",
+      "giftDays": "Days",
+      "giftEuros": "Amount (€)",
+      "giftNote": "What the friend gets",
+      "counts": "The invite counts",
+      "counts_paid": "On the first payment",
+      "counts_trial": "On the first trial",
+      "approval": "Rewards",
+      "approval_manual": "Approved by staff",
+      "approval_auto": "Approved automatically",
+      "window": "Invite holds (days)",
+      "cap": "Rewarded friends per member per year",
+      "capNone": "No limit",
+      "hint": "One programme is active per box: activating this one retires the other. Invites keep the terms they were made with."
+    },
+    "tabs": {
+      "invite": "Invite",
+      "invites": "Your invites · {count}"
+    }
   }
 }

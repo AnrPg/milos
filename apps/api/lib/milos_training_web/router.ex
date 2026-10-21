@@ -89,6 +89,11 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "buddy-invite")
   end
 
+  # ADR-156: invite pages; 32^8 codes behind a tight budget make guessing moot.
+  pipeline :public_referral_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "public-referral")
+  end
+
   pipeline :execution_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 240,
@@ -232,6 +237,12 @@ defmodule MilosTrainingWeb.Router do
     get("/:slug", PublicBoxController, :show)
   end
 
+  scope "/api/public/referrals", MilosTrainingWeb do
+    pipe_through([:api, :public_referral_rate_limited])
+
+    get("/:code", ReferralController, :invite)
+  end
+
   # ADR-155: the .pkpass behind a signed, short-lived link (Safari opens it
   # without the app's bearer header), and Apple's PassKit web service.
   scope "/api/wallet", MilosTrainingWeb do
@@ -356,6 +367,9 @@ defmodule MilosTrainingWeb.Router do
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
     put("/home-location", HomeLocationController, :update_mine)
+    # ADR-156: «Φέρε φίλο».
+    get("/referrals", ReferralController, :mine)
+    post("/referrals/code", ReferralController, :rotate_code)
 
     get("/threads/unread-count", MessagingController, :unread_count)
     post("/threads", MessagingController, :create_thread)
@@ -552,6 +566,7 @@ defmodule MilosTrainingWeb.Router do
     # ADR-158: shared body snapshots (audited in the client's access log).
     get("/clients/:user_id/body", ClientBodyController, :index)
     get("/clients/:user_id/body/snapshots/:id", ClientBodyController, :show)
+    get("/clients/:user_id/body/series", ClientBodyController, :series)
     # ADR-160: the weekly wellness summary, only with the client's grant.
     get("/clients/:user_id/wellness-summary", ClientWellnessSummaryController, :show)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
@@ -713,6 +728,13 @@ defmodule MilosTrainingWeb.Router do
     post("/trials/:id/accept", AdminTrialController, :accept)
     post("/trials/:id/decline", AdminTrialController, :decline)
     post("/trials/:id/attendance", AdminTrialController, :attendance)
+    # ADR-156: «Φέρε φίλο» invites.
+    get("/referrals", AdminReferralController, :index)
+    post("/referrals/:id/approve", AdminReferralController, :approve)
+    post("/referrals/:id/reject", AdminReferralController, :reject)
+    post("/referrals/:id/given", AdminReferralController, :given)
+    put("/referrals/:id/referrer", AdminReferralController, :reassign)
+    post("/referrals/:id/friend-gift", AdminReferralController, :friend_gift)
     # ADR-143: «Κοινότητα».
     get("/community/groups", AdminCommunityController, :groups)
     put("/community/groups/:id/decision", AdminCommunityController, :decide_group)
@@ -1148,6 +1170,8 @@ defmodule MilosTrainingWeb.Router do
     get("/boxes/:slug/schedule", PublicBoxController, :schedule)
     get("/boxes/:slug/posts", PublicBoxController, :posts)
     get("/boxes/:slug/events", CommunityEventController, :box_events)
+    # ADR-156: the friend's side of an invite.
+    post("/referrals/claim", ReferralController, :claim)
     # ADR-144: trials.
     post("/boxes/:slug/trials", TrialController, :create)
     get("/me/trials", TrialController, :index)

@@ -403,6 +403,42 @@ msgstr "Liked «%{event}»? %{box} invites you to a trial class."
 msgid "Message about «%{event}»"
 msgstr "Message about «%{event}»"
 
+msgid "Your invite"
+msgstr "Your invite"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} signed up with your invite."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} came to the event you invited them to."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} came to a trial."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} subscribed."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} joined the box."
+
+msgid "Referral reward"
+msgstr "Referral reward"
+
+msgid "Your referral reward was given."
+msgstr "Your referral reward was given."
+
+msgid "Your referral was not approved."
+msgstr "Your referral was not approved."
+
+msgid "Your referral reward was approved."
+msgstr "Your referral reward was approved."
+
+msgid "Referral to approve"
+msgstr "Referral to approve"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} subscribed, invited by %{referrer}."
+
 msgid "New near you"
 msgstr "New near you"
 

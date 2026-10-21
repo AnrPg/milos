@@ -2,6 +2,25 @@ defmodule MilosTraining.Application.RecordFinancePayment do
   alias MilosTraining.Application.RecordAnalyticsEvent
   alias MilosTraining.Finance
 
+  @doc false
+  # ADR-156: a package payment is a fact other contexts follow (the invite
+  # funnel's «paid»). Event payments go through Finance receipts of their own
+  # and never come here.
+  def announce_payment(membership, payment) do
+    if payment.payment_status == "paid" and (payment.amount_cents || 0) > 0 do
+      MilosTraining.DomainEvents.publish(:membership_payment_recorded, %{
+        organization_id: membership.organization_id,
+        user_id: membership.user_id,
+        membership_id: membership.id,
+        payment_id: payment.id,
+        amount_cents: payment.amount_cents,
+        at: DateTime.utc_now()
+      })
+    end
+
+    :ok
+  end
+
   def call(user_id, params) do
     case Finance.get_member_profile(user_id) do
       nil ->
@@ -21,6 +40,7 @@ defmodule MilosTraining.Application.RecordFinancePayment do
             }
           })
 
+          announce_payment(profile.membership, payment)
           {:ok, payment}
         end
     end

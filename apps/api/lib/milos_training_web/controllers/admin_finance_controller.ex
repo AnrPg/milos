@@ -258,23 +258,40 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       }
     }
   }
+  # ADR-156: the friend's side and the programme's own rules.
+  @referral_program_rules %{
+    reward_note: %Schema{type: :string, maxLength: 200, nullable: true},
+    friend_reward_type: %Schema{type: :string, enum: ["none", "free_days", "credit", "custom"]},
+    friend_reward_value: %Schema{
+      type: :integer,
+      minimum: 0,
+      description: "Days for free_days, cents for credit"
+    },
+    friend_reward_note: %Schema{type: :string, maxLength: 200, nullable: true},
+    qualifying_stage: %Schema{type: :string, enum: ["trial", "paid"]},
+    attribution_days: %Schema{type: :integer, minimum: 7, maximum: 365},
+    yearly_cap: %Schema{type: :integer, minimum: 1, maximum: 1000, nullable: true},
+    approval: %Schema{type: :string, enum: ["manual", "auto"]}
+  }
   @referral_program_request_body %RequestBody{
     required: true,
     content: %{
       "application/json" => %MediaType{
         schema: %Schema{
           type: :object,
-          properties: %{
-            name: %Schema{type: :string},
-            description: %Schema{type: :string, nullable: true},
-            active: %Schema{type: :boolean},
-            reward_type: %Schema{
-              type: :string,
-              enum: ["credit", "discount", "free_period", "manual"]
-            },
-            reward_value: %Schema{type: :integer, minimum: 0},
-            params: %Schema{type: :object, additionalProperties: true}
-          },
+          properties:
+            %{
+              name: %Schema{type: :string},
+              description: %Schema{type: :string, nullable: true},
+              active: %Schema{type: :boolean},
+              reward_type: %Schema{
+                type: :string,
+                enum: ["credit", "discount", "free_period", "manual"]
+              },
+              reward_value: %Schema{type: :integer, minimum: 0},
+              params: %Schema{type: :object, additionalProperties: true}
+            }
+            |> Map.merge(@referral_program_rules),
           required: [:name, :reward_type, :reward_value],
           additionalProperties: false
         }
@@ -287,17 +304,19 @@ defmodule MilosTrainingWeb.AdminFinanceController do
       "application/json" => %MediaType{
         schema: %Schema{
           type: :object,
-          properties: %{
-            name: %Schema{type: :string},
-            description: %Schema{type: :string, nullable: true},
-            active: %Schema{type: :boolean},
-            reward_type: %Schema{
-              type: :string,
-              enum: ["credit", "discount", "free_period", "manual"]
-            },
-            reward_value: %Schema{type: :integer, minimum: 0},
-            params: %Schema{type: :object, additionalProperties: true}
-          },
+          properties:
+            %{
+              name: %Schema{type: :string},
+              description: %Schema{type: :string, nullable: true},
+              active: %Schema{type: :boolean},
+              reward_type: %Schema{
+                type: :string,
+                enum: ["credit", "discount", "free_period", "manual"]
+              },
+              reward_value: %Schema{type: :integer, minimum: 0},
+              params: %Schema{type: :object, additionalProperties: true}
+            }
+            |> Map.merge(@referral_program_rules),
           additionalProperties: false
         }
       }

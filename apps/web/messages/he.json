@@ -69,7 +69,8 @@
     "coach": "מאמן",
     "memberTabs": "מדורים ראשיים",
     "trials": "אימוני ניסיון",
-    "community": "קהילה"
+    "community": "קהילה",
+    "body": "גוף"
   },
   "Profile": {
     "eyebrow": "פרופיל",
@@ -4333,7 +4334,14 @@
     "apiErrorAttendanceAlreadyRecorded": "הנוכחות שלך כבר נרשמה.",
     "apiErrorAttendanceRequiresApprovedBooking": "צ'ק-אין אפשרי רק עם הזמנה מאושרת.",
     "coachProgrammeTitle": "התוכנית שלי",
-    "coachProgrammeHint": "שנו יום, דחו אימון או בקשו אימון מהמאמן."
+    "coachProgrammeHint": "שנו יום, דחו אימון או בקשו אימון מהמאמן.",
+    "mpTabBody": "גוף",
+    "stfPortionsTitle": "מנות יומיות לפי יד",
+    "stfPortionsHint": "מה שהמתאמן רואה בעמוד הרווחה במקום מספרים. אפשר גם חצאים.",
+    "stfPortionsFromGrams": "מילוי מהגרמים",
+    "stfInvalidPortions": "המנות הן מ־0 עד 20, בחצאים.",
+    "stfMealSlots": "ארוחות היום",
+    "stfMealSlotsHint": "הארוחות שאליהן המתאמן רושם. השאר/י ריק לבוקר, צהריים, ערב ונשנוש."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4857,7 +4865,9 @@
         "review": "דירוג",
         "note": "הערה",
         "check_in": "איך אני מרגיש",
-        "body": "גוף"
+        "body": "גוף",
+        "wellness": "רווחה",
+        "craving": "חשק לאכול"
       },
       "loadMore": "רשומות קודמות",
       "loadingMore": "טוען…",
@@ -4954,7 +4964,10 @@
       "formReview": "סרטון טכניקה",
       "review": "ביקורת",
       "checkIn": "איך אני מרגיש",
-      "note": "הערה או מחשבה"
+      "note": "הערה או מחשבה",
+      "measure": "מדידה",
+      "wellness": "מים · שינה · ארוחה",
+      "craving": "חשק לאכול"
     },
     "entryKindHint": {
       "workout": "תוצאה, RPE, הערות",
@@ -4963,7 +4976,10 @@
       "formReview": "בקשו משוב מהמאמן",
       "review": "דרגו שיעור או אימון",
       "checkIn": "כמה שאלות קצרות",
-      "note": "טכניקה, מטרה, מצב רוח"
+      "note": "טכניקה, מטרה, מצב רוח",
+      "measure": "משקל, היקפים, תמונות",
+      "wellness": "כוס, הלילה שעבר, ארוחה",
+      "craving": "רשום/י אותו או בקש/י תמיכה"
     },
     "homeTitle": "בית",
     "wodToday": "האימון היומי במכון",
@@ -4974,7 +4990,8 @@
       "training": "אימון",
       "wellbeing": "רווחה",
       "coach": "מאמן",
-      "note": "הערה"
+      "note": "הערה",
+      "body": "גוף"
     },
     "checkIn": {
       "eyebrow": "איך אני מרגיש",
@@ -5075,7 +5092,223 @@
     "checkedIn": "בוצע צ'ק-אין ✓",
     "followClassTimer": "טיימר השיעור בשידור חי",
     "classCheckIn": "צ'ק-אין",
-    "programmeManage": "שינוי יום או דחייה"
+    "programmeManage": "שינוי יום או דחייה",
+    "meReferrals": "הבא חבר",
+    "meReferralsHint": "הקישור שלך, QR והזמנות",
+    "membershipReferral": "הבא חבר",
+    "wellness": {
+      "eyebrow": "רווחה",
+      "today": "היום",
+      "yesterday": "אתמול",
+      "loading": "טוען…",
+      "customize": "התאמה אישית",
+      "previousDay": "היום הקודם",
+      "nextDay": "היום הבא",
+      "close": "סגירה",
+      "save": "שמירה",
+      "saving": "שומר…",
+      "delete": "מחיקה",
+      "cancel": "ביטול",
+      "undo": "ביטול פעולה",
+      "open": "פתיחה",
+      "onlyMe": "רק את/ה רואה את זה. אפשר לשתף רשומות בודדות בהמשך.",
+      "whoSees": "מי רואה:",
+      "less": "פחות: {what}",
+      "more": "יותר: {what}",
+      "item": {
+        "water": "מים",
+        "sleep": "שינה",
+        "meals": "ארוחות",
+        "plan": "התוכנית של המאמן",
+        "mood": "מצב רוח",
+        "cravings": "חשק לאכול"
+      },
+      "water": {
+        "add": "+1 כוס",
+        "glasses": "{filled} מתוך {goal} כוסות",
+        "added": "נוספה כוס ({ml} מ״ל)",
+        "dropsLabel": "הכוסות של היום",
+        "remove": "הסרת הכוס הזו"
+      },
+      "sleep": {
+        "title": "שינה",
+        "night": "לילה",
+        "nap": "תנומה",
+        "bed": "הלכתי לישון",
+        "wake": "התעוררתי",
+        "napMinutes": "דקות",
+        "duration": "{hours} ש׳ {minutes} ד׳",
+        "quality": "איכות (1 עד 5)",
+        "qualityValue": "איכות {quality}/5",
+        "napValue": "תנומה {minutes} ד׳",
+        "empty": "לא נרשם",
+        "tap": "הקש/י כדי לרשום את הלילה",
+        "fromDevice": "מ־{source}",
+        "corrected": "מ־{source}, תוקן על ידך"
+      },
+      "source": {
+        "manual": "אותך",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "ארוחה",
+        "slot": "איזו ארוחה",
+        "logged": "נרשמה",
+        "addSnack": "+ נשנוש",
+        "fitLabel": {
+          "plan": "ומה עם התוכנית?",
+          "own": "כמו שרצית?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "בתוך התוכנית",
+            "off_plan": "מחוץ לתוכנית"
+          },
+          "own": {
+            "in_plan": "כמו שרציתי",
+            "off_plan": "אחרת"
+          }
+        },
+        "photo": "תמונה (רשות)",
+        "photoAdd": "הוספת תמונה",
+        "photoChange": "החלפת תמונה",
+        "photoRemove": "הסרה",
+        "photoUploading": "מעלה…",
+        "photoFailed": "התמונה לא עלתה. נסה/י שוב או שמור/י בלעדיה.",
+        "photoPrivate": "פרטית, כמו תמונות גוף. היא אף פעם לא עולה לפוסט בלי לשאול אותך.",
+        "note": "שורה עליה (רשות)",
+        "portions": "מנות לפי יד (רשות)",
+        "portionsHint": "כף יד, חופן, אגרוף, אגודל. אפשר גם חצאים. בלי שקילה, בלי קלוריות.",
+        "hungerLabel": "רעב ושובע (רשות)",
+        "hunger": "כמה הייתי רעב/ה לפני (1 עד 5)",
+        "fullness": "כמה שבע/ה אחרי (1 עד 5)"
+      },
+      "slot": {
+        "breakfast": "ארוחת בוקר",
+        "morning_snack": "נשנוש בוקר",
+        "lunch": "ארוחת צהריים",
+        "afternoon_snack": "נשנוש אחר הצהריים",
+        "dinner": "ארוחת ערב",
+        "evening_snack": "נשנוש לילה",
+        "snack": "נשנוש",
+        "pre_workout": "לפני האימון",
+        "post_workout": "אחרי האימון"
+      },
+      "portion": {
+        "protein": "חלבון (כף יד)",
+        "carbs": "פחמימות (חופן)",
+        "veg": "ירקות (אגרוף)",
+        "fat": "שומנים (אגודל)"
+      },
+      "plan": {
+        "title": "תזונה · {title}",
+        "showNumbers": "הצגת מספרים",
+        "hideNumbers": "הסתרת מספרים",
+        "of": "{logged} מתוך {target}",
+        "noPortions": "בתוכנית של המאמן שלך עוד אין מנות יומיות."
+      },
+      "mood": {
+        "mood": "מצב רוח {value}/4",
+        "stress": "מתח {value}/4",
+        "empty": "איך את/ה מרגיש/ה?",
+        "open": "ענה/י על «איך אני מרגיש/ה»"
+      },
+      "craving": {
+        "title": "חשק לאכול",
+        "tileTitle": "רשום/י אותו או בקש/י תמיכה",
+        "tileHint": "ברגע עצמו; איך זה נגמר אפשר להוסיף אחר כך",
+        "count": "{count, plural, one {# היום} other {# היום}}",
+        "edit": "עריכה",
+        "support": "אני צריך/ה תמיכה",
+        "supportNoBuddy": "כשתבחר/י באדי, הוא יקבל הודעה קצרה. אף פעם לא את הפרטים.",
+        "intensity": "כמה חזק?",
+        "trigger": "מה עורר אותו?",
+        "outcome": "מה קרה?",
+        "note": "מה רציתי (רשות)",
+        "notePlaceholder": "למשל משהו מתוק אחרי ארוחת הערב",
+        "tryNow": "נסה/י עכשיו",
+        "tryWater": "כוס מים",
+        "tryWalk": "הליכה של 10 דקות",
+        "tryWait": "חכה/י 10 דקות ונשום/נשמי לאט",
+        "waterCounted": "נספר",
+        "private": "רק את/ה רואה את זה. נשאל פעם אחת, בעוד 20 דקות, איך זה הלך.",
+        "howDidItGo": "איך זה הלך?"
+      },
+      "trigger": {
+        "stress": "מתח",
+        "fatigue": "עייפות",
+        "boredom": "שעמום",
+        "social": "חברתי",
+        "hunger": "רעב",
+        "other": "משהו אחר"
+      },
+      "outcome": {
+        "resisted": "התגברתי",
+        "ate_off_plan": "אכלתי משהו מחוץ לתוכנית",
+        "ongoing": "הוא עדיין כאן"
+      },
+      "week": {
+        "title": "השבוע",
+        "range": "{from} – {to}",
+        "previous": "השבוע הקודם",
+        "next": "השבוע הבא",
+        "item": "פריט",
+        "line": "שינה ביעד שלך {nights} מתוך {days} לילות · מים ביעד שלך {water} מתוך {days} ימים",
+        "dot": {
+          "full": "ביעד שלך",
+          "half": "חלקית",
+          "empty": "לא נרשם דבר",
+          "warm": "נרשם חשק"
+        }
+      },
+      "consent": {
+        "title": "המים, השינה, הארוחות והחשקים שלך",
+        "body": "מה שנרשם כאן הוא מידע בריאותי. הוא נשאר שלך ופרטי: המאמן רואה רשומה רק אם שיתפת אותה, ואפשר לייצא או למחוק הכול בכל עת.",
+        "items": "מה תרצה/י לראות?",
+        "later": "אפשר לשנות את זה בכל עת מ«התאמה אישית».",
+        "agree": "מסכים/ה, מתחילים"
+      },
+      "settings": {
+        "items": "פריטים וסדר",
+        "hiddenKeeps": "פריט שכיבית נעלם מהכרטיס, מהשבוע ומרשומה חדשה. המידע שלו נשמר עד שתמחק/י אותו.",
+        "moveUp": "הזזת {item} למעלה",
+        "moveDown": "הזזת {item} למטה",
+        "water": "מים",
+        "glass": "הכוס שלך",
+        "ml": "{ml} מ״ל",
+        "goalGlasses": "יעד יומי (כוסות)",
+        "reminder": "תזכורת אחר הצהריים",
+        "reminderHint": "פעם אחת, אחרי 15:00, אם את/ה מתחת לחצי מהיעד",
+        "goalYours": "היעדים שלך. מאמן יכול להציע, אבל אף פעם לא לקבוע.",
+        "sleep": "שינה",
+        "sleepGoal": "יעד שינה (שעות)",
+        "data": "המידע שלך",
+        "section": {
+          "wellness": "מים, שינה וארוחות",
+          "cravings": "חשקים"
+        },
+        "export": "ייצוא (JSON)",
+        "erase": "מחיקת הכול",
+        "eraseConfirm": "כן, למחוק לצמיתות",
+        "eraseWarning": "זה מוחק לצמיתות כל רשומה בחלק הזה, יחד עם תמונות הארוחות.",
+        "erased": "נמחק."
+      },
+      "feed": {
+        "water": "{count, plural, one {כוס אחת} other {# כוסות}}",
+        "meals": "{count, plural, one {ארוחה אחת} other {# ארוחות}}",
+        "craving": "חשק · {intensity}/10",
+        "empty": "רווחה"
+      },
+      "error": {
+        "health_data_consent_required": "קודם צריך להסכים לשמירת מידע בריאותי.",
+        "occurred_in_future": "השעה הזו בעתיד.",
+        "occurred_too_long_ago": "אפשר להשלים או לתקן עד 7 ימים אחורה.",
+        "invalid_wellness_value": "בדוק/י את הערכים ונסה/י שוב.",
+        "invalid_media": "התמונה לא מוכנה. בחר/י אותה שוב."
+      }
+    }
   },
   "Community": {
     "all": "הכול",
@@ -5963,7 +6196,8 @@
     "notif_event_guest_joined_body": "{person} מגיע/ה ל«{event}» עם כרטיס האורח שלכם.",
     "notif_event_trial_offer_title": "נסו אימון",
     "notif_event_trial_offer_body": "נהניתם מ«{event}»? {box} מזמין אתכם לשיעור ניסיון.",
-    "notif_event_message_title": "הודעה על «{event}»"
+    "notif_event_message_title": "הודעה על «{event}»",
+    "findNearbyLater": "מועדונים בסביבה יגיעו יחד עם «סביבי»."
   },
   "CommunityAdmin": {
     "title": "קהילה",
@@ -6196,7 +6430,9 @@
     "err_nobody_to_offer": "אף אחד מאלה שהגיעו לא ממתין להצעת ניסיון.",
     "err_trials_disabled": "הבוקס לא מקבל כרגע שיעורי ניסיון.",
     "eventsSegments": "אילו אירועים",
-    "nearMe": "קרוב אליי"
+    "nearMe": "קרוב אליי",
+    "fieldGoodForFriends": "מתאים לחברים",
+    "goodForFriendsHint": "מופיע ראשון כשחברים מזמינים חברים לאירוע."
   },
   "EventsAdmin": {
     "emptyUpcoming": "אין אירועים קרובים. צרו אחד עם «+ אירוע חדש».",
@@ -6752,5 +6988,506 @@
     "prSavedBody": "רוצה לשתף אותו עם הבוקס שלך? אפשר להוסיף תמונה או סרטון.",
     "prShare": "שיתוף",
     "prNotNow": "לא עכשיו"
+  },
+  "Body": {
+    "title": "גוף",
+    "settingsLink": "הגדרות",
+    "newMeasure": "מדידה חדשה",
+    "editMeasure": "עריכת מדידה",
+    "older": "מדידות קודמות",
+    "loading": "טוען…",
+    "offTitle": "אזור הגוף כבוי",
+    "offBody": "כיבית את אזור הגוף, ולכן הוא מוסתר ביומן שלך. המדידות שלך נשמרות.",
+    "turnOn": "הפעל שוב את אזור הגוף",
+    "emptyTitle": "הגוף שלך, בפרטיות",
+    "emptyBody": "באזור הגוף נשמרות מדידות, ואם תרצה גם תמונות, לאורך זמן, כדי שתראה את ההתקדמות שלך. כל השדות אופציונליים.",
+    "emptyPrivacy": "פרטי כברירת מחדל: רק אתה רואה, אלא אם תשתף מדידה עם המאמן שלך.",
+    "chartLabel": "גרף",
+    "chartEyebrow": "{metric} · {range}",
+    "chartTrendEyebrow": "{metric} · מגמה · {range}",
+    "chartTrendNote": "בלי מספרים · אפשר לשנות בהגדרות",
+    "chartTrendAria": "{metric}: {trend}",
+    "chartAria": "{metric}: {value}, שינוי {change}",
+    "chartAriaOne": "{metric}: {value}",
+    "chartHiddenTitle": "{metric}: מוסתר",
+    "chartHiddenBody": "בחרת לא לראות את זה. עדיין אפשר לרשום את זה בשביל המאמן שלך.",
+    "chartNoData": "אין מדידות בתקופה הזו.",
+    "changeInSettings": "שינוי בהגדרות",
+    "metricsLabel": "מדד",
+    "rangeLabel": "תקופה",
+    "compareTitle": "השוואה",
+    "compareRange": "{from} ↔ {to}",
+    "compareNoPhotos": "אין תמונות של אותה תנוחה בשני התאריכים.",
+    "compareNeedTwo": "צריך שתי מדידות כדי להשוות.",
+    "compareNoMetrics": "אף מדד לא נרשם בשני התאריכים.",
+    "compareFrom": "מתאריך",
+    "compareTo": "עד תאריך",
+    "compareChanges": "שינויים",
+    "compareModeLabel": "תצוגה",
+    "compareWith": "השוואה",
+    "modeSlider": "מחוון",
+    "modeSideBySide": "זו לצד זו",
+    "openCompare": "פתח את ההשוואה",
+    "photosPrivate": "תמונות פרטיות · אף אחד אחר לא רואה אותן",
+    "photosCoach": "המאמן שלך רואה את התמונות האלה",
+    "snapshotsTitle": "רישומים",
+    "summaryPart": "{metric} {value}",
+    "summaryEmpty": "מדידה",
+    "photoCount": "{count, plural, one {תמונה אחת} other {# תמונות}}",
+    "photoProcessing": "בעיבוד…",
+    "photoFailed": "לא עובדה",
+    "tapToShow": "הקש כדי להציג",
+    "revealPhoto": "הצג את התמונה {label}",
+    "revealCompare": "הצג את התמונות",
+    "dividerLabel": "קו מפריד בין שתי התמונות",
+    "trendOnly": "מגמה בלבד",
+    "trendNotYet": "עדיין אין מספיק מדידות",
+    "shareAria": "שתף לפני ואחרי",
+    "shareTitle": "שתף לפני ואחרי",
+    "shareExplain": "ייווצר פוסט עם שתי תמונות של אותה תנוחה, לפני ואחרי. לא מתווסף שום מדד; כתוב בעצמך אם תרצה.",
+    "shareBefore": "לפני",
+    "posesLabel": "תנוחה",
+    "shareNoPose": "לשני התאריכים האלה אין תמונה מוכנה של אותה תנוחה.",
+    "shareText": "טקסט (אופציונלי)",
+    "shareTextPlaceholder": "כמה מילים על ההתקדמות שלך",
+    "shareAudience": "מי רואה את הפוסט",
+    "shareConfirmTitle": "לפרסם את התמונות האלה?",
+    "shareConfirmBody": "התמונות שלך «{pose}» מ־{from} ומ־{to} יפורסמו עבור: {audience}.",
+    "shareNoNumbers": "המדידות שלך נשארות פרטיות. אפשר למחוק את הפוסט בכל זמן.",
+    "shareConfirmAction": "כן, לפרסם",
+    "sharing": "מפרסם…",
+    "shareDoneTitle": "פורסם",
+    "shareDoneBody": "הלפני ואחרי שלך נמצא בפוסטים שלך.",
+    "channelLabel": "{club} › {channel}",
+    "next": "הבא",
+    "back": "חזרה",
+    "close": "סגירה",
+    "cancel": "ביטול",
+    "photosLabel": "תמונות",
+    "optional": "אופציונלי",
+    "photosHint": "המצלמה מציגה בשקיפות את התמונה הקודמת שלך, לאותה תנוחה ומרחק.",
+    "photosDeclined": "בלי תמונות הפעם.",
+    "photosAddAnyway": "הוסף תמונות",
+    "addPose": "הוספת תמונה: {pose}",
+    "retakePose": "צילום מחדש: {pose}",
+    "removePose": "הסרת תמונה: {pose}",
+    "poseAdd": "+ {pose}",
+    "poseDone": "✓ {pose}",
+    "uploading": "מעלה…",
+    "uploadFailed": "נכשל",
+    "uploadFailedLong": "תמונה אחת לא הועלתה. הסר אותה או צלם אותה שוב.",
+    "measurementsLabel": "מדידות",
+    "howToMeasure": "איך מודדים?",
+    "hintsExplain": "הערכים החיוורים הם מהפעם הקודמת.",
+    "otherMeasure": "+ מדד אחר",
+    "lastTimeHint": "בפעם הקודמת: {value} {unit}",
+    "hiddenFieldNote": "מוסתר ממך; המאמן שלך רואה את זה רק אם תשתף.",
+    "whenLabel": "תאריך ושעה",
+    "notesLabel": "הערות",
+    "notesPlaceholder": "רק אתה רואה אותן",
+    "whoSees": "מי רואה",
+    "needOne": "הוסף לפחות מדד אחד או תמונה אחת.",
+    "saving": "שומר…",
+    "waitUploads": "ממתין לתמונות…",
+    "saveSnapshot": "שמירת רישום",
+    "saveChanges": "שמירת שינויים",
+    "edit": "עריכה",
+    "delete": "מחיקה",
+    "deleteTitle": "למחוק את המדידה הזו?",
+    "deleteBody": "הערכים והתמונות שלה נמחקים לצמיתות.",
+    "deleteConfirm": "מחיקה לצמיתות",
+    "cameraTitle": "תמונה: {pose}",
+    "cameraPreview": "מצלמה",
+    "cameraPreviewAlt": "התמונה שצילמת: {pose}",
+    "cameraUnavailable": "המצלמה לא זמינה. בחר תמונה מהגלריה.",
+    "ghostOpacity": "התמונה הקודמת",
+    "fromGallery": "מהגלריה",
+    "takePhoto": "צלם",
+    "cancelTimer": "עצור את הטיימר",
+    "timerOn": "טיימר {seconds} שנ׳",
+    "timerOff": "בלי טיימר",
+    "switchCamera": "החלף מצלמה",
+    "retake": "שוב",
+    "keep": "שמור",
+    "consentTitle": "תמונות גוף",
+    "consentLead": "רק אתה רואה אותן.",
+    "consentStored": "הן נשמרות באופן פרטי, בלי קישור ציבורי, ונתוני המיקום שלהן מוסרים.",
+    "consentWho": "המאמן שלך רואה אותן רק אם תבחר בכך במדידה.",
+    "consentDelete": "אפשר למחוק את כולן מתי שתרצה.",
+    "consentAgree": "אני מסכים",
+    "consentDecline": "בלי תמונות",
+    "weightDisplayQuestion": "איך תרצה לראות את המשקל שלך?",
+    "weightDisplayIntro": "אחוז השומן פועל לפי אותה בחירה. אפשר לשנות בהגדרות.",
+    "saveChoice": "שמירה",
+    "helpTitle": "איך מודדים?",
+    "helpIntro": "בסרט מדידה רך, על העור, צמוד אבל לא הדוק. מדוד באותה שעה ביום, רצוי בבוקר.",
+    "helpPhotos": "לתמונות: אותו מקום, אותה תאורה, אותו מרחק. הטיימר נותן לך 10 שניות להתרחק.",
+    "settingsTitle": "הגדרות גוף",
+    "settingsHubHint": "יחידות, משקל, תמונות, תזכורת",
+    "settingsIntro": "נתוני הגוף שלך פרטיים כברירת מחדל. כאן בוחרים איך הם מוצגים ומי רואה אותם.",
+    "unitsLabel": "יחידות",
+    "sectionsLabel": "אזורי היומן",
+    "sectionsHint": "אזור כבוי נעלם מהיומן שלך; שום דבר לא נמחק.",
+    "reminderLabel": "תזכורת למדידה",
+    "reminderOff": "כבויה",
+    "reminderEvery": "כל {weeks} שבועות",
+    "reminderHint": "התראה קצרה, בלי מספרים.",
+    "blurLabel": "טשטש תמונות עד שאקיש",
+    "blurHint": "שימושי בחדר הכושר",
+    "consentStatusLabel": "הסכמה לתמונות גוף",
+    "consentActive": "ניתנה ב־{date}.",
+    "consentWithdrawn": "בוטלה ב־{date}. המאמן שלך לא רואה תמונות.",
+    "consentNone": "עדיין לא ניתנה. היא תתבקש עם התמונה הראשונה שלך.",
+    "withdrawHint": "ביטול ההסכמה מסתיר מיד את כל התמונות מהמאמנים. התמונות נשארות שלך עד שתמחק אותן.",
+    "withdraw": "ביטול ההסכמה",
+    "deleteAll": "מחיקת כל התמונות",
+    "deleteAllTitle": "למחוק את כל תמונות הגוף?",
+    "deleteAllBody": "כל תמונת גוף נמחקת לצמיתות. גם מדידות שהיו בהן רק תמונות נמחקות.",
+    "deleteAllConfirm": "כן, למחוק הכול",
+    "deleteAllDone": "{count, plural, one {נמחקה תמונה אחת.} other {נמחקו # תמונות.}}",
+    "defaultVisibilityLabel": "מי רואה מדידה חדשה",
+    "accessLogLabel": "מי הסתכל",
+    "accessLogHint": "בכל פעם שמאמן פתח מדידות ששיתפת.",
+    "accessLogEmpty": "אף מאמן לא פתח את המדידות שלך.",
+    "accessLogPhotos": "עם תמונות",
+    "aCoach": "מאמן",
+    "coachNotice": "{name} רואה מתי פתחת את הדף הזה.",
+    "coachEmpty": "{name} עדיין לא שיתף איתך מדידה.",
+    "coachLoadError": "לא ניתן לטעון את המדידות.",
+    "coachNoNumbers": "במדידות המשותפות אין מספרים שאתה יכול לראות.",
+    "coachNoPhotos": "אין תמונות משותפות של אותה תנוחה בשני התאריכים.",
+    "coachShared": "מדידות משותפות",
+    "coachWithPhotos": "עם תמונות",
+    "coachWithoutPhotos": "בלי תמונות",
+    "coachWeightChoice": "{name} בחר לא לראות את המשקל כמספר, ולכן גם אתה לא רואה אותו.",
+    "metric": {
+      "weight": "משקל",
+      "body_fat": "אחוז שומן",
+      "waist": "מותניים",
+      "hips": "ירכיים",
+      "chest": "חזה",
+      "arm": "זרוע",
+      "thigh": "ירך",
+      "neck": "צוואר",
+      "calf": "שוק",
+      "arm_left": "זרוע שמאל",
+      "arm_right": "זרוע ימין",
+      "thigh_left": "ירך שמאל",
+      "thigh_right": "ירך ימין"
+    },
+    "metricShort": {
+      "weight": "משקל",
+      "body_fat": "שומן",
+      "waist": "מותניים",
+      "hips": "ירכיים",
+      "chest": "חזה",
+      "arm": "זרוע",
+      "thigh": "ירך",
+      "neck": "צוואר",
+      "calf": "שוק",
+      "arm_left": "זרוע שמאל",
+      "arm_right": "זרוע ימין",
+      "thigh_left": "ירך שמאל",
+      "thigh_right": "ירך ימין"
+    },
+    "pose": {
+      "front": "חזית",
+      "side": "צד",
+      "back": "גב",
+      "other": "אחרת"
+    },
+    "range": {
+      "1m": "1ח׳",
+      "3m": "3ח׳",
+      "1y": "1ש׳",
+      "all": "הכול"
+    },
+    "rangeLong": {
+      "1m": "חודש",
+      "3m": "3 חודשים",
+      "1y": "שנה",
+      "all": "הכול"
+    },
+    "trend": {
+      "steady": "יציבה",
+      "slightly_down": "ירידה קלה",
+      "down": "ירידה",
+      "slightly_up": "עלייה קלה",
+      "up": "עלייה"
+    },
+    "visibility": {
+      "private": "רק אני",
+      "coach_numbers": "המאמן שלי (בלי תמונות)",
+      "coach_full": "המאמן שלי (עם תמונות)"
+    },
+    "visibilityShort": {
+      "private": "רק אני",
+      "coach_numbers": "מאמן · בלי תמונות",
+      "coach_full": "מאמן · עם תמונות"
+    },
+    "visibilityHint": {
+      "private": "אף אחד אחר לא רואה",
+      "coach_numbers": "המאמן שלך רואה את המדידות, לא את התמונות",
+      "coach_full": "המאמן שלך רואה את המדידות ואת התמונות"
+    },
+    "weightDisplay": {
+      "number": "מספר",
+      "trend": "מגמה בלבד",
+      "hidden": "מוסתר"
+    },
+    "weightDisplayHint": {
+      "number": "הערך והשינוי שלו",
+      "trend": "קו מוחלק ומילים, אף פעם לא מספר",
+      "hidden": "עדיין אפשר לרשום אותו בשביל המאמן שלך"
+    },
+    "weightDisplayFormNote": {
+      "trend": "משקל ואחוז שומן מוצגים כמגמה בלבד; המספרים שאתה מקליד נשמרים אבל לא מוצגים.",
+      "hidden": "משקל ואחוז שומן מוסתרים ממך; רשום אותם רק אם המאמן שלך צריך."
+    },
+    "units": {
+      "metric": "מטרי (ק״ג, ס״מ)",
+      "imperial": "אימפריאלי (lb, in)"
+    },
+    "section": {
+      "body": "גוף",
+      "wellness": "רווחה",
+      "cravings": "חשקים"
+    },
+    "audience": {
+      "followers": "העוקבים שלי",
+      "public": "כולם"
+    },
+    "audienceHint": {
+      "followers": "האנשים שעוקבים אחריך",
+      "public": "כל אחד ב־Milos"
+    },
+    "accessLogEntry": {
+      "list": "{coach} צפה במדידות שלך · {date}",
+      "snapshot": "{coach} פתח מדידה · {date}",
+      "series": "{coach} צפה בגרף של המדידות שלך · {date}"
+    },
+    "fieldError": {
+      "invalid": "הקלד מספר",
+      "range": "בדוק את הערך הזה"
+    },
+    "help": {
+      "waist": "סביב הנקודה הצרה ביותר, בדרך כלל מעט מעל הטבור, אחרי נשיפה.",
+      "hips": "סביב הנקודה הרחבה ביותר של הישבן, כפות רגליים צמודות.",
+      "chest": "סביב החלק הרחב ביותר של החזה, ידיים רפויות.",
+      "arm": "סביב אמצע הזרוע העליונה, רפויה.",
+      "thigh": "סביב החלק העבה ביותר של הירך, בעמידה.",
+      "neck": "ממש מתחת לתפוח האדם.",
+      "calf": "סביב החלק הרחב ביותר של השוק, בעמידה."
+    },
+    "errors": {
+      "invalid_metric": "בדוק את המדידה הזו.",
+      "snapshot_empty": "הוסף לפחות מדד אחד או תמונה אחת.",
+      "invalid_body_visibility": "בחר מי רואה את המדידה הזו.",
+      "body_notes_too_long": "הערות הן עד 2000 תווים.",
+      "invalid_pose": "בחר חזית, צד או גב.",
+      "too_many_body_photos": "במדידה יש עד ארבע תמונות.",
+      "pose_taken": "למדידה הזו כבר יש תמונה של התנוחה הזו.",
+      "body_photo_consent_required": "קודם הסכם שנשמור תמונות גוף; הן נשארות פרטיות אלא אם תשתף אותן.",
+      "invalid_taken_at": "בדוק את תאריך המדידה.",
+      "share_confirmation_required": "אשר שברצונך לפרסם את התמונות האלה.",
+      "share_needs_two_snapshots": "בחר שתי מדידות שונות.",
+      "share_photo_missing": "שתי המדידות צריכות תמונה מוכנה של התנוחה הזו.",
+      "media_not_ready": "תמונה עדיין בעיבוד. נסה שוב בעוד רגע."
+    }
+  },
+  "Referrals": {
+    "title": "הבא חבר",
+    "pickBox": "איזה בוקס",
+    "noBox": "הצטרף לבוקס כדי להזמין לשם חברים.",
+    "loading": "טוען…",
+    "loadFailed": "לא הצלחנו לטעון את ההזמנות שלך. נסה שוב עוד רגע.",
+    "shareLink": "שתף קישור",
+    "showQr": "הצג QR",
+    "copied": "הקישור הועתק",
+    "shareText": "בוא להתאמן איתי ב-{box}",
+    "offer": {
+      "friend": "לחבר שלך: {gift}",
+      "friendNothing": "הזמן חבר להתאמן איתך",
+      "you": "לך: {reward}, {when}",
+      "cap": "{count, plural, one {עד חבר # בשנה} other {עד # חברים בשנה}}",
+      "staff": "שתף את הקישור עם מי שתרצה. התגמולים הם לחברי הבוקס.",
+      "noProgram": "לבוקס שלך אין כרגע תוכנית הפניות. הקישור שלך עדיין עובד והחברים שלך יופיעו כאן."
+    },
+    "events": {
+      "title": "הזמן לאירוע",
+      "shareText": "בוא איתי ל-{title}",
+      "free": "חינם",
+      "invite": "הזמן",
+      "goodForFriends": "מתאים לחברים"
+    },
+    "list": {
+      "title": "ההזמנות שלך",
+      "empty": "עדיין אף אחד. שתף את הקישור שלך או הזמן חבר לאירוע: זו ההתחלה הכי קלה.",
+      "totals": "{invited} הוזמנו · {trials} אימוני ניסיון · {paid} מנויים",
+      "someone": "מישהו",
+      "earned": "קיבלת {reward}"
+    },
+    "newLink": {
+      "action": "קישור חדש",
+      "confirm": "הקישור וה-QR הנוכחיים יפסיקו לעבוד. חברים שכבר הזמנת נשארים שלך.",
+      "yes": "צור קישור חדש",
+      "no": "השאר את זה"
+    },
+    "qr": {
+      "title": "ה-QR של ההזמנה שלך",
+      "close": "סגור",
+      "alt": "קוד QR של קישור ההזמנה שלך",
+      "hint": "החבר שלך סורק אותו עם מצלמת הטלפון."
+    },
+    "gift": {
+      "freeDays": "{days, plural, one {יום # חינם} other {# ימים חינם}}",
+      "credit": "זיכוי של {amount}"
+    },
+    "reward": {
+      "credit": "זיכוי של {amount}",
+      "discount": "‎−{percent}% בחידוש",
+      "freePeriod": "{days, plural, one {יום # חינם} other {# ימים חינם}}",
+      "manual": "מתנה מהבוקס"
+    },
+    "when": {
+      "trial": "כשיגיע לאימון ניסיון",
+      "paid": "כשירשם למנוי"
+    },
+    "stage": {
+      "signed_up": "נרשם",
+      "event": "הגיע לאירוע",
+      "trial": "הגיע לאימון ניסיון",
+      "joined": "הצטרף לבוקס",
+      "paid": "נרשם למנוי"
+    },
+    "status": {
+      "open": "בדרך",
+      "qualified": "נספרת",
+      "capped": "מעל המגבלה השנתית",
+      "expired": "פגה",
+      "void": "לא נספרת"
+    },
+    "rewardStatus": {
+      "upcoming": "עדיין לא",
+      "pending": "ממתין לאישור",
+      "approved": "אושר",
+      "given": "ניתן",
+      "rejected": "לא אושר",
+      "capped": "מעל המגבלה",
+      "none": "ללא תגמול"
+    },
+    "channel": {
+      "link": "קישור",
+      "qr": "QR",
+      "event": "אירוע",
+      "guest_pass": "כרטיס אורח",
+      "staff": "צוות"
+    },
+    "invite": {
+      "heading": "הזמנה",
+      "title": "{name} מזמין אותך ל-{box}",
+      "titleNoName": "הוזמנת ל-{box}",
+      "preview": "התאמן עם חבר ב-{box} ב-Milos.",
+      "from": "{name} מזמין אותך להתאמן ב-{box}",
+      "fromMember": "חבר בבוקס מזמין אותך להתאמן ב-{box}",
+      "toEvent": "…ולאירוע שם.",
+      "gift": "בשבילך: {gift}",
+      "giftWhen": "הבוקס נותן את זה עם החבילה הראשונה שלך.",
+      "signUp": "צור חשבון",
+      "signIn": "יש לי כבר חשבון",
+      "seeBox": "ראה את הבוקס",
+      "consent": "{name} יראה את שמך הפרטי ועד כמה התקדמת (הרשמה, אימון ניסיון, מנוי). שום דבר אחר.",
+      "consentNoName": "מי שהזמין אותך יראה את שמך הפרטי ועד כמה התקדמת (הרשמה, אימון ניסיון, מנוי). שום דבר אחר.",
+      "claiming": "שומרים את ההזמנה…",
+      "failed": "לא הצלחנו לשמור את ההזמנה עכשיו. ננסה שוב בפעם הבאה שתפתח את Milos.",
+      "alreadyMember": "אתה כבר ב-{box}, לכן ההזמנה לא חלה.",
+      "alreadyInvited": "ההזמנה של חבר אחר כבר נספרה עבורך.",
+      "self": "זה קישור ההזמנה שלך.",
+      "claimed": "בוצע. ההזמנה שלך ל-{box} נשמרה.",
+      "openMine": "פתח את הבא חבר",
+      "openEvent": "ראה את האירוע",
+      "bookTrial": "קבע אימון ניסיון",
+      "gone": "ההזמנה הזו כבר לא פעילה",
+      "goneHint": "ייתכן שהקישור הוחלף. בקש מהחבר שלך את החדש.",
+      "home": "עבור ל-Milos"
+    },
+    "notif": {
+      "progressTitle": "ההזמנה שלך",
+      "progress": {
+        "signed_up": "{person} נרשם עם ההזמנה שלך.",
+        "event": "{person} הגיע לאירוע שהזמנת אותו אליו.",
+        "trial": "{person} הגיע לאימון ניסיון.",
+        "joined": "{person} הצטרף לבוקס.",
+        "paid": "{person} נרשם למנוי."
+      },
+      "rewardTitle": "תגמול הפניה",
+      "reward": {
+        "approved": "תגמול ההפניה שלך אושר.",
+        "given": "תגמול ההפניה שלך ניתן.",
+        "rejected": "ההפניה שלך לא אושרה."
+      },
+      "reviewTitle": "הפניה לאישור",
+      "reviewBody": "{person} נרשם למנוי, בהזמנת {referrer}."
+    },
+    "staff": {
+      "title": "הזמנות מחברי הבוקס",
+      "filter": "אילו הזמנות",
+      "filter_review": "לאישור",
+      "filter_all": "הכול",
+      "stats": "90 הימים האחרונים: {open} בדרך · {qualified} נספרות · {expired} פגו",
+      "emptyReview": "אין מה לאשר.",
+      "empty": "עדיין אין הזמנות. חברי הבוקס משתפים את הקישור שלהם מ-אני › הבא חבר.",
+      "noReferrer": "חבר לשעבר",
+      "row": "{friend} ← {referrer}",
+      "panel": "הזמנה",
+      "approve": "אשר",
+      "reject": "דחה",
+      "given": "ניתן",
+      "applyGift": "החל את המתנה לחבר",
+      "reassign": "העבר לחבר אחר",
+      "status": "סטטוס",
+      "void_staff": "הצוות לא מקבל תגמולים",
+      "void_other": "לא נספרת",
+      "channel": "איך",
+      "newAccount": "חשבון חדש",
+      "window": "בתוקף",
+      "until": "עד {date}",
+      "program": "תוכנית",
+      "reward": "התגמול של החבר המזמין",
+      "gift": "המתנה לחבר",
+      "giftApplied": "הוחלה ב-{date}",
+      "previous": "קודם",
+      "notes": "הערות",
+      "newReferrer": "חבר חדש",
+      "reassignSave": "שמור",
+      "cancel": "ביטול",
+      "note": "הערה (לא חובה)",
+      "discountOnRenewal": "«ניתן» מוריד אותה מחשבונית החידוש הבאה של החבר."
+    },
+    "rules": {
+      "rewardNote": "מה החבר המזמין מקבל (במילים)",
+      "friendGift": "המתנה לחבר",
+      "gift_free_days": "ימים חינם בחבילה הראשונה",
+      "gift_credit": "זיכוי",
+      "gift_custom": "משהו אחר",
+      "gift_none": "כלום",
+      "giftDays": "ימים",
+      "giftEuros": "סכום (€)",
+      "giftNote": "מה החבר מקבל",
+      "counts": "ההזמנה נספרת",
+      "counts_paid": "בתשלום הראשון",
+      "counts_trial": "באימון הניסיון הראשון",
+      "approval": "תגמולים",
+      "approval_manual": "מאושרים על ידי הצוות",
+      "approval_auto": "מאושרים אוטומטית",
+      "window": "ההזמנה בתוקף (ימים)",
+      "cap": "חברים מתוגמלים לכל חבר בשנה",
+      "capNone": "ללא מגבלה",
+      "hint": "תוכנית אחת פעילה לכל בוקס: הפעלת זו מפסיקה את האחרת. ההזמנות שומרות את התנאים שבהם נעשו."
+    },
+    "tabs": {
+      "invite": "הזמן",
+      "invites": "ההזמנות שלך · {count}"
+    }
   }
 }

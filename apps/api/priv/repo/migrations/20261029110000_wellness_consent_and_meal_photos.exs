@@ -48,7 +48,7 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
     dangling_media(true)
 
     alter table(:wellness_preferences) do
-      add :water_reminder, :boolean, null: false, default: false
+      add :water_reminder, :boolean, null: false, default: true
       add :water_reminded_on, :date
       add :item_order, {:array, :text}, null: false, default: []
     end

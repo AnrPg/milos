@@ -16,7 +16,7 @@ defmodule MilosTraining.Wellness.Preferences do
     field(:sleep_goal_minutes, :integer, default: 420)
     field(:hidden_items, {:array, :string}, default: [])
     field(:item_order, {:array, :string}, default: [])
-    field(:water_reminder, :boolean, default: false)
+    field(:water_reminder, :boolean, default: true)
     field(:water_reminded_on, :date)
 
     timestamps(type: :utc_datetime_usec)

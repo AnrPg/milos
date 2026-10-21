@@ -103,15 +103,20 @@ defmodule MilosTraining.Infrastructure.Body.EctoBodyStore do
   end
 
   @impl true
-  def list_metric_points(_context, user_id, key, since) do
+  def list_metric_points(_context, user_id, key, since, opts) do
     Snapshot
     |> where([s], s.user_id == ^user_id)
+    |> shared_only(Keyword.get(opts, :shared_only, false))
     |> where([s], fragment("jsonb_typeof(? -> ?) = 'number'", s.metrics, ^key))
     |> then(fn query ->
       if since, do: where(query, [s], s.taken_at >= ^since), else: query
     end)
     |> order_by([s], asc: s.taken_at, asc: s.id)
-    |> select([s], %{at: s.taken_at, value: fragment("(? ->> ?)::float8", s.metrics, ^key)})
+    |> select([s], %{
+      at: s.taken_at,
+      value: fragment("(? ->> ?)::float8", s.metrics, ^key),
+      snapshot_id: s.id
+    })
     |> Repo.all()
   end
 

@@ -69,7 +69,8 @@
     "coach": "المدرب",
     "memberTabs": "الأقسام الرئيسية",
     "trials": "حصص تجريبية",
-    "community": "المجتمع"
+    "community": "المجتمع",
+    "body": "الجسم"
   },
   "Profile": {
     "eyebrow": "الملف الشخصي",
@@ -4333,7 +4334,14 @@
     "apiErrorAttendanceAlreadyRecorded": "سُجّل حضورك بالفعل.",
     "apiErrorAttendanceRequiresApprovedBooking": "لا يمكن تسجيل الحضور إلا بحجز معتمد.",
     "coachProgrammeTitle": "برنامجي",
-    "coachProgrammeHint": "غيّر يومًا أو ارفض تمرينًا أو اطلب تمرينًا من مدربك."
+    "coachProgrammeHint": "غيّر يومًا أو ارفض تمرينًا أو اطلب تمرينًا من مدربك.",
+    "mpTabBody": "الجسم",
+    "stfPortionsTitle": "حصص يومية باليد",
+    "stfPortionsHint": "ما يراه العضو في صفحة العافية بدل الأرقام. الأنصاف مقبولة.",
+    "stfPortionsFromGrams": "املأ من الغرامات",
+    "stfInvalidPortions": "الحصص من 0 إلى 20، بالأنصاف.",
+    "stfMealSlots": "وجبات اليوم",
+    "stfMealSlotsHint": "الوجبات التي يسجّل فيها العضو. اتركها فارغة للفطور والغداء والعشاء ووجبة خفيفة."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4857,7 +4865,9 @@
         "review": "تقييم",
         "note": "ملاحظة",
         "check_in": "كيف أشعر",
-        "body": "الجسم"
+        "body": "الجسم",
+        "wellness": "العافية",
+        "craving": "الرغبة الشديدة"
       },
       "loadMore": "إدخالات أقدم",
       "loadingMore": "جارٍ التحميل…",
@@ -4954,7 +4964,10 @@
       "formReview": "فيديو التقنية",
       "review": "تقييم",
       "checkIn": "كيف أشعر",
-      "note": "ملاحظة أو فكرة"
+      "note": "ملاحظة أو فكرة",
+      "measure": "قياس",
+      "wellness": "ماء · نوم · وجبة",
+      "craving": "الرغبة الشديدة"
     },
     "entryKindHint": {
       "workout": "النتيجة وRPE والملاحظات",
@@ -4963,7 +4976,10 @@
       "formReview": "اطلب ملاحظات من مدربك",
       "review": "قيّم حصة أو تمرينًا",
       "checkIn": "بضعة أسئلة سريعة",
-      "note": "التقنية، الهدف، المزاج"
+      "note": "التقنية، الهدف، المزاج",
+      "measure": "الوزن، المحيطات، الصور",
+      "wellness": "كوب، الليلة الماضية، وجبة",
+      "craving": "سجّلها أو اطلب الدعم"
     },
     "homeTitle": "الرئيسية",
     "wodToday": "تمرين اليوم في النادي",
@@ -4974,7 +4990,8 @@
       "training": "التدريب",
       "wellbeing": "العافية",
       "coach": "المدرب",
-      "note": "ملاحظة"
+      "note": "ملاحظة",
+      "body": "الجسم"
     },
     "checkIn": {
       "eyebrow": "كيف أشعر",
@@ -5075,7 +5092,223 @@
     "checkedIn": "تم تسجيل الحضور ✓",
     "followClassTimer": "مؤقت الحصة المباشر",
     "classCheckIn": "تسجيل الحضور",
-    "programmeManage": "تغيير اليوم أو الرفض"
+    "programmeManage": "تغيير اليوم أو الرفض",
+    "meReferrals": "أحضر صديقًا",
+    "meReferralsHint": "رابطك ورمز QR والدعوات",
+    "membershipReferral": "أحضر صديقًا",
+    "wellness": {
+      "eyebrow": "العافية",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "loading": "جارٍ التحميل…",
+      "customize": "تخصيص",
+      "previousDay": "اليوم السابق",
+      "nextDay": "اليوم التالي",
+      "close": "إغلاق",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "undo": "تراجع",
+      "open": "فتح",
+      "onlyMe": "أنت وحدك ترى هذا. يمكنك مشاركة إدخالات منفردة لاحقًا.",
+      "whoSees": "من يراه:",
+      "less": "أقل: {what}",
+      "more": "أكثر: {what}",
+      "item": {
+        "water": "الماء",
+        "sleep": "النوم",
+        "meals": "الوجبات",
+        "plan": "خطة المدرب",
+        "mood": "المزاج",
+        "cravings": "الرغبة الشديدة"
+      },
+      "water": {
+        "add": "+1 كوب",
+        "glasses": "{filled} من {goal} أكواب",
+        "added": "أُضيف كوب ({ml} مل)",
+        "dropsLabel": "أكواب اليوم",
+        "remove": "إزالة هذا الكوب"
+      },
+      "sleep": {
+        "title": "النوم",
+        "night": "الليل",
+        "nap": "قيلولة",
+        "bed": "ذهبت إلى النوم",
+        "wake": "استيقظت",
+        "napMinutes": "دقائق",
+        "duration": "{hours} س {minutes} د",
+        "quality": "الجودة (من 1 إلى 5)",
+        "qualityValue": "الجودة {quality}/5",
+        "napValue": "قيلولة {minutes} د",
+        "empty": "غير مسجّل",
+        "tap": "اضغط لتسجيل الليلة",
+        "fromDevice": "من {source}",
+        "corrected": "من {source}، صحّحته أنت"
+      },
+      "source": {
+        "manual": "أنت",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "وجبة",
+        "slot": "أي وجبة",
+        "logged": "مسجّلة",
+        "addSnack": "+ وجبة خفيفة",
+        "fitLabel": {
+          "plan": "والخطة؟",
+          "own": "كما أردت؟"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "ضمن الخطة",
+            "off_plan": "خارج الخطة"
+          },
+          "own": {
+            "in_plan": "كما أردت",
+            "off_plan": "بشكل مختلف"
+          }
+        },
+        "photo": "صورة (اختياري)",
+        "photoAdd": "أضف صورة",
+        "photoChange": "غيّر الصورة",
+        "photoRemove": "إزالة",
+        "photoUploading": "جارٍ الرفع…",
+        "photoFailed": "لم تُرفع الصورة. حاول مجددًا أو احفظ بدونها.",
+        "photoPrivate": "خاصة، مثل صور الجسم. لا تذهب أبدًا إلى منشور دون سؤالك.",
+        "note": "سطر عنها (اختياري)",
+        "portions": "حصص باليد (اختياري)",
+        "portionsHint": "كف، حفنة، قبضة، إبهام. الأنصاف مقبولة. بلا وزن ولا سعرات.",
+        "hungerLabel": "الجوع والشبع (اختياري)",
+        "hunger": "كم كنت جائعًا قبلها (1 إلى 5)",
+        "fullness": "كم شبعت بعدها (1 إلى 5)"
+      },
+      "slot": {
+        "breakfast": "الفطور",
+        "morning_snack": "وجبة خفيفة صباحية",
+        "lunch": "الغداء",
+        "afternoon_snack": "وجبة خفيفة بعد الظهر",
+        "dinner": "العشاء",
+        "evening_snack": "وجبة خفيفة مسائية",
+        "snack": "وجبة خفيفة",
+        "pre_workout": "قبل التمرين",
+        "post_workout": "بعد التمرين"
+      },
+      "portion": {
+        "protein": "البروتين (كف)",
+        "carbs": "الكربوهيدرات (حفنة)",
+        "veg": "الخضار (قبضة)",
+        "fat": "الدهون (إبهام)"
+      },
+      "plan": {
+        "title": "التغذية · {title}",
+        "showNumbers": "أظهر الأرقام",
+        "hideNumbers": "أخفِ الأرقام",
+        "of": "{logged} من {target}",
+        "noPortions": "خطة مدربك لا تحتوي بعد على حصص يومية."
+      },
+      "mood": {
+        "mood": "المزاج {value}/4",
+        "stress": "التوتر {value}/4",
+        "empty": "كيف تشعر؟",
+        "open": "أجب عن «كيف أشعر»"
+      },
+      "craving": {
+        "title": "الرغبة الشديدة",
+        "tileTitle": "سجّلها أو اطلب الدعم",
+        "tileHint": "في لحظتها؛ يمكن أن تضيف النتيجة لاحقًا",
+        "count": "{count, plural, one {# اليوم} other {# اليوم}}",
+        "edit": "تعديل",
+        "support": "أحتاج إلى دعم",
+        "supportNoBuddy": "عندما تختار رفيقًا، تصله رسالة قصيرة. لا تصله التفاصيل أبدًا.",
+        "intensity": "ما شدتها؟",
+        "trigger": "ما الذي أثارها؟",
+        "outcome": "ماذا حدث؟",
+        "note": "ما الذي أردته (اختياري)",
+        "notePlaceholder": "مثلًا شيء حلو بعد العشاء",
+        "tryNow": "جرّب الآن",
+        "tryWater": "كوب ماء",
+        "tryWalk": "مشي لمدة 10 دقائق",
+        "tryWait": "انتظر 10 دقائق وتنفّس ببطء",
+        "waterCounted": "احتُسب",
+        "private": "أنت وحدك تراها. سنسألك مرة واحدة، بعد 20 دقيقة، كيف سارت الأمور.",
+        "howDidItGo": "كيف سارت الأمور؟"
+      },
+      "trigger": {
+        "stress": "التوتر",
+        "fatigue": "التعب",
+        "boredom": "الملل",
+        "social": "اجتماعي",
+        "hunger": "الجوع",
+        "other": "شيء آخر"
+      },
+      "outcome": {
+        "resisted": "تجاوزتها",
+        "ate_off_plan": "أكلت شيئًا خارج الخطة",
+        "ongoing": "ما زالت لديّ"
+      },
+      "week": {
+        "title": "هذا الأسبوع",
+        "range": "{from} – {to}",
+        "previous": "الأسبوع السابق",
+        "next": "الأسبوع التالي",
+        "item": "العنصر",
+        "line": "النوم ضمن هدفك {nights} من {days} ليالٍ · الماء ضمن هدفك {water} من {days} أيام",
+        "dot": {
+          "full": "ضمن هدفك",
+          "half": "جزئيًا",
+          "empty": "لا شيء مسجّل",
+          "warm": "سُجّلت رغبة"
+        }
+      },
+      "consent": {
+        "title": "ماؤك ونومك ووجباتك ورغباتك",
+        "body": "ما تسجّله هنا بيانات صحية. تبقى ملكك وخاصة: لا يرى مدربك إدخالًا إلا إذا شاركته، ويمكنك تصدير كل شيء أو حذفه في أي وقت.",
+        "items": "ماذا تريد أن ترى؟",
+        "later": "يمكنك تغيير ذلك في أي وقت من «تخصيص».",
+        "agree": "أوافق ولنبدأ"
+      },
+      "settings": {
+        "items": "العناصر والترتيب",
+        "hiddenKeeps": "العنصر الذي توقفه يختفي من البطاقة والأسبوع وإدخال جديد. تبقى بياناته حتى تحذفها.",
+        "moveUp": "تحريك {item} لأعلى",
+        "moveDown": "تحريك {item} لأسفل",
+        "water": "الماء",
+        "glass": "كوبك",
+        "ml": "{ml} مل",
+        "goalGlasses": "الهدف اليومي (أكواب)",
+        "reminder": "تذكير بعد الظهر",
+        "reminderHint": "مرة واحدة، بعد 15:00، إذا كنت دون نصف هدفك",
+        "goalYours": "الأهداف لك. يمكن للمدرب أن يقترح هدفًا لكنه لا يحدده أبدًا.",
+        "sleep": "النوم",
+        "sleepGoal": "هدف النوم (ساعات)",
+        "data": "بياناتك",
+        "section": {
+          "wellness": "الماء والنوم والوجبات",
+          "cravings": "الرغبات"
+        },
+        "export": "تصدير (JSON)",
+        "erase": "حذف الكل",
+        "eraseConfirm": "نعم، احذف نهائيًا",
+        "eraseWarning": "يحذف هذا نهائيًا كل إدخال في هذا القسم، مع صور الوجبات.",
+        "erased": "تم الحذف."
+      },
+      "feed": {
+        "water": "{count, plural, zero {# أكواب} one {كوب واحد} two {كوبان} few {# أكواب} many {# كوبًا} other {# كوب}}",
+        "meals": "{count, plural, zero {# وجبات} one {وجبة واحدة} two {وجبتان} few {# وجبات} many {# وجبة} other {# وجبة}}",
+        "craving": "رغبة · {intensity}/10",
+        "empty": "العافية"
+      },
+      "error": {
+        "health_data_consent_required": "وافق أولًا على حفظ البيانات الصحية.",
+        "occurred_in_future": "هذا الوقت في المستقبل.",
+        "occurred_too_long_ago": "يمكنك الإكمال أو التصحيح حتى 7 أيام مضت.",
+        "invalid_wellness_value": "تحقق من القيم وحاول مجددًا.",
+        "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
+      }
+    }
   },
   "Community": {
     "all": "الكل",
@@ -5963,7 +6196,8 @@
     "notif_event_guest_joined_body": "{person} قادم إلى «{event}» بتصريح الضيف الخاص بك.",
     "notif_event_trial_offer_title": "جرّب حصة",
     "notif_event_trial_offer_body": "أعجبتك «{event}»؟ {box} يدعوك إلى حصة تجريبية.",
-    "notif_event_message_title": "رسالة حول «{event}»"
+    "notif_event_message_title": "رسالة حول «{event}»",
+    "findNearbyLater": "الأندية القريبة منك قادمة مع «حولي»."
   },
   "CommunityAdmin": {
     "title": "المجتمع",
@@ -6196,7 +6430,9 @@
     "err_nobody_to_offer": "لا أحد ممن حضروا ينتظر عرضًا تجريبيًا.",
     "err_trials_disabled": "البوكس لا يقبل حصصًا تجريبية حاليًا.",
     "eventsSegments": "أي فعاليات",
-    "nearMe": "بالقرب مني"
+    "nearMe": "بالقرب مني",
+    "fieldGoodForFriends": "مناسب للأصدقاء",
+    "goodForFriendsHint": "يظهر أولًا عندما يدعو الأعضاء أصدقاءهم إلى فعالية."
   },
   "EventsAdmin": {
     "emptyUpcoming": "لا فعاليات قادمة. أنشئ واحدة عبر «+ فعالية جديدة».",
@@ -6752,5 +6988,506 @@
     "prSavedBody": "هل تريد مشاركته مع البوكس الخاص بك؟ أضف صورة أو فيديو إن شئت.",
     "prShare": "شاركه",
     "prNotNow": "ليس الآن"
+  },
+  "Body": {
+    "title": "الجسم",
+    "settingsLink": "الإعدادات",
+    "newMeasure": "قياس جديد",
+    "editMeasure": "تعديل القياس",
+    "older": "قياسات أقدم",
+    "loading": "جارٍ التحميل…",
+    "offTitle": "قسم الجسم متوقف",
+    "offBody": "أوقفت قسم الجسم، لذلك هو مخفي في يومياتك. قياساتك محفوظة.",
+    "turnOn": "أعد تشغيل قسم الجسم",
+    "emptyTitle": "جسمك، بخصوصية",
+    "emptyBody": "يحفظ قسم الجسم القياسات، والصور إن أردت، عبر الزمن لترى تقدمك أنت. كل الحقول اختيارية.",
+    "emptyPrivacy": "خاص افتراضيًا: لا يراه أحد غيرك إلا إذا شاركت قياسًا مع مدربك.",
+    "chartLabel": "الرسم البياني",
+    "chartEyebrow": "{metric} · {range}",
+    "chartTrendEyebrow": "{metric} · الاتجاه · {range}",
+    "chartTrendNote": "بلا أرقام · يمكن تغييره من الإعدادات",
+    "chartTrendAria": "{metric}: {trend}",
+    "chartAria": "{metric}: {value}، التغيّر {change}",
+    "chartAriaOne": "{metric}: {value}",
+    "chartHiddenTitle": "{metric}: مخفي",
+    "chartHiddenBody": "اخترت ألا تراه. ما زال بإمكانك تسجيله لمدربك.",
+    "chartNoData": "لا توجد قياسات في هذه الفترة.",
+    "changeInSettings": "غيّره من الإعدادات",
+    "metricsLabel": "المقياس",
+    "rangeLabel": "الفترة",
+    "compareTitle": "مقارنة",
+    "compareRange": "{from} ↔ {to}",
+    "compareNoPhotos": "لا توجد صور للوضعية نفسها في التاريخين.",
+    "compareNeedTwo": "تحتاج إلى قياسين للمقارنة.",
+    "compareNoMetrics": "لا يوجد مقياس مسجّل في التاريخين.",
+    "compareFrom": "من",
+    "compareTo": "إلى",
+    "compareChanges": "التغيّرات",
+    "compareModeLabel": "العرض",
+    "compareWith": "قارن",
+    "modeSlider": "منزلق",
+    "modeSideBySide": "جنبًا إلى جنب",
+    "openCompare": "افتح المقارنة",
+    "photosPrivate": "صور خاصة · لا يراها أحد غيرك",
+    "photosCoach": "مدربك يرى هذه الصور",
+    "snapshotsTitle": "السجلات",
+    "summaryPart": "{metric} {value}",
+    "summaryEmpty": "قياس",
+    "photoCount": "{count, plural, one {صورة واحدة} other {# صور}}",
+    "photoProcessing": "جارٍ المعالجة…",
+    "photoFailed": "لم تُعالَج",
+    "tapToShow": "اضغط للعرض",
+    "revealPhoto": "اعرض الصورة {label}",
+    "revealCompare": "اعرض الصور",
+    "dividerLabel": "فاصل بين الصورتين",
+    "trendOnly": "الاتجاه فقط",
+    "trendNotYet": "لا توجد قياسات كافية بعد",
+    "shareAria": "شارك صورة قبل وبعد",
+    "shareTitle": "شارك صورة قبل وبعد",
+    "shareExplain": "ينشئ هذا منشورًا بصورتين للوضعية نفسها، قبل وبعد. لا يُضاف أي قياس؛ اكتبه بنفسك إن أردت.",
+    "shareBefore": "قبل",
+    "posesLabel": "الوضعية",
+    "shareNoPose": "لا توجد صورة جاهزة للوضعية نفسها في هذين التاريخين.",
+    "shareText": "نص (اختياري)",
+    "shareTextPlaceholder": "بضع كلمات عن تقدمك",
+    "shareAudience": "من يرى المنشور",
+    "shareConfirmTitle": "هل تنشر هذه الصور؟",
+    "shareConfirmBody": "ستُنشر صورك «{pose}» من {from} و{to} لـ: {audience}.",
+    "shareNoNumbers": "تبقى قياساتك خاصة. يمكنك حذف المنشور في أي وقت.",
+    "shareConfirmAction": "نعم، انشرها",
+    "sharing": "جارٍ النشر…",
+    "shareDoneTitle": "تم النشر",
+    "shareDoneBody": "صورة القبل والبعد موجودة في منشوراتك.",
+    "channelLabel": "{club} › {channel}",
+    "next": "التالي",
+    "back": "رجوع",
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "photosLabel": "الصور",
+    "optional": "اختياري",
+    "photosHint": "تعرض الكاميرا صورتك السابقة بشفافية فوق الصورة، للوضعية والمسافة نفسيهما.",
+    "photosDeclined": "بلا صور هذه المرة.",
+    "photosAddAnyway": "أضف صورًا",
+    "addPose": "أضف صورة: {pose}",
+    "retakePose": "أعد التصوير: {pose}",
+    "removePose": "أزل الصورة: {pose}",
+    "poseAdd": "+ {pose}",
+    "poseDone": "✓ {pose}",
+    "uploading": "جارٍ الرفع…",
+    "uploadFailed": "فشل",
+    "uploadFailedLong": "لم تُرفع إحدى الصور. أزلها أو التقطها من جديد.",
+    "measurementsLabel": "القياسات",
+    "howToMeasure": "كيف أقيس؟",
+    "hintsExplain": "القيم الباهتة من المرة السابقة.",
+    "otherMeasure": "+ قياس آخر",
+    "lastTimeHint": "المرة السابقة: {value} {unit}",
+    "hiddenFieldNote": "مخفي عنك؛ يراه مدربك فقط إذا شاركته.",
+    "whenLabel": "التاريخ والوقت",
+    "notesLabel": "ملاحظات",
+    "notesPlaceholder": "لا يراها أحد غيرك",
+    "whoSees": "من يراه",
+    "needOne": "أضف قياسًا واحدًا أو صورة واحدة على الأقل.",
+    "saving": "جارٍ الحفظ…",
+    "waitUploads": "بانتظار الصور…",
+    "saveSnapshot": "احفظ السجل",
+    "saveChanges": "احفظ التغييرات",
+    "edit": "تعديل",
+    "delete": "حذف",
+    "deleteTitle": "هل تحذف هذا القياس؟",
+    "deleteBody": "تُحذف قيمه وصوره نهائيًا.",
+    "deleteConfirm": "احذف نهائيًا",
+    "cameraTitle": "صورة: {pose}",
+    "cameraPreview": "الكاميرا",
+    "cameraPreviewAlt": "الصورة التي التقطتها: {pose}",
+    "cameraUnavailable": "الكاميرا غير متاحة. اختر صورة من المعرض.",
+    "ghostOpacity": "الصورة السابقة",
+    "fromGallery": "من المعرض",
+    "takePhoto": "التقط الصورة",
+    "cancelTimer": "أوقف المؤقت",
+    "timerOn": "مؤقت {seconds} ث",
+    "timerOff": "بلا مؤقت",
+    "switchCamera": "بدّل الكاميرا",
+    "retake": "أعد",
+    "keep": "احتفظ بها",
+    "consentTitle": "صور الجسم",
+    "consentLead": "لا يراها أحد غيرك.",
+    "consentStored": "تُحفظ بشكل خاص، بلا رابط عام، وتُزال بيانات الموقع منها.",
+    "consentWho": "يراها مدربك فقط إذا اخترت ذلك في القياس.",
+    "consentDelete": "يمكنك حذفها كلها متى شئت.",
+    "consentAgree": "أوافق",
+    "consentDecline": "بلا صور",
+    "weightDisplayQuestion": "كيف تريد أن ترى وزنك؟",
+    "weightDisplayIntro": "نسبة الدهون تتبع الاختيار نفسه. يمكنك تغييره من الإعدادات.",
+    "saveChoice": "حفظ",
+    "helpTitle": "كيف أقيس؟",
+    "helpIntro": "بشريط قياس ليّن، على الجلد، ملاصق دون شدّ. قِس في الوقت نفسه من اليوم، والأفضل صباحًا.",
+    "helpPhotos": "للصور: المكان نفسه، والإضاءة نفسها، والمسافة نفسها. يمنحك المؤقت 10 ثوانٍ للابتعاد.",
+    "settingsTitle": "إعدادات الجسم",
+    "settingsHubHint": "الوحدات، الوزن، الصور، التذكير",
+    "settingsIntro": "بيانات جسمك خاصة افتراضيًا. هنا تختار كيف تظهر ومن يراها.",
+    "unitsLabel": "الوحدات",
+    "sectionsLabel": "أقسام اليوميات",
+    "sectionsHint": "القسم المتوقف يختفي من يومياتك؛ لا يُحذف شيء.",
+    "reminderLabel": "تذكير بالقياس",
+    "reminderOff": "متوقف",
+    "reminderEvery": "كل {weeks} أسابيع",
+    "reminderHint": "إشعار قصير، بلا أرقام.",
+    "blurLabel": "اجعل الصور ضبابية حتى أضغط عليها",
+    "blurHint": "مفيد في النادي",
+    "consentStatusLabel": "الموافقة على صور الجسم",
+    "consentActive": "مُنحت في {date}.",
+    "consentWithdrawn": "سُحبت في {date}. لا يرى مدربك أي صور.",
+    "consentNone": "لم تُمنح بعد. تُطلب مع صورتك الأولى.",
+    "withdrawHint": "سحب الموافقة يخفي كل الصور عن المدربين فورًا. تبقى الصور لك حتى تحذفها.",
+    "withdraw": "اسحب الموافقة",
+    "deleteAll": "احذف كل الصور",
+    "deleteAllTitle": "هل تحذف كل صور الجسم؟",
+    "deleteAllBody": "تُحذف كل صورة للجسم نهائيًا. وتُحذف أيضًا القياسات التي لم يكن فيها سوى صور.",
+    "deleteAllConfirm": "نعم، احذف الكل",
+    "deleteAllDone": "{count, plural, one {حُذفت صورة واحدة.} other {حُذفت # صور.}}",
+    "defaultVisibilityLabel": "من يرى القياس الجديد",
+    "accessLogLabel": "من اطّلع",
+    "accessLogHint": "كل مرة فتح فيها مدرب قياسات شاركتها.",
+    "accessLogEmpty": "لم يفتح أي مدرب قياساتك.",
+    "accessLogPhotos": "مع الصور",
+    "aCoach": "مدرب",
+    "coachNotice": "يرى {name} متى فتحت هذه الصفحة.",
+    "coachEmpty": "لم يشارك {name} أي قياس معك.",
+    "coachLoadError": "تعذّر تحميل القياسات.",
+    "coachNoNumbers": "القياسات المشتركة لا تحتوي على أرقام يمكنك رؤيتها.",
+    "coachNoPhotos": "لا توجد صور مشتركة للوضعية نفسها في التاريخين.",
+    "coachShared": "القياسات المشتركة",
+    "coachWithPhotos": "مع الصور",
+    "coachWithoutPhotos": "بلا صور",
+    "coachWeightChoice": "اختار {name} ألا يرى الوزن كرقم، لذلك لا تراه أنت أيضًا.",
+    "metric": {
+      "weight": "الوزن",
+      "body_fat": "نسبة الدهون",
+      "waist": "الخصر",
+      "hips": "الوركان",
+      "chest": "الصدر",
+      "arm": "الذراع",
+      "thigh": "الفخذ",
+      "neck": "الرقبة",
+      "calf": "ربلة الساق",
+      "arm_left": "الذراع اليسرى",
+      "arm_right": "الذراع اليمنى",
+      "thigh_left": "الفخذ الأيسر",
+      "thigh_right": "الفخذ الأيمن"
+    },
+    "metricShort": {
+      "weight": "الوزن",
+      "body_fat": "الدهون",
+      "waist": "الخصر",
+      "hips": "الوركان",
+      "chest": "الصدر",
+      "arm": "الذراع",
+      "thigh": "الفخذ",
+      "neck": "الرقبة",
+      "calf": "الساق",
+      "arm_left": "الذراع اليسرى",
+      "arm_right": "الذراع اليمنى",
+      "thigh_left": "الفخذ الأيسر",
+      "thigh_right": "الفخذ الأيمن"
+    },
+    "pose": {
+      "front": "أمام",
+      "side": "جانب",
+      "back": "خلف",
+      "other": "أخرى"
+    },
+    "range": {
+      "1m": "1ش",
+      "3m": "3ش",
+      "1y": "1س",
+      "all": "الكل"
+    },
+    "rangeLong": {
+      "1m": "شهر",
+      "3m": "3 أشهر",
+      "1y": "سنة",
+      "all": "الكل"
+    },
+    "trend": {
+      "steady": "ثابت",
+      "slightly_down": "انخفاض طفيف",
+      "down": "انخفاض",
+      "slightly_up": "ارتفاع طفيف",
+      "up": "ارتفاع"
+    },
+    "visibility": {
+      "private": "أنا فقط",
+      "coach_numbers": "مدربي (بلا صور)",
+      "coach_full": "مدربي (مع الصور)"
+    },
+    "visibilityShort": {
+      "private": "أنا فقط",
+      "coach_numbers": "المدرب · بلا صور",
+      "coach_full": "المدرب · مع الصور"
+    },
+    "visibilityHint": {
+      "private": "لا يراه أحد غيرك",
+      "coach_numbers": "يرى مدربك القياسات، لا الصور",
+      "coach_full": "يرى مدربك القياسات والصور"
+    },
+    "weightDisplay": {
+      "number": "رقم",
+      "trend": "الاتجاه فقط",
+      "hidden": "مخفي"
+    },
+    "weightDisplayHint": {
+      "number": "القيمة وتغيّرها",
+      "trend": "خط مُنعَّم وكلمات، دون أي رقم",
+      "hidden": "ما زال بإمكانك تسجيله لمدربك"
+    },
+    "weightDisplayFormNote": {
+      "trend": "يظهر الوزن والدهون كاتجاه فقط؛ الأرقام التي تكتبها تُحفظ لكنها لا تُعرض.",
+      "hidden": "الوزن والدهون مخفيان عنك؛ سجّلهما فقط إذا احتاجهما مدربك."
+    },
+    "units": {
+      "metric": "مترية (كغ، سم)",
+      "imperial": "إمبراطورية (رطل، بوصة)"
+    },
+    "section": {
+      "body": "الجسم",
+      "wellness": "العافية",
+      "cravings": "الرغبة الشديدة"
+    },
+    "audience": {
+      "followers": "متابعيّ",
+      "public": "الجميع"
+    },
+    "audienceHint": {
+      "followers": "الأشخاص الذين يتابعونك",
+      "public": "أي شخص على Milos"
+    },
+    "accessLogEntry": {
+      "list": "اطّلع {coach} على قياساتك · {date}",
+      "snapshot": "فتح {coach} قياسًا · {date}",
+      "series": "اطّلع {coach} على رسم بياني لقياساتك · {date}"
+    },
+    "fieldError": {
+      "invalid": "اكتب رقمًا",
+      "range": "تحقق من هذه القيمة"
+    },
+    "help": {
+      "waist": "حول أضيق نقطة، عادةً فوق السرة مباشرة، بعد الزفير.",
+      "hips": "حول أعرض نقطة في الأرداف، مع ضم القدمين.",
+      "chest": "حول أعرض جزء من الصدر، مع إرخاء الذراعين.",
+      "arm": "حول منتصف العضد، وهو مرتخٍ.",
+      "thigh": "حول أسمك جزء من الفخذ، وقوفًا.",
+      "neck": "أسفل تفاحة آدم مباشرة.",
+      "calf": "حول أعرض جزء من ربلة الساق، وقوفًا."
+    },
+    "errors": {
+      "invalid_metric": "تحقق من هذا القياس.",
+      "snapshot_empty": "أضف قياسًا واحدًا أو صورة واحدة على الأقل.",
+      "invalid_body_visibility": "اختر من يرى هذا القياس.",
+      "body_notes_too_long": "الملاحظات 2000 حرف كحد أقصى.",
+      "invalid_pose": "اختر أمام أو جانب أو خلف.",
+      "too_many_body_photos": "يتسع القياس لأربع صور كحد أقصى.",
+      "pose_taken": "لهذا القياس صورة لهذه الوضعية بالفعل.",
+      "body_photo_consent_required": "وافق أولًا على حفظ صور الجسم؛ تبقى خاصة ما لم تشاركها.",
+      "invalid_taken_at": "تحقق من تاريخ القياس.",
+      "share_confirmation_required": "أكّد أنك تريد نشر هذه الصور.",
+      "share_needs_two_snapshots": "اختر قياسين مختلفين.",
+      "share_photo_missing": "يحتاج كلا القياسين إلى صورة جاهزة لهذه الوضعية.",
+      "media_not_ready": "ما زالت إحدى الصور قيد المعالجة. حاول بعد قليل."
+    }
+  },
+  "Referrals": {
+    "title": "أحضر صديقًا",
+    "pickBox": "أي نادٍ",
+    "noBox": "انضم إلى نادٍ لتدعو أصدقاءك إليه.",
+    "loading": "جارٍ التحميل…",
+    "loadFailed": "تعذّر تحميل دعواتك. حاول مجددًا بعد قليل.",
+    "shareLink": "شارك الرابط",
+    "showQr": "اعرض رمز QR",
+    "copied": "تم نسخ الرابط",
+    "shareText": "تعال وتدرّب معي في {box}",
+    "offer": {
+      "friend": "لصديقك: {gift}",
+      "friendNothing": "ادعُ صديقًا ليتدرّب معك",
+      "you": "لك: {reward}، {when}",
+      "cap": "{count, plural, zero {حتى # صديق في السنة} one {حتى صديق واحد في السنة} two {حتى صديقين في السنة} few {حتى # أصدقاء في السنة} many {حتى # صديقًا في السنة} other {حتى # صديق في السنة}}",
+      "staff": "شارك الرابط مع من تشاء. المكافآت للأعضاء.",
+      "noProgram": "لا يوجد لدى ناديك برنامج إحالة حاليًا. رابطك يعمل كالمعتاد ويظهر أصدقاؤك هنا."
+    },
+    "events": {
+      "title": "ادعُ إلى فعالية",
+      "shareText": "تعال معي إلى {title}",
+      "free": "مجانًا",
+      "invite": "ادعُ",
+      "goodForFriends": "مناسب للأصدقاء"
+    },
+    "list": {
+      "title": "دعواتك",
+      "empty": "لا أحد بعد. شارك رابطك أو ادعُ صديقًا إلى فعالية: إنها أسهل بداية.",
+      "totals": "{invited} مدعوون · {trials} حصص تجريبية · {paid} اشتراكات",
+      "someone": "شخص ما",
+      "earned": "حصلت على {reward}"
+    },
+    "newLink": {
+      "action": "رابط جديد",
+      "confirm": "سيتوقف رابطك ورمز QR الحاليان عن العمل. الأصدقاء الذين دعوتهم يبقون لك.",
+      "yes": "أنشئ رابطًا جديدًا",
+      "no": "احتفظ بهذا"
+    },
+    "qr": {
+      "title": "رمز QR لدعوتك",
+      "close": "إغلاق",
+      "alt": "رمز QR لرابط دعوتك",
+      "hint": "يمسحه صديقك بكاميرا هاتفه."
+    },
+    "gift": {
+      "freeDays": "{days, plural, zero {# يوم مجانًا} one {يوم واحد مجانًا} two {يومان مجانًا} few {# أيام مجانًا} many {# يومًا مجانًا} other {# يوم مجانًا}}",
+      "credit": "رصيد {amount}"
+    },
+    "reward": {
+      "credit": "رصيد {amount}",
+      "discount": "خصم {percent}% على التجديد",
+      "freePeriod": "{days, plural, zero {# يوم مجانًا} one {يوم واحد مجانًا} two {يومان مجانًا} few {# أيام مجانًا} many {# يومًا مجانًا} other {# يوم مجانًا}}",
+      "manual": "هدية من النادي"
+    },
+    "when": {
+      "trial": "عندما يحضر حصة تجريبية",
+      "paid": "عندما يشترك"
+    },
+    "stage": {
+      "signed_up": "سجّل",
+      "event": "حضر فعالية",
+      "trial": "حضر حصة تجريبية",
+      "joined": "انضم إلى النادي",
+      "paid": "اشترك"
+    },
+    "status": {
+      "open": "قيد التقدّم",
+      "qualified": "محتسبة",
+      "capped": "فوق الحد السنوي",
+      "expired": "انتهت",
+      "void": "غير محتسبة"
+    },
+    "rewardStatus": {
+      "upcoming": "ليس بعد",
+      "pending": "بانتظار الموافقة",
+      "approved": "تمت الموافقة",
+      "given": "مُنحت",
+      "rejected": "لم تتم الموافقة",
+      "capped": "فوق الحد",
+      "none": "بلا مكافأة"
+    },
+    "channel": {
+      "link": "رابط",
+      "qr": "QR",
+      "event": "فعالية",
+      "guest_pass": "تصريح ضيف",
+      "staff": "الفريق"
+    },
+    "invite": {
+      "heading": "دعوة",
+      "title": "{name} يدعوك إلى {box}",
+      "titleNoName": "أنت مدعو إلى {box}",
+      "preview": "تدرّب مع صديق في {box} عبر Milos.",
+      "from": "{name} يدعوك للتدرّب في {box}",
+      "fromMember": "عضو يدعوك للتدرّب في {box}",
+      "toEvent": "…وإلى فعالية هناك.",
+      "gift": "لك: {gift}",
+      "giftWhen": "يمنحك إياه النادي مع باقتك الأولى.",
+      "signUp": "أنشئ حسابًا",
+      "signIn": "لدي حساب بالفعل",
+      "seeBox": "شاهد النادي",
+      "consent": "سيرى {name} اسمك الأول ومدى تقدّمك (التسجيل، الحصة التجريبية، الاشتراك). لا شيء آخر.",
+      "consentNoName": "سيرى العضو الذي دعاك اسمك الأول ومدى تقدّمك (التسجيل، الحصة التجريبية، الاشتراك). لا شيء آخر.",
+      "claiming": "جارٍ حفظ دعوتك…",
+      "failed": "تعذّر حفظ دعوتك الآن. سنحاول مجددًا عندما تفتح Milos في المرة القادمة.",
+      "alreadyMember": "أنت بالفعل في {box}، لذا لا تنطبق هذه الدعوة.",
+      "alreadyInvited": "دعوة عضو آخر احتُسبت لك بالفعل.",
+      "self": "هذا رابط دعوتك الخاص.",
+      "claimed": "تم. حُفظت دعوتك إلى {box}.",
+      "openMine": "افتح أحضر صديقًا",
+      "openEvent": "شاهد الفعالية",
+      "bookTrial": "احجز حصة تجريبية",
+      "gone": "هذه الدعوة لم تعد فعّالة",
+      "goneHint": "ربما تم استبدال الرابط. اطلب الرابط الجديد من صديقك.",
+      "home": "اذهب إلى Milos"
+    },
+    "notif": {
+      "progressTitle": "دعوتك",
+      "progress": {
+        "signed_up": "سجّل {person} عبر دعوتك.",
+        "event": "حضر {person} الفعالية التي دعوته إليها.",
+        "trial": "حضر {person} حصة تجريبية.",
+        "joined": "انضم {person} إلى النادي.",
+        "paid": "اشترك {person}."
+      },
+      "rewardTitle": "مكافأة الإحالة",
+      "reward": {
+        "approved": "تمت الموافقة على مكافأة إحالتك.",
+        "given": "مُنحت مكافأة إحالتك.",
+        "rejected": "لم تتم الموافقة على إحالتك."
+      },
+      "reviewTitle": "إحالة بانتظار الموافقة",
+      "reviewBody": "اشترك {person} بدعوة من {referrer}."
+    },
+    "staff": {
+      "title": "دعوات من الأعضاء",
+      "filter": "أي دعوات",
+      "filter_review": "للموافقة",
+      "filter_all": "الكل",
+      "stats": "آخر 90 يومًا: {open} قيد التقدّم · {qualified} محتسبة · {expired} منتهية",
+      "emptyReview": "لا شيء للموافقة.",
+      "empty": "لا دعوات بعد. يشارك الأعضاء روابطهم من أنا › أحضر صديقًا.",
+      "noReferrer": "عضو سابق",
+      "row": "{friend} ← {referrer}",
+      "panel": "دعوة",
+      "approve": "موافقة",
+      "reject": "رفض",
+      "given": "مُنحت",
+      "applyGift": "طبّق هدية الصديق",
+      "reassign": "انقلها إلى عضو آخر",
+      "status": "الحالة",
+      "void_staff": "الفريق لا يحصل على مكافآت",
+      "void_other": "غير محتسبة",
+      "channel": "كيف",
+      "newAccount": "حساب جديد",
+      "window": "صالحة",
+      "until": "حتى {date}",
+      "program": "البرنامج",
+      "reward": "مكافأة العضو",
+      "gift": "هدية الصديق",
+      "giftApplied": "طُبّقت في {date}",
+      "previous": "سابقًا",
+      "notes": "ملاحظات",
+      "newReferrer": "عضو جديد",
+      "reassignSave": "حفظ",
+      "cancel": "إلغاء",
+      "note": "ملاحظة (اختياري)",
+      "discountOnRenewal": "«مُنحت» يخصمه من فاتورة التجديد التالية للعضو."
+    },
+    "rules": {
+      "rewardNote": "ما يحصل عليه العضو (بالكلمات)",
+      "friendGift": "هدية الصديق",
+      "gift_free_days": "أيام مجانية على الباقة الأولى",
+      "gift_credit": "رصيد",
+      "gift_custom": "شيء آخر",
+      "gift_none": "لا شيء",
+      "giftDays": "أيام",
+      "giftEuros": "المبلغ (€)",
+      "giftNote": "ما يحصل عليه الصديق",
+      "counts": "تُحتسب الدعوة",
+      "counts_paid": "عند الدفعة الأولى",
+      "counts_trial": "عند الحصة التجريبية الأولى",
+      "approval": "المكافآت",
+      "approval_manual": "يوافق عليها الفريق",
+      "approval_auto": "تُعتمد تلقائيًا",
+      "window": "مدة صلاحية الدعوة (أيام)",
+      "cap": "الأصدقاء المكافَؤون لكل عضو سنويًا",
+      "capNone": "بلا حد",
+      "hint": "برنامج واحد نشط لكل نادٍ: تفعيل هذا يوقف الآخر. تحتفظ الدعوات بالشروط التي أُنشئت بها."
+    },
+    "tabs": {
+      "invite": "ادعُ",
+      "invites": "دعواتك · {count}"
+    }
   }
 }

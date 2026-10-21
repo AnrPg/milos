@@ -143,6 +143,9 @@ test.describe("trials", () => {
 
   test("Πρόγραμμα tags trial classes, filters them, and books one from its sheet", async ({ page }) => {
     const asks = await visitor(page);
+    // The class sits at 23:30 today; pin the browser clock to midday so it
+    // is still upcoming whenever the suite runs.
+    await page.clock.setFixedTime(todayAt(12));
     await page.goto(`/b/${box.slug}#schedule`);
 
     await expect(page.getByRole("button", { name: /Competitors/ })).toBeVisible();
