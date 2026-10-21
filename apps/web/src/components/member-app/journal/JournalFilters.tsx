@@ -95,7 +95,7 @@ export function JournalFilters({
           onClear={() => onChange(EMPTY_JOURNAL_FILTER)}
         >
           <FilterSection label={t("filter.search")}>
-            <SearchField value={filter.q ?? ""} onCommit={(q) => set({ q: q || null })} label={t("filter.search")} placeholder={t("filter.searchPlaceholder")} />
+            <SearchField key={filter.q ?? ""} value={filter.q ?? ""} onCommit={(q) => set({ q: q || null })} label={t("filter.search")} placeholder={t("filter.searchPlaceholder")} />
           </FilterSection>
           <FilterSection label={t("filter.source")}>
             <ChoiceChips ariaLabel={t("filter.source")} options={sources} selected={filter.sources} multiple onChange={(values) => set({ sources: values })} />
@@ -137,7 +137,6 @@ function SearchField({
   placeholder: string;
 }) {
   const [draft, setDraft] = useState(value);
-  useEffect(() => setDraft(value), [value]);
   useEffect(() => {
     const text = draft.trim();
     if (text === value || (text.length > 0 && text.length < 2)) return;

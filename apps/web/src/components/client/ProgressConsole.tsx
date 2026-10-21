@@ -4,26 +4,42 @@ import { useId, useMemo, useState } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 
-import { fetchMyProgress, type PRTimelineEntry, type ProgressStats, type ScoreHistorySeries } from "@/api/content";
+import {
+  ACCOUNT_PROGRESS_KEY,
+  fetchAccountProgress,
+  PROGRESS_RANGES,
+  type AccountProgress,
+  type AccountScoreSeries,
+  type ProgressQuery,
+} from "@/api/account-training";
+import type { ProgressStats } from "@/api/content";
 import { listPRs, type PRRecord } from "@/api/gamification";
 import { PRHistoryModal } from "@/components/pantheon/PRHistoryModal";
 import { formatPRScore, groupPRTimelineByMonth, prImprovement } from "@/components/client/pr-timeline";
 import { semanticLabel } from "@/i18n/presentation";
 import { useSession } from "@/components/session-provider";
 import { ClientCard, ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
-import { FeatureGate } from "@/components/client/FeatureGate";
+import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
+import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
+import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
 import { formatDay } from "@/components/client/format";
-import { scaleWeekly, sourceShares, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
+import { scaleWeekly, sparklinePoints, type WeeklyMetric } from "@/components/client/progress";
+import { SourceLabel } from "@/components/providers/SourceLabel";
+import { useSourceDirectory } from "@/components/providers/use-providers";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { DEFAULT_PROGRESS_FILTER, parseProgressFilter } from "@/lib/account-filters";
+import { sourceColor, sourceOptions, sourceToken } from "@/lib/provider-sources";
+import { useTranslations } from "next-intl";
 
 /**
  * Ημερολόγιο › Πρόοδος (ADR-137): streak, badges and scores for everyone,
- * then personal records, the history export and, with
- * `view_advanced_analytics`, the detailed statistics.
+ * then personal records, the history export and the statistics across every
+ * provider (ADR-162, board 17 Q4): «Όλοι» by default, a provider chip next to
+ * the time range narrows it.
  */
 export function ProgressConsole() {
   const i18n = useUiTranslations();
@@ -32,36 +48,115 @@ export function ProgressConsole() {
       <ProgressOverview />
       <PantheonSection />
       <HistoryExportCard />
-      <FeatureGate feature="progress">
-        <ProgressContent />
-      </FeatureGate>
+      <ProgressContent />
     </ClientPage>
   );
 }
 
 function ProgressContent() {
   const { tokens } = useSession();
+  const token = tokens?.access_token ?? null;
+  const { filter, setFilter } = useRememberedFilter("progress", parseProgressFilter, DEFAULT_PROGRESS_FILTER);
   const query = useQuery({
-    queryKey: ["me", "progress"],
-    enabled: Boolean(tokens?.access_token),
-    queryFn: () => fetchMyProgress(tokens!.access_token),
+    queryKey: [...ACCOUNT_PROGRESS_KEY, token, filter],
+    enabled: Boolean(token) && filter !== null,
+    queryFn: () => fetchAccountProgress(token!, filter!),
+    placeholderData: (previous) => previous,
   });
 
-  if (query.isPending) return <LoadingLine />;
-  if (query.isError) return <QueryProblem error={query.error} onRetry={() => void query.refetch()} />;
-
-  const progress = query.data;
   return (
     <div className="flex flex-col gap-4">
-      <Totals progress={progress} />
-      <WeeklyChart progress={progress} />
-      <div className="grid gap-4 md:grid-cols-2">
-        <Consistency progress={progress} />
-        <Sources progress={progress} />
-      </div>
-      <PRTimeline entries={progress.pr_timeline ?? []} />
-      <ScoreHistory series={progress.score_history} />
+      {filter ? <ProgressFilters filter={filter} onChange={setFilter} /> : null}
+      {filter === null || query.isPending ? (
+        <LoadingLine />
+      ) : query.isError ? (
+        <QueryProblem error={query.error} onRetry={() => void query.refetch()} />
+      ) : (
+        <>
+          <Totals progress={query.data} />
+          <WeeklyChart progress={query.data} />
+          <div className="grid gap-4 md:grid-cols-2">
+            <Consistency progress={query.data} />
+            <BySource progress={query.data} />
+          </div>
+          <PRTimeline entries={query.data.pr_timeline ?? []} />
+          <ScoreHistory series={query.data.score_history} />
+        </>
+      )}
     </div>
+  );
+}
+
+/** Time range, then «Όλοι ▾» (every provider) to narrow by source. */
+function ProgressFilters({ filter, onChange }: { filter: ProgressQuery; onChange: (filter: ProgressQuery) => void }) {
+  const t = useTranslations("Providers");
+  const directory = useSourceDirectory();
+  const [pageOpen, setPageOpen] = useState(false);
+  const sources = sourceOptions(directory, {
+    freeform: t("source.freeform"),
+    device: t("source.device"),
+    former: (name) => t("source.former", { name }),
+  });
+  const chips: FilterChip[] = [
+    {
+      key: "range",
+      kind: "menu",
+      label: t(`range.${filter.range}`),
+      options: PROGRESS_RANGES.map((range) => ({ value: range, label: t(`range.${range}`) })),
+      selected: [filter.range],
+      multiple: false,
+      onChange: (values) => onChange({ ...filter, range: (values[0] as ProgressQuery["range"]) ?? DEFAULT_PROGRESS_FILTER.range }),
+    },
+    {
+      key: "sources",
+      kind: "menu",
+      label: t("filter.allSources"),
+      options: sources,
+      selected: filter.sources,
+      multiple: true,
+      onChange: (values) => onChange({ ...filter, sources: values }),
+    },
+  ];
+  const count = (filter.sources.length > 0 ? 1 : 0) + (filter.exercise ? 1 : 0);
+  const clear = () => onChange({ ...DEFAULT_PROGRESS_FILTER, range: filter.range });
+  return (
+    <>
+      <FilterChipRow
+        ariaLabel={t("filter.title")}
+        activeCount={count}
+        onOpenFilters={() => setPageOpen(true)}
+        onClear={clear}
+        chips={chips}
+      />
+      {pageOpen ? (
+        <FilterPage title={t("filter.title")} onClose={() => setPageOpen(false)} onClear={clear}>
+          <FilterSection label={t("filter.exercise")}>
+            <input
+              type="search"
+              aria-label={t("filter.exercise")}
+              placeholder={t("filter.exercisePlaceholder")}
+              defaultValue={filter.exercise ?? ""}
+              maxLength={100}
+              onBlur={(event) => onChange({ ...filter, exercise: event.target.value.trim() || null })}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") onChange({ ...filter, exercise: event.currentTarget.value.trim() || null });
+              }}
+              className="min-h-11 w-full rounded-2xl px-4 text-sm outline-none"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
+            />
+          </FilterSection>
+          <FilterSection label={t("filter.source")}>
+            <ChoiceChips
+              ariaLabel={t("filter.source")}
+              options={sources}
+              selected={filter.sources}
+              multiple
+              onChange={(values) => onChange({ ...filter, sources: values })}
+            />
+          </FilterSection>
+        </FilterPage>
+      ) : null}
+    </>
   );
 }
 
@@ -182,50 +277,41 @@ function Consistency({ progress }: { progress: ProgressStats }) {
   );
 }
 
-function sourceLabel(source: string, i18n: ReturnType<typeof useUiTranslations>) {
-  switch (source) {
-    case "repeat":
-      return i18n("clSourceRepeat");
-    case "class_booking":
-      return i18n("clSourceClass");
-    case "assigned":
-      return i18n("clSourceAssigned");
-    case "self_selected":
-      return i18n("clSourceSelfSelected");
-    default:
-      return source.replaceAll("_", " ");
-  }
-}
-
-function Sources({ progress }: { progress: ProgressStats }) {
+/** Sessions per provider (and freeform, devices), largest first. */
+function BySource({ progress }: { progress: AccountProgress }) {
   const i18n = useUiTranslations();
-  const shares = sourceShares(progress.sources);
+  const t = useTranslations("Providers");
+  const directory = useSourceDirectory();
+  const total = progress.by_source.reduce((sum, row) => sum + row.sessions, 0);
   return (
-    <ClientCard title={i18n("clProgressSources")}>
-      {shares.length === 0 ? (
+    <ClientCard title={t("progress.bySource")}>
+      {progress.by_source.length === 0 || total === 0 ? (
         <EmptyLine>{i18n("clProgressSourcesEmpty")}</EmptyLine>
       ) : (
         <ul className="flex flex-col gap-2">
-          {shares.map((share) => (
-            <li key={share.source}>
-              <div className="flex justify-between gap-2 text-sm">
-                <span style={{ color: "var(--text-soft)" }}>{sourceLabel(share.source, i18n)}</span>
-                <span className="tabular-nums" style={{ color: "var(--dim)" }}>
-                  {share.count} · {i18n("clPercentValue", { value: share.percent })}
-                </span>
-              </div>
-              <div aria-hidden="true" className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
-                <div className="h-full rounded-full" style={{ width: `${share.percent}%`, background: "var(--info)" }} />
-              </div>
-            </li>
-          ))}
+          {progress.by_source.map((row) => {
+            const percent = Math.round((row.sessions / total) * 100);
+            return (
+              <li key={sourceToken(row.source)}>
+                <div className="flex items-center justify-between gap-2 text-sm">
+                  <SourceLabel source={row.source} directory={directory} always />
+                  <span className="tabular-nums" style={{ color: "var(--dim)" }}>
+                    {row.sessions} · {i18n("clPercentValue", { value: percent })}
+                  </span>
+                </div>
+                <div aria-hidden="true" className="mt-1 h-1.5 w-full overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
+                  <div className="h-full rounded-full" style={{ width: `${percent}%`, background: sourceColor(row.source, directory) }} />
+                </div>
+              </li>
+            );
+          })}
         </ul>
       )}
     </ClientCard>
   );
 }
 
-function ScoreHistory({ series }: { series: ScoreHistorySeries[] }) {
+function ScoreHistory({ series }: { series: AccountScoreSeries[] }) {
   const i18n = useUiTranslations();
   return (
     <ClientCard title={i18n("clProgressScores")}>
@@ -243,7 +329,7 @@ function ScoreHistory({ series }: { series: ScoreHistorySeries[] }) {
   );
 }
 
-function ScoreSeries({ series }: { series: ScoreHistorySeries }) {
+function ScoreSeries({ series }: { series: AccountScoreSeries }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const listId = useId();
@@ -293,7 +379,10 @@ function ScoreSeries({ series }: { series: ScoreHistorySeries }) {
               <time dateTime={point.completed_on}>
                 {formatDay(point.completed_on, locale, { weekday: undefined, month: "short" })}
               </time>
-              <bdi className="tabular-nums">{`${String(point.value)}${unit}`}</bdi>
+              <span className="flex items-center gap-2">
+                <SourceLabel source={point.source} />
+                <bdi className="tabular-nums">{`${String(point.value)}${unit}`}</bdi>
+              </span>
             </li>
           ))}
         </ol>
@@ -302,7 +391,7 @@ function ScoreSeries({ series }: { series: ScoreHistorySeries }) {
   );
 }
 
-function PRTimeline({ entries }: { entries: PRTimelineEntry[] }) {
+function PRTimeline({ entries }: { entries: AccountProgress["pr_timeline"] }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens } = useSession();
@@ -381,7 +470,8 @@ function PRTimeline({ entries }: { entries: PRTimelineEntry[] }) {
                           style={{ color: improvement.kind === "first" ? "var(--dim)" : "var(--success)" }}
                         >
                           (<bdi>{improvementText}</bdi>)
-                        </span>
+                        </span>{" "}
+                        <SourceLabel source={entry.source} />
                       </button>
                     </li>
                   );

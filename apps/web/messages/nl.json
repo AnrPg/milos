@@ -5424,7 +5424,8 @@
     "clearAll": "Alle filters wissen",
     "clear": "Wissen",
     "back": "Terug",
-    "showResults": "{count, plural, =0 {Geen resultaten} other {Toon #}}"
+    "showResults": "{count, plural, =0 {Geen resultaten} other {Toon #}}",
+    "show": "Toon"
   },
   "BoxSchedule": {
     "title": "Rooster",
@@ -7488,6 +7489,110 @@
     "tabs": {
       "invite": "Uitnodigen",
       "invites": "Je uitnodigingen · {count}"
+    }
+  },
+  "Providers": {
+    "loading": "Laden…",
+    "switchLabel": "{name}, wissel van aanbieder",
+    "sheetTitle": "Wie je traint",
+    "switching": "Wisselen…",
+    "current": "Nu zichtbaar",
+    "add": "Box of coach toevoegen",
+    "kind": {
+      "gym": "Box",
+      "coach": "Personal coach"
+    },
+    "nextToday": "Vandaag {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# bericht} other {# berichten}}",
+    "formerTitle": "Eerdere aanbieders ({count})",
+    "formerHint": "Wat je met hen hebt gedaan, blijft in je logboek, Vault en voortgang. Ze zien je items niet meer.",
+    "formerSince": "Gestopt op {date} · ziet je items niet meer",
+    "todayTitle": "Vandaag",
+    "todayEmpty": "Vandaag staat er niets gepland bij je aanbieders.",
+    "todayPartial": "Kon vandaag niet laden van {names}.",
+    "todayKind": {
+      "class": "Les",
+      "appointment": "Afspraak",
+      "program": "Programma",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Geboekt",
+      "pending": "Wacht op goedkeuring",
+      "waitlisted": "Wachtlijst",
+      "booked": "Geboekt",
+      "completed": "Klaar",
+      "in_progress": "Bezig",
+      "logged": "Gelogd"
+    },
+    "source": {
+      "freeform": "Vrij",
+      "device": "Apparaat",
+      "unknown": "Aanbieder",
+      "former": "{name} (eerder)"
+    },
+    "filter": {
+      "title": "Filters",
+      "source": "Bron",
+      "allSources": "Iedereen",
+      "kind": "Type",
+      "visibility": "Zichtbaarheid",
+      "dates": "Datums",
+      "from": "Van",
+      "to": "Tot",
+      "search": "Zoeken",
+      "searchPlaceholder": "Woorden in items en reacties",
+      "clearSearch": "Zoekopdracht ‘{q}’ wissen",
+      "discipline": "Discipline",
+      "benchmark": "Benchmark",
+      "exercise": "Oefening",
+      "exercisePlaceholder": "bijv. back squat",
+      "empty": "Niets past bij deze filters.",
+      "clear": "Filters wissen"
+    },
+    "range": {
+      "4w": "4 weken",
+      "12w": "3 maanden",
+      "6m": "6 maanden",
+      "1y": "1 jaar",
+      "all": "Alles"
+    },
+    "progress": {
+      "bySource": "Sessies per bron"
+    },
+    "vault": {
+      "intro": "Elke workout die je hebt afgerond, bij elke aanbieder. Dezelfde workout op verschillende plekken vormt één trend.",
+      "sources": "Gedaan bij"
+    },
+    "audience": {
+      "title": "Mijn coaches betekent",
+      "askTitle": "Wie bedoel je met ‘Mijn coaches’?",
+      "hint": "Elke aanbieder ziet altijd wat je bij hen hebt gedaan. Kies wiens coaches dit item zien.",
+      "makeDefault": "Voortaan gebruiken voor mijn coaches",
+      "only": "Alleen {names}",
+      "settingTitle": "Mijn coaches",
+      "settingDescription": "De coaches van welke aanbieders items zien die je deelt met ‘Mijn coaches’.",
+      "settingHint": "Als je een item met je coaches deelt, zien de coaches van deze aanbieders het. Je kunt dit per item beperken.",
+      "ownAlways": "Een aanbieder ziet altijd wat je bij hen hebt gedaan (hun lessen en programma’s)."
+    },
+    "export": {
+      "title": "Mijn logboek exporteren",
+      "description": "Je hele logboek, van alle aanbieders, als bestanden.",
+      "hint": "We maken een bestand met alle items van alle aanbieders, inclusief vrije items en apparaten. Dit duurt even; je kunt deze pagina verlaten.",
+      "request": "Exporteren",
+      "preparing": "Voorbereiden…",
+      "inProgress": "Er wordt al een export voorbereid.",
+      "history": "Je exports",
+      "status": {
+        "pending": "Voorbereiden",
+        "ready": "Klaar",
+        "failed": "Mislukt",
+        "expired": "Verlopen"
+      },
+      "entries": "{count, plural, one {# item} other {# items}}",
+      "download": "{name} downloaden",
+      "expires": "Beschikbaar tot {date}"
     }
   }
 }

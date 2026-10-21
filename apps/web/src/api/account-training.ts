@@ -1,7 +1,8 @@
 import { apiRequest } from "@/api/client";
-import type { PRTimelineEntry, ProgressStats } from "@/api/content";
+import type { PRTimelineEntry, ProgressStats, ScoreHistorySeries } from "@/api/content";
 import type { components } from "@/api/generated/schema";
 import type { EntrySource } from "@/api/providers";
+import type { TrainingHistoryPage } from "@/api/training-history";
 
 /**
  * The account read model (ADR-150, ADR-162): history, Πρόοδος and the Vault
@@ -10,9 +11,12 @@ import type { EntrySource } from "@/api/providers";
  */
 type RawProgress = components["schemas"]["AccountProgress"];
 
-export type AccountProgress = Omit<RawProgress, "totals" | "weekly" | "consistency" | "pr_timeline"> &
+type ScorePoint = ScoreHistorySeries["points"][number] & { source?: EntrySource };
+
+export type AccountProgress = Omit<RawProgress, "totals" | "weekly" | "consistency" | "pr_timeline" | "score_history"> &
   Pick<ProgressStats, "totals" | "weekly" | "consistency"> & {
     pr_timeline: (PRTimelineEntry & { source?: EntrySource })[];
+    score_history: (Omit<ScoreHistorySeries, "points"> & { points: ScorePoint[] })[];
   };
 export type AccountScoreSeries = AccountProgress["score_history"][number];
 export type AccountVault = components["schemas"]["AccountVault"];
@@ -95,4 +99,33 @@ export function fetchAccountHistory(
     })}`,
     { token, scope: "account" },
   );
+}
+
+/**
+ * An account history page in the shape the training-log list reads: the
+ * execution's own source stays `source`, where it came from is `provider`.
+ */
+export function asTrainingHistoryPage(page: AccountHistoryPage): TrainingHistoryPage {
+  return {
+    kind: page.kind,
+    offset: page.offset,
+    next_offset: page.next_offset,
+    total: page.total,
+    entries: page.entries.map((entry) => ({
+      id: entry.id,
+      occurred_at: entry.occurred_at,
+      class: entry.class ?? null,
+      source: entry.execution_source ?? null,
+      provider: entry.source,
+      workout: entry.workout ? { id: entry.workout.id ?? undefined, title: entry.workout.title, type: entry.workout.type } : null,
+      performance: entry.performance
+        ? {
+            ...entry.performance,
+            execution_id: entry.performance.execution_id ?? entry.id,
+            status: entry.performance.status ?? "completed",
+            scores: entry.performance.scores ?? [],
+          }
+        : null,
+    })),
+  };
 }

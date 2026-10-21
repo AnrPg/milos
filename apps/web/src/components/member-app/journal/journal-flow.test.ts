@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import type { JournalFeedItem, JournalFeedPage } from "@/api/journal";
 
-import { journalFlow, withVisibility } from "./journal-flow";
+import { journalFlow, withAudience, withVisibility } from "./journal-flow";
 
 const item = (overrides: Partial<JournalFeedItem>): JournalFeedItem => ({
   kind: "note",
@@ -54,5 +54,14 @@ describe("withVisibility", () => {
     });
 
     expect(moved.items.map((entry) => entry.journal_visibility)).toEqual(["coach_reply_requested", "private"]);
+  });
+});
+
+describe("withAudience (ADR-162)", () => {
+  it("sets one entry's coach audience and leaves the rest", () => {
+    const pages = [page([item({ id: "a" }), item({ id: "b", audience: { custom: false, organization_ids: ["gym"] } })])];
+    const next = withAudience(pages, { kind: "note", id: "a" }, { custom: true, organization_ids: ["coach"] });
+    expect(next[0].items[0].audience).toEqual({ custom: true, organization_ids: ["coach"] });
+    expect(next[0].items[1].audience).toEqual({ custom: false, organization_ids: ["gym"] });
   });
 });

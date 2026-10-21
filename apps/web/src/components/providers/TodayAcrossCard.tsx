@@ -56,7 +56,7 @@ export function TodayAcrossCard() {
   const directory = useSourceDirectory();
   const { switchTo, pending, error } = useSwitchProvider();
   const date = useMemo(() => localIsoDate(new Date()), []);
-  const timezone = useMemo(zone, []);
+  const timezone = useMemo(() => zone(), []);
   const multiple = (providers.data?.providers.length ?? 0) > 1;
   const today = useQuery({
     queryKey: [...MY_TODAY_KEY, date, timezone],

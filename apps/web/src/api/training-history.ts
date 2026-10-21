@@ -1,8 +1,16 @@
 import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
 
-export type TrainingHistoryPage = components["schemas"]["TrainingHistoryPage"];
-export type TrainingHistoryEntry = TrainingHistoryPage["entries"][number];
+type GymHistoryPage = components["schemas"]["TrainingHistoryPage"];
+
+/**
+ * A page of the training log. Pages from the account read model (ADR-162)
+ * carry `provider`, where each entry came from; per-gym pages do not.
+ */
+export type TrainingHistoryEntry = GymHistoryPage["entries"][number] & {
+  provider?: components["schemas"]["EntrySource"];
+};
+export type TrainingHistoryPage = Omit<GymHistoryPage, "entries"> & { entries: TrainingHistoryEntry[] };
 export type TrainingHistoryKind = "workouts" | "classes";
 
 const PAGE_SIZE = 10;

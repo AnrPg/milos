@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useInfiniteQuery, useQuery, useQueryClient, type InfiniteData } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -10,13 +10,11 @@ import {
   EMPTY_JOURNAL_FILTER,
   fetchJournalPage,
   JOURNAL_FEED_KEY,
-  type JournalFeedFilter,
   type JournalFeedPage,
   type JournalVisibilityResult,
   type TypedJournalItem,
   type WellnessFeedDay,
 } from "@/api/journal";
-import { fetchSavedFilters } from "@/api/saved-filters";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { ClientPage, EmptyLine, LoadingLine, QueryProblem } from "@/components/client/ClientPage";
@@ -31,6 +29,7 @@ import { NoteSheet } from "@/components/journal/NoteSheet";
 import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
 import { executionHistoryEntry, journalFlow, withAudience, withVisibility } from "@/components/member-app/journal/journal-flow";
 import { JournalFilters } from "@/components/member-app/journal/JournalFilters";
+import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { EntryAudienceNote } from "@/components/journal/EntryAudience";
 import { SourceLabel } from "@/components/providers/SourceLabel";
 import { useSourceDirectory } from "@/components/providers/use-providers";
@@ -48,34 +47,6 @@ import { latestCommentBody, sortComments } from "@/lib/journal-comments";
 import { effectiveJournalFilter, journalFilterCount, journalFilterKey, parseJournalFilter } from "@/lib/journal-filter";
 
 const PAGE_SIZE = 30;
-const SAVED_FILTERS_KEY = ["my", "filters", "journal"] as const;
-
-/**
- * The Ροή filter, starting from the one remembered on the account (ADR-151,
- * ADR-162) so it follows the member across devices. A change is remembered
- * with the first page it asks for.
- */
-function useJournalFilter(token: string | null) {
-  const saved = useQuery({
-    queryKey: [...SAVED_FILTERS_KEY, token],
-    enabled: Boolean(token),
-    queryFn: () => fetchSavedFilters(token!, "journal"),
-    staleTime: Infinity,
-    retry: false,
-  });
-  const [filter, setFilterState] = useState<JournalFeedFilter | null>(null);
-  const changed = useRef(false);
-  useEffect(() => {
-    if (filter !== null) return;
-    if (saved.isSuccess) setFilterState(parseJournalFilter(saved.data.last_used));
-    else if (saved.isError) setFilterState(EMPTY_JOURNAL_FILTER);
-  }, [filter, saved.isSuccess, saved.isError, saved.data]);
-  const setFilter = useCallback((next: JournalFeedFilter) => {
-    changed.current = true;
-    setFilterState(next);
-  }, []);
-  return { filter, setFilter, remember: changed };
-}
 
 /**
  * Ημερολόγιο › Ροή (brief §7.7, ADR-137, ADR-139): every entry the member
@@ -93,7 +64,10 @@ export function JournalFlow() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const directory = useSourceDirectory();
-  const { filter, setFilter, remember } = useJournalFilter(token);
+  // Starts from the filter remembered on the account (ADR-151, ADR-162), so
+  // it follows the member across devices; a change is remembered with the
+  // first page it asks for.
+  const { filter, setFilter, changed } = useRememberedFilter("journal", parseJournalFilter, EMPTY_JOURNAL_FILTER, false);
   const queryKey = [...JOURNAL_FEED_KEY, filter ? journalFilterKey(filter) : "pending"] as const;
   const feed = useInfiniteQuery({
     queryKey,
@@ -106,7 +80,7 @@ export function JournalFlow() {
         kinds: effective.kinds,
         filter: effective,
         limit: PAGE_SIZE,
-        remember: remember.current && !pageParam,
+        remember: changed && !pageParam,
       });
     },
     getNextPageParam: (last) => last.next_cursor ?? undefined,

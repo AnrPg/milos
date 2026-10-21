@@ -5424,7 +5424,8 @@
     "clearAll": "Effacer tous les filtres",
     "clear": "Effacer",
     "back": "Retour",
-    "showResults": "{count, plural, =0 {Aucun résultat} other {Afficher #}}"
+    "showResults": "{count, plural, =0 {Aucun résultat} other {Afficher #}}",
+    "show": "Afficher"
   },
   "BoxSchedule": {
     "title": "Planning",
@@ -7488,6 +7489,110 @@
     "tabs": {
       "invite": "Inviter",
       "invites": "Tes invitations · {count}"
+    }
+  },
+  "Providers": {
+    "loading": "Chargement…",
+    "switchLabel": "{name}, changer de structure",
+    "sheetTitle": "Qui t'entraîne",
+    "switching": "Changement…",
+    "current": "Affiché maintenant",
+    "add": "Ajouter une box ou un coach",
+    "kind": {
+      "gym": "Box",
+      "coach": "Coach perso"
+    },
+    "nextToday": "Aujourd'hui à {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# message} many {# messages} other {# messages}}",
+    "formerTitle": "Anciennes structures ({count})",
+    "formerHint": "Ce que tu as fait avec elles reste dans ton journal, ton Vault et ta progression. Elles ne voient plus tes entrées.",
+    "formerSince": "Terminé le {date} · ne voit plus tes entrées",
+    "todayTitle": "Aujourd'hui",
+    "todayEmpty": "Rien de prévu aujourd'hui avec tes structures.",
+    "todayPartial": "Impossible de charger aujourd'hui depuis {names}.",
+    "todayKind": {
+      "class": "Cours",
+      "appointment": "Rendez-vous",
+      "program": "Programme",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Réservé",
+      "pending": "En attente de validation",
+      "waitlisted": "Liste d'attente",
+      "booked": "Réservé",
+      "completed": "Fait",
+      "in_progress": "En cours",
+      "logged": "Enregistré"
+    },
+    "source": {
+      "freeform": "Libre",
+      "device": "Appareil",
+      "unknown": "Structure",
+      "former": "{name} (ancienne)"
+    },
+    "filter": {
+      "title": "Filtres",
+      "source": "Source",
+      "allSources": "Tous",
+      "kind": "Type",
+      "visibility": "Visibilité",
+      "dates": "Dates",
+      "from": "Du",
+      "to": "Au",
+      "search": "Rechercher",
+      "searchPlaceholder": "Mots dans les entrées et commentaires",
+      "clearSearch": "Effacer la recherche «{q}»",
+      "discipline": "Discipline",
+      "benchmark": "Benchmark",
+      "exercise": "Exercice",
+      "exercisePlaceholder": "ex. back squat",
+      "empty": "Aucun résultat avec ces filtres.",
+      "clear": "Effacer les filtres"
+    },
+    "range": {
+      "4w": "4 semaines",
+      "12w": "3 mois",
+      "6m": "6 mois",
+      "1y": "1 an",
+      "all": "Tout"
+    },
+    "progress": {
+      "bySource": "Séances par source"
+    },
+    "vault": {
+      "intro": "Chaque séance que tu as terminée, avec chaque structure. La même séance faite à différents endroits forme une seule tendance.",
+      "sources": "Fait avec"
+    },
+    "audience": {
+      "title": "«Mes coachs» signifie",
+      "askTitle": "Qui veux-tu dire par «Mes coachs» ?",
+      "hint": "Chaque structure voit toujours ce que tu as fait avec elle. Choisis quels coachs voient cette entrée.",
+      "makeDefault": "Utiliser ce choix pour mes coachs à l'avenir",
+      "only": "Seulement {names}",
+      "settingTitle": "Mes coachs",
+      "settingDescription": "Les coachs de quelles structures voient les entrées que tu partages avec «Mes coachs».",
+      "settingHint": "Quand tu partages une entrée avec tes coachs, les coachs de ces structures la voient. Tu peux restreindre chaque entrée.",
+      "ownAlways": "Une structure voit toujours ce que tu as fait avec elle (ses cours et ses programmes)."
+    },
+    "export": {
+      "title": "Exporter mon journal",
+      "description": "Tout ton journal, de chaque structure, en fichiers.",
+      "hint": "On prépare un fichier avec chaque entrée de chaque structure, entrées libres et appareils compris. Ça prend un moment ; tu peux quitter cette page.",
+      "request": "Exporter",
+      "preparing": "Préparation…",
+      "inProgress": "Un export est déjà en préparation.",
+      "history": "Tes exports",
+      "status": {
+        "pending": "En préparation",
+        "ready": "Prêt",
+        "failed": "Échec",
+        "expired": "Expiré"
+      },
+      "entries": "{count, plural, one {# entrée} many {# entrées} other {# entrées}}",
+      "download": "Télécharger {name}",
+      "expires": "Disponible jusqu'au {date}"
     }
   }
 }

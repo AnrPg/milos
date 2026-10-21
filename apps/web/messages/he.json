@@ -5424,7 +5424,8 @@
     "clearAll": "ניקוי כל המסננים",
     "clear": "ניקוי",
     "back": "חזרה",
-    "showResults": "{count, plural, =0 {אין תוצאות} other {הצגת #}}"
+    "showResults": "{count, plural, =0 {אין תוצאות} other {הצגת #}}",
+    "show": "הצג"
   },
   "BoxSchedule": {
     "title": "לוח שיעורים",
@@ -7488,6 +7489,110 @@
     "tabs": {
       "invite": "הזמן",
       "invites": "ההזמנות שלך · {count}"
+    }
+  },
+  "Providers": {
+    "loading": "טוען…",
+    "switchLabel": "{name}, החלפת ספק",
+    "sheetTitle": "מי מאמן אותך",
+    "switching": "מחליף…",
+    "current": "מוצג עכשיו",
+    "add": "הוספת Box או מאמן",
+    "kind": {
+      "gym": "Box",
+      "coach": "מאמן אישי"
+    },
+    "nextToday": "היום {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {הודעה אחת} two {שתי הודעות} other {# הודעות}}",
+    "formerTitle": "ספקים קודמים ({count})",
+    "formerHint": "מה שעשית איתם נשאר ביומן, ב-Vault ובהתקדמות שלך. הם כבר לא רואים את הרשומות שלך.",
+    "formerSince": "הסתיים ב-{date} · כבר לא רואה את הרשומות שלך",
+    "todayTitle": "היום",
+    "todayEmpty": "אין שום דבר מתוכנן היום עם אף ספק.",
+    "todayPartial": "לא ניתן לטעון את היום מ-{names}.",
+    "todayKind": {
+      "class": "שיעור",
+      "appointment": "פגישה",
+      "program": "תוכנית",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "הוזמן",
+      "pending": "ממתין לאישור",
+      "waitlisted": "רשימת המתנה",
+      "booked": "הוזמן",
+      "completed": "הושלם",
+      "in_progress": "בתהליך",
+      "logged": "נרשם"
+    },
+    "source": {
+      "freeform": "חופשי",
+      "device": "מכשיר",
+      "unknown": "ספק",
+      "former": "{name} (קודם)"
+    },
+    "filter": {
+      "title": "מסננים",
+      "source": "מקור",
+      "allSources": "כולם",
+      "kind": "סוג",
+      "visibility": "נראות",
+      "dates": "תאריכים",
+      "from": "מ-",
+      "to": "עד",
+      "search": "חיפוש",
+      "searchPlaceholder": "מילים ברשומות ובתגובות",
+      "clearSearch": "ניקוי החיפוש «{q}»",
+      "discipline": "תחום",
+      "benchmark": "אימון ייחוס",
+      "exercise": "תרגיל",
+      "exercisePlaceholder": "למשל: סקוואט אחורי",
+      "empty": "אין תוצאות למסננים האלה.",
+      "clear": "ניקוי מסננים"
+    },
+    "range": {
+      "4w": "4 שבועות",
+      "12w": "3 חודשים",
+      "6m": "6 חודשים",
+      "1y": "שנה",
+      "all": "כל הזמן"
+    },
+    "progress": {
+      "bySource": "אימונים לפי מקור"
+    },
+    "vault": {
+      "intro": "כל אימון שסיימת, עם כל הספקים. אותו אימון במקומות שונים הוא מגמה אחת.",
+      "sources": "בוצע עם"
+    },
+    "audience": {
+      "title": "«המאמנים שלי» פירושו",
+      "askTitle": "למי הכוונה ב«המאמנים שלי»?",
+      "hint": "כל ספק תמיד רואה מה שעשית איתו. בחרו של מי המאמנים יראו את הרשומה הזו.",
+      "makeDefault": "להשתמש בזה למאמנים שלי מעכשיו",
+      "only": "רק {names}",
+      "settingTitle": "המאמנים שלי",
+      "settingDescription": "המאמנים של אילו ספקים רואים רשומות שמשותפות עם «המאמנים שלי».",
+      "settingHint": "כשמשתפים רשומה עם המאמנים שלך, המאמנים של הספקים האלה רואים אותה. אפשר לצמצם כל רשומה בנפרד.",
+      "ownAlways": "ספק תמיד רואה מה שעשית איתו (השיעורים והתוכניות שלו)."
+    },
+    "export": {
+      "title": "ייצוא היומן שלי",
+      "description": "כל היומן שלך, מכל הספקים, כקבצים.",
+      "hint": "אנחנו מכינים קובץ עם כל רשומה מכל ספק, כולל רשומות חופשיות ומכשירים. זה לוקח רגע; אפשר לעזוב את הדף.",
+      "request": "ייצוא",
+      "preparing": "מכין…",
+      "inProgress": "ייצוא כבר נמצא בהכנה.",
+      "history": "הייצואים שלך",
+      "status": {
+        "pending": "בהכנה",
+        "ready": "מוכן",
+        "failed": "נכשל",
+        "expired": "פג תוקף"
+      },
+      "entries": "{count, plural, one {רשומה אחת} two {שתי רשומות} other {# רשומות}}",
+      "download": "הורדת {name}",
+      "expires": "זמין עד {date}"
     }
   }
 }

@@ -5424,7 +5424,8 @@
     "clearAll": "Clear all filters",
     "clear": "Clear",
     "back": "Back",
-    "showResults": "{count, plural, =0 {No results} other {Show #}}"
+    "showResults": "{count, plural, =0 {No results} other {Show #}}",
+    "show": "Show"
   },
   "BoxSchedule": {
     "title": "Schedule",
@@ -7488,6 +7489,110 @@
     "tabs": {
       "invite": "Invite",
       "invites": "Your invites · {count}"
+    }
+  },
+  "Providers": {
+    "loading": "Loading…",
+    "switchLabel": "{name}, switch provider",
+    "sheetTitle": "Who trains you",
+    "switching": "Switching…",
+    "current": "Showing now",
+    "add": "Add a box or coach",
+    "kind": {
+      "gym": "Box",
+      "coach": "Personal coach"
+    },
+    "nextToday": "{time} today",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# message} other {# messages}}",
+    "formerTitle": "Past providers ({count})",
+    "formerHint": "What you did with them stays in your journal, Vault and progress. They no longer see your entries.",
+    "formerSince": "Ended {date} · no longer sees your entries",
+    "todayTitle": "Today",
+    "todayEmpty": "Nothing planned today with any of your providers.",
+    "todayPartial": "Couldn't load today from {names}.",
+    "todayKind": {
+      "class": "Class",
+      "appointment": "Appointment",
+      "program": "Programme",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Booked",
+      "pending": "Awaiting approval",
+      "waitlisted": "Waitlist",
+      "booked": "Booked",
+      "completed": "Done",
+      "in_progress": "In progress",
+      "logged": "Logged"
+    },
+    "source": {
+      "freeform": "Freeform",
+      "device": "Device",
+      "unknown": "Provider",
+      "former": "{name} (past)"
+    },
+    "filter": {
+      "title": "Filters",
+      "source": "Source",
+      "allSources": "Everyone",
+      "kind": "Type",
+      "visibility": "Visibility",
+      "dates": "Dates",
+      "from": "From",
+      "to": "To",
+      "search": "Search",
+      "searchPlaceholder": "Words in entries and comments",
+      "clearSearch": "Clear search «{q}»",
+      "discipline": "Discipline",
+      "benchmark": "Benchmark",
+      "exercise": "Exercise",
+      "exercisePlaceholder": "e.g. back squat",
+      "empty": "Nothing matches these filters.",
+      "clear": "Clear filters"
+    },
+    "range": {
+      "4w": "4 weeks",
+      "12w": "3 months",
+      "6m": "6 months",
+      "1y": "1 year",
+      "all": "All time"
+    },
+    "progress": {
+      "bySource": "Sessions by source"
+    },
+    "vault": {
+      "intro": "Every workout you have finished, with every provider. The same workout done in different places is one trend.",
+      "sources": "Done with"
+    },
+    "audience": {
+      "title": "My coaches means",
+      "askTitle": "Who do you mean by «My coaches»?",
+      "hint": "Each provider always sees what you did with them. Pick whose coaches see this entry.",
+      "makeDefault": "Use this for my coaches from now on",
+      "only": "Only {names}",
+      "settingTitle": "My coaches",
+      "settingDescription": "Which providers' coaches see entries you share with «My coaches».",
+      "settingHint": "When you share an entry with your coaches, these providers' coaches see it. You can narrow any single entry.",
+      "ownAlways": "A provider always sees what you did with them (their classes and programmes)."
+    },
+    "export": {
+      "title": "Export my journal",
+      "description": "Your whole journal, from every provider, as files.",
+      "hint": "We prepare a file of every entry from every provider, freeform and devices included. It takes a moment; you can leave this page.",
+      "request": "Export",
+      "preparing": "Preparing…",
+      "inProgress": "An export is already being prepared.",
+      "history": "Your exports",
+      "status": {
+        "pending": "Preparing",
+        "ready": "Ready",
+        "failed": "Failed",
+        "expired": "Expired"
+      },
+      "entries": "{count, plural, one {# entry} other {# entries}}",
+      "download": "Download {name}",
+      "expires": "Available until {date}"
     }
   }
 }

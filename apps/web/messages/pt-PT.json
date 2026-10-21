@@ -5424,7 +5424,8 @@
     "clearAll": "Limpar todos os filtros",
     "clear": "Limpar",
     "back": "Voltar",
-    "showResults": "{count, plural, =0 {Sem resultados} other {Mostrar #}}"
+    "showResults": "{count, plural, =0 {Sem resultados} other {Mostrar #}}",
+    "show": "Mostrar"
   },
   "BoxSchedule": {
     "title": "Horário",
@@ -7488,6 +7489,110 @@
     "tabs": {
       "invite": "Convidar",
       "invites": "Os teus convites · {count}"
+    }
+  },
+  "Providers": {
+    "loading": "A carregar…",
+    "switchLabel": "{name}, mudar de prestador",
+    "sheetTitle": "Quem te treina",
+    "switching": "A mudar…",
+    "current": "A mostrar agora",
+    "add": "Adiciona uma box ou treinador",
+    "kind": {
+      "gym": "Box",
+      "coach": "Personal trainer"
+    },
+    "nextToday": "Hoje às {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# mensagem} other {# mensagens}}",
+    "formerTitle": "Prestadores anteriores ({count})",
+    "formerHint": "O que fizeste com eles fica no teu diário, no Vault e no teu progresso. Já não veem os teus registos.",
+    "formerSince": "Terminou a {date} · já não vê os teus registos",
+    "todayTitle": "Hoje",
+    "todayEmpty": "Nada planeado para hoje com nenhum dos teus prestadores.",
+    "todayPartial": "Não foi possível carregar o dia de hoje de {names}.",
+    "todayKind": {
+      "class": "Aula",
+      "appointment": "Marcação",
+      "program": "Programa",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Reservado",
+      "pending": "A aguardar aprovação",
+      "waitlisted": "Lista de espera",
+      "booked": "Reservado",
+      "completed": "Feito",
+      "in_progress": "A decorrer",
+      "logged": "Registado"
+    },
+    "source": {
+      "freeform": "Livre",
+      "device": "Dispositivo",
+      "unknown": "Prestador",
+      "former": "{name} (anterior)"
+    },
+    "filter": {
+      "title": "Filtros",
+      "source": "Origem",
+      "allSources": "Todos",
+      "kind": "Tipo",
+      "visibility": "Visibilidade",
+      "dates": "Datas",
+      "from": "De",
+      "to": "Até",
+      "search": "Pesquisar",
+      "searchPlaceholder": "Palavras em registos e comentários",
+      "clearSearch": "Limpar pesquisa «{q}»",
+      "discipline": "Disciplina",
+      "benchmark": "Benchmark",
+      "exercise": "Exercício",
+      "exercisePlaceholder": "ex.: back squat",
+      "empty": "Nada corresponde a estes filtros.",
+      "clear": "Limpar filtros"
+    },
+    "range": {
+      "4w": "4 semanas",
+      "12w": "3 meses",
+      "6m": "6 meses",
+      "1y": "1 ano",
+      "all": "Tudo"
+    },
+    "progress": {
+      "bySource": "Sessões por origem"
+    },
+    "vault": {
+      "intro": "Todos os treinos que terminaste, com todos os prestadores. O mesmo treino feito em sítios diferentes é uma só tendência.",
+      "sources": "Feito com"
+    },
+    "audience": {
+      "title": "«Os meus treinadores» significa",
+      "askTitle": "Quem são «Os meus treinadores»?",
+      "hint": "Cada prestador vê sempre o que fizeste com ele. Escolhe que treinadores veem este registo.",
+      "makeDefault": "Usar isto para os meus treinadores a partir de agora",
+      "only": "Só {names}",
+      "settingTitle": "Os meus treinadores",
+      "settingDescription": "Os treinadores de que prestadores veem os registos que partilhas com «Os meus treinadores».",
+      "settingHint": "Quando partilhas um registo com os teus treinadores, os treinadores destes prestadores veem-no. Podes restringir cada registo.",
+      "ownAlways": "Um prestador vê sempre o que fizeste com ele (as aulas e programas dele)."
+    },
+    "export": {
+      "title": "Exportar o meu diário",
+      "description": "Todo o teu diário, de todos os prestadores, em ficheiros.",
+      "hint": "Preparamos um ficheiro com todos os teus registos de todos os prestadores, incluindo os livres e os de dispositivos. Demora um pouco; podes sair desta página.",
+      "request": "Exportar",
+      "preparing": "A preparar…",
+      "inProgress": "Já está a ser preparada uma exportação.",
+      "history": "As tuas exportações",
+      "status": {
+        "pending": "A preparar",
+        "ready": "Pronta",
+        "failed": "Falhou",
+        "expired": "Expirada"
+      },
+      "entries": "{count, plural, one {# registo} other {# registos}}",
+      "download": "Transferir {name}",
+      "expires": "Disponível até {date}"
     }
   }
 }
