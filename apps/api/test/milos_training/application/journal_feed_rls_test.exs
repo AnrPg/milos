@@ -76,7 +76,12 @@ defmodule MilosTraining.Application.JournalFeedRLSTest do
     # provider by default), but a reply request needs the entry's own gym.
     assert last.choosable_visibilities == ["private", "coach_can_view"]
     assert last.source == %{kind: "freeform", organization_id: nil, name: nil, former: false}
-    assert last.audience == %{custom: false, organization_ids: [ctx.gym.id]}
+
+    assert last.audience == %{
+             custom: false,
+             organization_ids: [ctx.gym.id],
+             coaches: [%{organization_id: ctx.gym.id, user_id: ctx.coach.id}]
+           }
 
     assert {:ok, %{items: [%{kind: "pr"}]}} =
              GetJournalFeed.call(ctx.member_ctx, %{"kinds" => "pr,execution"})

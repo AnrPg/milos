@@ -65,12 +65,13 @@ jobs:
         working-directory: apps/api
       - run: npm run check
         working-directory: apps/web
-      # Playwright's own Chromium: the image's google-chrome cannot create a
-      # WebGL context on this GPU-less runner, which the maps and 3D figure need.
-      - run: npx playwright install chromium
-        working-directory: apps/web
+      # The image's Chrome: the runner cannot reach cdn.playwright.dev to
+      # download Playwright's Chromium. playwright.config.ts asks it for
+      # software WebGL; the 3D figure tests skip if it still has none.
       - run: npm run test:e2e
         working-directory: apps/web
+        env:
+          PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH: /usr/bin/google-chrome
 
   version:
     name: Pick tag

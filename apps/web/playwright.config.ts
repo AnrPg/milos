@@ -5,8 +5,7 @@ const port = Number(process.env.PLAYWRIGHT_PORT ?? 18301);
 export const stubApiPort = Number(process.env.PLAYWRIGHT_STUB_API_PORT ?? 18302);
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 // Software WebGL (SwiftShader through ANGLE) so the maps and the 3D body
-// figure render the same on a GPU-less CI runner as on a laptop. The CI image's
-// own Chrome failed to create a WebGL context, so CI runs Playwright's Chromium.
+// figure render the same on a GPU-less CI runner as on a laptop.
 const args = [
   "--use-angle=swiftshader",
   "--enable-unsafe-swiftshader",
