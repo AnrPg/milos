@@ -172,3 +172,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-169 | Partners: training partners within a club, matches, «Κλείστε μαζί» and blocking | Accepted |
 | ADR-170 | Solo-coach tier, platform plans and the coach-centred Box | Accepted |
 | ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |
+| ADR-172 | Phone health data: Apple Health and Health Connect | Accepted |

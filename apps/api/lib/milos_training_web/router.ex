@@ -1437,7 +1437,8 @@ defmodule MilosTrainingWeb.Router do
     delete("/me/wallet-passes/:id", WalletController, :revoke)
   end
 
-  # ADR-161: Garmin in Συνδεδεμένες συσκευές and the journal's device card.
+  # ADR-161: Garmin in Συνδεδεμένες συσκευές and the journal's device card;
+  # ADR-172: the phone's health data.
   scope "/api/me", MilosTrainingWeb do
     pipe_through([
       :api,
@@ -1455,6 +1456,12 @@ defmodule MilosTrainingWeb.Router do
     post("/devices/garmin/sync", DevicesController, :sync)
     delete("/devices/garmin", DevicesController, :disconnect)
     get("/devices/garmin/pending", DevicesController, :pending)
+    # ADR-172: Apple Health and Health Connect from the store apps.
+    get("/devices/export", PhoneHealthController, :export)
+    post("/devices/phone/:provider/connect", PhoneHealthController, :connect)
+    patch("/devices/phone/:provider", PhoneHealthController, :update)
+    post("/devices/phone/:provider/ingest", PhoneHealthController, :ingest)
+    delete("/devices/phone/:provider", PhoneHealthController, :disconnect)
     post("/device-imports/:id/confirm", DevicesController, :confirm)
     get("/daily-stats", DevicesController, :daily_stats)
   end

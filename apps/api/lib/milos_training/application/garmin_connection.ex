@@ -20,7 +20,7 @@ defmodule MilosTraining.Application.GarminConnection do
   require Logger
 
   alias MilosTraining.Application.{DeviceData, DevicePresenter, DeviceTokens, WellnessConsent}
-  alias MilosTraining.{Body, Devices}
+  alias MilosTraining.Devices
 
   @provider "garmin"
   @recent_seconds 2 * 86_400
@@ -317,22 +317,13 @@ defmodule MilosTraining.Application.GarminConnection do
 
   # Sleep, weight and resting heart rate are health data (plan D8); workouts
   # alone are training data and need no consent.
-  defp consent(%{user_id: user_id} = context, prefs, params, now) do
-    cond do
-      not Devices.health_data?(prefs) ->
-        :ok
-
-      WellnessConsent.active?(context, user_id) ->
-        :ok
-
-      param(params, "health_data_consent") in [true, "true"] ->
-        with {:ok, _consent} <-
-               Body.grant_consent(context, user_id, WellnessConsent.scope(), now),
-             do: :ok
-
-      true ->
-        {:error, :health_data_consent_required}
-    end
+  defp consent(context, prefs, params, now) do
+    WellnessConsent.for_device(
+      context,
+      Devices.health_data?(@provider, prefs),
+      param(params, "health_data_consent"),
+      now
+    )
   end
 
   # Request bodies arrive with string keys, or atom keys once cast by OpenApiSpex.

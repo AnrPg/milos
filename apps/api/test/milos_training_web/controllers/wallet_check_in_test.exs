@@ -401,10 +401,12 @@ defmodule MilosTrainingWeb.WalletCheckInTest do
              %{"provider" => "health_connect", "status" => "native_only"}
            ] = devices["integrations"]
 
-    assert Enum.drop(devices["integrations"], 1) == [
-             %{"provider" => "apple_health", "status" => "native_only"},
-             %{"provider" => "health_connect", "status" => "native_only"}
-           ]
+    # ADR-172: the phone rows wait for the store app, with every kind on.
+    for row <- Enum.drop(devices["integrations"], 1) do
+      assert %{"status" => "native_only", "connection" => nil, "history_days" => 30} = row
+      assert Enum.all?(Map.values(row["sync_prefs"]))
+      assert map_size(row["sync_prefs"]) == 5
+    end
 
     # Nobody else sees my cards.
     assert %{"wallet" => %{"passes" => []}} =

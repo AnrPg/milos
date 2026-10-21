@@ -17,6 +17,27 @@ defmodule MilosTraining.Application.WellnessConsent do
     if active?(context, user_id), do: :ok, else: {:error, :health_data_consent_required}
   end
 
+  @doc """
+  Before a device brings in health data (ADR-161, ADR-172): `:ok` when
+  none is wanted or the consent is active; grants it when the person ticked
+  the consent line in the same step; otherwise asks for it.
+  """
+  def for_device(%{user_id: user_id} = context, health_data?, granted_now?, now) do
+    cond do
+      not health_data? ->
+        :ok
+
+      active?(context, user_id) ->
+        :ok
+
+      granted_now? in [true, "true"] ->
+        with {:ok, _consent} <- Body.grant_consent(context, user_id, @scope, now), do: :ok
+
+      true ->
+        {:error, :health_data_consent_required}
+    end
+  end
+
   def active?(context, user_id) do
     context
     |> Body.list_consents(user_id)

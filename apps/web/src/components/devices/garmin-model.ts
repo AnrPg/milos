@@ -20,12 +20,16 @@ export type SyncPref = "activities" | "sleep" | "weight" | "resting_hr";
 /** In the order the connect sheet lists them, each with the place it lands. */
 export const SYNC_PREFS: SyncPref[] = ["activities", "sleep", "weight", "resting_hr"];
 
-/** Προπονήσεις → Ημερολόγιο, Ύπνος → Ευεξία, Βάρος → Σώμα, Ρυθμός ηρεμίας → Πρόοδος. */
-export const PREF_DESTINATION: Record<SyncPref, "journal" | "wellness" | "body" | "progress"> = {
+/** A phone also counts steps (ADR-172). */
+export type DevicePref = SyncPref | "steps";
+
+/** Προπονήσεις → Ημερολόγιο, Ύπνος → Ευεξία, Βάρος → Σώμα, Ρυθμός ηρεμίας και βήματα → Πρόοδος. */
+export const PREF_DESTINATION: Record<DevicePref, "journal" | "wellness" | "body" | "progress"> = {
   activities: "journal",
   sleep: "wellness",
   weight: "body",
   resting_hr: "progress",
+  steps: "progress",
 };
 
 export type FullSyncPrefs = Record<SyncPref, boolean>;
@@ -92,14 +96,16 @@ export function garminRowOf(integrations: Integration[]): GarminRow | null {
   const row = integrations.find((integration) => integration.provider === "garmin");
   if (!row) return null;
   const configured = row.configured ?? row.status !== "unavailable";
+  // The integrations list types `connection` for every provider; Garmin's row carries Garmin's.
+  const connection = (row.connection ?? null) as GarminConnection | null;
   return {
     provider: "garmin",
-    status: row.status === "native_only" ? "unavailable" : row.status,
+    status: row.status === "native_only" ? "unavailable" : (row.status as GarminRow["status"]),
     configured,
     capability: row.capability ?? (configured ? "available" : "not_configured"),
     sync_prefs: fullPrefs(row.sync_prefs),
     backfill_day_options: row.backfill_day_options ?? [...BACKFILL_OPTIONS],
-    connection: row.connection ?? null,
+    connection,
   };
 }
 

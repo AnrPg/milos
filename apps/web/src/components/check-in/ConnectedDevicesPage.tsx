@@ -9,6 +9,9 @@ import { revokeWalletPass, type ConnectedDevices, type Integration, type WalletP
 import { DEVICES_KEY as CONNECTED_DEVICES_KEY, fetchDevices } from "@/api/devices";
 import { GarminRowItem } from "@/components/devices/GarminRow";
 import { garminReturn, garminRowOf, returnReasonKey } from "@/components/devices/garmin-model";
+import { DeviceDataExport } from "@/components/devices/DeviceDataExport";
+import { PhoneHealthRowItem } from "@/components/devices/PhoneHealthRow";
+import { anyDeviceConnected, isPhoneProvider, phoneRowOf, showsPhoneRow } from "@/components/devices/phone-health-model";
 import { useSession } from "@/components/session-provider";
 import { usePlatform } from "@/hooks/usePlatform";
 import { integrationStatusKey, visibleIntegrations } from "@/lib/platform/device-rows";
@@ -20,7 +23,8 @@ import { checkInErrorKey } from "./errors";
  * Εγώ › Συνδεδεμένες συσκευές (ADR-155 §11, vision §7.11): the Wallet cards
  * at every box (revoking one resets that box's code), the calendar feed to
  * subscribe to, and the health integrations as they really are: Garmin
- * (ADR-161) connects here, Apple Health and Health Connect need the phone app.
+ * (ADR-161) connects here, Apple Health and Health Connect connect from the
+ * phone app (ADR-172).
  */
 export function ConnectedDevicesPage() {
   const t = useTranslations("CheckIn");
@@ -223,6 +227,9 @@ function IntegrationsSection({ token, integrations }: { token: string; integrati
   const [message, setMessage] = useState<string | null>(null);
   const garmin = garminRowOf(integrations);
   const { platform, capabilities } = usePlatform();
+  // This app install's phone-health provider, when its plugin ships (ADR-172).
+  const appProvider =
+    platform === "ios" && capabilities.healthKit ? "apple_health" : platform === "android" && capabilities.healthConnect ? "health_connect" : null;
   const tone: Record<string, { color: string; background: string }> = {
     connected: { color: "var(--success)", background: "color-mix(in srgb, var(--success) 16%, transparent)" },
     disconnected: { color: "var(--text-soft)", background: "var(--panel-raised)" },
@@ -237,6 +244,10 @@ function IntegrationsSection({ token, integrations }: { token: string; integrati
         {visibleIntegrations(integrations, platform).map((integration) => {
           if (integration.provider === "garmin" && garmin) {
             return <GarminRowItem key="garmin" row={garmin} token={token} onMessage={setMessage} />;
+          }
+          const phoneRow = isPhoneProvider(integration.provider) && showsPhoneRow(integration, appProvider) ? phoneRowOf(integrations, integration.provider) : null;
+          if (phoneRow) {
+            return <PhoneHealthRowItem key={phoneRow.provider} row={phoneRow} token={token} inApp={phoneRow.provider === appProvider} onMessage={setMessage} />;
           }
           const status = integrationStatusKey(integration, platform, capabilities);
           return (
@@ -253,6 +264,7 @@ function IntegrationsSection({ token, integrations }: { token: string; integrati
         })}
       </ul>
       {message ? <p role="status" className="text-sm" style={{ color: "var(--text-soft)" }}>{message}</p> : null}
+      {anyDeviceConnected(integrations) ? <DeviceDataExport token={token} /> : null}
     </Card>
   );
 }

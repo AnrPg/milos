@@ -1,5 +1,6 @@
 ext {
-    minSdkVersion = 24
+    // ADR-172: Health Connect's client needs Android 8 (API 26).
+    minSdkVersion = 26
     compileSdkVersion = 36
     targetSdkVersion = 36
     androidxActivityVersion = '1.11.0'
@@ -13,4 +14,7 @@ ext {
     androidxJunitVersion = '1.3.0'
     androidxEspressoCoreVersion = '3.7.0'
     cordovaAndroidVersion = '14.0.1'
+    // ADR-172: the MilosHealth plugin (Kotlin, Health Connect).
+    healthConnectVersion = '1.1.0'
+    coroutinesVersion = '1.10.2'
 }
