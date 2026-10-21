@@ -62,6 +62,20 @@ export function androidIntentFilter(hostname, prefixes) {
   ].join("\n");
 }
 
+// ADR-173: an NFC door tag holds an https /c/ link; Android hands NDEF tags
+// to the app only through an NDEF_DISCOVERED filter (App Links don't apply).
+export function androidNdefFilter(hostname) {
+  return [
+    "<intent-filter>",
+    '    <action android:name="android.nfc.action.NDEF_DISCOVERED" />',
+    '    <category android:name="android.intent.category.DEFAULT" />',
+    '    <data android:scheme="https" />',
+    `    <data android:host="${hostname}" />`,
+    '    <data android:pathPrefix="/c/" />',
+    "</intent-filter>",
+  ].join("\n");
+}
+
 export function iosEntitlements(hostname, apsEnvironment) {
   return [
     "<key>com.apple.developer.associated-domains</key>",
@@ -123,10 +137,11 @@ export function configure(env = process.env, base = root) {
 
   const xml = { open: "<!--", close: "-->" };
   if (
-    patch(path.join(base, "android/app/src/main/AndroidManifest.xml"), androidIntentFilter(environment.hostname, prefixes), {
-      ...xml,
-      anchor: "</activity>",
-    })
+    patch(
+      path.join(base, "android/app/src/main/AndroidManifest.xml"),
+      [androidIntentFilter(environment.hostname, prefixes), androidNdefFilter(environment.hostname)].join("\n"),
+      { ...xml, anchor: "</activity>" },
+    )
   ) {
     done.push("android AndroidManifest.xml");
   }

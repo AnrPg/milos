@@ -7,5 +7,9 @@ import UIKit
 class MilosBridgeViewController: CAPBridgeViewController {
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(MilosHealthPlugin())
+        // ADR-173: home-screen widgets, the arrival reminder and NFC door tags.
+        bridge?.registerPluginInstance(MilosWidgetsPlugin())
+        bridge?.registerPluginInstance(MilosGeofencePlugin())
+        bridge?.registerPluginInstance(MilosNfcPlugin())
     }
 }

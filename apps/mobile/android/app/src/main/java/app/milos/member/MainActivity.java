@@ -8,6 +8,10 @@ public class MainActivity extends BridgeActivity {
     public void onCreate(Bundle savedInstanceState) {
         // ADR-172: the app's own Health Connect plugin (MilosHealth).
         registerPlugin(MilosHealthPlugin.class);
+        // ADR-173: home-screen widgets, the arrival reminder and NFC door tags.
+        registerPlugin(MilosWidgetsPlugin.class);
+        registerPlugin(MilosGeofencePlugin.class);
+        registerPlugin(MilosNfcPlugin.class);
         super.onCreate(savedInstanceState);
     }
 }
