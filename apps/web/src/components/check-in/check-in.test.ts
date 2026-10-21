@@ -12,6 +12,7 @@ import {
   modeChangeNeedsConfirm,
   nothingReasonKey,
   parseScannedCode,
+  scanBody,
   scanView,
   shouldAutoCheckIn,
   undoSecondsLeft,
@@ -134,6 +135,17 @@ describe("scanView", () => {
     expect(scanView(result({ outcome: "no_booking", membership: "member" }), "poster")).toEqual({ kind: "poster_member" });
     expect(scanView(result({ outcome: "visitor", trial: trial(2) }), "poster")).toEqual({ kind: "poster_visitor" });
     expect(scanView(result({ outcome: "nothing", classes: [{ id: "c", starts_at: iso(T0) }] }), "poster")).toEqual({ kind: "poster_member" });
+  });
+
+  it("keeps NFC tags and the arrival reminder to the limited outcomes too (ADR-173)", () => {
+    for (const source of ["nfc", "geofence"] as const) {
+      expect(scanView(result({ outcome: "visitor", trial: trial(2) }), source)).toEqual({ kind: "poster_visitor" });
+      expect(scanView(result({ outcome: "nothing", classes: [{ id: "c", starts_at: iso(T0) }] }), source)).toEqual({ kind: "poster_member" });
+    }
+    expect(scanBody("door", "l", "c")).toEqual({ location_id: "l", code: "c" });
+    expect(scanBody("poster", "l", "c")).toEqual({ location_id: "l", poster_code: "c" });
+    expect(scanBody("nfc", "l", "c")).toEqual({ location_id: "l", nfc_code: "c" });
+    expect(scanBody("geofence", "l", "t")).toEqual({ geofence_token: "t" });
   });
 
   it("explains why there was nothing to check in to", () => {

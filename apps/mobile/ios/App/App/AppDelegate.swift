@@ -7,7 +7,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // ADR-173: region events can relaunch the app in the background; the
+        // arrival reminder's monitor must exist from launch to receive them.
+        MilosGeofenceMonitor.shared.start()
         return true
     }
 

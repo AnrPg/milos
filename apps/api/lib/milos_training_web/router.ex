@@ -132,6 +132,13 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "around")
   end
 
+  # ADR-173: home-screen widgets, with their own token (not a session); a
+  # widget refreshes every few minutes and on «+1 νερό».
+  pipeline :widget do
+    plug(MilosTrainingWeb.Plugs.AuthenticateWidget)
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "widget")
+  end
+
   # ADR-155: door scans and the desk; generous for a busy door, bounded for guessing.
   pipeline :check_in_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "check-in")
@@ -759,6 +766,10 @@ defmodule MilosTrainingWeb.Router do
     get("/check-in/door/:location_id/poster", AdminCheckInController, :poster)
     put("/check-in/door/:location_id/poster", AdminCheckInController, :update_poster)
     post("/check-in/door/:location_id/poster/rotate", AdminCheckInController, :rotate_poster)
+    # ADR-173: NFC door tags.
+    get("/check-in/door/:location_id/nfc", AdminCheckInController, :nfc_tag)
+    put("/check-in/door/:location_id/nfc", AdminCheckInController, :update_nfc_tag)
+    post("/check-in/door/:location_id/nfc/rotate", AdminCheckInController, :rotate_nfc_tag)
     delete("/check-in/members/:user_id/code", AdminCheckInController, :revoke_member_code)
     post("/check-in/scan-member", AdminCheckInController, :scan_member)
     post("/check-in/members/:user_id", AdminCheckInController, :check_in_member)
@@ -1198,6 +1209,10 @@ defmodule MilosTrainingWeb.Router do
       :delete_native_push_token
     )
 
+    # ADR-173: the token the store app hands its home-screen widgets.
+    post("/me/widget-tokens", WidgetController, :create_token)
+    delete("/me/widget-tokens/:id", WidgetController, :delete_token)
+
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
@@ -1445,8 +1460,17 @@ defmodule MilosTrainingWeb.Router do
 
     post("/check-in/scan", ScanCheckInController, :scan)
     delete("/check-in/scan/:undo_token", ScanCheckInController, :undo)
+    # ADR-173: the arrival reminder's regions for the store apps.
+    get("/me/check-in/geofences", ScanCheckInController, :geofences)
     get("/me/connected-devices", WalletController, :devices)
     delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  scope "/api/widget", MilosTrainingWeb do
+    pipe_through([:api, :widget])
+
+    get("/snapshot", WidgetController, :snapshot)
+    post("/water", WidgetController, :add_water)
   end
 
   # ADR-161: Garmin in Συνδεδεμένες συσκευές and the journal's device card;

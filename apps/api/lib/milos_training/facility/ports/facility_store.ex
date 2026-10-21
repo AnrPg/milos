@@ -27,6 +27,11 @@ defmodule MilosTraining.Facility.Ports.FacilityStore do
   @callback rotate_poster_secret(context(), binary(), binary(), DateTime.t()) ::
               {:ok, map()} | {:error, term()}
   @callback set_poster_enabled(context(), binary(), boolean()) :: {:ok, map()} | {:error, term()}
+  # ADR-173: the NFC door tag, the poster's twin.
+  @callback get_nfc_tag(context(), binary()) :: map() | nil
+  @callback rotate_nfc_secret(context(), binary(), binary(), DateTime.t()) ::
+              {:ok, map()} | {:error, term()}
+  @callback set_nfc_enabled(context(), binary(), boolean()) :: {:ok, map()} | {:error, term()}
   @callback get_active_member_code(context(), binary()) :: map() | nil
   @callback get_member_code(context(), binary()) :: map() | nil
   @callback get_member_code_by_serial(context(), binary()) :: map() | nil

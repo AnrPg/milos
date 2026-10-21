@@ -11,7 +11,8 @@ defmodule MilosTraining.Facility.Domain.CheckInRulesTest do
              visitor_trial_offer: true,
              desk_override: false,
              door_rotation_seconds: 30,
-             member_code_mode: "rotating"
+             member_code_mode: "rotating",
+             geofence_reminder: true
            }
 
     assert CheckInRules.effective(%{window_before_minutes: 10, desk_override: nil}).window_before_minutes ==

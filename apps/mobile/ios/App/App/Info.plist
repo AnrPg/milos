@@ -26,6 +26,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>Milos reads the workouts, sleep, weight, resting heart rate and steps you choose, so they appear in your journal. Only you see them unless you share them.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Milos uses your location only on this phone, to remind you to check in when you arrive at your box with a booking.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>With "Always", Milos can remind you to check in when you arrive at your box with a booking, even while the app is closed. Your location stays on this phone.</string>
+	<key>NFCReaderUsageDescription</key>
+	<string>Milos writes your box's check-in link to an NFC tag at the door.</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>UIApplicationSceneManifest</key>

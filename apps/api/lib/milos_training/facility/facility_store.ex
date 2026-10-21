@@ -76,6 +76,17 @@ defmodule MilosTraining.Facility.FacilityStore do
     do: tenant_call(context, :set_poster_enabled, [location_id, enabled])
 
   @impl true
+  def get_nfc_tag(context, location_id), do: tenant_call(context, :get_nfc_tag, [location_id])
+
+  @impl true
+  def rotate_nfc_secret(context, location_id, secret, at),
+    do: tenant_call(context, :rotate_nfc_secret, [location_id, secret, at])
+
+  @impl true
+  def set_nfc_enabled(context, location_id, enabled),
+    do: tenant_call(context, :set_nfc_enabled, [location_id, enabled])
+
+  @impl true
   def get_active_member_code(context, user_id),
     do: tenant_call(context, :get_active_member_code, [user_id])
 

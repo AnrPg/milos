@@ -107,6 +107,7 @@ function Form({ token, initial }: { token: string; initial: RulesDraft }) {
           <Toggle label={t("openGymRequiresPackage")} hint={t("openGymRequiresPackageHint")} checked={draft.open_gym_requires_package} onChange={(value) => set("open_gym_requires_package", value)} />
           <Toggle label={t("visitorTrialOffer")} hint={t("visitorTrialOfferHint")} checked={draft.visitor_trial_offer} onChange={(value) => set("visitor_trial_offer", value)} />
           <Toggle label={t("deskOverride")} hint={t("deskOverrideHint")} checked={draft.desk_override} onChange={(value) => set("desk_override", value)} />
+          <Toggle label={t("geofenceReminder")} hint={t("geofenceReminderHint")} checked={draft.geofence_reminder} onChange={(value) => set("geofence_reminder", value)} />
         </Section>
 
         <Section title={t("rotationTitle")} hint={t("rotationHint")}>

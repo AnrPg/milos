@@ -6945,7 +6945,22 @@
     "integrationStatus_error": "Neu verbinden",
     "integrationHint_error": "Garmin antwortet nicht mehr; verbinde es neu.",
     "integrationStatus_native_soon": "Bald",
-    "integrationHint_native_soon": "Kommt in einer späteren Version der App."
+    "integrationHint_native_soon": "Kommt in einer späteren Version der App.",
+    "geofenceReminder": "Ankunftserinnerung in der App",
+    "geofenceReminderHint": "Mitglieder, die sie in der App einschalten, werden bei Ankunft mit Buchung erinnert; ein Tippen checkt sie ein.",
+    "nfcTitle": "NFC-Tag an der Tür",
+    "nfcHint": "Ein Antippen mit dem Handy checkt in eine jetzt offene Buchung ein. Er ändert sich nicht von selbst.",
+    "nfcWrite": "Auf Tag schreiben",
+    "nfcCopy": "Link kopieren",
+    "nfcCopied": "Link kopiert.",
+    "nfcHoldNear": "Halte den Tag an die Rückseite des Handys.",
+    "nfcWritten": "Der Tag wurde beschrieben.",
+    "nfcWriteFailed": "Der Tag wurde nicht beschrieben. Versuch es noch einmal.",
+    "nfcWriteElsewhere": "Um den Tag zu beschreiben, öffne diese Seite in der Milos-App oder kopiere den Link in eine NFC-App.",
+    "nfcRotated": "Neuer Tag-Code. Beschreibe deine Tags neu.",
+    "newNfcCode": "Neuer Tag-Code",
+    "newNfcCodeConfirm": "Alle bisher beschriebenen Tags funktionieren nicht mehr.",
+    "newNfcCodeAction": "Code ändern"
   },
   "Media": {
     "add": "Fotos oder ein Video hinzufügen",
@@ -8911,6 +8926,26 @@
       "overrideHint": "Leer: Preis des Tarifs",
       "notes": "Notizen"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Wasser",
+    "widgetAddGlass": "+1 Glas",
+    "widgetToday": "Heute",
+    "widgetNothingToday": "Heute nichts",
+    "widgetCheckIn": "Check-in",
+    "widgetNoClass": "Heute keine Buchung",
+    "widgetOpenApp": "Milos öffnen",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Programm",
+    "widgetKind_class": "Kurs",
+    "widgetKind_appointment": "Termin",
+    "reminderTitle": "Du bist bei {box}",
+    "reminderBody": "Tippe, um für {className} um {time} einzuchecken.",
+    "reminderBodyNoName": "Tippe, um für deine Buchung um {time} einzuchecken.",
+    "reminderToggle": "Bei Ankunft erinnern",
+    "reminderToggleHint": "Kommst du mit einer Buchung an der Box an, erinnert dich dein Handy an den Check-in. Dein Standort bleibt auf dem Handy.",
+    "reminderNeedsAlways": "Damit es bei geschlossener App funktioniert, wähle in den Einstellungen des Handys „Immer“ für den Standortzugriff.",
+    "reminderDenied": "Ohne Standortzugriff gibt es keine Erinnerung. Du kannst ihn in den Einstellungen des Handys erlauben."
   },
   "Scaling": {
     "loading": "Wird geladen…",

@@ -6945,7 +6945,22 @@
     "integrationStatus_error": "Precisa de nova ligação",
     "integrationHint_error": "O Garmin deixou de responder; volta a ligá-lo.",
     "integrationStatus_native_soon": "Em breve",
-    "integrationHint_native_soon": "Chega numa próxima versão da app."
+    "integrationHint_native_soon": "Chega numa próxima versão da app.",
+    "geofenceReminder": "Lembrete de chegada na app",
+    "geofenceReminderHint": "Os membros que o ativarem na app recebem um lembrete ao chegar com uma reserva; um toque faz o check-in.",
+    "nfcTitle": "Etiqueta NFC na porta",
+    "nfcHint": "Um toque com o telemóvel faz o check-in numa reserva aberta agora. Não muda sozinha.",
+    "nfcWrite": "Escrever numa etiqueta",
+    "nfcCopy": "Copiar ligação",
+    "nfcCopied": "Ligação copiada.",
+    "nfcHoldNear": "Aproxima a etiqueta da parte de trás do telemóvel.",
+    "nfcWritten": "A etiqueta foi escrita.",
+    "nfcWriteFailed": "A etiqueta não foi escrita. Tenta novamente.",
+    "nfcWriteElsewhere": "Para escrever a etiqueta, abre esta página na app Milos ou copia a ligação para uma app NFC.",
+    "nfcRotated": "Novo código da etiqueta. Volta a escrever as etiquetas.",
+    "newNfcCode": "Novo código da etiqueta",
+    "newNfcCodeConfirm": "Todas as etiquetas que escreveste deixam de funcionar.",
+    "newNfcCodeAction": "Mudar código"
   },
   "Media": {
     "add": "Adicionar fotografias ou um vídeo",
@@ -8911,6 +8926,26 @@
       "overrideHint": "Vazio: preço do plano",
       "notes": "Notas"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Água",
+    "widgetAddGlass": "+1 copo",
+    "widgetToday": "Hoje",
+    "widgetNothingToday": "Nada para hoje",
+    "widgetCheckIn": "Check-in",
+    "widgetNoClass": "Sem reservas hoje",
+    "widgetOpenApp": "Abrir o Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Programa",
+    "widgetKind_class": "Aula",
+    "widgetKind_appointment": "Marcação",
+    "reminderTitle": "Chegaste a {box}",
+    "reminderBody": "Toca para fazer check-in em {className} às {time}.",
+    "reminderBodyNoName": "Toca para fazer check-in na reserva das {time}.",
+    "reminderToggle": "Lembrar-me quando chego",
+    "reminderToggleHint": "Quando chegas ao box com uma reserva, o telemóvel lembra-te do check-in. A tua localização fica no telemóvel.",
+    "reminderNeedsAlways": "Para funcionar com a app fechada, escolhe «Sempre» no acesso à localização nas definições do telemóvel.",
+    "reminderDenied": "Sem acesso à localização não há lembrete. Podes permiti-lo nas definições do telemóvel."
   },
   "Scaling": {
     "loading": "A carregar…",

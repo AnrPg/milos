@@ -173,5 +173,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-170 | Solo-coach tier, platform plans and the coach-centred Box | Accepted |
 | ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |
 | ADR-172 | Phone health data: Apple Health and Health Connect | Accepted |
+| ADR-173 | Widgets, the arrival reminder (geofence) and NFC door tags | Accepted |
 | ADR-174 | AI scaling suggestions with mandatory coach approval | Accepted |
 | ADR-175 | Voice logging: record, transcribe, parsed draft, confirm to save | Accepted |

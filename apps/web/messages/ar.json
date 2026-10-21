@@ -6945,7 +6945,22 @@
     "integrationStatus_error": "يحتاج إلى إعادة ربط",
     "integrationHint_error": "توقف Garmin عن الاستجابة؛ أعد ربطه.",
     "integrationStatus_native_soon": "قريبًا",
-    "integrationHint_native_soon": "سيتوفر في إصدار لاحق من التطبيق."
+    "integrationHint_native_soon": "سيتوفر في إصدار لاحق من التطبيق.",
+    "geofenceReminder": "تذكير الوصول في التطبيق",
+    "geofenceReminderHint": "يتلقى الأعضاء الذين يفعّلونه في التطبيق تذكيرًا عند وصولهم مع حجز؛ ونقرة واحدة تسجّل حضورهم.",
+    "nfcTitle": "وسم NFC على الباب",
+    "nfcHint": "لمسة بالهاتف تسجّل الحضور في حجز مفتوح الآن. لا يتغيّر من تلقاء نفسه.",
+    "nfcWrite": "اكتب على وسم",
+    "nfcCopy": "نسخ الرابط",
+    "nfcCopied": "تم نسخ الرابط.",
+    "nfcHoldNear": "قرّب الوسم من ظهر الهاتف.",
+    "nfcWritten": "تمت كتابة الوسم.",
+    "nfcWriteFailed": "لم تتم كتابة الوسم. حاول مرة أخرى.",
+    "nfcWriteElsewhere": "لكتابة الوسم، افتح هذه الصفحة في تطبيق Milos أو انسخ الرابط إلى تطبيق NFC.",
+    "nfcRotated": "رمز وسم جديد. اكتب الوسوم من جديد.",
+    "newNfcCode": "رمز وسم جديد",
+    "newNfcCodeConfirm": "ستتوقف كل الوسوم التي كتبتها عن العمل.",
+    "newNfcCodeAction": "تغيير الرمز"
   },
   "Media": {
     "add": "أضف صورًا أو فيديو",
@@ -8911,6 +8926,26 @@
       "overrideHint": "فارغ: سعر الخطة",
       "notes": "ملاحظات"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "الماء",
+    "widgetAddGlass": "+1 كوب",
+    "widgetToday": "اليوم",
+    "widgetNothingToday": "لا شيء لليوم",
+    "widgetCheckIn": "تسجيل الحضور",
+    "widgetNoClass": "لا حجز اليوم",
+    "widgetOpenApp": "افتح Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "البرنامج",
+    "widgetKind_class": "حصة",
+    "widgetKind_appointment": "موعد",
+    "reminderTitle": "وصلت إلى {box}",
+    "reminderBody": "انقر لتسجيل الحضور في {className} الساعة {time}.",
+    "reminderBodyNoName": "انقر لتسجيل الحضور في حجز الساعة {time}.",
+    "reminderToggle": "ذكّرني عند الوصول",
+    "reminderToggleHint": "عند وصولك إلى النادي مع حجز، يذكّرك هاتفك بتسجيل الحضور. يبقى موقعك على هاتفك.",
+    "reminderNeedsAlways": "ليعمل والتطبيق مغلق، اختر «دائمًا» للوصول إلى الموقع في إعدادات الهاتف.",
+    "reminderDenied": "بدون الوصول إلى الموقع لا يوجد تذكير. يمكنك السماح به من إعدادات الهاتف."
   },
   "Scaling": {
     "loading": "جارٍ التحميل…",

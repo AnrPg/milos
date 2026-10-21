@@ -6945,7 +6945,22 @@
     "integrationStatus_error": "צריך לחבר מחדש",
     "integrationHint_error": "Garmin הפסיק להגיב; חברו אותו מחדש.",
     "integrationStatus_native_soon": "בקרוב",
-    "integrationHint_native_soon": "יגיע בגרסה הבאה של האפליקציה."
+    "integrationHint_native_soon": "יגיע בגרסה הבאה של האפליקציה.",
+    "geofenceReminder": "תזכורת הגעה באפליקציה",
+    "geofenceReminderHint": "חברים שמפעילים אותה באפליקציה מקבלים תזכורת כשהם מגיעים עם הזמנה; נגיעה אחת מבצעת צ'ק-אין.",
+    "nfcTitle": "תג NFC בדלת",
+    "nfcHint": "נגיעה בטלפון מבצעת צ'ק-אין להזמנה שפתוחה עכשיו. התג לא משתנה מעצמו.",
+    "nfcWrite": "כתיבה לתג",
+    "nfcCopy": "העתקת קישור",
+    "nfcCopied": "הקישור הועתק.",
+    "nfcHoldNear": "יש לקרב את התג לגב הטלפון.",
+    "nfcWritten": "התג נכתב.",
+    "nfcWriteFailed": "התג לא נכתב. אפשר לנסות שוב.",
+    "nfcWriteElsewhere": "כדי לכתוב את התג, יש לפתוח את הדף באפליקציית Milos או להעתיק את הקישור לאפליקציית NFC.",
+    "nfcRotated": "קוד תג חדש. יש לכתוב את התגים מחדש.",
+    "newNfcCode": "קוד תג חדש",
+    "newNfcCodeConfirm": "כל התגים שנכתבו יפסיקו לעבוד.",
+    "newNfcCodeAction": "החלפת קוד"
   },
   "Media": {
     "add": "הוספת תמונות או סרטון",
@@ -8911,6 +8926,26 @@
       "overrideHint": "ריק: מחיר התוכנית",
       "notes": "הערות"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "מים",
+    "widgetAddGlass": "+1 כוס",
+    "widgetToday": "היום",
+    "widgetNothingToday": "אין כלום להיום",
+    "widgetCheckIn": "צ'ק-אין",
+    "widgetNoClass": "אין הזמנה היום",
+    "widgetOpenApp": "פתיחת Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "תוכנית",
+    "widgetKind_class": "שיעור",
+    "widgetKind_appointment": "פגישה",
+    "reminderTitle": "הגעת אל {box}",
+    "reminderBody": "נגיעה לצ'ק-אין ל{className} בשעה {time}.",
+    "reminderBodyNoName": "נגיעה לצ'ק-אין להזמנה של {time}.",
+    "reminderToggle": "תזכורת כשאני מגיע/ה",
+    "reminderToggleHint": "כשמגיעים לבוקס עם הזמנה, הטלפון מזכיר לעשות צ'ק-אין. המיקום נשאר בטלפון.",
+    "reminderNeedsAlways": "כדי שזה יעבוד כשהאפליקציה סגורה, יש לבחור \"תמיד\" בגישה למיקום בהגדרות הטלפון.",
+    "reminderDenied": "בלי גישה למיקום אין תזכורת. אפשר לאשר אותה בהגדרות הטלפון."
   },
   "Scaling": {
     "loading": "טוען…",

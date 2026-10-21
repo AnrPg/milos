@@ -2,14 +2,15 @@ defmodule MilosTrainingWeb.ScanCheckInController do
   @moduledoc """
   The door scan (ADR-155): a signed-in person scans the door QR with the
   phone camera, the app opens `/c/<location>/<code>` and posts it here.
-  Not tied to one box: the door says which box it is.
+  Not tied to one box: the door says which box it is. The store apps also
+  read the arrival reminder's regions here (ADR-173).
   """
 
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
   alias Guardian.Plug, as: GuardianPlug
-  alias MilosTraining.Application.ScanCheckIn
+  alias MilosTraining.Application.{CheckInGeofences, ScanCheckIn}
   alias MilosTrainingWeb.Schemas.CheckIn, as: S
   alias OpenApiSpex.{Parameter, Schema}
 
@@ -33,6 +34,17 @@ defmodule MilosTrainingWeb.ScanCheckInController do
 
   def scan(conn, _params) do
     with {:ok, result} <- ScanCheckIn.scan(GuardianPlug.current_resource(conn), conn.body_params),
+         do: json(conn, result)
+  end
+
+  operation(:geofences,
+    summary:
+      "Where the store app reminds the member to check in: locations with a booking soon (ADR-173)",
+    responses: [ok: {"Regions", "application/json", S.geofences_response()}]
+  )
+
+  def geofences(conn, _params) do
+    with {:ok, result} <- CheckInGeofences.call(conn.assigns.user_context),
          do: json(conn, result)
   end
 

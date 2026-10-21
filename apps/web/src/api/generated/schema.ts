@@ -1302,6 +1302,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/check-in/geofences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Where the store app reminds the member to check in: locations with a booking soon (ADR-173) */
+        get: operations["MilosTrainingWeb.ScanCheckInController.geofences"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/clubs": {
         parameters: {
             query?: never;
@@ -3232,6 +3249,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/widget-tokens": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Issue this app install's widget token (replacing its previous one) */
+        post: operations["MilosTrainingWeb.WidgetController.create_token"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/widget-tokens/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Revoke a widget token (sign-out on that install) */
+        delete: operations["MilosTrainingWeb.WidgetController.delete_token"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/memberships": {
         parameters: {
             query?: never;
@@ -3690,6 +3741,41 @@ export interface paths {
         get: operations["MilosTrainingWeb.AdminCheckInController.door"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/nfc": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The NFC door tag of a location: the link to write and whether it is on */
+        get: operations["MilosTrainingWeb.AdminCheckInController.nfc_tag"];
+        /** Turn the NFC door tag of a location on or off */
+        put: operations["MilosTrainingWeb.AdminCheckInController.update_nfc_tag"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/nfc/rotate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «Νέος κωδικός ετικέτας»: every written tag stops working */
+        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_nfc_tag"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10232,6 +10318,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/widget/snapshot": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the widgets show now (widget token) */
+        get: operations["MilosTrainingWeb.WidgetController.snapshot"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/widget/water": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** «+1 νερό» from the widget: one glass of the member's size (widget token) */
+        post: operations["MilosTrainingWeb.WidgetController.add_water"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/workouts/{id}/timer-sequence": {
         parameters: {
             query?: never;
@@ -14933,7 +15053,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
                 override?: boolean;
             } | null;
             /** @enum {string} */
@@ -15028,6 +15148,40 @@ export interface components {
             /** @description Realtime topic with `checked_in` events (first names only) */
             topic: string;
         };
+        /**
+         * CheckInGeofences
+         * @description Where the phone reminds the member to check in (ADR-173): locations with a booking in the next hours, only in boxes that allow it
+         */
+        CheckInGeofences: {
+            regions: {
+                box_name: string;
+                /** @description Stable per location, for the phone's region list */
+                id: string;
+                latitude: number;
+                /** Format: uuid */
+                location_id: string;
+                location_name?: string | null;
+                longitude: number;
+                /** Format: uuid */
+                organization_id: string;
+                radius_m: number;
+                /** @description `geofence_token` for POST /api/check-in/scan */
+                token: string;
+                windows: {
+                    /** Format: uuid */
+                    booking_id: string;
+                    class_name?: string | null;
+                    /** Format: date-time */
+                    closes_at: string;
+                    /** Format: date-time */
+                    opens_at: string;
+                    /** Format: date-time */
+                    starts_at: string;
+                }[];
+            }[];
+            /** Format: date-time */
+            valid_until: string;
+        };
         /** CheckInLocation */
         CheckInLocation: {
             /** Format: uuid */
@@ -15056,6 +15210,24 @@ export interface components {
             revoked_passes: number;
             /** Format: uuid */
             user_id: string;
+        };
+        /**
+         * CheckInNfcTag
+         * @description The NFC door tag of a location (ADR-173): a static link that only checks in bookings
+         */
+        CheckInNfcTag: {
+            code: string;
+            /** @description `/c/<location>/n/<code>`, what the tag holds */
+            deep_link: string;
+            enabled: boolean;
+            /** CheckInLocation */
+            location: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
+            /** Format: date-time */
+            rotated_at?: string | null;
         };
         /**
          * CheckInPackage
@@ -15119,7 +15291,7 @@ export interface components {
             /** @enum {string} */
             kind: "class" | "open_gym";
             /** @enum {string|null} */
-            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
             override?: boolean;
         } | null;
         /** CheckInRules */
@@ -15127,6 +15299,8 @@ export interface components {
             desk_override?: boolean;
             /** @enum {integer} */
             door_rotation_seconds?: 15 | 30 | 60;
+            /** @description Members may get an arrival reminder in the app that checks in their booking (ADR-173) */
+            geofence_reminder?: boolean;
             /**
              * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
              * @enum {string}
@@ -15144,6 +15318,8 @@ export interface components {
                 desk_override?: boolean;
                 /** @enum {integer} */
                 door_rotation_seconds?: 15 | 30 | 60;
+                /** @description Members may get an arrival reminder in the app that checks in their booking (ADR-173) */
+                geofence_reminder?: boolean;
                 /**
                  * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
                  * @enum {string}
@@ -15157,14 +15333,18 @@ export interface components {
         };
         /**
          * CheckInScanRequest
-         * @description `location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer
+         * @description `location_id` + `code` (the door's rotating QR), `poster_code` (the printed poster) or `nfc_code` (an NFC door tag); or `geofence_token` (the arrival reminder), or `scan_token` from a `choose` answer
          */
         CheckInScanRequest: {
             /** Format: uuid */
             booking_id?: string;
             code?: string;
+            /** @description From GET /api/me/check-in/geofences (ADR-173): checks in a booking in its window only */
+            geofence_token?: string;
             /** Format: uuid */
             location_id?: string;
+            /** @description An NFC door tag's static code (ADR-173): checks in a booking in its window only */
+            nfc_code?: string;
             /** @description The printed poster's static code: checks in a booking in its window only */
             poster_code?: string;
             scan_token?: string;
@@ -15203,7 +15383,7 @@ export interface components {
                 /** @enum {string} */
                 kind: "class" | "open_gym";
                 /** @enum {string|null} */
-                method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
                 override?: boolean;
             } | null;
             choices?: {
@@ -28671,6 +28851,68 @@ export interface components {
                 wellness_since?: string | null;
             };
         };
+        /**
+         * WidgetSnapshot
+         * @description What the three widgets show: water today (null when hidden), the first items of «Σήμερα» and the next booked class
+         */
+        WidgetSnapshot: {
+            /** Format: date-time */
+            generated_at: string;
+            next_class: {
+                /** Format: date-time */
+                at?: string | null;
+                box_name?: string | null;
+                /** @enum {string} */
+                kind: "class" | "appointment" | "program" | "wod";
+                status?: string | null;
+                title?: string | null;
+            } | null;
+            today: {
+                /** Format: date-time */
+                at?: string | null;
+                box_name?: string | null;
+                /** @enum {string} */
+                kind: "class" | "appointment" | "program" | "wod";
+                status?: string | null;
+                title?: string | null;
+            }[];
+            water: {
+                /** @description False until the health-data consent is given in the app */
+                can_add: boolean;
+                count: number;
+                glass_ml: number;
+                goal_ml: number;
+                ml: number;
+                /** @enum {string} */
+                status: "none" | "partial" | "full";
+            } | null;
+        };
+        /**
+         * WidgetToken
+         * @description A token only the widget endpoints accept; the app stores it for its widgets
+         */
+        WidgetToken: {
+            /** Format: date-time */
+            expires_at: string;
+            /** Format: uuid */
+            id: string;
+            token: string;
+        };
+        /** WidgetTokenRequest */
+        WidgetTokenRequest: {
+            /** @enum {string} */
+            platform: "ios" | "android";
+            /**
+             * Format: uuid
+             * @description This install's previous token, revoked when the new one is issued
+             */
+            replaces_id?: string | null;
+        };
+        /** WidgetWaterRequest */
+        WidgetWaterRequest: {
+            /** @description The phone's IANA zone */
+            timezone?: string;
+        };
         /** WodLeaderboardEntry */
         WodLeaderboardEntry: {
             avatar_url?: string | null;
@@ -31686,8 +31928,12 @@ export interface operations {
                     /** Format: uuid */
                     booking_id?: string;
                     code?: string;
+                    /** @description From GET /api/me/check-in/geofences (ADR-173): checks in a booking in its window only */
+                    geofence_token?: string;
                     /** Format: uuid */
                     location_id?: string;
+                    /** @description An NFC door tag's static code (ADR-173): checks in a booking in its window only */
+                    nfc_code?: string;
                     /** @description The printed poster's static code: checks in a booking in its window only */
                     poster_code?: string;
                     scan_token?: string;
@@ -31734,7 +31980,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
                             override?: boolean;
                         } | null;
                         choices?: {
@@ -35171,6 +35417,55 @@ export interface operations {
                             unread_messages?: number;
                             via_link: boolean;
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.ScanCheckInController.geofences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Regions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        regions: {
+                            box_name: string;
+                            /** @description Stable per location, for the phone's region list */
+                            id: string;
+                            latitude: number;
+                            /** Format: uuid */
+                            location_id: string;
+                            location_name?: string | null;
+                            longitude: number;
+                            /** Format: uuid */
+                            organization_id: string;
+                            radius_m: number;
+                            /** @description `geofence_token` for POST /api/check-in/scan */
+                            token: string;
+                            windows: {
+                                /** Format: uuid */
+                                booking_id: string;
+                                class_name?: string | null;
+                                /** Format: date-time */
+                                closes_at: string;
+                                /** Format: date-time */
+                                opens_at: string;
+                                /** Format: date-time */
+                                starts_at: string;
+                            }[];
+                        }[];
+                        /** Format: date-time */
+                        valid_until: string;
                     };
                 };
             };
@@ -44987,6 +45282,86 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.WidgetController.create_token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    platform: "ios" | "android";
+                    /**
+                     * Format: uuid
+                     * @description This install's previous token, revoked when the new one is issued
+                     */
+                    replaces_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Widget token */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        expires_at: string;
+                        /** Format: uuid */
+                        id: string;
+                        token: string;
+                    };
+                };
+            };
+            /** @description Unknown platform */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WidgetController.delete_token": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Revoked */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description No such token */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OrganizationAccessController.memberships": {
         parameters: {
             query?: never;
@@ -46559,6 +46934,150 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AdminCheckInController.nfc_tag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description NFC tag */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/n/<code>`, what the tag holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.update_nfc_tag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    enabled: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description NFC tag */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/n/<code>`, what the tag holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminCheckInController.rotate_nfc_tag": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                location_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description NFC tag */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        /** @description `/c/<location>/n/<code>`, what the tag holds */
+                        deep_link: string;
+                        enabled: boolean;
+                        /** CheckInLocation */
+                        location: {
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                        };
+                        /** Format: date-time */
+                        rotated_at?: string | null;
+                    };
+                };
+            };
+            /** @description No such location */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.AdminCheckInController.poster": {
         parameters: {
             query?: never;
@@ -46855,7 +47374,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -47013,7 +47532,7 @@ export interface operations {
                             /** @enum {string} */
                             kind: "class" | "open_gym";
                             /** @enum {string|null} */
-                            method?: "door_qr" | "door_poster" | "member_qr" | "wallet" | "desk_search" | "self" | null;
+                            method?: "door_qr" | "door_poster" | "door_nfc" | "geofence" | "member_qr" | "wallet" | "desk_search" | "self" | null;
                             override?: boolean;
                         } | null;
                         /** @enum {string} */
@@ -47086,6 +47605,8 @@ export interface operations {
                             desk_override?: boolean;
                             /** @enum {integer} */
                             door_rotation_seconds?: 15 | 30 | 60;
+                            /** @description Members may get an arrival reminder in the app that checks in their booking (ADR-173) */
+                            geofence_reminder?: boolean;
                             /**
                              * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
                              * @enum {string}
@@ -47114,6 +47635,8 @@ export interface operations {
                     desk_override?: boolean;
                     /** @enum {integer} */
                     door_rotation_seconds?: 15 | 30 | 60;
+                    /** @description Members may get an arrival reminder in the app that checks in their booking (ADR-173) */
+                    geofence_reminder?: boolean;
                     /**
                      * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
                      * @enum {string}
@@ -47139,6 +47662,8 @@ export interface operations {
                             desk_override?: boolean;
                             /** @enum {integer} */
                             door_rotation_seconds?: 15 | 30 | 60;
+                            /** @description Members may get an arrival reminder in the app that checks in their booking (ADR-173) */
+                            geofence_reminder?: boolean;
                             /**
                              * @description Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.
                              * @enum {string}
@@ -79536,6 +80061,151 @@ export interface operations {
                             /** @enum {string} */
                             visibility: "admin_only" | "user_and_admin";
                         };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WidgetController.snapshot": {
+        parameters: {
+            query?: {
+                /** @description The phone's IANA zone (UTC by default) */
+                timezone?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        generated_at: string;
+                        next_class: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            box_name?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "appointment" | "program" | "wod";
+                            status?: string | null;
+                            title?: string | null;
+                        } | null;
+                        today: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            box_name?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "appointment" | "program" | "wod";
+                            status?: string | null;
+                            title?: string | null;
+                        }[];
+                        water: {
+                            /** @description False until the health-data consent is given in the app */
+                            can_add: boolean;
+                            count: number;
+                            glass_ml: number;
+                            goal_ml: number;
+                            ml: number;
+                            /** @enum {string} */
+                            status: "none" | "partial" | "full";
+                        } | null;
+                    };
+                };
+            };
+            /** @description Revoked or expired widget token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.WidgetController.add_water": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description The phone's IANA zone */
+                    timezone?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Snapshot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date-time */
+                        generated_at: string;
+                        next_class: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            box_name?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "appointment" | "program" | "wod";
+                            status?: string | null;
+                            title?: string | null;
+                        } | null;
+                        today: {
+                            /** Format: date-time */
+                            at?: string | null;
+                            box_name?: string | null;
+                            /** @enum {string} */
+                            kind: "class" | "appointment" | "program" | "wod";
+                            status?: string | null;
+                            title?: string | null;
+                        }[];
+                        water: {
+                            /** @description False until the health-data consent is given in the app */
+                            can_add: boolean;
+                            count: number;
+                            glass_ml: number;
+                            goal_ml: number;
+                            ml: number;
+                            /** @enum {string} */
+                            status: "none" | "partial" | "full";
+                        } | null;
+                    };
+                };
+            };
+            /** @description Revoked or expired widget token */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Health-data consent needed (open the app) */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

@@ -18,7 +18,10 @@ defmodule MilosTraining.Facility.Domain.CheckInRules do
     * `member_code_mode`: the member's personal QR is `rotating` (changes
       every 30 s; no Wallet card) or `static` (one persistent, revocable code
       that can also go on a Wallet card); default `rotating`. See
-      `MemberCodePolicy`.
+      `MemberCodePolicy`;
+    * `geofence_reminder`: members who turned it on in the app get a
+      reminder when they arrive at a location with a booking in its window
+      (ADR-173, default on); tapping it checks in to that booking only.
   """
 
   @defaults %{
@@ -28,7 +31,8 @@ defmodule MilosTraining.Facility.Domain.CheckInRules do
     visitor_trial_offer: true,
     desk_override: false,
     door_rotation_seconds: 30,
-    member_code_mode: "rotating"
+    member_code_mode: "rotating",
+    geofence_reminder: true
   }
 
   @rotations [15, 30, 60]

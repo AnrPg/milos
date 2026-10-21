@@ -96,11 +96,30 @@ export type ScanView =
   | { kind: "poster_member" }
   | { kind: "poster_visitor" };
 
+/** Where a scan came from: the rotating door QR, or a static source (ADR-155 §5, ADR-173). */
+export type ScanSource = "door" | "poster" | "nfc" | "geofence";
+
+/** The request body for a scan from `source` (`code` is the code or the reminder's token). */
+export function scanBody(source: ScanSource, locationId: string, code: string) {
+  switch (source) {
+    case "poster":
+      return { location_id: locationId, poster_code: code };
+    case "nfc":
+      return { location_id: locationId, nfc_code: code };
+    case "geofence":
+      return { geofence_token: code };
+    default:
+      return { location_id: locationId, code };
+  }
+}
+
 /**
- * What the phone shows for a scan's answer. The poster path only ever shows
- * the limited outcomes: a check-in, «no booking now», or «not a member».
+ * What the phone shows for a scan's answer. The static sources (poster, NFC
+ * tag, arrival reminder) only ever show the limited outcomes: a check-in,
+ * «no booking now», or «not a member».
  */
-export function scanView(result: ScanResult, source: "door" | "poster"): ScanView {
+export function scanView(result: ScanResult, source: ScanSource): ScanView {
+  const fixed = source !== "door";
   switch (result.outcome) {
     case "checked_in":
       return { kind: "checked_in" };
@@ -111,13 +130,13 @@ export function scanView(result: ScanResult, source: "door" | "poster"): ScanVie
     case "no_booking":
       return { kind: "poster_member" };
     case "visitor": {
-      if (source === "poster") return { kind: "poster_visitor" };
+      if (fixed) return { kind: "poster_visitor" };
       const trial = Boolean(result.trial?.enabled && !result.trial.blocked_reason && (result.trial.classes ?? []).length > 0);
       return { kind: "visitor", trial };
     }
     case "nothing":
     default:
-      if (source === "poster") return { kind: "poster_member" };
+      if (fixed) return { kind: "poster_member" };
       return (result.classes ?? []).length > 0 ? { kind: "suggestions" } : { kind: "nothing" };
   }
 }
@@ -194,6 +213,7 @@ export const DEFAULT_RULES: RulesDraft = {
   desk_override: false,
   door_rotation_seconds: 30,
   member_code_mode: "rotating",
+  geofence_reminder: true,
 };
 
 const inWindow = (value: unknown) => Number.isInteger(value) && (value as number) >= 0 && (value as number) <= 120;

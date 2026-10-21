@@ -18,7 +18,9 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
   A scan of the printed poster (`source: :poster`, board 10 Q1 extra) is
   weaker proof - the code never changes - so it only does step 1: with no
   booking in the window it is `{:poster_no_booking, :member | :visitor}`,
-  never open gym, suggestions or a trial offer.
+  never open gym, suggestions or a trial offer. An NFC door tag (`:nfc`)
+  and the geofenced reminder (`:geofence`) are static proof too (ADR-173)
+  and follow the same rule.
 
   Facts:
 
@@ -29,7 +31,8 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
     * `member?`: an active member of the box;
     * `open_gym`: `%{existing: check_in | nil, covered?: boolean}`;
     * `classes`: upcoming classes `%{id, starts_at, location_id, spots_remaining}`;
-    * `source`: `:door` (default, the rotating code) or `:poster`.
+    * `source`: `:door` (default, the rotating code), `:poster`, `:nfc` or
+      `:geofence`.
   """
 
   alias MilosTraining.Facility.Domain.CheckInRules
@@ -90,7 +93,7 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
       open != [] ->
         {:choose, open}
 
-      facts[:source] == :poster ->
+      static_source?(facts[:source]) ->
         {:poster_no_booking, if(facts[:member?], do: :member, else: :visitor)}
 
       facts[:member?] == true ->
@@ -100,6 +103,11 @@ defmodule MilosTraining.Facility.Domain.ResolveScan do
         :visitor
     end
   end
+
+  @static_sources [:poster, :nfc, :geofence]
+
+  @doc "Whether a source is static proof that only checks in a booking (ADR-155 §5, ADR-173)."
+  def static_source?(source), do: source in @static_sources
 
   defp member_without_booking(facts, settings, now) do
     open_gym = Map.get(facts, :open_gym, %{})

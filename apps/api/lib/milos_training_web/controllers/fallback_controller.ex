@@ -2321,6 +2321,9 @@ defmodule MilosTrainingWeb.FallbackController do
       {:conflict, "This box uses rotating codes; there is nothing to reset"},
     member_code_revoked: {:unprocessable_entity, "This code was revoked"},
     invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"},
+    # ADR-173: NFC door tags and widgets.
+    invalid_nfc_setting: {:unprocessable_entity, "Say whether the NFC tag is on"},
+    invalid_widget_token: {:unauthorized, "Open the app to refresh the widget"},
     # ADR-157: photos and videos in posts.
     too_many_media: {:unprocessable_entity, "A post carries up to ten photos or one video"},
     mixed_media: {:unprocessable_entity, "A post carries photos or a video, not both"},

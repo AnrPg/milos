@@ -11,7 +11,7 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
   @maybe_date %Schema{type: :string, format: :date, nullable: true}
   @maybe_string %Schema{type: :string, nullable: true}
   @maybe_integer %Schema{type: :integer, nullable: true}
-  @methods ~w(door_qr door_poster member_qr wallet desk_search self)
+  @methods ~w(door_qr door_poster door_nfc geofence member_qr wallet desk_search self)
 
   def body(schema), do: Community.body(schema)
   def error, do: %Schema{type: :object, additionalProperties: true}
@@ -129,7 +129,7 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
       title: "CheckInScanRequest",
       type: :object,
       description:
-        "`location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer",
+        "`location_id` + `code` (the door's rotating QR), `poster_code` (the printed poster) or `nfc_code` (an NFC door tag); or `geofence_token` (the arrival reminder), or `scan_token` from a `choose` answer",
       properties: %{
         location_id: @uuid,
         code: %Schema{type: :string, maxLength: 64},
@@ -137,6 +137,18 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
           type: :string,
           maxLength: 64,
           description: "The printed poster's static code: checks in a booking in its window only"
+        },
+        nfc_code: %Schema{
+          type: :string,
+          maxLength: 64,
+          description:
+            "An NFC door tag's static code (ADR-173): checks in a booking in its window only"
+        },
+        geofence_token: %Schema{
+          type: :string,
+          maxLength: 1024,
+          description:
+            "From GET /api/me/check-in/geofences (ADR-173): checks in a booking in its window only"
         },
         scan_token: %Schema{type: :string, maxLength: 1024},
         booking_id: @uuid
@@ -262,6 +274,82 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
         rotated_at: %Schema{type: :string, format: :"date-time", nullable: true}
       },
       required: [:location, :enabled, :code, :deep_link]
+    }
+  end
+
+  def nfc_tag_response do
+    %Schema{
+      title: "CheckInNfcTag",
+      type: :object,
+      description:
+        "The NFC door tag of a location (ADR-173): a static link that only checks in bookings",
+      properties: %{
+        location: location(),
+        enabled: %Schema{type: :boolean},
+        code: %Schema{type: :string},
+        deep_link: %Schema{
+          type: :string,
+          description: "`/c/<location>/n/<code>`, what the tag holds"
+        },
+        rotated_at: %Schema{type: :string, format: :"date-time", nullable: true}
+      },
+      required: [:location, :enabled, :code, :deep_link]
+    }
+  end
+
+  def geofences_response do
+    window = %Schema{
+      type: :object,
+      properties: %{
+        booking_id: @uuid,
+        class_name: @maybe_string,
+        starts_at: %Schema{type: :string, format: :"date-time"},
+        opens_at: %Schema{type: :string, format: :"date-time"},
+        closes_at: %Schema{type: :string, format: :"date-time"}
+      },
+      required: [:booking_id, :starts_at, :opens_at, :closes_at]
+    }
+
+    region = %Schema{
+      type: :object,
+      properties: %{
+        id: %Schema{
+          type: :string,
+          description: "Stable per location, for the phone's region list"
+        },
+        organization_id: @uuid,
+        box_name: %Schema{type: :string},
+        location_id: @uuid,
+        location_name: @maybe_string,
+        latitude: %Schema{type: :number},
+        longitude: %Schema{type: :number},
+        radius_m: %Schema{type: :integer},
+        token: %Schema{type: :string, description: "`geofence_token` for POST /api/check-in/scan"},
+        windows: %Schema{type: :array, items: window}
+      },
+      required: [
+        :id,
+        :organization_id,
+        :box_name,
+        :location_id,
+        :latitude,
+        :longitude,
+        :radius_m,
+        :token,
+        :windows
+      ]
+    }
+
+    %Schema{
+      title: "CheckInGeofences",
+      type: :object,
+      description:
+        "Where the phone reminds the member to check in (ADR-173): locations with a booking in the next hours, only in boxes that allow it",
+      properties: %{
+        regions: %Schema{type: :array, items: region},
+        valid_until: %Schema{type: :string, format: :"date-time"}
+      },
+      required: [:regions, :valid_until]
     }
   end
 
@@ -446,6 +534,11 @@ defmodule MilosTrainingWeb.Schemas.CheckIn do
           enum: ~w(rotating static),
           description:
             "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards."
+        },
+        geofence_reminder: %Schema{
+          type: :boolean,
+          description:
+            "Members may get an arrival reminder in the app that checks in their booking (ADR-173)"
         }
       }
     }

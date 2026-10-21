@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ADR-173: the water widget (RemoteViews, so plain views only). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/milos_widget_background"
+    android:orientation="vertical"
+    android:padding="14dp">
+
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/milos_widget_loading"
+        android:textColor="#FF9AA3AE"
+        android:textSize="12sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/widget_value"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="6dp"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="4"
+        android:textColor="#FFF5F7FA"
+        android:textSize="15sp" />
+    <TextView
+        android:id="@+id/widget_action"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_marginTop="8dp"
+        android:background="@drawable/milos_widget_button"
+        android:gravity="center"
+        android:textColor="#FF0B0D10"
+        android:textSize="15sp"
+        android:textStyle="bold" />
+</LinearLayout>

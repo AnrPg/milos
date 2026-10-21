@@ -271,6 +271,37 @@ defmodule MilosTraining.Infrastructure.Facility.EctoFacilityStore do
     update_location_with(organization_id, location_id, &Location.poster_changeset(&1, enabled))
   end
 
+  @impl true
+  def get_nfc_tag(%{organization_id: organization_id}, location_id) do
+    case fetch_location(organization_id, location_id) do
+      %Location{} = location ->
+        %{
+          location_id: location.id,
+          enabled: location.nfc_enabled,
+          secret: location.nfc_secret,
+          rotated_at: location.nfc_secret_rotated_at,
+          archived_at: location.archived_at
+        }
+
+      nil ->
+        nil
+    end
+  end
+
+  @impl true
+  def rotate_nfc_secret(%{organization_id: organization_id}, location_id, secret, at) do
+    update_location_with(
+      organization_id,
+      location_id,
+      &Location.rotate_nfc_changeset(&1, secret, at)
+    )
+  end
+
+  @impl true
+  def set_nfc_enabled(%{organization_id: organization_id}, location_id, enabled) do
+    update_location_with(organization_id, location_id, &Location.nfc_changeset(&1, enabled))
+  end
+
   defp update_location_with(organization_id, location_id, changeset) do
     case fetch_location(organization_id, location_id) do
       nil ->
@@ -402,6 +433,8 @@ defmodule MilosTraining.Infrastructure.Facility.EctoFacilityStore do
       door_secret_rotated_at: location.door_secret_rotated_at,
       poster_enabled: location.poster_enabled,
       poster_secret_rotated_at: location.poster_secret_rotated_at,
+      nfc_enabled: location.nfc_enabled,
+      nfc_secret_rotated_at: location.nfc_secret_rotated_at,
       inserted_at: location.inserted_at,
       updated_at: location.updated_at
     }

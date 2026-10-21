@@ -18,6 +18,9 @@
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
 		A172000000000000000000A2 /* MilosHealthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A172000000000000000000A1 /* MilosHealthPlugin.swift */; };
 		A172000000000000000000B2 /* MilosBridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A172000000000000000000B1 /* MilosBridgeViewController.swift */; };
+		A1730000000000000000000B /* MilosWidgetsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000A /* MilosWidgetsPlugin.swift */; };
+		A1730000000000000000000D /* MilosGeofencePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000C /* MilosGeofencePlugin.swift */; };
+		A1730000000000000000000F /* MilosNfcPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000E /* MilosNfcPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -33,6 +36,9 @@
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		A172000000000000000000A1 /* MilosHealthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosHealthPlugin.swift; sourceTree = "<group>"; };
 		A172000000000000000000B1 /* MilosBridgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosBridgeViewController.swift; sourceTree = "<group>"; };
+		A1730000000000000000000A /* MilosWidgetsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosWidgetsPlugin.swift; sourceTree = "<group>"; };
+		A1730000000000000000000C /* MilosGeofencePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosGeofencePlugin.swift; sourceTree = "<group>"; };
+		A1730000000000000000000E /* MilosNfcPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosNfcPlugin.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -73,6 +79,9 @@
 				504EC3071FED79650016851F /* AppDelegate.swift */,
 				A172000000000000000000B1 /* MilosBridgeViewController.swift */,
 				A172000000000000000000A1 /* MilosHealthPlugin.swift */,
+				A1730000000000000000000A /* MilosWidgetsPlugin.swift */,
+				A1730000000000000000000C /* MilosGeofencePlugin.swift */,
+				A1730000000000000000000E /* MilosNfcPlugin.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -168,6 +177,9 @@
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				A172000000000000000000A2 /* MilosHealthPlugin.swift in Sources */,
 				A172000000000000000000B2 /* MilosBridgeViewController.swift in Sources */,
+				A1730000000000000000000B /* MilosWidgetsPlugin.swift in Sources */,
+				A1730000000000000000000D /* MilosGeofencePlugin.swift in Sources */,
+				A1730000000000000000000F /* MilosNfcPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
