@@ -35,10 +35,15 @@ defmodule MilosTraining.Application.ClubMembers do
     end
   end
 
-  defp member_ids(_context, %{kind: "gym", organization_id: organization_id}),
+  @doc """
+  Everyone in the club, as the gym says right now: a gym club's members are
+  the gym's active members; any other club's are its active memberships.
+  Partners (ADR-169) re-checks eligibility with this on every read.
+  """
+  def member_ids(_context, %{kind: "gym", organization_id: organization_id}),
     do: Organizations.list_active_membership_user_ids(organization_id)
 
-  defp member_ids(context, club) do
+  def member_ids(context, club) do
     context
     |> then(&ClubScope.write_context(club, &1))
     |> Community.club_memberships(club.id, "active")

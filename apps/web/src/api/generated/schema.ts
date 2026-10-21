@@ -800,6 +800,41 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People you blocked */
+        get: operations["MilosTrainingWeb.PartnersController.blocks"];
+        put?: never;
+        /** Block a person: Partners matches and buddy links between you end; they are not told */
+        post: operations["MilosTrainingWeb.PartnersController.block"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/blocks/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Unblock a person (ended matches and links stay ended) */
+        delete: operations["MilosTrainingWeb.PartnersController.unblock"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/body/access-log": {
         parameters: {
             query?: never;
@@ -1262,6 +1297,91 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/clubs/{club_id}/partners": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Partners in a club as it applies to you: offered?, your profile, the options */
+        get: operations["MilosTrainingWeb.PartnersController.club"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/clubs/{club_id}/partners/deck": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The next people of the club who opted in, best fit first */
+        get: operations["MilosTrainingWeb.PartnersController.deck"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/clubs/{club_id}/partners/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Opt in or change your Partners profile in a club (a member of the club only) */
+        put: operations["MilosTrainingWeb.PartnersController.put_profile"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/clubs/{club_id}/partners/swipes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Like or pass; a like answered by a like makes a match */
+        post: operations["MilosTrainingWeb.PartnersController.swipe"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/clubs/{club_id}/partners/swipes/{target_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Take back a swipe that made no match */
+        delete: operations["MilosTrainingWeb.PartnersController.undo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2260,6 +2380,127 @@ export interface paths {
         get?: never;
         /** How much you hear from an open club */
         put: operations["MilosTrainingWeb.OpenClubController.set_notify_level"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your Partners matches, latest conversation first */
+        get: operations["MilosTrainingWeb.PartnersController.matches"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** End a match quietly; its conversation stays readable */
+        delete: operations["MilosTrainingWeb.PartnersController.end_match"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}/messages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A page of the match's conversation, newest first */
+        get: operations["MilosTrainingWeb.PartnersController.messages"];
+        put?: never;
+        /** Write in an active match's conversation */
+        post: operations["MilosTrainingWeb.PartnersController.post_message"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}/messages/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Mark the conversation read */
+        post: operations["MilosTrainingWeb.PartnersController.mark_read"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Suggest a class in the conversation («Κλείστε μαζί») */
+        post: operations["MilosTrainingWeb.PartnersController.plan"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/matches/{id}/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** «Κλείστε μαζί»: the gym's next classes that suit you both */
+        get: operations["MilosTrainingWeb.PartnersController.sessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/partners/settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ρυθμίσεις › Partners: whether others in your clubs see you */
+        get: operations["MilosTrainingWeb.PartnersController.settings"];
+        /** Pause or resume every Partners profile at once */
+        put: operations["MilosTrainingWeb.PartnersController.put_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -12572,6 +12813,43 @@ export interface components {
             label: string;
             sets: number;
         };
+        /** BlockPersonRequest */
+        BlockPersonRequest: {
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** BlockPersonResponse */
+        BlockPersonResponse: {
+            blocked: boolean;
+            /** Format: uuid */
+            user_id: string;
+        };
+        /** BlockedPeople */
+        BlockedPeople: {
+            blocks: {
+                /** Format: date-time */
+                blocked_at: string;
+                /** PartnerPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+            }[];
+        };
+        /** BlockedPerson */
+        BlockedPerson: {
+            /** Format: date-time */
+            blocked_at: string;
+            /** PartnerPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+        };
         /** BodyAccessLog */
         BodyAccessLog: {
             entries: {
@@ -16590,6 +16868,7 @@ export interface components {
             /** @enum {string} */
             member_groups: "none" | "approval" | "free";
             needs_approval: boolean;
+            partners_enabled: boolean;
         };
         /** CommunityGroupUpdateRequest */
         CommunityGroupUpdateRequest: {
@@ -16710,6 +16989,7 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
+                partners_enabled: boolean;
             };
         };
         /** CommunityMember */
@@ -17510,7 +17790,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel";
+            target_type: "post" | "comment" | "channel" | "partner";
         };
         /** CommunityReportActionResponse */
         CommunityReportActionResponse: {
@@ -17528,7 +17808,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel";
+            target_type: "post" | "comment" | "channel" | "partner";
         };
         /** CommunityReportResponse */
         CommunityReportResponse: {
@@ -17587,7 +17867,7 @@ export interface components {
             /** Format: uuid */
             target_id: string;
             /** @enum {string} */
-            target_type: "post" | "comment" | "channel";
+            target_type: "post" | "comment" | "channel" | "partner";
         };
         /** CommunityReportsResponse */
         CommunityReportsResponse: {
@@ -17640,13 +17920,15 @@ export interface components {
                 /** Format: uuid */
                 target_id: string;
                 /** @enum {string} */
-                target_type: "post" | "comment" | "channel";
+                target_type: "post" | "comment" | "channel" | "partner";
             }[];
         };
         /** CommunitySettingsRequest */
         CommunitySettingsRequest: {
             /** @enum {string} */
-            member_groups: "none" | "approval" | "free";
+            member_groups?: "none" | "approval" | "free";
+            /** @description Whether the gym's verified clubs offer Partners (ADR-169) */
+            partners_enabled?: boolean;
         };
         /** CommunitySettingsResponse */
         CommunitySettingsResponse: {
@@ -17657,6 +17939,7 @@ export interface components {
             };
             /** @enum {string} */
             member_groups: "none" | "approval" | "free";
+            partners_enabled: boolean;
         };
         /** CommunityStaffGroup */
         CommunityStaffGroup: {
@@ -17801,6 +18084,7 @@ export interface components {
                 /** @enum {string} */
                 member_groups: "none" | "approval" | "free";
                 needs_approval: boolean;
+                partners_enabled: boolean;
             };
         };
         /** ConnectedDevices */
@@ -20783,6 +21067,478 @@ export interface components {
             previous_score?: number | null;
             score: number;
             unit: string;
+        };
+        /** PartnerCard */
+        PartnerCard: {
+            about: string | null;
+            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+            /** @enum {string} */
+            level: "beginner" | "intermediate" | "advanced";
+            /** PartnerPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** Format: uuid */
+            profile_id: string;
+            /** PartnerShared */
+            shared: {
+                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                same_level: boolean;
+                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+            };
+            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+        };
+        /** PartnerDeck */
+        PartnerDeck: {
+            cards: {
+                about: string | null;
+                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                /** @enum {string} */
+                level: "beginner" | "intermediate" | "advanced";
+                /** PartnerPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** Format: uuid */
+                profile_id: string;
+                /** PartnerShared */
+                shared: {
+                    goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                    same_level: boolean;
+                    times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                };
+                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+            }[];
+            /** Format: uuid */
+            club_id: string;
+            swipes_remaining: number;
+        };
+        /** PartnerMatch */
+        PartnerMatch: {
+            /** Format: uuid */
+            club_id: string;
+            club_name: string | null;
+            /** @enum {string|null} */
+            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+            ended_by_me: boolean;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            last_message_at: string | null;
+            /** Format: date-time */
+            matched_at: string;
+            /**
+             * Format: uuid
+             * @description The other person's profile in the club, what a report names
+             */
+            partner_profile_id: string | null;
+            /** PartnerPerson */
+            person: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            /** @description «Κλείστε μαζί» offers the gym's classes */
+            plannable: boolean;
+            read_only: boolean;
+            /** @enum {string} */
+            status: "active" | "ended";
+            unread: number;
+        };
+        /** PartnerMatchEnded */
+        PartnerMatchEnded: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            status: "active" | "ended";
+        };
+        /** PartnerMatches */
+        PartnerMatches: {
+            matches: {
+                /** Format: uuid */
+                club_id: string;
+                club_name: string | null;
+                /** @enum {string|null} */
+                end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                ended_by_me: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_message_at: string | null;
+                /** Format: date-time */
+                matched_at: string;
+                /**
+                 * Format: uuid
+                 * @description The other person's profile in the club, what a report names
+                 */
+                partner_profile_id: string | null;
+                /** PartnerPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** @description «Κλείστε μαζί» offers the gym's classes */
+                plannable: boolean;
+                read_only: boolean;
+                /** @enum {string} */
+                status: "active" | "ended";
+                unread: number;
+            }[];
+        };
+        /** PartnerMessage */
+        PartnerMessage: {
+            /** PartnerPerson */
+            author: {
+                avatar_url: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname: string | null;
+            };
+            body: string | null;
+            /** Format: date-time */
+            created_at: string;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "text" | "plan";
+            /** Format: uuid */
+            match_id: string;
+            mine: boolean;
+            plan: {
+                /** Format: uuid */
+                class_id: string;
+                duration_minutes: number | null;
+                name: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+            } | null;
+        };
+        /** PartnerMessagePage */
+        PartnerMessagePage: {
+            messages: {
+                /** PartnerPerson */
+                author: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                body: string | null;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "text" | "plan";
+                /** Format: uuid */
+                match_id: string;
+                mine: boolean;
+                plan: {
+                    /** Format: uuid */
+                    class_id: string;
+                    duration_minutes: number | null;
+                    name: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                } | null;
+            }[];
+            next_cursor: string | null;
+            read_only: boolean;
+            unread: number;
+        };
+        /** PartnerMessageRequest */
+        PartnerMessageRequest: {
+            body: string;
+        };
+        /** PartnerMessageResponse */
+        PartnerMessageResponse: {
+            /** PartnerMessage */
+            message: {
+                /** PartnerPerson */
+                author: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                body: string | null;
+                /** Format: date-time */
+                created_at: string;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "text" | "plan";
+                /** Format: uuid */
+                match_id: string;
+                mine: boolean;
+                plan: {
+                    /** Format: uuid */
+                    class_id: string;
+                    duration_minutes: number | null;
+                    name: string | null;
+                    /** Format: date-time */
+                    scheduled_at: string;
+                } | null;
+            };
+        };
+        /** PartnerMessagesRead */
+        PartnerMessagesRead: {
+            read: number;
+        };
+        /** PartnerOptions */
+        PartnerOptions: {
+            about_max: number;
+            daily_swipes: number;
+            gender_preferences: ("any" | "women" | "men")[];
+            genders: ("woman" | "man" | "other")[];
+            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+            levels: ("beginner" | "intermediate" | "advanced")[];
+            max_goals: number;
+            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+        };
+        /** PartnerPerson */
+        PartnerPerson: {
+            avatar_url: string | null;
+            /** Format: uuid */
+            id: string;
+            nickname: string | null;
+        };
+        /** PartnerPlan */
+        PartnerPlan: {
+            /** Format: uuid */
+            class_id: string;
+            duration_minutes: number | null;
+            name: string | null;
+            /** Format: date-time */
+            scheduled_at: string;
+        };
+        /** PartnerPlanRequest */
+        PartnerPlanRequest: {
+            body?: string | null;
+            /** Format: uuid */
+            class_id: string;
+        };
+        /** PartnerProfile */
+        PartnerProfile: {
+            about: string | null;
+            active: boolean;
+            /** Format: uuid */
+            club_id: string;
+            /**
+             * @description Only used to honour preferences; never shown to anyone
+             * @enum {string|null}
+             */
+            gender: "woman" | "man" | "other" | null;
+            /** @enum {string} */
+            gender_preference: "any" | "women" | "men";
+            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            level: "beginner" | "intermediate" | "advanced";
+            /** @description Staff hid it after a report */
+            suspended: boolean;
+            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+            /** Format: date-time */
+            updated_at?: string;
+        };
+        /** PartnerProfileRequest */
+        PartnerProfileRequest: {
+            about?: string | null;
+            active?: boolean;
+            /** @enum {string|null} */
+            gender?: "woman" | "man" | "other" | null;
+            /** @enum {string} */
+            gender_preference?: "any" | "women" | "men";
+            goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+            /** @enum {string} */
+            level?: "beginner" | "intermediate" | "advanced";
+            times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+        };
+        /** PartnerProfileResponse */
+        PartnerProfileResponse: {
+            /** PartnerProfile */
+            profile: {
+                about: string | null;
+                active: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /**
+                 * @description Only used to honour preferences; never shown to anyone
+                 * @enum {string|null}
+                 */
+                gender: "woman" | "man" | "other" | null;
+                /** @enum {string} */
+                gender_preference: "any" | "women" | "men";
+                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                level: "beginner" | "intermediate" | "advanced";
+                /** @description Staff hid it after a report */
+                suspended: boolean;
+                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                /** Format: date-time */
+                updated_at?: string;
+            };
+        };
+        /** PartnerSession */
+        PartnerSession: {
+            booked_by_me: boolean;
+            booked_by_partner: boolean;
+            /** Format: uuid */
+            class_id: string;
+            duration_minutes: number | null;
+            name: string | null;
+            /** Format: date-time */
+            scheduled_at: string;
+            /** @description In a time both of you chose */
+            shared_time: boolean;
+            spots_remaining: number;
+        };
+        /** PartnerSessions */
+        PartnerSessions: {
+            available: boolean;
+            sessions: {
+                booked_by_me: boolean;
+                booked_by_partner: boolean;
+                /** Format: uuid */
+                class_id: string;
+                duration_minutes: number | null;
+                name: string | null;
+                /** Format: date-time */
+                scheduled_at: string;
+                /** @description In a time both of you chose */
+                shared_time: boolean;
+                spots_remaining: number;
+            }[];
+            timezone: string | null;
+        };
+        /** PartnerSettings */
+        PartnerSettings: {
+            club_ids: string[];
+            /** @description Clubs where you have a profile */
+            clubs: number;
+            /** @description Whether any of your profiles is on */
+            visible: boolean;
+        };
+        /** PartnerSettingsRequest */
+        PartnerSettingsRequest: {
+            visible: boolean;
+        };
+        /** PartnerShared */
+        PartnerShared: {
+            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+            same_level: boolean;
+            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+        };
+        /** PartnerSwipeRequest */
+        PartnerSwipeRequest: {
+            /** @enum {string} */
+            direction: "like" | "pass";
+            /** Format: uuid */
+            target_id: string;
+        };
+        /** PartnerSwipeResponse */
+        PartnerSwipeResponse: {
+            /** @enum {string} */
+            direction: "like" | "pass";
+            /** @description Set when the like was mutual */
+            match: {
+                /** Format: uuid */
+                club_id: string;
+                club_name: string | null;
+                /** @enum {string|null} */
+                end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                ended_by_me: boolean;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                last_message_at: string | null;
+                /** Format: date-time */
+                matched_at: string;
+                /**
+                 * Format: uuid
+                 * @description The other person's profile in the club, what a report names
+                 */
+                partner_profile_id: string | null;
+                /** PartnerPerson */
+                person: {
+                    avatar_url: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname: string | null;
+                };
+                /** @description «Κλείστε μαζί» offers the gym's classes */
+                plannable: boolean;
+                read_only: boolean;
+                /** @enum {string} */
+                status: "active" | "ended";
+                unread: number;
+            } | null;
+            swipes_remaining: number;
+            /** Format: uuid */
+            target_id: string;
+        };
+        /** PartnerUndoResponse */
+        PartnerUndoResponse: {
+            /** Format: uuid */
+            target_id: string;
+            undone: boolean;
+        };
+        /** PartnersClubOverview */
+        PartnersClubOverview: {
+            /** Format: uuid */
+            club_id: string;
+            /** @description Whether the viewer is a member of the club now */
+            member: boolean;
+            offered: boolean;
+            /** PartnerOptions */
+            options: {
+                about_max: number;
+                daily_swipes: number;
+                gender_preferences: ("any" | "women" | "men")[];
+                genders: ("woman" | "man" | "other")[];
+                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                levels: ("beginner" | "intermediate" | "advanced")[];
+                max_goals: number;
+                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+            };
+            profile: {
+                about: string | null;
+                active: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /**
+                 * @description Only used to honour preferences; never shown to anyone
+                 * @enum {string|null}
+                 */
+                gender: "woman" | "man" | "other" | null;
+                /** @enum {string} */
+                gender_preference: "any" | "women" | "men";
+                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                level: "beginner" | "intermediate" | "advanced";
+                /** @description Staff hid it after a report */
+                suspended: boolean;
+                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                /** Format: date-time */
+                updated_at?: string;
+            } | null;
+            swipes_remaining: number;
+            /** @enum {string|null} */
+            unavailable_reason: "disabled" | "not_offered" | null;
         };
         /** PersonPostsResponse */
         PersonPostsResponse: {
@@ -29732,6 +30488,95 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PartnersController.blocks": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Blocked people */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocks: {
+                            /** Format: date-time */
+                            blocked_at: string;
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.block": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    user_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Blocked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocked: boolean;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.unblock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Unblocked */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        blocked: boolean;
+                        /** Format: uuid */
+                        user_id: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MyBodyController.access_log": {
         parameters: {
             query?: never;
@@ -31981,6 +32826,282 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PartnersController.club": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Overview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        club_id: string;
+                        /** @description Whether the viewer is a member of the club now */
+                        member: boolean;
+                        offered: boolean;
+                        /** PartnerOptions */
+                        options: {
+                            about_max: number;
+                            daily_swipes: number;
+                            gender_preferences: ("any" | "women" | "men")[];
+                            genders: ("woman" | "man" | "other")[];
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            levels: ("beginner" | "intermediate" | "advanced")[];
+                            max_goals: number;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                        };
+                        profile: {
+                            about: string | null;
+                            active: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /**
+                             * @description Only used to honour preferences; never shown to anyone
+                             * @enum {string|null}
+                             */
+                            gender: "woman" | "man" | "other" | null;
+                            /** @enum {string} */
+                            gender_preference: "any" | "women" | "men";
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** @description Staff hid it after a report */
+                            suspended: boolean;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        } | null;
+                        swipes_remaining: number;
+                        /** @enum {string|null} */
+                        unavailable_reason: "disabled" | "not_offered" | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.deck": {
+        parameters: {
+            query?: {
+                time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
+                level?: "beginner" | "intermediate" | "advanced";
+                goal?: "strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency";
+            };
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Deck */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        cards: {
+                            about: string | null;
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** Format: uuid */
+                            profile_id: string;
+                            /** PartnerShared */
+                            shared: {
+                                goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                                same_level: boolean;
+                                times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            };
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                        }[];
+                        /** Format: uuid */
+                        club_id: string;
+                        swipes_remaining: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.put_profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    about?: string | null;
+                    active?: boolean;
+                    /** @enum {string|null} */
+                    gender?: "woman" | "man" | "other" | null;
+                    /** @enum {string} */
+                    gender_preference?: "any" | "women" | "men";
+                    goals?: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                    /** @enum {string} */
+                    level?: "beginner" | "intermediate" | "advanced";
+                    times?: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                };
+            };
+        };
+        responses: {
+            /** @description Profile */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerProfile */
+                        profile: {
+                            about: string | null;
+                            active: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /**
+                             * @description Only used to honour preferences; never shown to anyone
+                             * @enum {string|null}
+                             */
+                            gender: "woman" | "man" | "other" | null;
+                            /** @enum {string} */
+                            gender_preference: "any" | "women" | "men";
+                            goals: ("strength" | "conditioning" | "weight_loss" | "skills" | "competition" | "consistency")[];
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            level: "beginner" | "intermediate" | "advanced";
+                            /** @description Staff hid it after a report */
+                            suspended: boolean;
+                            times: ("early" | "midday" | "afternoon" | "evening" | "weekend")[];
+                            /** Format: date-time */
+                            updated_at?: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.swipe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    direction: "like" | "pass";
+                    /** Format: uuid */
+                    target_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Swipe */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        direction: "like" | "pass";
+                        /** @description Set when the like was mutual */
+                        match: {
+                            /** Format: uuid */
+                            club_id: string;
+                            club_name: string | null;
+                            /** @enum {string|null} */
+                            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                            ended_by_me: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_message_at: string | null;
+                            /** Format: date-time */
+                            matched_at: string;
+                            /**
+                             * Format: uuid
+                             * @description The other person's profile in the club, what a report names
+                             */
+                            partner_profile_id: string | null;
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** @description «Κλείστε μαζί» offers the gym's classes */
+                            plannable: boolean;
+                            read_only: boolean;
+                            /** @enum {string} */
+                            status: "active" | "ended";
+                            unread: number;
+                        } | null;
+                        swipes_remaining: number;
+                        /** Format: uuid */
+                        target_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.undo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                club_id: string;
+                target_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Undone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        target_id: string;
+                        undone: boolean;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.OpenClubController.members": {
         parameters: {
             query?: {
@@ -33764,7 +34885,7 @@ export interface operations {
                     /** Format: uuid */
                     target_id: string;
                     /** @enum {string} */
-                    target_type: "post" | "comment" | "channel";
+                    target_type: "post" | "comment" | "channel" | "partner";
                 };
             };
         };
@@ -37506,6 +38627,378 @@ export interface operations {
                         club_id: string;
                         /** @enum {string} */
                         notify_level: "all" | "announcements" | "none";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.matches": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Matches */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        matches: {
+                            /** Format: uuid */
+                            club_id: string;
+                            club_name: string | null;
+                            /** @enum {string|null} */
+                            end_reason: "unmatched" | "blocked" | "reported" | "left" | "hidden" | null;
+                            ended_by_me: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            last_message_at: string | null;
+                            /** Format: date-time */
+                            matched_at: string;
+                            /**
+                             * Format: uuid
+                             * @description The other person's profile in the club, what a report names
+                             */
+                            partner_profile_id: string | null;
+                            /** PartnerPerson */
+                            person: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            /** @description «Κλείστε μαζί» offers the gym's classes */
+                            plannable: boolean;
+                            read_only: boolean;
+                            /** @enum {string} */
+                            status: "active" | "ended";
+                            unread: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.end_match": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ended */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        /** @enum {string} */
+                        status: "active" | "ended";
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.messages": {
+        parameters: {
+            query?: {
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Messages */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        messages: {
+                            /** PartnerPerson */
+                            author: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            body: string | null;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "text" | "plan";
+                            /** Format: uuid */
+                            match_id: string;
+                            mine: boolean;
+                            plan: {
+                                /** Format: uuid */
+                                class_id: string;
+                                duration_minutes: number | null;
+                                name: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            } | null;
+                        }[];
+                        next_cursor: string | null;
+                        read_only: boolean;
+                        unread: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.post_message": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerMessage */
+                        message: {
+                            /** PartnerPerson */
+                            author: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            body: string | null;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "text" | "plan";
+                            /** Format: uuid */
+                            match_id: string;
+                            mine: boolean;
+                            plan: {
+                                /** Format: uuid */
+                                class_id: string;
+                                duration_minutes: number | null;
+                                name: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            } | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.mark_read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Read */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        read: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body?: string | null;
+                    /** Format: uuid */
+                    class_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Message */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PartnerMessage */
+                        message: {
+                            /** PartnerPerson */
+                            author: {
+                                avatar_url: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname: string | null;
+                            };
+                            body: string | null;
+                            /** Format: date-time */
+                            created_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "text" | "plan";
+                            /** Format: uuid */
+                            match_id: string;
+                            mine: boolean;
+                            plan: {
+                                /** Format: uuid */
+                                class_id: string;
+                                duration_minutes: number | null;
+                                name: string | null;
+                                /** Format: date-time */
+                                scheduled_at: string;
+                            } | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Sessions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        available: boolean;
+                        sessions: {
+                            booked_by_me: boolean;
+                            booked_by_partner: boolean;
+                            /** Format: uuid */
+                            class_id: string;
+                            duration_minutes: number | null;
+                            name: string | null;
+                            /** Format: date-time */
+                            scheduled_at: string;
+                            /** @description In a time both of you chose */
+                            shared_time: boolean;
+                            spots_remaining: number;
+                        }[];
+                        timezone: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        club_ids: string[];
+                        /** @description Clubs where you have a profile */
+                        clubs: number;
+                        /** @description Whether any of your profiles is on */
+                        visible: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PartnersController.put_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    visible: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        club_ids: string[];
+                        /** @description Clubs where you have a profile */
+                        clubs: number;
+                        /** @description Whether any of your profiles is on */
+                        visible: boolean;
                     };
                 };
             };
@@ -45810,6 +47303,7 @@ export interface operations {
                             /** @enum {string} */
                             member_groups: "none" | "approval" | "free";
                             needs_approval: boolean;
+                            partners_enabled: boolean;
                         };
                     };
                 };
@@ -45986,7 +47480,7 @@ export interface operations {
                             /** Format: uuid */
                             target_id: string;
                             /** @enum {string} */
-                            target_type: "post" | "comment" | "channel";
+                            target_type: "post" | "comment" | "channel" | "partner";
                         }[];
                     };
                 };
@@ -46008,7 +47502,7 @@ export interface operations {
                     /** Format: uuid */
                     target_id: string;
                     /** @enum {string} */
-                    target_type: "post" | "comment" | "channel";
+                    target_type: "post" | "comment" | "channel" | "partner";
                 };
             };
         };
@@ -46041,7 +47535,9 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string} */
-                    member_groups: "none" | "approval" | "free";
+                    member_groups?: "none" | "approval" | "free";
+                    /** @description Whether the gym's verified clubs offer Partners (ADR-169) */
+                    partners_enabled?: boolean;
                 };
             };
         };
@@ -46060,6 +47556,7 @@ export interface operations {
                         };
                         /** @enum {string} */
                         member_groups: "none" | "approval" | "free";
+                        partners_enabled: boolean;
                     };
                 };
             };
@@ -59134,6 +60631,7 @@ export interface operations {
                             /** @enum {string} */
                             member_groups: "none" | "approval" | "free";
                             needs_approval: boolean;
+                            partners_enabled: boolean;
                         };
                     };
                 };

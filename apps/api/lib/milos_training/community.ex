@@ -7,6 +7,7 @@ defmodule MilosTraining.Community do
   """
 
   alias MilosTraining.Community.Commands.{
+    Blocks,
     ChannelMembership,
     ClassGroups,
     Events,
@@ -291,6 +292,12 @@ defmodule MilosTraining.Community do
   defdelegate put_social_settings(context, user_id, attrs), to: SocialStore
   defdelegate booking_sharer_ids(context), to: SocialStore
   defdelegate hidden_member_ids(ids), to: SocialStore
+
+  # Blocking a person (ADR-169 §5).
+  defdelegate block_user(context, blocked_id), to: Blocks, as: :block
+  defdelegate unblock_user(context, blocked_id), to: Blocks, as: :unblock
+  defdelegate list_blocks(context), to: Blocks, as: :list
+  defdelegate blocked_user_ids(context), to: Blocks, as: :blocked_ids
 
   # Profile posts (ADR-142).
   defdelegate create_profile_post(context, audience, attrs), to: ProfilePosts, as: :create

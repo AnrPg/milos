@@ -544,6 +544,15 @@ msgstr "Експортът на дневника ти е готов"
 msgid "Download it within seven days from Settings."
 msgstr "Изтегли го до седем дни от Настройки."
 
+msgid "You found a training partner"
+msgstr "Намерихте партньор за тренировки"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Вие и %{nickname} искате да тренирате заедно. Кажете здравей."
+
+msgid "Training partner message"
+msgstr "Съобщение от партньор за тренировки"
+
 msgid "Squad invitation"
 msgstr "Покана за скуад"
 

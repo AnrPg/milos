@@ -544,6 +544,15 @@ msgstr "Tu exportación del diario está lista"
 msgid "Download it within seven days from Settings."
 msgstr "Descárgala en un plazo de siete días desde Ajustes."
 
+msgid "You found a training partner"
+msgstr "Has encontrado compañero de entrenamiento"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Tú y %{nickname} queréis entrenar juntos. Saluda."
+
+msgid "Training partner message"
+msgstr "Mensaje de tu compañero de entrenamiento"
+
 msgid "Squad invitation"
 msgstr "Invitación a un squad"
 

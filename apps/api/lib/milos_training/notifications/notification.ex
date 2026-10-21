@@ -81,6 +81,8 @@ defmodule MilosTraining.Notifications.Notification do
     :support_no_reply_nudge,
     :buddy_weekly_summary,
     :buddy_message,
+    :partner_match,
+    :partner_message,
     :coach_wellness_summary,
     :craving_follow_up,
     :water_reminder,

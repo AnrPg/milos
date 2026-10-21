@@ -542,6 +542,14 @@ msgstr ""
 msgid "Download it within seven days from Settings."
 msgstr ""
 
+msgid "You found a training partner"
+msgstr ""
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr ""
+
+msgid "Training partner message"
+
 msgid "Squad invitation"
 msgstr ""
 

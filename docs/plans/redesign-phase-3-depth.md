@@ -230,6 +230,20 @@ No board; decided for least clutter (owner's standing instruction), full list in
    when > 0, gym exercises (first 5, «Όλες (n)») with on-demand videos matched by tag/title behind the package gate.
 6. **Entry from goals:** «Άτλαντας ›» in the goals sheet and tappable muscle chips; the strip is unchanged.
 
+### Partners (2026-10-21, ADR-169)
+No board; decided for least clutter (owner's standing instruction), full list in ADR-169 «Decisions».
+1. **Where:** Club › Μέλη, a «Partners» card above the members list, only in clubs whose members the gym verified
+   (gym, PT squad, season, or an open club with approval or invite) and only while the gym's switch is on.
+2. **Opt-in:** a short card (members only, both must agree) → profile sheet: level, times, up to 3 goals, one line of
+   up to 140 characters; gender and a preference are optional, folded away, never shown to anyone.
+3. **Deck:** one card at a time, best fit first, «Κοινά: …» on top, ✕ / ✓ and drag; one «Φίλτρα» button for time,
+   level and goal; the last swipe can be undone unless it matched; 200 a day; no match score.
+4. **Match:** «Βρήκατε partner» sheet with «Πες γεια»; the conversation lives at `/partners/:id` and in Μηνύματα next
+   to Buddy's; «Κλείστε μαζί» offers the gym's classes in the next 7 days (booked by either first, then shared times).
+5. **Safety:** ⋯ ends the match, blocks (account-wide, ends buddy links too, the other side isn't told) or reports
+   (shared staff queue; «Απόκρυψη» suspends the profile in that club). Κοινοποίηση & ορατότητα: one switch pauses
+   every profile, and the blocked list with «Άρση».
+
 ### Native wrapper (2026-10-21, ADR-171, no board: owner's standing instruction)
 1. **Shell:** Capacitor 8 in `apps/mobile`, app id `app.milos.member`, «Milos»; the app loads the deployed web app
    (production `https://milos.4kq.net`, or `MILOS_APP_URL`), so web and apps ship together. Other hosts open in the
@@ -257,8 +271,8 @@ No board; decided for least clutter (owner's standing instruction), full list in
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
-- [ ] Partners: club-verified only, mutual consent, report/block, optional gender preference, «training partner» copy
-- [ ] Partners hidden unless the member opts in, per club
+- [x] Partners: club-verified only, mutual consent, report/block, optional gender preference, «training partner» copy
+- [x] Partners hidden unless the member opts in, per club
 - [ ] AI suggestions never reach an athlete without coach approval
 - [ ] Voice recordings deleted after transcription
 - [ ] Phone health data follows D8/D11 of Phase 2 (consent, delete, export)
@@ -271,5 +285,5 @@ No board; decided for least clutter (owner's standing instruction), full list in
 
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
-- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [x] P3-M6 (ADR-168) · [ ] P3-M7
+- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [x] P3-M6 (ADR-168) · [x] P3-M7 (ADR-169)
 - [ ] P3-M8 · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
