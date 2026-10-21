@@ -1,7 +1,7 @@
 "use client";
 
 // ADR-173: home-screen widgets inside the store apps («+1 νερό», Σήμερα,
-// Check-in), through the app's own `MilosWidgets` plugin (WidgetKit on iOS,
+// Check-in), through the app's own `PaleeWidgets` plugin (WidgetKit on iOS,
 // App Widgets on Android). Widgets run outside the web view, so the app hands
 // them a widget token of their own (POST /api/me/widget-tokens), the host to
 // call and the words to show; the native side fetches /api/widget/snapshot.
@@ -35,14 +35,14 @@ export type WidgetSession = {
   paths: typeof WIDGET_PATHS;
 };
 
-export type MilosWidgetsPlugin = {
+export type PaleeWidgetsPlugin = {
   setSession(session: WidgetSession): Promise<void>;
   clear(): Promise<void>;
 };
 
 type StoredToken = { id: string; token: string; userId: string; issuedAt: string };
 
-const STORAGE_KEY = "milos-widget-token";
+const STORAGE_KEY = "palee-widget-token";
 // The token lives 180 days; the app renews it well before.
 export const RENEW_AFTER_DAYS = 30;
 
@@ -50,12 +50,12 @@ export function widgetsSupported() {
   return hasCapability("widgets");
 }
 
-let pluginPromise: Promise<MilosWidgetsPlugin> | null = null;
+let pluginPromise: Promise<PaleeWidgetsPlugin> | null = null;
 
 // Capacitor's plugin proxy answers `then`, so it travels wrapped (see health.ts).
-export function widgetsPlugin(): Promise<MilosWidgetsPlugin> {
+export function widgetsPlugin(): Promise<PaleeWidgetsPlugin> {
   pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => {
-    const native = registerPlugin<MilosWidgetsPlugin>("MilosWidgets");
+    const native = registerPlugin<PaleeWidgetsPlugin>("PaleeWidgets");
     return { setSession: (session) => native.setSession(session), clear: () => native.clear() };
   });
   return pluginPromise;
@@ -95,7 +95,7 @@ export function syncWidgets(
   accessToken: string,
   userId: string,
   labels: WidgetLabels,
-  options: { plugin?: MilosWidgetsPlugin; origin?: string; now?: Date } = {},
+  options: { plugin?: PaleeWidgetsPlugin; origin?: string; now?: Date } = {},
 ): Promise<void> {
   inflight ??= (async () => {
     const platform = nativePlatform();
@@ -115,7 +115,7 @@ export function syncWidgets(
 }
 
 /** Sign-out: the widgets go blank and their token stops working. */
-export async function forgetWidgets(accessToken?: string | null, plugin?: MilosWidgetsPlugin): Promise<void> {
+export async function forgetWidgets(accessToken?: string | null, plugin?: PaleeWidgetsPlugin): Promise<void> {
   if (!widgetsSupported() && !plugin) return;
   const stored = readStored();
   writeStored(null);

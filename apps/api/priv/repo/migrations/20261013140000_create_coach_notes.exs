@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateCoachNotes do
+defmodule Palee.Repo.Migrations.CreateCoachNotes do
   use Ecto.Migration
 
   # ADR-101: private coach notes about a client and every read of them by
@@ -58,7 +58,7 @@ defmodule MilosTraining.Repo.Migrations.CreateCoachNotes do
         """
         CREATE TRIGGER #{table}_apply_tenant_context
         BEFORE INSERT OR UPDATE ON #{table}
-        FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+        FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
         """,
         "DROP TRIGGER IF EXISTS #{table}_apply_tenant_context ON #{table}"
       )

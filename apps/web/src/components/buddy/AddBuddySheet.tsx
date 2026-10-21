@@ -21,7 +21,7 @@ export function buddyInviteUrl(token: string): string {
 
 /**
  * «Πρόσθεσε άτομο ή τον coach» (board 15 q2 A): your coach, people of your
- * clubs and people you follow, or a link for someone not on Milos yet,
+ * clubs and people you follow, or a link for someone not on Palee yet,
  * shared through the phone's share sheet (copied where there is none).
  * Nothing starts until they accept; a link expires after a week.
  */

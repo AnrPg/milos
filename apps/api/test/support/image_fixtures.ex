@@ -1,4 +1,4 @@
-defmodule MilosTraining.TestSupport.ImageFixtures do
+defmodule Palee.TestSupport.ImageFixtures do
   @moduledoc "Leading bytes of small images for media upload tests (ADR-148)."
 
   import Bitwise

@@ -120,9 +120,9 @@ Update `docs/adr/README.md` after adding the ADR.
 
 Create:
 
-- `apps/api/lib/milos_training/finance.ex`
-- `apps/api/lib/milos_training/finance/`
-- `apps/api/lib/milos_training/infrastructure/finance/`
+- `apps/api/lib/palee/finance.ex`
+- `apps/api/lib/palee/finance/`
+- `apps/api/lib/palee/infrastructure/finance/`
 - ports, commands, queries, and schemas following existing context style.
 
 Start with the full known schema but keep abstractions thin. Add only behaviour
@@ -207,7 +207,7 @@ Create `finance_aggregates` materialized view for:
 
 Add an Oban refresh job:
 
-- `MilosTraining.Workers.RefreshFinanceAggregatesJob`
+- `Palee.Workers.RefreshFinanceAggregatesJob`
 
 Use `CONCURRENTLY` only if the view has the required unique index.
 
@@ -281,8 +281,8 @@ flows are active in MVP.
 
 Implement:
 
-- `MilosTraining.Infrastructure.Search.MemberIndexer`
-- `MilosTraining.Workers.IndexUserJob`
+- `Palee.Infrastructure.Search.MemberIndexer`
+- `Palee.Workers.IndexUserJob`
 - `GET /api/admin/search`
 
 Minimum filters:

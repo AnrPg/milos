@@ -55,7 +55,7 @@ function isSafeEditorUrl(value: string) {
   if (/^https?:/i.test(value)) return true;
 
   if (value.startsWith("/")) {
-    const origin = "http://milos.local";
+    const origin = "http://palee.local";
 
     try {
       const parsed = new URL(value, origin);

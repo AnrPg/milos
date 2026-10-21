@@ -39,7 +39,7 @@ import {
 type AlertCategory = "finance" | "coaching" | "training";
 
 const DEFAULT_CATEGORIES: AlertCategory[] = ["finance", "coaching", "training"];
-const STORAGE_KEY = "milos-admin-alert-categories";
+const STORAGE_KEY = "palee-admin-alert-categories";
 
 function loadCategories(): AlertCategory[] {
   try {

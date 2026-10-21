@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnforceUniqueAssignmentHeaders do
+defmodule Palee.Repo.Migrations.EnforceUniqueAssignmentHeaders do
   use Ecto.Migration
 
   def up do

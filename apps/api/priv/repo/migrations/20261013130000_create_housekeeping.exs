@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateHousekeeping do
+defmodule Palee.Repo.Migrations.CreateHousekeeping do
   use Ecto.Migration
 
   # ADR-102: cleaning areas with a task checklist, and cleaning entries.
@@ -55,7 +55,7 @@ defmodule MilosTraining.Repo.Migrations.CreateHousekeeping do
         """
         CREATE TRIGGER #{table}_apply_tenant_context
         BEFORE INSERT OR UPDATE ON #{table}
-        FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+        FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
         """,
         "DROP TRIGGER IF EXISTS #{table}_apply_tenant_context ON #{table}"
       )

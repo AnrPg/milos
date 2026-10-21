@@ -1,7 +1,7 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
-export const SELECTED_ORGANIZATION_SLUG_KEY = "milos:selected-organization-slug";
-export const SESSION_UPDATED_EVENT = "milos:session-updated";
-export const SESSION_EXPIRED_EVENT = "milos:session-expired";
+export const SELECTED_ORGANIZATION_SLUG_KEY = "palee:selected-organization-slug";
+export const SESSION_UPDATED_EVENT = "palee:session-updated";
+export const SESSION_EXPIRED_EVENT = "palee:session-expired";
 
 type SessionTokens = {
   access_token: string;
@@ -231,7 +231,7 @@ function getSessionChannel() {
   if (typeof window === "undefined" || !("BroadcastChannel" in window)) return null;
   if (sessionChannel) return sessionChannel;
 
-  sessionChannel = new BroadcastChannel("milos-session-v1");
+  sessionChannel = new BroadcastChannel("palee-session-v1");
   sessionChannel.addEventListener("message", (event: MessageEvent<{ access_token?: string; signed_out?: boolean }>) => {
     if (event.data?.signed_out) {
       latestSharedAccessToken = null;
@@ -324,7 +324,7 @@ async function refreshAccessToken(): Promise<string | null> {
 
   refreshPromise = (async () => {
     if (typeof navigator !== "undefined" && navigator.locks) {
-      return await navigator.locks.request("milos-refresh-cookie", async () => {
+      return await navigator.locks.request("palee-refresh-cookie", async () => {
         return await performRefresh();
       });
     }

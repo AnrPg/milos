@@ -1336,7 +1336,7 @@ function AiAssistantSection({ token }: { token: string }) {
   );
 }
 
-// ADR-170: the organization's Milos plan (owners and admins).
+// ADR-170: the organization's Palee plan (owners and admins).
 function PlanSection({ token }: { token: string }) {
   const t = useTranslations("SoloCoach");
   return (

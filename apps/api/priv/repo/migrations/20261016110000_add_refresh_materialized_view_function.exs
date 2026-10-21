@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddRefreshMaterializedViewFunction do
+defmodule Palee.Repo.Migrations.AddRefreshMaterializedViewFunction do
   use Ecto.Migration
 
   # TD-092 / ADR-131: `REFRESH MATERIALIZED VIEW` requires ownership of the
@@ -17,7 +17,7 @@ defmodule MilosTraining.Repo.Migrations.AddRefreshMaterializedViewFunction do
   # `REFRESH MATERIALIZED VIEW` already does.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_refresh_materialized_view(view_name text)
+    CREATE OR REPLACE FUNCTION palee_refresh_materialized_view(view_name text)
     RETURNS void
     LANGUAGE plpgsql
     VOLATILE
@@ -27,7 +27,7 @@ defmodule MilosTraining.Repo.Migrations.AddRefreshMaterializedViewFunction do
     BEGIN
       IF view_name IS NULL
          OR view_name NOT IN ('weekly_leaderboard', 'coaching_aggregates', 'finance_aggregates') THEN
-        RAISE EXCEPTION 'materialized view % cannot be refreshed through milos_refresh_materialized_view', view_name
+        RAISE EXCEPTION 'materialized view % cannot be refreshed through palee_refresh_materialized_view', view_name
           USING ERRCODE = 'insufficient_privilege';
       END IF;
 
@@ -42,13 +42,13 @@ defmodule MilosTraining.Repo.Migrations.AddRefreshMaterializedViewFunction do
     $$
     """)
 
-    # EXECUTE stays with PUBLIC (the default), like the other milos_*
+    # EXECUTE stays with PUBLIC (the default), like the other palee_*
     # SECURITY DEFINER helpers: runtime roles are provisioned outside
     # migrations under deployment-specific names, and the body only ever
     # refreshes the allow-listed views.
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_refresh_materialized_view(text)")
+    execute("DROP FUNCTION IF EXISTS palee_refresh_materialized_view(text)")
   end
 end

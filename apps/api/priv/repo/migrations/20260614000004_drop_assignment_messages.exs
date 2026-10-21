@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.DropAssignmentMessages do
+defmodule Palee.Repo.Migrations.DropAssignmentMessages do
   use Ecto.Migration
 
   def up do

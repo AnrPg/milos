@@ -19,7 +19,7 @@ if [ "${FREE}" -lt "${MIN_FREE_PERCENT}" ]; then
   exit 75
 fi
 
-pg_isready -h "${PGHOST:-postgres}" -p "${PGPORT:-5432}" -U "${PGUSER:-postgres}" -d "${PGDATABASE:-milos_training_dev}"
+pg_isready -h "${PGHOST:-postgres}" -p "${PGPORT:-5432}" -U "${PGUSER:-postgres}" -d "${PGDATABASE:-palee_dev}"
 
 pg_basebackup \
   -h "${PGHOST:-postgres}" \
@@ -31,7 +31,7 @@ pg_basebackup \
   -P \
   --checkpoint=fast \
   --write-recovery-conf \
-  --label="milos-${STAMP}"
+  --label="palee-${STAMP}"
 
 pg_verifybackup "${TARGET}"
 ln -sfn "${TARGET}" "${BACKUP_ROOT}/latest"

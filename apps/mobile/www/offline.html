@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Milos</title>
+    <title>Palee</title>
     <!-- ADR-171: shown by the native shell (server.errorPath) when the web app
          cannot be reached, e.g. a cold start without a connection. -->
     <script src="app-config.js"></script>
@@ -23,7 +23,7 @@
   <body>
     <main>
       <h1 id="title">Χωρίς σύνδεση</h1>
-      <p id="body">Το Milos χρειάζεται σύνδεση για να ανοίξει. Ό,τι κατέγραψες χωρίς σύνδεση μένει στη συσκευή και στέλνεται μόλις επανέλθει.</p>
+      <p id="body">Το Palee χρειάζεται σύνδεση για να ανοίξει. Ό,τι κατέγραψες χωρίς σύνδεση μένει στη συσκευή και στέλνεται μόλις επανέλθει.</p>
       <button id="retry" type="button">Δοκίμασε ξανά</button>
     </main>
     <script>
@@ -33,11 +33,11 @@
           document.documentElement.lang = "en";
           document.getElementById("title").textContent = "No connection";
           document.getElementById("body").textContent =
-            "Milos needs a connection to open. Anything you logged offline stays on this device and is sent once you are back online.";
+            "Palee needs a connection to open. Anything you logged offline stays on this device and is sent once you are back online.";
           document.getElementById("retry").textContent = "Try again";
         }
         function retry() {
-          if (window.MILOS_APP_URL) window.location.replace(window.MILOS_APP_URL);
+          if (window.PALEE_APP_URL) window.location.replace(window.PALEE_APP_URL);
         }
         document.getElementById("retry").addEventListener("click", retry);
         window.addEventListener("online", retry);

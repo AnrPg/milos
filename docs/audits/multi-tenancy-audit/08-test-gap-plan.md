@@ -13,30 +13,30 @@ DB_PORT=15434 MIX_ENV=test mix ecto.create
 DB_PORT=15434 MIX_ENV=test mix ecto.migrate
 
 # Tenancy audit task (read-only queries against the local dev DB, port 15434)
-DB_PORT=15434 mix milos.tenancy.audit
+DB_PORT=15434 mix palee.tenancy.audit
 # Result: all 44 tables in the script's checked list report
 # unmapped=0 rls=true force=true; ready_for_full_enforcement?/1 passes.
 # See 04-findings.md F-13 for why this passing is weaker evidence than it looks.
 
 # Hexagonal architecture boundary gate
-DB_PORT=15434 mix milos.architecture
+DB_PORT=15434 mix palee.architecture
 # Result: "Hexagonal architecture boundaries are clean"
 # See F-13 — this only checks two Scheduling files by substring match.
 
 # Tenancy/organizations/invitation/isolation test suites
 DB_PORT=15434 mix test \
-  test/milos_training/organizations/ \
-  test/milos_training/analytics/tenant_isolation_test.exs \
-  test/milos_training/execution/owner_isolation_test.exs \
-  test/milos_training/feedback/tenant_isolation_test.exs \
-  test/milos_training/finance/tenant_isolation_test.exs \
-  test/milos_training/gamification/tenant_isolation_test.exs \
-  test/milos_training/messaging/tenant_isolation_test.exs \
-  test/milos_training/scheduling/tenant_isolation_test.exs \
-  test/milos_training/workouts/tenant_isolation_test.exs \
-  test/milos_training_web/channels/user_socket_tenant_context_test.exs \
-  test/milos_training_web/controllers/organization_access_controller_test.exs \
-  test/milos_training_web/controllers/platform_organization_controller_test.exs
+  test/palee/organizations/ \
+  test/palee/analytics/tenant_isolation_test.exs \
+  test/palee/execution/owner_isolation_test.exs \
+  test/palee/feedback/tenant_isolation_test.exs \
+  test/palee/finance/tenant_isolation_test.exs \
+  test/palee/gamification/tenant_isolation_test.exs \
+  test/palee/messaging/tenant_isolation_test.exs \
+  test/palee/scheduling/tenant_isolation_test.exs \
+  test/palee/workouts/tenant_isolation_test.exs \
+  test/palee_web/channels/user_socket_tenant_context_test.exs \
+  test/palee_web/controllers/organization_access_controller_test.exs \
+  test/palee_web/controllers/platform_organization_controller_test.exs
 # Result: 51 tests, 0 failures.
 # CRITICAL CAVEAT: this test run, like all runs in this codebase's dev/test
 # config, connected as the Postgres superuser (config/test.exs default

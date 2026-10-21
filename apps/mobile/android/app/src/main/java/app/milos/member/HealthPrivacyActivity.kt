@@ -16,7 +16,7 @@ class HealthPrivacyActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         val base = (CapConfig.loadDefault(this).serverUrl ?: DEFAULT_URL).trimEnd('/')
-        val page = getString(R.string.milos_health_privacy_path)
+        val page = getString(R.string.palee_health_privacy_path)
         runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(base + page))) }
         finish()
     }

@@ -22,11 +22,11 @@ type CapacitorBridge = {
 // (widgets, geofence, NFC) and light up as soon as their plugin is present.
 const CAPABILITY_PLUGINS: Record<Capability, { plugin: string; platforms: NativePlatform[] }> = {
   nativePush: { plugin: "PushNotifications", platforms: ["ios", "android"] },
-  healthKit: { plugin: "MilosHealth", platforms: ["ios"] },
-  healthConnect: { plugin: "MilosHealth", platforms: ["android"] },
-  widgets: { plugin: "MilosWidgets", platforms: ["ios", "android"] },
-  geofence: { plugin: "MilosGeofence", platforms: ["ios", "android"] },
-  nfc: { plugin: "MilosNfc", platforms: ["ios", "android"] },
+  healthKit: { plugin: "PaleeHealth", platforms: ["ios"] },
+  healthConnect: { plugin: "PaleeHealth", platforms: ["android"] },
+  widgets: { plugin: "PaleeWidgets", platforms: ["ios", "android"] },
+  geofence: { plugin: "PaleeGeofence", platforms: ["ios", "android"] },
+  nfc: { plugin: "PaleeNfc", platforms: ["ios", "android"] },
 };
 
 export const CAPABILITIES = Object.keys(CAPABILITY_PLUGINS) as Capability[];

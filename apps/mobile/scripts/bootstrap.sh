@@ -1,9 +1,9 @@
 #!/bin/sh
 # ADR-171: reproducible setup of the store apps on a build machine.
 #
-#   MILOS_APP_ENV=production|staging|development  (default production)
-#   MILOS_APP_URL=https://…                        (overrides the environment's URL)
-#   MILOS_APS_ENVIRONMENT=production|development   (iOS push entitlement)
+#   PALEE_APP_ENV=production|staging|development  (default production)
+#   PALEE_APP_URL=https://…                        (overrides the environment's URL)
+#   PALEE_APS_ENVIRONMENT=production|development   (iOS push entitlement)
 #
 # The ios/ and android/ projects are in git (generated with `npx cap add`
 # from the pinned Capacitor versions). This installs the exact JS versions,

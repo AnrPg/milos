@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MakeMembershipLookupsRoleSetAware do
+defmodule Palee.Repo.Migrations.MakeMembershipLookupsRoleSetAware do
   use Ecto.Migration
 
   # ADR-099 gave memberships a role set (`roles`); `role` is only the primary
@@ -8,7 +8,7 @@ defmodule MilosTraining.Repo.Migrations.MakeMembershipLookupsRoleSetAware do
   # members' PRs. Both now match the role set; signatures are unchanged.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_organization_user_ids(org_id uuid, member_roles text[])
+    CREATE OR REPLACE FUNCTION palee_organization_user_ids(org_id uuid, member_roles text[])
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -38,7 +38,7 @@ defmodule MilosTraining.Repo.Migrations.MakeMembershipLookupsRoleSetAware do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_coaches(org_id uuid)
+    CREATE OR REPLACE FUNCTION palee_acting_user_coaches(org_id uuid)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -59,7 +59,7 @@ defmodule MilosTraining.Repo.Migrations.MakeMembershipLookupsRoleSetAware do
 
   def down do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_organization_user_ids(org_id uuid, member_roles text[])
+    CREATE OR REPLACE FUNCTION palee_organization_user_ids(org_id uuid, member_roles text[])
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -89,7 +89,7 @@ defmodule MilosTraining.Repo.Migrations.MakeMembershipLookupsRoleSetAware do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_coaches(org_id uuid)
+    CREATE OR REPLACE FUNCTION palee_acting_user_coaches(org_id uuid)
     RETURNS boolean
     LANGUAGE sql
     STABLE

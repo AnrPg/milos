@@ -670,7 +670,7 @@ export const useExecutionStore = create<ExecutionState>()(
       reset: () => set(initialState),
     }),
     {
-      name: "milos-execution-store",
+      name: "palee-execution-store",
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         executionId: state.executionId,

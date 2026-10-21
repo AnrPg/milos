@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MediaAndPublicProfiles do
+defmodule Palee.Repo.Migrations.MediaAndPublicProfiles do
   @moduledoc """
   ADR-148: uploaded images, one table per ownership scope so each carries one
   RLS rule and one deletion rule:
@@ -97,7 +97,7 @@ defmodule MilosTraining.Repo.Migrations.MediaAndPublicProfiles do
     # which people have unattached uploads older than the cutoff (ADR-131).
     execute(
       """
-      CREATE FUNCTION milos_account_media_orphan_owner_ids(cutoff timestamp)
+      CREATE FUNCTION palee_account_media_orphan_owner_ids(cutoff timestamp)
       RETURNS SETOF uuid
       LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public
       AS $$
@@ -105,7 +105,7 @@ defmodule MilosTraining.Repo.Migrations.MediaAndPublicProfiles do
         WHERE attached_at IS NULL AND inserted_at < cutoff
       $$
       """,
-      "DROP FUNCTION IF EXISTS milos_account_media_orphan_owner_ids(timestamp)"
+      "DROP FUNCTION IF EXISTS palee_account_media_orphan_owner_ids(timestamp)"
     )
 
     create table(:organization_public_profiles, primary_key: false) do
@@ -143,7 +143,7 @@ defmodule MilosTraining.Repo.Migrations.MediaAndPublicProfiles do
       """
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """,
       "DROP TRIGGER IF EXISTS #{table}_apply_tenant_context ON #{table}"
     )

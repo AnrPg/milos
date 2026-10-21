@@ -9,7 +9,7 @@ editor assistance, autocomplete, publication, and coach documentation
 
 ## 1. Executive Summary
 
-Milos Training will support two workout-authoring modes:
+Palee will support two workout-authoring modes:
 
 1. **Structured mode:** the existing visual, form-like workout canvas.
 2. **Quick Text mode:** a familiar document editor backed by a small,

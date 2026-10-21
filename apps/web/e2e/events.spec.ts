@@ -104,7 +104,7 @@ function communityEvent(overrides: Record<string, unknown> = {}) {
 const going = { status: "going", source: "member", paid: false, late_cancel: false };
 
 async function common(page: Page, persona: ReturnType<typeof personaFor>, memberships: unknown[]) {
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: persona.token, refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(persona.user)));
@@ -237,7 +237,7 @@ test.describe("events", () => {
   });
 
   test("signed out, a guest pass link signs in and comes back to the invitation", async ({ page }) => {
-    await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+    await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
     await page.route("**/api/**", (route) => route.fulfill(json({})));
     await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ error: "unauthorized" }, 401)));
     await page.goto("/events/event-1?invite=guest-token");

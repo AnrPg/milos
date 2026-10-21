@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.InjuryUpdatesAsTimelineEvents do
+defmodule Palee.Repo.Migrations.InjuryUpdatesAsTimelineEvents do
   @moduledoc """
   ADR-140 §3: an injury's progress is a timeline of `reported`, `updated`,
   `marked_healed` and `reopened` events. `note_added` had no producer; any

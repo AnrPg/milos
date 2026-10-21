@@ -913,7 +913,7 @@ export function exportFilename(document: ExportDocument, format: ExportFormat): 
     .replace(/[^\p{L}\p{N}]+/gu, "-")
     .replace(/^-|-$/g, "")
     .toLocaleLowerCase()
-    .slice(0, 72) || "milos-training";
+    .slice(0, 72) || "palee";
   return `${slug}.${format}`;
 }
 

@@ -16,7 +16,7 @@ Add one JSON file per example (files are read in name order):
 }
 ```
 
-Rules, enforced by `test/milos_training/infrastructure/workouts/workout_assistant_examples_test.exs`:
+Rules, enforced by `test/palee/infrastructure/workouts/workout_assistant_examples_test.exs`:
 
 - `answer` must pass `WorkoutAssistant.Contract` (the per-format JSON
   Schemas) against `text` — `find_text` must be verbatim, paths must exist.

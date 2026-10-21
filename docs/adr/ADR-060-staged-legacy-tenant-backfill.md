@@ -34,13 +34,13 @@ its RLS policy is forced.
 The baseline ownership inventory is recorded in
 `docs/architecture/tenant-ownership-inventory.md`. The stable
 `legacy-milos-training` organization can be created idempotently through the public
-Organizations API, release function, or `mix milos.organizations.ensure_legacy`.
+Organizations API, release function, or `mix palee.organizations.ensure_legacy`.
 No legacy domain rows were assigned yet; those changes remain in the ordered T4
 expand/backfill/enforce loops.
 
 Scheduling completed its enforce step on 2026-08-03 with same-tenant constraints,
 explicit predicates, transaction-local context, a two-tenant isolation suite, and
-forced RLS. `mix milos.tenancy.audit` classifies every other tenant table as
+forced RLS. `mix palee.tenancy.audit` classifies every other tenant table as
 transitional and deliberately prevents a false full-enforcement declaration.
 
 Workouts completed the same enforcement slice on 2026-08-04 for workout library

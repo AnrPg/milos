@@ -251,19 +251,19 @@ The registrant never selects an organization from a list and cannot alter the or
 My recommendation combines invitation links and tenant subdomains:
 
 ```text
-https://milos.example.com/join/<token>
+https://palee.example.com/join/<token>
 ```
 
 The server validates the invitation and redirects to:
 
 ```text
-https://acme-gym.milos.example.com/register
+https://acme-gym.palee.example.com/register
 ```
 
 For administrators:
 
 ```text
-https://milos.example.com/set-admin?invite=<token>
+https://palee.example.com/set-admin?invite=<token>
 ```
 
 The token determines both the organization and intended admin role. The page may display the organization for confirmation, but the organization should not be an editable form value.

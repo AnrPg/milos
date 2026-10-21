@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddCoachingRelationshipsAndClassCoaches do
+defmodule Palee.Repo.Migrations.AddCoachingRelationshipsAndClassCoaches do
   use Ecto.Migration
 
   # ADR-100: coaches are linked to their clients and to the classes they
@@ -44,7 +44,7 @@ defmodule MilosTraining.Repo.Migrations.AddCoachingRelationshipsAndClassCoaches 
     execute("""
     CREATE TRIGGER coaching_relationships_apply_tenant_context
     BEFORE INSERT OR UPDATE ON coaching_relationships
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

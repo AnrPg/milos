@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreatePhase8FinanceAnalyticsFoundations do
+defmodule Palee.Repo.Migrations.CreatePhase8FinanceAnalyticsFoundations do
   use Ecto.Migration
 
   def up do

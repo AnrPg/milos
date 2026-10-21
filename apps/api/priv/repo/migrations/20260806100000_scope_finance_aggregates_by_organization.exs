@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeFinanceAggregatesByOrganization do
+defmodule Palee.Repo.Migrations.ScopeFinanceAggregatesByOrganization do
   use Ecto.Migration
 
   def up do

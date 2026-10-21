@@ -60,7 +60,7 @@ import {
   type QuotaValue,
 } from "./package-catalog";
 
-const STORAGE_KEY = "milos.package-wizard.draft.v1";
+const STORAGE_KEY = "palee.package-wizard.draft.v1";
 const TYPE_ICONS: Record<string, string> = {
   membership: "🔁",
   class_pack: "🎟️",

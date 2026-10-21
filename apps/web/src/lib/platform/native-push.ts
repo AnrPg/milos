@@ -10,7 +10,7 @@ import { hasCapability, nativePlatform, nativePushProvider } from "./index";
 
 export type NativePushPermission = NotificationPermission | "unsupported";
 
-const DEVICE_TOKEN_KEY = "milos-native-push-token";
+const DEVICE_TOKEN_KEY = "palee-native-push-token";
 
 let pendingToken: Promise<string> | null = null;
 let listenersReady: Promise<void> | null = null;

@@ -47,7 +47,7 @@ describe("platform capability layer", () => {
   });
 
   it("limits a capability to its platforms", () => {
-    installBridge("android", ["PushNotifications", "MilosHealth"]);
+    installBridge("android", ["PushNotifications", "PaleeHealth"]);
     expect(nativePushProvider()).toBe("fcm");
     expect(hasCapability("healthConnect")).toBe(true);
     expect(hasCapability("healthKit")).toBe(false);

@@ -16,8 +16,8 @@ Feedback. Adding them requires an ADR and explicit approval because it extends
 the architecture.
 
 Recommended new contexts:
-- `MilosTraining.Wellbeing`: injury reports, healing events, limitations.
-- `MilosTraining.Feedback`: reviews, ratings, questionnaires, review targets.
+- `Palee.Wellbeing`: injury reports, healing events, limitations.
+- `Palee.Feedback`: reviews, ratings, questionnaires, review targets.
 
 These contexts should expose public APIs and publish plain PubSub events.
 Analytics should consume their facts through queries or materialized views,
@@ -82,8 +82,8 @@ Suggested fields:
 - `{:injury_healed, %{user_id: ..., injury_report_id: ...}}`
 
 Telemetry events:
-- `[:milos, :injury, :reported]`
-- `[:milos, :injury, :healed]`
+- `[:palee, :injury, :reported]`
+- `[:palee, :injury, :healed]`
 
 ## Feedback Context
 
@@ -225,5 +225,5 @@ Rules:
 - `{:review_submitted, %{user_id: ..., target_type: ..., target_id: ...}}`
 
 Telemetry events:
-- `[:milos, :review, :submitted]`
+- `[:palee, :review, :submitted]`
 

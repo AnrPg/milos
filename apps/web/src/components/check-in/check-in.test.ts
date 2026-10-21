@@ -28,7 +28,7 @@ function batch(count: number, rotation = 30, start = T0): DoorCode[] {
     const from = start + i * rotation * 1000;
     return {
       code: `code-${i}`,
-      deep_link: `https://milos.test/c/loc-1/code-${i}`,
+      deep_link: `https://palee.test/c/loc-1/code-${i}`,
       shows_from: iso(from),
       valid_until: iso(from + 2 * rotation * 1000),
     };
@@ -174,8 +174,8 @@ describe("parseScannedCode", () => {
   });
 
   it("recognises a door or poster QR held up by mistake, and rejects the rest", () => {
-    expect(parseScannedCode("https://milos.app/c/loc-1/AbCdEf0123456789")).toEqual({ kind: "door" });
-    expect(parseScannedCode("https://milos.app/c/loc-1/p/AbCdEf0123456789")).toEqual({ kind: "door" });
+    expect(parseScannedCode("https://palee.app/c/loc-1/AbCdEf0123456789")).toEqual({ kind: "door" });
+    expect(parseScannedCode("https://palee.app/c/loc-1/p/AbCdEf0123456789")).toEqual({ kind: "door" });
     expect(parseScannedCode("https://example.com/menu")).toEqual({ kind: "unknown" });
     expect(parseScannedCode("M1 short")).toEqual({ kind: "unknown" });
     expect(parseScannedCode("")).toEqual({ kind: "unknown" });

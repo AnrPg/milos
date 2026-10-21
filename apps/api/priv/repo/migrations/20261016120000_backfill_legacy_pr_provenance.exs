@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BackfillLegacyPrProvenance do
+defmodule Palee.Repo.Migrations.BackfillLegacyPrProvenance do
   @moduledoc """
   ADR-132 / TD-091: gives legacy Pantheon PRs (recorded before ADR-129 wrote
   provenance) the gym they were set in, where that gym is unambiguous.

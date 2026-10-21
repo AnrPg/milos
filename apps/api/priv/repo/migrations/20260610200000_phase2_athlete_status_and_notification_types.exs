@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.Phase2AthleteStatusAndNotificationTypes do
+defmodule Palee.Repo.Migrations.Phase2AthleteStatusAndNotificationTypes do
   use Ecto.Migration
 
   def up do

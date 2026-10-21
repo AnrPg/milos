@@ -122,10 +122,10 @@ installations.
 
 ## Implementation Notes
 - Migration `20261012090000_create_organization_purges` is additive: one
-  vendor-only RLS table (forced RLS, `milos_acting_user_is_vendor()` policy
+  vendor-only RLS table (forced RLS, `palee_acting_user_is_vendor()` policy
   mirroring `organization_provisioning_events`), a partial unique index allowing
   one open purge per organization, and a status check constraint. The table is
-  classified as platform-administered in `mix milos.tenancy.audit`.
+  classified as platform-administered in `mix palee.tenancy.audit`.
 - No new lifecycle status was added: `suspended` already blocks tenant
   contexts and jobs, and the purge record carries the pending-purge state.
   Archived organizations stay archived when a purge is requested.

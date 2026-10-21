@@ -19,12 +19,12 @@ const membership = {
   role: "member",
   organization: {
     id: "88888888-8888-4888-8888-888888888888",
-    name: "Milos Training",
-    slug: "milos-training",
+    name: "Palee",
+    slug: "palee",
   },
   settings: {
     brand_logo_url: null,
-    brand_name: "Milos Training",
+    brand_name: "Palee",
     brand_primary_color: null,
   },
 };

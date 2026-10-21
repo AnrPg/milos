@@ -659,7 +659,7 @@ const FILTER_TYPES: Record<FilterTab, string[] | null> = {
   ],
 };
 
-const OPEN_EVENT = "milos:open-notifications";
+const OPEN_EVENT = "palee:open-notifications";
 
 /** Opens the inbox from elsewhere, e.g. the avatar menu on phones (ADR-103). */
 export function openNotifications() {

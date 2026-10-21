@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.DropAdminAthleteNotes do
+defmodule Palee.Repo.Migrations.DropAdminAthleteNotes do
   use Ecto.Migration
 
   def up do

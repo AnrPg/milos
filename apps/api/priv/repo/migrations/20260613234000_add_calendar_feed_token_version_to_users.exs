@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddCalendarFeedTokenVersionToUsers do
+defmodule Palee.Repo.Migrations.AddCalendarFeedTokenVersionToUsers do
   use Ecto.Migration
 
   def change do

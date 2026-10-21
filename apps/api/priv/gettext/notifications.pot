@@ -88,7 +88,7 @@ msgstr ""
 msgid "You received a new message."
 msgstr ""
 
-msgid "TrainingJournal"
+msgid "Palee"
 msgstr ""
 
 msgid "You have a new notification."

@@ -25,8 +25,8 @@ when some workflows remain stubs, to avoid future breaking migrations.
 
 ## Decision
 
-Add three bounded contexts: `MilosTraining.Finance`, `MilosTraining.Wellbeing`,
-and `MilosTraining.Feedback`.
+Add three bounded contexts: `Palee.Finance`, `Palee.Wellbeing`,
+and `Palee.Feedback`.
 
 Finance owns membership packages, memberships, package subscriptions, payments,
 promotion campaigns/codes/redemptions, referral programs/events/rewards, and

@@ -6,7 +6,7 @@ Status: Approved
 
 ## Overview
 
-Implements a first-class private messaging system for Milos Training. Replaces three fragmented messaging primitives (`AssignmentMessage`, `AdminAthleteNote`, legacy `SendAthleteMessage`) with a unified `Messaging` bounded context. Supports context-anchored threads (per workout assignment or class slot) and free direct threads (any user to any user). Full real-time delivery via Phoenix Channels.
+Implements a first-class private messaging system for Palee. Replaces three fragmented messaging primitives (`AssignmentMessage`, `AdminAthleteNote`, legacy `SendAthleteMessage`) with a unified `Messaging` bounded context. Supports context-anchored threads (per workout assignment or class slot) and free direct threads (any user to any user). Full real-time delivery via Phoenix Channels.
 
 ---
 
@@ -77,13 +77,13 @@ messaging_messages
 ### Domain Modules
 
 ```
-MilosTraining.Messaging                        ← public context facade
-MilosTraining.Messaging.Thread                 ← Ecto schema
-MilosTraining.Messaging.Message                ← Ecto schema
-MilosTraining.Messaging.Participant            ← Ecto schema
-MilosTraining.Messaging.Domain.ThreadPolicy   ← authorization: who can join/read/write
-MilosTraining.Messaging.Ports.MessageStore    ← behaviour (port)
-MilosTraining.Messaging.Ports.ThreadStore     ← behaviour (port)
+Palee.Messaging                        ← public context facade
+Palee.Messaging.Thread                 ← Ecto schema
+Palee.Messaging.Message                ← Ecto schema
+Palee.Messaging.Participant            ← Ecto schema
+Palee.Messaging.Domain.ThreadPolicy   ← authorization: who can join/read/write
+Palee.Messaging.Ports.MessageStore    ← behaviour (port)
+Palee.Messaging.Ports.ThreadStore     ← behaviour (port)
 ```
 
 ### Legacy Deletions
@@ -142,14 +142,14 @@ Adds `:chat_message` to `Notification.@types` enum.
 ### DB Adapters
 
 ```
-MilosTraining.Infrastructure.Messaging.EctoThreadStore
+Palee.Infrastructure.Messaging.EctoThreadStore
   ← implements Messaging.Ports.ThreadStore
   ← get_or_create_direct/2
      get_or_create_context/3 (context_type, context_id, created_by_id)
      list_for_user/2 (user_id, context_type filter)
      get_with_participants/1
 
-MilosTraining.Infrastructure.Messaging.EctoMessageStore
+Palee.Infrastructure.Messaging.EctoMessageStore
   ← implements Messaging.Ports.MessageStore
   ← persist/1
      list_page/2 (thread_id, cursor params)
@@ -160,7 +160,7 @@ MilosTraining.Infrastructure.Messaging.EctoMessageStore
 
 Added to `UserSocket`:
 ```elixir
-channel "chat:*", MilosTrainingWeb.ChatChannel
+channel "chat:*", PaleeWeb.ChatChannel
 ```
 
 Topic format: `"chat:thread:{thread_id}"`
@@ -186,13 +186,13 @@ Topic format: `"chat:thread:{thread_id}"`
 
 ### Offline Notifier
 
-`MilosTraining.Infrastructure.Messaging.OfflineNotifier` — checks `Phoenix.PubSub.subscribers/2` for the thread topic; dispatches `:chat_message` notification to any participant not currently subscribed.
+`Palee.Infrastructure.Messaging.OfflineNotifier` — checks `Phoenix.PubSub.subscribers/2` for the thread topic; dispatches `:chat_message` notification to any participant not currently subscribed.
 
 ---
 
 ## Section 4 — Interface Layer
 
-### New Controller: `MilosTrainingWeb.MessagingController`
+### New Controller: `PaleeWeb.MessagingController`
 
 ```
 GET    /api/threads

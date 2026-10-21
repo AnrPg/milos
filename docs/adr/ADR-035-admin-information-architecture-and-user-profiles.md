@@ -86,7 +86,7 @@ Routes may need redirects or aliases so existing links continue working during t
 
 OpenAPI contracts must be added before any new admin user directory or profile endpoints. Controllers must remain thin and call Application Services.
 
-The user profile read model crosses Identity, Finance, Execution, Gamification, Wellbeing, Coaching, Scheduling, Workouts, and Messaging. Any composed profile or dossier endpoint must live in `MilosTraining.Application.*` and call public context APIs only.
+The user profile read model crosses Identity, Finance, Execution, Gamification, Wellbeing, Coaching, Scheduling, Workouts, and Messaging. Any composed profile or dossier endpoint must live in `Palee.Application.*` and call public context APIs only.
 
 The frontend should preserve existing design patterns and components wherever possible. This work should avoid a broad visual redesign.
 
@@ -175,7 +175,7 @@ Phase 3 (Users directory and profile dossier) completed on 2026-07-15.
   `/api/admin/users/:id/finance`, `/training-history`, `/prs`, `/incidents`,
   `/messages`, and `/coaching-context`; each has a stable `user_id` boundary and
   returns role-safe empty states rather than leaking role assumptions.
-- Kept cross-context stitching in six `MilosTraining.Application.*` read
+- Kept cross-context stitching in six `Palee.Application.*` read
   services. They call only the public Identity, Finance, Workouts, Execution,
   Pantheon/Gamification, Wellbeing, Coaching, and Messaging APIs. No new table,
   migration, direct Repo access, or cross-context schema import was introduced.

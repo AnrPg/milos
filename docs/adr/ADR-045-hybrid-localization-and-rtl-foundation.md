@@ -4,7 +4,7 @@ Status: Accepted
 
 ## Context
 
-Milos Training must support English, Greek, Arabic, Russian, German, Spanish,
+Palee must support English, Greek, Arabic, Russian, German, Spanish,
 Portuguese, Hebrew, Italian, Bulgarian, Dutch, and French. Users choose their
 language from personal settings. The application contains several distinct
 classes of text: versioned interface copy, backend-originated notification and

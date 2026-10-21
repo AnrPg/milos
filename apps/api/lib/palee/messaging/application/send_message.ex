@@ -1,0 +1,32 @@
+defmodule Palee.Messaging.Application.SendMessage do
+  alias Palee.Messaging.Domain.ThreadPolicy
+  alias Palee.Messaging.{MessageStore, ThreadStore}
+
+  def call(params, delivery \\ %{})
+
+  def call(%{thread_id: thread_id, sender_id: sender_id, body: body} = params, delivery) do
+    message_type = Map.get(params, :message_type, :chat)
+    client_operation_id = Map.get(params, :client_operation_id)
+
+    with %{} = thread <-
+           ThreadStore.get_thread_with_participants(thread_id) || {:error, :not_found},
+         :ok <- ThreadPolicy.can_send?(sender_id, thread),
+         {:ok, message} <-
+           MessageStore.create_message_with_delivery(
+             %{
+               organization_id: thread.organization_id,
+               thread_id: thread_id,
+               sender_id: sender_id,
+               body: body,
+               message_type: message_type,
+               client_operation_id: client_operation_id,
+               subject_kind: Map.get(params, :subject_kind),
+               subject_id: Map.get(params, :subject_id),
+               topic: Map.get(params, :topic)
+             },
+             Map.put(delivery, :organization_id, thread.organization_id)
+           ) do
+      {:ok, message}
+    end
+  end
+end

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnforceExecutionOwnerBoundaries do
+defmodule Palee.Repo.Migrations.EnforceExecutionOwnerBoundaries do
   use Ecto.Migration
 
   @tables ~w(workout_executions execution_progress_operations)

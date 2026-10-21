@@ -13,7 +13,7 @@ the final master workout deletion.
 ## Decision
 Hard-deleting a workout also deletes all recurring class series that reference
 that workout. The Scheduling context owns the series deletion command, and
-`MilosTraining.Application.DeleteWorkout` orchestrates it after deleting concrete
+`Palee.Application.DeleteWorkout` orchestrates it after deleting concrete
 scheduled classes and before deleting the master workout. The `class_series`
 foreign key to `master_workouts` is changed to `ON DELETE DELETE ALL` as a
 database-level backstop for the same product rule.

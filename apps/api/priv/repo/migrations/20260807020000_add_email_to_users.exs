@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddEmailToUsers do
+defmodule Palee.Repo.Migrations.AddEmailToUsers do
   use Ecto.Migration
 
   # F-10: registration_invitations.intended_email_digest was computed at issue

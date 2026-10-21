@@ -90,5 +90,5 @@ Initial implementation on 2026-07-17.
 - A standalone non-execution training-log aggregate remains TD-033 because it
   needs source selection, authorization, and gamification semantics that should
   not be hidden inside timer execution state.
-- Verification: backend compile, `mix milos.architecture`, focused domain tests,
+- Verification: backend compile, `mix palee.architecture`, focused domain tests,
   frontend `pnpm type-check`, targeted ESLint, and OpenAPI regeneration passed.

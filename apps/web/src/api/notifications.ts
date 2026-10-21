@@ -2,23 +2,23 @@ import { apiRequest } from "@/api/client";
 import type { operations } from "@/api/generated/schema";
 
 export type NotificationsResponse =
-  operations["MilosTrainingWeb.NotificationController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.NotificationController.index"]["responses"][200]["content"]["application/json"];
 
 export type NotificationRecord = NotificationsResponse["notifications"][number];
 
 export type PushNotificationConfig =
-  operations["MilosTrainingWeb.NotificationController.push_config"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.NotificationController.push_config"]["responses"][200]["content"]["application/json"];
 
 export type PushSubscriptionPayload =
   NonNullable<
-    operations["MilosTrainingWeb.NotificationController.create_push_subscription"]["requestBody"]
+    operations["PaleeWeb.NotificationController.create_push_subscription"]["requestBody"]
   >["content"]["application/json"];
 
 export type PushSubscriptionRecord =
-  operations["MilosTrainingWeb.NotificationController.create_push_subscription"]["responses"][201]["content"]["application/json"]["subscription"];
+  operations["PaleeWeb.NotificationController.create_push_subscription"]["responses"][201]["content"]["application/json"]["subscription"];
 
 export type PushSubscriptionStatus =
-  operations["MilosTrainingWeb.NotificationController.push_subscription_status"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.NotificationController.push_subscription_status"]["responses"][200]["content"]["application/json"];
 
 export type DeletePushSubscriptionPayload = {
   endpoint: string;
@@ -89,11 +89,11 @@ export async function fetchPushSubscriptionStatus(token: string, endpoint: strin
 
 // ADR-171: push to the store apps (FCM on Android, APNs on iOS).
 export type NativePushTokenPayload = NonNullable<
-  operations["MilosTrainingWeb.NotificationController.create_native_push_token"]["requestBody"]
+  operations["PaleeWeb.NotificationController.create_native_push_token"]["requestBody"]
 >["content"]["application/json"];
 
 export type NativePushTokenRecord =
-  operations["MilosTrainingWeb.NotificationController.create_native_push_token"]["responses"][201]["content"]["application/json"]["native_push_token"];
+  operations["PaleeWeb.NotificationController.create_native_push_token"]["responses"][201]["content"]["application/json"]["native_push_token"];
 
 export async function registerNativePushToken(token: string, payload: NativePushTokenPayload) {
   return apiRequest<{ native_push_token: NativePushTokenRecord }>("/notifications/native-push-tokens", {

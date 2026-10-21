@@ -93,7 +93,7 @@ will have separate Oban retry histories.
 Implemented on 2026-06-12.
 
 Referral reward fulfillment now uses
-`MilosTraining.Finance.Domain.ReferralRewardFulfillment` to dispatch by reward
+`Palee.Finance.Domain.ReferralRewardFulfillment` to dispatch by reward
 type. Credit rewards create the existing idempotent credit-ledger grant and
 still require a positive amount. `manual`, `discount`, and `free_period`
 rewards now apply successfully as lifecycle-only fulfillment and do not create
@@ -123,12 +123,12 @@ attempted, matching the best-effort notification side-effect boundary.
 
 Verification completed:
 
-- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/milos_api_build_adr20 mix test test/milos_training/finance/domain/referral_policy_test.exs test/milos_training/finance/domain/referral_reward_fulfillment_test.exs test/milos_training/finance/finance_test.exs test/milos_training/coaching/coaching_test.exs test/milos_training/workers/aggregate_refresh_job_test.exs test/milos_training_web/controllers/phase8_finance_controller_test.exs`
-- `MIX_BUILD_PATH=/tmp/milos_api_build_adr20 MIX_ENV=test mix milos.export_openapi ../web/src/api/generated/openapi.json`
+- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/palee_api_build_adr20 mix test test/palee/finance/domain/referral_policy_test.exs test/palee/finance/domain/referral_reward_fulfillment_test.exs test/palee/finance/finance_test.exs test/palee/coaching/coaching_test.exs test/palee/workers/aggregate_refresh_job_test.exs test/palee_web/controllers/phase8_finance_controller_test.exs`
+- `MIX_BUILD_PATH=/tmp/palee_api_build_adr20 MIX_ENV=test mix palee.export_openapi ../web/src/api/generated/openapi.json`
 - `npx openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts`
 - `npm run lint`
 - `npm run build`
-- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/milos_api_build_adr20 mix test`
+- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/palee_api_build_adr20 mix test`
 
 The full API suite passed with 224 tests and 0 failures. Frontend lint and the
 Next.js production build passed.

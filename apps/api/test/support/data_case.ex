@@ -1,4 +1,4 @@
-defmodule MilosTraining.DataCase do
+defmodule Palee.DataCase do
   @moduledoc """
   This module defines the setup for tests requiring
   access to the application's data layer.
@@ -10,7 +10,7 @@ defmodule MilosTraining.DataCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use MilosTraining.DataCase, async: true`, although
+  by setting `use Palee.DataCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -18,17 +18,17 @@ defmodule MilosTraining.DataCase do
 
   using do
     quote do
-      alias MilosTraining.Repo
+      alias Palee.Repo
 
       import Ecto
       import Ecto.Changeset
       import Ecto.Query
-      import MilosTraining.DataCase
+      import Palee.DataCase
     end
   end
 
   setup tags do
-    MilosTraining.DataCase.setup_sandbox(tags)
+    Palee.DataCase.setup_sandbox(tags)
     :ok
   end
 
@@ -36,7 +36,7 @@ defmodule MilosTraining.DataCase do
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(MilosTraining.Repo, shared: not tags[:async])
+    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Palee.Repo, shared: not tags[:async])
     allow_background_processes(pid)
     on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
 
@@ -49,17 +49,17 @@ defmodule MilosTraining.DataCase do
   `RepoContext.run/2` passes locally but returns nothing in production.
 
   Tests tagged `@moduletag :rls_enforced` (or every test when
-  `MILOS_TEST_ENFORCE_RLS=1`) switch the sandbox transaction to the
-  non-superuser `#{MilosTraining.RLSCase.runtime_role()}` role with
+  `PALEE_TEST_ENFORCE_RLS=1`) switch the sandbox transaction to the
+  non-superuser `#{Palee.RLSCase.runtime_role()}` role with
   `SET LOCAL ROLE`, so RLS policies apply exactly as they do for the
   production runtime role. Use `bypass_rls/1` for fixture setup that models
   pre-existing data rather than the code under test.
   """
   def rls_enforced?(tags),
-    do: Map.get(tags, :rls_enforced, false) or System.get_env("MILOS_TEST_ENFORCE_RLS") == "1"
+    do: Map.get(tags, :rls_enforced, false) or System.get_env("PALEE_TEST_ENFORCE_RLS") == "1"
 
   def enforce_rls! do
-    MilosTraining.Repo.query!("SET LOCAL ROLE #{MilosTraining.RLSCase.runtime_role()}")
+    Palee.Repo.query!("SET LOCAL ROLE #{Palee.RLSCase.runtime_role()}")
     :ok
   end
 
@@ -73,7 +73,7 @@ defmodule MilosTraining.DataCase do
     try do
       fun.()
     after
-      MilosTraining.Repo.query!("RESET ROLE")
+      Palee.Repo.query!("RESET ROLE")
     end
   end
 
@@ -99,7 +99,7 @@ defmodule MilosTraining.DataCase do
     previous =
       Enum.map(@session_settings, fn name ->
         %{rows: [[value]]} =
-          MilosTraining.Repo.query!("SELECT current_setting($1, true)", [name])
+          Palee.Repo.query!("SELECT current_setting($1, true)", [name])
 
         {name, value || ""}
       end)
@@ -120,22 +120,22 @@ defmodule MilosTraining.DataCase do
   end
 
   defp set_session!(name, value),
-    do: MilosTraining.Repo.query!("SELECT set_config($1, $2, false)", [name, value])
+    do: Palee.Repo.query!("SELECT set_config($1, $2, false)", [name, value])
 
   @doc """
   Runs `fun` as the superuser test role and restores the previous role.
   Only for fixtures: assertions about tenant isolation must run enforced.
   """
   def bypass_rls(fun) when is_function(fun, 0) do
-    %{rows: [[role]]} = MilosTraining.Repo.query!("SELECT current_user")
+    %{rows: [[role]]} = Palee.Repo.query!("SELECT current_user")
 
-    if role == MilosTraining.RLSCase.runtime_role() do
-      MilosTraining.Repo.query!("RESET ROLE")
+    if role == Palee.RLSCase.runtime_role() do
+      Palee.Repo.query!("RESET ROLE")
 
       try do
         fun.()
       after
-        MilosTraining.Repo.query!("SET LOCAL ROLE #{role}")
+        Palee.Repo.query!("SET LOCAL ROLE #{role}")
       end
     else
       fun.()

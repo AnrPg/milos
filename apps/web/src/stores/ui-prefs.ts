@@ -32,7 +32,7 @@ export const useUiPrefs = create<UiPrefsState>()(
       },
     }),
     {
-      name: "milos-ui-prefs",
+      name: "palee-ui-prefs",
       storage: createJSONStorage(() => localStorage),
     },
   ),

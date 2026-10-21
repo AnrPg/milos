@@ -1,9 +1,9 @@
-defmodule MilosTraining.MixProject do
+defmodule Palee.MixProject do
   use Mix.Project
 
   def project do
     [
-      app: :milos_training,
+      app: :palee,
       version: "0.1.0",
       elixir: "~> 1.18",
       elixirc_paths: elixirc_paths(Mix.env()),
@@ -33,7 +33,7 @@ defmodule MilosTraining.MixProject do
 
   def application do
     [
-      mod: {MilosTraining.Application, []},
+      mod: {Palee.Application, []},
       extra_applications: [
         :logger,
         :runtime_tools,
@@ -101,7 +101,7 @@ defmodule MilosTraining.MixProject do
       precommit: [
         "cmd node scripts/validate_gettext_catalogs.mjs",
         "compile --warning-as-errors",
-        "milos.architecture",
+        "palee.architecture",
         "credo --strict",
         "dialyzer --list-unused-filters",
         "deps.unlock --check-unused",

@@ -23,7 +23,7 @@ import { useSession } from "@/components/session-provider";
  * single coach there is nothing to choose.
  */
 export const COACH_RUNGS = ["coach_can_view", "coach_reply_requested"] as const;
-const ASKED_KEY = "milos:coach-audience-asked";
+const ASKED_KEY = "palee:coach-audience-asked";
 
 export function isCoachRung(rung: string) {
   return (COACH_RUNGS as readonly string[]).includes(rung);

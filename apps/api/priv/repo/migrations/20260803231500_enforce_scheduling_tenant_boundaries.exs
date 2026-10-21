@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnforceSchedulingTenantBoundaries do
+defmodule Palee.Repo.Migrations.EnforceSchedulingTenantBoundaries do
   use Ecto.Migration
 
   def up do

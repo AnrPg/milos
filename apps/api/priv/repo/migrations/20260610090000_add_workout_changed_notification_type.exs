@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddWorkoutChangedNotificationType do
+defmodule Palee.Repo.Migrations.AddWorkoutChangedNotificationType do
   use Ecto.Migration
 
   def up do

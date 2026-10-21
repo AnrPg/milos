@@ -6,8 +6,8 @@ import type { components, operations } from "@/api/generated/schema";
 
 type Json<T> = T extends { content: { "application/json": infer Body } } ? Body : never;
 
-type AvailabilityResponse = Json<operations["MilosTrainingWeb.MyVoiceLogController.show"]["responses"][200]>;
-export type VoiceDraftResponse = Json<operations["MilosTrainingWeb.MyVoiceLogController.create"]["responses"][200]>;
+type AvailabilityResponse = Json<operations["PaleeWeb.MyVoiceLogController.show"]["responses"][200]>;
+export type VoiceDraftResponse = Json<operations["PaleeWeb.MyVoiceLogController.create"]["responses"][200]>;
 export type VoiceAvailability = AvailabilityResponse["voice"];
 export type VoiceDraft = components["schemas"]["VoiceLogDraft"];
 export type VoiceDraftRequest = components["schemas"]["VoiceLogDraftRequest"];

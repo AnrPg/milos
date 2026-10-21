@@ -1,6 +1,6 @@
 /**
  * Offline mirror of the API's muscle tree
- * (`MilosTraining.Anatomy.Domain.MuscleTaxonomy`, ADR-163): region -> group ->
+ * (`Palee.Anatomy.Domain.MuscleTaxonomy`, ADR-163): region -> group ->
  * head, each group and head carrying the Terminologia Anatomica 2 ids of the
  * atlas meshes that draw it (ADR-164, nodes `ta2-<id>.<l|r|m>`).
  *

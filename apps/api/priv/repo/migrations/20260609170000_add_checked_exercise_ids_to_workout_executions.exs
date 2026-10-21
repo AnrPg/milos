@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddCheckedExerciseIdsToWorkoutExecutions do
+defmodule Palee.Repo.Migrations.AddCheckedExerciseIdsToWorkoutExecutions do
   use Ecto.Migration
 
   def change do

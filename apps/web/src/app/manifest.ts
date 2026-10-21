@@ -8,8 +8,8 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const locale = isAppLocale(requestedLocale) ? requestedLocale : DEFAULT_LOCALE;
   const translate = await getTranslations("Ui");
   return {
-    name: "TrainingJournal",
-    short_name: "Journal",
+    name: "Palee",
+    short_name: "Palee",
     description: translate("manifestDescription"),
     lang: locale,
     dir: localeDirection(locale),

@@ -1,10 +1,10 @@
-defmodule MilosTraining.FakeWorkoutIconSuggester do
+defmodule Palee.FakeWorkoutIconSuggester do
   @moduledoc """
   Test stand-in for Gemini. Answers by keyword so tests stay deterministic;
   "chatty" titles return prose to exercise the single-emoji validation.
   """
 
-  @behaviour MilosTraining.Application.Ports.WorkoutIconSuggester
+  @behaviour Palee.Application.Ports.WorkoutIconSuggester
 
   @impl true
   def suggest(%{title: title}, _metering) do

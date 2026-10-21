@@ -1,11 +1,11 @@
-defmodule MilosTraining.FakeImageProcessor do
+defmodule Palee.FakeImageProcessor do
   @moduledoc """
   Test stand-in for ImageMagick (ADR-157). Reads JPEG dimensions from the
   frame header, refuses files containing `UNREADABLE`, and writes renditions
   of a few bytes of "WebP".
   """
 
-  @behaviour MilosTraining.Application.Ports.ImageProcessor
+  @behaviour Palee.Application.Ports.ImageProcessor
 
   @impl true
   def available?, do: true
@@ -72,17 +72,17 @@ defmodule MilosTraining.FakeImageProcessor do
   defp sof(_other), do: %{width: 1600, height: 1200}
 end
 
-defmodule MilosTraining.FakeVideoTranscoder do
+defmodule Palee.FakeVideoTranscoder do
   @moduledoc """
   Test stand-in for ffmpeg (ADR-157): a 12-second 1920×1080 video, or 150
   seconds when the upload contains `LONG`. `available?/0` follows
   `:fake_video_available` (default true).
   """
 
-  @behaviour MilosTraining.Application.Ports.VideoTranscoder
+  @behaviour Palee.Application.Ports.VideoTranscoder
 
   @impl true
-  def available?, do: Application.get_env(:milos_training, :fake_video_available, true)
+  def available?, do: Application.get_env(:palee, :fake_video_available, true)
 
   @impl true
   def probe(path) do
@@ -96,7 +96,7 @@ defmodule MilosTraining.FakeVideoTranscoder do
     out = Path.join(work_dir, "video.mp4")
     poster = Path.join(work_dir, "poster.jpg")
     File.write!(out, "fake-mp4")
-    File.write!(poster, MilosTraining.TestSupport.ImageFixtures.jpeg(1920, 1080))
+    File.write!(poster, Palee.TestSupport.ImageFixtures.jpeg(1920, 1080))
 
     {:ok,
      %{
@@ -111,16 +111,16 @@ defmodule MilosTraining.FakeVideoTranscoder do
   end
 end
 
-defmodule MilosTraining.FakeImageDescriber do
+defmodule Palee.FakeImageDescriber do
   @moduledoc "Test stand-in for the alt text model (ADR-157); tells the test process it was asked."
 
-  @behaviour MilosTraining.Application.Ports.ImageDescriber
+  @behaviour Palee.Application.Ports.ImageDescriber
 
   @impl true
   def describe(%{bytes: _bytes}, %{locale: locale}, metering) do
     send(self(), {:described, locale, metering})
 
-    case {Application.get_env(:milos_training, :fake_describer_configured, true), locale} do
+    case {Application.get_env(:palee, :fake_describer_configured, true), locale} do
       {false, _locale} -> {:error, :not_configured}
       {true, "el"} -> {:ok, "  «Αθλήτρια σηκώνει μπάρα σε box» \n"}
       {true, _other} -> {:ok, "An athlete lifts a barbell in a gym"}

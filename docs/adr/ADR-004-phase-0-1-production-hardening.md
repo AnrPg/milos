@@ -77,12 +77,12 @@ stack aligned with the approved architecture, where background job
 infrastructure is present in the scaffold rather than silently disabled when
 the app boots.
 
-Local Docker host ports now default to an isolated Milos-specific high-port
+Local Docker host ports now default to an isolated Palee-specific high-port
 range instead of common service defaults such as 80, 443, 3000, 4000, 6379,
 7700, and 9000. That reduces accidental collisions with other local projects
 while keeping every exposed port explicitly overridable through `.env`.
 
-The API endpoint now applies explicit CORS approval for the Milos web origins
+The API endpoint now applies explicit CORS approval for the Palee web origins
 used in local development and proxy mode, including the direct Next.js host
 port and the Caddy HTTP/HTTPS entrypoints. This keeps browser-based service
 communication inside the project working without opening the API to arbitrary

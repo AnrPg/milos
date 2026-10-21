@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
+defmodule Palee.Repo.Migrations.CrossOrgJournal do
   @moduledoc """
   ADR-162 (P2-M14): one journal across every provider.
 
@@ -7,7 +7,7 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
   - `organization_memberships.ended_at`, kept by a trigger whenever a
     membership leaves or regains `active`, so «πρώην» providers carry the day
     their access ended whichever code path changed the status.
-  - `milos_my_providers()`: a definer lookup answering, for the caller only,
+  - `palee_my_providers()`: a definer lookup answering, for the caller only,
     every organization they are or were a member of (name, kind, brand,
     status, end date). A former provider's `organizations` row is invisible
     to the member's session, yet their journal still labels it.
@@ -17,7 +17,7 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     `journal_coach_audience_exclusions`; an entry can be narrowed to (or,
     for a provider-less entry, shared with) specific providers through
     `journal_entry_audiences`. The home provider of an entry always reads it
-    on a coach rung, as before. `milos_journal_entry_shared_with_org` is the
+    on a coach rung, as before. `palee_journal_entry_shared_with_org` is the
     SQL twin of `Journal.Domain.CoachAudience`; a coach reads shared entries
     of other providers through additive coach-read policies, only while the
     member is an active member of the coach's organization.
@@ -70,7 +70,7 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     """)
 
     execute("""
-    CREATE FUNCTION milos_membership_track_end() RETURNS trigger
+    CREATE FUNCTION palee_membership_track_end() RETURNS trigger
     LANGUAGE plpgsql AS $$
     BEGIN
       IF NEW.status = 'active' THEN
@@ -86,11 +86,11 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     execute("""
     CREATE TRIGGER organization_memberships_track_end
     BEFORE UPDATE OF status ON organization_memberships
-    FOR EACH ROW EXECUTE FUNCTION milos_membership_track_end()
+    FOR EACH ROW EXECUTE FUNCTION palee_membership_track_end()
     """)
 
     execute("""
-    CREATE FUNCTION milos_my_providers()
+    CREATE FUNCTION palee_my_providers()
     RETURNS TABLE (
       organization_id uuid, name text, slug text, provider_kind text,
       logo_url text, primary_color text, membership_status text, roles text[],
@@ -185,7 +185,7 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     # The member's audience rows are invisible to a coach's session, hence
     # SECURITY DEFINER; it answers one boolean about one entry and one gym.
     execute("""
-    CREATE FUNCTION milos_journal_entry_shared_with_org(
+    CREATE FUNCTION palee_journal_entry_shared_with_org(
       kind text, entry uuid, entry_user_id uuid, entry_org_id uuid, org uuid
     )
     RETURNS boolean
@@ -219,16 +219,16 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     """)
 
     execute("""
-    CREATE FUNCTION milos_entry_shared_with_acting_coach(
+    CREATE FUNCTION palee_entry_shared_with_acting_coach(
       kind text, entry uuid, entry_user_id uuid, entry_org_id uuid, visibility text
     )
     RETURNS boolean
     LANGUAGE sql STABLE
     AS $$
-      SELECT public.milos_journal_visibility_reaches_coach(visibility)
+      SELECT public.palee_journal_visibility_reaches_coach(visibility)
         AND #{@acting_org} IS NOT NULL
-        AND public.milos_acting_user_coaches(#{@acting_org})
-        AND public.milos_journal_entry_shared_with_org(
+        AND public.palee_acting_user_coaches(#{@acting_org})
+        AND public.palee_journal_entry_shared_with_org(
           kind, entry, entry_user_id, entry_org_id, #{@acting_org}
         )
     $$
@@ -239,7 +239,7 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
       CREATE POLICY #{table}_coach_shared_read_policy ON #{table}
       FOR SELECT
       USING (
-        #{guard}milos_entry_shared_with_acting_coach(
+        #{guard}palee_entry_shared_with_acting_coach(
           '#{kind}', id, user_id, organization_id, journal_visibility
         )
       )
@@ -278,11 +278,11 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     end
 
     execute(
-      "DROP FUNCTION IF EXISTS milos_entry_shared_with_acting_coach(text, uuid, uuid, uuid, text)"
+      "DROP FUNCTION IF EXISTS palee_entry_shared_with_acting_coach(text, uuid, uuid, uuid, text)"
     )
 
     execute(
-      "DROP FUNCTION IF EXISTS milos_journal_entry_shared_with_org(text, uuid, uuid, uuid, uuid)"
+      "DROP FUNCTION IF EXISTS palee_journal_entry_shared_with_org(text, uuid, uuid, uuid, uuid)"
     )
 
     drop table(:journal_exports)
@@ -290,13 +290,13 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     drop table(:journal_coach_audience_exclusions)
     drop table(:account_provider_selections)
 
-    execute("DROP FUNCTION IF EXISTS milos_my_providers()")
+    execute("DROP FUNCTION IF EXISTS palee_my_providers()")
 
     execute(
       "DROP TRIGGER IF EXISTS organization_memberships_track_end ON organization_memberships"
     )
 
-    execute("DROP FUNCTION IF EXISTS milos_membership_track_end()")
+    execute("DROP FUNCTION IF EXISTS palee_membership_track_end()")
 
     alter table(:organization_memberships) do
       remove :ended_at

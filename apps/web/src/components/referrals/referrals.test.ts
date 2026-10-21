@@ -49,9 +49,9 @@ describe("«Φέρε φίλο» words", () => {
   });
 
   it("builds the links a member shares", () => {
-    expect(inviteUrl("https://milos.gr", "AB12CD34")).toBe("https://milos.gr/r/AB12CD34");
-    expect(inviteUrl("https://milos.gr", "AB12CD34", { via: "qr" })).toBe("https://milos.gr/r/AB12CD34?via=qr");
-    expect(inviteUrl("https://milos.gr", "AB12CD34", { eventId: "e1", via: "qr" })).toBe("https://milos.gr/r/AB12CD34?event=e1");
+    expect(inviteUrl("https://palee.gr", "AB12CD34")).toBe("https://palee.gr/r/AB12CD34");
+    expect(inviteUrl("https://palee.gr", "AB12CD34", { via: "qr" })).toBe("https://palee.gr/r/AB12CD34?via=qr");
+    expect(inviteUrl("https://palee.gr", "AB12CD34", { eventId: "e1", via: "qr" })).toBe("https://palee.gr/r/AB12CD34?event=e1");
   });
 });
 

@@ -58,7 +58,7 @@ function invoice(overrides: Partial<CorporateInvoiceDocument> = {}): CorporateIn
       status: "active",
       package_name: "Corporate Gold",
     },
-    issuer: { name: "Milos Gym" },
+    issuer: { name: "Palee Gym" },
     ...overrides,
   } as CorporateInvoiceDocument;
 }
@@ -66,7 +66,7 @@ function invoice(overrides: Partial<CorporateInvoiceDocument> = {}): CorporateIn
 describe("buildCorporateInvoiceLayout", () => {
   it("lays out header, bill-to, line and totals", () => {
     const layout = buildCorporateInvoiceLayout(invoice(), labels, "en-GB");
-    expect(layout.issuer).toBe("Milos Gym");
+    expect(layout.issuer).toBe("Palee Gym");
     expect(layout.title).toBe("Invoice INV-000123-CORP-1");
     expect(layout.status).toBe("Status: Overdue");
     expect(layout.billTo).toEqual(["Ακμή Α.Ε.", "Contact: Μαρία", "Email: billing@akmi.gr"]);

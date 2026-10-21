@@ -88,8 +88,8 @@ msgstr "رسالة جديدة"
 msgid "You received a new message."
 msgstr "لقد تلقيت رسالة جديدة."
 
-msgid "TrainingJournal"
-msgstr "تدريب ميلوس"
+msgid "Palee"
+msgstr "Palee"
 
 msgid "You have a new notification."
 msgstr "لديك إشعار جديد."

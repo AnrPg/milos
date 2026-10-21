@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddSourceScheduledClassToAssignedWorkouts do
+defmodule Palee.Repo.Migrations.AddSourceScheduledClassToAssignedWorkouts do
   @moduledoc """
   ADR-125: personalized member programming.
 

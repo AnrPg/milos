@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CommunityGroupEvents do
+defmodule Palee.Repo.Migrations.CommunityGroupEvents do
   use Ecto.Migration
 
   # ADR-153 §13 (P2-M5): events of a member group.
@@ -33,7 +33,7 @@ defmodule MilosTraining.Repo.Migrations.CommunityGroupEvents do
 
     # The member groups a person belongs to, at any box.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_group_ids()
+    CREATE OR REPLACE FUNCTION palee_acting_user_group_ids()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -51,12 +51,12 @@ defmodule MilosTraining.Repo.Migrations.CommunityGroupEvents do
     CREATE POLICY community_events_member_read_policy ON community_events
     FOR SELECT
     USING (
-      milos_acting_user_belongs_to(organization_id)
+      palee_acting_user_belongs_to(organization_id)
       AND (
         channel_id IS NULL
-        OR channel_id IN (SELECT milos_acting_user_group_ids())
-        OR milos_acting_user_administers(organization_id)
-        OR milos_acting_user_coaches(organization_id)
+        OR channel_id IN (SELECT palee_acting_user_group_ids())
+        OR palee_acting_user_administers(organization_id)
+        OR palee_acting_user_coaches(organization_id)
       )
     )
     """)
@@ -68,10 +68,10 @@ defmodule MilosTraining.Repo.Migrations.CommunityGroupEvents do
     execute("""
     CREATE POLICY community_events_member_read_policy ON community_events
     FOR SELECT
-    USING (milos_acting_user_belongs_to(organization_id))
+    USING (palee_acting_user_belongs_to(organization_id))
     """)
 
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_group_ids()")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_group_ids()")
     drop constraint(:community_events, :community_events_group_check)
     execute("ALTER TABLE community_events DROP CONSTRAINT community_events_channel_id_fkey")
     drop index(:community_events, [:channel_id, :starts_at])

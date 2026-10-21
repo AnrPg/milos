@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeScaleLevelsToOrganizations do
+defmodule Palee.Repo.Migrations.ScopeScaleLevelsToOrganizations do
   use Ecto.Migration
 
   # ADR-128 / TD-063: scale levels become tenant-owned.
@@ -95,7 +95,7 @@ defmodule MilosTraining.Repo.Migrations.ScopeScaleLevelsToOrganizations do
     execute("""
     CREATE TRIGGER scale_levels_apply_tenant_context
     BEFORE INSERT OR UPDATE ON scale_levels
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

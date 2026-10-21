@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreatePushSubscriptionsAndExpandNotificationTypes do
+defmodule Palee.Repo.Migrations.CreatePushSubscriptionsAndExpandNotificationTypes do
   use Ecto.Migration
 
   def up do

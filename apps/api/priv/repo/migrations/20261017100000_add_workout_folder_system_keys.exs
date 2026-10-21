@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddWorkoutFolderSystemKeys do
+defmodule Palee.Repo.Migrations.AddWorkoutFolderSystemKeys do
   use Ecto.Migration
 
   # System folders (Athletes, Classes, per-athlete and per-day class folders) are

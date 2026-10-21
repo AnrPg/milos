@@ -15,54 +15,54 @@
 ## File Map
 
 ### New files (infrastructure)
-- `apps/api/lib/milos_training/infrastructure/messaging/ecto_thread_store.ex`
-- `apps/api/lib/milos_training/infrastructure/messaging/ecto_message_store.ex`
-- `apps/api/lib/milos_training/infrastructure/messaging/offline_notifier.ex`
+- `apps/api/lib/palee/infrastructure/messaging/ecto_thread_store.ex`
+- `apps/api/lib/palee/infrastructure/messaging/ecto_message_store.ex`
+- `apps/api/lib/palee/infrastructure/messaging/offline_notifier.ex`
 
 ### New files (application)
-- `apps/api/lib/milos_training/application/get_or_create_thread.ex`
-- `apps/api/lib/milos_training/application/send_message.ex`
-- `apps/api/lib/milos_training/application/get_thread_messages.ex`
-- `apps/api/lib/milos_training/application/list_threads_for_user.ex`
-- `apps/api/lib/milos_training/application/mark_thread_read.ex`
-- `apps/api/lib/milos_training/application/broadcast_typing.ex`
-- `apps/api/lib/milos_training/application/add_participant.ex`
+- `apps/api/lib/palee/application/get_or_create_thread.ex`
+- `apps/api/lib/palee/application/send_message.ex`
+- `apps/api/lib/palee/application/get_thread_messages.ex`
+- `apps/api/lib/palee/application/list_threads_for_user.ex`
+- `apps/api/lib/palee/application/mark_thread_read.ex`
+- `apps/api/lib/palee/application/broadcast_typing.ex`
+- `apps/api/lib/palee/application/add_participant.ex`
 
 ### New files (channel + interface)
-- `apps/api/lib/milos_training_web/channels/chat_channel.ex`
-- `apps/api/lib/milos_training_web/controllers/messaging_controller.ex`
+- `apps/api/lib/palee_web/channels/chat_channel.ex`
+- `apps/api/lib/palee_web/controllers/messaging_controller.ex`
 - `apps/api/test/support/channel_case.ex`
-- `apps/api/test/milos_training/application/get_or_create_thread_test.exs`
-- `apps/api/test/milos_training/application/send_message_test.exs`
-- `apps/api/test/milos_training/application/list_threads_for_user_test.exs`
-- `apps/api/test/milos_training_web/channels/chat_channel_test.exs`
-- `apps/api/test/milos_training_web/controllers/messaging_controller_test.exs`
+- `apps/api/test/palee/application/get_or_create_thread_test.exs`
+- `apps/api/test/palee/application/send_message_test.exs`
+- `apps/api/test/palee/application/list_threads_for_user_test.exs`
+- `apps/api/test/palee_web/channels/chat_channel_test.exs`
+- `apps/api/test/palee_web/controllers/messaging_controller_test.exs`
 
 ### Modified files
-- `apps/api/lib/milos_training_web/user_socket.ex` — add `channel "chat:*"`
-- `apps/api/lib/milos_training_web/router.ex` — add `/api/threads` routes
-- `apps/api/lib/milos_training/notifications/notification.ex` — add `:chat_message` type
+- `apps/api/lib/palee_web/user_socket.ex` — add `channel "chat:*"`
+- `apps/api/lib/palee_web/router.ex` — add `/api/threads` routes
+- `apps/api/lib/palee/notifications/notification.ex` — add `:chat_message` type
 
 ---
 
 ## Task 1: EctoThreadStore
 
 **Files:**
-- Create: `apps/api/lib/milos_training/infrastructure/messaging/ecto_thread_store.ex`
-- Create: `apps/api/test/milos_training/application/get_or_create_thread_test.exs` (covers store indirectly via use case)
+- Create: `apps/api/lib/palee/infrastructure/messaging/ecto_thread_store.ex`
+- Create: `apps/api/test/palee/application/get_or_create_thread_test.exs` (covers store indirectly via use case)
 
 - [ ] **Step 1: Implement EctoThreadStore**
 
 ```elixir
-# apps/api/lib/milos_training/infrastructure/messaging/ecto_thread_store.ex
-defmodule MilosTraining.Infrastructure.Messaging.EctoThreadStore do
-  @behaviour MilosTraining.Messaging.Ports.ThreadStore
+# apps/api/lib/palee/infrastructure/messaging/ecto_thread_store.ex
+defmodule Palee.Infrastructure.Messaging.EctoThreadStore do
+  @behaviour Palee.Messaging.Ports.ThreadStore
 
   import Ecto.Query
 
-  alias MilosTraining.Messaging.{Thread, Participant}
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
-  alias MilosTraining.Repo
+  alias Palee.Messaging.{Thread, Participant}
+  alias Palee.Messaging.Domain.ThreadPolicy
+  alias Palee.Repo
 
   @impl true
   def get_or_create_direct(user_a_id, user_b_id) do
@@ -206,19 +206,19 @@ Expected: no errors.
 ## Task 2: EctoMessageStore
 
 **Files:**
-- Create: `apps/api/lib/milos_training/infrastructure/messaging/ecto_message_store.ex`
+- Create: `apps/api/lib/palee/infrastructure/messaging/ecto_message_store.ex`
 
 - [ ] **Step 1: Implement EctoMessageStore**
 
 ```elixir
-# apps/api/lib/milos_training/infrastructure/messaging/ecto_message_store.ex
-defmodule MilosTraining.Infrastructure.Messaging.EctoMessageStore do
-  @behaviour MilosTraining.Messaging.Ports.MessageStore
+# apps/api/lib/palee/infrastructure/messaging/ecto_message_store.ex
+defmodule Palee.Infrastructure.Messaging.EctoMessageStore do
+  @behaviour Palee.Messaging.Ports.MessageStore
 
   import Ecto.Query
 
-  alias MilosTraining.Messaging.Message
-  alias MilosTraining.Repo
+  alias Palee.Messaging.Message
+  alias Palee.Repo
 
   @default_page_size 50
 
@@ -309,20 +309,20 @@ cd apps/api && mix compile 2>&1 | grep "error" | head -10
 ## Task 3: Application — GetOrCreateThread
 
 **Files:**
-- Create: `apps/api/lib/milos_training/application/get_or_create_thread.ex`
-- Create: `apps/api/test/milos_training/application/get_or_create_thread_test.exs`
+- Create: `apps/api/lib/palee/application/get_or_create_thread.ex`
+- Create: `apps/api/test/palee/application/get_or_create_thread_test.exs`
 
 - [ ] **Step 1: Write failing test**
 
 ```elixir
-# apps/api/test/milos_training/application/get_or_create_thread_test.exs
-defmodule MilosTraining.Application.GetOrCreateThreadTest do
-  use MilosTraining.DataCase, async: false
+# apps/api/test/palee/application/get_or_create_thread_test.exs
+defmodule Palee.Application.GetOrCreateThreadTest do
+  use Palee.DataCase, async: false
 
-  import MilosTraining.TestFixtures
+  import Palee.TestFixtures
 
-  alias MilosTraining.Application.GetOrCreateThread
-  alias MilosTraining.Messaging
+  alias Palee.Application.GetOrCreateThread
+  alias Palee.Messaging
 
   describe "call/2 — direct" do
     test "creates a new direct thread between two users" do
@@ -387,15 +387,15 @@ end
 - [ ] **Step 2: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/get_or_create_thread_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee/application/get_or_create_thread_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 3: Implement GetOrCreateThread**
 
 ```elixir
-# apps/api/lib/milos_training/application/get_or_create_thread.ex
-defmodule MilosTraining.Application.GetOrCreateThread do
-  alias MilosTraining.Messaging
+# apps/api/lib/palee/application/get_or_create_thread.ex
+defmodule Palee.Application.GetOrCreateThread do
+  alias Palee.Messaging
 
   def direct(user_a_id, user_b_id) do
     Messaging.get_or_create_direct(user_a_id, user_b_id)
@@ -410,7 +410,7 @@ end
 - [ ] **Step 4: Run test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/get_or_create_thread_test.exs
+cd apps/api && mix test test/palee/application/get_or_create_thread_test.exs
 ```
 
 Expected: `6 tests, 0 failures`
@@ -418,9 +418,9 @@ Expected: `6 tests, 0 failures`
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/infrastructure/messaging/ \
-        apps/api/lib/milos_training/application/get_or_create_thread.ex \
-        apps/api/test/milos_training/application/get_or_create_thread_test.exs
+git add apps/api/lib/palee/infrastructure/messaging/ \
+        apps/api/lib/palee/application/get_or_create_thread.ex \
+        apps/api/test/palee/application/get_or_create_thread_test.exs
 git commit -m "feat(messaging): EctoThreadStore, EctoMessageStore, GetOrCreateThread"
 ```
 
@@ -429,12 +429,12 @@ git commit -m "feat(messaging): EctoThreadStore, EctoMessageStore, GetOrCreateTh
 ## Task 4: Application — SendMessage
 
 **Files:**
-- Create: `apps/api/lib/milos_training/application/send_message.ex`
-- Create: `apps/api/test/milos_training/application/send_message_test.exs`
+- Create: `apps/api/lib/palee/application/send_message.ex`
+- Create: `apps/api/test/palee/application/send_message_test.exs`
 
 - [ ] **Step 1: Add `:chat_message` to Notification types**
 
-In `apps/api/lib/milos_training/notifications/notification.ex`, add `:chat_message` to the `@types` list:
+In `apps/api/lib/palee/notifications/notification.ex`, add `:chat_message` to the `@types` list:
 
 ```elixir
 # Find the @types list and add :chat_message:
@@ -459,14 +459,14 @@ In `apps/api/lib/milos_training/notifications/notification.ex`, add `:chat_messa
 - [ ] **Step 2: Write failing test**
 
 ```elixir
-# apps/api/test/milos_training/application/send_message_test.exs
-defmodule MilosTraining.Application.SendMessageTest do
-  use MilosTraining.DataCase, async: false
+# apps/api/test/palee/application/send_message_test.exs
+defmodule Palee.Application.SendMessageTest do
+  use Palee.DataCase, async: false
 
-  import MilosTraining.TestFixtures
+  import Palee.TestFixtures
 
-  alias MilosTraining.Application.{GetOrCreateThread, SendMessage}
-  alias MilosTraining.Messaging
+  alias Palee.Application.{GetOrCreateThread, SendMessage}
+  alias Palee.Messaging
 
   describe "call/3" do
     test "sends a text message in a direct thread" do
@@ -521,15 +521,15 @@ end
 - [ ] **Step 3: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/send_message_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee/application/send_message_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 4: Implement OfflineNotifier**
 
 ```elixir
-# apps/api/lib/milos_training/infrastructure/messaging/offline_notifier.ex
-defmodule MilosTraining.Infrastructure.Messaging.OfflineNotifier do
-  alias MilosTraining.Notifications
+# apps/api/lib/palee/infrastructure/messaging/offline_notifier.ex
+defmodule Palee.Infrastructure.Messaging.OfflineNotifier do
+  alias Palee.Notifications
 
   def notify_offline_participants(thread, message, sender_id) do
     topic = "chat:thread:#{thread.id}"
@@ -542,7 +542,7 @@ defmodule MilosTraining.Infrastructure.Messaging.OfflineNotifier do
   end
 
   defp subscribed_user_ids(topic) do
-    case Phoenix.PubSub.list_topics(MilosTraining.PubSub) do
+    case Phoenix.PubSub.list_topics(Palee.PubSub) do
       _ ->
         # Check subscribers to the channel topic via PubSub
         # Falls back to empty list if topic has no active subscriptions
@@ -581,13 +581,13 @@ end
 - [ ] **Step 5: Implement SendMessage**
 
 ```elixir
-# apps/api/lib/milos_training/application/send_message.ex
-defmodule MilosTraining.Application.SendMessage do
-  alias MilosTraining.Application.RecordCommunicationMessage
-  alias MilosTraining.Identity
-  alias MilosTraining.Infrastructure.Messaging.OfflineNotifier
-  alias MilosTraining.Messaging
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
+# apps/api/lib/palee/application/send_message.ex
+defmodule Palee.Application.SendMessage do
+  alias Palee.Application.RecordCommunicationMessage
+  alias Palee.Identity
+  alias Palee.Infrastructure.Messaging.OfflineNotifier
+  alias Palee.Messaging
+  alias Palee.Messaging.Domain.ThreadPolicy
 
   def call(thread_id, sender_id, params) do
     with %{} = thread <- Messaging.get_thread_with_participants(thread_id) || :not_found,
@@ -606,7 +606,7 @@ defmodule MilosTraining.Application.SendMessage do
   end
 
   defp broadcast(thread_id, message, _sender_id) do
-    MilosTrainingWeb.Endpoint.broadcast(
+    PaleeWeb.Endpoint.broadcast(
       "chat:thread:#{thread_id}",
       "new_message",
       message
@@ -642,7 +642,7 @@ end
 - [ ] **Step 6: Run test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/send_message_test.exs
+cd apps/api && mix test test/palee/application/send_message_test.exs
 ```
 
 Expected: `4 tests, 0 failures`
@@ -650,10 +650,10 @@ Expected: `4 tests, 0 failures`
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/notifications/notification.ex \
-        apps/api/lib/milos_training/infrastructure/messaging/offline_notifier.ex \
-        apps/api/lib/milos_training/application/send_message.ex \
-        apps/api/test/milos_training/application/send_message_test.exs
+git add apps/api/lib/palee/notifications/notification.ex \
+        apps/api/lib/palee/infrastructure/messaging/offline_notifier.ex \
+        apps/api/lib/palee/application/send_message.ex \
+        apps/api/test/palee/application/send_message_test.exs
 git commit -m "feat(messaging): SendMessage, OfflineNotifier, :chat_message notification type"
 ```
 
@@ -662,23 +662,23 @@ git commit -m "feat(messaging): SendMessage, OfflineNotifier, :chat_message noti
 ## Task 5: Remaining Application Use Cases
 
 **Files:**
-- Create: `apps/api/lib/milos_training/application/get_thread_messages.ex`
-- Create: `apps/api/lib/milos_training/application/list_threads_for_user.ex`
-- Create: `apps/api/lib/milos_training/application/mark_thread_read.ex`
-- Create: `apps/api/lib/milos_training/application/broadcast_typing.ex`
-- Create: `apps/api/lib/milos_training/application/add_participant.ex`
-- Create: `apps/api/test/milos_training/application/list_threads_for_user_test.exs`
+- Create: `apps/api/lib/palee/application/get_thread_messages.ex`
+- Create: `apps/api/lib/palee/application/list_threads_for_user.ex`
+- Create: `apps/api/lib/palee/application/mark_thread_read.ex`
+- Create: `apps/api/lib/palee/application/broadcast_typing.ex`
+- Create: `apps/api/lib/palee/application/add_participant.ex`
+- Create: `apps/api/test/palee/application/list_threads_for_user_test.exs`
 
 - [ ] **Step 1: Write failing test for ListThreadsForUser**
 
 ```elixir
-# apps/api/test/milos_training/application/list_threads_for_user_test.exs
-defmodule MilosTraining.Application.ListThreadsForUserTest do
-  use MilosTraining.DataCase, async: false
+# apps/api/test/palee/application/list_threads_for_user_test.exs
+defmodule Palee.Application.ListThreadsForUserTest do
+  use Palee.DataCase, async: false
 
-  import MilosTraining.TestFixtures
+  import Palee.TestFixtures
 
-  alias MilosTraining.Application.{GetOrCreateThread, ListThreadsForUser, SendMessage}
+  alias Palee.Application.{GetOrCreateThread, ListThreadsForUser, SendMessage}
 
   describe "call/2" do
     test "returns all threads for user" do
@@ -724,16 +724,16 @@ end
 - [ ] **Step 2: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/list_threads_for_user_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee/application/list_threads_for_user_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 3: Implement GetThreadMessages**
 
 ```elixir
-# apps/api/lib/milos_training/application/get_thread_messages.ex
-defmodule MilosTraining.Application.GetThreadMessages do
-  alias MilosTraining.Messaging
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
+# apps/api/lib/palee/application/get_thread_messages.ex
+defmodule Palee.Application.GetThreadMessages do
+  alias Palee.Messaging
+  alias Palee.Messaging.Domain.ThreadPolicy
 
   def call(thread_id, actor_id, params \\ %{}) do
     case Messaging.get_thread_with_participants(thread_id) do
@@ -755,9 +755,9 @@ end
 - [ ] **Step 4: Implement ListThreadsForUser**
 
 ```elixir
-# apps/api/lib/milos_training/application/list_threads_for_user.ex
-defmodule MilosTraining.Application.ListThreadsForUser do
-  alias MilosTraining.Messaging
+# apps/api/lib/palee/application/list_threads_for_user.ex
+defmodule Palee.Application.ListThreadsForUser do
+  alias Palee.Messaging
 
   def call(user_id, context_type \\ nil) do
     Messaging.list_threads_for_user(user_id, context_type)
@@ -768,14 +768,14 @@ end
 - [ ] **Step 5: Implement MarkThreadRead**
 
 ```elixir
-# apps/api/lib/milos_training/application/mark_thread_read.ex
-defmodule MilosTraining.Application.MarkThreadRead do
+# apps/api/lib/palee/application/mark_thread_read.ex
+defmodule Palee.Application.MarkThreadRead do
   import Ecto.Query
 
-  alias MilosTraining.Messaging
-  alias MilosTraining.Messaging.{Participant}
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
-  alias MilosTraining.Repo
+  alias Palee.Messaging
+  alias Palee.Messaging.{Participant}
+  alias Palee.Messaging.Domain.ThreadPolicy
+  alias Palee.Repo
 
   def call(thread_id, actor_id, last_message_id) do
     case Messaging.get_thread_with_participants(thread_id) do
@@ -801,7 +801,7 @@ defmodule MilosTraining.Application.MarkThreadRead do
   end
 
   defp broadcast_receipt(thread_id, actor_id, last_message_id) do
-    MilosTrainingWeb.Endpoint.broadcast(
+    PaleeWeb.Endpoint.broadcast(
       "chat:thread:#{thread_id}",
       "read_receipt",
       %{user_id: actor_id, last_read_message_id: last_message_id}
@@ -813,10 +813,10 @@ end
 - [ ] **Step 6: Implement BroadcastTyping**
 
 ```elixir
-# apps/api/lib/milos_training/application/broadcast_typing.ex
-defmodule MilosTraining.Application.BroadcastTyping do
-  alias MilosTraining.Messaging
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
+# apps/api/lib/palee/application/broadcast_typing.ex
+defmodule Palee.Application.BroadcastTyping do
+  alias Palee.Messaging
+  alias Palee.Messaging.Domain.ThreadPolicy
 
   def call(thread_id, actor_id, nickname, typing) when is_boolean(typing) do
     case Messaging.get_thread_with_participants(thread_id) do
@@ -825,7 +825,7 @@ defmodule MilosTraining.Application.BroadcastTyping do
 
       thread ->
         if ThreadPolicy.participant?(actor_id, thread.participants) do
-          MilosTrainingWeb.Endpoint.broadcast(
+          PaleeWeb.Endpoint.broadcast(
             "chat:thread:#{thread_id}",
             "typing",
             %{user_id: actor_id, nickname: nickname, typing: typing}
@@ -843,9 +843,9 @@ end
 - [ ] **Step 7: Implement AddParticipant**
 
 ```elixir
-# apps/api/lib/milos_training/application/add_participant.ex
-defmodule MilosTraining.Application.AddParticipant do
-  alias MilosTraining.Messaging
+# apps/api/lib/palee/application/add_participant.ex
+defmodule Palee.Application.AddParticipant do
+  alias Palee.Messaging
 
   def call(thread_id, user_id) do
     case Messaging.get_thread_with_participants(thread_id) do
@@ -859,7 +859,7 @@ end
 - [ ] **Step 8: Run ListThreadsForUser test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/list_threads_for_user_test.exs
+cd apps/api && mix test test/palee/application/list_threads_for_user_test.exs
 ```
 
 Expected: `3 tests, 0 failures`
@@ -867,12 +867,12 @@ Expected: `3 tests, 0 failures`
 - [ ] **Step 9: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/get_thread_messages.ex \
-        apps/api/lib/milos_training/application/list_threads_for_user.ex \
-        apps/api/lib/milos_training/application/mark_thread_read.ex \
-        apps/api/lib/milos_training/application/broadcast_typing.ex \
-        apps/api/lib/milos_training/application/add_participant.ex \
-        apps/api/test/milos_training/application/list_threads_for_user_test.exs
+git add apps/api/lib/palee/application/get_thread_messages.ex \
+        apps/api/lib/palee/application/list_threads_for_user.ex \
+        apps/api/lib/palee/application/mark_thread_read.ex \
+        apps/api/lib/palee/application/broadcast_typing.ex \
+        apps/api/lib/palee/application/add_participant.ex \
+        apps/api/test/palee/application/list_threads_for_user_test.exs
 git commit -m "feat(messaging): remaining application use cases"
 ```
 
@@ -882,28 +882,28 @@ git commit -m "feat(messaging): remaining application use cases"
 
 **Files:**
 - Create: `apps/api/test/support/channel_case.ex`
-- Create: `apps/api/lib/milos_training_web/channels/chat_channel.ex`
-- Create: `apps/api/test/milos_training_web/channels/chat_channel_test.exs`
-- Modify: `apps/api/lib/milos_training_web/user_socket.ex`
+- Create: `apps/api/lib/palee_web/channels/chat_channel.ex`
+- Create: `apps/api/test/palee_web/channels/chat_channel_test.exs`
+- Modify: `apps/api/lib/palee_web/user_socket.ex`
 
 - [ ] **Step 1: Add ChannelCase test support**
 
 ```elixir
 # apps/api/test/support/channel_case.ex
-defmodule MilosTrainingWeb.ChannelCase do
+defmodule PaleeWeb.ChannelCase do
   use ExUnit.CaseTemplate
 
   using do
     quote do
       import Phoenix.ChannelTest
-      import MilosTraining.TestFixtures
+      import Palee.TestFixtures
 
-      @endpoint MilosTrainingWeb.Endpoint
+      @endpoint PaleeWeb.Endpoint
     end
   end
 
   setup tags do
-    MilosTraining.DataCase.setup_sandbox(tags)
+    Palee.DataCase.setup_sandbox(tags)
     :ok
   end
 end
@@ -912,16 +912,16 @@ end
 - [ ] **Step 2: Write failing ChatChannel test**
 
 ```elixir
-# apps/api/test/milos_training_web/channels/chat_channel_test.exs
-defmodule MilosTrainingWeb.ChatChannelTest do
-  use MilosTrainingWeb.ChannelCase, async: false
+# apps/api/test/palee_web/channels/chat_channel_test.exs
+defmodule PaleeWeb.ChatChannelTest do
+  use PaleeWeb.ChannelCase, async: false
 
-  alias MilosTraining.Application.GetOrCreateThread
-  alias MilosTraining.Infrastructure.Auth.Guardian
+  alias Palee.Application.GetOrCreateThread
+  alias Palee.Infrastructure.Auth.Guardian
 
   defp connect_user(user) do
     {:ok, token, _} = Guardian.encode_and_sign(user, %{}, token_type: "access")
-    {:ok, socket} = connect(MilosTrainingWeb.UserSocket, %{"token" => token})
+    {:ok, socket} = connect(PaleeWeb.UserSocket, %{"token" => token})
     socket
   end
 
@@ -982,19 +982,19 @@ end
 - [ ] **Step 3: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training_web/channels/chat_channel_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee_web/channels/chat_channel_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 4: Implement ChatChannel**
 
 ```elixir
-# apps/api/lib/milos_training_web/channels/chat_channel.ex
-defmodule MilosTrainingWeb.ChatChannel do
+# apps/api/lib/palee_web/channels/chat_channel.ex
+defmodule PaleeWeb.ChatChannel do
   use Phoenix.Channel
 
-  alias MilosTraining.Application.{SendMessage, MarkThreadRead, BroadcastTyping}
-  alias MilosTraining.Messaging
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
+  alias Palee.Application.{SendMessage, MarkThreadRead, BroadcastTyping}
+  alias Palee.Messaging
+  alias Palee.Messaging.Domain.ThreadPolicy
 
   @impl true
   def join("chat:thread:" <> thread_id, _payload, socket) do
@@ -1065,25 +1065,25 @@ end
 
 - [ ] **Step 5: Register channel in UserSocket**
 
-In `apps/api/lib/milos_training_web/user_socket.ex`, add the chat channel:
+In `apps/api/lib/palee_web/user_socket.ex`, add the chat channel:
 
 ```elixir
 # After the existing channel declarations, add:
-channel "chat:*", MilosTrainingWeb.ChatChannel
+channel "chat:*", PaleeWeb.ChatChannel
 ```
 
 Full updated file:
 ```elixir
-defmodule MilosTrainingWeb.UserSocket do
+defmodule PaleeWeb.UserSocket do
   use Phoenix.Socket
 
-  alias MilosTraining.Infrastructure.Auth.Guardian
+  alias Palee.Infrastructure.Auth.Guardian
 
-  channel "schedule:lobby", MilosTrainingWeb.ScheduleChannel
-  channel "notifications:*", MilosTrainingWeb.NotificationChannel
-  channel "sync:*", MilosTrainingWeb.SyncChannel
-  channel "execution:*", MilosTrainingWeb.ExecutionChannel
-  channel "chat:*", MilosTrainingWeb.ChatChannel
+  channel "schedule:lobby", PaleeWeb.ScheduleChannel
+  channel "notifications:*", PaleeWeb.NotificationChannel
+  channel "sync:*", PaleeWeb.SyncChannel
+  channel "execution:*", PaleeWeb.ExecutionChannel
+  channel "chat:*", PaleeWeb.ChatChannel
 
   @impl true
   def connect(%{"token" => token}, socket, _connect_info) when is_binary(token) do
@@ -1105,7 +1105,7 @@ end
 - [ ] **Step 6: Run channel tests**
 
 ```bash
-cd apps/api && mix test test/milos_training_web/channels/chat_channel_test.exs
+cd apps/api && mix test test/palee_web/channels/chat_channel_test.exs
 ```
 
 Expected: `4 tests, 0 failures`
@@ -1113,10 +1113,10 @@ Expected: `4 tests, 0 failures`
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training_web/channels/chat_channel.ex \
-        apps/api/lib/milos_training_web/user_socket.ex \
+git add apps/api/lib/palee_web/channels/chat_channel.ex \
+        apps/api/lib/palee_web/user_socket.ex \
         apps/api/test/support/channel_case.ex \
-        apps/api/test/milos_training_web/channels/chat_channel_test.exs
+        apps/api/test/palee_web/channels/chat_channel_test.exs
 git commit -m "feat(messaging): ChatChannel with join auth, send_message, typing, mark_read"
 ```
 
@@ -1125,18 +1125,18 @@ git commit -m "feat(messaging): ChatChannel with join auth, send_message, typing
 ## Task 7: MessagingController + Routes
 
 **Files:**
-- Create: `apps/api/lib/milos_training_web/controllers/messaging_controller.ex`
-- Create: `apps/api/test/milos_training_web/controllers/messaging_controller_test.exs`
-- Modify: `apps/api/lib/milos_training_web/router.ex`
+- Create: `apps/api/lib/palee_web/controllers/messaging_controller.ex`
+- Create: `apps/api/test/palee_web/controllers/messaging_controller_test.exs`
+- Modify: `apps/api/lib/palee_web/router.ex`
 
 - [ ] **Step 1: Write failing controller test**
 
 ```elixir
-# apps/api/test/milos_training_web/controllers/messaging_controller_test.exs
-defmodule MilosTrainingWeb.MessagingControllerTest do
-  use MilosTrainingWeb.ConnCase, async: false
+# apps/api/test/palee_web/controllers/messaging_controller_test.exs
+defmodule PaleeWeb.MessagingControllerTest do
+  use PaleeWeb.ConnCase, async: false
 
-  import MilosTraining.TestFixtures
+  import Palee.TestFixtures
 
   describe "GET /api/threads" do
     test "returns threads for authenticated user", %{conn: conn} do
@@ -1255,19 +1255,19 @@ end
 - [ ] **Step 2: Run test — expect compile error (no controller or routes yet)**
 
 ```bash
-cd apps/api && mix test test/milos_training_web/controllers/messaging_controller_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee_web/controllers/messaging_controller_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 3: Implement MessagingController**
 
 ```elixir
-# apps/api/lib/milos_training_web/controllers/messaging_controller.ex
-defmodule MilosTrainingWeb.MessagingController do
-  use MilosTrainingWeb, :controller
+# apps/api/lib/palee_web/controllers/messaging_controller.ex
+defmodule PaleeWeb.MessagingController do
+  use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
   alias Guardian.Plug, as: GuardianPlug
-  alias MilosTraining.Application.{
+  alias Palee.Application.{
     GetOrCreateThread,
     GetThreadMessages,
     ListThreadsForUser,
@@ -1276,7 +1276,7 @@ defmodule MilosTrainingWeb.MessagingController do
   }
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
-  action_fallback MilosTrainingWeb.FallbackController
+  action_fallback PaleeWeb.FallbackController
 
   tags(["Messaging"])
   security([%{"bearerAuth" => []}])
@@ -1462,7 +1462,7 @@ end
 
 - [ ] **Step 4: Add routes to router**
 
-In `apps/api/lib/milos_training_web/router.ex`, inside the `scope "/api"` + authenticated + user_only block, add:
+In `apps/api/lib/palee_web/router.ex`, inside the `scope "/api"` + authenticated + user_only block, add:
 
 ```elixir
 # Messaging (private chat)
@@ -1477,7 +1477,7 @@ post "/threads/:id/read", MessagingController, :mark_read
 - [ ] **Step 5: Run controller tests**
 
 ```bash
-cd apps/api && mix test test/milos_training_web/controllers/messaging_controller_test.exs
+cd apps/api && mix test test/palee_web/controllers/messaging_controller_test.exs
 ```
 
 Expected: `6 tests, 0 failures`
@@ -1491,9 +1491,9 @@ cd apps/api && mix test 2>&1 | tail -5
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training_web/controllers/messaging_controller.ex \
-        apps/api/lib/milos_training_web/router.ex \
-        apps/api/test/milos_training_web/controllers/messaging_controller_test.exs
+git add apps/api/lib/palee_web/controllers/messaging_controller.ex \
+        apps/api/lib/palee_web/router.ex \
+        apps/api/test/palee_web/controllers/messaging_controller_test.exs
 git commit -m "feat(messaging): MessagingController, OpenAPI specs, routes"
 ```
 

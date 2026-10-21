@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowExecutionAdminAndAuthorizationReads do
+defmodule Palee.Repo.Migrations.AllowExecutionAdminAndAuthorizationReads do
   use Ecto.Migration
 
   def up do

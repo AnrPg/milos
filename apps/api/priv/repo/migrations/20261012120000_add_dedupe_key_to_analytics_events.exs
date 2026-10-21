@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddDedupeKeyToAnalyticsEvents do
+defmodule Palee.Repo.Migrations.AddDedupeKeyToAnalyticsEvents do
   use Ecto.Migration
 
   # ADR-123 / TD-011: analytics events that must be recorded at most once

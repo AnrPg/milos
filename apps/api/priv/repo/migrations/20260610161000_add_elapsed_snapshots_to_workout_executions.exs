@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddElapsedSnapshotsToWorkoutExecutions do
+defmodule Palee.Repo.Migrations.AddElapsedSnapshotsToWorkoutExecutions do
   use Ecto.Migration
 
   def change do

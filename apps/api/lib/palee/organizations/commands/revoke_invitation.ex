@@ -1,0 +1,15 @@
+defmodule Palee.Organizations.Commands.RevokeInvitation do
+  alias Palee.Infrastructure.Tenancy.RepoContext
+  alias Palee.Organizations.Domain.TenantAuthorization
+  alias Palee.Organizations.OrganizationStore
+
+  # registration_invitations is a root tenant table: RLS admits the row only in
+  # the acting owner/admin's tenant scope (TD-046).
+  def call(context, invitation_id, revoked_at) do
+    with :ok <- TenantAuthorization.authorize_capability(context, :invite_clients) do
+      RepoContext.run(context, fn ->
+        OrganizationStore.revoke_invitation(context.organization_id, invitation_id, revoked_at)
+      end)
+    end
+  end
+end

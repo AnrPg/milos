@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BackfillAndRequireUserEmail do
+defmodule Palee.Repo.Migrations.BackfillAndRequireUserEmail do
   use Ecto.Migration
 
   # F-10 follow-up: email is now mandatory. Existing accounts predate the

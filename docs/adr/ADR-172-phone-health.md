@@ -7,7 +7,7 @@ Plan P3-M10 (`docs/plans/redesign-phase-3-depth.md`, ADR candidate «ADR-172 Pho
 health data»): the store apps from ADR-171 should bring in workouts, sleep, weight,
 resting heart rate and steps from the phone's own health store, with a permissions
 flow on «Εγώ › Συνδεδεμένες συσκευές», ingest, dedupe and a status row. ADR-171 left
-the phone row as «Σύντομα» until a `MilosHealth` plugin is present; its capability
+the phone row as «Σύντομα» until a `PaleeHealth` plugin is present; its capability
 layer (`apps/web/src/lib/platform`) turns `healthKit` / `healthConnect` on when it is.
 
 Garmin (ADR-161) already set the pattern: `device_connections`, `device_imports`
@@ -20,10 +20,10 @@ Unlike Garmin there is no server-to-server API: HealthKit and Health Connect can
 be read on the phone, by the app, while it runs.
 
 ## Decision
-1. **One native plugin, `MilosHealth`, written in the app** (no third-party health
-   plugin): Swift HealthKit (`ios/App/App/MilosHealthPlugin.swift`, registered by
-   `MilosBridgeViewController`) and Kotlin Health Connect
-   (`android/.../MilosHealthPlugin.kt`, registered in `MainActivity`), with the same
+1. **One native plugin, `PaleeHealth`, written in the app** (no third-party health
+   plugin): Swift HealthKit (`ios/App/App/PaleeHealthPlugin.swift`, registered by
+   `PaleeBridgeViewController`) and Kotlin Health Connect
+   (`android/.../PaleeHealthPlugin.kt`, registered in `MainActivity`), with the same
    read-only surface: `availability()`, `requestAuthorization({kinds})`,
    `read({kinds, from, to})`, plus `openInstaller()` on Android.
 2. **The plugin returns raw records; one pure TS module shapes them**

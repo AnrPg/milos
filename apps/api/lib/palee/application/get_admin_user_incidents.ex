@@ -1,0 +1,40 @@
+defmodule Palee.Application.GetAdminUserIncidents do
+  @moduledoc false
+
+  alias Palee.{Identity, Wellbeing}
+
+  def call(context, user_id) do
+    with %{} <- Identity.find_by_id(user_id) || {:error, :not_found} do
+      incidents = Wellbeing.list_injuries_for_user(context, user_id) |> Enum.map(&serialize/1)
+
+      {:ok,
+       %{
+         user_id: user_id,
+         incidents: incidents,
+         summary: %{
+           total: length(incidents),
+           active: Enum.count(incidents, &(&1.status == "active"))
+         }
+       }}
+    end
+  end
+
+  def call(user_id), do: call(%{}, user_id)
+
+  defp serialize(report) do
+    Map.take(report, [
+      :id,
+      :body_area,
+      :severity,
+      :status,
+      :started_on,
+      :healed_on,
+      :description,
+      :training_limitations,
+      :tags,
+      :visibility,
+      :reported_by_role,
+      :inserted_at
+    ])
+  end
+end

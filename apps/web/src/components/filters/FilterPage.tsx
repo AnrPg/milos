@@ -204,7 +204,7 @@ export function RangeSlider({
           step={step}
           value={value.from}
           onChange={(event) => onChange({ from: Math.min(Number(event.target.value), value.to - step), to: value.to })}
-          className="milos-range-thumb pointer-events-none absolute inset-x-0 top-0 h-8 w-full appearance-none bg-transparent"
+          className="palee-range-thumb pointer-events-none absolute inset-x-0 top-0 h-8 w-full appearance-none bg-transparent"
         />
         <input
           type="range"
@@ -215,7 +215,7 @@ export function RangeSlider({
           step={step}
           value={value.to}
           onChange={(event) => onChange({ from: value.from, to: Math.max(Number(event.target.value), value.from + step) })}
-          className="milos-range-thumb pointer-events-none absolute inset-x-0 top-0 h-8 w-full appearance-none bg-transparent"
+          className="palee-range-thumb pointer-events-none absolute inset-x-0 top-0 h-8 w-full appearance-none bg-transparent"
         />
       </div>
       <div className="flex justify-between text-xs" style={{ color: "var(--dim)" }}>

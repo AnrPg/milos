@@ -24,8 +24,8 @@ import {
 import { ApiError } from "@/api/client";
 import { localizeError } from "@/i18n/presentation";
 
-const PUSH_CONFIG_CACHE = "milos-push-config-v1";
-const PUSH_CONFIG_REQUEST = "/__milos_push_config__";
+const PUSH_CONFIG_CACHE = "palee-push-config-v1";
+const PUSH_CONFIG_REQUEST = "/__palee_push_config__";
 
 function base64UrlToUint8Array(value: string) {
   const padding = "=".repeat((4 - (value.length % 4)) % 4);
@@ -56,7 +56,7 @@ function toPayload(subscription: PushSubscription): PushSubscriptionPayload {
 
 async function clearStoredServiceWorkerToken(): Promise<void> {
   await new Promise<void>((resolve) => {
-    const req = indexedDB.open("milos-sw", 1);
+    const req = indexedDB.open("palee-sw", 1);
     req.onupgradeneeded = () => {
       if (!req.result.objectStoreNames.contains("config")) {
         req.result.createObjectStore("config", { keyPath: "key" });
@@ -91,7 +91,7 @@ async function persistPushConfig(config: PushNotificationConfig) {
   }
 
   registration.active?.postMessage({
-    type: "milos:push-config",
+    type: "palee:push-config",
     vapidPublicKey: config.vapid_public_key,
   });
 }
@@ -276,8 +276,8 @@ function useWebPushNotifications(accessToken: string | null | undefined, active:
 
     function handleWorkerMessage(event: MessageEvent) {
       if (
-        event.data?.type === "milos:push-subscription-stale" ||
-        event.data?.type === "milos:push-subscription-updated"
+        event.data?.type === "palee:push-subscription-stale" ||
+        event.data?.type === "palee:push-subscription-updated"
       ) {
         void syncSubscription(token, Notification.permission === "granted").catch((caught) => {
           setState("error");
@@ -286,7 +286,7 @@ function useWebPushNotifications(accessToken: string | null | undefined, active:
       }
 
       if (
-        event.data?.type === "milos:notification-clicked" &&
+        event.data?.type === "palee:notification-clicked" &&
         typeof event.data.notificationId === "string"
       ) {
         void markNotificationClicked(token, event.data.notificationId, event.data.url ?? null);

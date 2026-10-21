@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddStructuredDetailsToPrResults do
+defmodule Palee.Repo.Migrations.AddStructuredDetailsToPrResults do
   use Ecto.Migration
 
   def change do

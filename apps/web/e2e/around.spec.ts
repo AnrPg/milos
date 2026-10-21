@@ -136,7 +136,7 @@ async function stub(page: Page, { area = [kypseli] as unknown[], thin = false, v
   let aroundVisibility = { visible, has_area: hasArea };
   const filters = () => ({ surface: "around_me", last_used: null, saved });
 
-  await page.context().addCookies([{ name: "milos_locale", value: "el", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "el", url: "http://127.0.0.1" }]);
   // A blank map style: no tiles from the network in tests.
   await page.route("https://tiles.openfreemap.org/**", (route) => route.fulfill(json({ version: 8, sources: {}, layers: [] })));
   await page.route("**/api/**", (route) => route.fulfill(json({})));

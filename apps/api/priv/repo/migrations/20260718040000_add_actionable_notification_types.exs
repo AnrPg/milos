@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddActionableNotificationTypes do
+defmodule Palee.Repo.Migrations.AddActionableNotificationTypes do
   use Ecto.Migration
 
   @types [

@@ -15,7 +15,7 @@ import { classifyDeliveryError, type OutboxFailure } from "@/lib/outbox-failure"
  * and its owning API context dedupes replays server-side.
  */
 
-export const OFFLINE_COMMAND_OUTBOX_EVENT = "milos:offline-command-outbox";
+export const OFFLINE_COMMAND_OUTBOX_EVENT = "palee:offline-command-outbox";
 
 export type OutboxCommandKind =
   | "booking.request"

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddOrganizationUserIdsFunction do
+defmodule Palee.Repo.Migrations.AddOrganizationUserIdsFunction do
   use Ecto.Migration
 
   # TD-046: organization_memberships RLS only admits a vendor, the acting
@@ -12,7 +12,7 @@ defmodule MilosTraining.Repo.Migrations.AddOrganizationUserIdsFunction do
   # already belongs to that organization (tenant scope, membership, or vendor).
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_organization_user_ids(org_id uuid, member_roles text[])
+    CREATE OR REPLACE FUNCTION palee_organization_user_ids(org_id uuid, member_roles text[])
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -47,6 +47,6 @@ defmodule MilosTraining.Repo.Migrations.AddOrganizationUserIdsFunction do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_organization_user_ids(uuid, text[])")
+    execute("DROP FUNCTION IF EXISTS palee_organization_user_ids(uuid, text[])")
   end
 end

@@ -21,11 +21,11 @@ lose all of that.
    `@capacitor/core|cli|ios|android` 8.5.3, `app` 8.1.2,
    `push-notifications` 8.1.3, `browser` 8.0.5, `preferences` 8.0.1,
    `splash-screen` 8.0.2, `status-bar` 8.0.4, `haptics` 8.0.2. App id
-   `app.milos.member` (no bundle id existed in the repo), name «Milos».
+   `app.milos.member` (no bundle id existed in the repo), name «Palee».
 2. **The shell loads the deployed web app** (`server.url`), chosen per build
-   by `MILOS_APP_ENV` (`production` → `https://milos.4kq.net`, `staging` →
-   `MILOS_APP_URL` required, `development` → `http://localhost:18080`;
-   `MILOS_APP_URL` overrides any of them; production refuses http).
+   by `PALEE_APP_ENV` (`production` → `https://milos.4kq.net`, `staging` →
+   `PALEE_APP_URL` required, `development` → `http://localhost:18080`;
+   `PALEE_APP_URL` overrides any of them; production refuses http).
    `apps/mobile/config/environments.json` + `config/resolve.cjs` hold this;
    `capacitor.config.ts` and the scripts both read it.
 3. **Navigation allow-list:** the app's host plus `connect.garmin.com`
@@ -45,7 +45,7 @@ lose all of that.
    ran here without the Android SDK or Xcode (Capacitor 8 uses Swift Package
    Manager on iOS, so no CocoaPods either), so `apps/mobile/android` and
    `apps/mobile/ios` are committed. `scripts/configure.mjs` writes the
-   environment into them between `milos:app-links` markers on every run:
+   environment into them between `palee:app-links` markers on every run:
    the Android App Links intent filter (`autoVerify`), the iOS Associated
    Domains and `aps-environment` entitlements (and `CODE_SIGN_ENTITLEMENTS`
    in the Xcode project), `WKAppBoundDomains`, and `www/app-config.js`.
@@ -70,7 +70,7 @@ lose all of that.
    travels in the body, never in a URL), and `GET
    /api/notifications/push-config` gains `native_providers`. A token moves
    to whoever registers it last on that install
-   (`milos_claim_native_push_token`, SECURITY DEFINER, deletes only other
+   (`palee_claim_native_push_token`, SECURITY DEFINER, deletes only other
    accounts' rows for that exact token). Every notification that gets a web
    push also queues one `NativePushDispatchJob` per install whose provider
    is configured; the job sends the same title, body and link, records the
@@ -94,8 +94,8 @@ lose all of that.
    `@capacitor/app` and `@capacitor/push-notifications` are imported lazily
    inside the app only, so the web bundle carries no Capacitor code on any
    page. A capability is "its plugin is present on its platforms", so
-   P3-M10/M11 light up by shipping their plugin (`MilosHealth`,
-   `MilosWidgets`, `MilosGeofence`, `MilosNfc`). `usePlatform()` exposes it
+   P3-M10/M11 light up by shipping their plugin (`PaleeHealth`,
+   `PaleeWidgets`, `PaleeGeofence`, `PaleeNfc`). `usePlatform()` exposes it
    to components without a hydration mismatch.
 10. **Push in the app:** `usePushNotifications` keeps its interface and
     switches to OS push when native (permission → APNs/FCM token →
@@ -163,7 +163,7 @@ most robust, least clutter).
 7. Confirm the production host (`https://milos.4kq.net` is the default in
    `apps/mobile/config/environments.json`) and set a staging URL if wanted.
 8. App icons and splash artwork (the generated defaults are Capacitor's),
-   then store listings for both stores: name «Milos», descriptions in Greek
+   then store listings for both stores: name «Palee», descriptions in Greek
    and English, screenshots, privacy policy URL, data-safety / privacy
    nutrition answers (push token, account data; health data arrives with
    P3-M10), age rating, support contact.

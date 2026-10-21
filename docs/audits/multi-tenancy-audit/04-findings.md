@@ -27,14 +27,14 @@ required rebuilding it via migration
 then scoping `financial_summary/1`'s raw query by
 `RepoContext.current_setting("app.organization_id")`, mirroring the
 `coaching_aggregates` pattern. Verified with a new failing-then-passing test
-in `test/milos_training/finance/tenant_isolation_test.exs` ("financial_summary
+in `test/palee/finance/tenant_isolation_test.exs` ("financial_summary
 aggregates are isolated by organization") plus the full 83-test Finance suite
 and the full 575-test project suite, all green.
 
 **Severity:** Critical · **Confidence:** Confirmed (read directly)
 **Invariant affected:** Direct cross-tenant data access to financial records — the single most severe category named in the audit brief.
 
-**Evidence:** `apps/api/lib/milos_training/infrastructure/finance/ecto_finance_store.ex`
+**Evidence:** `apps/api/lib/palee/infrastructure/finance/ecto_finance_store.ex`
 `financial_summary/1` runs:
 ```sql
 SELECT period_start, user_type_snapshot, package_code, package_family,
@@ -119,13 +119,13 @@ dropped `organization_id` from every execution map returned anywhere in the
 app, which would have broken any future org-aware consumer of executions
 without explicit context threading. Verified with a new
 failing-then-passing test in
-`test/milos_training/gamification/tenant_isolation_test.exs` ("weekly
+`test/palee/gamification/tenant_isolation_test.exs` ("weekly
 leaderboard is isolated by organization context") plus the full 49-test
 Gamification suite and the full 575-test project suite, all green.
 
 **Severity:** Critical · **Confidence:** Confirmed (read directly)
 
-**Evidence:** `apps/api/lib/milos_training/infrastructure/gamification/ecto_gamification_store.ex`
+**Evidence:** `apps/api/lib/palee/infrastructure/gamification/ecto_gamification_store.ex`
 `get_leaderboard/2`:
 ```sql
 SELECT user_id, nickname, workouts_this_week, prs_this_month
@@ -187,8 +187,8 @@ Because this codebase's entire test suite runs against Postgres as a
 superuser (see F-07 below — `rolbypassrls = true`), an ordinary Ecto-based
 ExUnit test cannot actually exercise RLS: it would report false-green
 regardless of policy correctness. To verify this fix honestly, a dedicated
-non-superuser role (`milos_test_runtime`) is now self-provisioned by
-`test/milos_training/execution/tenant_isolation_test.exs`, which connects via
+non-superuser role (`palee_test_runtime`) is now self-provisioned by
+`test/palee/execution/tenant_isolation_test.exs`, which connects via
 raw `Postgrex` and proves both directions: (1) a global admin with no
 membership in the target org cannot read its executions, and (2) a global
 admin who *is* an active coach/admin/owner in that org still can. This was
@@ -202,7 +202,7 @@ lane") should generalize — P1.5 remains open for the rest of the suite.
 **Invariant affected:** "An account's role in one tenant must not grant access to data or operations in another tenant"; IDOR via IDs in route parameters.
 
 **Evidence:**
-`apps/api/lib/milos_training/application/get_workout_execution.ex`:
+`apps/api/lib/palee/application/get_workout_execution.ex`:
 ```elixir
 def call(execution_id, %{role: :admin}) do
   case Execution.get_execution(execution_id) do
@@ -212,7 +212,7 @@ def call(execution_id, %{role: :admin}) do
 end
 ```
 `Execution.get_execution/1` performs no ownership/org check itself; it relies
-entirely on RLS. `apps/api/lib/milos_training/infrastructure/tenancy/repo_context.ex`
+entirely on RLS. `apps/api/lib/palee/infrastructure/tenancy/repo_context.ex`
 `maybe_put_admin_mode/2`:
 ```elixir
 defp maybe_put_admin_mode(settings, %{account: %{role: role}}) do
@@ -285,7 +285,7 @@ belonging to a user in Org X; must be rejected.
 iterate every active organization from `OrganizationStore.list_organizations/0`
 and call the Finance store functions once per organization context (see
 remediation direction below, now implemented as described). Covered by
-`test/milos_training/workers/mark_overdue_invoices_job_test.exs`,
+`test/palee/workers/mark_overdue_invoices_job_test.exs`,
 `payment_reminder_job_test.exs`, and
 `reconcile_entitlement_reservations_job_test.exs`, each asserting the job
 mutates a *non-legacy* organization's data.
@@ -293,7 +293,7 @@ mutates a *non-legacy* organization's data.
 **Additional finding discovered during remediation (beyond original scope):**
 this was not merely a "silent no-op for non-legacy orgs" bug. The
 `finance_invoices_apply_tenant_context` DB trigger (`BEFORE INSERT/UPDATE` on
-`finance_invoices`, backed by `milos_apply_tenant_context()`) unconditionally
+`finance_invoices`, backed by `palee_apply_tenant_context()`) unconditionally
 overwrites `NEW.organization_id` with the current `app.organization_id`
 session GUC whenever that GUC is set. `mark_overdue_invoices/0`,
 `memberships_needing_payment_reminder/1`, and
@@ -362,11 +362,11 @@ existing `/api/org/:organization_slug/me` (`tenant_member`) scope, and gave
 `Messaging.with_tenant_context/2` when `conn.assigns.tenant_context` is
 present — the legacy flat `/api/threads/*` routes are left as-is (same
 known F-01/P1.4 debt as everywhere else). Covered by
-`test/milos_training_web/controllers/messaging_controller_tenant_context_test.exs`.
+`test/palee_web/controllers/messaging_controller_tenant_context_test.exs`.
 
 **Follow-up gap found 2026-08-08 during the full audit-doc sweep: the WebSocket
 chat channel was missed by this fix.** `MessagingController`'s `action/2`
-covers the REST surface, but `MilosTrainingWeb.ChatChannel` calls
+covers the REST surface, but `PaleeWeb.ChatChannel` calls
 `Messaging.get_thread/2` (in `join/3`), `SendMessage.call/2` (in
 `handle_in("send_message", ...)`), and `Messaging.mark_read/3` (in
 `handle_in("mark_read", ...)`) directly, with no `with_tenant_context/2`
@@ -393,7 +393,7 @@ an automated test yet (only GETs), so this has been silently latent. Needs
 a systematic audit of every mirrored controller's `operation/2` specs before
 the frontend cuts over to the org-scoped URLs.
 
-**Severity:** High · **Confidence:** Confirmed by delegated research (not independently re-read; recommend a direct read of `apps/api/lib/milos_training/messaging/application/*.ex` before remediation) · **Invariant affected:** tenant feature parity, not leakage (fails closed)
+**Severity:** High · **Confidence:** Confirmed by delegated research (not independently re-read; recommend a direct read of `apps/api/lib/palee/messaging/application/*.ex` before remediation) · **Invariant affected:** tenant feature parity, not leakage (fails closed)
 
 **Evidence (as reported):** None of `get_thread.ex`, `list_threads.ex`,
 `list_messages.ex`, `get_or_create_thread.ex`, `mark_read.ex`,
@@ -470,20 +470,20 @@ org-scoped paths.
 **Invariant affected:** Tenant resolution must never trust body/header/cookie/token-supplied organization identifiers (ADR-058); authorization must depend on `membership(U,A)` derived from trusted server context.
 
 **Evidence:**
-`apps/api/lib/milos_training_web/plugs/resolve_tenant_context.ex:13-16`:
+`apps/api/lib/palee_web/plugs/resolve_tenant_context.ex:13-16`:
 ```elixir
 slug =
   conn.path_params["organization_slug"] ||
     List.first(get_req_header(conn, "x-organization-slug")) ||
-    MilosTraining.Organizations.legacy_organization_slug()
+    Palee.Organizations.legacy_organization_slug()
 ```
-`apps/api/lib/milos_training_web/router.ex:166` — `scope "/api/admin", ...
+`apps/api/lib/palee_web/router.ex:166` — `scope "/api/admin", ...
 pipe_through([:api, :authenticated, :admin_only])` spans ~140 route lines
 (166–320): users, workouts, finance, schedule, class types, challenges,
 wellbeing, settings. None of these routes carry `:organization_slug` in their
 path, so `conn.path_params["organization_slug"]` is always `nil` for every one
 of them. The same header-trust pattern is repeated in
-`apps/api/lib/milos_training_web/controllers/me_controller.ex:245-250`
+`apps/api/lib/palee_web/controllers/me_controller.ex:245-250`
 (`organization_slug/1` for `/api/me/search/users`).
 
 **Failure scenario:** An authenticated tenant `admin` for Org A sends any
@@ -532,21 +532,21 @@ any org.
 **Severity:** High · **Confidence:** Confirmed (read directly)
 **Invariant affected:** Tenant roles must be attached to membership, not treated as a global user property; a user's role in tenant A must not grant access derived from a global attribute.
 
-**Evidence:** `apps/api/lib/milos_training/identity/user.ex:14` — `users` schema
+**Evidence:** `apps/api/lib/palee/identity/user.ex:14` — `users` schema
 retains `field :role, Ecto.Enum, values: RegistrationPolicy.roles()`
 (`[:member, :athlete, :admin]`). Read as a live authorization gate at:
-- `apps/api/lib/milos_training/application/get_calendar_feed.ex:30,38,79,81,115,123`
+- `apps/api/lib/palee/application/get_calendar_feed.ex:30,38,79,81,115,123`
   — `user.role == :admin` unlocks org-wide attendee visibility on a
   **token-authenticated public ICS feed** (`GET /api/calendar/feed.ics`) that
   never resolves `TenantContext` at all.
-- `apps/api/lib/milos_training/application/get_schedule_calendar.ex:75` —
+- `apps/api/lib/palee/application/get_schedule_calendar.ex:75` —
   `admin_role?(nil, actor), do: actor.role == :admin`, the fallback branch used
   whenever no `TenantContext` is supplied.
-- `apps/api/lib/milos_training/application/get_leaderboard_snippet.ex:7`.
-- `apps/api/lib/milos_training/infrastructure/identity/ecto_user_store.ex:28,69,91,172,194`
+- `apps/api/lib/palee/application/get_leaderboard_snippet.ex:7`.
+- `apps/api/lib/palee/infrastructure/identity/ecto_user_store.ex:28,69,91,172,194`
   — including a global "don't demote the last admin" invariant that is
   installation-wide, not per-tenant.
-- `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex:1910`.
+- `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex:1910`.
 
 **Failure scenario:** A user whose global `role` is `admin` (set once, anywhere
 — e.g. via legacy data, via `Application.UpdateUserRole`, or via the legacy
@@ -584,18 +584,18 @@ calendar feed or elevated schedule/leaderboard views.
 **Severity:** High · **Confidence:** Confirmed (read directly, refined from initial subagent report)
 **Invariant affected:** Creation must derive tenant identity from trusted server-side context, not client input.
 
-**Evidence:** `apps/api/lib/milos_training/execution/commands/start_execution.ex:12`:
+**Evidence:** `apps/api/lib/palee/execution/commands/start_execution.ex:12`:
 ```elixir
 execution_params <- %{
   organization_id: params[:organization_id] || params["organization_id"],
   ...
 ```
-Caller chain: `POST /api/executions` (`apps/api/lib/milos_training_web/router.ex:391-401`,
+Caller chain: `POST /api/executions` (`apps/api/lib/palee_web/router.ex:391-401`,
 pipeline `:user_only` — `AssignUserContext` only, no `ResolveTenantContext`) →
-`apps/api/lib/milos_training/application/start_workout_execution.ex:30` —
+`apps/api/lib/palee/application/start_workout_execution.ex:30` —
 `Execution.start_execution(actor.id, Map.merge(params, authorized_source))`.
 `authorized_source` comes from
-`apps/api/lib/milos_training/application/authorize_workout_execution_source.ex`:
+`apps/api/lib/palee/application/authorize_workout_execution_source.ex`:
 for `source == "assigned"`, it **does** include a server-derived
 `organization_id: access.organization_id` (from the assignment record), which
 correctly overrides the client value via `Map.merge/2` key precedence. For
@@ -646,12 +646,12 @@ with a bare `organization_id = NULLIF(current_setting('app.organization_id',
 true), '')::uuid` predicate, matching the pattern Scheduling's tables
 (`bookings`, `class_types`, `class_series`, `scheduled_classes`,
 `class_attendance_records`, `scheduling_settings`) already used correctly.
-Verified directly against the non-superuser `milos_test_runtime` role (not
+Verified directly against the non-superuser `palee_test_runtime` role (not
 just "tests still pass," which is meaningless here per F-07): inserted a
 `memberships` row under a real organization, cleared `app.organization_id`
 entirely, and confirmed the row is now invisible (0 rows) instead of
 matching via the old fallback. The 46 `DEFAULT
-milos_legacy_organization_id()` **column defaults were deliberately left in
+palee_legacy_organization_id()` **column defaults were deliberately left in
 place** — the remediation roadmap's own sequencing note says to defer
 dropping these until the write-paths that rely on them without an active
 tenant session (F-24 Finance jobs, F-25 Messaging) are fixed; dropping them
@@ -665,8 +665,8 @@ follow-up.
 
 **Evidence:**
 `apps/api/priv/repo/migrations/20260803223000_add_t4_ownership_foundation.exs:66-73,236-241`
-creates `milos_legacy_organization_id()` and adds `organization_id DEFAULT
-milos_legacy_organization_id()` to ~44 tenant tables (default never dropped in
+creates `palee_legacy_organization_id()` and adds `organization_id DEFAULT
+palee_legacy_organization_id()` to ~44 tenant tables (default never dropped in
 any later migration). Every subsequent "enforce"-stage migration
 (`20260804090000_enforce_remaining_t4_tenant_boundaries.exs:49-63`,
 `20260804113000_enforce_feedback_tenant_boundaries.exs:18-22`,
@@ -676,15 +676,15 @@ policies of the form:
 ```sql
 organization_id = COALESCE(
   NULLIF(current_setting('app.organization_id', true), '')::uuid,
-  milos_legacy_organization_id()
+  palee_legacy_organization_id()
 )
 ```
 across finance, memberships, promotions, referrals, messaging, gamification,
 analytics, feedback/reviews, and attendance tables. `RepoContext.run/2`
-(`apps/api/lib/milos_training/infrastructure/tenancy/repo_context.ex:4-13`) has
+(`apps/api/lib/palee/infrastructure/tenancy/repo_context.ex:4-13`) has
 a `user_id`-only clause that never sets `app.organization_id` — any code path
 using that context class against a T4 tenant table hits the fallback.
-`mix milos.tenancy.audit` cannot detect this: it only checks the
+`mix palee.tenancy.audit` cannot detect this: it only checks the
 `relrowsecurity`/`relforcerowsecurity` booleans (`rls_enabled`/`rls_forced`),
 never the policy predicate text.
 
@@ -711,14 +711,14 @@ enforcement claim in `docs/technical_debt.md` TD-038.
 database via the running `milos-api` pod's own Ecto connection (Kubernetes
 namespace `tenant-m4`, see `10-production-verification.md`) confirm:
 - **40 RLS policies in production currently contain the
-  `milos_legacy_organization_id` fallback** — the vulnerability is
+  `palee_legacy_organization_id` fallback** — the vulnerability is
   structurally live in the deployed database, not just in the migration
   source.
-- However, `milos_legacy_organization_id()` currently **returns `NULL`** in
+- However, `palee_legacy_organization_id()` currently **returns `NULL`** in
   production, because the function resolves the legacy organization by a
   hardcoded slug lookup (`SELECT id FROM organizations WHERE slug =
   'legacy-milos-training' LIMIT 1`) and production's only organization has
-  since had its slug changed to `milos-training` (no `legacy-` prefix) —
+  since had its slug changed to `palee` (no `legacy-` prefix) —
   apparently a deliberate rebranding action taken independently of this
   fallback function. This means the COALESCE fallback is **currently inert
   by accident**: an unset `app.organization_id` session setting today
@@ -732,19 +732,19 @@ namespace `tenant-m4`, see `10-production-verification.md`) confirm:
   function still exists, is still referenced by all 40 policies, and will
   silently reactivate the instant *any* organization is created or renamed
   to slug `legacy-milos-training` again — including via a routine re-run of
-  `mix milos.organizations.ensure_legacy` (explicitly documented as
+  `mix palee.organizations.ensure_legacy` (explicitly documented as
   idempotent and safe to re-run), or via a future migration/seed script that
   assumes that slug still exists. The current inertness is an unintended
   side effect of an unrelated branding change, not a deployed mitigation,
   and provides no defense against a code path that reaches these tables via
   the `user_id`-only `RepoContext.run/2` clause without ever going through
   the slug lookup at all (that clause never calls
-  `milos_legacy_organization_id()` — it simply never sets
+  `palee_legacy_organization_id()` — it simply never sets
   `app.organization_id`, so the same COALESCE-to-NULL currently applies, but
   would silently flip to COALESCE-to-a-real-org-id the moment the slug
   collision reappears).
 - Additionally, production currently has **exactly one organization** (slug
-  `milos-training`, 5 users, 3 memberships, 1 active platform owner) — this
+  `palee`, 5 users, 3 memberships, 1 active platform owner) — this
   is evidently a pre-commercial-launch/single-tenant deployment, consistent
   with the runbook's own guidance not to provision a second independent
   tenant until T4–T6 enforcement is fully validated. This does not reduce
@@ -755,13 +755,13 @@ namespace `tenant-m4`, see `10-production-verification.md`) confirm:
   no second tenant for data to leak to or be misattributed to.
 
 **Recommended remediation direction:** Remove the `COALESCE(...,
-milos_legacy_organization_id())` fallback from every enforce-stage RLS policy;
+palee_legacy_organization_id())` fallback from every enforce-stage RLS policy;
 policies should use bare `organization_id = NULLIF(current_setting(...),
 '')::uuid` so an unset session setting matches zero rows. Drop the `DEFAULT
-milos_legacy_organization_id()` column defaults once all write paths reliably
-supply `organization_id` explicitly. Extend `mix milos.tenancy.audit` to parse
+palee_legacy_organization_id()` column defaults once all write paths reliably
+supply `organization_id` explicitly. Extend `mix palee.tenancy.audit` to parse
 policy predicate text and fail if any policy references
-`milos_legacy_organization_id`.
+`palee_legacy_organization_id`.
 
 **Recommended validation test:** Open a raw transaction with no
 `app.organization_id` setting; attempt to `SELECT` from each enforce-stage
@@ -796,7 +796,7 @@ the full 577-test suite, all green.
 **Severity:** Critical · **Confidence:** Confirmed (grep + direct read of representative call sites)
 **Invariant affected:** ADR-056's explicit "enforce isolation twice" mandate; financial cross-tenant corruption is named as a Critical-severity category in the audit brief.
 
-**Evidence:** `apps/api/lib/milos_training/infrastructure/finance/ecto_finance_store.ex`
+**Evidence:** `apps/api/lib/palee/infrastructure/finance/ecto_finance_store.ex`
 (4,215 lines) contains **no `scoped_to_tenant`-style helper and no explicit
 `where(query, [row], row.organization_id == ^organization_id)` clause
 anywhere**, unlike the equivalent Messaging (`ecto_message_store.ex:154-162`),
@@ -810,10 +810,10 @@ inconsistently) stores, which all define and use an explicit
 (`Repo.get(Membership, ...)`), and 3966/3982
 (`get_finance_settings/0`/`update_finance_settings/1`, `Repo.one(from s in
 FinanceSetting, limit: 1)` — no predicate at all).
-`apps/api/lib/milos_training/finance.ex:138` — `defdelegate get_invoice(invoice_id),
+`apps/api/lib/palee/finance.ex:138` — `defdelegate get_invoice(invoice_id),
 to: FinanceStore` is a **public, unscoped 1-arity API**, distinct from the
 correctly-scoped 2-arity `get_invoice(context, invoice_id)` at line 139.
-`apps/api/lib/milos_training_web/controllers/admin_finance_controller.ex:1198,1222`
+`apps/api/lib/palee_web/controllers/admin_finance_controller.ex:1198,1222`
 calls the unscoped 1-arity form and only *afterward* checks `invoice.organization_id
 == context.organization_id` — the fetch itself is unscoped; the safety net is a
 manual post-hoc equality check, not structural scoping.
@@ -834,7 +834,7 @@ in the audit brief.
 weakest defense-in-depth in the entire codebase. The only thing currently
 preventing exploitation is (a) the two known controller call sites happening to
 add a manual guard, and (b) RLS being technically "enforced" per
-`mix milos.tenancy.audit` — but RLS enforcement for Finance has never been
+`mix palee.tenancy.audit` — but RLS enforcement for Finance has never been
 exercised by any test, because tests run as a Postgres superuser (see
 `02-tenant-surface-matrix.md` / `08-test-gap-plan.md`), which unconditionally
 bypasses RLS regardless of `FORCE ROW LEVEL SECURITY`.
@@ -873,7 +873,7 @@ admin, and an owner inviting a peer owner, both still succeed.
 **Severity:** Critical · **Confidence:** Confirmed (read directly)
 **Invariant affected:** "Gym administrators must not be able to escalate themselves or another account into a role equal to or greater than their own."
 
-**Evidence:** `apps/api/lib/milos_training/organizations/commands/issue_invitation.ex:12-24`:
+**Evidence:** `apps/api/lib/palee/organizations/commands/issue_invitation.ex:12-24`:
 ```elixir
 def call(context, params, issued_at) do
   with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]) do
@@ -889,7 +889,7 @@ def call(context, params, issued_at) do
 a member of `MembershipPolicy.roles()` (all five tenant roles, including
 `:owner`) — there is no comparison of the requested role against the issuer's
 own role. `MembershipPolicy.can_manage_invitations?/1`
-(`apps/api/lib/milos_training/organizations/domain/membership_policy.ex:11`)
+(`apps/api/lib/palee/organizations/domain/membership_policy.ex:11`)
 exists and would be a natural place to encode a ceiling check, but it is
 **dead code** — confirmed by repo-wide grep, its only callers are its own unit
 test. No test anywhere exercises "an admin issues an owner invitation" — the
@@ -928,10 +928,10 @@ but the current code enforces neither restriction).
 
 **STATUS (2026-08-06): FIXED for verification integrity.** Three pieces
 landed: (1) `test/support/rls_case.ex` — a reusable `ExUnit` case template
-(`MilosTraining.RLSCase`) that self-provisions a dedicated non-superuser,
+(`Palee.RLSCase`) that self-provisions a dedicated non-superuser,
 non-BYPASSRLS Postgres role and hands tests a raw `Postgrex` connection that
-genuinely enforces RLS; (2) `MilosTraining.Infrastructure.Tenancy.PrivilegeGuard`,
-a boot-time check wired into `MilosTraining.Application.start/2` that queries
+genuinely enforces RLS; (2) `Palee.Infrastructure.Tenancy.PrivilegeGuard`,
+a boot-time check wired into `Palee.Application.start/2` that queries
 `rolsuper`/`rolbypassrls` for the running connection and **raises (refuses to
 boot) if the app is running in `:prod` with a superuser/bypassrls
 connection**; it only warns outside prod, since dev/test/CI are expected to
@@ -992,7 +992,7 @@ SELECT rolname, rolsuper, rolbypassrls FROM pg_roles;
 ```
 The non-owner `milos_runtime` role documented in
 `docs/operations/tenant-lifecycle-and-recovery.md:9-28` and provisioned by
-`ops/postgres/init/010-milos-runtime-role.sh` **does not exist** in this
+`ops/postgres/init/010-palee-runtime-role.sh` **does not exist** in this
 database. `docker-compose.yml`'s `api` service (line 7) *does* correctly wire
 `DATABASE_URL` to `milos_runtime`, so a properly deployed instance where an
 operator has run `provision_postgres_runtime_role.sh` and set
@@ -1025,7 +1025,7 @@ should be the **first** query run against any production-adjacent environment
 before trusting any other finding's "RLS enforced" conclusion.
 
 **Recommended remediation direction:** Add a CI/test-suite step (or a
-`mix milos.tenancy.audit`-adjacent task) that runs the isolation test suite (or
+`mix palee.tenancy.audit`-adjacent task) that runs the isolation test suite (or
 at least a representative subset) against a genuinely non-superuser,
 non-BYPASSRLS role, so RLS is actually exercised by automation. Add a
 production readiness/health check that queries `pg_roles` for `current_user`
@@ -1057,7 +1057,7 @@ was never load-bearing. Whether this matters depends on whether any
 application code relied on this policy as its scoping mechanism (own-account
 access is normally enforced at the application layer via `current_resource`),
 but a policy that looks active in `pg_policies` and is not is a dangerous
-false sense of security, and directly explains why `mix milos.tenancy.audit`
+false sense of security, and directly explains why `mix palee.tenancy.audit`
 (which doesn't check `users` at all — it's absent from `@ready_tenant_tables`/
 `@ready_personal_tables`) never caught it.
 
@@ -1066,7 +1066,7 @@ existing policy (after confirming its predicate is correct for the app's
 own-account access patterns) or remove the orphaned policy and document that
 `users` is intentionally protected at the application layer only.
 
-**Recommended validation test:** Add `users` to `mix milos.tenancy.audit`'s
+**Recommended validation test:** Add `users` to `mix palee.tenancy.audit`'s
 checked table list so a future regression here is caught automatically.
 
 ---
@@ -1120,7 +1120,7 @@ workouts, settings, metrics, coaching-assignments, etc.) has **no organization
 slug anywhere in its route paths**. The only thing scoping every `/admin/*`
 request to a tenant is `apps/web/src/api/client.ts:52-86`
 (`organizationSlugForRequest()`), which resolves the org as: **(a)** URL path
-`/org/:slug` (never present under `/admin`) → **(b)** `localStorage["milos:selected-organization-slug"]`
+`/org/:slug` (never present under `/admin`) → **(b)** `localStorage["palee:selected-organization-slug"]`
 → **(c)** first membership in the decoded JWT — then sends it as the
 `X-Organization-Slug` header (this is the exact header trusted server-side per
 F-01). `apps/web/src/lib/realtime.ts:42-48` resolves the WebSocket's org via a
@@ -1177,7 +1177,7 @@ scenario impossible).
 **Evidence:** Populated at issuance in all three invitation-creation paths
 (e.g. `issue_invitation.ex:23`). Never read back: confirmed by repo-wide grep,
 it appears only in write-side/schema-cast code and the OpenAPI
-`intended_email` param. `apps/api/lib/milos_training/application/redeem_registration_invitation.ex:4`
+`intended_email` param. `apps/api/lib/palee/application/redeem_registration_invitation.ex:4`
 (`def call(%{id: user_id}, token), do: Organizations.redeem_invitation(token,
 user_id)`) and `EctoOrganizationStore.redeem_invitation/3` never compare it
 against the redeeming account's email.
@@ -1212,7 +1212,7 @@ actually happens.
 **Severity:** Medium · **Confidence:** Confirmed (grep across all Organizations commands/ports)
 
 **Evidence:** `organization_memberships.status ∈ {invited, active, suspended,
-revoked}` (`apps/api/lib/milos_training/organizations/organization_membership.ex`),
+revoked}` (`apps/api/lib/palee/organizations/organization_membership.ex`),
 but no function in `organizations/commands/`, `organizations/ports/organization_store.ex`,
 or the Ecto adapter transitions a membership to `suspended` or `revoked` —
 confirmed by grep for `suspend_membership`/`revoke_membership` (zero results).
@@ -1240,11 +1240,11 @@ their next request to any tenant-scoped endpoint for that org is rejected.
 ## F-12 — No `platform_owners` revocation path exists
 
 
-**STATUS: FIXED 2026-08-07 (P2.2).** `Organizations.revoke_vendor/1` and `mix milos.platform.revoke_vendor`, mirroring the grant task's shell-only surface.
+**STATUS: FIXED 2026-08-07 (P2.2).** `Organizations.revoke_vendor/1` and `mix palee.platform.revoke_vendor`, mirroring the grant task's shell-only surface.
 **Severity:** Low-Medium · **Confidence:** Confirmed (grep across Organizations context)
 
 **Evidence:** `grant_platform_owner/1` exists and is correctly restricted to the
-`mix milos.platform.grant_owner` Mix task (no HTTP path, verified). No
+`mix palee.platform.grant_owner` Mix task (no HTTP path, verified). No
 `revoke_platform_owner` function exists anywhere. The `status` enum on
 `platform_owners` (`active`/`revoked`) implies a revoke workflow that isn't
 implemented.
@@ -1255,18 +1255,18 @@ constraints (and this codebase's own architecture rules) treat as something to
 avoid.
 
 **Recommended remediation direction:** Add a symmetrical
-`mix milos.platform.revoke_owner` Mix task using the same idempotent,
+`mix palee.platform.revoke_owner` Mix task using the same idempotent,
 audited pattern as the grant task.
 
 ---
 
-## F-13 — Coverage gaps in `mix milos.tenancy.audit` and `mix milos.architecture` make TD-038's "complete" claim materially overstated
+## F-13 — Coverage gaps in `mix palee.tenancy.audit` and `mix palee.architecture` make TD-038's "complete" claim materially overstated
 
 
-**STATUS: FIXED 2026-08-07 (P2.7).** The audit now fails on any unclassified table carrying `organization_id` (which immediately found two), reports root tables and materialized views explicitly, and guards against the COALESCE fallback returning. `mix milos.architecture` covers all eleven context stores plus a materialized-view predicate check.
+**STATUS: FIXED 2026-08-07 (P2.7).** The audit now fails on any unclassified table carrying `organization_id` (which immediately found two), reports root tables and materialized views explicitly, and guards against the COALESCE fallback returning. `mix palee.architecture` covers all eleven context stores plus a materialized-view predicate check.
 **Severity:** Medium (process/tooling — produces false confidence, not itself an exploit) · **Confidence:** Confirmed (source read directly)
 
-**Evidence:** `apps/api/lib/milos_training/infrastructure/tenancy/audit.ex:4-29`
+**Evidence:** `apps/api/lib/palee/infrastructure/tenancy/audit.ex:4-29`
 — `@ready_tenant_tables`/`@ready_personal_tables` are static, hand-maintained
 lists; `organizations`, `organization_memberships`, `organization_settings`,
 `users`, `user_pr_history`, `platform_owners`, and the three tenant-owned
@@ -1274,7 +1274,7 @@ materialized views (`finance_aggregates`, `coaching_aggregates`,
 `weekly_leaderboard`) are absent from both lists, so the audit never inspects
 them, and `@transitional_tenant_tables` is permanently `[]` — the gate can
 never report an incomplete context by design, only tables someone remembered
-to add to the "ready" list. `apps/api/lib/mix/tasks/milos.architecture.ex:57-80`
+to add to the "ready" list. `apps/api/lib/mix/tasks/palee.architecture.ex:57-80`
 (`tenant_scope_violations/0`) hardcodes exactly two files
 (`scheduling_store.ex`, `ecto_scheduling_store.ex`) and checks for two literal
 substrings — it says nothing about Finance, Messaging, Notifications,
@@ -1282,7 +1282,7 @@ Gamification, Analytics, or Wellbeing, the six contexts TD-038 cites this task
 as having validated.
 
 **Failure scenario:** A developer reads `docs/technical_debt.md` TD-038 ("...
-`mix milos.tenancy.audit` and `mix milos.architecture` pass") and reasonably
+`mix palee.tenancy.audit` and `mix palee.architecture` pass") and reasonably
 concludes RLS/tenant enforcement is fully verified for those six contexts. In
 reality, passing those two tasks proves only that a hand-curated subset of
 tables have the RLS booleans set and that two specific Scheduling files contain
@@ -1294,7 +1294,7 @@ two specific substrings — neither tool detects the COALESCE-to-legacy fallback
 `@ready_personal_tables` to the full ownership inventory (including root
 tenant tables and materialized views, with an explicit "platform-administered,
 no per-row RLS expected" classification where appropriate rather than silent
-omission); extend `mix milos.architecture`'s tenant-scope check beyond
+omission); extend `mix palee.architecture`'s tenant-scope check beyond
 Scheduling to every T4 context; add the COALESCE-fallback detection from F-04.
 
 **Recommended validation test:** N/A directly (this is a tooling gap); its
@@ -1314,7 +1314,7 @@ cross-tenant read of medical data that survives RLS in production.
 
 **Severity:** Medium · **Confidence:** Confirmed (directory listing + content grep)
 
-**Evidence:** `apps/api/test/milos_training/` contains
+**Evidence:** `apps/api/test/palee/` contains
 `analytics/tenant_isolation_test.exs`, `feedback/tenant_isolation_test.exs`,
 `finance/tenant_isolation_test.exs`, `gamification/tenant_isolation_test.exs`,
 `messaging/tenant_isolation_test.exs`, `scheduling/tenant_isolation_test.exs`,
@@ -1344,7 +1344,7 @@ Org A's rows through any public context API function.
 
 
 **STATUS: RESOLVED 2026-08-07.** Verified against the live policy: the `app.admin_mode` branch requires an active owner/admin/coach membership in the execution's *own* organization (F-23's fix), so the flag requests the widened policy but cannot grant it. `app.execution_authorization_check` is set only by `ExecutionStore.with_authorization_context/2`, reached from exactly two audited call sites. The flag is now also derived from the membership role wherever a tenant context exists.
-**Severity:** Medium · **Confidence:** Reported by delegated research, not independently re-verified against the live migration text — recommend a follow-up read of `apps/api/priv/repo/migrations/20260804161500_allow_execution_admin_and_authorization_reads.exs` and `apps/api/lib/milos_training/infrastructure/execution/ecto_execution_store.ex:254-262` before acting.
+**Severity:** Medium · **Confidence:** Reported by delegated research, not independently re-verified against the live migration text — recommend a follow-up read of `apps/api/priv/repo/migrations/20260804161500_allow_execution_admin_and_authorization_reads.exs` and `apps/api/lib/palee/infrastructure/execution/ecto_execution_store.ex:254-262` before acting.
 
 **Evidence (as reported):** `scoped_to_user/1` in the execution store
 deliberately returns an unfiltered query when `app.admin_mode == "true"` or
@@ -1414,10 +1414,10 @@ ownership inventory so the exception is deliberate, not an oversight.
 
 ---
 
-## F-17 — Materialized views are not covered by any RLS or by `mix milos.tenancy.audit`
+## F-17 — Materialized views are not covered by any RLS or by `mix palee.tenancy.audit`
 
 
-**STATUS: FIXED 2026-08-07 (P2.7).** Materialized views are reported by the audit task with RLS marked inapplicable, and `mix milos.architecture` now fails any raw SQL naming one without an `organization_id` predicate - verified by injecting the F-22 regression.
+**STATUS: FIXED 2026-08-07 (P2.7).** Materialized views are reported by the audit task with RLS marked inapplicable, and `mix palee.architecture` now fails any raw SQL naming one without an `organization_id` predicate - verified by injecting the F-22 regression.
 **Severity:** Low · **Confidence:** Confirmed (`pg_matviews` cannot host RLS; audit script table list checked directly)
 
 **Evidence:** `finance_aggregates`, `coaching_aggregates`, `weekly_leaderboard`
@@ -1441,11 +1441,11 @@ makes an unscoped read impossible to write.
 **STATUS: LARGELY FIXED 2026-08-07 (P3.1).** Assignment archiving and the calendar feed now use organization-scoped arities. The legacy no-context arities remain for other callers and are labelled as such; note they resolve via a hardcoded `legacy-milos-training` slug that does not exist in production, so any surviving un-scoped path fails rather than silently reading another tenant.
 **Severity:** Low (functional inequality for new tenants, not a security leak — RLS still bounds these calls to the legacy org) · **Confidence:** Confirmed (code comment + function inspection)
 
-**Evidence:** `apps/api/lib/milos_training/workouts/workout_store.ex:10-11`:
+**Evidence:** `apps/api/lib/palee/workouts/workout_store.ex:10-11`:
 > "Scoped variants are the tenant-aware public boundary. The legacy arities
 > remain temporarily for jobs and callers still being migrated; RLS limits
 > those to legacy."
-Mirrored throughout `apps/api/lib/milos_training/scheduling/scheduling_store.ex`'s
+Mirrored throughout `apps/api/lib/palee/scheduling/scheduling_store.ex`'s
 un-scoped function arities.
 
 **Impact:** Any Oban job or caller still using these legacy arities only
@@ -1478,12 +1478,12 @@ of the admin DTO map (which doesn't carry that field at all). Chose
 "log a warning, keep the fallback" over a hard raise, since the fallback is
 still legitimately needed for that one remaining legacy-arity call site and a
 raise there would turn a Medium silent-misrouting bug into a hard outage for
-it. Covered by `test/milos_training/application/schedule_realtime_test.exs`.
+it. Covered by `test/palee/application/schedule_realtime_test.exs`.
 
 **Severity:** Medium · **Confidence:** Confirmed (read directly)
 
-**Evidence:** `apps/api/lib/milos_training_web/realtime.ex:5-15,52-54` and
-`apps/api/lib/milos_training/application/schedule_realtime.ex:5-19`:
+**Evidence:** `apps/api/lib/palee_web/realtime.ex:5-15,52-54` and
+`apps/api/lib/palee/application/schedule_realtime.ex:5-19`:
 ```elixir
 organization_id =
   Map.get(payload, :organization_id) ||
@@ -1519,12 +1519,12 @@ site. Added the missing `RepoContext.run/2` clause and wired the job to use
 `with_authorization_context/2`. Proved with two tests since an ordinary
 `mix test` run (Postgres superuser, bypasses RLS) can't catch this class of
 bug at all: a direct `RepoContext.run/2` unit test
-(`test/milos_training/infrastructure/tenancy/repo_context_test.exs`), and an
+(`test/palee/infrastructure/tenancy/repo_context_test.exs`), and an
 `RLSCase`-based test against a real non-superuser connection showing the
 execution is invisible without the GUC and visible with it
-(`test/milos_training/execution/rls_enforcement_test.exs`).
+(`test/palee/execution/rls_enforcement_test.exs`).
 
-**Severity:** Medium (functional regression, not a leak) · **Confidence:** Reported by delegated research, not independently re-verified — recommend confirming against `apps/api/lib/milos_training/workers/process_workout_completion_job.ex` and `execution/queries/get_execution.ex` directly before acting.
+**Severity:** Medium (functional regression, not a leak) · **Confidence:** Reported by delegated research, not independently re-verified — recommend confirming against `apps/api/lib/palee/workers/process_workout_completion_job.ex` and `execution/queries/get_execution.ex` directly before acting.
 
 **Evidence (as reported):** `ProcessWorkoutCompletionJob` calls
 `Execution.get_execution(execution_id)` (a plain `defdelegate` to
@@ -1568,7 +1568,7 @@ fake-index (`OrgCapturingIndex`) pattern already used by
 the search params, and a direct test of `AdminMemberSearchDocuments.build_all/0`
 confirming documents carry the right `organization_ids`.
 
-**Severity:** Medium · **Confidence:** Reported by delegated research, not independently re-verified — recommend confirming against `apps/api/lib/milos_training/infrastructure/search/meilisearch_member_index.ex` and `application/admin_search_users.ex` directly.
+**Severity:** Medium · **Confidence:** Reported by delegated research, not independently re-verified — recommend confirming against `apps/api/lib/palee/infrastructure/search/meilisearch_member_index.ex` and `application/admin_search_users.ex` directly.
 
 **Evidence (as reported):** `MeilisearchMemberIndex` uses one platform-wide
 index (`admin_members`) with no organization-filterable attribute; tenant
@@ -1602,7 +1602,7 @@ either requires an org filter parameter or returns no results without one.
 **STATUS: FIXED 2026-08-07 (P3.5)** by removing the claim rather than refreshing it. It was never read back - not for authorization, not by the client - and embedded the account's full organization/role list in a credential that gets logged.
 **Severity:** Low (confirmed cosmetic/UI-only, not an authorization bypass) · **Confidence:** Confirmed (read directly)
 
-**Evidence:** `apps/api/lib/milos_training/infrastructure/auth/guardian_token_issuer.ex:21-32`
+**Evidence:** `apps/api/lib/palee/infrastructure/auth/guardian_token_issuer.ex:21-32`
 embeds a `"memberships"` claims array at token-issue time; confirmed by
 repo-wide grep that it is **never read back for authorization** anywhere
 (`TenantContext` is always rebuilt from live DB state per request). Role
@@ -1634,7 +1634,7 @@ low priority given no security impact.
 **Severity:** High for `injury_reports` (medical data, confirmed to survive RLS
 in production); Medium for `notifications` · **Confidence:** Confirmed
 (reproduced under real non-superuser RLS in
-`apps/api/test/milos_training/wellbeing/rls_enforcement_test.exs`)
+`apps/api/test/palee/wellbeing/rls_enforcement_test.exs`)
 
 **Discovered:** 2026-08-07, while implementing F-14's isolation tests. Not
 anticipated by F-14, which assumed these contexts were correct-but-untested.
@@ -1644,7 +1644,7 @@ anticipated by F-14, which assumed these contexts were correct-but-untested.
 Both the application layer and the RLS policy express the owner/tenant scope as
 a disjunction, and the two are **identical**, so neither constrains the other:
 
-`apps/api/lib/milos_training/infrastructure/wellbeing/ecto_wellbeing_store.ex`
+`apps/api/lib/palee/infrastructure/wellbeing/ecto_wellbeing_store.ex`
 (`scoped_to_owner_or_tenant/1`):
 
 ```elixir
@@ -1682,7 +1682,7 @@ correct. Confirmed by test.
 ### Notifications — same shape, lower blast radius
 
 Every inbox read in
-`apps/api/lib/milos_training/infrastructure/notifications/ecto_notification_store.ex`
+`apps/api/lib/palee/infrastructure/notifications/ecto_notification_store.ex`
 (`list_for_user/1`, `list_inbox_page/2`, `count_unread_inbox/1`,
 `mark_all_read/1`, `mark_read/2`) applies `scoped_to_user/1` but never
 `scoped_to_organization/1` — which exists in the same module and is used at
@@ -1730,7 +1730,7 @@ is the regression test for the fix.
 
 **Severity:** High (cross-tenant privilege escalation + IDOR) · **Confidence:**
 Confirmed (read directly, then reproduced in
-`apps/api/test/milos_training/organizations/set_membership_role_test.exs`)
+`apps/api/test/palee/organizations/set_membership_role_test.exs`)
 
 **Discovered:** 2026-08-07, while auditing what still reads the global
 `users.role`. Not in the original audit.

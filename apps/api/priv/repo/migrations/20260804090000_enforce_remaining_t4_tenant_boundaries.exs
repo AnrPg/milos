@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnforceRemainingT4TenantBoundaries do
+defmodule Palee.Repo.Migrations.EnforceRemainingT4TenantBoundaries do
   use Ecto.Migration
 
   @tenant_tables ~w(
@@ -17,7 +17,7 @@ defmodule MilosTraining.Repo.Migrations.EnforceRemainingT4TenantBoundaries do
     scope_finance_uniqueness()
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_apply_tenant_context()
+    CREATE OR REPLACE FUNCTION palee_apply_tenant_context()
     RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -41,7 +41,7 @@ defmodule MilosTraining.Repo.Migrations.EnforceRemainingT4TenantBoundaries do
       execute("""
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """)
 
       execute("DROP POLICY IF EXISTS #{table}_tenant_policy ON #{table}")
@@ -51,13 +51,13 @@ defmodule MilosTraining.Repo.Migrations.EnforceRemainingT4TenantBoundaries do
       USING (
         organization_id = COALESCE(
           NULLIF(current_setting('app.organization_id', true), '')::uuid,
-          milos_legacy_organization_id()
+          palee_legacy_organization_id()
         )
       )
       WITH CHECK (
         organization_id = COALESCE(
           NULLIF(current_setting('app.organization_id', true), '')::uuid,
-          milos_legacy_organization_id()
+          palee_legacy_organization_id()
         )
       )
       """)
@@ -94,7 +94,7 @@ defmodule MilosTraining.Repo.Migrations.EnforceRemainingT4TenantBoundaries do
 
     restore_global_finance_uniqueness()
 
-    execute("DROP FUNCTION IF EXISTS milos_apply_tenant_context()")
+    execute("DROP FUNCTION IF EXISTS palee_apply_tenant_context()")
   end
 
   defp scope_finance_uniqueness do

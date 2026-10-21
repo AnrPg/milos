@@ -32,7 +32,7 @@ recoverable draft artifact; publication always reparses and validates it on
 the backend before using the existing Workouts publish/materialization path.
 
 Implement the authoritative lexer/parser, canonicalizer, validator, and
-formatter as pure Elixir domain modules within `MilosTraining.Workouts.Domain`.
+formatter as pure Elixir domain modules within `Palee.Workouts.Domain`.
 The parser returns canonical draft maps plus structured, source-positioned
 diagnostics. It does not access Ecto, Phoenix, HTTP, search infrastructure, or
 the exercise database.
@@ -145,7 +145,7 @@ Both implementation phases were completed on 2026-07-31.
 
 Phase 1 established the canonical language and safe preview boundary:
 
-- `MilosTraining.Workouts.Domain.WorkoutDsl` provides a deterministic,
+- `Palee.Workouts.Domain.WorkoutDsl` provides a deterministic,
   line-oriented parser, canonicalizer, validator, and formatter with
   source-positioned diagnostics and bounded source/document sizes.
 - `WorkoutDsl.Vocabulary` is the single registry for the nineteen canonical
@@ -199,7 +199,7 @@ randomized prescription combinations, source and capability limits,
 manual/vocabulary synchronization, timer construction, stale revisions, and
 warning acknowledgement. The affected workout creation suite passes 5/5,
 compilation with warnings as errors succeeds, and
-`mix milos.architecture` reports clean boundaries.
+`mix palee.architecture` reports clean boundaries.
 
 The frontend passes 26 Vitest files / 96 tests, TypeScript, ESLint, and a full
 Next.js production build. Playwright verifies load, preview, Beautify,

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddUserSecurityVersion do
+defmodule Palee.Repo.Migrations.AddUserSecurityVersion do
   use Ecto.Migration
 
   def change do

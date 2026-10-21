@@ -8,7 +8,7 @@ with no gym, a handful of clients, sessions in a park or on a call, a session pa
 instead of a membership, and a small «Team» club for their people. Organizations
 already carry a `provider_kind` (gym | coach, ADR-162) that the provider switch uses,
 but nothing could create a coach organization self-serve, nothing described what a
-customer of Milos pays for, and Box spoke only in gym words.
+customer of Palee pays for, and Box spoke only in gym words.
 
 The tier prices are not decided (plan §7 Q1). Whatever we build must let the platform
 team set and change prices, limits and trials without a deploy, must never show a

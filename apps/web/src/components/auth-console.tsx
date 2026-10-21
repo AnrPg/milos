@@ -234,7 +234,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
 
           <div className="mb-6 text-center">
             <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-              {i18n("milosTraining5b1a1c1")}
+              {i18n("brandName")}
             </p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
               {mode === "register" ? i18n("createYourAccount4046b58") : i18n("signInada2e9e")}

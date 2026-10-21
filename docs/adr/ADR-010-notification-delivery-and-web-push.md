@@ -30,7 +30,7 @@ Oban-backed `PushDispatchJob`.
 The concrete design is:
 
 - event producers broadcast semantic PubSub events only
-- `MilosTraining.Notifications.EventHandler` translates those events into
+- `Palee.Notifications.EventHandler` translates those events into
   notification writes plus enqueueing of push work
 - notification records persist normalized semantic payloads, including a
   destination URL for click-through
@@ -110,7 +110,7 @@ rather than writing notification rows directly.
 - Brought the admin-to-athlete note producer online through a minimal Coaching
   bounded-context slice and admin endpoint, so `coaching:note_written` is now a
   real integrated producer rather than a future-only subscription hook.
-- Added a test-sandbox allowance for `MilosTraining.Notifications.EventHandler`
+- Added a test-sandbox allowance for `Palee.Notifications.EventHandler`
   so controller/application tests can exercise the async PubSub notification
   path without DB ownership races.
 - The browser UI enables push explicitly from the notification panel instead of

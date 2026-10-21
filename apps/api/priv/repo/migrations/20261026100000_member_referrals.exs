@@ -1,10 +1,10 @@
-defmodule MilosTraining.Repo.Migrations.MemberReferrals do
+defmodule Palee.Repo.Migrations.MemberReferrals do
   use Ecto.Migration
 
   # ADR-156 (P2-M8, board 11): members bring friends.
   #
   # 1. referral_codes: one personal code per member per box; the link and QR
-  #    are milos.gr/r/<code>. Codes are unique across Milos, so the code alone
+  #    are palee.gr/r/<code>. Codes are unique across Palee, so the code alone
   #    finds the box, and a SECURITY DEFINER lookup tells a visitor exactly
   #    what the invite page shows (who invites, to which box), nothing more.
   # 2. referral_attributions: one row per friend per box, the funnel from the
@@ -32,7 +32,7 @@ defmodule MilosTraining.Repo.Migrations.MemberReferrals do
   def down do
     execute("DELETE FROM notifications WHERE type IN (#{in_list(@notification_types)})")
     remove_notification_types(@notification_types)
-    execute("DROP FUNCTION IF EXISTS milos_referral_invite(text)")
+    execute("DROP FUNCTION IF EXISTS palee_referral_invite(text)")
     drop table(:referral_attributions)
     drop table(:referral_codes)
     drop index(:referral_programs, [:organization_id], name: :referral_programs_one_active_index)
@@ -254,7 +254,7 @@ defmodule MilosTraining.Repo.Migrations.MemberReferrals do
     # invites (an active member of it). A revoked code, a former member or a
     # closed box find nothing.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_referral_invite(invite_code text)
+    CREATE OR REPLACE FUNCTION palee_referral_invite(invite_code text)
     RETURNS TABLE (code_id uuid, organization_id uuid, user_id uuid, slug text, name text,
                    logo_url text, primary_color text, published boolean)
     LANGUAGE sql

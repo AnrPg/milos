@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.NutritionPortions do
+defmodule Palee.Repo.Migrations.NutritionPortions do
   use Ecto.Migration
 
   @moduledoc """
@@ -8,7 +8,7 @@ defmodule MilosTraining.Repo.Migrations.NutritionPortions do
   stay as the coach wrote them; calories stay staff-only.
 
   Ευεξία is read in the member's personal session, where tenant tables are
-  closed, so `milos_own_nutrition_plans()` answers the caller's own plans in
+  closed, so `palee_own_nutrition_plans()` answers the caller's own plans in
   gyms where they are an active member, without calories or the plan text.
   """
 
@@ -31,7 +31,7 @@ defmodule MilosTraining.Repo.Migrations.NutritionPortions do
     """)
 
     execute("""
-    CREATE FUNCTION milos_own_nutrition_plans()
+    CREATE FUNCTION palee_own_nutrition_plans()
     RETURNS TABLE (
       id uuid, organization_id uuid, title varchar, protein_grams integer,
       carbs_grams integer, fat_grams integer, portion_targets jsonb,
@@ -52,7 +52,7 @@ defmodule MilosTraining.Repo.Migrations.NutritionPortions do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_own_nutrition_plans()")
+    execute("DROP FUNCTION IF EXISTS palee_own_nutrition_plans()")
 
     alter table(:nutrition_plans) do
       remove :portion_targets

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateExecutionProgressOperations do
+defmodule Palee.Repo.Migrations.CreateExecutionProgressOperations do
   use Ecto.Migration
 
   def change do

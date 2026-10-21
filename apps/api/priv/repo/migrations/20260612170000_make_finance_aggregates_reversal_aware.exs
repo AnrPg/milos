@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MakeFinanceAggregatesReversalAware do
+defmodule Palee.Repo.Migrations.MakeFinanceAggregatesReversalAware do
   use Ecto.Migration
 
   def up do

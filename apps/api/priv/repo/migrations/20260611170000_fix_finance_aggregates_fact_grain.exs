@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.FixFinanceAggregatesFactGrain do
+defmodule Palee.Repo.Migrations.FixFinanceAggregatesFactGrain do
   use Ecto.Migration
 
   def up do

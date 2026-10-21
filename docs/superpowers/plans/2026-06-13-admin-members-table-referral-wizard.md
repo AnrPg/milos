@@ -19,8 +19,8 @@
 - `apps/web/src/components/admin/finance/hooks/useSortFilter.ts`
 
 **Modify:**
-- `apps/api/lib/milos_training/infrastructure/finance/ecto_finance_store.ex` — extend `member_search_summaries/1`
-- `apps/api/lib/milos_training/application/list_finance_members.ex` — expose new fields in `build_row/3`
+- `apps/api/lib/palee/infrastructure/finance/ecto_finance_store.ex` — extend `member_search_summaries/1`
+- `apps/api/lib/palee/application/list_finance_members.ex` — expose new fields in `build_row/3`
 - `apps/web/src/components/admin/finance/tabs/MembersTab.tsx` — new columns, InlineAssignPackage, useSortFilter, SortableHeader
 - `apps/web/src/components/admin/finance/ReferralEventWizard.tsx` — two UserSearchFields, inline membership setup
 
@@ -31,12 +31,12 @@
 ## Task 1: Backend — extend `member_search_summaries` with last-payment data
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/infrastructure/finance/ecto_finance_store.ex` (around line 1487)
-- Test: `apps/api/test/milos_training/finance/finance_test.exs`
+- Modify: `apps/api/lib/palee/infrastructure/finance/ecto_finance_store.ex` (around line 1487)
+- Test: `apps/api/test/palee/finance/finance_test.exs`
 
 - [ ] **Step 1: Write the failing test**
 
-Add at the end of `apps/api/test/milos_training/finance/finance_test.exs`:
+Add at the end of `apps/api/test/palee/finance/finance_test.exs`:
 
 ```elixir
 test "search_member_summaries includes last_payment_on and last_payment_amount_cents" do
@@ -85,7 +85,7 @@ end
 
 ```bash
 cd /home/rodochrousbisbiki/MyApps/milos/apps/api
-mix test test/milos_training/finance/finance_test.exs --seed 0 2>&1 | tail -20
+mix test test/palee/finance/finance_test.exs --seed 0 2>&1 | tail -20
 ```
 
 Expected: test fails with `KeyError` or `undefined field`.
@@ -138,7 +138,7 @@ end
 - [ ] **Step 4: Run tests**
 
 ```bash
-mix test test/milos_training/finance/finance_test.exs --seed 0 2>&1 | tail -20
+mix test test/palee/finance/finance_test.exs --seed 0 2>&1 | tail -20
 ```
 
 Expected: all tests pass.
@@ -147,7 +147,7 @@ Expected: all tests pass.
 
 ```bash
 cd /home/rodochrousbisbiki/MyApps/milos/apps/api
-git add lib/milos_training/infrastructure/finance/ecto_finance_store.ex test/milos_training/finance/finance_test.exs
+git add lib/palee/infrastructure/finance/ecto_finance_store.ex test/palee/finance/finance_test.exs
 git commit -m "feat(finance): add last_payment_on and last_payment_amount_cents to member_search_summaries"
 ```
 
@@ -156,7 +156,7 @@ git commit -m "feat(finance): add last_payment_on and last_payment_amount_cents 
 ## Task 2: Backend — expose new fields in `build_row`
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/application/list_finance_members.ex`
+- Modify: `apps/api/lib/palee/application/list_finance_members.ex`
 
 - [ ] **Step 1: Replace `build_row/3` in `list_finance_members.ex`**
 
@@ -199,7 +199,7 @@ Expected: all tests pass.
 - [ ] **Step 3: Commit**
 
 ```bash
-git add lib/milos_training/application/list_finance_members.ex
+git add lib/palee/application/list_finance_members.ex
 git commit -m "feat(finance): expose last_payment_on, last_payment_amount_cents, notes in member list rows"
 ```
 

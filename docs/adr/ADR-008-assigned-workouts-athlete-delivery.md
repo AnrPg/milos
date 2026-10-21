@@ -61,13 +61,13 @@ Phase 5 adds `assigned_workouts` and `assigned_workout_athletes` tables inside
 the Workouts context, with one assignment header row per admin action and one
 join row per athlete recipient.
 
-Assignment creation now runs through `MilosTraining.Application.AssignWorkout`,
+Assignment creation now runs through `Palee.Application.AssignWorkout`,
 which validates the selected ids through Identity before delegating the write
 to the Workouts context. That keeps athlete-role checks outside Workouts while
 preserving workout-owned persistence.
 
 Week-view reads now run through
-`MilosTraining.Application.GetAssignedWorkoutWeek`. Athletes receive only their
+`Palee.Application.GetAssignedWorkoutWeek`. Athletes receive only their
 own assignments, while admins receive the full week plus athlete nicknames
 attached as plain maps. The Workouts query returns workout-owned assignment
 data only; Identity enrichment happens in the Application layer.

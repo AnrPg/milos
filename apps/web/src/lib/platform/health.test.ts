@@ -5,7 +5,7 @@ import type { PhoneHealthRow } from "@/api/phone-health";
 const ingest = vi.fn();
 vi.mock("@/api/phone-health", () => ({ ingestPhoneHealth: (...args: unknown[]) => ingest(...args) }));
 
-import { autoSyncDue, enabledKinds, grantedPrefs, newCount, phoneHealthProvider, plainHealthPlugin, syncPhoneHealth, syncWindow, type MilosHealthPlugin } from "./health";
+import { autoSyncDue, enabledKinds, grantedPrefs, newCount, phoneHealthProvider, plainHealthPlugin, syncPhoneHealth, syncWindow, type PaleeHealthPlugin } from "./health";
 
 function bridge(platform: "ios" | "android", plugins: string[]) {
   (window as unknown as { Capacitor?: unknown }).Capacitor = {
@@ -37,9 +37,9 @@ afterEach(() => {
 describe("phoneHealthProvider", () => {
   it("is this phone's provider only when the plugin ships in the app", () => {
     expect(phoneHealthProvider()).toBeNull();
-    bridge("ios", ["MilosHealth"]);
+    bridge("ios", ["PaleeHealth"]);
     expect(phoneHealthProvider()).toBe("apple_health");
-    bridge("android", ["MilosHealth"]);
+    bridge("android", ["PaleeHealth"]);
     expect(phoneHealthProvider()).toBe("health_connect");
     bridge("android", []);
     expect(phoneHealthProvider()).toBeNull();
@@ -81,7 +81,7 @@ describe("when and what to read", () => {
 
 describe("syncPhoneHealth", () => {
   it("reads the chosen kinds once and sends the batches", async () => {
-    const plugin: MilosHealthPlugin = {
+    const plugin: PaleeHealthPlugin = {
       availability: vi.fn(),
       requestAuthorization: vi.fn(),
       read: vi.fn().mockResolvedValue({
@@ -111,7 +111,7 @@ describe("syncPhoneHealth", () => {
   });
 
   it("still reports an empty read so the last sync moves on", async () => {
-    const plugin = { availability: vi.fn(), requestAuthorization: vi.fn(), read: vi.fn().mockResolvedValue({}) } as MilosHealthPlugin;
+    const plugin = { availability: vi.fn(), requestAuthorization: vi.fn(), read: vi.fn().mockResolvedValue({}) } as PaleeHealthPlugin;
     ingest.mockResolvedValue({ counts: {}, row: row() });
     await syncPhoneHealth("token", row(), plugin);
     expect(ingest).toHaveBeenCalledWith("token", "apple_health", {});
@@ -122,7 +122,7 @@ describe("plainHealthPlugin", () => {
   it("lets a promise resolve to Capacitor's thenable plugin proxy", async () => {
     // Like Capacitor's proxy: every property, `then` included, is a method.
     const native = new Proxy({}, { get: (_target, prop) => (prop === "availability" ? async () => ({ available: true }) : () => new Promise(() => undefined)) });
-    const plugin = await Promise.resolve(plainHealthPlugin(native as MilosHealthPlugin));
+    const plugin = await Promise.resolve(plainHealthPlugin(native as PaleeHealthPlugin));
     await expect(plugin.availability()).resolves.toEqual({ available: true });
   });
 });

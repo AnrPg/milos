@@ -2,9 +2,9 @@
 
 Date: 2026-10-15
 Branch: `redesign/social-centered` (baseline release `v1.0.0` = `main@ee6f189`; the redesign ships as `v2.0.0`)
-Source of truth: `docs/product/2026-10-15-milos-product-vision-and-ia.md` (the brief) and
-`docs/product/mockups/milos-ia-mockup.html` (screens in `docs/product/mockups/screens/`).
-`milos-bottom-bar-exploration.html` is superseded and is not a spec.
+Source of truth: `docs/product/2026-10-15-palee-product-vision-and-ia.md` (the brief) and
+`docs/product/mockups/palee-ia-mockup.html` (screens in `docs/product/mockups/screens/`).
+`palee-bottom-bar-exploration.html` is superseded and is not a spec.
 
 > Naming: the brief's roadmap rows "v1/v2/v3" are **Phase 1/2/3** of the redesign. `v1.0.0`/`v2.0.0`
 > are release tags.
@@ -57,7 +57,7 @@ pitch holds: "Τα μέλη σου μένουν γιατί είναι κοινό
   the URL, then localStorage (`lib/organization-slug.ts`).
 - Landing: `components/landing-page.tsx` (1.4k lines): member hero (streak, badges), Motivation /
   Perseverance / Volume stats, seasonal challenges, opt-in leaderboard, recent completions with
-  history export and "Κοινοποίηση στο Milos".
+  history export and "Κοινοποίηση στο Palee".
 - Package-gated features: `components/client/entitlement.ts` (`videos`, `progress`, `coaching`,
   `appointments`).
 - i18n: `next-intl`, 12 locales in `apps/web/messages/*.json`; `npm run i18n:check` fails on missing
@@ -75,7 +75,7 @@ pitch holds: "Τα μέλη σου μένουν γιατί είναι κοινό
   form reviews), `Organizations` (`organization_settings.settings` free-form map).
 - Membership JSON (`/api/memberships`) exposes only `brand_name`, `brand_logo_url`,
   `brand_primary_color` from settings.
-- Contract-first: OpenAPI via `open_api_spex`; `npm run generate:api` runs `mix milos.export_openapi`.
+- Contract-first: OpenAPI via `open_api_spex`; `npm run generate:api` runs `mix palee.export_openapi`.
 - Last ADR: ADR-136. Last tech-debt id: TD-103.
 
 ### §8.1 table check: mismatches
@@ -254,7 +254,7 @@ Done so far: ladder columns, backfill, defaults, `journal_notes`, check-in table
 - [x] Notifications, web push → Αρχική ♡ (M2)
 - [x] Seasonal challenges + opt-in leaderboard → Club #challenges (M8); own progress → Πρόοδος (M4)
 - [x] Global leaderboard opt-in → Εγώ › Κοινοποίηση & ορατότητα (M9)
-- [x] "Κοινοποίηση στο Milos" → ⊕ with attachment (M7)
+- [x] "Κοινοποίηση στο Palee" → ⊕ with attachment (M7)
 - [x] Shared-with-me PRs → Ημερολόγιο › Πρόοδος › Pantheon (M4)
 - [x] WOD of the day, scale levels → Box card (M3)
 - [x] Execution (timer, steps, modifications, notes) → Box › Έναρξη, Vault › Επανάληψη (M3/M4)

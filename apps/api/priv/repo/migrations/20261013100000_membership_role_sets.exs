@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.MembershipRoleSets do
+defmodule Palee.Repo.Migrations.MembershipRoleSets do
   use Ecto.Migration
 
   # ADR-099: memberships hold a set of roles; `role` stays as the primary
@@ -17,7 +17,7 @@ defmodule MilosTraining.Repo.Migrations.MembershipRoleSets do
 
     # Writers that set only `role` (legacy paths, SQL fixtures) get it as the set.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_membership_default_roles() RETURNS trigger AS $$
+    CREATE OR REPLACE FUNCTION palee_membership_default_roles() RETURNS trigger AS $$
     BEGIN
       IF NEW.roles IS NULL OR cardinality(NEW.roles) = 0 THEN
         NEW.roles := ARRAY[NEW.role]::varchar[];
@@ -30,7 +30,7 @@ defmodule MilosTraining.Repo.Migrations.MembershipRoleSets do
     execute("""
     CREATE TRIGGER organization_memberships_default_roles
     BEFORE INSERT OR UPDATE ON organization_memberships
-    FOR EACH ROW EXECUTE FUNCTION milos_membership_default_roles()
+    FOR EACH ROW EXECUTE FUNCTION palee_membership_default_roles()
     """)
 
     drop constraint(:organization_memberships, :organization_memberships_role_check)
@@ -81,7 +81,7 @@ defmodule MilosTraining.Repo.Migrations.MembershipRoleSets do
       "DROP TRIGGER IF EXISTS organization_memberships_default_roles ON organization_memberships"
     )
 
-    execute("DROP FUNCTION IF EXISTS milos_membership_default_roles()")
+    execute("DROP FUNCTION IF EXISTS palee_membership_default_roles()")
     drop constraint(:organization_memberships, :organization_memberships_coach_scope_check)
     drop constraint(:organization_memberships, :organization_memberships_roles_check)
     drop constraint(:organization_memberships, :organization_memberships_role_check)
@@ -105,7 +105,7 @@ defmodule MilosTraining.Repo.Migrations.MembershipRoleSets do
 
   defp administers(condition) do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_administers(org_id uuid) RETURNS boolean AS $$
+    CREATE OR REPLACE FUNCTION palee_acting_user_administers(org_id uuid) RETURNS boolean AS $$
       SELECT EXISTS (
         SELECT 1 FROM public.organization_memberships om
         WHERE om.organization_id = org_id

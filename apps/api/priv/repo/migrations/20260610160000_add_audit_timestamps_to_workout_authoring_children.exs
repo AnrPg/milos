@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddAuditTimestampsToWorkoutAuthoringChildren do
+defmodule Palee.Repo.Migrations.AddAuditTimestampsToWorkoutAuthoringChildren do
   use Ecto.Migration
 
   def up do

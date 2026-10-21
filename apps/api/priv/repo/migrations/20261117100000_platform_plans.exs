@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PlatformPlans do
+defmodule Palee.Repo.Migrations.PlatformPlans do
   @moduledoc """
   ADR-170 (P3-M8): the solo-coach tier and the platform plans behind it.
 
@@ -14,11 +14,11 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
     trial end and a negotiated price. Platform-administered: the owners and
     admins of the organization read it, only vendors and system sessions
     write it.
-  - `milos_ensure_platform_subscription(org)`: the one write an organization's
+  - `palee_ensure_platform_subscription(org)`: the one write an organization's
     own admin may cause. It starts the default plan of the organization's
     kind, on trial when the plan has one, and never changes an existing row,
     so a creator can never pick or extend their own plan.
-  - `milos_organization_slug_taken(slug)`: whether a slug is used by any
+  - `palee_organization_slug_taken(slug)`: whether a slug is used by any
     organization or retired alias. A self-serve coach cannot see other
     organizations, yet their practice needs a free slug; slugs are public
     (`/b/<slug>`), so the answer reveals nothing new.
@@ -114,7 +114,7 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
        '{"staff_seats": 2, "active_clients": 50}'::jsonb, 1900, 19000, 'EUR',
        'placeholder', 30, true, true, true, 10, now(), now()),
       (gen_random_uuid(), 'gym', 'gym', 'Gym',
-       'Everything Milos offers a gym, without limits.',
+       'Everything Palee offers a gym, without limits.',
        '{}'::jsonb, NULL, NULL, 'EUR', 'placeholder', 0, true, true, true, 20, now(), now())
     """)
 
@@ -127,8 +127,8 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
     execute("""
     CREATE POLICY platform_plans_write_policy ON platform_plans
       FOR ALL
-      USING (#{@acting_user} IS NULL OR milos_acting_user_is_vendor())
-      WITH CHECK (#{@acting_user} IS NULL OR milos_acting_user_is_vendor())
+      USING (#{@acting_user} IS NULL OR palee_acting_user_is_vendor())
+      WITH CHECK (#{@acting_user} IS NULL OR palee_acting_user_is_vendor())
     """)
 
     execute("ALTER TABLE platform_plans ENABLE ROW LEVEL SECURITY")
@@ -194,8 +194,8 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
       ON organization_platform_subscriptions
       FOR SELECT
       USING (
-        milos_acting_user_is_vendor()
-        OR milos_acting_user_administers(organization_id)
+        palee_acting_user_is_vendor()
+        OR palee_acting_user_administers(organization_id)
         OR (#{@acting_user} IS NULL AND organization_id = #{@acting_org})
       )
     """)
@@ -204,8 +204,8 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
     CREATE POLICY organization_platform_subscriptions_write_policy
       ON organization_platform_subscriptions
       FOR ALL
-      USING (#{@acting_user} IS NULL OR milos_acting_user_is_vendor())
-      WITH CHECK (#{@acting_user} IS NULL OR milos_acting_user_is_vendor())
+      USING (#{@acting_user} IS NULL OR palee_acting_user_is_vendor())
+      WITH CHECK (#{@acting_user} IS NULL OR palee_acting_user_is_vendor())
     """)
 
     execute("ALTER TABLE organization_platform_subscriptions ENABLE ROW LEVEL SECURITY")
@@ -215,7 +215,7 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
     # a vendor, a system session or an admin of that organization (the owner
     # who just created it); it never touches an existing subscription.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_ensure_platform_subscription(org_id uuid)
+    CREATE OR REPLACE FUNCTION palee_ensure_platform_subscription(org_id uuid)
     RETURNS void
     LANGUAGE plpgsql
     VOLATILE
@@ -225,8 +225,8 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
     BEGIN
       IF NOT (
         #{@acting_user} IS NULL
-        OR milos_acting_user_is_vendor()
-        OR milos_acting_user_administers(org_id)
+        OR palee_acting_user_is_vendor()
+        OR palee_acting_user_administers(org_id)
       ) THEN
         RAISE EXCEPTION 'not allowed to start a platform subscription'
           USING ERRCODE = 'insufficient_privilege';
@@ -258,7 +258,7 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_organization_slug_taken(candidate text)
+    CREATE OR REPLACE FUNCTION palee_organization_slug_taken(candidate text)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -295,8 +295,8 @@ defmodule MilosTraining.Repo.Migrations.PlatformPlans do
       remove :mode
     end
 
-    execute("DROP FUNCTION IF EXISTS milos_organization_slug_taken(text)")
-    execute("DROP FUNCTION IF EXISTS milos_ensure_platform_subscription(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_organization_slug_taken(text)")
+    execute("DROP FUNCTION IF EXISTS palee_ensure_platform_subscription(uuid)")
     drop table(:organization_platform_subscriptions)
     drop table(:platform_plans)
   end

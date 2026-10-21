@@ -13,11 +13,11 @@ jobs:
         # PostGIS: the migrations create the postgis extension.
         image: postgis/postgis:16-3.5-alpine
         env:
-          POSTGRES_DB: milos_training_test
+          POSTGRES_DB: palee_test
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         options: >-
-          --health-cmd "pg_isready -U postgres -d milos_training_test"
+          --health-cmd "pg_isready -U postgres -d palee_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -40,7 +40,7 @@ jobs:
         working-directory: apps/api
         env:
           DB_HOST: postgres
-          DB_NAME: milos_training_test
+          DB_NAME: palee_test
           DB_PASSWORD: postgres
           DB_USER: postgres
 

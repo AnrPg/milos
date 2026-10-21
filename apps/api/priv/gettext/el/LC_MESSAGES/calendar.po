@@ -25,11 +25,11 @@ msgstr "Ανατεθειμένη προπόνηση"
 msgid "Workout: %{title}"
 msgstr "Προπόνηση: %{title}"
 
-msgid "Assigned workout in TrainingJournal."
-msgstr "Ανατέθηκε προπόνηση στο TrainingJournal."
+msgid "Assigned workout in Palee."
+msgstr "Ανατέθηκε προπόνηση στο Palee."
 
-msgid "Scheduled %{name} class in TrainingJournal."
-msgstr "Προγραμματισμένο %{name} μάθημα στο TrainingJournal."
+msgid "Scheduled %{name} class in Palee."
+msgstr "Προγραμματισμένο %{name} μάθημα στο Palee."
 
 msgid "Pending"
 msgstr "Εκκρεμής"
@@ -40,8 +40,8 @@ msgstr "Εγκρίθηκε"
 msgid "Scheduled"
 msgstr "Προγραμματισμένος"
 
-msgid "TrainingJournal class booking status: %{status}."
-msgstr "Κατάσταση κράτησης για το προπονητικό μάθημα Milos: %{status}."
+msgid "Palee class booking status: %{status}."
+msgstr "Κατάσταση κράτησης για το προπονητικό μάθημα Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Δοκιμαστικό στο %{box}: %{name}"

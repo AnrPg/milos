@@ -43,7 +43,7 @@ leaderboard, class-slot groups, Phase 1 moderation and text-only media.
    change) and, in Phase 2, the memberships of club kinds that are not
    derived. Nothing needs syncing, so nothing can drift.
 3. **RLS.** Every table has the usual tenant policy (writes happen in the
-   gym's scope) plus a `FOR SELECT` policy `milos_acting_user_belongs_to(organization_id)`,
+   gym's scope) plus a `FOR SELECT` policy `palee_acting_user_belongs_to(organization_id)`,
    so a member's personal session reads the clubs and posts of every gym
    they actively belong to. That is how the club bar and the cross-gym feed
    read without one request per gym.

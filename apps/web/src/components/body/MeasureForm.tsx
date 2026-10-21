@@ -47,7 +47,7 @@ import {
 } from "@/lib/body";
 
 const VISIBILITIES: BodyVisibility[] = ["private", "coach_numbers", "coach_full"];
-const ASKED_KEY = "milos:body:weight-display-asked";
+const ASKED_KEY = "palee:body:weight-display-asked";
 
 function readAsked() {
   try {

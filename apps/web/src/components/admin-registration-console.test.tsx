@@ -42,8 +42,8 @@ describe("AdminRegistrationConsole", () => {
       expires_at: "2026-08-19T00:00:00Z",
       organization: {
         id: "org-1",
-        slug: "milos-method",
-        name: "Milos Method",
+        slug: "palee-method",
+        name: "Palee Method",
       },
     });
     signUpAdmin.mockResolvedValue({
@@ -58,7 +58,7 @@ describe("AdminRegistrationConsole", () => {
   it("selects the invited organization and opens tenant admin after admin registration", async () => {
     render(<AdminRegistrationConsole />);
 
-    await screen.findByText("Milos Method");
+    await screen.findByText("Palee Method");
 
     fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
       target: { value: "client_admin" },
@@ -80,14 +80,14 @@ describe("AdminRegistrationConsole", () => {
       });
     });
 
-    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("milos-method");
-    expect(replace).toHaveBeenCalledWith("/org/milos-method/admin");
+    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("palee-method");
+    expect(replace).toHaveBeenCalledWith("/org/palee-method/admin");
   });
 
   it("requires only the backend-compatible minimum password length before submitting", async () => {
     render(<AdminRegistrationConsole />);
 
-    await screen.findByText("Milos Method");
+    await screen.findByText("Palee Method");
 
     fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
       target: { value: "client_admin" },
@@ -117,7 +117,7 @@ describe("AdminRegistrationConsole", () => {
   it("shows password guidance when the password is shorter than four characters", async () => {
     render(<AdminRegistrationConsole />);
 
-    await screen.findByText("Milos Method");
+    await screen.findByText("Palee Method");
 
     fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
       target: { value: "client_admin" },
@@ -154,7 +154,7 @@ describe("AdminRegistrationConsole", () => {
 
     render(<AdminRegistrationConsole />);
 
-    await screen.findByText("Milos Method");
+    await screen.findByText("Palee Method");
 
     fireEvent.change(screen.getByLabelText("nicknamece2bd99"), {
       target: { value: "client_admin" },

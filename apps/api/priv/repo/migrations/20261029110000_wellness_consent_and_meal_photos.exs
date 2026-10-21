@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
+defmodule Palee.Repo.Migrations.WellnessConsentAndMealPhotos do
   @moduledoc """
   ADR-159 §7, §9.
 
@@ -24,7 +24,7 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
 
   def up do
     execute("""
-    CREATE FUNCTION milos_health_data_consented(member_id uuid)
+    CREATE FUNCTION palee_health_data_consented(member_id uuid)
     RETURNS boolean
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -85,8 +85,8 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
       &(&1 -- @notification_types)
     )
 
-    execute("DROP FUNCTION IF EXISTS milos_craving_follow_ups_due(timestamp, integer)")
-    execute("DROP FUNCTION IF EXISTS milos_water_reminders_due(timestamp, integer)")
+    execute("DROP FUNCTION IF EXISTS palee_craving_follow_ups_due(timestamp, integer)")
+    execute("DROP FUNCTION IF EXISTS palee_water_reminders_due(timestamp, integer)")
 
     alter table(:wellness_preferences) do
       remove :water_reminder
@@ -106,7 +106,7 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
     )
 
     coach_policies(false)
-    execute("DROP FUNCTION IF EXISTS milos_health_data_consented(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_health_data_consented(uuid)")
   end
 
   defp coach_policies(consent?) do
@@ -118,8 +118,8 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
       FOR SELECT
       USING (
         deleted_at IS NULL
-        AND milos_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility)
-        #{if consent?, do: "AND milos_health_data_consented(user_id)", else: ""}
+        AND palee_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility)
+        #{if consent?, do: "AND palee_health_data_consented(user_id)", else: ""}
       )
       """)
     end
@@ -191,7 +191,7 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
         else: ""
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_dangling_post_media(cutoff timestamp, max_rows integer)
+    CREATE OR REPLACE FUNCTION palee_dangling_post_media(cutoff timestamp, max_rows integer)
     RETURNS TABLE (user_id uuid, media_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -218,7 +218,7 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
 
   defp nudge_functions do
     execute("""
-    CREATE FUNCTION milos_craving_follow_ups_due(p_now timestamp, p_lim integer)
+    CREATE FUNCTION palee_craving_follow_ups_due(p_now timestamp, p_lim integer)
     RETURNS TABLE (user_id uuid, craving_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -234,7 +234,7 @@ defmodule MilosTraining.Repo.Migrations.WellnessConsentAndMealPhotos do
     # The member's zone is the zone of their latest entry. Due from 15:00 to
     # 21:00 local, once a local day, while that day is under half the goal.
     execute("""
-    CREATE FUNCTION milos_water_reminders_due(p_now timestamp, p_lim integer)
+    CREATE FUNCTION palee_water_reminders_due(p_now timestamp, p_lim integer)
     RETURNS TABLE (user_id uuid, local_day date)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$

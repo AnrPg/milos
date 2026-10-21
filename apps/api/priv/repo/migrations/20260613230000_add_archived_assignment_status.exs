@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddArchivedAssignmentStatus do
+defmodule Palee.Repo.Migrations.AddArchivedAssignmentStatus do
   use Ecto.Migration
 
   def up do

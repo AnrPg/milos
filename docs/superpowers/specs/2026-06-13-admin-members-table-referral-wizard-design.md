@@ -289,8 +289,8 @@ ReferralEventWizard
 
 | File | Change |
 |------|--------|
-| `apps/api/lib/milos_training/application/list_finance_members.ex` | Add `last_payment_on`, `last_payment_amount_cents`, `notes` to `build_row` |
-| `apps/api/lib/milos_training/infrastructure/finance/ecto_finance_store.ex` | Extend `search_member_summaries` with last-payment subquery |
+| `apps/api/lib/palee/application/list_finance_members.ex` | Add `last_payment_on`, `last_payment_amount_cents`, `notes` to `build_row` |
+| `apps/api/lib/palee/infrastructure/finance/ecto_finance_store.ex` | Extend `search_member_summaries` with last-payment subquery |
 | `src/components/admin/finance/tabs/MembersTab.tsx` | Wire `useSortFilter`, `SortableHeader`, `packagesQuery`, new columns |
 | `src/components/admin/finance/ReferralEventWizard.tsx` | Replace shared search with two `UserSearchField`s + inline membership setup |
 

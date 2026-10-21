@@ -19,7 +19,7 @@ changes is not enough.
 ## Decision
 Move production SSL enforcement from Phoenix's endpoint-level `force_ssl`
 setting into an explicit endpoint plug,
-`MilosTrainingWeb.Plugs.ForceSslExceptHealth`, that applies `Plug.SSL` to all
+`PaleeWeb.Plugs.ForceSslExceptHealth`, that applies `Plug.SSL` to all
 paths except exactly `/api/health` when the caller is an internal/private
 probe.
 
@@ -57,9 +57,9 @@ loopback, RFC1918, and unique-local IPv6 addresses. It must remain
 unauthenticated and must not expose sensitive details beyond readiness state.
 
 ## Implementation Notes
-Implemented `MilosTrainingWeb.Plugs.ForceSslExceptHealth` in the endpoint plug
+Implemented `PaleeWeb.Plugs.ForceSslExceptHealth` in the endpoint plug
 pipeline immediately after remote IP restoration. Production config now stores
-the SSL options under `config :milos_training, :force_ssl`.
+the SSL options under `config :palee, :force_ssl`.
 
 Regression tests cover the required behaviors: internal `/api/health` does not
 redirect when SSL enforcement is enabled, external `/api/health` still

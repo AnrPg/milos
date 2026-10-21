@@ -12,7 +12,7 @@ Part of: [Main plan](./2026-06-07-workout-creation-ux.md)
 - [ ] **Step 1: Write the migration**
 
 ```elixir
-defmodule MilosTraining.Repo.Migrations.ExtendWorkoutModelForCanvasUx do
+defmodule Palee.Repo.Migrations.ExtendWorkoutModelForCanvasUx do
   use Ecto.Migration
 
   def up do
@@ -108,7 +108,7 @@ Expected: migration runs without errors.
 
 - [ ] **Step 3: Update existing test payload to new schema**
 
-In `test/milos_training_web/controllers/workout_controller_test.exs`, replace the exercise payload:
+In `test/palee_web/controllers/workout_controller_test.exs`, replace the exercise payload:
 
 Old (remove):
 ```elixir
@@ -167,7 +167,7 @@ Expected: all tests pass. (Some will fail until schemas are updated in Task 3 �
 
 ```bash
 git add apps/api/priv/repo/migrations/20260607000000_extend_workout_model_for_canvas_ux.exs \
-        apps/api/test/milos_training_web/controllers/workout_controller_test.exs
+        apps/api/test/palee_web/controllers/workout_controller_test.exs
 git commit -m "feat(db): extend workout schema for canvas UX — new prescription model, status, draft_data"
 ```
 
@@ -176,17 +176,17 @@ git commit -m "feat(db): extend workout schema for canvas UX — new prescriptio
 ## Task 2: Extend TimerConfig for All 18 Formats
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/workouts/domain/timer_config.ex`
+- Modify: `apps/api/lib/palee/workouts/domain/timer_config.ex`
 
 - [ ] **Step 1: Write the failing test**
 
-In `test/milos_training/workouts/domain/timer_config_test.exs` (create if missing):
+In `test/palee/workouts/domain/timer_config_test.exs` (create if missing):
 
 ```elixir
-defmodule MilosTraining.Workouts.Domain.TimerConfigTest do
+defmodule Palee.Workouts.Domain.TimerConfigTest do
   use ExUnit.Case, async: true
 
-  alias MilosTraining.Workouts.Domain.TimerConfig
+  alias Palee.Workouts.Domain.TimerConfig
 
   test "amrap requires duration_seconds" do
     assert {:error, _} = TimerConfig.normalize(%{"type" => "amrap"})
@@ -244,7 +244,7 @@ end
 - [ ] **Step 2: Run test to verify it fails**
 
 ```bash
-cd apps/api && mix test test/milos_training/workouts/domain/timer_config_test.exs
+cd apps/api && mix test test/palee/workouts/domain/timer_config_test.exs
 ```
 
 Expected: FAIL — many format types not accepted yet.
@@ -252,7 +252,7 @@ Expected: FAIL — many format types not accepted yet.
 - [ ] **Step 3: Extend `timer_config.ex`**
 
 ```elixir
-defmodule MilosTraining.Workouts.Domain.TimerConfig do
+defmodule Palee.Workouts.Domain.TimerConfig do
   @types ~w(
     untimed for_time train_to_exhaustion kcal_target
     emom complex_emom even_odd billat
@@ -354,7 +354,7 @@ end
 - [ ] **Step 4: Run tests to verify pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/workouts/domain/timer_config_test.exs
+cd apps/api && mix test test/palee/workouts/domain/timer_config_test.exs
 ```
 
 Expected: all pass.
@@ -362,8 +362,8 @@ Expected: all pass.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/workouts/domain/timer_config.ex \
-        apps/api/test/milos_training/workouts/domain/timer_config_test.exs
+git add apps/api/lib/palee/workouts/domain/timer_config.ex \
+        apps/api/test/palee/workouts/domain/timer_config_test.exs
 git commit -m "feat(domain): extend TimerConfig to support all 18 workout format types"
 ```
 
@@ -372,18 +372,18 @@ git commit -m "feat(domain): extend TimerConfig to support all 18 workout format
 ## Task 3: Update Ecto Schemas
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/workouts/master_workout.ex`
-- Modify: `apps/api/lib/milos_training/workouts/workout_exercise.ex`
-- Modify: `apps/api/lib/milos_training/workouts/exercise_variation.ex`
+- Modify: `apps/api/lib/palee/workouts/master_workout.ex`
+- Modify: `apps/api/lib/palee/workouts/workout_exercise.ex`
+- Modify: `apps/api/lib/palee/workouts/exercise_variation.ex`
 
 - [ ] **Step 1: Update `master_workout.ex`**
 
 ```elixir
-defmodule MilosTraining.Workouts.MasterWorkout do
+defmodule Palee.Workouts.MasterWorkout do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MilosTraining.Workouts.WorkoutSection
+  alias Palee.Workouts.WorkoutSection
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -443,11 +443,11 @@ end
 - [ ] **Step 2: Update `workout_exercise.ex`**
 
 ```elixir
-defmodule MilosTraining.Workouts.WorkoutExercise do
+defmodule Palee.Workouts.WorkoutExercise do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MilosTraining.Workouts.{ExerciseVariation, WorkoutSection}
+  alias Palee.Workouts.{ExerciseVariation, WorkoutSection}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -503,11 +503,11 @@ end
 - [ ] **Step 3: Update `exercise_variation.ex`**
 
 ```elixir
-defmodule MilosTraining.Workouts.ExerciseVariation do
+defmodule Palee.Workouts.ExerciseVariation do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias MilosTraining.{ScaleLevel, Workouts.WorkoutExercise}
+  alias Palee.{ScaleLevel, Workouts.WorkoutExercise}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -577,7 +577,7 @@ end
 
 - [ ] **Step 4: Update `WorkoutMaterializer.apply_variation/2` for new field names**
 
-In `apps/api/lib/milos_training/workouts/domain/workout_materializer.ex`, replace `apply_variation`:
+In `apps/api/lib/palee/workouts/domain/workout_materializer.ex`, replace `apply_variation`:
 
 ```elixir
 defp apply_variation(exercise, scale_slug) do
@@ -615,10 +615,10 @@ Expected: all tests pass. Fix any compilation errors before proceeding.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/workouts/master_workout.ex \
-        apps/api/lib/milos_training/workouts/workout_exercise.ex \
-        apps/api/lib/milos_training/workouts/exercise_variation.ex \
-        apps/api/lib/milos_training/workouts/domain/workout_materializer.ex
+git add apps/api/lib/palee/workouts/master_workout.ex \
+        apps/api/lib/palee/workouts/workout_exercise.ex \
+        apps/api/lib/palee/workouts/exercise_variation.ex \
+        apps/api/lib/palee/workouts/domain/workout_materializer.ex
 git commit -m "feat(schema): update exercise and variation schemas to new prescription model"
 ```
 
@@ -627,15 +627,15 @@ git commit -m "feat(schema): update exercise and variation schemas to new prescr
 ## Task 4: Update EctoWorkoutStore + Port
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/workouts/ports/workout_store.ex`
-- Modify: `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex`
+- Modify: `apps/api/lib/palee/workouts/ports/workout_store.ex`
+- Modify: `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex`
 
 - [ ] **Step 1: Add new callbacks to the port**
 
 In `workout_store.ex`, add:
 
 ```elixir
-defmodule MilosTraining.Workouts.Ports.WorkoutStore do
+defmodule Palee.Workouts.Ports.WorkoutStore do
   @callback create_workout(binary(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback create_draft(binary()) :: {:ok, map()} | {:error, Ecto.Changeset.t()}
   @callback update_draft(binary(), map()) :: {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
@@ -888,8 +888,8 @@ end
 - [ ] **Step 5: Update `workouts.ex` context to expose new functions**
 
 ```elixir
-defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Commands.{
+defmodule Palee.Workouts do
+  alias Palee.Workouts.Commands.{
     CreateWorkout,
     CreateDraftWorkout,
     UpdateDraftWorkout,
@@ -897,7 +897,7 @@ defmodule MilosTraining.Workouts do
     ReplaceScaleLevels
   }
 
-  alias MilosTraining.Workouts.Queries.{
+  alias Palee.Workouts.Queries.{
     GetWorkout,
     ListScaleLevels,
     ListWorkouts,
@@ -926,9 +926,9 @@ cd apps/api && mix test
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/workouts/ports/workout_store.ex \
-        apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex \
-        apps/api/lib/milos_training/workouts.ex
+git add apps/api/lib/palee/workouts/ports/workout_store.ex \
+        apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex \
+        apps/api/lib/palee/workouts.ex
 git commit -m "feat(infra): add create_draft, update_draft, publish_workout to EctoWorkoutStore"
 ```
 
@@ -937,15 +937,15 @@ git commit -m "feat(infra): add create_draft, update_draft, publish_workout to E
 ## Task 5: Create Command Modules
 
 **Files:**
-- Create: `apps/api/lib/milos_training/workouts/commands/create_draft_workout.ex`
-- Create: `apps/api/lib/milos_training/workouts/commands/update_draft_workout.ex`
-- Create: `apps/api/lib/milos_training/workouts/commands/publish_workout.ex`
+- Create: `apps/api/lib/palee/workouts/commands/create_draft_workout.ex`
+- Create: `apps/api/lib/palee/workouts/commands/update_draft_workout.ex`
+- Create: `apps/api/lib/palee/workouts/commands/publish_workout.ex`
 
 - [ ] **Step 1: Write `create_draft_workout.ex`**
 
 ```elixir
-defmodule MilosTraining.Workouts.Commands.CreateDraftWorkout do
-  alias MilosTraining.Workouts.WorkoutStore
+defmodule Palee.Workouts.Commands.CreateDraftWorkout do
+  alias Palee.Workouts.WorkoutStore
 
   def call(admin_id), do: WorkoutStore.create_draft(admin_id)
 end
@@ -954,8 +954,8 @@ end
 - [ ] **Step 2: Write `update_draft_workout.ex`**
 
 ```elixir
-defmodule MilosTraining.Workouts.Commands.UpdateDraftWorkout do
-  alias MilosTraining.Workouts.WorkoutStore
+defmodule Palee.Workouts.Commands.UpdateDraftWorkout do
+  alias Palee.Workouts.WorkoutStore
 
   def call(id, params), do: WorkoutStore.update_draft(id, params)
 end
@@ -964,18 +964,18 @@ end
 - [ ] **Step 3: Write `publish_workout.ex` (command)**
 
 ```elixir
-defmodule MilosTraining.Workouts.Commands.PublishWorkout do
-  alias MilosTraining.Workouts.WorkoutStore
+defmodule Palee.Workouts.Commands.PublishWorkout do
+  alias Palee.Workouts.WorkoutStore
 
   def call(id, params \\ %{}), do: WorkoutStore.publish_workout(id, params)
 end
 ```
 
-- [ ] **Step 4: Write application service `apps/api/lib/milos_training/application/publish_workout.ex`**
+- [ ] **Step 4: Write application service `apps/api/lib/palee/application/publish_workout.ex`**
 
 ```elixir
-defmodule MilosTraining.Application.PublishWorkout do
-  alias MilosTraining.Workouts
+defmodule Palee.Application.PublishWorkout do
+  alias Palee.Workouts
 
   def call(admin, id) do
     case Workouts.get_workout_for_admin(id) do
@@ -1010,8 +1010,8 @@ cd apps/api && mix test
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/workouts/commands/ \
-        apps/api/lib/milos_training/application/publish_workout.ex
+git add apps/api/lib/palee/workouts/commands/ \
+        apps/api/lib/palee/application/publish_workout.ex
 git commit -m "feat(app): add CreateDraftWorkout, UpdateDraftWorkout, PublishWorkout commands"
 ```
 
@@ -1020,15 +1020,15 @@ git commit -m "feat(app): add CreateDraftWorkout, UpdateDraftWorkout, PublishWor
 ## Task 6: Router + Controller — New Admin Endpoints
 
 **Files:**
-- Modify: `apps/api/lib/milos_training_web/router.ex`
-- Modify: `apps/api/lib/milos_training_web/controllers/admin_workout_controller.ex`
+- Modify: `apps/api/lib/palee_web/router.ex`
+- Modify: `apps/api/lib/palee_web/controllers/admin_workout_controller.ex`
 
 - [ ] **Step 1: Add routes to `router.ex`**
 
 In the `/api/admin` scope, replace the workout routes:
 
 ```elixir
-scope "/api/admin", MilosTrainingWeb do
+scope "/api/admin", PaleeWeb do
   pipe_through [:api, :authenticated, :admin_only]
 
   patch "/users/:id/role", AdminUserController, :update_role
@@ -1065,7 +1065,7 @@ Add the new action specs and implementations. Append to the existing controller:
   def create_draft(conn, _params) do
     admin = GuardianPlug.current_resource(conn)
 
-    case MilosTraining.Workouts.create_draft(admin) do
+    case Palee.Workouts.create_draft(admin) do
       {:ok, draft} ->
         conn |> put_status(:created) |> json(%{workout: draft})
       error -> error
@@ -1085,7 +1085,7 @@ Add the new action specs and implementations. Append to the existing controller:
   )
 
   def show(conn, %{"id" => id}) do
-    case MilosTraining.Workouts.get_workout_for_admin(id) do
+    case Palee.Workouts.get_workout_for_admin(id) do
       nil -> conn |> put_status(:not_found) |> json(%{error: "workout not found"})
       workout -> json(conn, %{workout: workout})
     end
@@ -1110,7 +1110,7 @@ Add the new action specs and implementations. Append to the existing controller:
       draft_data: conn.body_params
     }
 
-    case MilosTraining.Workouts.update_draft(id, params) do
+    case Palee.Workouts.update_draft(id, params) do
       {:ok, draft} -> json(conn, %{workout: draft})
       {:error, :not_found} -> conn |> put_status(:not_found) |> json(%{error: "workout not found"})
       {:error, cs} -> {:error, cs}
@@ -1134,7 +1134,7 @@ Add the new action specs and implementations. Append to the existing controller:
   def publish(conn, %{"id" => id}) do
     admin = GuardianPlug.current_resource(conn)
 
-    case MilosTraining.Application.PublishWorkout.call(admin, id) do
+    case Palee.Application.PublishWorkout.call(admin, id) do
       {:ok, workout} -> json(conn, %{workout: workout})
       {:error, :not_found} -> conn |> put_status(:not_found) |> json(%{error: "workout not found"})
       {:error, :forbidden} -> conn |> put_status(:forbidden) |> json(%{error: "forbidden"})
@@ -1148,11 +1148,11 @@ Note: also add `CastAndValidate` plug to include the new actions.
 
 - [ ] **Step 3: Ensure the `WorkoutStore` module alias resolves correctly**
 
-In `ecto_workout_store.ex`, add `alias MilosTraining.Workouts.Ports.WorkoutStore` if missing, and add the module reference in `workouts.ex`:
+In `ecto_workout_store.ex`, add `alias Palee.Workouts.Ports.WorkoutStore` if missing, and add the module reference in `workouts.ex`:
 
 ```elixir
 # In workouts.ex, add near top:
-alias MilosTraining.Workouts.Ports.WorkoutStore
+alias Palee.Workouts.Ports.WorkoutStore
 ```
 
 - [ ] **Step 4: Run tests**
@@ -1166,8 +1166,8 @@ Fix any warnings or credo issues.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training_web/router.ex \
-        apps/api/lib/milos_training_web/controllers/admin_workout_controller.ex
+git add apps/api/lib/palee_web/router.ex \
+        apps/api/lib/palee_web/controllers/admin_workout_controller.ex
 git commit -m "feat(api): add admin workout show, update_draft, and publish endpoints"
 ```
 
@@ -1176,13 +1176,13 @@ git commit -m "feat(api): add admin workout show, update_draft, and publish endp
 ## Task 7: New Controller Tests
 
 **Files:**
-- Create: `apps/api/test/milos_training_web/controllers/admin_workout_controller_test.exs`
+- Create: `apps/api/test/palee_web/controllers/admin_workout_controller_test.exs`
 
 - [ ] **Step 1: Write the tests**
 
 ```elixir
-defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
-  use MilosTrainingWeb.ConnCase, async: false
+defmodule PaleeWeb.AdminWorkoutControllerTest do
+  use PaleeWeb.ConnCase, async: false
 
   describe "POST /api/admin/workouts — create draft" do
     test "admin can create an empty draft", %{conn: conn} do
@@ -1309,26 +1309,26 @@ defmodule MilosTrainingWeb.AdminWorkoutControllerTest do
 
   # Test helpers — add these to ConnCase support if not already present:
   defp authenticate_as_admin(conn, username) do
-    {:ok, user} = MilosTraining.Identity.create_user(%{
+    {:ok, user} = Palee.Identity.create_user(%{
       username: username,
       email: "#{username}@test.com",
       password: "password123456",
       role: :admin
     })
     {:ok, token, _claims} =
-      MilosTraining.Infrastructure.Auth.Guardian.encode_and_sign(user)
+      Palee.Infrastructure.Auth.Guardian.encode_and_sign(user)
     put_req_header(conn, "authorization", "Bearer #{token}")
   end
 
   defp authenticate_as_member(conn, username) do
-    {:ok, user} = MilosTraining.Identity.create_user(%{
+    {:ok, user} = Palee.Identity.create_user(%{
       username: username,
       email: "#{username}@test.com",
       password: "password123456",
       role: :member
     })
     {:ok, token, _claims} =
-      MilosTraining.Infrastructure.Auth.Guardian.encode_and_sign(user)
+      Palee.Infrastructure.Auth.Guardian.encode_and_sign(user)
     put_req_header(conn, "authorization", "Bearer #{token}")
   end
 end
@@ -1337,7 +1337,7 @@ end
 - [ ] **Step 2: Run tests**
 
 ```bash
-cd apps/api && mix test test/milos_training_web/controllers/admin_workout_controller_test.exs
+cd apps/api && mix test test/palee_web/controllers/admin_workout_controller_test.exs
 ```
 
 Expected: all pass.
@@ -1361,7 +1361,7 @@ Fix any remaining issues.
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/test/milos_training_web/controllers/admin_workout_controller_test.exs
+git add apps/api/test/palee_web/controllers/admin_workout_controller_test.exs
 git commit -m "test(api): add admin workout draft/publish endpoint tests"
 ```
 
@@ -1369,19 +1369,19 @@ git commit -m "test(api): add admin workout draft/publish endpoint tests"
 
 ## Fix: Add delegating functions to `WorkoutStore` concrete module
 
-The `MilosTraining.Workouts.WorkoutStore` module (at `lib/milos_training/workouts/workout_store.ex`) is the concrete module commands use. It delegates to an adapter (default: `EctoWorkoutStore`). New callbacks added to the port and implementation must also be added here.
+The `Palee.Workouts.WorkoutStore` module (at `lib/palee/workouts/workout_store.ex`) is the concrete module commands use. It delegates to an adapter (default: `EctoWorkoutStore`). New callbacks added to the port and implementation must also be added here.
 
-**Modify `lib/milos_training/workouts/workout_store.ex`** — add after the existing functions:
+**Modify `lib/palee/workouts/workout_store.ex`** — add after the existing functions:
 
 ```elixir
-defmodule MilosTraining.Workouts.WorkoutStore do
-  @behaviour MilosTraining.Workouts.Ports.WorkoutStore
+defmodule Palee.Workouts.WorkoutStore do
+  @behaviour Palee.Workouts.Ports.WorkoutStore
 
   defp adapter do
     Application.get_env(
-      :milos_training,
+      :palee,
       :workout_store,
-      MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
+      Palee.Infrastructure.Workouts.EctoWorkoutStore
     )
   end
 

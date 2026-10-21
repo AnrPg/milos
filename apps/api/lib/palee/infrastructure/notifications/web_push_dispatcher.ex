@@ -1,0 +1,35 @@
+defmodule Palee.Infrastructure.Notifications.WebPushDispatcher do
+  @behaviour Palee.Notifications.Ports.PushDispatcher
+
+  alias Palee.Notifications.PushConfig
+
+  @impl true
+  def send_push(subscription, message) do
+    with :ok <- PushConfig.apply_to_web_push_elixir(),
+         true <- PushConfig.enabled?(),
+         true <- Code.ensure_loaded?(WebPushElixir) do
+      subscription
+      |> encode_subscription()
+      |> WebPushElixir.send_notification(Jason.encode!(message))
+      |> normalize_result()
+    else
+      false -> {:error, :push_not_configured}
+    end
+  end
+
+  defp encode_subscription(subscription) do
+    Jason.encode!(%{
+      endpoint: subscription.endpoint,
+      keys: %{
+        p256dh: subscription.keys["p256dh"] || subscription.keys[:p256dh],
+        auth: subscription.keys["auth"] || subscription.keys[:auth]
+      }
+    })
+  end
+
+  defp normalize_result({:ok, _response}), do: :ok
+  defp normalize_result({:error, reason}), do: normalize_error(reason)
+
+  defp normalize_error(:expired), do: {:error, :expired}
+  defp normalize_error(reason), do: {:error, reason}
+end

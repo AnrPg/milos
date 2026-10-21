@@ -118,7 +118,7 @@ Unique index: `(user_id, challenge_id)`. Default: **opted-out** (no row = not in
 ### New: `ChallengeRule` module
 
 ```elixir
-defmodule MilosTraining.Gamification.Domain.ChallengeRule do
+defmodule Palee.Gamification.Domain.ChallengeRule do
   # evaluate one rule against completion_facts
   # returns 0 if condition not met, `rule["points"]` if met
   @spec evaluate(rule :: map(), facts :: map()) :: non_neg_integer()
@@ -159,7 +159,7 @@ evaluated per challenge (because the challenge period differs).
 ### New: `ChallengeLeaderboard`
 
 ```elixir
-defmodule MilosTraining.Gamification.Domain.ChallengeLeaderboard do
+defmodule Palee.Gamification.Domain.ChallengeLeaderboard do
   @spec rank(participants :: list(map())) :: list(map())
   # adds :rank field, handles ties (equal progress → same rank)
 end

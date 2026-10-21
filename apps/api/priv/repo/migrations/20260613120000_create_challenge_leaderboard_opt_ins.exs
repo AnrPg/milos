@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateChallengeLeaderboardOptIns do
+defmodule Palee.Repo.Migrations.CreateChallengeLeaderboardOptIns do
   use Ecto.Migration
 
   def change do

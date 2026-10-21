@@ -97,7 +97,7 @@ describe("apiRequest tenant headers", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify([
-            { role: "admin", organization: { slug: "milos-method" } },
+            { role: "admin", organization: { slug: "palee-method" } },
           ]),
           { status: 200 },
         ),
@@ -118,13 +118,13 @@ describe("apiRequest tenant headers", () => {
     );
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "/api/org/milos-method/admin/workouts",
+      "/api/org/palee-method/admin/workouts",
       expect.objectContaining({
         method: "POST",
-        headers: expect.objectContaining({ "X-Organization-Slug": "milos-method" }),
+        headers: expect.objectContaining({ "X-Organization-Slug": "palee-method" }),
       }),
     );
-    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("milos-method");
+    expect(window.localStorage.getItem(SELECTED_ORGANIZATION_SLUG_KEY)).toBe("palee-method");
   });
 
   it("hydrates the selected organization before tenant member finance requests", async () => {
@@ -133,7 +133,7 @@ describe("apiRequest tenant headers", () => {
       .mockResolvedValueOnce(
         new Response(
           JSON.stringify([
-            { role: "member", organization: { slug: "milos-method" } },
+            { role: "member", organization: { slug: "palee-method" } },
           ]),
           { status: 200 },
         ),
@@ -145,7 +145,7 @@ describe("apiRequest tenant headers", () => {
     expect(fetchMock).toHaveBeenNthCalledWith(1, "/api/memberships", expect.anything());
     expect(fetchMock).toHaveBeenNthCalledWith(
       2,
-      "/api/org/milos-method/me/finance",
+      "/api/org/palee-method/me/finance",
       expect.anything(),
     );
   });

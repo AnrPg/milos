@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CheckInAndWallet do
+defmodule Palee.Repo.Migrations.CheckInAndWallet do
   use Ecto.Migration
 
   # ADR-155 (P2-M7): QR check-in and Wallet.
@@ -262,9 +262,9 @@ defmodule MilosTraining.Repo.Migrations.CheckInAndWallet do
   def down do
     execute("DELETE FROM notifications WHERE type IN (#{in_list(@check_in_types)})")
     replace_notification_types(@before_types)
-    execute("DROP FUNCTION IF EXISTS milos_wallet_device_serials(text, timestamp)")
-    execute("DROP FUNCTION IF EXISTS milos_wallet_pass_organization(text)")
-    execute("DROP FUNCTION IF EXISTS milos_door_location(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_wallet_device_serials(text, timestamp)")
+    execute("DROP FUNCTION IF EXISTS palee_wallet_pass_organization(text)")
+    execute("DROP FUNCTION IF EXISTS palee_door_location(uuid)")
     drop table(:wallet_device_registrations)
     drop table(:wallet_passes)
     drop table(:facility_member_codes)
@@ -296,7 +296,7 @@ defmodule MilosTraining.Repo.Migrations.CheckInAndWallet do
     # colour, the location's name), for an active box and a location that
     # is not archived. Never the seed.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_door_location(door_location_id uuid)
+    CREATE OR REPLACE FUNCTION palee_door_location(door_location_id uuid)
     RETURNS TABLE (organization_id uuid, slug text, name text, logo_url text,
                    primary_color text, location_name text)
     LANGUAGE sql
@@ -318,7 +318,7 @@ defmodule MilosTraining.Repo.Migrations.CheckInAndWallet do
 
     # PassKit calls carry a serial and the pass's own token, never a tenant.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_wallet_pass_organization(pass_serial text)
+    CREATE OR REPLACE FUNCTION palee_wallet_pass_organization(pass_serial text)
     RETURNS uuid
     LANGUAGE sql
     STABLE
@@ -331,7 +331,7 @@ defmodule MilosTraining.Repo.Migrations.CheckInAndWallet do
 
     # «Which of my passes changed?», asked by an Apple device by its id.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_wallet_device_serials(device text, since timestamp)
+    CREATE OR REPLACE FUNCTION palee_wallet_device_serials(device text, since timestamp)
     RETURNS TABLE (serial text, last_updated_at timestamp)
     LANGUAGE sql
     STABLE

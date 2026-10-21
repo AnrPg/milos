@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddGamificationPreferencesAndUserStatsFields do
+defmodule Palee.Repo.Migrations.AddGamificationPreferencesAndUserStatsFields do
   use Ecto.Migration
 
   def change do

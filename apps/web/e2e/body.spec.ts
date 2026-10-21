@@ -124,7 +124,7 @@ async function stub(page: Page, world: World) {
     max_reminder_weeks: 12,
   });
 
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: token, refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));

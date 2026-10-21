@@ -148,9 +148,9 @@ export function trialCalendarFile(trial: MyTrial, title: string) {
   return [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Milos//Trial//EN",
+    "PRODID:-//Palee//Trial//EN",
     "BEGIN:VEVENT",
-    `UID:trial-${trial.id}@milos`,
+    `UID:trial-${trial.id}@palee`,
     `DTSTAMP:${stamp(new Date())}`,
     `DTSTART:${stamp(start)}`,
     `DTEND:${stamp(end)}`,

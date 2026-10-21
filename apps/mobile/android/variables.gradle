@@ -14,9 +14,9 @@ ext {
     androidxJunitVersion = '1.3.0'
     androidxEspressoCoreVersion = '3.7.0'
     cordovaAndroidVersion = '14.0.1'
-    // ADR-172: the MilosHealth plugin (Kotlin, Health Connect).
+    // ADR-172: the PaleeHealth plugin (Kotlin, Health Connect).
     healthConnectVersion = '1.1.0'
     coroutinesVersion = '1.10.2'
-    // ADR-173: the MilosGeofence plugin.
+    // ADR-173: the PaleeGeofence plugin.
     playServicesLocationVersion = '21.3.0'
 }

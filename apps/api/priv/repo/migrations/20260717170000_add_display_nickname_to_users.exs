@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddDisplayNicknameToUsers do
+defmodule Palee.Repo.Migrations.AddDisplayNicknameToUsers do
   use Ecto.Migration
 
   def up do

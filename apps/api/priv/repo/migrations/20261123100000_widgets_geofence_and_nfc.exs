@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.WidgetsGeofenceAndNfc do
+defmodule Palee.Repo.Migrations.WidgetsGeofenceAndNfc do
   @moduledoc """
   ADR-173 (P3-M11): home-screen widgets, the geofenced check-in reminder and
   NFC door tags.

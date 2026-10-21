@@ -20,7 +20,7 @@ Introduce executable architecture boundaries:
    in context/domain modules; environment configuration owns every default.
 2. Controllers invoke one application service or public context API and never
    internal queries, schemas, Repo, or infrastructure. Cross-context work always
-   lives in `MilosTraining.Application.*`.
+   lives in `Palee.Application.*`.
 3. Application and context modules publish transport-neutral events through
    ports. Phoenix Endpoint, Channels, cache, search, storage, and job adapters
    point inward and are selected at the composition root.
@@ -75,12 +75,12 @@ Implemented 2026-07-16.
   domain metadata module.
 - Moved time-dependent domain calculations to explicit date/time inputs at the
   application boundary so domain functions remain deterministic.
-- Added `mix milos.architecture`, which scans application/context/domain and
+- Added `mix palee.architecture`, which scans application/context/domain and
   controller layers for forbidden infrastructure, Repo/Ecto, web, and implicit
   clock dependencies. The task is part of backend `mix precommit` and CI.
 - Updated the design bounded-context catalog to include Identity, Scheduling,
   Workouts, Execution, Gamification, Coaching, Notifications, Finance,
   Analytics, Feedback, Wellbeing, Messaging, and Pantheon.
 - Verification after implementation: `mix compile --warnings-as-errors`, `mix
-  milos.architecture`, and `mix credo --strict --format oneline` all pass with
+  palee.architecture`, and `mix credo --strict --format oneline` all pass with
   the new OTEL dependencies and architecture rules.

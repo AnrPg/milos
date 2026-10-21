@@ -49,7 +49,7 @@ Markdown, text, and CSV renderers remain dependency-free.
 Admin workout-library controls remain under the existing admin-only route and
 operate only on records already returned by its authorized API. WOD history and
 Pantheon controls operate only on records returned for the current authenticated
-user. Generated blobs are ephemeral and are not uploaded to Milos Training or a
+user. Generated blobs are ephemeral and are not uploaded to Palee or a
 conversion service.
 
 ## Rationale
@@ -60,7 +60,7 @@ avoids inventing cross-context persistence for transient artifacts.
 
 The system share sheet is the only portable web capability that can hand an
 actual file to Apple, Microsoft, Google, email, and social applications without
-storing provider OAuth grants in Milos Training. Explicit fallbacks keep the
+storing provider OAuth grants in Palee. Explicit fallbacks keep the
 feature useful on desktop browsers that do not implement file sharing.
 
 ## Alternatives Considered
@@ -98,7 +98,7 @@ stable enough for spreadsheet import.
 Implemented on 2026-07-18 with a single `ShareExportDialog` used by the admin
 workout library, the current user's complete WOD history, and the current user's
 complete Pantheon PR list. A follow-up correction on the same date separated
-single-record card sharing into a compact authenticated Milos direct-message
+single-record card sharing into a compact authenticated Palee direct-message
 dialog and reduced collection export to two selectors plus one action.
 
 The canonical export model has source adapters for materialized workouts,

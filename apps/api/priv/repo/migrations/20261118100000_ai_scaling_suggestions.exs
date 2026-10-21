@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AiScalingSuggestions do
+defmodule Palee.Repo.Migrations.AiScalingSuggestions do
   @moduledoc """
   ADR-174 (P3-M12): AI scaling suggestions.
 
@@ -103,7 +103,7 @@ defmodule MilosTraining.Repo.Migrations.AiScalingSuggestions do
       execute("""
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """)
 
       execute("""

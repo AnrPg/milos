@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeWeeklyLeaderboardPrsByOrganization do
+defmodule Palee.Repo.Migrations.ScopeWeeklyLeaderboardPrsByOrganization do
   use Ecto.Migration
 
   def up do

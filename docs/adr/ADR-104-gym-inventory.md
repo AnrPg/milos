@@ -102,7 +102,7 @@ problems in the loop without exposing money.
 - Follow-ups are listed in TD-056.
 
 ## Implementation Notes
-- Facade `MilosTraining.Inventory`; pure rules in
+- Facade `Palee.Inventory`; pure rules in
   `Inventory.Domain.{MachinePolicy, StockPolicy, InventoryReport,
   InventoryDigest}`; port `InventoryStore` with
   `Infrastructure.Inventory.EctoInventoryStore`; alerts in

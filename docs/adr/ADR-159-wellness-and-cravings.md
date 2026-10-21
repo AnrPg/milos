@@ -51,7 +51,7 @@ already records mood and stress; the coach's plan is Nutrition (ADR-098).
    neutral statuses `none | partial | full`; meals reflect logging (the
    three main meals logged), never what was eaten; cravings are a count.
 7. **Privacy.** Personal rows with optional gym provenance, exactly like
-   Πώς νιώθω: owner policy plus `milos_entry_visible_to_acting_coach`, so a
+   Πώς νιώθω: owner policy plus `palee_entry_visible_to_acting_coach`, so a
    coach of the provenance gym reads an entry only on a rung that reaches
    them. Everything starts `private`. Preferences are owner-only. Tenant
    purge removes rows with that gym's provenance (ADR-117); «Διαγραφή όλων»
@@ -62,7 +62,7 @@ already records mood and stress; the coach's plan is Nutrition (ADR-098).
 9. **Consent (board 14).** Logging anything needs M10's `health_data`
    consent (`health_data_consent_required`, 403); the page asks on the first
    visit, together with which items to show. Coach reads also need it, in
-   row security (`milos_health_data_consented`), so withdrawing it hides
+   row security (`palee_health_data_consented`), so withdrawing it hides
    every widened entry at once while the member keeps their data.
 10. **Meal photos (Q4).** A `meal_photo` media purpose (account scope,
     `media_private`, server-stripped renditions, ADR-157), attached to the
@@ -93,7 +93,7 @@ already records mood and stress; the coach's plan is Nutrition (ADR-098).
     sheet offers. Meals take portions; the day sums them against the plan.
     Calories never reach the member (`Nutrition.for_member/1`). The member
     reads their plans across gyms in their personal session through
-    `milos_own_nutrition_plans()` (no calories, no text).
+    `palee_own_nutrition_plans()` (no calories, no text).
 15. **Λιγούρα support (Q6).** «Χρειάζομαι στήριξη» stamps the craving once
     and calls the `SupportRequests` port with only the craving id; M12's
     buddy adapter decides who hears. Craving details never go to a buddy.

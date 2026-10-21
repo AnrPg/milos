@@ -7,7 +7,7 @@ import type { operations } from "@/api/generated/schema";
 type Json<T> = T extends { content: { "application/json": infer Body } } ? Body : never;
 type Body<T> = T extends { requestBody: { content: { "application/json": infer B } } } ? B : never;
 type Op = operations;
-type InventoryOp<Name extends string> = Op[`MilosTrainingWeb.InventoryController.${Name}` & keyof Op];
+type InventoryOp<Name extends string> = Op[`PaleeWeb.InventoryController.${Name}` & keyof Op];
 
 type MachinesResponse = Json<InventoryOp<"machines">["responses"][200]>;
 type MachineResponse = Json<InventoryOp<"update_machine">["responses"][200]>;

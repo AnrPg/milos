@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinanceReconciliationRecords do
+defmodule Palee.Repo.Migrations.CreateFinanceReconciliationRecords do
   use Ecto.Migration
 
   # ADR-126 / TD-022: provider-agnostic reconciliation records. Each row is
@@ -92,7 +92,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceReconciliationRecords do
     execute("""
     CREATE TRIGGER finance_reconciliation_records_apply_tenant_context
     BEFORE INSERT OR UPDATE ON finance_reconciliation_records
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

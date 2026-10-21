@@ -7,29 +7,29 @@ import type { operations } from "@/api/generated/schema";
 type Json<T> = T extends { content: { "application/json": infer Body } } ? Body : never;
 type Op = operations;
 
-type ClientsResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.clients"]["responses"][200]>;
-type ClientResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.update_client"]["responses"][200]>;
-type SeatsResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.seats"]["responses"][200]>;
-type SeatResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.end_seat"]["responses"][200]>;
-type InvoicesResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.invoices"]["responses"][200]>;
-type InvoiceResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.invoice_status"]["responses"][200]>;
-type InvoiceDocumentResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.invoice"]["responses"][200]>;
-type BeneficiariesResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.beneficiaries"]["responses"][200]>;
-type BeneficiaryResponse = Json<Op["MilosTrainingWeb.PaymentModelsController.remove_beneficiary"]["responses"][200]>;
+type ClientsResponse = Json<Op["PaleeWeb.PaymentModelsController.clients"]["responses"][200]>;
+type ClientResponse = Json<Op["PaleeWeb.PaymentModelsController.update_client"]["responses"][200]>;
+type SeatsResponse = Json<Op["PaleeWeb.PaymentModelsController.seats"]["responses"][200]>;
+type SeatResponse = Json<Op["PaleeWeb.PaymentModelsController.end_seat"]["responses"][200]>;
+type InvoicesResponse = Json<Op["PaleeWeb.PaymentModelsController.invoices"]["responses"][200]>;
+type InvoiceResponse = Json<Op["PaleeWeb.PaymentModelsController.invoice_status"]["responses"][200]>;
+type InvoiceDocumentResponse = Json<Op["PaleeWeb.PaymentModelsController.invoice"]["responses"][200]>;
+type BeneficiariesResponse = Json<Op["PaleeWeb.PaymentModelsController.beneficiaries"]["responses"][200]>;
+type BeneficiaryResponse = Json<Op["PaleeWeb.PaymentModelsController.remove_beneficiary"]["responses"][200]>;
 
 export type CorporateClient = ClientsResponse["clients"][number];
 export type CorporateClientCreate = NonNullable<
-  Op["MilosTrainingWeb.PaymentModelsController.create_client"]["requestBody"]
+  Op["PaleeWeb.PaymentModelsController.create_client"]["requestBody"]
 >["content"]["application/json"];
 export type CorporateClientUpdate = NonNullable<
-  Op["MilosTrainingWeb.PaymentModelsController.update_client"]["requestBody"]
+  Op["PaleeWeb.PaymentModelsController.update_client"]["requestBody"]
 >["content"]["application/json"];
 export type CorporateSeat = SeatsResponse["seats"][number];
 export type CorporateInvoice = InvoicesResponse["invoices"][number];
 export type CorporatePayment = CorporateInvoice["payments"][number];
 export type CorporatePaymentMethod = CorporatePayment["payment_method"];
 export type CorporatePaymentInput = NonNullable<
-  Op["MilosTrainingWeb.PaymentModelsController.record_payment"]["requestBody"]
+  Op["PaleeWeb.PaymentModelsController.record_payment"]["requestBody"]
 >["content"]["application/json"];
 export type CorporateInvoiceDocument = InvoiceDocumentResponse["invoice"];
 export type SubscriptionBeneficiary = BeneficiariesResponse["beneficiaries"][number];

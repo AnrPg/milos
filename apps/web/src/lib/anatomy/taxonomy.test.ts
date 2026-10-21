@@ -15,7 +15,7 @@ import {
   muscleNode,
 } from "./taxonomy";
 
-const domainDir = path.resolve(__dirname, "../../../../api/lib/milos_training/anatomy/domain");
+const domainDir = path.resolve(__dirname, "../../../../api/lib/palee/anatomy/domain");
 const taxonomySource = path.join(domainDir, "muscle_taxonomy.ex");
 const qualitiesSource = path.join(domainDir, "fitness_qualities.ex");
 const atlasIndex = path.resolve(__dirname, "../../../public/anatomy/v1/index.json");

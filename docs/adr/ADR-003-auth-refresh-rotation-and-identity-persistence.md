@@ -45,7 +45,7 @@ project’s intended architecture.
 
 ## Implementation Notes
 Identity command/query modules now delegate persistence through
-`MilosTraining.Identity.UserStore`, with `MilosTraining.Infrastructure.Identity.EctoUserStore`
+`Palee.Identity.UserStore`, with `Palee.Infrastructure.Identity.EctoUserStore`
 as the production adapter. `Repo` calls no longer live in command/query
 modules.
 

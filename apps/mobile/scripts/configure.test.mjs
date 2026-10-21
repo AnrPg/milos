@@ -10,31 +10,31 @@ const { resolveEnvironment, appLinkPathPrefixes } = require("../config/resolve.c
 const xml = { open: "<!--", close: "-->" };
 
 test("production loads the https web app and allows its host", () => {
-  const env = resolveEnvironment({ MILOS_APP_ENV: "production" });
+  const env = resolveEnvironment({ PALEE_APP_ENV: "production" });
   assert.equal(env.url, "https://milos.4kq.net");
   assert.equal(env.appId, "app.milos.member");
   assert.equal(env.cleartext, false);
   assert.ok(env.navigationHosts.includes("milos.4kq.net"));
 });
 
-test("MILOS_APP_URL overrides the URL and production refuses http", () => {
-  assert.equal(resolveEnvironment({ MILOS_APP_ENV: "staging", MILOS_APP_URL: "https://staging.example.test/x" }).url, "https://staging.example.test");
-  assert.throws(() => resolveEnvironment({ MILOS_APP_ENV: "production", MILOS_APP_URL: "http://plain.example.test" }));
-  assert.throws(() => resolveEnvironment({ MILOS_APP_ENV: "staging" }), /MILOS_APP_URL/);
-  assert.throws(() => resolveEnvironment({ MILOS_APP_ENV: "nope" }));
+test("PALEE_APP_URL overrides the URL and production refuses http", () => {
+  assert.equal(resolveEnvironment({ PALEE_APP_ENV: "staging", PALEE_APP_URL: "https://staging.example.test/x" }).url, "https://staging.example.test");
+  assert.throws(() => resolveEnvironment({ PALEE_APP_ENV: "production", PALEE_APP_URL: "http://plain.example.test" }));
+  assert.throws(() => resolveEnvironment({ PALEE_APP_ENV: "staging" }), /PALEE_APP_URL/);
+  assert.throws(() => resolveEnvironment({ PALEE_APP_ENV: "nope" }));
 });
 
 test("development may use cleartext", () => {
-  assert.equal(resolveEnvironment({ MILOS_APP_ENV: "development" }).cleartext, true);
+  assert.equal(resolveEnvironment({ PALEE_APP_ENV: "development" }).cleartext, true);
 });
 
 test("the share links come from the web's list", () => {
   const prefixes = appLinkPathPrefixes();
   assert.ok(prefixes.includes("/c/"));
   assert.ok(prefixes.includes("/join/"));
-  const filter = androidIntentFilter("milos.test", prefixes);
+  const filter = androidIntentFilter("palee.test", prefixes);
   assert.match(filter, /android:autoVerify="true"/);
-  assert.match(filter, /android:host="milos.test"/);
+  assert.match(filter, /android:host="palee.test"/);
   assert.match(filter, /android:pathPrefix="\/b\/"/);
 });
 
@@ -42,7 +42,7 @@ test("marker blocks are inserted once and then replaced in place", () => {
   const manifest = "<activity>\n        <intent-filter />\n        </activity>\n";
   const first = replaceBetweenMarkers(manifest, "<a />", { ...xml, anchor: "</activity>" });
   const second = replaceBetweenMarkers(first, "<b />", { ...xml, anchor: "</activity>" });
-  assert.equal((second.match(/milos:app-links begin/g) ?? []).length, 1);
+  assert.equal((second.match(/palee:app-links begin/g) ?? []).length, 1);
   assert.match(second, /<b \/>/);
   assert.doesNotMatch(second, /<a \/>/);
   assert.equal(replaceBetweenMarkers(second, "<b />", { ...xml, anchor: "</activity>" }), second);

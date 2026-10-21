@@ -16,7 +16,7 @@ Problem observed:
 - Ecto rejected `DateTime.utc_now()` with microseconds for a `:utc_datetime` field.
 
 Fix implemented:
-- `MilosTraining.Infrastructure.Notifications.EctoNotificationStore` now writes second-precision timestamps for both single-read and mark-all-read paths.
+- `Palee.Infrastructure.Notifications.EctoNotificationStore` now writes second-precision timestamps for both single-read and mark-all-read paths.
 - Controller regressions cover:
   - `POST /api/notifications/:id/read`
   - `POST /api/notifications/read-all`

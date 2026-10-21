@@ -1,7 +1,7 @@
-defmodule MilosTraining.FakeGeocoder do
+defmodule Palee.FakeGeocoder do
   @moduledoc "Test stand-in for Photon: one known address, an outage on «down»."
 
-  @behaviour MilosTraining.Application.Ports.Geocoder
+  @behaviour Palee.Application.Ports.Geocoder
 
   @kypseli %{
     label: "Φωκίωνος Νέγρη 12, Κυψέλη, Αθήνα",

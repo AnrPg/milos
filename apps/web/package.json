@@ -1,5 +1,5 @@
 {
-  "name": "milos-training-web",
+  "name": "palee-web",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -14,7 +14,7 @@
     "check:contract": "npm run generate:api && git diff --exit-code -- src/api/generated/openapi.json src/api/generated/schema.ts",
     "check": "npm run lint && npm run type-check && npm run test && npm run check:contract && npm run build",
     "i18n:check": "node scripts/validate-messages.mjs && node scripts/check-untranslated-messages.mjs && node scripts/check-hardcoded-ui-copy.mjs",
-    "generate:api": "cd ../api && mix milos.export_openapi ../web/src/api/generated/openapi.json && cd ../web && openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts"
+    "generate:api": "cd ../api && mix palee.export_openapi ../web/src/api/generated/openapi.json && cd ../web && openapi-typescript src/api/generated/openapi.json -o src/api/generated/schema.ts"
   },
   "dependencies": {
     "@capacitor/app": "8.1.2",

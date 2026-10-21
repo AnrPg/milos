@@ -59,7 +59,7 @@ const parsedDraft = {
 type Handler = (route: Route, path: string, method: string) => Promise<void> | null;
 
 async function stubMember(page: Page, extra: Handler) {
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", async (route) => {
     const path = tenantless(new URL(route.request().url()).pathname);
     const method = route.request().method();

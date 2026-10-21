@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ConstrainReviewTargetType do
+defmodule Palee.Repo.Migrations.ConstrainReviewTargetType do
   use Ecto.Migration
 
   @valid_target_types "'workout', 'execution', 'exercise', 'class_slot', 'gym_parameter', 'coaching_parameter', 'membership_package', 'app', 'general'"

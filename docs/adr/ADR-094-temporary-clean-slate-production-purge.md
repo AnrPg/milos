@@ -17,8 +17,8 @@ indexes, deletes every non-owner Postgres user, and preserves only the SaaS
 owner's user row, active vendor grant, migration history, and static reference
 seed tables.
 
-The purge refuses to run unless `MILOS_SAAS_OWNER_NICKNAME` identifies the
-account to preserve and `MILOS_CONFIRM_PROD_PURGE` equals the exact confirmation
+The purge refuses to run unless `PALEE_SAAS_OWNER_NICKNAME` identifies the
+account to preserve and `PALEE_CONFIRM_PROD_PURGE` equals the exact confirmation
 phrase. If that account is missing an active vendor grant, the purge recreates
 one while removing every other vendor row.
 
@@ -43,8 +43,8 @@ production cleanup should add a new ADR and a new explicitly guarded release
 entrypoint.
 
 ## Implementation Notes
-The release entrypoint lives in `MilosTraining.Release` and delegates to
-`MilosTraining.Infrastructure.Maintenance.CleanSlatePurge`. The GitOps manifest
+The release entrypoint lives in `Palee.Release` and delegates to
+`Palee.Infrastructure.Maintenance.CleanSlatePurge`. The GitOps manifest
 is a one-shot Kubernetes Job using the same API image policy and secrets as the
 API Deployment. The first production run refused to execute because the selected
 nickname was wrong and the live owner account had no vendor row; the retry job

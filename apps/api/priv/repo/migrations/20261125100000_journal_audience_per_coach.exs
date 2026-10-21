@@ -1,16 +1,16 @@
-defmodule MilosTraining.Repo.Migrations.JournalAudiencePerCoach do
+defmodule Palee.Repo.Migrations.JournalAudiencePerCoach do
   @moduledoc """
   ADR-162 (ANR, 2026-10-21): «Οι coach μου» names individual coaches, not
   whole providers. An entry's own audience and the default's exclusions get
   `coach_user_id`; the rows that named a provider become one row per coach
   it has today. A provider's coaches still always read what was recorded
-  there (`milos_entry_visible_to_acting_coach`); these rows only decide who
+  there (`palee_entry_visible_to_acting_coach`); these rows only decide who
   else reads a shared entry.
 
-  `milos_journal_entry_shared_with_coach` replaces
-  `milos_journal_entry_shared_with_org` and `milos_entry_shared_with_acting_coach`
+  `palee_journal_entry_shared_with_coach` replaces
+  `palee_journal_entry_shared_with_org` and `palee_entry_shared_with_acting_coach`
   passes the acting coach, so every policy and the coach feed check one
-  coach of one provider. `milos_my_provider_coaches()` lists the coaches of
+  coach of one provider. `palee_my_provider_coaches()` lists the coaches of
   the caller's active providers, for the chooser.
   """
 
@@ -54,7 +54,7 @@ defmodule MilosTraining.Repo.Migrations.JournalAudiencePerCoach do
     end
 
     execute("""
-    CREATE FUNCTION milos_journal_entry_shared_with_coach(
+    CREATE FUNCTION palee_journal_entry_shared_with_coach(
       kind text, entry uuid, entry_user_id uuid, entry_org_id uuid, org uuid, coach uuid
     )
     RETURNS boolean
@@ -90,27 +90,27 @@ defmodule MilosTraining.Repo.Migrations.JournalAudiencePerCoach do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_entry_shared_with_acting_coach(
+    CREATE OR REPLACE FUNCTION palee_entry_shared_with_acting_coach(
       kind text, entry uuid, entry_user_id uuid, entry_org_id uuid, visibility text
     )
     RETURNS boolean
     LANGUAGE sql STABLE
     AS $$
-      SELECT public.milos_journal_visibility_reaches_coach(visibility)
+      SELECT public.palee_journal_visibility_reaches_coach(visibility)
         AND #{@acting_org} IS NOT NULL
-        AND public.milos_acting_user_coaches(#{@acting_org})
-        AND public.milos_journal_entry_shared_with_coach(
+        AND public.palee_acting_user_coaches(#{@acting_org})
+        AND public.palee_journal_entry_shared_with_coach(
           kind, entry, entry_user_id, entry_org_id, #{@acting_org}, #{@acting_user}
         )
     $$
     """)
 
-    execute("DROP FUNCTION milos_journal_entry_shared_with_org(text, uuid, uuid, uuid, uuid)")
+    execute("DROP FUNCTION palee_journal_entry_shared_with_org(text, uuid, uuid, uuid, uuid)")
 
     # The coaches of the caller's active providers (whose memberships a
     # member's session cannot read), without the caller.
     execute("""
-    CREATE FUNCTION milos_my_provider_coaches()
+    CREATE FUNCTION palee_my_provider_coaches()
     RETURNS TABLE (organization_id uuid, coach_user_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -127,10 +127,10 @@ defmodule MilosTraining.Repo.Migrations.JournalAudiencePerCoach do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_my_provider_coaches()")
+    execute("DROP FUNCTION IF EXISTS palee_my_provider_coaches()")
 
     execute("""
-    CREATE FUNCTION milos_journal_entry_shared_with_org(
+    CREATE FUNCTION palee_journal_entry_shared_with_org(
       kind text, entry uuid, entry_user_id uuid, entry_org_id uuid, org uuid
     )
     RETURNS boolean
@@ -164,23 +164,23 @@ defmodule MilosTraining.Repo.Migrations.JournalAudiencePerCoach do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_entry_shared_with_acting_coach(
+    CREATE OR REPLACE FUNCTION palee_entry_shared_with_acting_coach(
       kind text, entry uuid, entry_user_id uuid, entry_org_id uuid, visibility text
     )
     RETURNS boolean
     LANGUAGE sql STABLE
     AS $$
-      SELECT public.milos_journal_visibility_reaches_coach(visibility)
+      SELECT public.palee_journal_visibility_reaches_coach(visibility)
         AND #{@acting_org} IS NOT NULL
-        AND public.milos_acting_user_coaches(#{@acting_org})
-        AND public.milos_journal_entry_shared_with_org(
+        AND public.palee_acting_user_coaches(#{@acting_org})
+        AND public.palee_journal_entry_shared_with_org(
           kind, entry, entry_user_id, entry_org_id, #{@acting_org}
         )
     $$
     """)
 
     execute(
-      "DROP FUNCTION milos_journal_entry_shared_with_coach(text, uuid, uuid, uuid, uuid, uuid)"
+      "DROP FUNCTION palee_journal_entry_shared_with_coach(text, uuid, uuid, uuid, uuid, uuid)"
     )
 
     for {table, key} <- [

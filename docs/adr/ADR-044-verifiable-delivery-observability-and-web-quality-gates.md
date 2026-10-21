@@ -95,7 +95,7 @@ Implemented 2026-07-16.
   source verification.
 - Verification performed after implementation: `npm run test`, `npm run
   type-check`, `npm run lint`, `npm run test:e2e`, `mix compile
-  --warnings-as-errors`, `mix milos.architecture`, and `mix credo --strict
+  --warnings-as-errors`, `mix palee.architecture`, and `mix credo --strict
   --format oneline`.
 - The 2026-07-16 continuation reran the quality-gate stack and corrected a
   formatter regression in the notification event adapter. A non-breaking audit

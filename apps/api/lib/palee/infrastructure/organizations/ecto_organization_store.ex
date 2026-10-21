@@ -1,0 +1,1237 @@
+defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
+  @behaviour Palee.Organizations.Ports.OrganizationStore
+
+  import Ecto.Query
+
+  alias Ecto.Multi
+
+  alias Palee.Organizations.Domain.{
+    BrandLogoPolicy,
+    InvitationPolicy,
+    MembershipPolicy,
+    SlugRenamePolicy
+  }
+
+  alias Palee.Organizations.{
+    Organization,
+    OrganizationDomain,
+    OrganizationMembership,
+    OrganizationProvisioningEvent,
+    OrganizationPurge,
+    OrganizationSetting,
+    OrganizationSlugAlias,
+    ProviderSelection,
+    RegistrationInvitation,
+    Vendor
+  }
+
+  alias Palee.Repo
+
+  @impl true
+  def create_organization(params) do
+    changeset =
+      params
+      |> Organization.changeset()
+      |> Organization.put_initial_provider_kind(value(params, :provider_kind))
+
+    Multi.new()
+    |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
+    |> Multi.insert(:organization, changeset)
+    |> Multi.insert(:settings, fn %{organization: organization} ->
+      OrganizationSetting.changeset(%{
+        organization_id: organization.id,
+        timezone: value(params, :timezone) || "UTC",
+        default_locale: value(params, :default_locale) || "en",
+        invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
+        brand_name: value(params, :brand_name) || organization.name,
+        brand_logo_url: value(params, :brand_logo_url),
+        brand_primary_color: value(params, :brand_primary_color),
+        settings: value(params, :settings) || %{}
+      })
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, %{organization: organization}} -> {:ok, organization}
+      {:error, _step, reason, _changes} -> {:error, reason}
+    end
+  end
+
+  @impl true
+  def add_membership(params) do
+    %OrganizationMembership{}
+    |> OrganizationMembership.changeset(params)
+    |> Repo.insert(
+      on_conflict:
+        {:replace, [:role, :roles, :status, :joined_at, :invited_by_user_id, :updated_at]},
+      conflict_target: [:organization_id, :user_id],
+      returning: true
+    )
+  end
+
+  @impl true
+  def issue_invitation(params, issued_at) do
+    %RegistrationInvitation{}
+    |> RegistrationInvitation.issue_changeset(params, issued_at)
+    |> Repo.insert()
+  end
+
+  @impl true
+  def revoke_invitation(organization_id, invitation_id, revoked_at) do
+    Repo.transaction(fn ->
+      invitation =
+        RegistrationInvitation
+        |> where(
+          [invitation],
+          invitation.id == ^invitation_id and invitation.organization_id == ^organization_id
+        )
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(invitation) or InvitationPolicy.state(invitation, revoked_at) != :active do
+        Repo.rollback(:invalid_invitation)
+      end
+
+      invitation
+      |> RegistrationInvitation.revoke_changeset(revoked_at)
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def redeem_invitation(digest, user_id, redeemed_at) do
+    Repo.transaction(fn ->
+      invitation =
+        RegistrationInvitation
+        |> where([invitation], invitation.token_digest == ^digest)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(invitation) or not InvitationPolicy.redeemable?(invitation, redeemed_at) do
+        Repo.rollback(:invalid_invitation)
+      end
+
+      membership = upsert_redeemed_membership(invitation, user_id, redeemed_at)
+
+      redeemed =
+        invitation
+        |> RegistrationInvitation.redeem_changeset(user_id, redeemed_at)
+        |> Repo.update()
+        |> unwrap_or_rollback()
+
+      %{
+        invitation: redeemed,
+        membership: membership,
+        organization: Repo.get!(Organization, invitation.organization_id)
+      }
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def get_organization_by_id(id), do: Repo.get(Organization, id)
+
+  @impl true
+  def get_organization_by_slug(slug), do: Repo.get_by(Organization, slug: slug)
+
+  @impl true
+  def get_organization_by_slug_alias(slug) when is_binary(slug) do
+    Organization
+    |> join(:inner, [organization], slug_alias in OrganizationSlugAlias,
+      on: slug_alias.organization_id == organization.id
+    )
+    |> where([_organization, slug_alias], slug_alias.slug == ^slug)
+    |> select([organization, _slug_alias], organization)
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_canonical_slug_for_alias(slug) when is_binary(slug) do
+    Organization
+    |> join(:inner, [organization], slug_alias in OrganizationSlugAlias,
+      on: slug_alias.organization_id == organization.id
+    )
+    |> where([_organization, slug_alias], slug_alias.slug == ^slug)
+    |> select([organization, _slug_alias], organization.slug)
+    |> Repo.one()
+  end
+
+  @impl true
+  def list_slug_aliases(organization_id) do
+    OrganizationSlugAlias
+    |> where([slug_alias], slug_alias.organization_id == ^organization_id)
+    |> order_by([slug_alias], desc: slug_alias.retired_at, asc: slug_alias.slug)
+    |> Repo.all()
+  end
+
+  @impl true
+  def count_pending_invitations(organization_id, now) do
+    RegistrationInvitation
+    |> where(
+      [invitation],
+      invitation.organization_id == ^organization_id and is_nil(invitation.redeemed_at) and
+        is_nil(invitation.revoked_at) and invitation.expires_at > ^now
+    )
+    |> Repo.aggregate(:count)
+  end
+
+  @impl true
+  def slug_taken?(slug) do
+    %{rows: [[taken]]} = Repo.query!("SELECT palee_organization_slug_taken($1)", [slug])
+    taken
+  end
+
+  @impl true
+  def count_seats(organization_id, now) do
+    staff =
+      Enum.map(
+        MembershipPolicy.admin_roles() ++ MembershipPolicy.staff_roles(),
+        &Atom.to_string/1
+      )
+
+    clients = Enum.map(MembershipPolicy.client_roles(), &Atom.to_string/1)
+
+    %{staff: staff_members, clients: client_members} =
+      OrganizationMembership
+      |> where(
+        [membership],
+        membership.organization_id == ^organization_id and membership.status == :active
+      )
+      |> select([membership], %{
+        staff:
+          fragment(
+            "count(*) FILTER (WHERE ?::text[] && ?::text[])",
+            membership.roles,
+            type(^staff, {:array, :string})
+          ),
+        clients:
+          fragment(
+            "count(*) FILTER (WHERE ?::text[] && ?::text[] AND NOT ?::text[] && ?::text[])",
+            membership.roles,
+            type(^clients, {:array, :string}),
+            membership.roles,
+            type(^staff, {:array, :string})
+          )
+      })
+      |> Repo.one()
+
+    staff_atoms = MembershipPolicy.admin_roles() ++ MembershipPolicy.staff_roles()
+
+    pending_staff =
+      RegistrationInvitation
+      |> where(
+        [invitation],
+        invitation.organization_id == ^organization_id and is_nil(invitation.redeemed_at) and
+          is_nil(invitation.revoked_at) and invitation.expires_at > ^now and
+          invitation.role in ^staff_atoms
+      )
+      |> Repo.aggregate(:count)
+
+    %{staff: staff_members, clients: client_members, pending_staff_invitations: pending_staff}
+  end
+
+  @impl true
+  def get_organization_by_domain(host) do
+    Organization
+    |> join(:inner, [organization], domain in OrganizationDomain,
+      on: domain.organization_id == organization.id
+    )
+    |> where([_organization, domain], domain.host == ^normalize_host(host))
+    |> select([organization, _domain], organization)
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_membership(organization_id, user_id) do
+    Repo.get_by(OrganizationMembership,
+      organization_id: organization_id,
+      user_id: user_id
+    )
+  end
+
+  @impl true
+  def get_membership_by_id(organization_id, membership_id) do
+    Repo.get_by(OrganizationMembership,
+      id: membership_id,
+      organization_id: organization_id
+    )
+  end
+
+  @impl true
+  def list_memberships(user_id) do
+    OrganizationMembership
+    |> join(:inner, [membership], organization in Organization,
+      on: organization.id == membership.organization_id
+    )
+    |> join(:left, [_membership, organization], settings in OrganizationSetting,
+      on: settings.organization_id == organization.id
+    )
+    |> where(
+      [membership, organization, _settings],
+      membership.user_id == ^user_id and membership.status == :active and
+        organization.status == :active
+    )
+    |> order_by([_membership, organization, _settings], asc: organization.name)
+    |> select([membership, organization, settings], %{
+      membership: membership,
+      organization: organization,
+      settings: settings
+    })
+    |> Repo.all()
+  end
+
+  @impl true
+  def list_organization_memberships(organization_id) do
+    OrganizationMembership
+    |> where([membership], membership.organization_id == ^organization_id)
+    |> order_by([membership], asc: membership.inserted_at)
+    |> Repo.all()
+  end
+
+  @impl true
+  def list_active_membership_user_ids(organization_id),
+    do: organization_user_ids(organization_id, nil)
+
+  @impl true
+  def list_staff_user_ids(nil), do: []
+
+  def list_staff_user_ids(organization_id),
+    do: organization_user_ids(organization_id, ["owner", "admin", "coach"])
+
+  # Co-member and staff lookups must resolve for any session that belongs to
+  # the organization - including a member whose own RLS view of
+  # organization_memberships is limited to their row - so they read through the
+  # narrow `palee_organization_user_ids/2` SECURITY DEFINER function (TD-046),
+  # which refuses sessions outside the organization.
+  defp organization_user_ids(organization_id, roles) do
+    from(
+      member in fragment(
+        "SELECT palee_organization_user_ids(?, ?) AS user_id",
+        type(^organization_id, :binary_id),
+        type(^roles, {:array, :string})
+      ),
+      select: type(member.user_id, :binary_id)
+    )
+    |> Repo.all()
+  end
+
+  # Role facts of active members (TD-092), through the narrow
+  # `palee_organization_member_roles/3` SECURITY DEFINER function for the same
+  # reason as `organization_user_ids/2`.
+  @impl true
+  def list_member_roles(organization_id, roles, user_id) do
+    from(
+      member in fragment(
+        "SELECT * FROM palee_organization_member_roles(?, ?, ?)",
+        type(^organization_id, :binary_id),
+        type(^roles, {:array, :string}),
+        type(^user_id, :binary_id)
+      ),
+      select: %{
+        user_id: type(member.user_id, :binary_id),
+        role: member.role,
+        roles: member.roles,
+        coach_scope: member.coach_scope,
+        notes_visible_to_admins: member.notes_visible_to_admins,
+        home_location_id: type(member.home_location_id, :binary_id)
+      }
+    )
+    |> Repo.all()
+    |> Enum.map(fn member ->
+      %{
+        member
+        | role: String.to_existing_atom(member.role),
+          roles: Enum.map(member.roles, &String.to_existing_atom/1),
+          coach_scope: member.coach_scope && String.to_existing_atom(member.coach_scope)
+      }
+    end)
+  end
+
+  @impl true
+  def list_membership_organization_ids(user_ids) do
+    OrganizationMembership
+    |> where([membership], membership.user_id in ^user_ids and membership.status == :active)
+    |> select([membership], {membership.user_id, membership.organization_id})
+    |> Repo.all()
+    |> Enum.group_by(fn {user_id, _organization_id} -> user_id end, fn {_user_id, organization_id} ->
+      organization_id
+    end)
+  end
+
+  @impl true
+  def list_deletable_organization_user_ids(organization_id, platform_user_id) do
+    other_memberships =
+      from(other in OrganizationMembership,
+        where:
+          other.user_id == parent_as(:candidate).user_id and
+            other.organization_id != ^organization_id
+      )
+
+    active_vendor =
+      from(vendor in Vendor,
+        where: vendor.user_id == parent_as(:candidate).user_id and vendor.status == :active
+      )
+
+    from(candidate in OrganizationMembership, as: :candidate)
+    |> where([candidate], candidate.organization_id == ^organization_id)
+    |> where([candidate], candidate.user_id != ^platform_user_id)
+    |> where([candidate], not exists(other_memberships))
+    |> where([candidate], not exists(active_vendor))
+    |> select([candidate], candidate.user_id)
+    |> distinct(true)
+    |> Repo.all()
+  end
+
+  @impl true
+  def get_invitation_by_digest(digest),
+    do: Repo.get_by(RegistrationInvitation, token_digest: digest)
+
+  @impl true
+  def get_invitation_with_organization(digest) do
+    RegistrationInvitation
+    |> join(:inner, [invitation], organization in Organization,
+      on: organization.id == invitation.organization_id
+    )
+    |> where([invitation, _organization], invitation.token_digest == ^digest)
+    |> select([invitation, organization], %{invitation: invitation, organization: organization})
+    |> Repo.one()
+  end
+
+  @impl true
+  def grant_vendor(user_id) do
+    %Vendor{}
+    |> Vendor.changeset(%{user_id: user_id, status: :active})
+    |> Repo.insert(
+      on_conflict: {:replace, [:status, :updated_at]},
+      conflict_target: [:user_id],
+      returning: true
+    )
+  end
+
+  @impl true
+  def revoke_vendor(user_id) do
+    case Repo.get_by(Vendor, user_id: user_id) do
+      nil ->
+        {:error, :not_found}
+
+      %Vendor{} = vendor ->
+        vendor
+        |> Vendor.changeset(%{status: :revoked})
+        |> Repo.update()
+    end
+  end
+
+  @impl true
+  def get_vendor(user_id),
+    do: Repo.get_by(Vendor, user_id: user_id, status: :active)
+
+  @impl true
+  def provision_organization(organization_params, invitation_params, platform_user_id, issued_at) do
+    changeset = Organization.changeset(organization_params)
+
+    Multi.new()
+    |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
+    |> Multi.insert(:organization, changeset)
+    |> Multi.insert(:settings, fn %{organization: organization} ->
+      OrganizationSetting.changeset(%{
+        organization_id: organization.id,
+        timezone: value(organization_params, :timezone) || "UTC",
+        default_locale: value(organization_params, :default_locale) || "en",
+        invitation_lifetime_seconds:
+          value(organization_params, :invitation_lifetime_seconds) || 604_800,
+        brand_name: value(organization_params, :brand_name) || organization.name,
+        brand_logo_url: value(organization_params, :brand_logo_url),
+        brand_primary_color: value(organization_params, :brand_primary_color),
+        settings: value(organization_params, :settings) || %{}
+      })
+    end)
+    |> Multi.insert(:invitation, fn %{organization: organization} ->
+      invitation_params
+      |> Map.put(:organization_id, organization.id)
+      |> Map.put(:issued_by_user_id, platform_user_id)
+      |> then(&RegistrationInvitation.issue_changeset(%RegistrationInvitation{}, &1, issued_at))
+    end)
+    |> Multi.insert(:event, fn %{organization: organization} ->
+      OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization.id,
+        vendor_user_id: platform_user_id,
+        event: "organization_provisioned",
+        metadata: %{initial_admin_invitation: true, provisioning_owner_membership: false}
+      })
+    end)
+    |> Repo.transaction()
+    |> case do
+      {:ok, result} -> {:ok, result}
+      {:error, _step, reason, _changes} -> {:error, reason}
+    end
+  end
+
+  @impl true
+  def list_organizations do
+    # An org is "pending" while its initial tenant-operator invitation is still
+    # unredeemed - provisioning always succeeds immediately (it's how the
+    # vendor gets a token/link to send), but nobody has actually logged in
+    # to run the tenant yet.
+    pending_initial_operator_invitations =
+      from(invitation in RegistrationInvitation,
+        where:
+          invitation.role in [:owner, :admin] and is_nil(invitation.redeemed_at) and
+            is_nil(invitation.revoked_at),
+        distinct: invitation.organization_id,
+        select: %{organization_id: invitation.organization_id}
+      )
+
+    # Once an owner or admin is an active member the gym is running, even if
+    # another operator invitation is still open.
+    active_operators =
+      from(membership in OrganizationMembership,
+        where:
+          membership.status == :active and
+            fragment("? && ARRAY['owner', 'admin']::varchar[]", membership.roles),
+        distinct: membership.organization_id,
+        select: %{organization_id: membership.organization_id}
+      )
+
+    Organization
+    |> join(:left, [organization], settings in OrganizationSetting,
+      on: settings.organization_id == organization.id
+    )
+    |> join(:left, [organization], pending in subquery(pending_initial_operator_invitations),
+      on: pending.organization_id == organization.id
+    )
+    |> join(:left, [organization], operator in subquery(active_operators),
+      on: operator.organization_id == organization.id
+    )
+    |> order_by([organization, _settings], asc: organization.name)
+    |> select([organization, settings, pending, operator], %{
+      organization: organization,
+      settings: settings,
+      pending_registration:
+        not is_nil(pending.organization_id) and is_nil(operator.organization_id)
+    })
+    |> Repo.all()
+  end
+
+  # TD-092 / ADR-131: the only cross-tenant listing a job may make. The
+  # SECURITY DEFINER helper returns ids of active organizations and nothing
+  # else; callers then enter each organization through its own scope.
+  @impl true
+  def list_active_organization_ids do
+    %{rows: rows} = Repo.query!("SELECT id FROM palee_active_organization_ids() AS id")
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
+  end
+
+  @impl true
+  def delete_organization(organization_id, platform_user_id, deleted_at) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization_id,
+        vendor_user_id: platform_user_id,
+        event: "organization_permanently_deleted",
+        metadata: %{deleted_at: DateTime.to_iso8601(deleted_at)}
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      from(event in OrganizationProvisioningEvent,
+        where: event.organization_id == ^organization_id
+      )
+      |> Repo.delete_all()
+
+      organization
+      |> Repo.delete()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def update_organization_lifecycle(organization_id, status, platform_user_id, changed_at) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      updated =
+        organization
+        |> Organization.changeset(%{status: status})
+        |> Repo.update()
+        |> unwrap_or_rollback()
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization_id,
+        vendor_user_id: platform_user_id,
+        event: "organization_#{status}",
+        metadata: %{changed_at: DateTime.to_iso8601(changed_at)}
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      updated
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def rename_organization(organization_id, name, platform_user_id, changed_at) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      previous_name = organization.name
+
+      updated =
+        organization
+        |> Organization.changeset(%{name: name})
+        # Organization.changeset derives :slug from :name whenever :slug is
+        # absent from the params - and since the slug's *value* isn't
+        # actually changing, casting it explicitly doesn't register as a
+        # change either (Ecto no-ops same-value casts), so derive_slug still
+        # fires. Force the slug back after the fact instead: this is a
+        # display-name-only rename, canonical_path/:org routing and any
+        # bookmarked links must not move as a side effect of it.
+        |> Ecto.Changeset.put_change(:slug, organization.slug)
+        |> Repo.update()
+        |> unwrap_or_rollback()
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization_id,
+        vendor_user_id: platform_user_id,
+        event: "organization_renamed",
+        metadata: %{
+          previous_name: previous_name,
+          name: updated.name,
+          changed_at: DateTime.to_iso8601(changed_at)
+        }
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      updated
+    end)
+    |> flatten_transaction()
+  end
+
+  # ADR-122: slug rename + alias bookkeeping + audit event in one transaction.
+  # The organization row is locked first, then both the retired and the
+  # requested slug are serialized with transaction-scoped advisory locks so a
+  # concurrent provisioning or rename cannot claim either slug between the
+  # availability check and the commit.
+  @impl true
+  def rename_organization_slug(
+        organization_id,
+        requested_slug,
+        confirmation,
+        platform_user_id,
+        changed_at
+      ) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      previous_slug = organization.slug
+
+      with :ok <- SlugRenamePolicy.verify_confirmation(previous_slug, confirmation),
+           :ok <- ensure_no_open_purge(organization_id),
+           :ok <- lock_slugs([previous_slug, requested_slug]),
+           {:ok, plan} <-
+             SlugRenamePolicy.plan(
+               organization_id,
+               previous_slug,
+               requested_slug,
+               slug_claim(requested_slug)
+             ) do
+        if plan.reclaim_alias do
+          from(slug_alias in OrganizationSlugAlias,
+            where:
+              slug_alias.organization_id == ^organization_id and slug_alias.slug == ^plan.slug
+          )
+          |> Repo.delete_all()
+        end
+
+        updated =
+          organization
+          |> Organization.changeset(%{slug: plan.slug})
+          |> Repo.update()
+          |> unwrap_or_rollback()
+
+        %OrganizationSlugAlias{}
+        |> OrganizationSlugAlias.changeset(%{
+          organization_id: organization_id,
+          slug: plan.retire,
+          retired_at: changed_at,
+          retired_by_user_id: platform_user_id
+        })
+        |> Repo.insert()
+        |> unwrap_or_rollback()
+
+        %OrganizationProvisioningEvent{}
+        |> OrganizationProvisioningEvent.changeset(%{
+          organization_id: organization_id,
+          vendor_user_id: platform_user_id,
+          event: "organization_slug_renamed",
+          metadata: %{
+            previous_slug: previous_slug,
+            slug: updated.slug,
+            reclaimed_alias: plan.reclaim_alias,
+            changed_at: DateTime.to_iso8601(changed_at)
+          }
+        })
+        |> Repo.insert()
+        |> unwrap_or_rollback()
+
+        %{
+          organization: updated,
+          previous_slug: previous_slug,
+          aliases: list_slug_aliases(organization_id)
+        }
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def record_invitation_email_sent(organization_id, platform_user_id, email_digest) do
+    %OrganizationProvisioningEvent{}
+    |> OrganizationProvisioningEvent.changeset(%{
+      organization_id: organization_id,
+      vendor_user_id: platform_user_id,
+      event: "organization_invitation_emailed",
+      metadata: %{
+        # Hex, not the raw digest bytes - :map casts to jsonb, which can't
+        # hold arbitrary binary. Never the address itself (InvitationEmail
+        # digests are one-way by design elsewhere in this module).
+        to_digest: email_digest && Base.encode16(email_digest, case: :lower),
+        sent_at: DateTime.to_iso8601(DateTime.utc_now())
+      }
+    })
+    |> Repo.insert()
+  end
+
+  @impl true
+  def get_organization_settings(organization_id),
+    do: Repo.get_by(OrganizationSetting, organization_id: organization_id)
+
+  # Tenant-owned preferences (join link, onboarding progress) live as entries of
+  # the free-form `settings` map. Unlike vendor settings updates they are not
+  # recorded as provisioning events.
+  @impl true
+  def put_organization_settings_entry(organization_id, key, value) when is_binary(key) do
+    Repo.transaction(fn ->
+      settings =
+        OrganizationSetting
+        |> where([setting], setting.organization_id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(settings), do: Repo.rollback(:not_found)
+
+      settings
+      |> OrganizationSetting.changeset(%{settings: Map.put(settings.settings || %{}, key, value)})
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def list_active_invitations(organization_id, now) do
+    RegistrationInvitation
+    |> where([invitation], invitation.organization_id == ^organization_id)
+    |> where([invitation], is_nil(invitation.redeemed_at) and is_nil(invitation.revoked_at))
+    |> where([invitation], invitation.expires_at > ^now)
+    |> order_by([invitation], desc: invitation.inserted_at)
+    |> limit(100)
+    |> Repo.all()
+  end
+
+  @impl true
+  def update_organization_settings(organization_id, params, platform_user_id, changed_at) do
+    Repo.transaction(fn ->
+      settings = Repo.get_by(OrganizationSetting, organization_id: organization_id)
+      if is_nil(settings), do: Repo.rollback(:not_found)
+
+      updated =
+        settings
+        |> OrganizationSetting.changeset(params)
+        |> Repo.update()
+        |> unwrap_or_rollback()
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization_id,
+        vendor_user_id: platform_user_id,
+        event: "organization_settings_updated",
+        metadata: %{changed_at: DateTime.to_iso8601(changed_at)}
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      updated
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def replace_organization_logo(organization_id, logo, actor, changed_at) do
+    next_key = logo && logo.object_key
+
+    Repo.transaction(fn ->
+      settings =
+        OrganizationSetting
+        |> where([settings], settings.organization_id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(settings), do: Repo.rollback(:not_found)
+
+      case BrandLogoPolicy.change_event(settings, next_key) do
+        nil ->
+          %{settings: settings, previous_object_key: nil, event: nil}
+
+        event ->
+          updated =
+            settings
+            |> OrganizationSetting.logo_changeset(%{
+              brand_logo_object_key: next_key,
+              brand_logo_url: logo && logo.url
+            })
+            |> Repo.update()
+            |> unwrap_or_rollback()
+
+          %OrganizationProvisioningEvent{}
+          |> OrganizationProvisioningEvent.changeset(%{
+            organization_id: organization_id,
+            # The audit column predates tenant-initiated events; it records
+            # the acting account, and metadata.actor_scope says which kind.
+            vendor_user_id: actor.user_id,
+            event: event,
+            metadata: BrandLogoPolicy.event_metadata(actor, settings, next_key, changed_at)
+          })
+          |> Repo.insert()
+          |> unwrap_or_rollback()
+
+          %{settings: updated, previous_object_key: settings.brand_logo_object_key, event: event}
+      end
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def transaction(fun) when is_function(fun, 0) do
+    if Repo.in_transaction?() do
+      fun.()
+    else
+      Repo.transaction(fn ->
+        case fun.() do
+          {:ok, value} -> value
+          {:error, reason} -> Repo.rollback(reason)
+        end
+      end)
+      |> flatten_transaction()
+    end
+  end
+
+  @impl true
+  def update_membership_role(organization_id, membership_id, role) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(%{role: role})
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  # A tenant owner archives their gym (ADR-099); the vendor purges it later.
+  @impl true
+  def set_organization_status(organization_id, status) do
+    case Repo.get(Organization, organization_id) do
+      nil -> {:error, :not_found}
+      organization -> organization |> Organization.changeset(%{status: status}) |> Repo.update()
+    end
+  end
+
+  # One key of the gym's free-form settings map, e.g. role grants (ADR-099).
+  @impl true
+  def put_organization_setting(organization_id, key, value) do
+    case Repo.get_by(OrganizationSetting, organization_id: organization_id) do
+      nil ->
+        {:error, :not_found}
+
+      settings ->
+        settings
+        |> Ecto.Changeset.change(settings: Map.put(settings.settings || %{}, key, value))
+        |> Repo.update()
+    end
+  end
+
+  @impl true
+  def update_membership_roles(organization_id, membership_id, roles) do
+    update_membership(organization_id, membership_id, %{roles: roles})
+  end
+
+  # Coach scope (ADR-100), notes visibility (ADR-101) and home location (Phase 2).
+  @impl true
+  def update_membership_settings(organization_id, membership_id, settings) do
+    update_membership(
+      organization_id,
+      membership_id,
+      Map.take(settings, [:coach_scope, :notes_visible_to_admins, :home_location_id])
+    )
+  end
+
+  defp update_membership(organization_id, membership_id, params) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(params)
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def update_membership_status(organization_id, membership_id, status) do
+    Repo.transaction(fn ->
+      membership = get_membership_by_id(organization_id, membership_id)
+      if is_nil(membership), do: Repo.rollback(:not_found)
+
+      membership
+      |> OrganizationMembership.changeset(%{status: status})
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def request_organization_purge(
+        organization_id,
+        platform_user_id,
+        lifecycle_status,
+        requested_at
+      ) do
+    Repo.transaction(fn ->
+      organization =
+        Organization
+        |> where([organization], organization.id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      if is_nil(organization), do: Repo.rollback(:not_found)
+
+      purge =
+        %{
+          organization_id: organization.id,
+          organization_slug: organization.slug,
+          requested_by_user_id: platform_user_id,
+          requested_at: requested_at
+        }
+        |> OrganizationPurge.request_changeset()
+        |> Repo.insert()
+        |> case do
+          {:ok, purge} -> purge
+          {:error, %Ecto.Changeset{}} -> Repo.rollback(:organization_purge_exists)
+        end
+
+      organization =
+        if organization.status == lifecycle_status do
+          organization
+        else
+          organization
+          |> Organization.changeset(%{status: lifecycle_status})
+          |> Repo.update()
+          |> unwrap_or_rollback()
+        end
+
+      %OrganizationProvisioningEvent{}
+      |> OrganizationProvisioningEvent.changeset(%{
+        organization_id: organization.id,
+        vendor_user_id: platform_user_id,
+        event: "organization_purge_requested",
+        metadata: %{purge_id: purge.id, requested_at: DateTime.to_iso8601(requested_at)}
+      })
+      |> Repo.insert()
+      |> unwrap_or_rollback()
+
+      %{purge: purge, organization: organization}
+    end)
+    |> flatten_transaction()
+  end
+
+  @impl true
+  def get_purge(purge_id), do: Repo.get(OrganizationPurge, purge_id)
+
+  @impl true
+  def lock_purge(purge_id) do
+    OrganizationPurge
+    |> where([purge], purge.id == ^purge_id)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_open_purge(organization_id) do
+    OrganizationPurge
+    |> where(
+      [purge],
+      purge.organization_id == ^organization_id and
+        purge.status not in ^[:completed, :cancelled]
+    )
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @impl true
+  def get_latest_purge(organization_id) do
+    OrganizationPurge
+    |> where([purge], purge.organization_id == ^organization_id)
+    |> order_by([purge], desc: purge.inserted_at, desc: purge.id)
+    |> limit(1)
+    |> Repo.one()
+  end
+
+  @impl true
+  def list_purges(limit) do
+    OrganizationPurge
+    |> order_by([purge], desc: purge.inserted_at, desc: purge.id)
+    |> limit(^limit)
+    |> Repo.all()
+  end
+
+  @impl true
+  def update_purge(%OrganizationPurge{} = purge, params) do
+    purge
+    |> OrganizationPurge.progress_changeset(params)
+    |> Repo.update()
+  end
+
+  # The organization row (and, by cascade, memberships, invitations, settings,
+  # domains and provisioning events) goes in the same transaction that marks
+  # the purge completed, so the platform record is the surviving audit trail.
+  @impl true
+  def finalize_purge(%OrganizationPurge{} = purge, params, _platform_user_id, _completed_at) do
+    Repo.transaction(fn ->
+      from(event in OrganizationProvisioningEvent,
+        where: event.organization_id == ^purge.organization_id
+      )
+      |> Repo.delete_all()
+
+      from(organization in Organization, where: organization.id == ^purge.organization_id)
+      |> Repo.delete_all()
+
+      purge
+      |> OrganizationPurge.progress_changeset(params)
+      |> Repo.update()
+      |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  defp upsert_redeemed_membership(invitation, user_id, redeemed_at) do
+    params = %{
+      organization_id: invitation.organization_id,
+      user_id: user_id,
+      role: invitation.role,
+      status: :active,
+      joined_at: redeemed_at,
+      invited_by_user_id: invitation.issued_by_user_id
+    }
+
+    case get_membership(invitation.organization_id, user_id) do
+      nil ->
+        %OrganizationMembership{}
+        |> OrganizationMembership.changeset(params)
+        |> Repo.insert()
+        |> unwrap_or_rollback()
+
+      # An existing member gains the invited role (ADR-099); an inactive
+      # membership restarts with it.
+      membership ->
+        roles =
+          if membership.status == :active,
+            do: Enum.uniq([invitation.role | membership.roles]),
+            else: [invitation.role]
+
+        membership
+        |> OrganizationMembership.changeset(params |> Map.delete(:role) |> Map.put(:roles, roles))
+        |> Repo.update()
+        |> unwrap_or_rollback()
+    end
+  end
+
+  defp ensure_no_open_purge(organization_id) do
+    if get_open_purge(organization_id),
+      do: {:error, :slug_rename_blocked_by_purge},
+      else: :ok
+  end
+
+  defp slug_claim(slug) do
+    case Repo.get_by(Organization, slug: slug) do
+      %Organization{id: id} ->
+        {:organization, id}
+
+      nil ->
+        case Repo.get_by(OrganizationSlugAlias, slug: slug) do
+          %OrganizationSlugAlias{organization_id: id} -> {:alias, id}
+          nil -> nil
+        end
+    end
+  end
+
+  # Organization slugs and retired aliases share one namespace (ADR-122), but
+  # live in two tables, so no single unique index covers both. Provisioning
+  # and slug renames take the same advisory lock per slug before checking.
+  defp lock_slugs(slugs) do
+    slugs
+    |> Enum.uniq()
+    |> Enum.sort()
+    |> Enum.each(fn slug ->
+      Repo.query!("SELECT pg_advisory_xact_lock(hashtext($1))", ["organization_slug:" <> slug])
+    end)
+
+    :ok
+  end
+
+  defp reserve_new_slug(%Ecto.Changeset{} = changeset) do
+    case Ecto.Changeset.get_field(changeset, :slug) do
+      slug when is_binary(slug) and slug != "" ->
+        :ok = lock_slugs([slug])
+
+        if Repo.exists?(
+             from(slug_alias in OrganizationSlugAlias, where: slug_alias.slug == ^slug)
+           ),
+           do:
+             {:error,
+              Ecto.Changeset.add_error(changeset, :slug, "has already been taken",
+                validation: :unsafe_unique,
+                fields: [:slug]
+              )},
+           else: {:ok, slug}
+
+      _missing ->
+        # Let the insert step report the changeset's own validation errors.
+        {:ok, nil}
+    end
+  end
+
+  defp unwrap_or_rollback({:ok, value}), do: value
+  defp unwrap_or_rollback({:error, reason}), do: Repo.rollback(reason)
+
+  defp flatten_transaction({:ok, value}), do: {:ok, value}
+  defp flatten_transaction({:error, reason}), do: {:error, reason}
+
+  defp normalize_host(host) when is_binary(host),
+    do: host |> String.trim() |> String.downcase() |> String.trim_trailing(".")
+
+  defp normalize_host(_host), do: ""
+
+  defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
+
+  # ADR-162: one definer lookup answers the caller's memberships of any
+  # status with the organization's name and brand, which a former member's
+  # session can no longer read directly. Runs in the member's session.
+  @impl true
+  def list_my_providers do
+    keys = ~w(organization_id name slug provider_kind logo_url primary_color
+              membership_status roles joined_at ended_at organization_status)a
+
+    %{rows: rows} =
+      Repo.query!("SELECT #{Enum.join(keys, ", ")} FROM palee_my_providers()")
+
+    Enum.map(rows, fn row ->
+      keys
+      |> Enum.zip(row)
+      |> Map.new()
+      |> Map.update!(:organization_id, &Ecto.UUID.load!/1)
+    end)
+  end
+
+  # ADR-162: the coaches of the caller's active providers, by one definer
+  # lookup (a member's session cannot read other memberships).
+  @impl true
+  def list_my_provider_coaches do
+    %{rows: rows} =
+      Repo.query!("SELECT organization_id, coach_user_id FROM palee_my_provider_coaches()")
+
+    Enum.map(rows, fn [organization_id, coach_user_id] ->
+      {Ecto.UUID.load!(organization_id), Ecto.UUID.load!(coach_user_id)}
+    end)
+  end
+
+  @impl true
+  def get_provider_kind(organization_id) do
+    Organization
+    |> where([organization], organization.id == ^organization_id)
+    |> select([organization], organization.provider_kind)
+    |> Repo.one()
+  end
+
+  # The column's check constraint keeps it to the known kinds.
+  @impl true
+  def put_provider_kind(organization_id, kind) do
+    case Organization
+         |> where([organization], organization.id == ^organization_id)
+         |> Repo.update_all(set: [provider_kind: kind, updated_at: DateTime.utc_now()]) do
+      {1, _rows} -> :ok
+      {0, _rows} -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def get_provider_selection(user_id) do
+    ProviderSelection
+    |> where([selection], selection.user_id == ^user_id)
+    |> select([selection], selection.organization_id)
+    |> Repo.one()
+  end
+
+  @impl true
+  def put_provider_selection(user_id, organization_id) do
+    now = DateTime.utc_now()
+
+    Repo.insert_all(
+      ProviderSelection,
+      [%{user_id: user_id, organization_id: organization_id, inserted_at: now, updated_at: now}],
+      on_conflict: {:replace, [:organization_id, :updated_at]},
+      conflict_target: [:user_id]
+    )
+
+    :ok
+  end
+end

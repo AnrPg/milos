@@ -9,7 +9,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // ADR-173: region events can relaunch the app in the background; the
         // arrival reminder's monitor must exist from launch to receive them.
-        MilosGeofenceMonitor.shared.start()
+        PaleeGeofenceMonitor.shared.start()
         return true
     }
 

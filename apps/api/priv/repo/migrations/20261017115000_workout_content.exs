@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.WorkoutContent do
+defmodule Palee.Repo.Migrations.WorkoutContent do
   @moduledoc """
   ADR-140 §4 (M5.5): workout notes become workout content.
 

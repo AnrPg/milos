@@ -107,7 +107,7 @@ clients cannot bypass.
 ## Implementation Notes
 Implemented 2026-07-16.
 
-- Contextual messaging now flows through `MilosTraining.Application.GetOrCreateMessagingThread`.
+- Contextual messaging now flows through `Palee.Application.GetOrCreateMessagingThread`.
   It asks the Workouts and Scheduling public APIs whether the caller may access
   assignment/class-slot context before creating or joining a thread. Controller
   and channel tests cover foreign assignment and class-slot IDs.

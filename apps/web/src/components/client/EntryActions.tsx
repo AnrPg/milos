@@ -46,9 +46,9 @@ export function EntryActions({
           onClick={onShare}
           className="rounded-full px-3 py-1.5 text-xs font-semibold"
           style={{ border: "1px solid var(--border)", color: "var(--text)" }}
-          aria-label={`${i18n("shareInMilos")}: ${workoutTitle}`}
+          aria-label={`${i18n("shareInPalee")}: ${workoutTitle}`}
         >
-          {i18n("shareInMilos")}
+          {i18n("shareInPalee")}
         </button>
       ) : null}
     </div>

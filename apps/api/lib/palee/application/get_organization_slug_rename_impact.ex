@@ -1,0 +1,7 @@
+defmodule Palee.Application.GetOrganizationSlugRenameImpact do
+  @moduledoc "ADR-122: impact summary a vendor reviews before confirming a slug rename."
+  alias Palee.Organizations
+
+  def call(platform_context, organization_id),
+    do: Organizations.slug_rename_impact(platform_context, organization_id)
+end

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateOrganizationSlugAliases do
+defmodule Palee.Repo.Migrations.CreateOrganizationSlugAliases do
   use Ecto.Migration
 
   # ADR-122: a vendor can rename an organization's path slug. Every slug the
@@ -39,8 +39,8 @@ defmodule MilosTraining.Repo.Migrations.CreateOrganizationSlugAliases do
     create index(:organization_slug_aliases, [:organization_id])
 
     predicate = """
-    milos_acting_user_is_vendor()
-    OR milos_acting_user_belongs_to(organization_slug_aliases.organization_id)
+    palee_acting_user_is_vendor()
+    OR palee_acting_user_belongs_to(organization_slug_aliases.organization_id)
     OR current_setting('app.invitation_redemption', true) = 'true'
     """
 

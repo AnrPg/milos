@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinanceInvoicesAndEntitlements do
+defmodule Palee.Repo.Migrations.CreateFinanceInvoicesAndEntitlements do
   use Ecto.Migration
 
   def change do

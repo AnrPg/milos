@@ -97,9 +97,9 @@ Status: Accepted | Superseded by ADR-XXX
 ### File Map
 
 ```
-milos/
+palee/
 ├── apps/
-│   ├── api/                          # Phoenix app (MilosTraining)
+│   ├── api/                          # Phoenix app (Palee)
 │   └── web/                          # Next.js app
 ├── docs/
 │   ├── adr/
@@ -162,7 +162,7 @@ milos/
 - [ ] **Scaffold Phoenix app**
   ```bash
   cd apps
-  mix phx.new api --app milos_training --no-html --no-assets --no-live --database postgres
+  mix phx.new api --app palee --no-html --no-assets --no-live --database postgres
   cd api
   ```
 
@@ -205,7 +205,7 @@ milos/
       environment:
         POSTGRES_USER: ${DB_USER}
         POSTGRES_PASSWORD: ${DB_PASSWORD}
-        POSTGRES_DB: milos_training_dev
+        POSTGRES_DB: palee_dev
       volumes: [.postgres-data:/var/lib/postgresql/data]
       networks: [app]
 
@@ -264,8 +264,8 @@ milos/
   FROM alpine:3.19 AS runtime
   RUN apk add --no-cache libstdc++ openssl ncurses-libs
   WORKDIR /app
-  COPY --from=build /app/_build/prod/rel/milos_training ./
-  CMD ["./bin/milos_training", "start"]
+  COPY --from=build /app/_build/prod/rel/palee ./
+  CMD ["./bin/palee", "start"]
   ```
 
 - [ ] **Create `apps/api/Dockerfile.dev`** (hot reload for development)
@@ -279,18 +279,18 @@ milos/
 
 - [ ] **Add Phoenix health endpoint**
 
-  Create `apps/api/lib/milos_training_web/controllers/health_controller.ex`:
+  Create `apps/api/lib/palee_web/controllers/health_controller.ex`:
   ```elixir
-  defmodule MilosTrainingWeb.HealthController do
-    use MilosTrainingWeb, :controller
+  defmodule PaleeWeb.HealthController do
+    use PaleeWeb, :controller
 
     def index(conn, _params) do
-      json(conn, %{status: "ok", version: Application.spec(:milos_training, :vsn)})
+      json(conn, %{status: "ok", version: Application.spec(:palee, :vsn)})
     end
   end
   ```
 
-  Add to `apps/api/lib/milos_training_web/router.ex`:
+  Add to `apps/api/lib/palee_web/router.ex`:
   ```elixir
   scope "/api" do
     get "/health", HealthController, :index
@@ -320,8 +320,8 @@ milos/
 
 - [ ] **Configure Oban in `apps/api/config/config.exs`**
   ```elixir
-  config :milos_training, Oban,
-    repo: MilosTraining.Repo,
+  config :palee, Oban,
+    repo: Palee.Repo,
     queues: [
       default: 10,
       notifications: 20,
@@ -387,7 +387,7 @@ milos/
         - run: mix test
           working-directory: apps/api
           env:
-            DATABASE_URL: postgres://postgres:postgres@localhost/milos_training_test
+            DATABASE_URL: postgres://postgres:postgres@localhost/palee_test
 
     web-test:
       runs-on: self-hosted
@@ -422,7 +422,7 @@ milos/
 - [ ] **Commit & push** (in this order):
   ```
   chore: initialize git repo and add .gitignore
-  chore: scaffold Phoenix API app (milos_training, no HTML)
+  chore: scaffold Phoenix API app (palee, no HTML)
   chore: scaffold Next.js frontend app (App Router, TypeScript, Tailwind)
   chore: add docker-compose.yml with all services (postgres, redis, meilisearch, minio, caddy)
   chore: add Dockerfiles for api (prod + dev) and web
@@ -444,7 +444,7 @@ milos/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── identity/
 │   ├── user.ex                    # Ecto schema
 │   ├── commands/
@@ -461,7 +461,7 @@ apps/api/lib/milos_training/
 └── application/
     └── register_user.ex           # Application Service
 
-apps/api/lib/milos_training_web/
+apps/api/lib/palee_web/
 ├── controllers/
 │   └── auth_controller.ex
 └── router.ex
@@ -470,10 +470,10 @@ apps/api/priv/repo/migrations/
 └── YYYYMMDDHHMMSS_create_users.exs
 
 apps/api/test/
-├── milos_training/identity/
+├── palee/identity/
 │   ├── register_user_test.exs
 │   └── find_user_test.exs
-└── milos_training_web/controllers/
+└── palee_web/controllers/
     └── auth_controller_test.exs
 ```
 
@@ -485,12 +485,12 @@ apps/api/test/
 
 - [ ] **Write failing test for user registration**
 
-  `apps/api/test/milos_training/identity/register_user_test.exs`:
+  `apps/api/test/palee/identity/register_user_test.exs`:
   ```elixir
-  defmodule MilosTraining.Identity.RegisterUserTest do
-    use MilosTraining.DataCase, async: true
+  defmodule Palee.Identity.RegisterUserTest do
+    use Palee.DataCase, async: true
 
-    alias MilosTraining.Identity.Commands.RegisterUser
+    alias Palee.Identity.Commands.RegisterUser
 
     describe "call/1" do
       test "creates user with valid params" do
@@ -525,7 +525,7 @@ apps/api/test/
 
 - [ ] **Run test — verify it fails**
   ```bash
-  cd apps/api && mix test test/milos_training/identity/register_user_test.exs
+  cd apps/api && mix test test/palee/identity/register_user_test.exs
   # Expected: compile error or test failures
   ```
 
@@ -533,7 +533,7 @@ apps/api/test/
 
   `apps/api/priv/repo/migrations/YYYYMMDDHHMMSS_create_users.exs`:
   ```elixir
-  defmodule MilosTraining.Repo.Migrations.CreateUsers do
+  defmodule Palee.Repo.Migrations.CreateUsers do
     use Ecto.Migration
 
     def change do
@@ -554,9 +554,9 @@ apps/api/test/
 
 - [ ] **Create User schema**
 
-  `apps/api/lib/milos_training/identity/user.ex`:
+  `apps/api/lib/palee/identity/user.ex`:
   ```elixir
-  defmodule MilosTraining.Identity.User do
+  defmodule Palee.Identity.User do
     use Ecto.Schema
     import Ecto.Changeset
 
@@ -601,10 +601,10 @@ apps/api/test/
 
 - [ ] **Create RegisterUser command**
 
-  `apps/api/lib/milos_training/identity/commands/register_user.ex`:
+  `apps/api/lib/palee/identity/commands/register_user.ex`:
   ```elixir
-  defmodule MilosTraining.Identity.Commands.RegisterUser do
-    alias MilosTraining.{Repo, Identity.User}
+  defmodule Palee.Identity.Commands.RegisterUser do
+    alias Palee.{Repo, Identity.User}
 
     def call(params) do
       %User{}
@@ -616,11 +616,11 @@ apps/api/test/
 
 - [ ] **Create FindUser queries**
 
-  `apps/api/lib/milos_training/identity/queries/find_user.ex`:
+  `apps/api/lib/palee/identity/queries/find_user.ex`:
   ```elixir
-  defmodule MilosTraining.Identity.Queries.FindUser do
+  defmodule Palee.Identity.Queries.FindUser do
     import Ecto.Query
-    alias MilosTraining.{Repo, Identity.User}
+    alias Palee.{Repo, Identity.User}
 
     def by_nickname(nickname) do
       Repo.get_by(User, nickname: nickname)
@@ -634,11 +634,11 @@ apps/api/test/
 
 - [ ] **Create Identity context public API**
 
-  `apps/api/lib/milos_training/identity/identity.ex`:
+  `apps/api/lib/palee/identity/identity.ex`:
   ```elixir
-  defmodule MilosTraining.Identity do
-    alias MilosTraining.Identity.Commands.{RegisterUser, UpdateRole}
-    alias MilosTraining.Identity.Queries.FindUser
+  defmodule Palee.Identity do
+    alias Palee.Identity.Commands.{RegisterUser, UpdateRole}
+    alias Palee.Identity.Queries.FindUser
 
     defdelegate register(params), to: RegisterUser, as: :call
     defdelegate find_by_nickname(nickname), to: FindUser, as: :by_nickname
@@ -649,17 +649,17 @@ apps/api/test/
 
 - [ ] **Run registration tests — verify they pass**
   ```bash
-  cd apps/api && mix test test/milos_training/identity/register_user_test.exs
+  cd apps/api && mix test test/palee/identity/register_user_test.exs
   # Expected: all green
   ```
 
 - [ ] **Create Guardian implementation**
 
-  `apps/api/lib/milos_training/infrastructure/auth/guardian.ex`:
+  `apps/api/lib/palee/infrastructure/auth/guardian.ex`:
   ```elixir
-  defmodule MilosTraining.Auth.Guardian do
-    use Guardian, otp_app: :milos_training
-    alias MilosTraining.Identity
+  defmodule Palee.Auth.Guardian do
+    use Guardian, otp_app: :palee
+    alias Palee.Identity
 
     def subject_for_token(user, _claims), do: {:ok, to_string(user.id)}
 
@@ -674,19 +674,19 @@ apps/api/test/
 
   Configure in `config/config.exs`:
   ```elixir
-  config :milos_training, MilosTraining.Auth.Guardian,
-    issuer: "milos_training",
-    secret_key: {MilosTraining.Auth.Guardian, :fetch_secret, []},
+  config :palee, Palee.Auth.Guardian,
+    issuer: "palee",
+    secret_key: {Palee.Auth.Guardian, :fetch_secret, []},
     token_ttl: %{"access" => {15, :minutes}, "refresh" => {30, :days}}
   ```
 
 - [ ] **Create auth controller**
 
-  `apps/api/lib/milos_training_web/controllers/auth_controller.ex`:
+  `apps/api/lib/palee_web/controllers/auth_controller.ex`:
   ```elixir
-  defmodule MilosTrainingWeb.AuthController do
-    use MilosTrainingWeb, :controller
-    alias MilosTraining.{Identity, Auth.Guardian}
+  defmodule PaleeWeb.AuthController do
+    use PaleeWeb, :controller
+    alias Palee.{Identity, Auth.Guardian}
 
     def register(conn, params) do
       case Identity.register(params) do
@@ -731,33 +731,33 @@ apps/api/test/
 
 - [ ] **Update router with auth routes and role-based pipelines**
 
-  `apps/api/lib/milos_training_web/router.ex`:
+  `apps/api/lib/palee_web/router.ex`:
   ```elixir
-  defmodule MilosTrainingWeb.Router do
-    use MilosTrainingWeb, :router
+  defmodule PaleeWeb.Router do
+    use PaleeWeb, :router
 
     pipeline :api do
       plug :accepts, ["json"]
     end
 
     pipeline :authenticated do
-      plug Guardian.Plug.Pipeline, module: MilosTraining.Auth.Guardian,
-        error_handler: MilosTrainingWeb.AuthErrorHandler
+      plug Guardian.Plug.Pipeline, module: Palee.Auth.Guardian,
+        error_handler: PaleeWeb.AuthErrorHandler
       plug Guardian.Plug.VerifyHeader, scheme: "Bearer"
       plug Guardian.Plug.EnsureAuthenticated
       plug Guardian.Plug.LoadResource
     end
 
     pipeline :admin_only do
-      plug MilosTrainingWeb.Plugs.RequireRole, role: :admin
+      plug PaleeWeb.Plugs.RequireRole, role: :admin
     end
 
     pipeline :member_or_admin do
-      plug MilosTrainingWeb.Plugs.RequireRole, roles: [:member, :admin]
+      plug PaleeWeb.Plugs.RequireRole, roles: [:member, :admin]
     end
 
     pipeline :athlete_or_admin do
-      plug MilosTrainingWeb.Plugs.RequireRole, roles: [:athlete, :admin]
+      plug PaleeWeb.Plugs.RequireRole, roles: [:athlete, :admin]
     end
 
     scope "/api" do
@@ -772,9 +772,9 @@ apps/api/test/
 
 - [ ] **Create RequireRole plug**
 
-  `apps/api/lib/milos_training_web/plugs/require_role.ex`:
+  `apps/api/lib/palee_web/plugs/require_role.ex`:
   ```elixir
-  defmodule MilosTrainingWeb.Plugs.RequireRole do
+  defmodule PaleeWeb.Plugs.RequireRole do
     import Plug.Conn
     import Phoenix.Controller, only: [json: 2]
 
@@ -795,10 +795,10 @@ apps/api/test/
 
 - [ ] **Write and run controller integration tests**
 
-  `apps/api/test/milos_training_web/controllers/auth_controller_test.exs`:
+  `apps/api/test/palee_web/controllers/auth_controller_test.exs`:
   ```elixir
-  defmodule MilosTrainingWeb.AuthControllerTest do
-    use MilosTrainingWeb.ConnCase, async: true
+  defmodule PaleeWeb.AuthControllerTest do
+    use PaleeWeb.ConnCase, async: true
 
     describe "POST /api/auth/register" do
       test "returns tokens on valid registration", %{conn: conn} do
@@ -817,7 +817,7 @@ apps/api/test/
 
     describe "POST /api/auth/login" do
       setup do
-        {:ok, _} = MilosTraining.Identity.register(%{
+        {:ok, _} = Palee.Identity.register(%{
           nickname: "hermes", password: "S3cur3P@ss!", role: :member
         })
         :ok
@@ -837,7 +837,7 @@ apps/api/test/
   ```
 
   ```bash
-  cd apps/api && mix test test/milos_training_web/controllers/auth_controller_test.exs
+  cd apps/api && mix test test/palee_web/controllers/auth_controller_test.exs
   # Expected: all green
   ```
 
@@ -845,11 +845,11 @@ apps/api/test/
 
   Add to `apps/api/mix.exs`: `{:ex_rated, "~> 2.1"}`
 
-  Add plug to auth routes: `plug MilosTrainingWeb.Plugs.RateLimit, max: 10, interval: 60_000`
+  Add plug to auth routes: `plug PaleeWeb.Plugs.RateLimit, max: 10, interval: 60_000`
 
 - [ ] **Generate OpenAPI spec for auth endpoints** using `open_api_spex`
 
-  Create `apps/api/lib/milos_training_web/api_spec.ex` with spec metadata. Add `@doc` and `@spec` to auth controller actions per `open_api_spex` conventions.
+  Create `apps/api/lib/palee_web/api_spec.ex` with spec metadata. Add `@doc` and `@spec` to auth controller actions per `open_api_spex` conventions.
 
 - [ ] **Generate TypeScript auth client**
   ```bash
@@ -896,7 +896,7 @@ apps/api/test/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── workouts/
 │   ├── master_workout.ex
 │   ├── workout_section.ex
@@ -942,12 +942,12 @@ apps/web/src/
 
 - [ ] **Write failing test for WorkoutMaterializer domain module** (pure function — no DB)
 
-  `apps/api/test/milos_training/workouts/domain/workout_materializer_test.exs`:
+  `apps/api/test/palee/workouts/domain/workout_materializer_test.exs`:
   ```elixir
-  defmodule MilosTraining.Workouts.Domain.WorkoutMaterializerTest do
+  defmodule Palee.Workouts.Domain.WorkoutMaterializerTest do
     use ExUnit.Case, async: true
 
-    alias MilosTraining.Workouts.Domain.WorkoutMaterializer
+    alias Palee.Workouts.Domain.WorkoutMaterializer
 
     @base_workout %{
       id: "wod-a",
@@ -1013,14 +1013,14 @@ apps/web/src/
 
 - [ ] **Run test — verify it fails**
   ```bash
-  cd apps/api && mix test test/milos_training/workouts/domain/workout_materializer_test.exs
+  cd apps/api && mix test test/palee/workouts/domain/workout_materializer_test.exs
   ```
 
 - [ ] **Implement WorkoutMaterializer (pure Domain — no Repo, no Phoenix)**
 
-  `apps/api/lib/milos_training/workouts/domain/workout_materializer.ex`:
+  `apps/api/lib/palee/workouts/domain/workout_materializer.ex`:
   ```elixir
-  defmodule MilosTraining.Workouts.Domain.WorkoutMaterializer do
+  defmodule Palee.Workouts.Domain.WorkoutMaterializer do
     @moduledoc """
     Pure domain module. Derives scale-specific workout instances from a master
     workout by applying variation inheritance: each scale instance is the base
@@ -1070,7 +1070,7 @@ apps/web/src/
 
 - [ ] **Run materializer tests — verify all pass**
   ```bash
-  cd apps/api && mix test test/milos_training/workouts/domain/workout_materializer_test.exs
+  cd apps/api && mix test test/palee/workouts/domain/workout_materializer_test.exs
   # Expected: all green
   ```
 
@@ -1102,7 +1102,7 @@ apps/web/src/
 - [ ] **Write and run full test suite** for workout creation + materialization with DB
 
   ```bash
-  cd apps/api && mix test test/milos_training/workouts/
+  cd apps/api && mix test test/palee/workouts/
   ```
 
 - [ ] **Create OpenAPI spec** for `POST /api/admin/workouts`, `GET /api/workouts/:id`, `GET /api/workouts/:id/scales`
@@ -1138,7 +1138,7 @@ apps/web/src/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── scheduling/
 │   ├── scheduled_class.ex
 │   ├── booking.ex
@@ -1188,18 +1188,18 @@ apps/web/src/
 
 - [ ] **Implement SubmitBooking Application Service**
 
-  `apps/api/lib/milos_training/application/submit_booking.ex`:
+  `apps/api/lib/palee/application/submit_booking.ex`:
   ```elixir
-  defmodule MilosTraining.Application.SubmitBooking do
-    alias MilosTraining.{Scheduling, Notifications}
-    alias MilosTraining.Workers.BookingTimeoutJob
+  defmodule Palee.Application.SubmitBooking do
+    alias Palee.{Scheduling, Notifications}
+    alias Palee.Workers.BookingTimeoutJob
 
     def call(user_id, slot_id) do
       with {:ok, slot} <- Scheduling.get_slot(slot_id),
            :ok <- Scheduling.Domain.BookingPolicy.can_book?(slot, user_id: user_id),
            {:ok, booking} <- Scheduling.Commands.SubmitBooking.call(user_id, slot_id) do
         if slot.auto_approve do
-          MilosTraining.Application.ResolveBooking.approve(booking.id, nil)
+          Palee.Application.ResolveBooking.approve(booking.id, nil)
         else
           schedule_timeout(booking, slot)
           Notifications.notify_admin_new_booking(booking)
@@ -1229,7 +1229,7 @@ apps/web/src/
 
 - [ ] **Run full test suite for Phase 3**
   ```bash
-  cd apps/api && mix test test/milos_training/scheduling/ test/milos_training/application/
+  cd apps/api && mix test test/palee/scheduling/ test/palee/application/
   ```
 
 - [ ] **LIVE TEST:**
@@ -1255,7 +1255,7 @@ apps/web/src/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── execution/
 │   ├── workout_execution.ex
 │   ├── domain/
@@ -1328,7 +1328,7 @@ apps/web/src/
 
 - [ ] **Run full Phase 4 test suite**
   ```bash
-  cd apps/api && mix test test/milos_training/execution/ test/milos_training/application/complete_workout_test.exs
+  cd apps/api && mix test test/palee/execution/ test/palee/application/complete_workout_test.exs
   ```
 
 - [ ] **LIVE TEST:**
@@ -1353,7 +1353,7 @@ apps/web/src/
 ### File Map
 
 ```
-apps/api/lib/milos_training/workouts/
+apps/api/lib/palee/workouts/
 ├── assigned_workout.ex
 ├── assigned_workout_athlete.ex       # join table schema
 ├── commands/
@@ -1404,7 +1404,7 @@ apps/web/src/app/
 
 - [ ] **Run tests**
   ```bash
-  cd apps/api && mix test test/milos_training/workouts/
+  cd apps/api && mix test test/palee/workouts/
   ```
 
 - [ ] **LIVE TEST:**
@@ -1428,7 +1428,7 @@ apps/web/src/app/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── notifications/
 │   ├── notification.ex
 │   ├── push_subscription.ex
@@ -1462,23 +1462,23 @@ apps/web/src/
 
 - [ ] **Implement PubSub event handlers** for all notification types
 
-  `apps/api/lib/milos_training/notifications/event_handler.ex`:
+  `apps/api/lib/palee/notifications/event_handler.ex`:
   ```elixir
-  defmodule MilosTraining.Notifications.EventHandler do
+  defmodule Palee.Notifications.EventHandler do
     use GenServer
 
     def start_link(_), do: GenServer.start_link(__MODULE__, [], name: __MODULE__)
 
     def init(_) do
-      Phoenix.PubSub.subscribe(MilosTraining.PubSub, "workout:completed")
-      Phoenix.PubSub.subscribe(MilosTraining.PubSub, "booking:submitted")
-      Phoenix.PubSub.subscribe(MilosTraining.PubSub, "booking:resolved")
+      Phoenix.PubSub.subscribe(Palee.PubSub, "workout:completed")
+      Phoenix.PubSub.subscribe(Palee.PubSub, "booking:submitted")
+      Phoenix.PubSub.subscribe(Palee.PubSub, "booking:resolved")
       {:ok, []}
     end
 
     def handle_info({:workout_completed, %{exercise_notes: notes} = execution}, state)
         when length(notes) > 0 do
-      MilosTraining.Notifications.Commands.CreateNotification.call(%{
+      Palee.Notifications.Commands.CreateNotification.call(%{
         user_id: admin_user_id(),
         type: :workout_note,
         payload: %{execution_id: execution.id, user_id: execution.user_id}
@@ -1490,14 +1490,14 @@ apps/web/src/
     def handle_info(_, state), do: {:noreply, state}
 
     defp dispatch_push(type, user_id, payload) do
-      MilosTraining.Workers.PushDispatchJob.new(%{
+      Palee.Workers.PushDispatchJob.new(%{
         "type" => to_string(type),
         "user_id" => user_id,
         "payload" => payload
       }) |> Oban.insert()
     end
 
-    defp admin_user_id, do: MilosTraining.Identity.Queries.FindUser.admin_id()
+    defp admin_user_id, do: Palee.Identity.Queries.FindUser.admin_id()
   end
   ```
 
@@ -1506,12 +1506,12 @@ apps/web/src/
   Add to `apps/api/mix.exs`: `{:web_push_elixir, "~> 0.3"}`
 
   ```elixir
-  defmodule MilosTraining.Workers.PushDispatchJob do
+  defmodule Palee.Workers.PushDispatchJob do
     use Oban.Worker, queue: :notifications, max_attempts: 3
 
     @impl Oban.Worker
     def perform(%Oban.Job{args: %{"user_id" => user_id} = args}) do
-      subscriptions = MilosTraining.Notifications.get_push_subscriptions(user_id)
+      subscriptions = Palee.Notifications.get_push_subscriptions(user_id)
       payload = Jason.encode!(%{type: args["type"], payload: args["payload"]})
 
       Enum.each(subscriptions, fn sub ->
@@ -1549,7 +1549,7 @@ apps/web/src/
 
 - [ ] **Run tests**
   ```bash
-  cd apps/api && mix test test/milos_training/notifications/
+  cd apps/api && mix test test/palee/notifications/
   ```
 
 - [ ] **LIVE TEST:**
@@ -1574,7 +1574,7 @@ apps/web/src/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── gamification/
 │   ├── user_stats.ex
 │   ├── user_achievement.ex
@@ -1616,9 +1616,9 @@ apps/web/src/
 
 - [ ] **Write failing tests for StreakCalculator (pure Domain)**
   ```elixir
-  defmodule MilosTraining.Gamification.Domain.StreakCalculatorTest do
+  defmodule Palee.Gamification.Domain.StreakCalculatorTest do
     use ExUnit.Case, async: true
-    alias MilosTraining.Gamification.Domain.StreakCalculator
+    alias Palee.Gamification.Domain.StreakCalculator
 
     test "streak increments when current week has >= target workouts" do
       stats = %{current_streak: 3, last_workout_at: last_week()}
@@ -1684,12 +1684,12 @@ apps/web/src/
 - [ ] **Implement RefreshLeaderboardJob** (Oban, every 15 minutes)
 
   ```elixir
-  defmodule MilosTraining.Workers.RefreshLeaderboardJob do
+  defmodule Palee.Workers.RefreshLeaderboardJob do
     use Oban.Worker, queue: :analytics
 
     @impl Oban.Worker
     def perform(_job) do
-      MilosTraining.Repo.query!("REFRESH MATERIALIZED VIEW CONCURRENTLY weekly_leaderboard")
+      Palee.Repo.query!("REFRESH MATERIALIZED VIEW CONCURRENTLY weekly_leaderboard")
       :ok
     end
   end
@@ -1697,17 +1697,17 @@ apps/web/src/
 
   Schedule in `config.exs`:
   ```elixir
-  config :milos_training, Oban,
+  config :palee, Oban,
     crontab: [
-      {"*/15 * * * *", MilosTraining.Workers.RefreshLeaderboardJob}
+      {"*/15 * * * *", Palee.Workers.RefreshLeaderboardJob}
     ]
   ```
 
 - [ ] **Implement Redis Cache-Aside for Landing Page**
 
-  `apps/api/lib/milos_training/infrastructure/cache/landing_cache.ex`:
+  `apps/api/lib/palee/infrastructure/cache/landing_cache.ex`:
   ```elixir
-  defmodule MilosTraining.Infrastructure.Cache.LandingCache do
+  defmodule Palee.Infrastructure.Cache.LandingCache do
     @ttl 60  # seconds
 
     def get_or_fetch(user_id, fetch_fn) do
@@ -1748,7 +1748,7 @@ apps/web/src/
 
 - [ ] **Run full test suite**
   ```bash
-  cd apps/api && mix test test/milos_training/gamification/
+  cd apps/api && mix test test/palee/gamification/
   ```
 
 - [ ] **LIVE TEST:**
@@ -1773,7 +1773,7 @@ apps/web/src/
 ### File Map
 
 ```
-apps/api/lib/milos_training/
+apps/api/lib/palee/
 ├── coaching/
 │   ├── admin_athlete_note.ex
 │   ├── commands/
@@ -1809,9 +1809,9 @@ apps/web/src/
 
 - [ ] **Configure Meilisearch** — create `users` index with searchable/filterable attributes
 
-  `apps/api/lib/milos_training/infrastructure/search/member_indexer.ex`:
+  `apps/api/lib/palee/infrastructure/search/member_indexer.ex`:
   ```elixir
-  defmodule MilosTraining.Infrastructure.Search.MemberIndexer do
+  defmodule Palee.Infrastructure.Search.MemberIndexer do
     @index "users"
 
     def index_user(user) do
@@ -1841,7 +1841,7 @@ apps/web/src/
 
 - [ ] **Run tests**
   ```bash
-  cd apps/api && mix test test/milos_training/coaching/
+  cd apps/api && mix test test/palee/coaching/
   ```
 
 - [ ] **LIVE TEST:**
@@ -1898,7 +1898,7 @@ docker-compose.prod.yml                # Production overrides
   ```json
   {
     "name": "Gym App",
-    "short_name": "MilosTraining",
+    "short_name": "Palee",
     "start_url": "/",
     "display": "standalone",
     "background_color": "#ffffff",
