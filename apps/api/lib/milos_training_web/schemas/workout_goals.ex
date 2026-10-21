@@ -29,7 +29,15 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
       workout_id: %Schema{type: :string, format: :uuid},
       saved: %Schema{
         type: :boolean,
-        description: "False when nothing is saved yet and these are the live suggestion"
+        description:
+          "False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion"
+      },
+      inherited_from: %Schema{
+        type: :string,
+        format: :uuid,
+        nullable: true,
+        description:
+          "The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own"
       },
       muscles: %Schema{type: :array, items: @muscle},
       qualities: @ids,
@@ -43,6 +51,7 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
     required: [
       :workout_id,
       :saved,
+      :inherited_from,
       :muscles,
       :qualities,
       :stimulus,
@@ -92,7 +101,8 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
       stimulus: %Schema{type: :string, nullable: true, maxLength: 280},
       visible_to_members: %Schema{
         type: :boolean,
-        description: "Left out: keep the saved value (hidden on a first save)"
+        description:
+          "Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default"
       }
     },
     required: [:muscles, :qualities]

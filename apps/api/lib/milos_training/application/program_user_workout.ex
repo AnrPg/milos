@@ -150,7 +150,8 @@ defmodule MilosTraining.Application.ProgramUserWorkout do
       with {:ok, draft} <-
              DuplicateWorkout.call(context, source_id,
                folder_id: folder_id,
-               title_suffix: suffix
+               title_suffix: suffix,
+               copy_goals: false
              ) do
         Workouts.publish_workout(context, draft.id, %{expected_source_revision: 0})
       end

@@ -10,8 +10,12 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoGoalStore do
 
   import Ecto.Query
 
+  alias MilosTraining.Infrastructure.Tenancy.RepoContext
   alias MilosTraining.Repo
-  alias MilosTraining.Workouts.WorkoutGoal
+  alias MilosTraining.Workouts.{MasterWorkout, WorkoutGoal}
+
+  # How far up a chain of copies a workout looks for goals to inherit.
+  @max_inheritance_depth 5
 
   @impl true
   def get_goals(workout_id) do
@@ -22,6 +26,51 @@ defmodule MilosTraining.Infrastructure.Workouts.EctoGoalStore do
       _missing -> nil
     end
   end
+
+  @impl true
+  def resolve_goals(workout_id) do
+    case Ecto.UUID.cast(workout_id) do
+      {:ok, workout_id} ->
+        case get_goals(workout_id) do
+          nil -> workout_id |> inherited([workout_id]) |> as_inherited()
+          goals -> %{goals: goals, inherited_from: nil}
+        end
+
+      :error ->
+        %{goals: nil, inherited_from: nil}
+    end
+  end
+
+  # Walks `source_workout_id` up to the first ancestor with goals of its own,
+  # only through workouts of the session's gym.
+  defp inherited(workout_id, seen) do
+    case RepoContext.current_setting("app.organization_id") do
+      nil -> nil
+      organization_id -> inherited(organization_id, workout_id, seen)
+    end
+  end
+
+  defp inherited(organization_id, workout_id, seen) do
+    parent_id =
+      MasterWorkout
+      |> join(:inner, [workout], parent in MasterWorkout,
+        on: parent.id == workout.source_workout_id
+      )
+      |> where([workout], workout.id == ^workout_id)
+      |> where([workout, parent], parent.organization_id == ^organization_id)
+      |> select([_workout, parent], parent.id)
+      |> Repo.one()
+
+    cond do
+      is_nil(parent_id) or parent_id in seen -> nil
+      goals = get_goals(parent_id) -> goals
+      length(seen) >= @max_inheritance_depth -> nil
+      true -> inherited(organization_id, parent_id, [parent_id | seen])
+    end
+  end
+
+  defp as_inherited(nil), do: %{goals: nil, inherited_from: nil}
+  defp as_inherited(goals), do: %{goals: goals, inherited_from: goals.workout_id}
 
   @impl true
   def put_goals(workout_id, attrs) do
