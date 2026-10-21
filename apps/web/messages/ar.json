@@ -8727,6 +8727,43 @@
       "sharedOnly": "فقط من الإدخالات التي يشاركها العميل مع مدربي الصالة."
     }
   },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "إخفاء",
+    "restore": "إظهار مجددًا",
+    "hidden": "مخفية: {count}",
+    "note": "مؤشر، وليس نصيحة طبية.",
+    "noteWithWeeks": "من بيانات {weeks} أسابيع · مؤشر، وليس نصيحة طبية.",
+    "empty": {
+      "collecting": "تظهر الـ insights بعد {min} أسابيع من التسجيلات (النوم، الماء، الرغبة الشديدة في الأكل، التمارين). حتى الآن: {weeks} من {min}.",
+      "moreEntries": "يلزم بعض التسجيلات الإضافية حتى يظهر نمط ما.",
+      "noPattern": "لا يوجد نمط واضح في آخر {window} أسبوعًا. تُحدَّث الـ insights كل ليلة.",
+      "allHidden": "أخفيت كل الـ insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "تحقق أرقامًا شخصية أكثر بـ {ratio}× بعد {hours}+ ساعات من النوم.",
+        "all_after_goal": "جاءت كل أرقامك الشخصية ({count}) بعد {hours}+ ساعات من النوم."
+      },
+      "sleep_effort": {
+        "harder_after_short": "بعد نوم أقل من {hours} ساعات، تقيّم التمارين أصعب بـ {delta} نقاط RPE."
+      },
+      "time_of_day": {
+        "best_part": "تحقق أرقامًا شخصية أكثر بـ {ratio}× في تمارين {part, select, morning {الصباح} afternoon {بعد الظهر} evening {المساء} other {الليل}}.",
+        "only_part": "جاءت كل أرقامك الشخصية ({count}) في تمارين {part, select, morning {الصباح} afternoon {بعد الظهر} evening {المساء} other {الليل}}."
+      },
+      "cravings": {
+        "part_and_trigger": "تأتي معظم رغباتك الشديدة في الأكل ({count} من {total}) {part, select, morning {في الصباح} afternoon {بعد الظهر} evening {في المساء} other {في وقت متأخر من الليل}}، غالبًا مع {trigger, select, stress {التوتر} fatigue {التعب} boredom {الملل} social {الصحبة} other {الجوع}}.",
+        "part": "تأتي معظم رغباتك الشديدة في الأكل ({count} من {total}) {part, select, morning {في الصباح} afternoon {بعد الظهر} evening {في المساء} other {في وقت متأخر من الليل}}.",
+        "trigger": "مع رغباتك الشديدة في الأكل تسجّل غالبًا {trigger, select, stress {التوتر} fatigue {التعب} boredom {الملل} social {الصحبة} other {الجوع}} ({count} من {total})."
+      },
+      "hydration": {
+        "on_goal": "بلغت هدفك من الماء في {onGoal} من أصل {logged} يومًا سجّلتها.",
+        "training_more": "في أيام التمرين تبلغ هدفك من الماء أكثر ({training}% مقابل {rest}% في الأيام الأخرى).",
+        "training_less": "في أيام التمرين تبلغ هدفك من الماء أقل ({training}% مقابل {rest}% في الأيام الأخرى)."
+      }
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "إجراءات المدرب",

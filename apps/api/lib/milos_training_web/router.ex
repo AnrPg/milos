@@ -1223,6 +1223,10 @@ defmodule MilosTrainingWeb.Router do
     get("/me/progress", AccountTrainingController, :progress)
     # ADR-165: coverage summary, qualities radar and training load.
     get("/me/progress/depth", TrainingDepthController, :show)
+    # ADR-166: the Πρόοδος insights slot.
+    get("/me/insights", InsightsController, :show)
+    post("/me/insights/restore", InsightsController, :restore)
+    post("/me/insights/:rule/dismiss", InsightsController, :dismiss)
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)

@@ -8727,6 +8727,43 @@
       "sharedOnly": "Solo de las entradas que el cliente comparte con los coaches del box."
     }
   },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Ocultar",
+    "restore": "Mostrar de nuevo",
+    "hidden": "Ocultos: {count}",
+    "note": "Un indicador, no un consejo médico.",
+    "noteWithWeeks": "A partir de {weeks} semanas de datos · Un indicador, no un consejo médico.",
+    "empty": {
+      "collecting": "Los insights aparecen tras {min} semanas de registros (sueño, agua, antojos, entrenamientos). Hasta ahora: {weeks} de {min}.",
+      "moreEntries": "Faltan algunos registros más para que se vea un patrón.",
+      "noPattern": "Ningún patrón claro en las últimas {window} semanas. Los insights se actualizan cada noche.",
+      "allHidden": "Has ocultado todos los insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Haces PR {ratio}× más a menudo tras {hours}+ horas de sueño.",
+        "all_after_goal": "Tus {count} PR llegaron todos tras {hours}+ horas de sueño."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Tras dormir menos de {hours} horas, valoras los entrenamientos {delta} puntos de RPE más duros."
+      },
+      "time_of_day": {
+        "best_part": "Haces PR {ratio}× más a menudo en los entrenamientos {part, select, morning {de la mañana} afternoon {de la tarde} evening {de la noche} other {de madrugada}}.",
+        "only_part": "Tus {count} PR llegaron todos en entrenamientos {part, select, morning {de la mañana} afternoon {de la tarde} evening {de la noche} other {de madrugada}}."
+      },
+      "cravings": {
+        "part_and_trigger": "La mayoría de tus antojos ({count} de {total}) llegan {part, select, morning {por la mañana} afternoon {por la tarde} evening {por la noche} other {de madrugada}}, normalmente con {trigger, select, stress {estrés} fatigue {cansancio} boredom {aburrimiento} social {compañía} other {hambre}}.",
+        "part": "La mayoría de tus antojos ({count} de {total}) llegan {part, select, morning {por la mañana} afternoon {por la tarde} evening {por la noche} other {de madrugada}}.",
+        "trigger": "En tus antojos anotas más a menudo {trigger, select, stress {estrés} fatigue {cansancio} boredom {aburrimiento} social {compañía} other {hambre}} ({count} de {total})."
+      },
+      "hydration": {
+        "on_goal": "Alcanzaste tu objetivo de agua {onGoal} de los {logged} días que registraste.",
+        "training_more": "Los días de entrenamiento alcanzas tu objetivo de agua más a menudo ({training}% frente a {rest}% el resto).",
+        "training_less": "Los días de entrenamiento alcanzas tu objetivo de agua con menos frecuencia ({training}% frente a {rest}% el resto)."
+      }
+    }
+  },
   "SoloCoach": {
     "box": {
       "actionsLabel": "Acciones del entrenador",

@@ -23,6 +23,7 @@ import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipR
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
+import { InsightsCard } from "@/components/member-app/progress/InsightsCard";
 import { ProgressDepthSections } from "@/components/member-app/progress/ProgressDepthSections";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
 import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
@@ -43,7 +44,8 @@ import { useTranslations } from "next-intl";
  * then personal records, the history export and the statistics across every
  * provider (ADR-162, board 17 Q4): «Όλοι» by default, a provider chip next to
  * the time range narrows it. The depth slots follow in a fixed order
- * (ADR-165): Μυϊκή κάλυψη (into the atlas), Ποιότητες, Φορτίο.
+ * (ADR-165): Μυϊκή κάλυψη (into the atlas), Ποιότητες, Φορτίο, then the
+ * single Insights slot (ADR-166).
  */
 export function ProgressConsole() {
   const i18n = useUiTranslations();
@@ -89,6 +91,7 @@ function ProgressContent() {
         </>
       )}
       {filter ? <ProgressDepthSections filter={filter} /> : null}
+      <InsightsCard />
     </div>
   );
 }
