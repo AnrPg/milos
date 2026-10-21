@@ -11,7 +11,7 @@ defmodule MilosTraining.Application.SetJournalVisibility do
   """
 
   alias MilosTraining.Application.{BroadcastUserSync, RequestCoachReply}
-  alias MilosTraining.{Execution, Journal, Pantheon, Wellbeing}
+  alias MilosTraining.{Execution, Journal, Pantheon, Wellbeing, Wellness}
 
   def call(%{user_id: user_id} = context, kind, id, params) do
     rung = param(params, "visibility")
@@ -58,6 +58,9 @@ defmodule MilosTraining.Application.SetJournalVisibility do
   defp owned("injury", id, user_id), do: Wellbeing.get_injury_for_user(user_id, id)
   defp owned("note", id, user_id), do: Journal.get_note_for_user(id, user_id)
   defp owned("check_in", id, user_id), do: Wellbeing.get_check_in_for_user(id, user_id)
+  defp owned("wellness", _id, _user_id), do: {:error, :visibility_not_allowed}
+  defp owned("wellness_entry", id, user_id), do: Wellness.get_entry(id, user_id)
+  defp owned("craving", id, user_id), do: Wellness.get_craving(id, user_id)
   defp owned("review", _id, _user_id), do: {:error, :visibility_not_allowed}
   # ADR-158: a snapshot's visibility is set on the snapshot (Σώμα).
   defp owned("body", _id, _user_id), do: {:error, :visibility_not_allowed}
@@ -79,6 +82,13 @@ defmodule MilosTraining.Application.SetJournalVisibility do
 
   defp move("check_in", id, user_id, rung),
     do: Wellbeing.set_check_in_visibility(id, user_id, rung)
+
+  # ADR-159: wellness entries and cravings move one by one.
+  defp move("wellness_entry", id, user_id, rung),
+    do: Wellness.set_entry_visibility(Wellness.get_entry(id, user_id), rung)
+
+  defp move("craving", id, user_id, rung),
+    do: Wellness.set_craving_visibility(Wellness.get_craving(id, user_id), rung)
 
   defp broadcast({:ok, result} = ok, user_id) do
     BroadcastUserSync.for_user(user_id, ["my_journal"],

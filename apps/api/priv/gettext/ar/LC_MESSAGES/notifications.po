@@ -459,3 +459,15 @@ msgstr "حان وقت قياس جديد"
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "لقطة جديدة تساعدك على رؤية اتجاهك. يستغرق الأمر دقيقة."
+
+msgid "How did it go?"
+msgstr "كيف سارت الأمور؟"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "ملاحظة سريعة عمّا حدث قبل قليل تساعدك على معرفة ما يناسبك."
+
+msgid "A glass of water?"
+msgstr "كوب ماء؟"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "فترة بعد الظهر وقت مناسب لتعويض شرب الماء."

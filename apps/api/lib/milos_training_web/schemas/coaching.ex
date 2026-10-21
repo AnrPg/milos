@@ -27,6 +27,31 @@ defmodule MilosTrainingWeb.Schemas.Coaching do
     required: [:id, :user_id, :video_url, :status, :inserted_at]
   }
 
+  @slots MilosTraining.Nutrition.meal_slots()
+
+  @portions %Schema{
+    type: :object,
+    nullable: true,
+    description:
+      "Daily hand portions: palm of protein, cupped hand of carbs, fist of veg, thumb of fat; halves allowed",
+    properties: %{
+      protein: %Schema{type: :number, minimum: 0, maximum: 20, multipleOf: 0.5},
+      carbs: %Schema{type: :number, minimum: 0, maximum: 20, multipleOf: 0.5},
+      veg: %Schema{type: :number, minimum: 0, maximum: 20, multipleOf: 0.5},
+      fat: %Schema{type: :number, minimum: 0, maximum: 20, multipleOf: 0.5}
+    },
+    additionalProperties: false
+  }
+
+  def portions, do: @portions
+
+  def meal_slots,
+    do: %Schema{
+      type: :array,
+      description: "Meal slots the member logs against; empty means the default ones",
+      items: %Schema{type: :string, enum: @slots}
+    }
+
   @plan_schema %Schema{
     title: "NutritionPlan",
     type: :object,
@@ -36,10 +61,20 @@ defmodule MilosTrainingWeb.Schemas.Coaching do
       user_id: @uuid,
       title: %Schema{type: :string},
       body: %Schema{type: :string},
-      daily_calories: %Schema{type: :integer, nullable: true},
+      daily_calories: %Schema{
+        type: :integer,
+        nullable: true,
+        description: "Staff only; never sent to the member"
+      },
       protein_grams: %Schema{type: :integer, nullable: true},
       carbs_grams: %Schema{type: :integer, nullable: true},
       fat_grams: %Schema{type: :integer, nullable: true},
+      portion_targets: @portions,
+      portions: %{@portions | description: "Effective daily portions (member view)"},
+      meal_slots: %Schema{
+        type: :array,
+        items: %Schema{type: :string, enum: @slots}
+      },
       updated_at: %Schema{type: :string, format: :"date-time"}
     },
     required: [:id, :user_id, :title, :body]

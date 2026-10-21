@@ -459,3 +459,15 @@ msgstr "Tijd voor een nieuwe meting"
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Een nieuwe momentopname laat je je trend zien. Het kost een minuut."
+
+msgid "How did it go?"
+msgstr "Hoe ging het?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Een korte notitie over eerder helpt je zien wat voor jou werkt."
+
+msgid "A glass of water?"
+msgstr "Een glas water?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "De middag is een goed moment om je water in te halen."

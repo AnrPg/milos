@@ -48,6 +48,18 @@ defmodule MilosTraining.Media.Domain.MediaPolicy do
       types: @post_image_types,
       max_bytes: 25 * @mb
     },
+    # ADR-159: an optional photo of a meal; the body-photo pipeline and
+    # storage rules (private bucket, never a post, signed URLs only).
+    "meal_photo" => %{
+      scope: :account,
+      bucket: :media_private,
+      folder: "media/meals",
+      kind: "image",
+      processing: :server,
+      post: false,
+      types: @post_image_types,
+      max_bytes: 25 * @mb
+    },
     "post_photo" => %{
       scope: :account,
       bucket: :media_private,

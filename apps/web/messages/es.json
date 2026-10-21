@@ -4335,7 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Solo una reserva aprobada permite hacer check-in.",
     "coachProgrammeTitle": "Mi programa",
     "coachProgrammeHint": "Cambia un día, rechaza un entrenamiento o pide uno a tu coach.",
-    "mpTabBody": "Cuerpo"
+    "mpTabBody": "Cuerpo",
+    "stfPortionsTitle": "Porciones diarias con la mano",
+    "stfPortionsHint": "Lo que el miembro ve en Bienestar en lugar de números. Se admiten medias.",
+    "stfPortionsFromGrams": "Rellenar desde los gramos",
+    "stfInvalidPortions": "Las porciones van de 0 a 20, de media en media.",
+    "stfMealSlots": "Comidas del día",
+    "stfMealSlotsHint": "Las comidas en las que registra el miembro. Déjalo vacío para desayuno, comida, cena y tentempié."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -4859,7 +4865,9 @@
         "review": "Valoración",
         "note": "Nota",
         "check_in": "Cómo me siento",
-        "body": "Cuerpo"
+        "body": "Cuerpo",
+        "wellness": "Bienestar",
+        "craving": "Antojo"
       },
       "loadMore": "Entradas anteriores",
       "loadingMore": "Cargando…",
@@ -4957,7 +4965,9 @@
       "review": "Valoración",
       "checkIn": "Cómo me siento",
       "note": "Nota o pensamiento",
-      "measure": "Medición"
+      "measure": "Medición",
+      "wellness": "Agua · Sueño · Comida",
+      "craving": "Antojo"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
@@ -4967,7 +4977,9 @@
       "review": "Valora una clase o un entrenamiento",
       "checkIn": "Unas preguntas rápidas",
       "note": "Técnica, objetivo, ánimo",
-      "measure": "Peso, perímetros, fotos"
+      "measure": "Peso, perímetros, fotos",
+      "wellness": "Un vaso, anoche, una comida",
+      "craving": "Anótalo o pide apoyo"
     },
     "homeTitle": "Inicio",
     "wodToday": "El WOD de hoy en el box",
@@ -5083,7 +5095,220 @@
     "programmeManage": "Cambiar el día o rechazar",
     "meReferrals": "Trae a un amigo",
     "meReferralsHint": "Tu enlace, QR e invitaciones",
-    "membershipReferral": "Trae a un amigo"
+    "membershipReferral": "Trae a un amigo",
+    "wellness": {
+      "eyebrow": "Bienestar",
+      "today": "Hoy",
+      "yesterday": "Ayer",
+      "loading": "Cargando…",
+      "customize": "Personalizar",
+      "previousDay": "Día anterior",
+      "nextDay": "Día siguiente",
+      "close": "Cerrar",
+      "save": "Guardar",
+      "saving": "Guardando…",
+      "delete": "Eliminar",
+      "cancel": "Cancelar",
+      "undo": "Deshacer",
+      "open": "Abrir",
+      "onlyMe": "Solo tú lo ves. Puedes compartir entradas sueltas más adelante.",
+      "whoSees": "Quién lo ve:",
+      "less": "Menos {what}",
+      "more": "Más {what}",
+      "item": {
+        "water": "Agua",
+        "sleep": "Sueño",
+        "meals": "Comidas",
+        "plan": "Plan del coach",
+        "mood": "Ánimo",
+        "cravings": "Antojo"
+      },
+      "water": {
+        "add": "+1 vaso",
+        "glasses": "{filled} de {goal} vasos",
+        "added": "Vaso añadido ({ml} ml)",
+        "dropsLabel": "Vasos de hoy",
+        "remove": "Quitar este vaso"
+      },
+      "sleep": {
+        "title": "Sueño",
+        "night": "Noche",
+        "nap": "Siesta",
+        "bed": "Me acosté",
+        "wake": "Me desperté",
+        "napMinutes": "Minutos",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Calidad (de 1 a 5)",
+        "qualityValue": "Calidad {quality}/5",
+        "napValue": "Siesta {minutes} min",
+        "empty": "Sin registrar",
+        "tap": "Toca para registrar la noche",
+        "fromDevice": "de {source}",
+        "corrected": "de {source}, corregido por ti"
+      },
+      "source": {
+        "manual": "ti",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Comida",
+        "slot": "Qué comida",
+        "logged": "Registrada",
+        "addSnack": "+ Tentempié",
+        "fitLabel": {
+          "plan": "¿Y el plan?",
+          "own": "¿Como querías?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Dentro del plan",
+            "off_plan": "Fuera del plan"
+          },
+          "own": {
+            "in_plan": "Como quería",
+            "off_plan": "De otra forma"
+          }
+        },
+        "photo": "Foto (opcional)",
+        "photoAdd": "Añadir una foto",
+        "photoChange": "Cambiar foto",
+        "photoRemove": "Quitar",
+        "photoUploading": "Subiendo…",
+        "photoFailed": "La foto no se subió. Inténtalo de nuevo o guarda sin ella.",
+        "photoPrivate": "Privada, como las fotos corporales. Nunca va a una publicación sin preguntarte.",
+        "note": "Una línea sobre ella (opcional)",
+        "portions": "Porciones con la mano (opcional)",
+        "portionsHint": "Palma, mano ahuecada, puño, pulgar. Las mitades valen. Sin pesar, sin calorías.",
+        "hungerLabel": "Hambre y saciedad (opcional)",
+        "hunger": "Cuánta hambre tenía antes (1 a 5)",
+        "fullness": "Qué tan lleno quedé después (1 a 5)"
+      },
+      "slot": {
+        "breakfast": "Desayuno",
+        "morning_snack": "Media mañana",
+        "lunch": "Almuerzo",
+        "afternoon_snack": "Merienda",
+        "dinner": "Cena",
+        "evening_snack": "Tentempié nocturno",
+        "snack": "Tentempié",
+        "pre_workout": "Antes de entrenar",
+        "post_workout": "Después de entrenar"
+      },
+      "portion": {
+        "protein": "Proteína (palma)",
+        "carbs": "Hidratos (mano ahuecada)",
+        "veg": "Verduras (puño)",
+        "fat": "Grasas (pulgar)"
+      },
+      "plan": {
+        "title": "Nutrición · {title}",
+        "showNumbers": "Mostrar números",
+        "hideNumbers": "Ocultar números",
+        "of": "{logged} de {target}",
+        "noPortions": "El plan de tu coach aún no tiene porciones diarias."
+      },
+      "mood": {
+        "mood": "Ánimo {value}/4",
+        "stress": "Estrés {value}/4",
+        "empty": "¿Cómo te sientes?",
+        "open": "Responder «Cómo me siento»"
+      },
+      "craving": {
+        "title": "Antojo",
+        "tileTitle": "Regístralo o pide apoyo",
+        "tileHint": "En el momento; cómo terminó puede venir después",
+        "count": "{count, plural, one {# hoy} other {# hoy}}",
+        "edit": "Editar",
+        "support": "Necesito apoyo",
+        "supportNoBuddy": "Cuando elijas un buddy, recibirá un mensaje corto. Nunca los detalles.",
+        "intensity": "¿Qué tan fuerte?",
+        "trigger": "¿Qué lo provocó?",
+        "outcome": "¿Qué pasó?",
+        "note": "Lo que quería (opcional)",
+        "notePlaceholder": "p. ej. algo dulce después de cenar",
+        "tryNow": "Prueba ahora",
+        "tryWater": "Un vaso de agua",
+        "tryWalk": "Un paseo de 10 minutos",
+        "tryWait": "Espera 10 minutos y respira despacio",
+        "waterCounted": "Contado",
+        "private": "Solo tú lo ves. Te preguntaremos una vez, en 20 minutos, cómo fue.",
+        "howDidItGo": "¿Cómo fue?"
+      },
+      "trigger": {
+        "stress": "Estrés",
+        "fatigue": "Cansancio",
+        "boredom": "Aburrimiento",
+        "social": "Social",
+        "hunger": "Hambre",
+        "other": "Otra cosa"
+      },
+      "outcome": {
+        "resisted": "Lo superé",
+        "ate_off_plan": "Comí algo fuera del plan",
+        "ongoing": "Todavía lo tengo"
+      },
+      "week": {
+        "title": "Esta semana",
+        "range": "{from} – {to}",
+        "previous": "Semana anterior",
+        "next": "Semana siguiente",
+        "item": "Elemento",
+        "line": "Sueño en tu meta {nights} de {days} noches · agua en tu meta {water} de {days} días",
+        "dot": {
+          "full": "En tu meta",
+          "half": "En parte",
+          "empty": "Nada registrado",
+          "warm": "Antojo registrado"
+        }
+      },
+      "consent": {
+        "title": "Tu agua, tu sueño, tus comidas y tus antojos",
+        "body": "Lo que registras aquí son datos de salud. Siguen siendo tuyos y privados: tu coach ve una entrada solo si la compartes, y puedes exportarlo o borrarlo todo cuando quieras.",
+        "items": "¿Qué quieres ver?",
+        "later": "Puedes cambiarlo cuando quieras desde «Personalizar».",
+        "agree": "Acepto y empiezo"
+      },
+      "settings": {
+        "items": "Elementos y orden",
+        "hiddenKeeps": "Un elemento que apagas desaparece de la tarjeta, la semana y Nueva entrada. Sus datos se quedan hasta que los borres.",
+        "moveUp": "Subir {item}",
+        "moveDown": "Bajar {item}",
+        "water": "Agua",
+        "glass": "Tu vaso",
+        "ml": "{ml} ml",
+        "goalGlasses": "Meta diaria (vasos)",
+        "reminder": "Recordatorio por la tarde",
+        "reminderHint": "Una vez, después de las 15:00, si vas por debajo de la mitad de tu meta",
+        "goalYours": "Las metas son tuyas. Un coach puede sugerir una, pero nunca fijarla.",
+        "sleep": "Sueño",
+        "sleepGoal": "Meta de sueño (horas)",
+        "data": "Tus datos",
+        "section": {
+          "wellness": "Agua, sueño y comidas",
+          "cravings": "Antojos"
+        },
+        "export": "Exportar (JSON)",
+        "erase": "Borrar todo",
+        "eraseConfirm": "Sí, borrar para siempre",
+        "eraseWarning": "Esto elimina para siempre cada entrada de esta sección, con las fotos de las comidas.",
+        "erased": "Borrado."
+      },
+      "feed": {
+        "water": "{count, plural, one {# vaso} other {# vasos}}",
+        "meals": "{count, plural, one {# comida} other {# comidas}}",
+        "craving": "Antojo · {intensity}/10",
+        "empty": "Bienestar"
+      },
+      "error": {
+        "health_data_consent_required": "Primero acepta que guardemos datos de salud.",
+        "occurred_in_future": "Esa hora está en el futuro.",
+        "occurred_too_long_ago": "Puedes completar o corregir hasta 7 días atrás.",
+        "invalid_wellness_value": "Revisa los valores e inténtalo de nuevo.",
+        "invalid_media": "La foto no está lista. Elígela de nuevo."
+      }
+    }
   },
   "Community": {
     "all": "Todo",

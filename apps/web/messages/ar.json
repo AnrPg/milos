@@ -4335,7 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "لا يمكن تسجيل الحضور إلا بحجز معتمد.",
     "coachProgrammeTitle": "برنامجي",
     "coachProgrammeHint": "غيّر يومًا أو ارفض تمرينًا أو اطلب تمرينًا من مدربك.",
-    "mpTabBody": "الجسم"
+    "mpTabBody": "الجسم",
+    "stfPortionsTitle": "حصص يومية باليد",
+    "stfPortionsHint": "ما يراه العضو في صفحة العافية بدل الأرقام. الأنصاف مقبولة.",
+    "stfPortionsFromGrams": "املأ من الغرامات",
+    "stfInvalidPortions": "الحصص من 0 إلى 20، بالأنصاف.",
+    "stfMealSlots": "وجبات اليوم",
+    "stfMealSlotsHint": "الوجبات التي يسجّل فيها العضو. اتركها فارغة للفطور والغداء والعشاء ووجبة خفيفة."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4859,7 +4865,9 @@
         "review": "تقييم",
         "note": "ملاحظة",
         "check_in": "كيف أشعر",
-        "body": "الجسم"
+        "body": "الجسم",
+        "wellness": "العافية",
+        "craving": "الرغبة الشديدة"
       },
       "loadMore": "إدخالات أقدم",
       "loadingMore": "جارٍ التحميل…",
@@ -4957,7 +4965,9 @@
       "review": "تقييم",
       "checkIn": "كيف أشعر",
       "note": "ملاحظة أو فكرة",
-      "measure": "قياس"
+      "measure": "قياس",
+      "wellness": "ماء · نوم · وجبة",
+      "craving": "الرغبة الشديدة"
     },
     "entryKindHint": {
       "workout": "النتيجة وRPE والملاحظات",
@@ -4967,7 +4977,9 @@
       "review": "قيّم حصة أو تمرينًا",
       "checkIn": "بضعة أسئلة سريعة",
       "note": "التقنية، الهدف، المزاج",
-      "measure": "الوزن، المحيطات، الصور"
+      "measure": "الوزن، المحيطات، الصور",
+      "wellness": "كوب، الليلة الماضية، وجبة",
+      "craving": "سجّلها أو اطلب الدعم"
     },
     "homeTitle": "الرئيسية",
     "wodToday": "تمرين اليوم في النادي",
@@ -5083,7 +5095,220 @@
     "programmeManage": "تغيير اليوم أو الرفض",
     "meReferrals": "أحضر صديقًا",
     "meReferralsHint": "رابطك ورمز QR والدعوات",
-    "membershipReferral": "أحضر صديقًا"
+    "membershipReferral": "أحضر صديقًا",
+    "wellness": {
+      "eyebrow": "العافية",
+      "today": "اليوم",
+      "yesterday": "أمس",
+      "loading": "جارٍ التحميل…",
+      "customize": "تخصيص",
+      "previousDay": "اليوم السابق",
+      "nextDay": "اليوم التالي",
+      "close": "إغلاق",
+      "save": "حفظ",
+      "saving": "جارٍ الحفظ…",
+      "delete": "حذف",
+      "cancel": "إلغاء",
+      "undo": "تراجع",
+      "open": "فتح",
+      "onlyMe": "أنت وحدك ترى هذا. يمكنك مشاركة إدخالات منفردة لاحقًا.",
+      "whoSees": "من يراه:",
+      "less": "أقل: {what}",
+      "more": "أكثر: {what}",
+      "item": {
+        "water": "الماء",
+        "sleep": "النوم",
+        "meals": "الوجبات",
+        "plan": "خطة المدرب",
+        "mood": "المزاج",
+        "cravings": "الرغبة الشديدة"
+      },
+      "water": {
+        "add": "+1 كوب",
+        "glasses": "{filled} من {goal} أكواب",
+        "added": "أُضيف كوب ({ml} مل)",
+        "dropsLabel": "أكواب اليوم",
+        "remove": "إزالة هذا الكوب"
+      },
+      "sleep": {
+        "title": "النوم",
+        "night": "الليل",
+        "nap": "قيلولة",
+        "bed": "ذهبت إلى النوم",
+        "wake": "استيقظت",
+        "napMinutes": "دقائق",
+        "duration": "{hours} س {minutes} د",
+        "quality": "الجودة (من 1 إلى 5)",
+        "qualityValue": "الجودة {quality}/5",
+        "napValue": "قيلولة {minutes} د",
+        "empty": "غير مسجّل",
+        "tap": "اضغط لتسجيل الليلة",
+        "fromDevice": "من {source}",
+        "corrected": "من {source}، صحّحته أنت"
+      },
+      "source": {
+        "manual": "أنت",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "وجبة",
+        "slot": "أي وجبة",
+        "logged": "مسجّلة",
+        "addSnack": "+ وجبة خفيفة",
+        "fitLabel": {
+          "plan": "والخطة؟",
+          "own": "كما أردت؟"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "ضمن الخطة",
+            "off_plan": "خارج الخطة"
+          },
+          "own": {
+            "in_plan": "كما أردت",
+            "off_plan": "بشكل مختلف"
+          }
+        },
+        "photo": "صورة (اختياري)",
+        "photoAdd": "أضف صورة",
+        "photoChange": "غيّر الصورة",
+        "photoRemove": "إزالة",
+        "photoUploading": "جارٍ الرفع…",
+        "photoFailed": "لم تُرفع الصورة. حاول مجددًا أو احفظ بدونها.",
+        "photoPrivate": "خاصة، مثل صور الجسم. لا تذهب أبدًا إلى منشور دون سؤالك.",
+        "note": "سطر عنها (اختياري)",
+        "portions": "حصص باليد (اختياري)",
+        "portionsHint": "كف، حفنة، قبضة، إبهام. الأنصاف مقبولة. بلا وزن ولا سعرات.",
+        "hungerLabel": "الجوع والشبع (اختياري)",
+        "hunger": "كم كنت جائعًا قبلها (1 إلى 5)",
+        "fullness": "كم شبعت بعدها (1 إلى 5)"
+      },
+      "slot": {
+        "breakfast": "الفطور",
+        "morning_snack": "وجبة خفيفة صباحية",
+        "lunch": "الغداء",
+        "afternoon_snack": "وجبة خفيفة بعد الظهر",
+        "dinner": "العشاء",
+        "evening_snack": "وجبة خفيفة مسائية",
+        "snack": "وجبة خفيفة",
+        "pre_workout": "قبل التمرين",
+        "post_workout": "بعد التمرين"
+      },
+      "portion": {
+        "protein": "البروتين (كف)",
+        "carbs": "الكربوهيدرات (حفنة)",
+        "veg": "الخضار (قبضة)",
+        "fat": "الدهون (إبهام)"
+      },
+      "plan": {
+        "title": "التغذية · {title}",
+        "showNumbers": "أظهر الأرقام",
+        "hideNumbers": "أخفِ الأرقام",
+        "of": "{logged} من {target}",
+        "noPortions": "خطة مدربك لا تحتوي بعد على حصص يومية."
+      },
+      "mood": {
+        "mood": "المزاج {value}/4",
+        "stress": "التوتر {value}/4",
+        "empty": "كيف تشعر؟",
+        "open": "أجب عن «كيف أشعر»"
+      },
+      "craving": {
+        "title": "الرغبة الشديدة",
+        "tileTitle": "سجّلها أو اطلب الدعم",
+        "tileHint": "في لحظتها؛ يمكن أن تضيف النتيجة لاحقًا",
+        "count": "{count, plural, one {# اليوم} other {# اليوم}}",
+        "edit": "تعديل",
+        "support": "أحتاج إلى دعم",
+        "supportNoBuddy": "عندما تختار رفيقًا، تصله رسالة قصيرة. لا تصله التفاصيل أبدًا.",
+        "intensity": "ما شدتها؟",
+        "trigger": "ما الذي أثارها؟",
+        "outcome": "ماذا حدث؟",
+        "note": "ما الذي أردته (اختياري)",
+        "notePlaceholder": "مثلًا شيء حلو بعد العشاء",
+        "tryNow": "جرّب الآن",
+        "tryWater": "كوب ماء",
+        "tryWalk": "مشي لمدة 10 دقائق",
+        "tryWait": "انتظر 10 دقائق وتنفّس ببطء",
+        "waterCounted": "احتُسب",
+        "private": "أنت وحدك تراها. سنسألك مرة واحدة، بعد 20 دقيقة، كيف سارت الأمور.",
+        "howDidItGo": "كيف سارت الأمور؟"
+      },
+      "trigger": {
+        "stress": "التوتر",
+        "fatigue": "التعب",
+        "boredom": "الملل",
+        "social": "اجتماعي",
+        "hunger": "الجوع",
+        "other": "شيء آخر"
+      },
+      "outcome": {
+        "resisted": "تجاوزتها",
+        "ate_off_plan": "أكلت شيئًا خارج الخطة",
+        "ongoing": "ما زالت لديّ"
+      },
+      "week": {
+        "title": "هذا الأسبوع",
+        "range": "{from} – {to}",
+        "previous": "الأسبوع السابق",
+        "next": "الأسبوع التالي",
+        "item": "العنصر",
+        "line": "النوم ضمن هدفك {nights} من {days} ليالٍ · الماء ضمن هدفك {water} من {days} أيام",
+        "dot": {
+          "full": "ضمن هدفك",
+          "half": "جزئيًا",
+          "empty": "لا شيء مسجّل",
+          "warm": "سُجّلت رغبة"
+        }
+      },
+      "consent": {
+        "title": "ماؤك ونومك ووجباتك ورغباتك",
+        "body": "ما تسجّله هنا بيانات صحية. تبقى ملكك وخاصة: لا يرى مدربك إدخالًا إلا إذا شاركته، ويمكنك تصدير كل شيء أو حذفه في أي وقت.",
+        "items": "ماذا تريد أن ترى؟",
+        "later": "يمكنك تغيير ذلك في أي وقت من «تخصيص».",
+        "agree": "أوافق ولنبدأ"
+      },
+      "settings": {
+        "items": "العناصر والترتيب",
+        "hiddenKeeps": "العنصر الذي توقفه يختفي من البطاقة والأسبوع وإدخال جديد. تبقى بياناته حتى تحذفها.",
+        "moveUp": "تحريك {item} لأعلى",
+        "moveDown": "تحريك {item} لأسفل",
+        "water": "الماء",
+        "glass": "كوبك",
+        "ml": "{ml} مل",
+        "goalGlasses": "الهدف اليومي (أكواب)",
+        "reminder": "تذكير بعد الظهر",
+        "reminderHint": "مرة واحدة، بعد 15:00، إذا كنت دون نصف هدفك",
+        "goalYours": "الأهداف لك. يمكن للمدرب أن يقترح هدفًا لكنه لا يحدده أبدًا.",
+        "sleep": "النوم",
+        "sleepGoal": "هدف النوم (ساعات)",
+        "data": "بياناتك",
+        "section": {
+          "wellness": "الماء والنوم والوجبات",
+          "cravings": "الرغبات"
+        },
+        "export": "تصدير (JSON)",
+        "erase": "حذف الكل",
+        "eraseConfirm": "نعم، احذف نهائيًا",
+        "eraseWarning": "يحذف هذا نهائيًا كل إدخال في هذا القسم، مع صور الوجبات.",
+        "erased": "تم الحذف."
+      },
+      "feed": {
+        "water": "{count, plural, zero {# أكواب} one {كوب واحد} two {كوبان} few {# أكواب} many {# كوبًا} other {# كوب}}",
+        "meals": "{count, plural, zero {# وجبات} one {وجبة واحدة} two {وجبتان} few {# وجبات} many {# وجبة} other {# وجبة}}",
+        "craving": "رغبة · {intensity}/10",
+        "empty": "العافية"
+      },
+      "error": {
+        "health_data_consent_required": "وافق أولًا على حفظ البيانات الصحية.",
+        "occurred_in_future": "هذا الوقت في المستقبل.",
+        "occurred_too_long_ago": "يمكنك الإكمال أو التصحيح حتى 7 أيام مضت.",
+        "invalid_wellness_value": "تحقق من القيم وحاول مجددًا.",
+        "invalid_media": "الصورة غير جاهزة. اخترها مرة أخرى."
+      }
+    }
   },
   "Community": {
     "all": "الكل",

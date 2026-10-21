@@ -4335,7 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Seule une réservation validée permet de s'enregistrer.",
     "coachProgrammeTitle": "Mon programme",
     "coachProgrammeHint": "Change un jour, refuse une séance ou demande-en une à ton coach.",
-    "mpTabBody": "Corps"
+    "mpTabBody": "Corps",
+    "stfPortionsTitle": "Portions quotidiennes à la main",
+    "stfPortionsHint": "Ce que le membre voit dans Bien-être au lieu des chiffres. Les demi-portions sont possibles.",
+    "stfPortionsFromGrams": "Remplir depuis les grammes",
+    "stfInvalidPortions": "Les portions vont de 0 à 20, par demi.",
+    "stfMealSlots": "Repas de la journée",
+    "stfMealSlotsHint": "Les repas sur lesquels le membre note. Laisse vide pour petit-déjeuner, déjeuner, dîner et collation."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -4859,7 +4865,9 @@
         "review": "Évaluation",
         "note": "Note",
         "check_in": "Comment je me sens",
-        "body": "Corps"
+        "body": "Corps",
+        "wellness": "Bien-être",
+        "craving": "Fringale"
       },
       "loadMore": "Entrées plus anciennes",
       "loadingMore": "Chargement…",
@@ -4957,7 +4965,9 @@
       "review": "Avis",
       "checkIn": "Comment je me sens",
       "note": "Note ou pensée",
-      "measure": "Mesure"
+      "measure": "Mesure",
+      "wellness": "Eau · Sommeil · Repas",
+      "craving": "Fringale"
     },
     "entryKindHint": {
       "workout": "Résultat, RPE, remarques",
@@ -4967,7 +4977,9 @@
       "review": "Notez un cours ou une séance",
       "checkIn": "Quelques questions rapides",
       "note": "Technique, objectif, humeur",
-      "measure": "Poids, tours, photos"
+      "measure": "Poids, tours, photos",
+      "wellness": "Un verre, la nuit dernière, un repas",
+      "craving": "Note-la ou demande du soutien"
     },
     "homeTitle": "Accueil",
     "wodToday": "Le WOD du jour à la salle",
@@ -5083,7 +5095,220 @@
     "programmeManage": "Changer le jour ou refuser",
     "meReferrals": "Amène un ami",
     "meReferralsHint": "Ton lien, ton QR et tes invitations",
-    "membershipReferral": "Amène un ami"
+    "membershipReferral": "Amène un ami",
+    "wellness": {
+      "eyebrow": "Bien-être",
+      "today": "Aujourd'hui",
+      "yesterday": "Hier",
+      "loading": "Chargement…",
+      "customize": "Personnaliser",
+      "previousDay": "Jour précédent",
+      "nextDay": "Jour suivant",
+      "close": "Fermer",
+      "save": "Enregistrer",
+      "saving": "Enregistrement…",
+      "delete": "Supprimer",
+      "cancel": "Annuler",
+      "undo": "Annuler l'ajout",
+      "open": "Ouvrir",
+      "onlyMe": "Toi seul le vois. Tu peux partager des entrées une à une plus tard.",
+      "whoSees": "Qui le voit :",
+      "less": "Moins de {what}",
+      "more": "Plus de {what}",
+      "item": {
+        "water": "Eau",
+        "sleep": "Sommeil",
+        "meals": "Repas",
+        "plan": "Plan du coach",
+        "mood": "Humeur",
+        "cravings": "Fringale"
+      },
+      "water": {
+        "add": "+1 verre",
+        "glasses": "{filled} verres sur {goal}",
+        "added": "Verre ajouté ({ml} ml)",
+        "dropsLabel": "Verres aujourd'hui",
+        "remove": "Retirer ce verre"
+      },
+      "sleep": {
+        "title": "Sommeil",
+        "night": "Nuit",
+        "nap": "Sieste",
+        "bed": "Couché à",
+        "wake": "Réveillé à",
+        "napMinutes": "Minutes",
+        "duration": "{hours} h {minutes} min",
+        "quality": "Qualité (de 1 à 5)",
+        "qualityValue": "Qualité {quality}/5",
+        "napValue": "Sieste {minutes} min",
+        "empty": "Pas noté",
+        "tap": "Touche pour noter la nuit",
+        "fromDevice": "depuis {source}",
+        "corrected": "depuis {source}, corrigé par toi"
+      },
+      "source": {
+        "manual": "toi",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Repas",
+        "slot": "Quel repas",
+        "logged": "Noté",
+        "addSnack": "+ En-cas",
+        "fitLabel": {
+          "plan": "Et le plan ?",
+          "own": "Comme tu le voulais ?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Dans le plan",
+            "off_plan": "Hors plan"
+          },
+          "own": {
+            "in_plan": "Comme je voulais",
+            "off_plan": "Autrement"
+          }
+        },
+        "photo": "Photo (facultatif)",
+        "photoAdd": "Ajouter une photo",
+        "photoChange": "Changer la photo",
+        "photoRemove": "Retirer",
+        "photoUploading": "Envoi…",
+        "photoFailed": "La photo n'a pas été envoyée. Réessaie ou enregistre sans elle.",
+        "photoPrivate": "Privée, comme les photos du corps. Elle ne va jamais dans une publication sans te demander.",
+        "note": "Une ligne à ce sujet (facultatif)",
+        "portions": "Portions à la main (facultatif)",
+        "portionsHint": "Paume, main en coupe, poing, pouce. Les moitiés comptent. Sans pesée, sans calories.",
+        "hungerLabel": "Faim et satiété (facultatif)",
+        "hunger": "Faim avant (1 à 5)",
+        "fullness": "Satiété après (1 à 5)"
+      },
+      "slot": {
+        "breakfast": "Petit-déjeuner",
+        "morning_snack": "Collation du matin",
+        "lunch": "Déjeuner",
+        "afternoon_snack": "Goûter",
+        "dinner": "Dîner",
+        "evening_snack": "Collation du soir",
+        "snack": "En-cas",
+        "pre_workout": "Avant l'entraînement",
+        "post_workout": "Après l'entraînement"
+      },
+      "portion": {
+        "protein": "Protéines (paume)",
+        "carbs": "Glucides (main en coupe)",
+        "veg": "Légumes (poing)",
+        "fat": "Lipides (pouce)"
+      },
+      "plan": {
+        "title": "Nutrition · {title}",
+        "showNumbers": "Afficher les chiffres",
+        "hideNumbers": "Masquer les chiffres",
+        "of": "{logged} sur {target}",
+        "noPortions": "Le plan de ton coach n'a pas encore de portions par jour."
+      },
+      "mood": {
+        "mood": "Humeur {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Comment te sens-tu ?",
+        "open": "Répondre à « Comment je me sens »"
+      },
+      "craving": {
+        "title": "Fringale",
+        "tileTitle": "Note-la, ou demande du soutien",
+        "tileHint": "Sur le moment ; la suite peut venir après",
+        "count": "{count, plural, one {# aujourd'hui} other {# aujourd'hui}}",
+        "edit": "Modifier",
+        "support": "J'ai besoin de soutien",
+        "supportNoBuddy": "Quand tu auras choisi un buddy, il recevra un court message. Jamais les détails.",
+        "intensity": "Quelle intensité ?",
+        "trigger": "Qu'est-ce qui l'a déclenchée ?",
+        "outcome": "Que s'est-il passé ?",
+        "note": "Ce dont j'avais envie (facultatif)",
+        "notePlaceholder": "p. ex. quelque chose de sucré après le dîner",
+        "tryNow": "Essaie maintenant",
+        "tryWater": "Un verre d'eau",
+        "tryWalk": "Une marche de 10 minutes",
+        "tryWait": "Attends 10 minutes et respire lentement",
+        "waterCounted": "Compté",
+        "private": "Toi seul la vois. On te demandera une fois, dans 20 minutes, comment ça s'est passé.",
+        "howDidItGo": "Comment ça s'est passé ?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Fatigue",
+        "boredom": "Ennui",
+        "social": "Social",
+        "hunger": "Faim",
+        "other": "Autre chose"
+      },
+      "outcome": {
+        "resisted": "Je l'ai surmontée",
+        "ate_off_plan": "J'ai mangé quelque chose hors plan",
+        "ongoing": "Je l'ai encore"
+      },
+      "week": {
+        "title": "Cette semaine",
+        "range": "{from} – {to}",
+        "previous": "Semaine précédente",
+        "next": "Semaine suivante",
+        "item": "Élément",
+        "line": "Sommeil à ton objectif {nights} nuits sur {days} · eau à ton objectif {water} jours sur {days}",
+        "dot": {
+          "full": "À ton objectif",
+          "half": "En partie",
+          "empty": "Rien de noté",
+          "warm": "Fringale notée"
+        }
+      },
+      "consent": {
+        "title": "Ton eau, ton sommeil, tes repas et tes fringales",
+        "body": "Ce que tu notes ici, ce sont des données de santé. Elles restent à toi et privées : ton coach ne voit une entrée que si tu la partages, et tu peux tout exporter ou supprimer à tout moment.",
+        "items": "Que veux-tu voir ?",
+        "later": "Tu peux le changer à tout moment depuis « Personnaliser ».",
+        "agree": "J'accepte et je commence"
+      },
+      "settings": {
+        "items": "Éléments et ordre",
+        "hiddenKeeps": "Un élément désactivé disparaît de la carte, de la semaine et de Nouvelle entrée. Ses données restent jusqu'à ce que tu les supprimes.",
+        "moveUp": "Monter {item}",
+        "moveDown": "Descendre {item}",
+        "water": "Eau",
+        "glass": "Ton verre",
+        "ml": "{ml} ml",
+        "goalGlasses": "Objectif du jour (verres)",
+        "reminder": "Rappel l'après-midi",
+        "reminderHint": "Une fois, après 15 h, si tu es sous la moitié de ton objectif",
+        "goalYours": "Les objectifs sont à toi. Un coach peut en proposer un, jamais l'imposer.",
+        "sleep": "Sommeil",
+        "sleepGoal": "Objectif de sommeil (heures)",
+        "data": "Tes données",
+        "section": {
+          "wellness": "Eau, sommeil et repas",
+          "cravings": "Fringales"
+        },
+        "export": "Exporter (JSON)",
+        "erase": "Tout supprimer",
+        "eraseConfirm": "Oui, supprimer définitivement",
+        "eraseWarning": "Cela supprime définitivement chaque entrée de cette section, avec les photos des repas.",
+        "erased": "Supprimé."
+      },
+      "feed": {
+        "water": "{count, plural, one {# verre} other {# verres}}",
+        "meals": "{count, plural, one {# repas} other {# repas}}",
+        "craving": "Fringale · {intensity}/10",
+        "empty": "Bien-être"
+      },
+      "error": {
+        "health_data_consent_required": "Accepte d'abord que nous gardions des données de santé.",
+        "occurred_in_future": "Cette heure est dans le futur.",
+        "occurred_too_long_ago": "Tu peux compléter ou corriger jusqu'à 7 jours en arrière.",
+        "invalid_wellness_value": "Vérifie les valeurs et réessaie.",
+        "invalid_media": "La photo n'est pas prête. Choisis-la à nouveau."
+      }
+    }
   },
   "Community": {
     "all": "Tout",

@@ -600,6 +600,46 @@ ANR picked the recommended option on every question, with these extras and notes
    unless the member adds them.
 7. **Coach (Q7):** a «Σώμα» tab on the client page with shared snapshots only, logged.
 
+### Ευεξία and Λιγούρα (2026-10-20, [board 14](https://claude.ai/artifact/TFB9oaaefQXoxwhHi5BGEV))
+
+Apostolos picked the recommended option everywhere except the page layout (Q1: B, tiles), left
+sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every extra.
+
+1. **Page (Q1, B):** a grid of large tiles (Νερό, Ύπνος, Γεύματα, Διάθεση, Λιγούρα,
+   Τραυματισμοί), each with its value and one-tap action; then the plan and the week strip.
+   Extras: a compact «Σήμερα» strip (water +1, Λιγούρα) on Αρχική for people who use Ευεξία; past
+   days can be filled in or corrected up to 7 days back; tiles can be reordered and hidden.
+2. **Water (Q2, A):** glasses of your own size (250 ml default), goal in glasses, stored in ml;
+   undo in the toast, tap a drop to remove a glass. Extras: the goal is yours (a coach only
+   suggests); an afternoon reminder when under half, on by default once a goal is set (ANR's note), switchable off; no automatic extra on training days.
+3. **Sleep (Q3, built as A):** «Έπεσα» and «Ξύπνησα» prefilled from usual times, hours worked
+   out, quality 1–5. Extras: «από Garmin» with «διορθώθηκε» after an edit; naps as separate short
+   entries; Πώς νιώθω stops asking about sleep on a day sleep is logged.
+4. **Meals (Q4, A):** Πρωινό, Μεσημεριανό, Βραδινό and «+ Σνακ»; «Εντός / Εκτός πλάνου» (without
+   a coach plan «Όπως το ήθελα / Διαφορετικά»), optional photo and line of text. Extras: photos
+   private like body photos, never posted without a separate confirmation; optional «Πόσο
+   πεινούσα / Πόσο χόρτασα» 1–5, hidden by default; the coach can define the slots in the plan.
+5. **Plan and macros (Q5, B):** optional hand portions per meal (palm, fist, cupped hand, thumb)
+   filling bars against the plan's daily portions; numbers hidden unless shown. Extras: «Κρύψε τη
+   διατροφή» removes the plan card and bars; calories never reach the member; the coach's plan
+   editor gets «Μερίδες ανά ημέρα», pre-filled from grams.
+6. **Λιγούρα (Q6, B):** support on top, intensity, causes, «Τι έγινε;» starting on «Ακόμα την
+   έχω»; saving without an outcome asks «Πώς πήγε;» once, 20 minutes later. Extras: «Δοκίμασε
+   τώρα» card (breathing, water +1, walk); without a buddy «Όρισε buddy» (M12); optional note; the
+   time is kept for Πρόοδος.
+7. **Week strip (Q7, A):** a small grid per item, full / half / empty against your own targets,
+   cravings a neutral warm dot; tap a day to open it. Extras: no streaks or «you missed»
+   messages; swipe back to earlier weeks.
+8. **Ροή and coach (Q8, A):** one «Ευεξία · day» item per day in Ροή and each Λιγούρα as its own
+   item; the coach sees nothing unless the member turns on the weekly summary (counts only;
+   cravings only if ticked too). Extras: single entries can be widened with the ladder badge; a
+   meal photo becomes a post only after a separate confirmation. The weekly summary is built in
+   M12 with the buddy summaries.
+9. **Switches (Q9, A):** M10's section switches plus per-item switches from «Προσαρμογή» (Νερό,
+   Ύπνος, Γεύματα, Διατροφή πλάνου, Διάθεση); an item off disappears everywhere, its data stays.
+   Extras: the first visit asks which items you want (with the health-data consent); delete-all
+   and export per section (JSON with meal photos).
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [x] Weight as trend only option
@@ -622,4 +662,4 @@ ANR picked the recommended option on every question, with these extras and notes
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
 - [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
-- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [ ] P2-M11 · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14
+- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [ ] P2-M12 · [ ] P2-M13 · [ ] P2-M14

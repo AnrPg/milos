@@ -18,6 +18,7 @@ import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { GreetingCard } from "@/components/member-app/home/GreetingCard";
 import { LeaderboardCard } from "@/components/member-app/home/LeaderboardCard";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { WellnessStrip } from "@/components/member-app/wellness/WellnessStrip";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
 import { HeartButton } from "@/components/social/HeartButton";
@@ -64,6 +65,7 @@ export function HomeHub() {
       {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
       <ScopeToggle current="clubs" />
       <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
+      <WellnessStrip />
       <MyTrialsCard />
       {gymClub ? (
         <WodCard club={gymClub} />

@@ -9,6 +9,7 @@ import {
   setJournalVisibility,
   type ChoosableVisibility,
   type JournalFeedItem,
+  type JournalMoveKind,
   type JournalVisibilityResult,
 } from "@/api/journal";
 import { orderedChoices, needsQuestion, VISIBILITY_ICON } from "@/components/journal/visibility";
@@ -24,7 +25,7 @@ export function VisibilityBadge({
   item,
   onChanged,
 }: {
-  item: Pick<JournalFeedItem, "kind" | "id" | "journal_visibility" | "choosable_visibilities">;
+  item: Pick<JournalFeedItem, "id" | "journal_visibility" | "choosable_visibilities"> & { kind: JournalMoveKind };
   onChanged?: (result: JournalVisibilityResult) => void;
 }) {
   const t = useTranslations("MemberApp.journal");
@@ -85,7 +86,7 @@ function VisibilityPicker({
   onClose,
   onChanged,
 }: {
-  item: Pick<JournalFeedItem, "kind" | "id" | "journal_visibility">;
+  item: Pick<JournalFeedItem, "id" | "journal_visibility"> & { kind: JournalMoveKind };
   choices: ChoosableVisibility[];
   onClose: () => void;
   onChanged: (result: JournalVisibilityResult) => void;

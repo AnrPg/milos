@@ -46,7 +46,8 @@ config :milos_training, Oban,
        {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
        {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
        {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob},
-       {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob}
+       {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob},
+       {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob}
      ]}
   ],
   queues: [
@@ -248,6 +249,15 @@ config :milos_training, :feedback_store, MilosTraining.Infrastructure.Feedback.E
 config :milos_training,
        :wellbeing_store,
        MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore
+
+config :milos_training,
+       :wellness_store,
+       MilosTraining.Infrastructure.Wellness.EctoWellnessStore
+
+# ADR-159: «Χρειάζομαι στήριξη» from a Λιγούρα; M12 (Buddy) replaces the adapter.
+config :milos_training,
+       :support_requests,
+       MilosTraining.Infrastructure.Wellness.NoSupportRequests
 
 config :milos_training,
        :messaging_thread_store,

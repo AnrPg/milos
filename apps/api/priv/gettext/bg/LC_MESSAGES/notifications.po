@@ -459,3 +459,15 @@ msgstr "Време е за ново измерване"
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Нов запис ти помага да видиш тенденцията си. Отнема минута."
+
+msgid "How did it go?"
+msgstr "Как мина?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Кратка бележка за по-рано ти помага да видиш какво работи за теб."
+
+msgid "A glass of water?"
+msgstr "Чаша вода?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "Следобедът е добър момент да наваксаш с водата."

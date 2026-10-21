@@ -4,4 +4,5 @@ defmodule MilosTraining.Nutrition.Ports.NutritionStore do
   @callback get_plan(map(), binary()) :: map() | nil
   @callback put_plan(map(), binary(), map()) :: {:ok, map()} | {:error, term()}
   @callback delete_plan(map(), binary()) :: :ok
+  @callback list_own_plans() :: [map()]
 end

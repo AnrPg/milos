@@ -459,3 +459,15 @@ msgstr "È ora di una nuova misurazione"
 
 msgid "A new snapshot helps you see your trend. It takes a minute."
 msgstr "Una nuova istantanea ti aiuta a vedere il tuo andamento. Ci vuole un minuto."
+
+msgid "How did it go?"
+msgstr "Com'è andata?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Una breve nota su prima ti aiuta a capire cosa funziona per te."
+
+msgid "A glass of water?"
+msgstr "Un bicchiere d'acqua?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "Il pomeriggio è un buon momento per recuperare con l'acqua."

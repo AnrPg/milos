@@ -4,6 +4,8 @@ defmodule MilosTraining.Nutrition.Plan do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias MilosTraining.Nutrition.Domain.PortionPolicy
+
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
@@ -16,6 +18,8 @@ defmodule MilosTraining.Nutrition.Plan do
     field :protein_grams, :integer
     field :carbs_grams, :integer
     field :fat_grams, :integer
+    field :portion_targets, :map
+    field :meal_slots, {:array, :string}, default: []
     field :updated_by_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
@@ -28,6 +32,8 @@ defmodule MilosTraining.Nutrition.Plan do
     :protein_grams,
     :carbs_grams,
     :fat_grams,
+    :portion_targets,
+    :meal_slots,
     :updated_by_id
   ]
 
@@ -41,6 +47,17 @@ defmodule MilosTraining.Nutrition.Plan do
     |> validate_number(:protein_grams, greater_than_or_equal_to: 0, less_than_or_equal_to: 1000)
     |> validate_number(:carbs_grams, greater_than_or_equal_to: 0, less_than_or_equal_to: 2000)
     |> validate_number(:fat_grams, greater_than_or_equal_to: 0, less_than_or_equal_to: 1000)
+    |> validate_portions()
+    |> validate_subset(:meal_slots, PortionPolicy.slots())
+    |> update_change(:meal_slots, &Enum.uniq/1)
+    |> check_constraint(:meal_slots, name: :nutrition_plans_meal_slots_check)
     |> unique_constraint([:organization_id, :user_id])
+  end
+
+  defp validate_portions(changeset) do
+    case PortionPolicy.validate(get_change(changeset, :portion_targets)) do
+      {:ok, targets} -> put_change(changeset, :portion_targets, targets)
+      {:error, message} -> add_error(changeset, :portion_targets, message)
+    end
   end
 end

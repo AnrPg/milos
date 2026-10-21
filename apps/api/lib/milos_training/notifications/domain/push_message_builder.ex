@@ -540,6 +540,23 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-159: lock-screen safe, so neither push names a craving or a number.
+  def build("craving_follow_up", payload, localize) do
+    %{
+      title: localize.("How did it go?", %{}),
+      body: localize.("A quick note on earlier helps you see what works for you.", %{}),
+      url: payload["url"] || "/journal/wellbeing"
+    }
+  end
+
+  def build("water_reminder", payload, localize) do
+    %{
+      title: localize.("A glass of water?", %{}),
+      body: localize.("The afternoon is a good moment to catch up on water.", %{}),
+      url: payload["url"] || "/journal/wellbeing"
+    }
+  end
+
   # ADR-155 (board 10, Q3).
   def build("check_in_visitor", payload, localize) do
     bindings = %{

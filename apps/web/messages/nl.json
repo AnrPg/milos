@@ -4335,7 +4335,13 @@
     "apiErrorAttendanceRequiresApprovedBooking": "Alleen met een goedgekeurde boeking kun je inchecken.",
     "coachProgrammeTitle": "Mijn programma",
     "coachProgrammeHint": "Wijzig een dag, weiger een training of vraag je coach om een training.",
-    "mpTabBody": "Lichaam"
+    "mpTabBody": "Lichaam",
+    "stfPortionsTitle": "Dagelijkse handporties",
+    "stfPortionsHint": "Wat het lid op de Welzijn-pagina ziet in plaats van getallen. Halve mogen ook.",
+    "stfPortionsFromGrams": "Invullen vanuit de grammen",
+    "stfInvalidPortions": "Porties gaan van 0 tot 20, per halve.",
+    "stfMealSlots": "Maaltijden van de dag",
+    "stfMealSlotsHint": "De maaltijden waarop het lid logt. Laat leeg voor ontbijt, lunch, avondeten en een snack."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4859,7 +4865,9 @@
         "review": "Beoordeling",
         "note": "Notitie",
         "check_in": "Hoe ik me voel",
-        "body": "Lichaam"
+        "body": "Lichaam",
+        "wellness": "Welzijn",
+        "craving": "Trek"
       },
       "loadMore": "Oudere invoer",
       "loadingMore": "Laden…",
@@ -4957,7 +4965,9 @@
       "review": "Beoordeling",
       "checkIn": "Hoe ik me voel",
       "note": "Notitie of gedachte",
-      "measure": "Meting"
+      "measure": "Meting",
+      "wellness": "Water · Slaap · Maaltijd",
+      "craving": "Trek"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
@@ -4967,7 +4977,9 @@
       "review": "Beoordeel een les of training",
       "checkIn": "Een paar snelle vragen",
       "note": "Techniek, doel, stemming",
-      "measure": "Gewicht, omtrekken, foto's"
+      "measure": "Gewicht, omtrekken, foto's",
+      "wellness": "Een glas, afgelopen nacht, een maaltijd",
+      "craving": "Noteer het of vraag om steun"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -5083,7 +5095,220 @@
     "programmeManage": "Dag wijzigen of weigeren",
     "meReferrals": "Neem een vriend mee",
     "meReferralsHint": "Je link, QR en uitnodigingen",
-    "membershipReferral": "Neem een vriend mee"
+    "membershipReferral": "Neem een vriend mee",
+    "wellness": {
+      "eyebrow": "Welzijn",
+      "today": "Vandaag",
+      "yesterday": "Gisteren",
+      "loading": "Laden…",
+      "customize": "Aanpassen",
+      "previousDay": "Vorige dag",
+      "nextDay": "Volgende dag",
+      "close": "Sluiten",
+      "save": "Opslaan",
+      "saving": "Opslaan…",
+      "delete": "Verwijderen",
+      "cancel": "Annuleren",
+      "undo": "Ongedaan maken",
+      "open": "Openen",
+      "onlyMe": "Alleen jij ziet dit. Losse items kun je later delen.",
+      "whoSees": "Wie het ziet:",
+      "less": "Minder {what}",
+      "more": "Meer {what}",
+      "item": {
+        "water": "Water",
+        "sleep": "Slaap",
+        "meals": "Maaltijden",
+        "plan": "Plan van de coach",
+        "mood": "Stemming",
+        "cravings": "Trek"
+      },
+      "water": {
+        "add": "+1 glas",
+        "glasses": "{filled} van {goal} glazen",
+        "added": "Glas toegevoegd ({ml} ml)",
+        "dropsLabel": "Glazen vandaag",
+        "remove": "Dit glas verwijderen"
+      },
+      "sleep": {
+        "title": "Slaap",
+        "night": "Nacht",
+        "nap": "Dutje",
+        "bed": "Naar bed gegaan",
+        "wake": "Wakker geworden",
+        "napMinutes": "Minuten",
+        "duration": "{hours} u {minutes} min",
+        "quality": "Kwaliteit (1 tot 5)",
+        "qualityValue": "Kwaliteit {quality}/5",
+        "napValue": "Dutje {minutes} min",
+        "empty": "Niet vastgelegd",
+        "tap": "Tik om de nacht vast te leggen",
+        "fromDevice": "van {source}",
+        "corrected": "van {source}, door jou gecorrigeerd"
+      },
+      "source": {
+        "manual": "jou",
+        "garmin": "Garmin",
+        "apple_health": "Apple Health",
+        "health_connect": "Health Connect"
+      },
+      "meal": {
+        "title": "Maaltijd",
+        "slot": "Welke maaltijd",
+        "logged": "Vastgelegd",
+        "addSnack": "+ Tussendoortje",
+        "fitLabel": {
+          "plan": "En het plan?",
+          "own": "Zoals je wilde?"
+        },
+        "fit": {
+          "plan": {
+            "in_plan": "Binnen het plan",
+            "off_plan": "Buiten het plan"
+          },
+          "own": {
+            "in_plan": "Zoals ik wilde",
+            "off_plan": "Anders"
+          }
+        },
+        "photo": "Foto (optioneel)",
+        "photoAdd": "Foto toevoegen",
+        "photoChange": "Foto wijzigen",
+        "photoRemove": "Verwijderen",
+        "photoUploading": "Uploaden…",
+        "photoFailed": "De foto is niet geüpload. Probeer het opnieuw of sla op zonder.",
+        "photoPrivate": "Privé, net als lichaamsfoto's. Hij komt nooit in een bericht zonder dat je het vraagt.",
+        "note": "Een regel erover (optioneel)",
+        "portions": "Handporties (optioneel)",
+        "portionsHint": "Handpalm, holle hand, vuist, duim. Halve mag ook. Niet wegen, geen calorieën.",
+        "hungerLabel": "Honger en verzadiging (optioneel)",
+        "hunger": "Hoeveel honger vooraf (1 tot 5)",
+        "fullness": "Hoe vol daarna (1 tot 5)"
+      },
+      "slot": {
+        "breakfast": "Ontbijt",
+        "morning_snack": "Ochtendsnack",
+        "lunch": "Lunch",
+        "afternoon_snack": "Middagsnack",
+        "dinner": "Avondeten",
+        "evening_snack": "Avondsnack",
+        "snack": "Tussendoortje",
+        "pre_workout": "Voor de training",
+        "post_workout": "Na de training"
+      },
+      "portion": {
+        "protein": "Eiwit (handpalm)",
+        "carbs": "Koolhydraten (holle hand)",
+        "veg": "Groenten (vuist)",
+        "fat": "Vetten (duim)"
+      },
+      "plan": {
+        "title": "Voeding · {title}",
+        "showNumbers": "Getallen tonen",
+        "hideNumbers": "Getallen verbergen",
+        "of": "{logged} van {target}",
+        "noPortions": "Het plan van je coach heeft nog geen dagporties."
+      },
+      "mood": {
+        "mood": "Stemming {value}/4",
+        "stress": "Stress {value}/4",
+        "empty": "Hoe voel je je?",
+        "open": "Beantwoord «Hoe voel ik me»"
+      },
+      "craving": {
+        "title": "Trek",
+        "tileTitle": "Leg het vast of vraag om steun",
+        "tileHint": "Op het moment zelf; hoe het afliep kan later",
+        "count": "{count, plural, one {# vandaag} other {# vandaag}}",
+        "edit": "Bewerken",
+        "support": "Ik heb steun nodig",
+        "supportNoBuddy": "Zodra je een buddy kiest, krijgt die een kort bericht. Nooit de details.",
+        "intensity": "Hoe sterk?",
+        "trigger": "Wat zette het in gang?",
+        "outcome": "Wat gebeurde er?",
+        "note": "Waar ik zin in had (optioneel)",
+        "notePlaceholder": "bv. iets zoets na het eten",
+        "tryNow": "Probeer nu",
+        "tryWater": "Een glas water",
+        "tryWalk": "Een wandeling van 10 minuten",
+        "tryWait": "Wacht 10 minuten en adem rustig",
+        "waterCounted": "Geteld",
+        "private": "Alleen jij ziet dit. We vragen één keer, over 20 minuten, hoe het ging.",
+        "howDidItGo": "Hoe ging het?"
+      },
+      "trigger": {
+        "stress": "Stress",
+        "fatigue": "Vermoeidheid",
+        "boredom": "Verveling",
+        "social": "Sociaal",
+        "hunger": "Honger",
+        "other": "Iets anders"
+      },
+      "outcome": {
+        "resisted": "Ik ben eroverheen gekomen",
+        "ate_off_plan": "Ik heb iets buiten het plan gegeten",
+        "ongoing": "Ik heb het nog"
+      },
+      "week": {
+        "title": "Deze week",
+        "range": "{from} – {to}",
+        "previous": "Vorige week",
+        "next": "Volgende week",
+        "item": "Item",
+        "line": "Slaap op je doel {nights} van {days} nachten · water op je doel {water} van {days} dagen",
+        "dot": {
+          "full": "Op je doel",
+          "half": "Gedeeltelijk",
+          "empty": "Niets vastgelegd",
+          "warm": "Trek vastgelegd"
+        }
+      },
+      "consent": {
+        "title": "Je water, slaap, maaltijden en trek",
+        "body": "Wat je hier vastlegt, zijn gezondheidsgegevens. Ze blijven van jou en privé: je coach ziet een item alleen als je het deelt, en je kunt alles altijd exporteren of verwijderen.",
+        "items": "Wat wil je zien?",
+        "later": "Je kunt dit altijd wijzigen via «Aanpassen».",
+        "agree": "Akkoord, beginnen"
+      },
+      "settings": {
+        "items": "Items en volgorde",
+        "hiddenKeeps": "Een item dat je uitzet, verdwijnt uit de kaart, de week en Nieuw item. De gegevens blijven tot je ze verwijdert.",
+        "moveUp": "{item} omhoog",
+        "moveDown": "{item} omlaag",
+        "water": "Water",
+        "glass": "Je glas",
+        "ml": "{ml} ml",
+        "goalGlasses": "Dagdoel (glazen)",
+        "reminder": "Herinnering in de middag",
+        "reminderHint": "Eén keer, na 15:00, als je onder de helft van je doel zit",
+        "goalYours": "De doelen zijn van jou. Een coach kan er een voorstellen, maar nooit vastleggen.",
+        "sleep": "Slaap",
+        "sleepGoal": "Slaapdoel (uren)",
+        "data": "Je gegevens",
+        "section": {
+          "wellness": "Water, slaap en maaltijden",
+          "cravings": "Trek"
+        },
+        "export": "Exporteren (JSON)",
+        "erase": "Alles verwijderen",
+        "eraseConfirm": "Ja, definitief verwijderen",
+        "eraseWarning": "Dit verwijdert elk item van dit onderdeel definitief, met de maaltijdfoto's.",
+        "erased": "Verwijderd."
+      },
+      "feed": {
+        "water": "{count, plural, one {# glas} other {# glazen}}",
+        "meals": "{count, plural, one {# maaltijd} other {# maaltijden}}",
+        "craving": "Trek · {intensity}/10",
+        "empty": "Welzijn"
+      },
+      "error": {
+        "health_data_consent_required": "Ga eerst akkoord met het bewaren van gezondheidsgegevens.",
+        "occurred_in_future": "Dat tijdstip ligt in de toekomst.",
+        "occurred_too_long_ago": "Je kunt tot 7 dagen terug aanvullen of corrigeren.",
+        "invalid_wellness_value": "Controleer de waarden en probeer het opnieuw.",
+        "invalid_media": "De foto is niet klaar. Kies hem opnieuw."
+      }
+    }
   },
   "Community": {
     "all": "Alles",

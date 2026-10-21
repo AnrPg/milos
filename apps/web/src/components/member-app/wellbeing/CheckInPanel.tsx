@@ -28,9 +28,10 @@ const QUESTION_KEYS = ["sleep", "energy", "mood", "stress", "body"] as const;
  * Πώς νιώθω (ADR-140 §2): a few questions answered with one of four faces;
  * an answer opens an optional text field under its question. Every
  * submission is a new timestamped entry; below, each question draws a
- * timeline with a point per submission.
+ * timeline with a point per submission. Questions Ευεξία already answered
+ * that day (sleep) are skipped.
  */
-export function CheckInPanel() {
+export function CheckInPanel({ skipQuestions = [] }: { skipQuestions?: string[] } = {}) {
   const t = useTranslations("MemberApp.checkIn");
   const { tokens } = useSession();
   const queryClient = useQueryClient();
@@ -46,7 +47,10 @@ export function CheckInPanel() {
       fetchMyCheckIns(tokens!.access_token, { from: range.from.toISOString(), to: range.to.toISOString() }),
   });
 
-  const questionKeys = timelineQuery.data?.questions.map((question) => question.key) ?? [...QUESTION_KEYS];
+  // ADR-159 (board 14, Q3): no sleep question on a day the night is already logged.
+  const questionKeys = (timelineQuery.data?.questions.map((question) => question.key) ?? [...QUESTION_KEYS]).filter(
+    (key) => !skipQuestions.includes(key),
+  );
   const answers = draftAnswers(draft, questionKeys);
 
   const submitMutation = useMutation({
