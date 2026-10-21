@@ -199,6 +199,25 @@ every milestone; all copy in the 12 locales.
 
 ## 5a. UX decisions (filled in per screen, from the boards)
 
+### WOD goals (2026-10-21, [board 18](https://claude.ai/artifact/4FpEmCjYhx3NXDUmuPqqbw))
+All recommended options, with every recommended extra.
+1. **Coach (Q1 A):** a «Στόχοι» panel in the workout editor, filled from the exercises as the coach types; edits stick,
+   «Επαναφορά πρότασης» restores the suggestion; the toggle «Εμφάνιση στόχων στα μέλη» sits at the top. Extras: a gym
+   setting «Στόχοι ορατοί από προεπιλογή» sets the toggle's starting value (off by default); class variants and scaled
+   versions inherit the goals and the coach can change them per variant.
+2. **Picking (Q2 A + note «Both tap and list search»):** one picker with the rotatable 3D body (tap group, tap again for
+   the head, long press cycles the role) and a searchable list by region, sharing one selection. Picking a head zooms
+   onto it.
+3. **Member card (Q3 A):** compact strip in the workout card (small figure, top muscles, qualities, stimulus); tap opens
+   the 3D sheet. Members see κύριοι and βοηθητικοί on the card, σταθεροποίηση only in the sheet. The strip also shows
+   on the «Έτοιμος;» screen before the timer.
+4. **«Τι ένιωσες;» (Q4 A):** one optional step after timed and logged workouts: goal chips tap to «felt», «+ Κάτι άλλο»
+   from the body, qualities, «Παράλειψη». Workouts without goals still offer the step from the body (can be switched
+   off in Ρυθμίσεις); the journal entry shows «Ένιωσα: …» with the entry's visibility.
+5. **Stimulus (Q5 A):** free text with tap-to-insert phrases.
+6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
+   entries; also lists goals nobody felt.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
