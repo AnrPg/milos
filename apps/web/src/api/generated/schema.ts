@@ -61817,8 +61817,8 @@ export interface operations {
                     };
                 };
             };
-            /** @description Assistant unavailable */
-            502: {
+            /** @description Assistant unavailable, out of credits or unclear */
+            424: {
                 headers: {
                     [name: string]: unknown;
                 };
