@@ -109,6 +109,11 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
   if (has("manage_inventory") && !users) {
     items.push({ id: "inventory", href: "/admin/inventory", labelKey: "inventory", match: ["/admin/inventory"], scoped: true });
   }
+  // ADR-143: coaches moderate the community from the bar ("More"); owners and
+  // admins reach Κοινότητα from a dashboard tile and from settings.
+  if (has("moderate_community") && !users) {
+    items.push({ id: "community", href: "/admin/community", labelKey: "community", match: ["/admin/community"], scoped: true });
+  }
   return items;
 }
 
@@ -120,7 +125,7 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
  */
 export function clientNavItems(): NavItem[] {
   return [
-    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs"], exact: true },
+    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs", "/around", "/around/events", "/around/boxes", "/around/clubs", "/around/posts"], exact: true },
     {
       id: "box",
       href: "/box",
@@ -150,7 +155,7 @@ export function clientExtraLinks(membership?: MembershipLike | null): NavItem[] 
 }
 
 /** Full-screen pages where the bottom bar would get in the way. */
-const BOTTOM_BAR_HIDDEN = [/^\/workouts\/[^/]+\/execute(?:\/|$)/, /^\/workouts\/free-text\/execute(?:\/|$)/, /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/];
+const BOTTOM_BAR_HIDDEN = [/^\/workouts\/[^/]+\/execute(?:\/|$)/, /^\/workouts\/free-text\/execute(?:\/|$)/, /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/, /^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/];
 
 export function showsBottomBar(pathname: string) {
   const path = relativePath(pathname);
@@ -186,7 +191,13 @@ export type SectionGroup = { id: string; tabs: SectionTab[] };
 /** The tab strip of the page group `pathname` belongs to, if any. */
 export function sectionGroupFor(
   pathname: string,
-  context: { surface: "admin" | "member" | "athlete"; staffItems: NavItem[]; features: ClientFeature[] },
+  context: {
+    surface: "admin" | "member" | "athlete";
+    staffItems: NavItem[];
+    features: ClientFeature[];
+    /** Ρυθμίσεις › Σώμα (ADR-158 §7): a section switched off loses its segment. */
+    journalSections?: { body?: boolean; wellness?: boolean } | null;
+  },
 ): SectionGroup | null {
   const path = relativePath(pathname);
   const groups: SectionGroup[] = [];
@@ -219,8 +230,8 @@ export function sectionGroupFor(
         ...(feature("coaching") ? [{ id: "coaching", href: "/box/coach", labelKey: "coach", match: ["/box/coach"] }] : []),
       ],
     });
-    // Journal segments in the map's order: Ροή · Vault · (Σώμα, Phase 2) ·
-    // Ευεξία · Πρόοδος. Reviews are entries of Ροή; their form page lights Ροή.
+    // Journal segments in the map's order: Ροή · Vault · Σώμα · Ευεξία ·
+    // Πρόοδος. Σώμα and Ευεξία leave when switched off in Ρυθμίσεις › Σώμα. Reviews are entries of Ροή; their form page lights Ροή.
     // Πρόοδος is for everyone (its advanced statistics stay package-gated
     // inside the page) and owns the full Pantheon page.
     groups.push({
@@ -228,8 +239,13 @@ export function sectionGroupFor(
       tabs: [
         { id: "flow", href: "/journal", labelKey: "journalFlow", match: ["/journal"] },
         { id: "vault", href: "/journal/vault", labelKey: "vault", match: ["/journal/vault"] },
-        { id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] },
-        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon"] },
+        ...(context.journalSections?.body === false
+          ? []
+          : [{ id: "body", href: "/journal/body", labelKey: "body", match: ["/journal/body"] }]),
+        ...(context.journalSections?.wellness === false
+          ? []
+          : [{ id: "wellbeing", href: "/journal/wellbeing", labelKey: "wellbeing", match: ["/journal/wellbeing"] }]),
+        { id: "progress", href: "/journal/progress", labelKey: "progress", match: ["/journal/progress", "/journal/pantheon", "/journal/atlas"] },
       ],
     });
   }

@@ -5,7 +5,7 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
   """
 
   alias MilosTraining.Application.TrackMessagingAnalytics
-  alias MilosTraining.{Identity, Messaging, Organizations, Scheduling, Workouts}
+  alias MilosTraining.{Identity, Messaging, Organizations, Scheduling, Trials, Workouts}
 
   def call(%{id: actor_id}, %{context_type: :direct, participant_id: actor_id}),
     do: {:error, :self_conversation}
@@ -97,7 +97,9 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
       })
       when is_binary(organization_id) and is_binary(member_id) do
     with :ok <- Organizations.authorize_capability(context, :message_from_box),
-         true <- active_member?(member_id, organization_id) || {:error, :not_found},
+         true <-
+           (active_member?(member_id, organization_id) or trial_guest?(context, member_id)) ||
+             {:error, :not_found},
          {:ok, thread} <-
            Messaging.with_tenant_context(context, fn ->
              Messaging.get_or_create_thread(%{
@@ -166,6 +168,10 @@ defmodule MilosTraining.Application.GetOrCreateMessagingThread do
       _ -> {:error, :forbidden}
     end
   end
+
+  # ADR-144: staff also write to people who tried a class (board 6 Q4).
+  defp trial_guest?(context, user_id),
+    do: Trials.list_requests(context, %{user_id: user_id, limit: 1}) != []
 
   defp active_member?(user_id, organization_id) do
     Enum.any?(Organizations.list_memberships(user_id), fn %{membership: membership} ->

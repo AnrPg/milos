@@ -15,6 +15,7 @@ import { localizeError } from "@/i18n/presentation";
 import { CommentList } from "@/components/journal/CommentList";
 import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
+import { FeltStep } from "@/components/wod-goals/FeltStep";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import {
@@ -61,7 +62,14 @@ const labelClass = "block text-xs font-semibold tracking-[0.16em]";
 export type TrainingLogDialogState =
   | { mode: "closed" }
   | { mode: "pick" }
-  | { mode: "create"; source: SelectedTrainingSource }
+  | {
+      mode: "create";
+      source: SelectedTrainingSource;
+      /** A prefilled form to review (voice logging, ADR-175); nothing is saved until the member confirms. */
+      draft?: TrainingLogForm;
+      /** What was heard, shown with the draft. */
+      transcript?: string;
+    }
   | { mode: "edit"; entry: TrainingLogEntry }
   | { mode: "void"; entry: TrainingLogEntry };
 
@@ -87,6 +95,7 @@ export function TrainingLogEntryCard({
   onEdit,
   onVoid,
   badge,
+  device,
 }: {
   entry: TrainingLogEntry;
   locale: string;
@@ -94,6 +103,8 @@ export function TrainingLogEntryCard({
   onVoid: () => void;
   /** The entry's visibility badge, where the journal shows one. */
   badge?: ReactNode;
+  /** The watch's numbers once a device matched this workout (ADR-161). */
+  device?: ReactNode;
 }) {
   const i18n = useUiTranslations();
   const voided = entry.status === "voided";
@@ -132,6 +143,7 @@ export function TrainingLogEntryCard({
               ? ` · ${i18n("trainingLogEffortValue", { effort: entry.perceived_effort })}`
               : ""}
           </p>
+          {device}
           {badge ? <div className="mt-1">{badge}</div> : null}
           {entry.comments.length > 0 ? (
             <div className="mt-2">
@@ -204,7 +216,7 @@ export function TrainingLogDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center sm:items-center sm:p-4"
+      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4"
       style={{ background: "rgba(0, 0, 0, 0.45)" }}
       role="dialog"
       aria-modal="true"
@@ -235,12 +247,32 @@ export function TrainingLogDialog({
             <EntryForm
               token={token}
               state={state}
-              onBack={state.mode === "create" ? () => onNavigate({ mode: "pick" }) : undefined}
+              onBack={state.mode === "create" && !state.draft ? () => onNavigate({ mode: "pick" }) : undefined}
               onDone={onClose}
             />
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Above a voice draft (ADR-175): review before saving, and what was heard. */
+function VoiceDraftNotice({ transcript }: { transcript?: string }) {
+  const t = useTranslations("VoiceLog");
+  return (
+    <div
+      className="rounded-2xl px-4 py-3 text-sm"
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+      data-testid="voice-draft-notice"
+    >
+      <p className="font-semibold">{t("draftNotice")}</p>
+      {transcript ? (
+        <details className="mt-1">
+          <summary className="cursor-pointer text-xs font-semibold" style={{ color: "var(--dim)" }}>{t("heard")}</summary>
+          <p className="mt-1 break-words text-xs" style={{ color: "var(--muted)" }}>«{transcript}»</p>
+        </details>
+      ) : null}
     </div>
   );
 }
@@ -370,7 +402,7 @@ function EntryForm({
   onDone,
 }: {
   token: string;
-  state: { mode: "create"; source: SelectedTrainingSource } | { mode: "edit"; entry: TrainingLogEntry };
+  state: Extract<TrainingLogDialogState, { mode: "create" }> | { mode: "edit"; entry: TrainingLogEntry };
   onBack?: () => void;
   onDone: () => void;
 }) {
@@ -381,11 +413,14 @@ function EntryForm({
   const sections =
     state.mode === "create" ? state.source.scoreableSections : sectionsFromEntryScores(state.entry);
   const [form, setForm] = useState<TrainingLogForm>(() =>
-    state.mode === "create" ? emptyTrainingLogForm(new Date(), state.source.title) : formFromEntry(state.entry),
+    state.mode === "create"
+      ? (state.draft ?? emptyTrainingLogForm(new Date(), state.source.title))
+      : formFromEntry(state.entry),
   );
   const [idempotencyKey] = useState(newIdempotencyKey);
   const [errors, setErrors] = useState<TrainingLogFormError[]>([]);
   const [queued, setQueued] = useState(false);
+  const [feltEntryId, setFeltEntryId] = useState<string | null>(null);
   const submitCommand = useOutboxCommand();
   const commentWriter = useJournalCommentWriter();
 
@@ -393,13 +428,13 @@ function EntryForm({
     // ADR-120: new entries go through the durable outbox (the form's
     // idempotency key is the operation id); edits stay online-only because
     // they carry an optimistic-lock version.
-    mutationFn: async (): Promise<{ queued: boolean }> => {
+    mutationFn: async (): Promise<{ queued: boolean; createdId?: string }> => {
       if (state.mode === "create") {
-        const outcome = await submitCommand(
+        const outcome = await submitCommand<TrainingLogEntry, unknown>(
           "training_log.create",
           buildCreatePayload(form, state.source, { idempotencyKey, timezone: browserTimezone() }),
         );
-        return { queued: outcome.status === "queued" };
+        return outcome.status === "queued" ? { queued: true } : { queued: false, createdId: outcome.result?.id };
       }
 
       await updateTrainingLogEntry(token, state.entry.id, buildUpdatePayload(form, state.entry, sections, browserTimezone()));
@@ -416,7 +451,9 @@ function EntryForm({
         queryClient.invalidateQueries({ queryKey: ["training-log"] }),
         queryClient.invalidateQueries({ queryKey: ["landing"] }),
       ]);
-      onDone();
+      // «Τι ένιωσες;» needs the entry on the server; a queued entry skips it.
+      if (result.createdId) setFeltEntryId(result.createdId);
+      else onDone();
     },
   });
 
@@ -434,8 +471,13 @@ function EntryForm({
     if (nextErrors.length === 0) mutation.mutate();
   };
 
+  if (feltEntryId) {
+    return <FeltStep entryKind="training_log" entryId={feltEntryId} layout="inline" onDone={() => onDone()} />;
+  }
+
   return (
     <form className="grid gap-4" onSubmit={submit} noValidate>
+      {state.mode === "create" && state.draft ? <VoiceDraftNotice transcript={state.transcript} /> : null}
       {sourceType === "freeform" ? (
         <label className={labelClass} style={{ color: "var(--dim)" }}>
           {i18n("trainingLogFormTitle")}

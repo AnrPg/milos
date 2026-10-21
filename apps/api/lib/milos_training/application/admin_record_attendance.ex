@@ -1,7 +1,7 @@
 defmodule MilosTraining.Application.AdminRecordAttendance do
   alias MilosTraining.Application.{BookingEntitlement, BookingTerms, TrackAnalyticsEvent}
   alias MilosTraining.Scheduling.Domain.AttendancePolicy
-  alias MilosTraining.{Finance, Scheduling}
+  alias MilosTraining.Scheduling
 
   def call(context, slot_id, user_id, admin_id, params) do
     with {:ok, approved_booking} <- approved_booking(context, slot_id, user_id),
@@ -26,6 +26,8 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
           metadata: %{member_id: user_id}
         })
 
+        announce_attendance(attendance)
+
         {:ok, attendance}
       end
     end
@@ -42,10 +44,9 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
   # TD-092: every ledger transition runs in the tenant's scope - unscoped, RLS
   # hid the reservation and the visit was silently never finalized/returned.
   defp reconcile_visit(context, %{status: "cancelled"} = attendance, allowance, _waived?) do
-    Finance.release_entitlement_source(
+    BookingEntitlement.release(
       context,
       attendance.user_id,
-      "scheduling",
       attendance.scheduled_class_id,
       allowance,
       %{
@@ -57,10 +58,9 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
 
   # ADR-097: packages that waive the no-show penalty return the visit.
   defp reconcile_visit(context, %{status: "no_show"} = attendance, allowance, true) do
-    Finance.release_entitlement_source(
+    BookingEntitlement.release(
       context,
       attendance.user_id,
-      "scheduling",
       attendance.scheduled_class_id,
       allowance,
       %{
@@ -71,10 +71,9 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
   end
 
   defp reconcile_visit(context, attendance, allowance, _waived?) do
-    Finance.finalize_entitlement_source(
+    BookingEntitlement.finalize(
       context,
       attendance.user_id,
-      "scheduling",
       attendance.scheduled_class_id,
       allowance,
       %{
@@ -100,5 +99,17 @@ defmodule MilosTraining.Application.AdminRecordAttendance do
       nil -> {:error, :attendance_requires_approved_booking}
       booking -> {:ok, booking}
     end
+  end
+
+  @doc false
+  def announce_attendance(attendance) do
+    MilosTraining.DomainEvents.publish(:attendance_recorded, %{
+      organization_id: attendance.organization_id,
+      scheduled_class_id: attendance.scheduled_class_id,
+      user_id: attendance.user_id,
+      booking_id: Map.get(attendance, :booking_id),
+      status: attendance.status,
+      at: DateTime.utc_now()
+    })
   end
 end

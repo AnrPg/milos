@@ -1,10 +1,11 @@
 import type { CoachNote, CoachNoteSubjectKind } from "@/api/roles";
 
 /**
- * ADR-140 §8: the staff member profile has six tabs, a few sections each.
+ * ADR-140 §8: the staff member profile has six tabs, a few sections each;
+ * ADR-158 adds «Σώμα» for a client's coach (snapshots the member shared).
  * The active tab is in the URL (`?tab=`), so a link opens the right one.
  */
-export const PROFILE_TABS = ["overview", "training", "wellbeing", "coaching", "finance", "account"] as const;
+export const PROFILE_TABS = ["overview", "training", "wellbeing", "body", "coaching", "finance", "account"] as const;
 export type ProfileTab = (typeof PROFILE_TABS)[number];
 
 /** Which tab holds each section (the `#section` anchors keep working). */
@@ -13,10 +14,15 @@ export const SECTION_TAB: Record<string, ProfileTab> = {
   box_message: "overview",
   schedule: "training",
   training_history: "training",
+  // ADR-165: the client's coverage, qualities and load (shared entries only).
+  training_depth: "training",
   prs: "training",
   training_notes: "training",
   health_incidents: "wellbeing",
   wellbeing_notes: "wellbeing",
+  // ADR-160: the weekly wellness summary the member chose to share.
+  wellness_summary: "wellbeing",
+  body: "body",
   coaching_context: "coaching",
   coaching_relationships: "coaching",
   coach_notes: "coaching",

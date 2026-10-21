@@ -6,16 +6,51 @@ if System.get_env("PHX_SERVER") do
   config :milos_training, MilosTrainingWeb.Endpoint, server: true
 end
 
+# Outbound Gemini calls honour HTTPS_PROXY (corporate egress, or a sandbox
+# proxy that attaches the API key itself), trusting SSL_CERT_FILE when set.
+gemini_req_options =
+  case System.get_env("HTTPS_PROXY") || System.get_env("https_proxy") do
+    proxy when is_binary(proxy) and proxy != "" ->
+      %URI{scheme: scheme, host: host, port: port} = URI.parse(proxy)
+      cacertfile = System.get_env("SSL_CERT_FILE")
+
+      [
+        connect_options:
+          [proxy: {String.to_existing_atom(scheme || "http"), host, port, []}] ++
+            if(cacertfile, do: [transport_opts: [cacertfile: cacertfile]], else: [])
+      ]
+
+    _none ->
+      []
+  end
+
 # Free-text workout analysis assistant. Without a key the analyze endpoint
 # answers 503 and the editor keeps working as a plain text editor.
+# ADR-141: point at a self-hosted Photon in production.
+config :milos_training, :photon,
+  base_url: System.get_env("PHOTON_BASE_URL", "https://photon.komoot.io")
+
 config :milos_training, :gemini,
+  req_options: gemini_req_options,
   api_key: System.get_env("GEMINI_API_KEY"),
   model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
   # Leave empty for models without thinking levels (e.g. gemini-2.5-*).
   thinking_level: System.get_env("GEMINI_THINKING_LEVEL", "low"),
   parser_thinking_level: System.get_env("GEMINI_PARSER_THINKING_LEVEL", "medium"),
   # Workout library icons (ADR-136) use their own small, cheap model.
-  icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite")
+  icon_model: System.get_env("GEMINI_ICON_MODEL", "gemini-2.5-flash-lite"),
+  # ADR-157: alt text suggestions (vision).
+  vision_model: System.get_env("GEMINI_VISION_MODEL", "gemini-2.5-flash-lite"),
+  # ADR-175: voice logging speech to text (audio in, transcript out).
+  transcribe_model: System.get_env("GEMINI_TRANSCRIBE_MODEL", "gemini-2.5-flash")
+
+# ADR-174: AI scaling suggestions call the Claude API with each gym's own key
+# (set in the gym's AI settings); only the default model is configured here.
+config :milos_training, :anthropic,
+  req_options: gemini_req_options,
+  scaling_model: System.get_env("ANTHROPIC_SCALING_MODEL", "claude-sonnet-5-5"),
+  # ADR-175: voice logging turns the transcript into a draft entry.
+  voice_model: System.get_env("ANTHROPIC_VOICE_MODEL", "claude-sonnet-5-5")
 
 config :web_push_elixir,
   vapid_public_key: System.get_env("WEB_PUSH_PUBLIC_KEY"),
@@ -50,7 +85,8 @@ config :milos_training,
   minio_access_key: minio_access_key,
   minio_secret_key: minio_secret_key,
   minio_bucket: System.get_env("MINIO_BUCKET", "milos-invoices"),
-  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")
+  minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars"),
+  minio_media_bucket: System.get_env("MINIO_MEDIA_BUCKET", "milos-media")
 
 meili_url =
   System.get_env("MEILI_URL") ||
@@ -78,6 +114,68 @@ present_env = fn name ->
     value when is_binary(value) -> if String.trim(value) == "", do: nil, else: String.trim(value)
     nil -> nil
   end
+end
+
+# ADR-155: Wallet cards. Each platform works only with all of its values set;
+# otherwise adding a card answers wallet_not_configured and the rest of
+# check-in works. PEM values may be the PEM text or a path to a PEM file.
+config :milos_training, :wallet,
+  apple: [
+    pass_type_identifier: present_env.("WALLET_APPLE_PASS_TYPE_ID"),
+    team_identifier: present_env.("WALLET_APPLE_TEAM_ID"),
+    certificate: present_env.("WALLET_APPLE_CERTIFICATE"),
+    private_key: present_env.("WALLET_APPLE_PRIVATE_KEY"),
+    private_key_password: present_env.("WALLET_APPLE_PRIVATE_KEY_PASSWORD"),
+    wwdr_certificate: present_env.("WALLET_APPLE_WWDR_CERTIFICATE"),
+    apns_host: present_env.("WALLET_APPLE_APNS_HOST")
+  ],
+  google: [
+    issuer_id: present_env.("WALLET_GOOGLE_ISSUER_ID"),
+    service_account_email: present_env.("WALLET_GOOGLE_SERVICE_ACCOUNT_EMAIL"),
+    private_key: present_env.("WALLET_GOOGLE_PRIVATE_KEY"),
+    origins:
+      (present_env.("WALLET_GOOGLE_ORIGINS") || "")
+      |> String.split(",", trim: true)
+      |> Enum.map(&String.trim/1)
+  ]
+
+# ADR-171: push to the store apps. FCM (Android) needs the Firebase service
+# account JSON (the text or a path); APNs (iOS) needs the team id, the key id
+# and the .p8 key (text or path). APNS_TOPIC is the iOS bundle id. Without
+# them that provider is off: nothing is registered or sent.
+config :milos_training, :native_push,
+  fcm: [service_account: present_env.("FCM_SERVICE_ACCOUNT_JSON")],
+  apns: [
+    team_id: present_env.("APNS_TEAM_ID"),
+    key_id: present_env.("APNS_KEY_ID"),
+    private_key: present_env.("APNS_PRIVATE_KEY"),
+    topic: present_env.("APNS_TOPIC")
+  ]
+
+# ADR-161: Garmin (Health + Activity APIs). Without the client id and
+# secret the devices row shows «Σύντομα» and connecting answers
+# garmin_not_configured. GARMIN_PUSH_TOKEN, when set, must also appear as
+# ?token=… in the push URLs registered at Garmin.
+config :milos_training, :garmin,
+  client_id: present_env.("GARMIN_CLIENT_ID"),
+  client_secret: present_env.("GARMIN_CLIENT_SECRET"),
+  redirect_uri: present_env.("GARMIN_REDIRECT_URI"),
+  push_token: present_env.("GARMIN_PUSH_TOKEN")
+
+# ADR-161: the key that encrypts device tokens at rest (32 bytes, base64).
+# Without it a key is derived from SECRET_KEY_BASE for this one purpose.
+case present_env.("DATA_ENCRYPTION_KEY") do
+  nil ->
+    :ok
+
+  encoded ->
+    case Base.decode64(encoded) do
+      {:ok, key} when byte_size(key) == 32 ->
+        config :milos_training, :data_encryption_key, key
+
+      _invalid ->
+        raise "DATA_ENCRYPTION_KEY must be 32 bytes, base64-encoded"
+    end
 end
 
 otel_traces_endpoint = present_env.("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")

@@ -3,9 +3,13 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
 
   @ready_tenant_tables ~w(
     class_types scheduling_settings class_series scheduled_classes bookings
+    scheduling_trial_policies scheduling_trial_requests
+    season_offerings season_enrollments
+    referral_codes referral_attributions
     class_attendance_records class_timers
     master_workouts workout_folders workout_sections workout_exercises
     exercise_variations assigned_workouts assigned_workout_athletes scale_levels
+    workout_goals
     membership_packages memberships membership_package_subscriptions
     membership_payments promotion_campaigns promotion_codes promotion_redemptions
     referral_programs referral_events referral_rewards finance_invoices
@@ -14,7 +18,8 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     finance_document_counters finance_refund_receipts finance_reconciliation_records
     finance_accounting_exports
     finance_entitlement_usage_entries finance_settings finance_subscription_freezes
-    facility_locations facility_check_ins content_videos
+    facility_locations facility_check_ins facility_check_in_settings
+    facility_visitor_scans facility_member_codes wallet_passes content_videos
     coaching_form_reviews coaching_reply_alerts nutrition_plans appointment_slots
     appointment_bookings finance_subscription_beneficiaries finance_corporate_clients
     finance_corporate_invoices
@@ -23,9 +28,14 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     coaching_notes
     coaching_note_reads
     journal_coach_reads
+    body_access_log
+    wellness_access_log
     community_clubs community_channels community_club_memberships
     community_channel_memberships community_posts community_post_reactions
-    community_post_comments
+    community_post_comments community_reports community_settings
+    community_events community_event_attendees
+    partner_profiles partner_swipes partner_matches partner_messages
+    media_tenant_objects organization_public_profiles profile_tag_suggestions
     housekeeping_areas
     housekeeping_entries
     inventory_machines
@@ -42,6 +52,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     push_dispatch_attempts
     user_pr_history
     training_log_entries
+    ai_usage_records organization_ai_settings scaling_suggestions
   )
 
   @transitional_tenant_tables []
@@ -55,6 +66,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     organizations organization_memberships organization_settings
     organization_domains organization_slug_aliases registration_invitations vendors users
     organization_provisioning_events organization_purges
+    platform_plans organization_platform_subscriptions
   )
 
   # Materialized views carry denormalized tenant data but cannot have RLS
@@ -66,9 +78,21 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
 
   @ready_personal_tables ~w(
     workout_executions execution_progress_operations notifications push_subscriptions
+    native_push_tokens widget_tokens
+    community_follows community_profile_posts community_profile_post_reactions
+    community_profile_post_comments community_social_settings community_user_blocks
     user_pr_records user_stats user_achievements user_gamification_preferences
     injury_reports user_pr_share_grants journal_visibility_defaults
-    journal_notes journal_comments wellbeing_check_ins wellbeing_check_in_answers
+    journal_notes journal_comments goal_feedback wellbeing_check_ins wellbeing_check_in_answers
+    wellness_entries craving_entries wellness_preferences
+    media_account_objects saved_filters user_home_areas
+    body_snapshots body_snapshot_photos user_health_consents body_settings
+    buddy_links buddy_settings support_requests support_request_deliveries support_replies
+    buddy_messages
+    wellness_summary_grants
+    device_connections device_activities device_imports daily_stats
+    account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
+    user_insights
   )
 
   def report do

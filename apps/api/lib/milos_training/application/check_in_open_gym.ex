@@ -4,10 +4,17 @@ defmodule MilosTraining.Application.CheckInOpenGym do
   The visit is reserved and finalized in the Finance ledger under the member's
   package, so access, location scope and the `open_gym_visits` quota apply.
   A second check-in on the same local day returns the first one unchanged.
+
+  ADR-155 options (`params`): `method` (how it happened, default `self` for
+  the member and `desk_search` for staff); `defer_finalize` keeps the visit
+  reserved (not yet consumed) so a door scan can be undone within its minute,
+  and `FinalizeScanCheckInJob` consumes it afterwards; `override` («Check-in
+  παρ' όλα αυτά» at the desk) records the visit without touching the package.
   """
 
   alias MilosTraining.{Facility, Finance, Identity}
   alias MilosTraining.Facility.Domain.CheckInPolicy
+  alias MilosTraining.Workers.FinalizeScanCheckInJob
 
   def call(context, %{id: actor_id}, user_id, params \\ %{}) do
     now = DateTime.utc_now()
@@ -19,24 +26,27 @@ defmodule MilosTraining.Application.CheckInOpenGym do
         {:ok, Map.put(existing, :already_checked_in, true)}
 
       nil ->
+        source = CheckInPolicy.source(actor_id, user_id)
+
         with %{} = member <- Identity.find_by_id(user_id) || {:error, :not_found},
              :ok <- location(context, location_id),
              id = Ecto.UUID.generate(),
-             {:ok, reservation} <- reserve(context, member, id, location_id, today) do
+             {:ok, reservation} <- reserve(context, member, id, location_id, today, params) do
           attrs = %{
             id: id,
             user_id: user_id,
             location_id: location_id,
             checked_in_on: today,
             checked_in_at: now,
-            source: CheckInPolicy.source(actor_id, user_id),
+            source: source,
+            method: param(params, :method) || default_method(source),
             recorded_by_id: actor_id,
             reservation_id: reservation_id(reservation)
           }
 
           case Facility.create_check_in(context, attrs) do
             {:ok, check_in} ->
-              finalize(context, reservation, id)
+              after_check_in(context, reservation, id, param(params, :defer_finalize))
               {:ok, Map.put(check_in, :already_checked_in, false)}
 
             {:error, reason} ->
@@ -56,19 +66,53 @@ defmodule MilosTraining.Application.CheckInOpenGym do
     end
   end
 
-  defp reserve(context, member, check_in_id, location_id, today) do
-    request =
-      location_id
-      |> CheckInPolicy.entitlement_request(today)
-      |> Map.merge(%{
-        actor_role: member.role,
-        source_context: "facility",
-        source_id: check_in_id,
-        idempotency_key: CheckInPolicy.idempotency_key(member.id, today)
-      })
+  defp reserve(context, member, check_in_id, location_id, today, params) do
+    if param(params, :override) == true do
+      {:ok, nil}
+    else
+      request =
+        location_id
+        |> CheckInPolicy.entitlement_request(today)
+        |> Map.merge(%{
+          actor_role: member.role,
+          source_context: "facility",
+          source_id: check_in_id,
+          idempotency_key: CheckInPolicy.idempotency_key(member.id, today, check_in_id)
+        })
 
-    Finance.reserve_entitlement(context, member.id, request)
+      Finance.reserve_entitlement(context, member.id, request)
+    end
   end
+
+  defp after_check_in(context, reservation, check_in_id, true) do
+    case reservation_id(reservation) do
+      nil -> :ok
+      _id -> FinalizeScanCheckInJob.schedule(context.organization_id, check_in_id)
+    end
+  end
+
+  defp after_check_in(context, reservation, check_in_id, _defer),
+    do: finalize(context, reservation, check_in_id)
+
+  @doc "Consumes the visit a deferred check-in reserved (ADR-155)."
+  def finalize_deferred(context, check_in_id) do
+    case Facility.get_check_in_by_id(context, check_in_id) do
+      %{reservation_id: reservation_id} when is_binary(reservation_id) ->
+        finalize(context, %{id: reservation_id}, check_in_id)
+
+      _undone_or_free ->
+        :ok
+    end
+  end
+
+  @doc "Returns the visit of a check-in that is being undone (ADR-155)."
+  def release_visit(context, %{id: check_in_id, reservation_id: reservation_id}),
+    do: release(context, %{id: reservation_id}, check_in_id)
+
+  defp default_method("self"), do: "self"
+  defp default_method(_staff), do: "desk_search"
+
+  defp param(params, key), do: Map.get(params, key, Map.get(params, Atom.to_string(key)))
 
   defp finalize(context, reservation, check_in_id) do
     case reservation_id(reservation) do

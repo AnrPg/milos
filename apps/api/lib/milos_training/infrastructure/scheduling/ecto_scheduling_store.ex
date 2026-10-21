@@ -416,6 +416,18 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
   end
 
   @impl true
+  def list_slots_by_ids(_context, []), do: []
+
+  def list_slots_by_ids(%{organization_id: organization_id}, ids) do
+    ScheduledClass
+    |> where([slot], slot.id in ^Enum.uniq(ids))
+    |> for_organization(organization_id)
+    |> Repo.all()
+    |> Repo.preload(@slot_preloads)
+    |> Enum.map(&normalize_slot/1)
+  end
+
+  @impl true
   def list_member_slots(%{organization_id: organization_id}, user_id, start_at, end_at) do
     Booking
     |> join(:inner, [booking], slot in ScheduledClass, on: slot.id == booking.scheduled_class_id)
@@ -574,9 +586,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     %ClassAttendanceRecord{}
     |> ClassAttendanceRecord.changeset(params)
     |> Repo.insert(
-      on_conflict:
-        {:replace,
-         [:booking_id, :status, :marked_by_id, :marked_at, :notes, :params, :updated_at]},
+      on_conflict: {:replace, attendance_replace_fields(params)},
       conflict_target: [:scheduled_class_id, :user_id]
     )
     |> case do
@@ -591,6 +601,64 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
 
       result ->
         normalize_attendance_result(result)
+    end
+  end
+
+  # ADR-155: a roster mark keeps the method of the check-in it confirms.
+  defp attendance_replace_fields(params) do
+    base = [:booking_id, :status, :marked_by_id, :marked_at, :notes, :params, :updated_at]
+    if params["check_in_method"], do: [:check_in_method | base], else: base
+  end
+
+  @impl true
+  def delete_attendance(%{organization_id: organization_id}, id) do
+    case Repo.get_by(ClassAttendanceRecord, id: id, organization_id: organization_id) do
+      nil -> {:error, :not_found}
+      record -> record |> Repo.delete() |> normalize_attendance_result()
+    end
+  end
+
+  @impl true
+  def list_recent_class_check_ins(%{organization_id: organization_id}, since, location_id) do
+    from(record in ClassAttendanceRecord,
+      join: slot in ScheduledClass,
+      on: slot.id == record.scheduled_class_id,
+      left_join: user in "users",
+      on: user.id == record.user_id,
+      where:
+        record.organization_id == ^organization_id and record.status == "attended" and
+          not is_nil(record.check_in_method) and record.marked_at >= ^since,
+      order_by: [desc: record.marked_at],
+      limit: 20,
+      select: %{
+        user_id: record.user_id,
+        display_name: coalesce(user.display_nickname, user.nickname),
+        location_id: slot.location_id,
+        method: record.check_in_method,
+        at: record.marked_at
+      }
+    )
+    |> then(fn query ->
+      if location_id,
+        do:
+          where(
+            query,
+            [_record, slot],
+            is_nil(slot.location_id) or slot.location_id == ^location_id
+          ),
+        else: query
+    end)
+    |> Repo.all()
+  end
+
+  @impl true
+  def get_attendance(%{organization_id: organization_id}, id) do
+    with {:ok, id} <- Ecto.UUID.cast(id) do
+      ClassAttendanceRecord
+      |> Repo.get_by(id: id, organization_id: organization_id)
+      |> normalize_attendance()
+    else
+      :error -> nil
     end
   end
 
@@ -1010,6 +1078,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Map.take([
       "guest_name",
       "entitlement_allowance",
+      "kind",
       "waitlist_priority",
       "client_operation_id"
     ])
@@ -1350,6 +1419,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       waitlisted_at: booking.waitlisted_at,
       guest_name: booking.guest_name,
       entitlement_allowance: booking.entitlement_allowance,
+      kind: booking.kind,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }
@@ -1367,6 +1437,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       waitlisted_at: booking.waitlisted_at,
       guest_name: booking.guest_name,
       entitlement_allowance: booking.entitlement_allowance,
+      kind: booking.kind,
       inserted_at: booking.inserted_at,
       updated_at: booking.updated_at
     }
@@ -1386,6 +1457,7 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       marked_at: record.marked_at,
       notes: record.notes,
       params: record.params || %{},
+      check_in_method: record.check_in_method,
       inserted_at: record.inserted_at,
       updated_at: record.updated_at
     }
@@ -1409,6 +1481,8 @@ defmodule MilosTraining.Infrastructure.Scheduling.EctoSchedulingStore do
       archived_at: class_type.archived_at,
       credit_cost: class_type.credit_cost,
       kind: class_type.kind,
+      level: class_type.level,
+      audiences: class_type.audiences,
       inserted_at: class_type.inserted_at,
       updated_at: class_type.updated_at
     }

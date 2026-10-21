@@ -9,9 +9,33 @@ defmodule MilosTraining.Application.BookingTerms do
 
   def for_slot(context, user_id, slot) do
     date = DateTime.to_date(slot.scheduled_at)
-    terms = finance_terms(context, user_id, date)
+    resolve(finance_terms(context, user_id, date), settings(context))
+  end
+
+  @doc """
+  The moment each slot stops being free to cancel for this member, or nil when
+  no cutoff applies. Terms are read once per class date, not once per slot.
+  """
+  def cancel_free_until(context, user_id, slots) do
     settings = settings(context)
 
+    cutoffs =
+      slots
+      |> Enum.map(&DateTime.to_date(&1.scheduled_at))
+      |> Enum.uniq()
+      |> Map.new(fn date ->
+        {date, resolve(finance_terms(context, user_id, date), settings).cancellation_cutoff_hours}
+      end)
+
+    Enum.map(slots, fn slot ->
+      case cutoffs[DateTime.to_date(slot.scheduled_at)] do
+        hours when is_integer(hours) -> DateTime.add(slot.scheduled_at, -hours * 3600, :second)
+        _ -> nil
+      end
+    end)
+  end
+
+  defp resolve(terms, settings) do
     %{
       booking_window_days:
         BookingPolicy.effective_rule(

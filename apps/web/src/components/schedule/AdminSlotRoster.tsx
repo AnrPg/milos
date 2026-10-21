@@ -6,8 +6,9 @@ import type { ScheduleBooking, ScheduleSlot } from "@/api/schedule";
 import { splitRoster } from "@/components/schedule/admin-roster";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useUiTranslations } from "@/i18n/ui";
+import { useTranslations } from "next-intl";
 
-/** Admin class roster: booked members (guests marked with their host), then the waitlist in offer order.
+/** Admin class roster: booked members (guests marked with their host, trial visitors tagged), then the waitlist in offer order.
  * `header` renders above the bookings (the injury-warning panel), `badgeFor` next to each person, and
  * members' personalized class versions (ADR-125) are listed after the roster. */
 export function AdminSlotRoster({
@@ -24,6 +25,7 @@ export function AdminSlotRoster({
   badgeFor?: (booking: ScheduleBooking) => ReactNode;
 }) {
   const i18n = useUiTranslations();
+  const tTrials = useTranslations("Trials");
   const { booked, waitlist } = splitRoster(slot.bookings);
 
   const personLabel = (booking: ScheduleBooking) => {
@@ -56,6 +58,14 @@ export function AdminSlotRoster({
               <div>
                 <p className="flex flex-wrap items-center gap-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
                   {personLabel(booking)}
+                  {booking.kind === "trial" ? (
+                    <span
+                      className="rounded-full px-2 py-0.5 text-[11px] font-bold"
+                      style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}
+                    >
+                      {tTrials("tag")}
+                    </span>
+                  ) : null}
                   {badgeFor?.(booking)}
                 </p>
                 <p className="mt-1 text-xs uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>

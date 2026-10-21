@@ -42,3 +42,21 @@ msgstr "Programmé"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "Statut de réservation du cours de formation Milos : %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "Séance d'essai chez %{box} : %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "Statut de la séance d'essai : %{status}."
+
+msgid "Waiting for the box"
+msgstr "En attente de la salle"
+
+msgid "Booked"
+msgstr "Réservée"
+
+msgid "Event: %{title}"
+msgstr "Événement : %{title}"
+
+msgid "You're going to this event."
+msgstr "Tu participes à cet événement."

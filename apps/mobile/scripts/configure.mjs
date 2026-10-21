@@ -1,0 +1,175 @@
+#!/usr/bin/env node
+// ADR-171: applies the chosen environment to the store apps before `cap sync`.
+//
+//   - www/app-config.js: the web app URL for the offline page's «Δοκίμασε ξανά».
+//   - Android: an App Links intent filter (autoVerify) for the share links on
+//     the app's host, in AndroidManifest.xml.
+//   - iOS: Associated Domains (applinks:<host>) in App.entitlements and the
+//     app-bound domains (WKAppBoundDomains) in Info.plist.
+//
+// Every edit sits between `milos:app-links` markers and is rewritten on each
+// run, so the native projects stay in git and switching environments is a
+// rerun. Missing native projects are skipped (run `npx cap add` first).
+import { createRequire } from "node:module";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
+const require = createRequire(import.meta.url);
+const { resolveEnvironment, appLinkPathPrefixes } = require("../config/resolve.cjs");
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+
+const BEGIN = "milos:app-links begin";
+const END = "milos:app-links end";
+
+export function replaceBetweenMarkers(source, block, { open, close, anchor }) {
+  const start = source.indexOf(`${open} ${BEGIN}`);
+  const end = source.indexOf(`${END} ${close}`);
+  const wrapped = `${open} ${BEGIN} ${close}\n${block}\n${open} ${END} ${close}`;
+
+  if (start !== -1 && end !== -1) {
+    const lineStart = source.lastIndexOf("\n", start) + 1;
+    const indent = source.slice(lineStart, start);
+    return source.slice(0, lineStart) + indent + indentBlock(wrapped, indent).trimStart() + source.slice(end + `${END} ${close}`.length);
+  }
+
+  const at = source.indexOf(anchor);
+  if (at === -1) throw new Error(`Anchor not found: ${anchor}`);
+  const lineStart = source.lastIndexOf("\n", at) + 1;
+  const indent = source.slice(lineStart, at).replace(/\S.*$/, "");
+  return source.slice(0, lineStart) + indentBlock(wrapped, `${indent}    `) + "\n" + source.slice(lineStart);
+}
+
+function indentBlock(text, indent) {
+  return text
+    .split("\n")
+    .map((line) => (line ? indent + line : line))
+    .join("\n");
+}
+
+export function androidIntentFilter(hostname, prefixes) {
+  const data = prefixes.map((prefix) => `    <data android:pathPrefix="${prefix}" />`).join("\n");
+  return [
+    '<intent-filter android:autoVerify="true">',
+    '    <action android:name="android.intent.action.VIEW" />',
+    '    <category android:name="android.intent.category.DEFAULT" />',
+    '    <category android:name="android.intent.category.BROWSABLE" />',
+    '    <data android:scheme="https" />',
+    `    <data android:host="${hostname}" />`,
+    data,
+    "</intent-filter>",
+  ].join("\n");
+}
+
+// ADR-173: an NFC door tag holds an https /c/ link; Android hands NDEF tags
+// to the app only through an NDEF_DISCOVERED filter (App Links don't apply).
+export function androidNdefFilter(hostname) {
+  return [
+    "<intent-filter>",
+    '    <action android:name="android.nfc.action.NDEF_DISCOVERED" />',
+    '    <category android:name="android.intent.category.DEFAULT" />',
+    '    <data android:scheme="https" />',
+    `    <data android:host="${hostname}" />`,
+    '    <data android:pathPrefix="/c/" />',
+    "</intent-filter>",
+  ].join("\n");
+}
+
+export function iosEntitlements(hostname, apsEnvironment) {
+  return [
+    "<key>com.apple.developer.associated-domains</key>",
+    "<array>",
+    `    <string>applinks:${hostname}</string>`,
+    "</array>",
+    "<key>aps-environment</key>",
+    `<string>${apsEnvironment}</string>`,
+  ].join("\n");
+}
+
+// Points both build configurations at App.entitlements (once).
+export function withEntitlementsSetting(pbxproj) {
+  if (pbxproj.includes("CODE_SIGN_ENTITLEMENTS")) return pbxproj;
+  return pbxproj.replace(/^(\s*)(CODE_SIGN_STYLE = Automatic;)$/gm, "$1CODE_SIGN_ENTITLEMENTS = App/App.entitlements;\n$1$2");
+}
+
+export function iosAppBoundDomains(hosts) {
+  return ["<key>WKAppBoundDomains</key>", "<array>", ...hosts.map((host) => `    <string>${host}</string>`), "</array>"].join(
+    "\n",
+  );
+}
+
+function patch(file, block, markers) {
+  if (!fs.existsSync(file)) return false;
+  const source = fs.readFileSync(file, "utf8");
+  const next = replaceBetweenMarkers(source, block, markers);
+  if (next !== source) fs.writeFileSync(file, next);
+  return true;
+}
+
+function ensureEntitlementsFile(file) {
+  if (fs.existsSync(file) || !fs.existsSync(path.dirname(file))) return;
+  fs.writeFileSync(
+    file,
+    [
+      '<?xml version="1.0" encoding="UTF-8"?>',
+      '<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">',
+      '<plist version="1.0">',
+      "<dict>",
+      "</dict>",
+      "</plist>",
+      "",
+    ].join("\n"),
+  );
+}
+
+export function configure(env = process.env, base = root) {
+  const environment = resolveEnvironment(env);
+  const prefixes = appLinkPathPrefixes();
+  const hostnames = environment.navigationHosts.map((host) => host.split(":")[0]);
+  const done = [];
+
+  fs.writeFileSync(
+    path.join(base, "www", "app-config.js"),
+    `// Generated by scripts/configure.mjs (${environment.name}); do not edit.\nwindow.MILOS_APP_URL = ${JSON.stringify(environment.url + "/")};\n`,
+  );
+  done.push("www/app-config.js");
+
+  const xml = { open: "<!--", close: "-->" };
+  if (
+    patch(
+      path.join(base, "android/app/src/main/AndroidManifest.xml"),
+      [androidIntentFilter(environment.hostname, prefixes), androidNdefFilter(environment.hostname)].join("\n"),
+      { ...xml, anchor: "</activity>" },
+    )
+  ) {
+    done.push("android AndroidManifest.xml");
+  }
+
+  const entitlements = path.join(base, "ios/App/App/App.entitlements");
+  ensureEntitlementsFile(entitlements);
+  const apsEnvironment = (env.MILOS_APS_ENVIRONMENT || "").trim() || (environment.name === "development" ? "development" : "production");
+  if (patch(entitlements, iosEntitlements(environment.hostname, apsEnvironment), { ...xml, anchor: "</dict>" })) {
+    done.push("ios App.entitlements");
+  }
+
+  const pbxproj = path.join(base, "ios/App/App.xcodeproj/project.pbxproj");
+  if (fs.existsSync(pbxproj)) {
+    const source = fs.readFileSync(pbxproj, "utf8");
+    const next = withEntitlementsSetting(source);
+    if (next !== source) fs.writeFileSync(pbxproj, next);
+    done.push("ios project.pbxproj");
+  }
+
+  if (patch(path.join(base, "ios/App/App/Info.plist"), iosAppBoundDomains([...new Set(hostnames)]), { ...xml, anchor: "</dict>\n</plist>" })) {
+    done.push("ios Info.plist");
+  }
+
+  return { environment, done };
+}
+
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  const { environment, done } = configure();
+  console.log(`Milos ${environment.name}: ${environment.url} (${environment.appId})`);
+  for (const item of done) console.log(`  updated ${item}`);
+}

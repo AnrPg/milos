@@ -5,6 +5,13 @@ defmodule MilosTraining.Application.DeleteScheduledSlot do
   def call(context, id) do
     with :ok <- Scheduling.delete_slot(context, id) do
       broadcast_slot_deleted(context.organization_id, id)
+
+      MilosTraining.DomainEvents.publish(:class_cancelled, %{
+        organization_id: context.organization_id,
+        scheduled_class_id: id,
+        at: DateTime.utc_now()
+      })
+
       TrackAnalyticsEvent.call("class_slot_cancelled", context, %{id: id})
       :ok
     end

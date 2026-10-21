@@ -7,7 +7,7 @@ defmodule MilosTraining.Journal.Commands.WriteNote do
   alias MilosTraining.Journal.Domain.Visibility
   alias MilosTraining.Journal.JournalStore
 
-  @fields ~w(topic body linked_kind linked_id written_at written_tz)
+  @fields ~w(topic body linked_kind linked_id written_at written_tz)a
 
   def call(user_id, organization_id, params, %DateTime{} = now) do
     defaults = JournalStore.list_defaults(user_id)
@@ -26,10 +26,10 @@ defmodule MilosTraining.Journal.Commands.WriteNote do
   @doc false
   def attrs(params) do
     for field <- @fields,
-        Map.has_key?(params, field) or Map.has_key?(params, String.to_existing_atom(field)),
+        key = Atom.to_string(field),
+        Map.has_key?(params, key) or Map.has_key?(params, field),
         into: %{} do
-      {String.to_existing_atom(field),
-       Map.get(params, field, Map.get(params, String.to_existing_atom(field)))}
+      {field, Map.get(params, key, Map.get(params, field))}
     end
     |> Map.reject(fn {key, value} -> key == :written_at and is_nil(value) end)
   end

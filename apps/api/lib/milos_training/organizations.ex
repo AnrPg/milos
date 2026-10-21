@@ -1,5 +1,5 @@
 defmodule MilosTraining.Organizations do
-  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, TenantAuthorization}
+  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, Provider, TenantAuthorization}
   alias MilosTraining.Organizations.OrganizationStore
   alias MilosTraining.Infrastructure.Tenancy.RepoContext
 
@@ -51,7 +51,7 @@ defmodule MilosTraining.Organizations do
   def legacy_organization_slug, do: @legacy_organization.slug
 
   defdelegate create_organization(params), to: CreateOrganization, as: :call
-  defdelegate add_membership(params), to: AddMembership, as: :call
+  def add_membership(params), do: params |> AddMembership.call() |> announce_activation()
   defdelegate get_by_id(id), to: FindOrganization, as: :by_id
   defdelegate get_by_slug(slug), to: FindOrganization, as: :by_slug
   defdelegate get_by_domain(host), to: FindOrganization, as: :by_domain
@@ -69,6 +69,59 @@ defmodule MilosTraining.Organizations do
 
   defdelegate list_memberships(user_id), to: ListMemberships, as: :call
 
+  @doc """
+  ADR-162: everyone who provides the member's training, active and former
+  (`Domain.Provider`), read in the member's personal session.
+  """
+  def list_my_providers(%{user_id: user_id}) when is_binary(user_id) do
+    RepoContext.run(%{user_id: user_id}, fn ->
+      Enum.map(OrganizationStore.list_my_providers(), &Provider.from_row/1)
+    end)
+  end
+
+  @doc "The provider Box ▾ last opened on (may no longer be active)."
+  def get_provider_selection(%{user_id: user_id}) when is_binary(user_id),
+    do:
+      RepoContext.run(%{user_id: user_id}, fn ->
+        OrganizationStore.get_provider_selection(user_id)
+      end)
+
+  def put_provider_selection(%{user_id: user_id}, organization_id) when is_binary(user_id),
+    do:
+      RepoContext.run(%{user_id: user_id}, fn ->
+        OrganizationStore.put_provider_selection(user_id, organization_id)
+      end)
+
+  @doc "Whether the gym presents as a gym or an independent coach (ADR-162)."
+  def get_provider_kind(%{organization_id: organization_id} = context)
+      when is_binary(organization_id) do
+    RepoContext.run(context, fn ->
+      kind = OrganizationStore.get_provider_kind(organization_id)
+      if kind in Provider.kinds(), do: kind, else: "gym"
+    end)
+  end
+
+  @doc """
+  The owner marks the organization as a gym or an independent coach
+  (ADR-162): members see it so in Box ▾, labels and the coach audience.
+  """
+  def put_provider_kind(%{organization_id: organization_id} = context, kind)
+      when is_binary(organization_id) do
+    with :ok <- TenantAuthorization.authorize(context, [:owner]),
+         :ok <- if(kind in Provider.kinds(), do: :ok, else: {:error, :invalid_provider_kind}) do
+      RepoContext.run(context, fn ->
+        OrganizationStore.put_provider_kind(organization_id, kind)
+      end)
+    end
+  end
+
+  def put_provider_kind(_context, _kind), do: {:error, :organization_context_required}
+
+  defdelegate split_providers(providers), to: Provider, as: :split
+  defdelegate provider_directory(providers), to: Provider, as: :directory
+  defdelegate selected_provider(active, remembered_id), to: Provider, as: :selected
+  defdelegate active_provider_ids(providers), to: Provider, as: :active_ids
+
   defdelegate list_active_membership_user_ids(context_or_organization_id),
     to: ListActiveMembershipUserIds,
     as: :call
@@ -78,9 +131,41 @@ defmodule MilosTraining.Organizations do
 
   @doc "IANA timezone the organization operates in (defaults to UTC)."
   def organization_timezone(organization_id) when is_binary(organization_id) do
-    case OrganizationStore.get_organization_settings(organization_id) do
-      %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
-      _missing -> "Etc/UTC"
+    RepoContext.run(%{organization_id: organization_id}, fn ->
+      case OrganizationStore.get_organization_settings(organization_id) do
+        %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
+        _missing -> "Etc/UTC"
+      end
+    end)
+  end
+
+  @doc """
+  ADR-155: how a box presents itself on a Wallet card - its name (the brand
+  name when set), slug, logo URL and primary colour. Nil for an unknown box.
+  """
+  def brand_summary(organization_id) when is_binary(organization_id) do
+    with %{} = organization <- get_by_id(organization_id) do
+      settings =
+        RepoContext.run(%{organization_id: organization_id}, fn ->
+          OrganizationStore.get_organization_settings(organization_id)
+        end) || %{}
+
+      brand_name =
+        case Map.get(settings, :brand_name) do
+          name when is_binary(name) ->
+            if String.trim(name) == "", do: nil, else: String.trim(name)
+
+          _none ->
+            nil
+        end
+
+      %{
+        organization_id: organization.id,
+        name: brand_name || organization.name,
+        slug: organization.slug,
+        logo_url: Map.get(settings, :brand_logo_url),
+        primary_color: Map.get(settings, :brand_primary_color)
+      }
     end
   end
 
@@ -120,18 +205,56 @@ defmodule MilosTraining.Organizations do
 
   def member_roles(_organization_id, _user_id), do: []
 
+  @doc """
+  Where a person stands with a gym (ADR-144): `:member` (active), `:former`
+  (suspended or revoked), or `:none` (never joined, or only invited).
+  """
+  def membership_standing(organization_id, user_id)
+      when is_binary(organization_id) and is_binary(user_id) do
+    # The person's own scope: the membership policies let anyone read their
+    # own membership row, whoever is asking.
+    RepoContext.run(%{organization_id: organization_id, user_id: user_id}, fn ->
+      case OrganizationStore.get_membership(organization_id, user_id) do
+        %{status: :active} -> :member
+        %{status: status} when status in [:suspended, :revoked] -> :former
+        _none -> :none
+      end
+    end)
+  end
+
   @doc "A member's roles and coach scope in the gym, or nil (ADR-099, ADR-100)."
   def membership_summary(organization_id, user_id) do
     case member(organization_id, user_id) do
       %{} = membership ->
         %{
           roles: Enum.map(membership.roles, &to_string/1),
-          coach_scope: to_string(membership.coach_scope || :own)
+          coach_scope: to_string(membership.coach_scope || :own),
+          home_location_id: membership.home_location_id
         }
 
       nil ->
         nil
     end
+  end
+
+  @doc """
+  Sets the location a member's gym opens on (Phase 2). Callers decide who may
+  set it; the database keeps the location inside the same gym.
+  """
+  def put_home_location(context, user_id, location_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(context.organization_id, user_id) do
+        nil ->
+          {:error, :not_found}
+
+        membership ->
+          OrganizationStore.update_membership_settings(
+            context.organization_id,
+            membership.id,
+            %{home_location_id: location_id}
+          )
+      end
+    end)
   end
 
   @doc "Whether a coach lets admins read their private notes (ADR-101)."
@@ -218,6 +341,13 @@ defmodule MilosTraining.Organizations do
   def update_join_link(context, params),
     do: MilosTraining.Organizations.Commands.UpdateJoinLink.call(context, params)
 
+  @doc "ADR-163: the gym's workout-authoring defaults (any staff member may read them)."
+  def get_workout_settings(context),
+    do: MilosTraining.Organizations.Queries.GetWorkoutSettings.call(context)
+
+  def update_workout_settings(context, params),
+    do: MilosTraining.Organizations.Commands.UpdateWorkoutSettings.call(context, params)
+
   def get_onboarding_state(context),
     do: MilosTraining.Organizations.Queries.GetOnboardingState.call(context)
 
@@ -225,19 +355,28 @@ defmodule MilosTraining.Organizations do
     do: MilosTraining.Organizations.Commands.UpdateOnboarding.call(context, params, now)
 
   @doc "Builds the onboarding checklist view from stored state and setup signals."
-  def onboarding_checklist(state, signals),
-    do: MilosTraining.Organizations.Domain.OnboardingChecklist.build(state, signals)
+  def onboarding_checklist(state, signals, audience \\ "gym"),
+    do: MilosTraining.Organizations.Domain.OnboardingChecklist.build(state, signals, audience)
+
+  @doc "ADR-170: which onboarding checklist the context's organization gets (`gym` | `coach`)."
+  def onboarding_audience(%{organization: %{provider_kind: kind}}),
+    do: MilosTraining.Organizations.Domain.OnboardingChecklist.audience(kind)
+
+  def onboarding_audience(_context), do: "gym"
 
   def inspect_join_link(slug), do: MilosTraining.Organizations.Queries.InspectJoinLink.call(slug)
 
   def join_by_link(slug, user_id, joined_at \\ DateTime.utc_now()),
-    do: MilosTraining.Organizations.Commands.JoinByLink.call(slug, user_id, joined_at)
+    do:
+      slug
+      |> MilosTraining.Organizations.Commands.JoinByLink.call(user_id, joined_at)
+      |> announce_activation()
 
   def inspect_invitation(token, now \\ DateTime.utc_now()),
     do: InspectInvitation.call(token, now)
 
   def redeem_invitation(token, user_id, redeemed_at \\ DateTime.utc_now()),
-    do: RedeemInvitation.call(token, user_id, redeemed_at)
+    do: token |> RedeemInvitation.call(user_id, redeemed_at) |> announce_activation()
 
   def resolve_tenant_context(account, slug, request_metadata \\ %{}),
     do: ResolveTenantContext.call(account, slug, request_metadata)
@@ -281,7 +420,36 @@ defmodule MilosTraining.Organizations do
     do: UpdateMembershipRole.call(context, organization_id, membership_id, params)
 
   def set_membership_status(context, membership_id, status),
-    do: SetMembershipStatus.call(context, membership_id, status)
+    do: context |> SetMembershipStatus.call(membership_id, status) |> announce_activation()
+
+  # ADR-144: every way a person becomes an active member announces it, so
+  # other contexts (trials conversion, later referrals) can react.
+  defp announce_activation({:ok, result} = outcome) do
+    case activated_membership(result) do
+      %{organization_id: organization_id, user_id: user_id} ->
+        MilosTraining.DomainEvents.publish(:membership_activated, %{
+          organization_id: organization_id,
+          user_id: user_id,
+          at: DateTime.utc_now()
+        })
+
+      nil ->
+        :ok
+    end
+
+    outcome
+  end
+
+  defp announce_activation(outcome), do: outcome
+
+  defp activated_membership(%{created: false}), do: nil
+  defp activated_membership(%{membership: membership}), do: activated_membership(membership)
+
+  defp activated_membership(%{status: :active, organization_id: org, user_id: user} = membership)
+       when is_binary(org) and is_binary(user),
+       do: membership
+
+  defp activated_membership(_result), do: nil
 
   def set_membership_role(context, user_id, role),
     do: SetMembershipRole.call(context, user_id, role)
@@ -307,6 +475,52 @@ defmodule MilosTraining.Organizations do
   def create_owned_organization(account, params, opts \\ []),
     do:
       MilosTraining.Organizations.Commands.OwnerOrganizationActions.create(account, params, opts)
+
+  @doc """
+  ADR-170: an account opens its own practice as an independent coach (a
+  one-person organization of kind `coach`). `opts[:seed_defaults]` as in
+  `create_owned_organization/3`.
+  """
+  def create_coach_practice(account, params, opts \\ []),
+    do: MilosTraining.Organizations.Commands.CreateCoachPractice.call(account, params, opts)
+
+  @doc """
+  ADR-170: seats the organization uses, keyed like the plan limits:
+  `staff_seats` (active owners, admins and staff plus staff invitations not
+  yet redeemed) and `active_clients` (active members and athletes without a
+  staff role). Owners and admins only.
+  """
+  def seat_usage(%{organization_id: organization_id} = context, now \\ DateTime.utc_now()) do
+    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]) do
+      seats =
+        RepoContext.run(context, fn -> OrganizationStore.count_seats(organization_id, now) end)
+
+      {:ok,
+       %{
+         "staff_seats" => seats.staff + seats.pending_staff_invitations,
+         "active_clients" => seats.clients
+       }}
+    end
+  end
+
+  @doc "Whether the account already holds an owner, admin or staff role in the context's gym."
+  def staff_member?(%{organization_id: organization_id} = context, user_id)
+      when is_binary(user_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(organization_id, user_id) do
+        %{status: :active, roles: roles} -> Enum.any?(roles, &(&1 in staff_and_admin_roles()))
+        _other -> false
+      end
+    end)
+  end
+
+  def staff_member?(_context, _user_id), do: false
+
+  @doc "Roles that take a staff seat (ADR-170)."
+  def staff_and_admin_roles,
+    do:
+      MilosTraining.Organizations.Domain.MembershipPolicy.admin_roles() ++
+        MilosTraining.Organizations.Domain.MembershipPolicy.staff_roles()
 
   def transfer_ownership(context, to_user_id),
     do:
@@ -508,6 +722,73 @@ defmodule MilosTraining.Organizations do
         end
     end
   end
+
+  # Public profile of a gym (ADR-142).
+  def get_public_profile(context),
+    do: MilosTraining.Organizations.PublicProfileStore.get(context)
+
+  def upsert_public_profile(context, params),
+    do: MilosTraining.Organizations.PublicProfileStore.upsert(context, params)
+
+  def create_tag_suggestion(context, params),
+    do: MilosTraining.Organizations.PublicProfileStore.create_suggestion(context, params)
+
+  def pending_tag_suggestions,
+    do: MilosTraining.Organizations.PublicProfileStore.pending_suggestions()
+
+  @doc "The published gym a slug or one of its aliases names, for visitors (ADR-142)."
+  def public_box_by_slug(slug),
+    do: MilosTraining.Organizations.PublicProfileStore.public_box_by_slug(slug)
+
+  @doc "Name, slug, logo and colour of the published gyms among `ids`."
+  def public_boxes(ids), do: MilosTraining.Organizations.PublicProfileStore.public_boxes(ids)
+
+  def resolve_tag_suggestion(id, status),
+    do: MilosTraining.Organizations.PublicProfileStore.resolve_suggestion(id, status)
+
+  defdelegate box_vocabulary(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :vocabulary
+
+  defdelegate box_amenities(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :amenities
+
+  defdelegate box_services(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :services
+
+  defdelegate box_suggestion_lists(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :suggestion_lists
+
+  defdelegate box_profile_missing(profile),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :missing
+
+  defdelegate box_disciplines(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :disciplines
+
+  defdelegate box_audiences(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :audiences
+
+  defdelegate default_box_languages(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :default_languages
+
+  defdelegate box_profile_max_photos(),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :max_photos
+
+  defdelegate normalize_box_photo_ids(ids),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :normalize_photo_ids
+
+  defdelegate box_profile_publishable?(profile),
+    to: MilosTraining.Organizations.Domain.BoxProfilePolicy,
+    as: :publishable?
 
   defp legacy_membership_role(:admin), do: :owner
   defp legacy_membership_role(:athlete), do: :athlete

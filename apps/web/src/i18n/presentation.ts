@@ -237,6 +237,12 @@ const SEMANTIC_KEYS: Record<string, string> = {
 };
 
 const API_ERROR_KEYS: Record<string, string> = {
+  // ADR-170: platform plans and the solo-coach tier.
+  coach_practice_exists: "apiErrorCoachPracticeExists",
+  plan_limit_reached: "apiErrorPlanLimitReached",
+  unknown_plan: "apiErrorUnknownPlan",
+  trial_end_required: "apiErrorTrialEndRequired",
+  invalid_name: "apiErrorInvalidName",
   no_coaching_relationship: "apiErrorNoCoachingRelationship",
   box_message_outside_box_thread: "apiErrorBoxMessageOutsideBoxThread",
   channel_not_optional: "apiErrorChannelNotOptional",

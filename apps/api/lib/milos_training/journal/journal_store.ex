@@ -65,5 +65,31 @@ defmodule MilosTraining.Journal.JournalStore do
   @impl true
   def transaction(fun), do: adapter().transaction(fun)
 
+  @impl true
+  def list_audience_exclusions(user_id), do: adapter().list_audience_exclusions(user_id)
+
+  @impl true
+  def replace_audience_exclusions(user_id, ids),
+    do: adapter().replace_audience_exclusions(user_id, ids)
+
+  @impl true
+  def entry_audiences(user_id, kind, ids), do: adapter().entry_audiences(user_id, kind, ids)
+
+  @impl true
+  def put_entry_audience(user_id, kind, id, ids),
+    do: adapter().put_entry_audience(user_id, kind, id, ids)
+
+  @impl true
+  def insert_export(attrs), do: adapter().insert_export(attrs)
+
+  @impl true
+  def get_export(id, user_id), do: adapter().get_export(id, user_id)
+
+  @impl true
+  def list_exports(user_id), do: adapter().list_exports(user_id)
+
+  @impl true
+  def finish_export(export, attrs), do: adapter().finish_export(export, attrs)
+
   defp adapter, do: Application.fetch_env!(:milos_training, :journal_store)
 end

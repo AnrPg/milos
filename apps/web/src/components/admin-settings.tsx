@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { useTranslations } from "next-intl";
 import { localizeError } from "@/i18n/presentation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -30,6 +31,10 @@ import { THEME_UPDATED_EVENT } from "@/components/theme-provider";
 import { APP_THEMES, THEME_SLUGS, normalizeThemeSlug, type ThemeSlug } from "@/lib/theme";
 import { ClassTypeSettings } from "@/components/admin/ClassTypeSettings";
 import { LocationSettings } from "@/components/admin/LocationSettings";
+import { PublicPageLink } from "@/components/admin/public-page/PublicPageLink";
+import { TrialsLink } from "@/components/admin/trials/TrialsLink";
+import { CommunitySettingsLink } from "@/components/admin/community/CommunitySettings";
+import { CheckInSettingsLink } from "@/components/check-in/CheckInSettings";
 import { RoleAccessSettings } from "@/components/admin/RoleAccessSettings";
 import { OrganizationOwnerSettings } from "@/components/admin/OrganizationOwnerSettings";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
@@ -38,6 +43,10 @@ import { IntegerInput } from "@/components/integer-input";
 import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
 import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
+import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting";
+import { WodGoalsDefaultSetting } from "@/components/wod-goals/WodGoalsDefaultSetting";
+import { AiScalingSettings } from "@/components/scaling/AiScalingSettings";
+import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1309,6 +1318,43 @@ function NotificationsSection({ token }: { token: string }) {
   );
 }
 
+function ProviderKindSection({ token }: { token: string }) {
+  const t = useTranslations("Providers");
+  return (
+    <CollapsibleSection id="provider-kind" title={t("kindSetting.title")} description={t("kindSetting.description")}>
+      <ProviderKindSetting token={token} />
+    </CollapsibleSection>
+  );
+}
+
+function AiAssistantSection({ token }: { token: string }) {
+  const t = useTranslations("Scaling");
+  return (
+    <CollapsibleSection id="ai-assistant" title={t("settings.title")} description={t("settings.description")} defaultOpen={false}>
+      <AiScalingSettings token={token} />
+    </CollapsibleSection>
+  );
+}
+
+// ADR-170: the organization's Milos plan (owners and admins).
+function PlanSection({ token }: { token: string }) {
+  const t = useTranslations("SoloCoach");
+  return (
+    <CollapsibleSection id="plan" title={t("plan.title")} description={t("plan.description")} defaultOpen={false}>
+      <PlanCard token={token} />
+    </CollapsibleSection>
+  );
+}
+
+function WorkoutDefaultsSection({ token }: { token: string }) {
+  const t = useTranslations("WodGoals");
+  return (
+    <CollapsibleSection id="workout-defaults" title={t("settings.sectionTitle")} description={t("settings.sectionDescription")}>
+      <WodGoalsDefaultSetting token={token} />
+    </CollapsibleSection>
+  );
+}
+
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
@@ -1322,9 +1368,12 @@ export function AdminSettingsHub() {
         <PageHeader title={i18n("appConfigurationse0effaa")} />
         <AdminOnboardingPanel />
         <ClientAccessPanel />
+        {token ? <PlanNotice token={token} /> : null}
 
         {token ? (
           <>
+            <PlanSection token={token} />
+
             <CollapsibleSection
               id="appearance"
               title={i18n("appearance41def7a")}
@@ -1340,6 +1389,8 @@ export function AdminSettingsHub() {
             >
               <BrandingSection token={token} />
             </CollapsibleSection>
+
+            <ProviderKindSection token={token} />
 
             <CollapsibleSection
               id="gamification"
@@ -1371,6 +1422,19 @@ export function AdminSettingsHub() {
               description={i18n("scheduleClassificationAndFiltersc6f2df8")}
             >
               <ClassTypeSettings token={token} />
+            </CollapsibleSection>
+
+            <CollapsibleSection id="public-page" title={i18n("admPublicPageTitle")} description={i18n("admPublicPageDescription")}>
+              <PublicPageLink />
+              <div className="mt-3">
+                <TrialsLink />
+              </div>
+              <div className="mt-3">
+                <CommunitySettingsLink />
+              </div>
+              <div className="mt-3">
+                <CheckInSettingsLink />
+              </div>
             </CollapsibleSection>
 
             <CollapsibleSection
@@ -1411,6 +1475,10 @@ export function AdminSettingsHub() {
                 <OrganizationOwnerSettings token={token} slug={selectedOrganizationSlug} currentUserId={currentUser?.id} />
               </CollapsibleSection>
             ) : null}
+
+            <WorkoutDefaultsSection token={token} />
+
+            {can(membership, "manage_settings") ? <AiAssistantSection token={token} /> : null}
 
             <CollapsibleSection
               id="level-taxonomy"

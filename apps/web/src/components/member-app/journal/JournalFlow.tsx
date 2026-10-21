@@ -7,13 +7,13 @@ import { useTranslations } from "next-intl";
 
 import { fetchExecution } from "@/api/executions";
 import {
+  EMPTY_JOURNAL_FILTER,
   fetchJournalPage,
   JOURNAL_FEED_KEY,
-  JOURNAL_FILTER_KINDS,
   type JournalFeedPage,
-  type JournalFilter,
   type JournalVisibilityResult,
   type TypedJournalItem,
+  type WellnessFeedDay,
 } from "@/api/journal";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
@@ -27,8 +27,18 @@ import { formatElapsed, type HistoryEntry } from "@/components/client/vault";
 import { CommentList } from "@/components/journal/CommentList";
 import { NoteSheet } from "@/components/journal/NoteSheet";
 import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
-import { executionHistoryEntry, journalFlow, withVisibility } from "@/components/member-app/journal/journal-flow";
+import { executionHistoryEntry, journalFlow, withAudience, withVisibility } from "@/components/member-app/journal/journal-flow";
+import { JournalFilters } from "@/components/member-app/journal/JournalFilters";
+import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
+import { EntryAudienceNote } from "@/components/journal/EntryAudience";
+import { SourceLabel } from "@/components/providers/SourceLabel";
+import { useSourceDirectory } from "@/components/providers/use-providers";
 import { CHECK_IN_FACES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
+import { BodyFeedCard } from "@/components/body/BodyFeedCard";
+import type { DeviceMetrics } from "@/api/devices";
+import { DeviceActivityCard, DeviceActivityDetail, DeviceAttachmentLine } from "@/components/devices/DeviceActivityCard";
+import { DeviceJournalCard } from "@/components/devices/DeviceJournalCard";
+import { FeltLine } from "@/components/wod-goals/FeltLine";
 import { ReviewCard } from "@/components/my-reviews";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { InAppShareDialog } from "@/components/share-export/InAppShareDialog";
@@ -38,8 +48,9 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { buildExecutionDocument, renderText } from "@/lib/document-export";
 import { latestCommentBody, sortComments } from "@/lib/journal-comments";
+import { effectiveJournalFilter, journalFilterCount, journalFilterKey, parseJournalFilter } from "@/lib/journal-filter";
+import { SeasonTag } from "@/components/seasons/SeasonTag";
 
-const FILTERS: JournalFilter[] = ["all", "training", "notes", "wellbeing"];
 const PAGE_SIZE = 30;
 
 /**
@@ -52,25 +63,40 @@ const PAGE_SIZE = 30;
 export function JournalFlow() {
   const i18n = useUiTranslations();
   const t = useTranslations("MemberApp.journal");
+  const tProviders = useTranslations("Providers");
   const locale = useUiLocale();
   const queryClient = useQueryClient();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const [filter, setFilter] = useState<JournalFilter>("all");
-  const queryKey = [...JOURNAL_FEED_KEY, filter] as const;
+  const directory = useSourceDirectory();
+  // Starts from the filter remembered on the account (ADR-151, ADR-162), so
+  // it follows the member across devices; a change is remembered with the
+  // first page it asks for.
+  const { filter, setFilter, changed } = useRememberedFilter("journal", parseJournalFilter, EMPTY_JOURNAL_FILTER, false);
+  const queryKey = [...JOURNAL_FEED_KEY, filter ? journalFilterKey(filter) : "pending"] as const;
   const feed = useInfiniteQuery({
     queryKey,
-    enabled: Boolean(token),
+    enabled: Boolean(token) && filter !== null,
     initialPageParam: null as string | null,
-    queryFn: ({ pageParam }) =>
-      fetchJournalPage(token!, { cursor: pageParam, kinds: JOURNAL_FILTER_KINDS[filter], limit: PAGE_SIZE }),
+    queryFn: ({ pageParam }) => {
+      const effective = effectiveJournalFilter(filter!);
+      return fetchJournalPage(token!, {
+        cursor: pageParam,
+        kinds: effective.kinds,
+        filter: effective,
+        limit: PAGE_SIZE,
+        remember: changed && !pageParam,
+      });
+    },
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
+  const filtered = filter !== null && journalFilterCount(filter) > 0;
   const { repeat, pendingId, error } = useRepeatWorkout();
   const [performance, setPerformance] = useState<HistoryEntry | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const [editingNote, setEditingNote] = useState<Extract<TypedJournalItem, { kind: "note" }> | null>(null);
+  const [deviceDetail, setDeviceDetail] = useState<{ metrics: DeviceMetrics; title: string } | null>(null);
   const days = useMemo(() => journalFlow(feed.data?.pages ?? []), [feed.data]);
 
   function refresh() {
@@ -84,8 +110,24 @@ export function JournalFlow() {
     refresh();
   }
 
+  // The rung, the source (board 17 Q3) and, on a coach rung, which
+  // providers' coaches it reaches (board 17 Q5).
   function badge(item: TypedJournalItem) {
-    return <VisibilityBadge item={item} onChanged={moved} />;
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <VisibilityBadge
+          item={item}
+          onChanged={moved}
+          onAudienceChanged={(audience) =>
+            queryClient.setQueryData<InfiniteData<JournalFeedPage>>(queryKey, (data) =>
+              data ? { ...data, pages: withAudience(data.pages, item, audience) } : data,
+            )
+          }
+        />
+        <SourceLabel source={item.source} directory={directory} />
+        <EntryAudienceNote item={item} />
+      </span>
+    );
   }
 
   return (
@@ -102,24 +144,9 @@ export function JournalFlow() {
         </Link>
       }
     >
-      <div role="group" aria-label={t("filterLabel")} className="flex flex-wrap gap-2">
-        {FILTERS.map((option) => (
-          <button
-            key={option}
-            type="button"
-            aria-pressed={filter === option}
-            onClick={() => setFilter(option)}
-            className="rounded-full px-3 py-1.5 text-sm font-semibold"
-            style={{
-              background: filter === option ? "var(--primary)" : "var(--panel-raised)",
-              color: filter === option ? "var(--bg)" : "var(--text)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            {t(`filter.${option}`)}
-          </button>
-        ))}
-      </div>
+      <DeviceJournalCard token={token} locale={locale} />
+
+      {filter ? <JournalFilters filter={filter} onChange={setFilter} /> : null}
 
       {error ? (
         <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
@@ -127,12 +154,26 @@ export function JournalFlow() {
         </p>
       ) : null}
 
-      {feed.isPending ? (
+      {filter === null || feed.isPending ? (
         <LoadingLine />
       ) : feed.isError ? (
         <QueryProblem error={feed.error} onRetry={() => void feed.refetch()} />
       ) : days.length === 0 ? (
-        <EmptyLine>{i18n("clHistoryEmpty")}</EmptyLine>
+        filtered ? (
+          <div className="flex flex-col items-start gap-3">
+            <EmptyLine>{tProviders("filter.empty")}</EmptyLine>
+            <button
+              type="button"
+              onClick={() => setFilter(EMPTY_JOURNAL_FILTER)}
+              className="rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ background: "var(--border)", color: "var(--text)" }}
+            >
+              {tProviders("filter.clear")}
+            </button>
+          </div>
+        ) : (
+          <EmptyLine>{i18n("clHistoryEmpty")}</EmptyLine>
+        )
       ) : (
         <ol className="flex flex-col gap-5">
           {days.map((day) => (
@@ -154,19 +195,30 @@ export function JournalFlow() {
                           />
                         </li>
                       );
-                    case "training_log":
+                    case "training_log": {
+                      const device = item.entry.device;
                       return (
                         <TrainingLogEntryCard
                           key={key}
                           entry={item.entry}
                           locale={locale}
                           badge={badge(item)}
+                          device={
+                            <>
+                              {device ? (
+                                <DeviceAttachmentLine device={device} locale={locale} onOpen={() => setDeviceDetail({ metrics: device, title: item.entry.title })} />
+                              ) : null}
+                              <FeltLine felt={item.entry.felt} />
+                            </>
+                          }
                           onEdit={() => setLogDialog({ mode: "edit", entry: item.entry })}
                           onVoid={() => setLogDialog({ mode: "void", entry: item.entry })}
                         />
                       );
+                    }
                     case "execution": {
                       const entry = executionHistoryEntry(item, day.day);
+                      const device = item.entry.device;
                       return (
                         <ExecutionRow
                           key={key}
@@ -178,9 +230,34 @@ export function JournalFlow() {
                           onShare={() => setSharingId(entry.id)}
                           repeating={pendingId === entry.id}
                           disabled={Boolean(pendingId)}
+                          device={
+                            <>
+                              {device ? (
+                                <DeviceAttachmentLine
+                                  device={device}
+                                  locale={locale}
+                                  onOpen={() => setDeviceDetail({ metrics: device, title: entry.workout_title ?? i18n("workout39463a5") })}
+                                />
+                              ) : null}
+                              <FeltLine felt={item.entry.felt} />
+                            </>
+                          }
                         />
                       );
                     }
+                    case "device_activity":
+                      return (
+                        <DeviceActivityCard
+                          key={key}
+                          activity={item.entry}
+                          occurredAt={item.occurred_at}
+                          locale={locale}
+                          badge={badge(item)}
+                          onOpen={() => setDeviceDetail({ metrics: item.entry, title: item.entry.title })}
+                        />
+                      );
+                    case "body":
+                      return <BodyFeedCard key={key} item={item} locale={locale} badge={badge(item)} />;
                     default:
                       return (
                         <FeedCard key={key} item={item} locale={locale} badge={badge(item)} onEditNote={setEditingNote} />
@@ -224,6 +301,9 @@ export function JournalFlow() {
           }}
         />
       ) : null}
+      {deviceDetail ? (
+        <DeviceActivityDetail activity={deviceDetail.metrics} title={deviceDetail.title} locale={locale} onClose={() => setDeviceDetail(null)} />
+      ) : null}
       {editingNote ? (
         <NoteSheet
           note={editingNote.entry}
@@ -245,13 +325,14 @@ function FeedCard({
   badge,
   onEditNote,
 }: {
-  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" }>;
+  item: Exclude<TypedJournalItem, { kind: "execution" | "training_log" | "review" | "body" | "device_activity" }>;
   locale: string;
   badge: ReactNode;
   onEditNote: (item: Extract<TypedJournalItem, { kind: "note" }>) => void;
 }) {
   const t = useTranslations("MemberApp.journal");
   const tCheckIn = useTranslations("MemberApp.checkIn");
+  const tWellness = useTranslations("MemberApp.wellness");
   const time = item.occurred_on ? null : formatTime(item.occurred_at, locale);
   let title: ReactNode;
   let detail: ReactNode = null;
@@ -300,6 +381,24 @@ function FeedCard({
         )
         .join(" · ");
       break;
+    case "wellness":
+      title = wellnessDayLine(item.entry, tWellness);
+      actions = (
+        <Link href="/journal/wellbeing#today" className="rounded-full px-3 py-1.5 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+          {tWellness("open")}
+        </Link>
+      );
+      break;
+    case "craving":
+      title = tWellness("feed.craving", { intensity: item.entry.intensity });
+      detail = [
+        ...item.entry.triggers.map((trigger) => tWellness(`trigger.${trigger}`)),
+        tWellness(`outcome.${item.entry.outcome ?? "ongoing"}`),
+        item.entry.note,
+      ]
+        .filter(Boolean)
+        .join(" · ");
+      break;
   }
 
   return (
@@ -325,6 +424,20 @@ function FeedCard({
   );
 }
 
+/** «Ευεξία · Τρίτη»: one line for the day, plain counts, no grading words. */
+function wellnessDayLine(day: WellnessFeedDay, t: ReturnType<typeof useTranslations>) {
+  const kinds = (kind: string) => day.entries.filter((entry) => entry.kind === kind);
+  const parts: string[] = [];
+  const water = kinds("water");
+  if (water.length) parts.push(t("feed.water", { count: water.length }));
+  const night = kinds("sleep").find((entry) => !entry.value.nap);
+  const minutes = day.summary?.sleep.minutes ?? (night?.value.minutes as number | undefined);
+  if (typeof minutes === "number") parts.push(t("sleep.duration", { hours: Math.floor(minutes / 60), minutes: minutes % 60 }));
+  const meals = kinds("meal");
+  if (meals.length) parts.push(t("feed.meals", { count: meals.length }));
+  return parts.join(" · ") || t("feed.empty");
+}
+
 function ExecutionRow({
   entry,
   locale,
@@ -334,10 +447,12 @@ function ExecutionRow({
   onShare,
   repeating,
   disabled,
+  device,
 }: {
   entry: HistoryEntry;
   locale: string;
   badge: ReactNode;
+  device?: ReactNode;
   onPerformance: () => void;
   onRepeat: () => void;
   onShare: () => void;
@@ -356,6 +471,7 @@ function ExecutionRow({
         <p className="break-words text-base font-semibold" style={{ color: "var(--text)" }}>
           {title}
         </p>
+        <SeasonTag season={entry.season} />
         <p className="mt-1 flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--dim)" }}>
           <time dateTime={entry.completed_at_utc}>{formatTime(entry.completed_at_utc, locale)}</time>
           {entry.workout_type ? <SemanticLabel value={entry.workout_type} /> : null}
@@ -363,6 +479,7 @@ function ExecutionRow({
           {entry.scale_level_slug ? <SemanticLabel value={entry.scale_level_slug} /> : null}
           <SourceBadge source={entry.source} />
         </p>
+        {device}
         <div className="mt-2">{badge}</div>
       </div>
       <EntryActions

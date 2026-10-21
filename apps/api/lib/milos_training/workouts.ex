@@ -1,5 +1,12 @@
 defmodule MilosTraining.Workouts do
-  alias MilosTraining.Workouts.Domain.{ExerciseDescriptors, TimerConfig, WorkoutDsl, WorkoutType}
+  alias MilosTraining.Workouts.Domain.{
+    ExerciseDescriptors,
+    TimerConfig,
+    WorkoutDsl,
+    WorkoutFocus,
+    WorkoutType
+  }
+
   alias MilosTraining.Workouts.Domain.WorkoutDsl.Preflight
   alias MilosTraining.Workouts.Domain.WorkoutDsl.{Manual, Templates, Vocabulary}
 
@@ -32,7 +39,7 @@ defmodule MilosTraining.Workouts do
     MaterializeWorkout
   }
 
-  alias MilosTraining.Workouts.WorkoutStore
+  alias MilosTraining.Workouts.{GoalStore, WorkoutStore}
 
   def with_tenant_context(context, fun) when is_function(fun, 0),
     do: WorkoutStore.with_tenant_context(context, fun)
@@ -58,6 +65,11 @@ defmodule MilosTraining.Workouts do
 
   defdelegate delete_assigned_workout(id), to: DeleteAssignedWorkout, as: :call
   def delete_assigned_workout(context, id), do: WorkoutStore.delete_assigned_workout(context, id)
+
+  @doc "ADR-167: removes an athlete from a season's programme from `from_date` on."
+  def remove_season_athlete(context, season_offering_id, athlete_id, from_date),
+    do: WorkoutStore.remove_season_athlete(context, season_offering_id, athlete_id, from_date)
+
   def update_draft(id, params), do: UpdateDraftWorkout.call(id, params)
   def publish_workout(id, params), do: PublishWorkout.call(id, params)
   def publish_workout(context, id, params), do: WorkoutStore.publish_workout(context, id, params)
@@ -110,6 +122,39 @@ defmodule MilosTraining.Workouts do
 
   @doc "`%{name, exercise_ref, category}` per exercise of a normalized workout (ADR-124)."
   def exercise_descriptors(workout), do: ExerciseDescriptors.from_workout(workout)
+
+  @doc """
+  `%{name, exercise_ref, category, weight}` per exercise of a workout, for
+  WOD-goal suggestion (ADR-163): sections when it has them, else its free
+  text read line by line.
+  """
+  def goal_exercises(workout), do: ExerciseDescriptors.weighted_from_workout(workout)
+
+  @doc """
+  The Quick Text catalog entry (`%{id, label, category}`) an exercise names:
+  its `exercise_ref` when known, else its name read leniently (plurals),
+  else nil (ADR-164: performed exercises of log entries, tagged videos).
+  """
+  def resolve_catalog_exercise(exercise_ref, name),
+    do: ExerciseDescriptors.resolve_catalog_entry(exercise_ref, name)
+
+  @doc "The saved WOD goals of a workout in the context's gym, or nil (ADR-163)."
+  def get_workout_goals(context, workout_id), do: GoalStore.get_goals(context, workout_id)
+
+  @doc """
+  The WOD goals a workout uses (ADR-163): its own, else those of the nearest
+  workout it was copied from (`source_workout_id`: class variants, member
+  versions, filed copies), as `%{goals, inherited_from}`.
+  """
+  def resolve_workout_goals(context, workout_id),
+    do: GoalStore.resolve_goals(context, workout_id)
+
+  @doc "Upserts a workout's WOD goals; attrs are already normalised (ADR-163)."
+  def put_workout_goals(context, workout_id, attrs),
+    do: GoalStore.put_goals(context, workout_id, attrs)
+
+  @doc "What a workout trains, read from its movements (Πρόγραμμα «Εστίαση» filter)."
+  def workout_focus(workout), do: WorkoutFocus.from_workout(workout)
 
   @doc """
   Descriptors of the exercises an athlete runs at `scale_slug` (TD-088): the

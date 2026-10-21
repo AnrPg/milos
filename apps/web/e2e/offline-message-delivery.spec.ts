@@ -88,7 +88,10 @@ async function mockAuthenticatedApi(
     if (path === "/api/auth/me") return json(route, user);
     if (path === "/api/memberships") return json(route, [membership]);
     if (path === "/api/me/threads/unread-count") return json(route, { unread_count: 0 });
-    if (path === "/api/me/threads" && method === "GET") return json(route, { threads: [thread] });
+    if (path === "/api/me/threads" && method === "GET") {
+      const contextType = url.searchParams.get("context_type");
+      return json(route, { threads: contextType && contextType !== "direct" ? [] : [thread] });
+    }
 
     if (path === `/api/me/threads/${thread.id}/messages` && method === "POST") {
       const payload = route.request().postDataJSON() as Record<string, unknown>;

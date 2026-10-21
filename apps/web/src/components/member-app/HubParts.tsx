@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 // slots: a card keeps its place and shows an empty state instead of moving
 // (brief §4.2, §8.5).
 
-export function HubPage({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
+export function HubPage({ title, actions, children }: { title: ReactNode; actions?: ReactNode; children: ReactNode }) {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-6 pt-4">
       <header className="flex items-center justify-between gap-3">
@@ -74,15 +74,18 @@ export function HubListRow({
   onClick,
   label,
   detail,
+  badge,
 }: {
   href?: string;
   onClick?: () => void;
   label: string;
   detail?: string;
+  /** A count or marker shown before the chevron (e.g. unread buddy messages). */
+  badge?: ReactNode;
 }) {
   const body = (
     <>
-      <span className="flex min-w-0 flex-col">
+      <span className="flex min-w-0 flex-1 flex-col">
         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
           {label}
         </span>
@@ -92,6 +95,7 @@ export function HubListRow({
           </span>
         ) : null}
       </span>
+      {badge ?? null}
       <span aria-hidden="true" style={{ color: "var(--dim)" }}>
         ›
       </span>

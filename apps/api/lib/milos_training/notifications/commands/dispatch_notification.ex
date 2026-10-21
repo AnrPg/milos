@@ -1,5 +1,6 @@
 defmodule MilosTraining.Notifications.Commands.DispatchNotification do
   alias MilosTraining.Notifications.Commands.CreateNotification
+  alias MilosTraining.Notifications.Commands.EnqueueNativePushDispatch
   alias MilosTraining.Notifications.Commands.EnqueuePushDispatch
   alias MilosTraining.Notifications.NotificationStore
   alias MilosTraining.Notifications.Domain.{PayloadNormalizer, PushMessageBuilder}
@@ -39,7 +40,7 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
           :ok
 
         _notification ->
-          case maybe_enqueue_push(notification) do
+          case maybe_enqueue_push(notification, silent?(payload)) do
             :ok -> {:ok, notification}
             {:error, reason} -> {:error, {:push_enqueue_failed, notification, reason}}
           end
@@ -47,11 +48,20 @@ defmodule MilosTraining.Notifications.Commands.DispatchNotification do
     end
   end
 
-  defp maybe_enqueue_push(notification) do
-    if PushConfig.enabled?() do
-      EnqueuePushDispatch.call(notification)
-    else
-      :ok
+  # ADR-160: a support request inside a buddy's quiet hours lands in the
+  # inbox without a push.
+  defp silent?(payload),
+    do: Map.get(payload, :silent) == true or Map.get(payload, "silent") == true
+
+  defp maybe_enqueue_push(_notification, true), do: :ok
+
+  # ADR-171: the store apps' installs get the same push as the browser ones.
+  defp maybe_enqueue_push(notification, false) do
+    web = if PushConfig.enabled?(), do: EnqueuePushDispatch.call(notification), else: :ok
+
+    case {web, EnqueueNativePushDispatch.call(notification)} do
+      {:ok, native} -> native
+      {web_error, _native} -> web_error
     end
   end
 

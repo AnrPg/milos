@@ -58,7 +58,11 @@ export function useFeed(filter: FeedFilter) {
   });
 }
 
-/** Refetches open feeds when a club's posts change (topic `community:club:<id>`). */
+/**
+ * Refetches open feeds when a club's posts change, and the clubs and groups
+ * when its channels do (a group proposed, approved, joined or archived), on
+ * topic `community:club:<id>`.
+ */
 export function useClubRealtime(clubs: CommunityClub[] | undefined) {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
@@ -71,6 +75,11 @@ export function useClubRealtime(clubs: CommunityClub[] | undefined) {
       void queryClient.invalidateQueries({ queryKey: FEED_KEY });
       void queryClient.invalidateQueries({ queryKey: WOD_KEY });
     };
+    const channelsChanged = () => {
+      void queryClient.invalidateQueries({ queryKey: CLUBS_KEY });
+      void queryClient.invalidateQueries({ queryKey: ["community", "groups"] });
+      void queryClient.invalidateQueries({ queryKey: ["community", "group"] });
+    };
     const unsubscribers = ids
       .split(",")
       .map((id) =>
@@ -78,6 +87,7 @@ export function useClubRealtime(clubs: CommunityClub[] | undefined) {
           post_created: refresh,
           post_updated: refresh,
           post_deleted: refresh,
+          channels_changed: channelsChanged,
         }),
       );
     return () => unsubscribers.forEach((leave) => leave());

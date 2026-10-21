@@ -1,3 +1,5 @@
+import { buddyNotificationUrl } from "@/components/buddy/buddy-links";
+import { seasonNotificationUrl } from "@/components/seasons/season-links";
 import { currentMemberPath } from "@/lib/member-routes";
 
 type LinkableNotification = {
@@ -15,6 +17,27 @@ function preferredUrl(notification: LinkableNotification) {
   const slotId = notification.payload.scheduled_class_id;
   if (notification.type === "booking_waitlist_promoted" && typeof slotId === "string" && slotId) {
     return `/box/schedule?open_slot=${encodeURIComponent(slotId)}`;
+  }
+  // ADR-153: event notifications open the event page; the trial offer keeps
+  // its own link to the box's trial sheet.
+  const eventId = notification.payload.event_id;
+  if (
+    notification.type.startsWith("community_event_") &&
+    notification.type !== "community_event_trial_offer" &&
+    typeof eventId === "string" &&
+    eventId
+  ) {
+    return `/events/${encodeURIComponent(eventId)}`;
+  }
+  // ADR-155: a visitor at the door opens the desk on that visitor.
+  if (notification.type === "check_in_visitor") {
+    const scanId = notification.payload.scan_id;
+    return typeof scanId === "string" && scanId ? `/admin/check-in?visitor=${encodeURIComponent(scanId)}#visitors` : "/admin/check-in#visitors";
+  }
+  // ADR-154: a saved Γύρω μου filter's alert opens Γύρω μου with that filter.
+  const filterId = notification.payload.filter_id;
+  if (notification.type === "around_new_matches") {
+    return typeof filterId === "string" && filterId ? `/around?filter=${encodeURIComponent(filterId)}` : "/around";
   }
   return null;
 }
@@ -53,8 +76,13 @@ function phaseCUrl(notification: LinkableNotification, role: string | null | und
 }
 
 function fallbackUrl(notification: LinkableNotification) {
+  // ADR-161: a Garmin sync error opens the devices page to reconnect.
+  if (notification.type === "device_sync_error") return "/me/devices";
   if (notification.type === "booking_waitlist_promoted") return "/box/schedule";
   if (notification.type === "package_expiring") return "/me/payments";
+  // ADR-156: the member's referral notices open their invites, staff's the queue.
+  if (notification.type === "referral_progress" || notification.type === "referral_reward") return "/me/referrals?tab=invites";
+  if (notification.type === "referral_review") return "/admin/finance?tab=referrals";
   return null;
 }
 
@@ -78,6 +106,12 @@ export function notificationTargetUrl(
 ) {
   const phaseC = phaseCUrl(notification, role);
   if (phaseC) return phaseC;
+  // ADR-160: buddy notices open the buddy screens, the coach's the client page.
+  const buddy = buddyNotificationUrl(notification.type, notification.payload);
+  if (buddy) return buddy;
+  // ADR-167: a season request opens the builder on it, an answer the season in Box.
+  const season = seasonNotificationUrl(notification.type, notification.payload);
+  if (season) return season;
 
   const rawUrl = preferredUrl(notification) ?? payloadUrl(notification) ?? fallbackUrl(notification);
   const isAdmin = isStaffRole(role);

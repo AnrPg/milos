@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 
+import { configuredMapOrigins } from "@/lib/map-style";
 import { retiredOrganizationSlugRedirect } from "@/lib/organization-slug-alias";
 
 type MediaOriginEnv = Record<string, string | undefined>;
@@ -22,15 +23,20 @@ export async function proxy(request: NextRequest) {
 
   const nonce = Buffer.from(crypto.randomUUID()).toString("base64");
   const mediaOrigins = configuredMediaOrigins();
+  const mapOrigins = configuredMapOrigins();
   const development = process.env.NODE_ENV !== "production";
 
   const csp = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'${development ? " 'unsafe-eval'" : ""}`,
+    // ADR-164: the anatomy atlas is meshopt-compressed and decoded in WebAssembly;
+    // 'wasm-unsafe-eval' allows compiling WebAssembly only, not JavaScript eval.
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic' 'wasm-unsafe-eval'${development ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline'",
-    `img-src 'self' data: blob: ${mediaOrigins}`,
+    `img-src 'self' data: blob: ${mediaOrigins} ${mapOrigins}`,
+    // ADR-157: post videos play from the media origin; compose previews a picked file from a blob.
+    `media-src 'self' blob: ${mediaOrigins}`,
     "font-src 'self' data:",
-    `connect-src 'self' ${mediaOrigins} ws: wss:`,
+    `connect-src 'self' ${mediaOrigins} ${mapOrigins} ws: wss:`,
     "worker-src 'self' blob:",
     "manifest-src 'self'",
     "object-src 'none'",
@@ -59,7 +65,7 @@ export async function proxy(request: NextRequest) {
 function applySecurityHeaders(response: NextResponse) {
   response.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
   response.headers.set("X-Content-Type-Options", "nosniff");
-  response.headers.set("Permissions-Policy", "camera=(), microphone=(), geolocation=()");
+  response.headers.set("Permissions-Policy", "camera=(self), microphone=(self), geolocation=(self)");
   return response;
 }
 

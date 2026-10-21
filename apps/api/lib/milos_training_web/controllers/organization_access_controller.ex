@@ -54,7 +54,9 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       name: %Schema{type: :string},
-      slug: %Schema{type: :string}
+      slug: %Schema{type: :string},
+      # ADR-170: a gym or an independent coach's practice (memberships only).
+      provider_kind: %Schema{type: :string, enum: ["gym", "coach"]}
     },
     required: [:id, :name, :slug]
   }
@@ -88,6 +90,12 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
       roles: %Schema{type: :array, items: %Schema{type: :string}},
       coach_scope: %Schema{type: :string, enum: ["own", "all"]},
       notes_visible_to_admins: %Schema{type: :boolean, description: "ADR-101"},
+      home_location_id: %Schema{
+        type: :string,
+        format: :uuid,
+        nullable: true,
+        description: "The location this gym opens on for the person (Phase 2)"
+      },
       capabilities: %Schema{
         type: :object,
         description: "capability => scope (all, own, status), ADR-099",
@@ -372,6 +380,7 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
       roles: Enum.map(membership.roles, &to_string/1),
       coach_scope: to_string(membership.coach_scope),
       notes_visible_to_admins: membership.notes_visible_to_admins != false,
+      home_location_id: membership.home_location_id,
       capabilities:
         membership.roles
         |> MilosTraining.Organizations.capabilities_for(
@@ -379,7 +388,12 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
           role_grants(Map.get(entry, :settings))
         )
         |> Map.new(fn {capability, scope} -> {to_string(capability), to_string(scope)} end),
-      organization: %{id: organization.id, name: organization.name, slug: organization.slug},
+      organization: %{
+        id: organization.id,
+        name: organization.name,
+        slug: organization.slug,
+        provider_kind: Map.get(organization, :provider_kind) || "gym"
+      },
       settings: serialize_settings(Map.get(entry, :settings))
     }
   end

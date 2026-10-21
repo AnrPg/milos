@@ -2,17 +2,24 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
   @moduledoc """
   OpenAPI schemas of the journal feed, ladder moves and Σημείωση notes
   (ADR-139). A feed item's `entry` is the entry as its own endpoint returns
-  it (execution, training-log entry, PR, injury, review, note or check-in),
-  chosen by `kind`.
+  it (execution, training-log entry, PR, injury, review, note, check-in or,
+  ADR-158, a body snapshot, only ever in your own feed), chosen by `kind`.
+  ADR-159: `wellness` is a day (date, summary, entries, photos) and
+  `craving` one Λιγούρα; single wellness entries move as `wellness_entry`.
   """
 
   alias OpenApiSpex.Schema
 
-  @kinds ~w(execution training_log pr injury review note check_in)
+  @kinds ~w(execution training_log pr injury review note check_in body wellness craving
+            device_activity)
+  @movable_kinds @kinds ++ ~w(wellness_entry)
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
   @topics ~w(technique thought mood goal)
 
   def kinds, do: @kinds
+
+  @doc "Kinds whose entries move on the ladder: feed kinds plus single wellness entries."
+  def movable_kinds, do: @movable_kinds
 
   defmodule Item do
     @moduledoc false
@@ -33,7 +40,8 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
         properties: %{
           kind: %Schema{
             type: :string,
-            enum: ~w(execution training_log pr injury review note check_in)
+            enum: ~w(execution training_log pr injury review note check_in body wellness craving
+                     device_activity)
           },
           id: %Schema{type: :string, format: :uuid},
           occurred_at: %Schema{type: :string, format: :"date-time"},
@@ -56,7 +64,34 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
               enum: ~w(private coach_can_view coach_reply_requested)
             }
           },
-          entry: %Schema{type: :object, additionalProperties: true}
+          entry: %Schema{
+            description:
+              "The entry, chosen by `kind`. ADR-161: a `device_activity` entry is a DeviceActivity; an execution or training-log entry a watch matched carries its numbers as `device` (DeviceMetrics).",
+            anyOf: [
+              MilosTrainingWeb.Schemas.Devices.activity(),
+              %Schema{
+                title: "JournalFeedEntry",
+                type: :object,
+                additionalProperties: true,
+                properties: %{
+                  device: MilosTrainingWeb.Schemas.Devices.merged_metrics(),
+                  felt: %Schema{
+                    description:
+                      "ADR-163: «Ένιωσα» on an execution or training-log entry: felt muscle ids and fitness qualities; null when none.",
+                    type: :object,
+                    nullable: true,
+                    required: [:muscles, :qualities],
+                    properties: %{
+                      muscles: %Schema{type: :array, items: %Schema{type: :string}},
+                      qualities: %Schema{type: :array, items: %Schema{type: :string}}
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          source: MilosTrainingWeb.Schemas.CrossProvider.source(),
+          audience: MilosTrainingWeb.Schemas.CrossProvider.audience()
         }
       },
       struct?: false
@@ -101,7 +136,13 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
       required: [:items],
       properties: %{
         items: %Schema{type: :array, items: Item},
-        next_cursor: %Schema{type: :string, nullable: true}
+        next_cursor: %Schema{type: :string, nullable: true},
+        filter: %Schema{
+          type: :object,
+          additionalProperties: true,
+          description: "The Ροή filter applied, in its canonical (saved) form."
+        },
+        active_filter_count: %Schema{type: :integer}
       }
     }
   end
@@ -122,6 +163,13 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
           type: :string,
           format: :uuid,
           description: "Which coach answers, when the member has several."
+        },
+        audience: %Schema{
+          type: :array,
+          items: %Schema{type: :string, format: :uuid},
+          nullable: true,
+          description:
+            "ADR-162: providers to share with besides the entry's own; null resets to the default."
         }
       },
       additionalProperties: false
@@ -138,6 +186,7 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
         id: %Schema{type: :string, format: :uuid},
         journal_visibility: %Schema{type: :string, enum: @rungs},
         choosable_visibilities: %Schema{type: :array, items: %Schema{type: :string}},
+        audience: MilosTrainingWeb.Schemas.CrossProvider.audience(),
         reply_request: %Schema{
           type: :object,
           nullable: true,

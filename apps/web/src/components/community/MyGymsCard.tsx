@@ -111,7 +111,7 @@ function JoinForm() {
   }
 
   return (
-    <form onSubmit={(event) => void submit(event)} className="flex flex-col gap-2">
+    <form id="join" onSubmit={(event) => void submit(event)} className="flex scroll-mt-20 flex-col gap-2">
       <label htmlFor="join-input" className="text-sm font-semibold" style={{ color: "var(--text)" }}>
         {t("joinLabel")}
       </label>

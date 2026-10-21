@@ -1,6 +1,6 @@
 defmodule MilosTraining.Application.GetCalendarFeed do
-  alias MilosTraining.Application.CalendarFeedToken
-  alias MilosTraining.{Organizations, Scheduling}
+  alias MilosTraining.Application.{CalendarFeedToken, Trials}
+  alias MilosTraining.{Community, Organizations, Scheduling}
   alias MilosTraining.Workouts.WorkoutStore
   alias MilosTraining.Localization
 
@@ -26,13 +26,15 @@ defmodule MilosTraining.Application.GetCalendarFeed do
     # this called the un-scoped arities, which resolve to the legacy
     # organization - so every user's feed carried the legacy gym's classes, and
     # a global admin's carried every athlete's assignments (F-18/F-29).
+    contexts = active_tenant_contexts(user)
+
     events =
-      user
-      |> active_tenant_contexts()
-      |> Enum.flat_map(fn context ->
+      Enum.flat_map(contexts, fn context ->
         class_events(context, user, start_at, end_at, locale) ++
           assignment_events(context, user, start_date, end_date, locale)
-      end)
+      end) ++
+        trial_events(user, Enum.map(contexts, & &1.organization_id), locale) ++
+        club_events(user, start_at, end_at, locale)
 
     render_ics(events, now)
   end
@@ -107,6 +109,61 @@ defmodule MilosTraining.Application.GetCalendarFeed do
       description: class_description(slot, user, locale, admin?)
     }
   end
+
+  # ADR-144 (board 6 Q5): trials at boxes the person isn't a member of; at
+  # their own gym the trial seat already shows as a class booking.
+  defp trial_events(user, member_organization_ids, locale) do
+    user
+    |> Trials.mine()
+    |> Enum.filter(&(&1.status in ~w(requested booked)))
+    |> Enum.reject(&(&1.organization_id in member_organization_ids))
+    |> Enum.map(fn trial ->
+      starts_at = trial.class.scheduled_at
+      minutes = trial.class[:duration_minutes] || 60
+
+      %{
+        uid: "trial-#{trial.id}@trainingjournal",
+        title:
+          translate(locale, "Trial at %{box}: %{name}", %{
+            box: (trial.box && trial.box.name) || "",
+            name: trial.class.name || ""
+          }),
+        starts_at: starts_at,
+        ends_at: DateTime.add(starts_at, minutes * 60, :second),
+        description:
+          translate(locale, "Trial status: %{status}.", %{
+            status: translate(locale, trial_status_message(trial.status))
+          })
+      }
+    end)
+  end
+
+  # ADR-153: club events the person is going to, at any box.
+  defp club_events(user, start_at, end_at, locale) do
+    %{user_id: user.id}
+    |> Community.attendances_of(user.id, ["going"])
+    |> Enum.group_by(& &1.organization_id, & &1.event_id)
+    |> Enum.flat_map(fn {organization_id, ids} ->
+      Community.list_events(%{organization_id: organization_id, user_id: user.id}, %{
+        organization_ids: [organization_id],
+        ids: ids,
+        from: start_at,
+        to: end_at
+      })
+    end)
+    |> Enum.map(fn event ->
+      %{
+        uid: "community-event-#{event.id}@trainingjournal",
+        title: translate(locale, "Event: %{title}", %{title: event.title}),
+        starts_at: event.starts_at,
+        ends_at: event.ends_at,
+        description: translate(locale, "You're going to this event.")
+      }
+    end)
+  end
+
+  defp trial_status_message("requested"), do: "Waiting for the box"
+  defp trial_status_message(_booked), do: "Booked"
 
   defp assignment_events(context, user, start_date, end_date, locale) do
     cond do

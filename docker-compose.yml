@@ -24,6 +24,7 @@ services:
       MINIO_SECRET_KEY: ${MINIO_ROOT_PASSWORD:-milos-minio-change-me}
       MINIO_BUCKET: ${MINIO_BUCKET:-milos-invoices}
       MINIO_AVATAR_BUCKET: ${MINIO_AVATAR_BUCKET:-milos-avatars}
+      MINIO_MEDIA_BUCKET: ${MINIO_MEDIA_BUCKET:-milos-media}
       PHX_HOST: ${PHX_HOST:-localhost}
       PHX_SERVER: "true"
       PORT: 4000
@@ -38,6 +39,12 @@ services:
       OTEL_SERVICE_NAMESPACE: ${OTEL_SERVICE_NAMESPACE:-milos-training}
       METRICS_PORT: ${METRICS_PORT:-}
       METRICS_TOKEN: ${METRICS_TOKEN:-}
+      # Push to the store apps (ADR-171). Empty = that provider is off.
+      FCM_SERVICE_ACCOUNT_JSON: ${FCM_SERVICE_ACCOUNT_JSON:-}
+      APNS_TEAM_ID: ${APNS_TEAM_ID:-}
+      APNS_KEY_ID: ${APNS_KEY_ID:-}
+      APNS_PRIVATE_KEY: ${APNS_PRIVATE_KEY:-}
+      APNS_TOPIC: ${APNS_TOPIC:-}
     command: sh -lc "./bin/milos_training eval \"MilosTraining.Release.migrate()\" && exec ./bin/milos_training start"
     depends_on:
       postgres:
@@ -92,10 +99,19 @@ services:
       args:
         MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
         NEXT_PUBLIC_MEDIA_ORIGIN: ${NEXT_PUBLIC_MEDIA_ORIGIN:-${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}}
+        NEXT_PUBLIC_MAP_STYLE_URL: ${NEXT_PUBLIC_MAP_STYLE_URL:-}
+        NEXT_PUBLIC_MAP_ORIGINS: ${NEXT_PUBLIC_MAP_ORIGINS:-}
     environment:
       API_PROXY_TARGET: http://api:4000
       MINIO_PUBLIC_ENDPOINT: ${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}
       NEXT_PUBLIC_MEDIA_ORIGIN: ${NEXT_PUBLIC_MEDIA_ORIGIN:-${MINIO_PUBLIC_ENDPOINT:-http://media.localhost:18080}}
+      NEXT_PUBLIC_MAP_STYLE_URL: ${NEXT_PUBLIC_MAP_STYLE_URL:-}
+      NEXT_PUBLIC_MAP_ORIGINS: ${NEXT_PUBLIC_MAP_ORIGINS:-}
+      # Universal links / App Links for the store apps (ADR-171). Empty = 404.
+      APPLE_TEAM_ID: ${APPLE_TEAM_ID:-}
+      IOS_BUNDLE_ID: ${IOS_BUNDLE_ID:-}
+      ANDROID_PACKAGE_NAME: ${ANDROID_PACKAGE_NAME:-}
+      ANDROID_SHA256_CERT_FINGERPRINTS: ${ANDROID_SHA256_CERT_FINGERPRINTS:-}
       PORT: 3000
     depends_on:
       api:
@@ -125,7 +141,7 @@ services:
     networks: [app]
 
   postgres:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5-alpine
     command:
       - postgres
       - -c
@@ -154,7 +170,7 @@ services:
       retries: 10
 
   postgres-backup:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5-alpine
     profiles: ["backup"]
     environment:
       PGHOST: postgres
@@ -177,7 +193,7 @@ services:
     restart: "no"
 
   postgres-restore-drill:
-    image: postgres:16-alpine
+    image: postgis/postgis:16-3.5-alpine
     profiles: ["backup"]
     environment:
       BACKUP_ROOT: /backups/postgres

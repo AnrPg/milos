@@ -49,6 +49,14 @@ type ApiRequestOptions = {
   body?: unknown;
   /** "text" returns the raw body of a successful response (e.g. a printable HTML document). */
   responseType?: "json" | "text";
+  /** Cancels the request (react-query passes one so stale searches stop). */
+  signal?: AbortSignal;
+  /**
+   * `"account"` sends the path as is, never under `/org/:slug`: the account
+   * read model (ADR-162) shares paths such as `/me/history` and
+   * `/me/progress` with their older per-gym versions.
+   */
+  scope?: "tenant" | "account";
 };
 
 function organizationSlugFromPath() {
@@ -94,6 +102,7 @@ export function currentOrganizationSlug(token?: string | null) {
 
 const TENANT_SCOPED_PREFIXES = [
   "/admin",
+  "/anatomy/nodes",
   "/bookings",
   "/challenges",
   "/class-timers",
@@ -105,13 +114,16 @@ const TENANT_SCOPED_PREFIXES = [
   "/me/entitlement",
   "/me/finance",
   "/me/form-reviews",
+  "/me/goal-feedback",
   "/me/history",
+  "/me/home-location",
   "/me/invoices",
   "/me/refund-receipts",
   "/me/nutrition-plan",
   "/me/progress",
   "/me/reviews",
   "/me/search/users",
+  "/me/seasons",
   "/me/threads",
   "/me/training-log",
   "/me/workouts",
@@ -337,7 +349,8 @@ export async function apiRequest<T>(
     allowRefresh && options.token && tokenExpiresSoon(options.token)
       ? (await refreshAccessToken()) ?? options.token
       : options.token;
-  const organizationSlug = await resolveOrganizationSlugForRequest(path, token);
+  const organizationSlug =
+    options.scope === "account" ? null : await resolveOrganizationSlugForRequest(path, token);
   const requestPath = tenantScopedPath(path, organizationSlug);
 
   const response = await fetch(`${API_BASE_URL}${requestPath}`, {
@@ -349,6 +362,7 @@ export async function apiRequest<T>(
     },
     body: options.body ? JSON.stringify(options.body) : undefined,
     credentials: "same-origin",
+    signal: options.signal,
   });
 
   rememberCanonicalOrganizationSlug(response, organizationSlug);

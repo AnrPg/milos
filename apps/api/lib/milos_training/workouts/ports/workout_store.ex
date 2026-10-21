@@ -15,6 +15,9 @@ defmodule MilosTraining.Workouts.Ports.WorkoutStore do
               {:ok, map()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback delete_assigned_workout(binary()) ::
               :ok | {:error, Ecto.Changeset.t()} | {:error, :not_found}
+  @doc "ADR-167: drops one athlete from a season's programme from a date on."
+  @callback remove_season_athlete(binary(), binary(), Date.t()) ::
+              {:ok, non_neg_integer()} | {:error, term()}
   @callback list_assigned_workouts_for_athlete(binary(), Date.t(), Date.t()) :: [map()]
   @callback list_assigned_workouts_for_admin(Date.t(), Date.t()) :: [map()]
   @callback list_workout_change_targets(binary()) :: [map()]

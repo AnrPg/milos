@@ -47,11 +47,23 @@ export type SchedulingSettings = {
   updated_at?: string | null;
 };
 
+/** ADR-162: how members see the organization; only the owner edits it. */
+export type ProviderKind = "gym" | "coach";
+export type ProviderSettings = { kind: ProviderKind; editable: boolean };
+
 export type AdminSettingsPayload = {
   gamification: GamificationSettings;
   finance: FinanceSettings;
   notifications: NotificationPushSettings;
   scheduling: SchedulingSettings;
+  provider?: ProviderSettings;
+  /** ADR-163: workout-authoring defaults. */
+  workouts?: WorkoutAuthoringSettings;
+};
+
+export type WorkoutAuthoringSettings = {
+  /** Starting value of «Εμφάνιση στόχων στα μέλη» on a workout without goals of its own. */
+  wod_goals_visible_by_default: boolean;
 };
 
 export type GamificationUpdate = Partial<
@@ -67,9 +79,11 @@ export type NotificationPushUpdate = Partial<{
 }>;
 
 export type AdminSettingsUpdate = {
+  provider?: { kind: ProviderKind };
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
   notifications?: NotificationPushUpdate;
+  workouts?: Partial<WorkoutAuthoringSettings>;
   scheduling?: Partial<
     Pick<
       SchedulingSettings,

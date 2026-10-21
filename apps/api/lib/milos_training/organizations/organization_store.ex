@@ -32,6 +32,12 @@ defmodule MilosTraining.Organizations.OrganizationStore do
     do: impl().count_pending_invitations(organization_id, now)
 
   @impl true
+  def slug_taken?(slug), do: impl().slug_taken?(slug)
+
+  @impl true
+  def count_seats(organization_id, now), do: impl().count_seats(organization_id, now)
+
+  @impl true
   def rename_organization_slug(
         organization_id,
         requested_slug,
@@ -224,6 +230,23 @@ defmodule MilosTraining.Organizations.OrganizationStore do
   @impl true
   def finalize_purge(purge, params, platform_user_id, completed_at),
     do: impl().finalize_purge(purge, params, platform_user_id, completed_at)
+
+  @impl true
+  def list_my_providers, do: impl().list_my_providers()
+
+  @impl true
+  def get_provider_selection(user_id), do: impl().get_provider_selection(user_id)
+
+  @impl true
+  def put_provider_selection(user_id, organization_id),
+    do: impl().put_provider_selection(user_id, organization_id)
+
+  @impl true
+  def get_provider_kind(organization_id), do: impl().get_provider_kind(organization_id)
+
+  @impl true
+  def put_provider_kind(organization_id, kind),
+    do: impl().put_provider_kind(organization_id, kind)
 
   defp impl, do: Application.fetch_env!(:milos_training, :organization_store)
 end

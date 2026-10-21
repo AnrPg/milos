@@ -91,6 +91,9 @@ defmodule MilosTraining.Analytics.Domain.EventCatalog do
     "class_booking_approved" => {"class_booking", [:scheduled_class_id], :subject},
     "class_booking_rejected" => {"class_booking", [:scheduled_class_id], :subject},
     "class_booking_cancelled" => {"class_booking", [:scheduled_class_id], :subject},
+    # ADR-144 trials: the funnel from ask to member.
+    "trial_requested" => {"trial", [:scheduled_class_id, :status, :source], :subject},
+    "trial_status_changed" => {"trial", [:scheduled_class_id, :status], nil},
     "class_booking_timed_out" => {"class_booking", [:scheduled_class_id], :subject},
     "class_attendance_recorded" =>
       {"class_attendance", [:scheduled_class_id, :booking_id, :status], nil},

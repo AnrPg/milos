@@ -25,6 +25,8 @@ export type TodayTrainingItem = {
   completed: boolean;
   /** The assignment's own Οδηγίες (ADR-140 §4), read before the workout's. */
   instructions?: string;
+  /** ADR-167: the season a programme workout belongs to. */
+  seasonTitle?: string;
 };
 
 export type ActiveExecution = { id: string; status: string; master_workout_id?: string | null };
@@ -108,6 +110,7 @@ export function buildTodayTraining(input: {
       slotId: null,
       completed: assignment.execution_status === "completed",
       instructions: assignment.instructions?.trim() || undefined,
+      seasonTitle: assignment.season?.title || undefined,
     });
   }
 

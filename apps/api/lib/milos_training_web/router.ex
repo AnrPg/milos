@@ -51,6 +51,25 @@ defmodule MilosTrainingWeb.Router do
     )
   end
 
+  # ADR-157: one upload per picked file, plus its completion.
+  pipeline :media_upload_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 60,
+      interval: 300_000,
+      bucket: "media-uploads",
+      methods: ["POST", "PATCH", "DELETE"]
+    )
+  end
+
+  pipeline :ai_suggestion_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 20,
+      interval: 300_000,
+      bucket: "ai-suggestions",
+      methods: ["POST"]
+    )
+  end
+
   pipeline :messaging_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit,
       max: 60,
@@ -58,6 +77,21 @@ defmodule MilosTrainingWeb.Router do
       bucket: "messaging",
       methods: ["POST"]
     )
+  end
+
+  # ADR-142: the public box page; the web server renders it, so many
+  # visitors can arrive from one address.
+  pipeline :public_box_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "public-box")
+  end
+
+  pipeline :public_invite_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "buddy-invite")
+  end
+
+  # ADR-156: invite pages; 32^8 codes behind a tight budget make guessing moot.
+  pipeline :public_referral_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "public-referral")
   end
 
   pipeline :execution_rate_limited do
@@ -84,6 +118,53 @@ defmodule MilosTrainingWeb.Router do
       interval: 60_000,
       bucket: "notification-writes",
       methods: ["POST", "DELETE"]
+    )
+  end
+
+  # ADR-141: address lookups go to a shared OpenStreetMap geocoder.
+  pipeline :geocode_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
+  end
+
+  # ADR-154: Γύρω μου searches run several indexed queries (and may geocode
+  # a typed place); a generous budget that still bounds scraping.
+  pipeline :around_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "around")
+  end
+
+  # ADR-173: home-screen widgets, with their own token (not a session); a
+  # widget refreshes every few minutes and on «+1 νερό».
+  pipeline :widget do
+    plug(MilosTrainingWeb.Plugs.AuthenticateWidget)
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "widget")
+  end
+
+  # ADR-155: door scans and the desk; generous for a busy door, bounded for guessing.
+  pipeline :check_in_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 60, interval: 60_000, bucket: "check-in")
+  end
+
+  # ADR-155: Wallet downloads and Apple's PassKit web service (no app session;
+  # many phones behind one address at a gym).
+  pipeline :wallet_public do
+    plug(OpenApiSpex.Plug.PutApiSpec, module: MilosTrainingWeb.ApiSpec)
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 300, interval: 60_000, bucket: "wallet")
+  end
+
+  # ADR-161: Garmin's OAuth return (a browser redirect) and its push and
+  # deregistration calls; no app session, Garmin may send in bursts.
+  pipeline :garmin_public do
+    plug(OpenApiSpex.Plug.PutApiSpec, module: MilosTrainingWeb.ApiSpec)
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "garmin-public")
+  end
+
+  # ADR-161: connecting, syncing and confirming device imports.
+  pipeline :device_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 30,
+      interval: 60_000,
+      bucket: "devices",
+      methods: ["POST", "PATCH", "DELETE"]
     )
   end
 
@@ -171,6 +252,58 @@ defmodule MilosTrainingWeb.Router do
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", MilosTrainingWeb.CalendarFeedController, :feed)
     get("/theme", MilosTrainingWeb.ThemeController, :show)
+    get("/box-vocabulary", MilosTrainingWeb.BoxVocabularyController, :show)
+  end
+
+  scope "/api/public/boxes", MilosTrainingWeb do
+    pipe_through([:api, :public_box_rate_limited])
+
+    get("/:slug", PublicBoxController, :show)
+  end
+
+  # ADR-170: the public platform plan catalog (pricing, coach onboarding).
+  scope "/api/public/platform-plans", MilosTrainingWeb do
+    pipe_through([:api, :public_box_rate_limited])
+
+    get("/", PlatformPlanController, :index_public)
+  end
+
+  scope "/api/public/referrals", MilosTrainingWeb do
+    pipe_through([:api, :public_referral_rate_limited])
+
+    get("/:code", ReferralController, :invite)
+  end
+
+  # ADR-155: the .pkpass behind a signed, short-lived link (Safari opens it
+  # without the app's bearer header), and Apple's PassKit web service.
+  scope "/api/wallet", MilosTrainingWeb do
+    pipe_through([:wallet_public])
+
+    get("/passes/:token", WalletController, :download)
+
+    post(
+      "/apple/v1/devices/:device_id/registrations/:pass_type_id/:serial",
+      PassKitController,
+      :register
+    )
+
+    delete(
+      "/apple/v1/devices/:device_id/registrations/:pass_type_id/:serial",
+      PassKitController,
+      :unregister
+    )
+
+    get("/apple/v1/devices/:device_id/registrations/:pass_type_id", PassKitController, :serials)
+    get("/apple/v1/passes/:pass_type_id/:serial", PassKitController, :latest)
+    post("/apple/v1/log", PassKitController, :log)
+  end
+
+  scope "/api/integrations/garmin", MilosTrainingWeb do
+    pipe_through([:garmin_public])
+
+    get("/callback", GarminIntegrationController, :callback)
+    post("/push", GarminIntegrationController, :push)
+    post("/deregistration", GarminIntegrationController, :deregistration)
   end
 
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
@@ -210,6 +343,10 @@ defmodule MilosTrainingWeb.Router do
 
     get("/memberships", OrganizationAccessController, :memberships)
     post("/organizations", OwnerOrganizationController, :create)
+    # ADR-170: an account opens its practice as an independent coach.
+    post("/coach-practices", CoachPracticeController, :create)
+    # ADR-163: the static, code-owned muscle taxonomy (ETag-cached).
+    get("/anatomy/taxonomy", AnatomyController, :taxonomy)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -247,6 +384,10 @@ defmodule MilosTrainingWeb.Router do
     ])
 
     get("/finance", MyFinanceController, :index)
+    # ADR-155: Box › Check-in.
+    get("/check-in/code", MyCheckInController, :code)
+    post("/check-in/code/reset", MyCheckInController, :reset_code)
+    post("/wallet-passes", MyCheckInController, :add_wallet_pass)
     get("/entitlement", MyFinanceController, :entitlement)
     get("/videos", MyContentController, :videos)
     get("/form-reviews", CoachingExtrasController, :my_form_reviews)
@@ -268,6 +409,14 @@ defmodule MilosTrainingWeb.Router do
     get("/reviews", ReviewController, :index)
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
+    put("/home-location", HomeLocationController, :update_mine)
+    # ADR-167: Box › Συνδρομή › seasons.
+    get("/seasons", SeasonController, :index)
+    post("/seasons/:id/request", SeasonController, :request)
+    post("/seasons/:id/cancel", SeasonController, :cancel)
+    # ADR-156: «Φέρε φίλο».
+    get("/referrals", ReferralController, :mine)
+    post("/referrals/code", ReferralController, :rotate_code)
 
     get("/threads/unread-count", MessagingController, :unread_count)
     post("/threads", MessagingController, :create_thread)
@@ -300,6 +449,30 @@ defmodule MilosTrainingWeb.Router do
     get("/posts/:id/comments", CommunityPostController, :comments)
     post("/posts/:id/comments", CommunityPostController, :comment)
     delete("/comments/:id", CommunityPostController, :delete_comment)
+    put("/comments/:id/hidden", CommunityPostController, :hide_comment)
+    # ADR-143: member groups.
+    get("/groups", CommunityGroupController, :index)
+    post("/groups", CommunityGroupController, :create)
+    get("/groups/:id", CommunityGroupController, :show)
+    patch("/groups/:id", CommunityGroupController, :update)
+    post("/groups/:id/membership", CommunityGroupController, :join)
+    delete("/groups/:id/membership", CommunityGroupController, :leave)
+    put("/groups/:id/requests/:user_id", CommunityGroupController, :answer_request)
+    put("/groups/:id/admins/:user_id", CommunityGroupController, :set_admin)
+    delete("/groups/:id/members/:user_id", CommunityGroupController, :remove_member)
+    post("/groups/:id/archive", CommunityGroupController, :archive)
+    post("/groups/:id/reopen", CommunityGroupController, :reopen)
+    # ADR-168: PT squads.
+    get("/squads", PtSquadController, :index)
+    post("/squads", PtSquadController, :create)
+    get("/squads/:id", PtSquadController, :show)
+    patch("/squads/:id", PtSquadController, :update)
+    post("/squads/:id/invites", PtSquadController, :invite)
+    put("/squads/:id/invite", PtSquadController, :answer)
+    delete("/squads/:id/membership", PtSquadController, :leave)
+    delete("/squads/:id/members/:user_id", PtSquadController, :remove_member)
+    post("/squads/:id/archive", PtSquadController, :archive)
+    post("/squads/:id/reopen", PtSquadController, :reopen)
   end
 
   # ADR-118: standalone training log (class / offline workouts).
@@ -318,6 +491,9 @@ defmodule MilosTrainingWeb.Router do
     patch("/entries/:id", TrainingLogController, :update)
     post("/entries/:id/void", TrainingLogController, :void)
     get("/sources", TrainingLogController, :sources)
+    # ADR-175: voice logging (a draft only; nothing is saved).
+    get("/voice", MyVoiceLogController, :show)
+    post("/voice/drafts", MyVoiceLogController, :create)
   end
 
   # ADR-124: the acting user's own injury safety warnings for a workout they
@@ -333,6 +509,26 @@ defmodule MilosTrainingWeb.Router do
 
     get("/injury-warnings", MyInjuryWarningController, :show)
     post("/injury-warnings/acknowledge", MyInjuryWarningController, :acknowledge)
+    # ADR-174: the coach-approved adaptation (never a pending suggestion).
+    get("/scaling", MyScalingController, :show)
+  end
+
+  # ADR-163: WOD goals on the workout card and «τι ένιωσες» on the member's
+  # own entries (athletes and members alike).
+  scope "/api/org/:organization_slug", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :tenant_member,
+      :tenant_write_rate_limited
+    ])
+
+    get("/workouts/:id/goals", WorkoutGoalsController, :show)
+    get("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :show)
+    put("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :update)
+    # ADR-164: the gym's exercises (and videos) for an atlas node.
+    get("/anatomy/nodes/:node_id/exercises", AnatomyAtlasController, :exercises)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -413,6 +609,20 @@ defmodule MilosTrainingWeb.Router do
       :api,
       :authenticated,
       :authenticated_rate_limited,
+      :admin_only,
+      :geocode_rate_limited
+    ])
+
+    get("/geocode", AdminFacilityController, :search_addresses)
+    get("/geocode/reverse", AdminFacilityController, :reverse_geocode)
+    get("/geocode/link", AdminFacilityController, :resolve_map_link)
+  end
+
+  scope "/api/org/:organization_slug/admin", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
       :tenant_staff
     ])
 
@@ -434,6 +644,14 @@ defmodule MilosTrainingWeb.Router do
     get("/members", StaffController, :index)
     get("/clients/:user_id/coach-notes", CoachNotesController, :index)
     get("/clients/:user_id/journal", JournalController, :client_journal)
+    # ADR-158: shared body snapshots (audited in the client's access log).
+    get("/clients/:user_id/body", ClientBodyController, :index)
+    get("/clients/:user_id/body/snapshots/:id", ClientBodyController, :show)
+    get("/clients/:user_id/body/series", ClientBodyController, :series)
+    # ADR-160: the weekly wellness summary, only with the client's grant.
+    get("/clients/:user_id/wellness-summary", ClientWellnessSummaryController, :show)
+    # ADR-165: a client's coverage, qualities and load from shared entries.
+    get("/clients/:user_id/progress-depth", TrainingDepthController, :client)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -467,6 +685,10 @@ defmodule MilosTrainingWeb.Router do
     get("/form-reviews", CoachingExtrasController, :form_review_queue)
     post("/form-reviews/:id/review", CoachingExtrasController, :complete_form_review)
     get("/reply-queue", CoachingExtrasController, :reply_queue)
+    # ADR-174: the AI scaling approval queue.
+    get("/scaling-suggestions", StaffScalingController, :index)
+    post("/scaling-suggestions/:id/approve", StaffScalingController, :approve)
+    post("/scaling-suggestions/:id/dismiss", StaffScalingController, :dismiss)
     get("/my-client-stats", CoachingExtrasController, :my_client_stats)
     get("/clients/:user_id/nutrition-plan", CoachingExtrasController, :nutrition_plan)
     put("/clients/:user_id/nutrition-plan", CoachingExtrasController, :save_nutrition_plan)
@@ -519,6 +741,7 @@ defmodule MilosTrainingWeb.Router do
     post("/organization/transfer", OwnerOrganizationController, :transfer)
     post("/organization/archive", OwnerOrganizationController, :archive)
     patch("/users/:id/coach-scope", AdminUserController, :update_coach_scope)
+    put("/users/:id/home-location", HomeLocationController, :update_member)
     get("/users/:id/membership-status", AdminUserController, :membership_status)
     get("/search", AdminSearchController, :index)
     get("/analytics/summary", AdminAnalyticsController, :summary)
@@ -537,6 +760,22 @@ defmodule MilosTrainingWeb.Router do
     post("/locations/:id/archive", AdminFacilityController, :archive_location)
     get("/check-ins", AdminFacilityController, :index_check_ins)
     post("/check-ins", AdminFacilityController, :create_check_in)
+    # ADR-155: QR check-in desk, door display and rules.
+    get("/check-in/door/:location_id", AdminCheckInController, :door)
+    post("/check-in/door/:location_id/rotate", AdminCheckInController, :rotate_door)
+    get("/check-in/door/:location_id/poster", AdminCheckInController, :poster)
+    put("/check-in/door/:location_id/poster", AdminCheckInController, :update_poster)
+    post("/check-in/door/:location_id/poster/rotate", AdminCheckInController, :rotate_poster)
+    # ADR-173: NFC door tags.
+    get("/check-in/door/:location_id/nfc", AdminCheckInController, :nfc_tag)
+    put("/check-in/door/:location_id/nfc", AdminCheckInController, :update_nfc_tag)
+    post("/check-in/door/:location_id/nfc/rotate", AdminCheckInController, :rotate_nfc_tag)
+    delete("/check-in/members/:user_id/code", AdminCheckInController, :revoke_member_code)
+    post("/check-in/scan-member", AdminCheckInController, :scan_member)
+    post("/check-in/members/:user_id", AdminCheckInController, :check_in_member)
+    get("/check-in/visitors", AdminCheckInController, :visitors)
+    get("/check-in/settings", AdminCheckInController, :settings)
+    put("/check-in/settings", AdminCheckInController, :update_settings)
     post("/class-types", AdminClassTypeController, :create)
     patch("/class-types/:id", AdminClassTypeController, :update)
     delete("/class-types/:id", AdminClassTypeController, :delete)
@@ -553,6 +792,9 @@ defmodule MilosTrainingWeb.Router do
     get("/workouts/:id/dsl", AdminWorkoutDslController, :show_authoring)
     post("/workouts/:id/dsl/publish", AdminWorkoutDslController, :publish)
     get("/workouts/:id", AdminWorkoutController, :show)
+    get("/workouts/:id/goals", AdminWorkoutGoalsController, :show)
+    put("/workouts/:id/goals", AdminWorkoutGoalsController, :update)
+    get("/workouts/:id/goal-feedback-summary", AdminWorkoutGoalsController, :feedback_summary)
     patch("/workouts/:id/draft", AdminWorkoutController, :update_draft)
     patch("/workouts/:id/library", AdminWorkoutController, :update_library)
     post("/workouts/:id/publish", AdminWorkoutController, :publish)
@@ -571,9 +813,69 @@ defmodule MilosTrainingWeb.Router do
     delete("/challenges/:id", AdminChallengeController, :delete)
     get("/settings", AdminSettingsController, :show)
     get("/onboarding", AdminOnboardingController, :show)
+    get("/plan", AdminPlanController, :show)
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
+    # ADR-174: the gym's AI settings (own key, scaling switch, usage).
+    get("/ai-settings", AdminAiSettingsController, :show)
+    put("/ai-settings", AdminAiSettingsController, :update)
     get("/branding", AdminBrandingController, :show)
+    get("/trial-policy", AdminTrialController, :policy)
+    put("/trial-policy", AdminTrialController, :update_policy)
+    get("/trials", AdminTrialController, :queue)
+    post("/trials/:id/accept", AdminTrialController, :accept)
+    post("/trials/:id/decline", AdminTrialController, :decline)
+    post("/trials/:id/attendance", AdminTrialController, :attendance)
+    # ADR-156: «Φέρε φίλο» invites.
+    get("/referrals", AdminReferralController, :index)
+    post("/referrals/:id/approve", AdminReferralController, :approve)
+    post("/referrals/:id/reject", AdminReferralController, :reject)
+    post("/referrals/:id/given", AdminReferralController, :given)
+    put("/referrals/:id/referrer", AdminReferralController, :reassign)
+    post("/referrals/:id/friend-gift", AdminReferralController, :friend_gift)
+    # ADR-143: «Κοινότητα».
+    get("/community/groups", AdminCommunityController, :groups)
+    put("/community/groups/:id/decision", AdminCommunityController, :decide_group)
+    post("/community/groups/:id/reopen", AdminCommunityController, :reopen_group)
+    put("/community/settings", AdminCommunityController, :update_settings)
+    get("/community/reports", AdminCommunityController, :reports)
+    post("/community/reports/actions", AdminCommunityController, :act_on_report)
+    get("/community/clubs", AdminCommunityController, :clubs)
+    post("/community/clubs", AdminCommunityController, :create_club)
+    get("/community/clubs/:id", AdminCommunityController, :club)
+    patch("/community/clubs/:id", AdminCommunityController, :update_club)
+    post("/community/clubs/:id/archive", AdminCommunityController, :archive_club)
+    put("/community/clubs/:id/requests/:user_id", AdminCommunityController, :answer_club_request)
+    delete("/community/clubs/:id/members/:user_id", AdminCommunityController, :remove_club_member)
+    # ADR-153: club events.
+    get("/community/events", AdminCommunityEventController, :index)
+    post("/community/events", AdminCommunityEventController, :create)
+    get("/community/events/:id", AdminCommunityEventController, :show)
+    patch("/community/events/:id", AdminCommunityEventController, :update)
+    post("/community/events/:id/cancel", AdminCommunityEventController, :cancel)
+    post("/community/events/:id/message", AdminCommunityEventController, :message)
+    post("/community/events/:id/trial-offer", AdminCommunityEventController, :trial_offer)
+
+    put(
+      "/community/events/:id/attendees/:user_id/check-in",
+      AdminCommunityEventController,
+      :check_in
+    )
+
+    put(
+      "/community/events/:id/attendees/:user_id/paid",
+      AdminCommunityEventController,
+      :mark_paid
+    )
+
+    delete("/community/events/:id/attendees/:user_id", AdminCommunityEventController, :remove)
+    get("/public-profile", AdminPublicProfileController, :show)
+    put("/public-profile", AdminPublicProfileController, :update)
+    post("/public-profile/publish", AdminPublicProfileController, :publish)
+    post("/public-profile/unpublish", AdminPublicProfileController, :unpublish)
+    post("/public-profile/suggestions", AdminPublicProfileController, :suggest)
+    post("/public-profile/photos", AdminPublicProfileController, :photo_upload)
+    post("/public-profile/photos/:id/complete", AdminPublicProfileController, :complete_photo)
     post("/branding/logo/upload-url", AdminBrandingController, :logo_upload_url)
     put("/branding/logo", AdminBrandingController, :finalize_logo)
     delete("/branding/logo", AdminBrandingController, :remove_logo)
@@ -581,6 +883,13 @@ defmodule MilosTrainingWeb.Router do
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
+
+    get(
+      "/schedule/slots/:id/goal-feedback-summary",
+      AdminWorkoutGoalsController,
+      :class_feedback_summary
+    )
+
     patch("/bookings/:id/approve", AdminScheduleController, :approve_booking)
     patch("/bookings/:id/reject", AdminScheduleController, :reject_booking)
 
@@ -595,6 +904,14 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
+    # ADR-167: seasons.
+    get("/seasons", AdminSeasonController, :index)
+    post("/seasons", AdminSeasonController, :create)
+    get("/seasons/:id", AdminSeasonController, :show)
+    patch("/seasons/:id", AdminSeasonController, :update)
+    post("/season-enrollments/:id/confirm", AdminSeasonController, :confirm)
+    post("/season-enrollments/:id/decline", AdminSeasonController, :decline)
+    post("/season-enrollments/:id/remove", AdminSeasonController, :remove)
     get("/finance/packages", AdminFinanceController, :packages)
     get("/finance/package-catalog", AdminFinanceController, :package_catalog)
     get("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :beneficiaries)
@@ -780,6 +1097,14 @@ defmodule MilosTrainingWeb.Router do
       :platform_write_rate_limited
     ])
 
+    get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    # ADR-170: platform plans, prices and each organization's plan.
+    get("/plans", PlatformPlanController, :index)
+    post("/plans", PlatformPlanController, :create)
+    patch("/plans/:code", PlatformPlanController, :update)
+    get("/subscriptions", PlatformPlanController, :subscriptions)
+    put("/organizations/:id/plan", PlatformPlanController, :assign)
+    patch("/tag-suggestions/:id", PlatformTagSuggestionController, :resolve)
     get("/organizations", PlatformOrganizationController, :index)
     post("/organizations", PlatformOrganizationController, :create)
     delete("/organizations/:id", PlatformOrganizationController, :delete)
@@ -846,6 +1171,7 @@ defmodule MilosTrainingWeb.Router do
     post("/avatar/upload-url", MeController, :avatar_upload_url)
     patch("/avatar", MeController, :update_avatar)
     get("/search/users", MeController, :search_users)
+    get("/places", MyPlacesController, :index)
   end
 
   scope "/api", MilosTrainingWeb do
@@ -874,6 +1200,19 @@ defmodule MilosTrainingWeb.Router do
     )
 
     delete("/notifications/push-subscriptions", NotificationController, :delete_push_subscription)
+    # ADR-171: push to the store apps.
+    post("/notifications/native-push-tokens", NotificationController, :create_native_push_token)
+
+    post(
+      "/notifications/native-push-tokens/unregister",
+      NotificationController,
+      :delete_native_push_token
+    )
+
+    # ADR-173: the token the store app hands its home-screen widgets.
+    post("/me/widget-tokens", WidgetController, :create_token)
+    delete("/me/widget-tokens/:id", WidgetController, :delete_token)
+
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
@@ -882,16 +1221,320 @@ defmodule MilosTrainingWeb.Router do
     get("/wellbeing/check-ins", CheckInController, :index)
     post("/wellbeing/check-ins", CheckInController, :create)
     delete("/wellbeing/check-ins/:id", CheckInController, :delete)
+    get("/me/wellness", WellnessController, :show)
+    post("/me/wellness/entries", WellnessController, :create_entry)
+    patch("/me/wellness/entries/:id", WellnessController, :update_entry)
+    delete("/me/wellness/entries/:id", WellnessController, :delete_entry)
+    post("/me/wellness/cravings", WellnessController, :create_craving)
+    patch("/me/wellness/cravings/:id", WellnessController, :update_craving)
+    delete("/me/wellness/cravings/:id", WellnessController, :delete_craving)
+    get("/me/wellness/preferences", WellnessController, :preferences)
+    put("/me/wellness/preferences", WellnessController, :update_preferences)
+    delete("/me/wellness", WellnessController, :erase)
+    post("/me/wellness/meal-photos", WellnessController, :upload_meal_photo)
+    get("/me/wellness/export", WellnessController, :export)
     post("/journal/comments/batch", JournalCommentController, :batch)
     put("/journal/comments/:id", JournalCommentController, :save)
     delete("/journal/comments/:id", JournalCommentController, :delete)
     get("/me/journal", JournalController, :index)
+    # ADR-162: one journal across providers, Box ▾ and the merged «Σήμερα».
+    get("/me/journal/coach-audience", JournalController, :coach_audience)
+    put("/me/journal/coach-audience", JournalController, :put_coach_audience)
+    put("/me/journal/entries/:kind/:id/audience", JournalController, :entry_audience)
+    post("/me/journal/export", JournalController, :export)
+    get("/me/journal/exports", JournalController, :exports)
+    get("/me/providers", MyProvidersController, :index)
+    put("/me/providers/selected", MyProvidersController, :select)
+    get("/me/today", MyProvidersController, :today)
+    get("/me/history", AccountTrainingController, :history)
+    get("/me/progress", AccountTrainingController, :progress)
+    # ADR-165: coverage summary, qualities radar and training load.
+    get("/me/progress/depth", TrainingDepthController, :show)
+    # ADR-166: the Πρόοδος insights slot.
+    get("/me/insights", InsightsController, :show)
+    post("/me/insights/restore", InsightsController, :restore)
+    post("/me/insights/:rule/dismiss", InsightsController, :dismiss)
+    get("/me/vault", AccountTrainingController, :vault)
+    # ADR-164: the anatomy atlas, the member's coverage across providers.
+    get("/me/atlas", AnatomyAtlasController, :show)
+    get("/me/filters/:surface", SavedFilterController, :show)
+    put("/me/filters/:surface/last-used", SavedFilterController, :remember)
+    post("/me/filters/:surface", SavedFilterController, :save)
+    delete("/me/filters/:surface/:id", SavedFilterController, :delete)
+    put("/me/filters/:surface/:id/alert", SavedFilterController, :alert)
     put("/me/journal/entries/:kind/:id/visibility", JournalController, :set_visibility)
     post("/me/journal/notes", JournalController, :create_note)
     patch("/me/journal/notes/:id", JournalController, :update_note)
     delete("/me/journal/notes/:id", JournalController, :delete_note)
     get("/me/clubs", CommunityController, :my_clubs)
     get("/me/feed", CommunityPostController, :feed)
+    # ADR-143: open clubs, «Βρες», «Μέλη», reports, and posting in any club.
+    get("/me/community/discover", OpenClubController, :discover)
+    get("/me/clubs/:id/members", OpenClubController, :members)
+    get("/me/open-clubs/:id", OpenClubController, :show)
+    post("/me/open-clubs/:id/membership", OpenClubController, :join)
+    delete("/me/open-clubs/:id/membership", OpenClubController, :leave)
+    put("/me/open-clubs/:id/notify-level", OpenClubController, :set_notify_level)
+    post("/me/community/reports", OpenClubController, :report)
+    post("/me/community/posts", ClubPostController, :create)
+    delete("/me/community/posts/:id", ClubPostController, :delete)
+    put("/me/community/posts/:id/hidden", ClubPostController, :hide)
+    put("/me/community/posts/:id/pinned", ClubPostController, :pin)
+    put("/me/community/posts/:id/kudos", ClubPostController, :kudos)
+    get("/me/community/posts/:id/comments", ClubPostController, :comments)
+    post("/me/community/posts/:id/comments", ClubPostController, :comment)
+    delete("/me/community/comments/:id", ClubPostController, :delete_comment)
+    put("/me/community/comments/:id/hidden", ClubPostController, :hide_comment)
+    # ADR-153: club events.
+    get("/me/community/clubs/:id/events", CommunityEventController, :club_events)
+    post("/me/community/clubs/:id/events", CommunityEventController, :create)
+    get("/me/community/events", CommunityEventController, :clubs_events)
+    get("/me/events", CommunityEventController, :mine)
+    get("/me/events/:id", CommunityEventController, :show)
+    patch("/me/events/:id", CommunityEventController, :update)
+    post("/me/events/:id/cancel", CommunityEventController, :cancel)
+    put("/me/events/:id/rsvp", CommunityEventController, :rsvp)
+    post("/me/events/:id/invites", CommunityEventController, :invite)
+    # ADR-142: follows, profile posts and people.
+    get("/me/social", FollowController, :summary)
+    put("/me/social/booking-sharing", FollowController, :booking_sharing)
+    put("/me/social/member-visibility", FollowController, :member_visibility)
+    put("/me/social/around-visibility", FollowController, :around_visibility)
+    post("/me/follows", FollowController, :create)
+    get("/me/follows/:target_type/:target_id", FollowController, :show)
+    delete("/me/follows/:target_type/:target_id", FollowController, :delete)
+    get("/me/follow-requests", FollowController, :requests)
+    post("/me/follow-requests/:id/accept", FollowController, :accept)
+    delete("/me/follow-requests/:id", FollowController, :remove)
+    get("/me/followers", FollowController, :followers)
+    delete("/me/followers/:id", FollowController, :remove)
+    get("/me/following", FollowController, :following)
+    get("/me/post-attachments/:type/:id", PostAttachmentController, :show)
+    post("/profile-posts", ProfilePostController, :create)
+    delete("/profile-posts/:id", ProfilePostController, :delete)
+    put("/profile-posts/:id/kudos", ProfilePostController, :kudos)
+    get("/profile-posts/:id/comments", ProfilePostController, :comments)
+    post("/profile-posts/:id/comments", ProfilePostController, :comment)
+    delete("/profile-post-comments/:id", ProfilePostController, :delete_comment)
+    get("/people/:id", PeopleController, :show)
+    get("/people/:id/posts", PeopleController, :posts)
+    # Board 4 D2: only «Σχετικά» is public; the rest of a box page needs sign-in.
+    get("/boxes/:slug/schedule", PublicBoxController, :schedule)
+    get("/boxes/:slug/posts", PublicBoxController, :posts)
+    get("/boxes/:slug/events", CommunityEventController, :box_events)
+    # ADR-156: the friend's side of an invite.
+    post("/referrals/claim", ReferralController, :claim)
+    # ADR-144: trials.
+    post("/boxes/:slug/trials", TrialController, :create)
+    get("/me/trials", TrialController, :index)
+    get("/me/trials/:id", TrialController, :show)
+    post("/me/trials/:id/cancel", TrialController, :cancel)
+    post("/me/trials/:id/follow-up", TrialController, :follow_up)
+    # ADR-158: Ημερολόγιο › Σώμα.
+    get("/me/body/snapshots", MyBodyController, :index)
+    post("/me/body/snapshots", MyBodyController, :create)
+    get("/me/body/snapshots/:id", MyBodyController, :show)
+    patch("/me/body/snapshots/:id", MyBodyController, :update)
+    delete("/me/body/snapshots/:id", MyBodyController, :delete)
+    post("/me/body/snapshots/:id/photos", MyBodyController, :add_photo)
+    delete("/me/body/snapshots/:id/photos/:photo_id", MyBodyController, :remove_photo)
+    get("/me/body/series", MyBodyController, :series)
+    get("/me/body/compare", MyBodyController, :compare)
+    get("/me/body/photos/latest", MyBodyController, :latest_photos)
+    delete("/me/body/photos", MyBodyController, :delete_photos)
+    get("/me/body/settings", MyBodyController, :settings)
+    put("/me/body/settings", MyBodyController, :update_settings)
+    get("/me/body/consents", MyBodyController, :consents)
+    put("/me/body/consents/:scope", MyBodyController, :grant_consent)
+    delete("/me/body/consents/:scope", MyBodyController, :withdraw_consent)
+    get("/me/body/access-log", MyBodyController, :access_log)
+    post("/me/body/share", MyBodyController, :share)
+    # ADR-169: Partners.
+    get("/me/clubs/:club_id/partners", PartnersController, :club)
+    put("/me/clubs/:club_id/partners/profile", PartnersController, :put_profile)
+    get("/me/clubs/:club_id/partners/deck", PartnersController, :deck)
+    post("/me/clubs/:club_id/partners/swipes", PartnersController, :swipe)
+    delete("/me/clubs/:club_id/partners/swipes/:target_id", PartnersController, :undo)
+    get("/me/partners/matches", PartnersController, :matches)
+    delete("/me/partners/matches/:id", PartnersController, :end_match)
+    get("/me/partners/matches/:id/messages", PartnersController, :messages)
+    post("/me/partners/matches/:id/messages", PartnersController, :post_message)
+    post("/me/partners/matches/:id/messages/read", PartnersController, :mark_read)
+    get("/me/partners/matches/:id/sessions", PartnersController, :sessions)
+    post("/me/partners/matches/:id/plans", PartnersController, :plan)
+    get("/me/partners/settings", PartnersController, :settings)
+    put("/me/partners/settings", PartnersController, :put_settings)
+    get("/me/blocks", PartnersController, :blocks)
+    post("/me/blocks", PartnersController, :block)
+    delete("/me/blocks/:user_id", PartnersController, :unblock)
+    # ADR-160: Buddy για στήριξη.
+    get("/me/buddies", MyBuddiesController, :index)
+    get("/me/buddies/candidates", MyBuddiesController, :candidates)
+    get("/me/buddies/settings", MyBuddiesController, :settings)
+    put("/me/buddies/settings", MyBuddiesController, :update_settings)
+    post("/me/buddies", MyBuddiesController, :invite)
+    post("/me/buddies/invite-links", MyBuddiesController, :create_invite_link)
+    post("/me/buddies/:id/accept", MyBuddiesController, :accept)
+    post("/me/buddies/:id/decline", MyBuddiesController, :decline)
+    post("/me/buddies/:id/leave", MyBuddiesController, :leave)
+    patch("/me/buddies/:id", MyBuddiesController, :update)
+    get("/me/buddies/:id/messages", BuddyMessagesController, :index)
+    post("/me/buddies/:id/messages", BuddyMessagesController, :create)
+    post("/me/buddies/:id/messages/read", BuddyMessagesController, :read)
+    post("/me/buddy-invites/:token/claim", MyBuddiesController, :claim)
+    get("/me/support-requests", SupportRequestController, :index)
+    post("/me/support-requests", SupportRequestController, :create)
+    get("/me/support-requests/:id", SupportRequestController, :show)
+    post("/me/support-requests/:id/undo", SupportRequestController, :undo)
+    post("/me/support-requests/:id/replies", SupportRequestController, :reply)
+    get("/me/wellness-summary-sharing", WellnessSummarySharingController, :show)
+
+    get(
+      "/me/wellness-summary-sharing/access-log",
+      WellnessSummarySharingController,
+      :access_log
+    )
+
+    put("/me/wellness-summary-sharing", WellnessSummarySharingController, :update)
+  end
+
+  # ADR-160: the public landing page of a buddy invite link.
+  scope "/api/buddy-invites", MilosTrainingWeb do
+    pipe_through([:api, :public_invite_rate_limited])
+
+    get("/:token", BuddyInviteController, :show)
+  end
+
+  # ADR-157: photos and videos for posts.
+  scope "/api/me/media", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :media_upload_rate_limited
+    ])
+
+    get("/capabilities", MyMediaController, :capabilities)
+    post("/uploads", MyMediaController, :upload)
+    get("/:id", MyMediaController, :show)
+    post("/:id/complete", MyMediaController, :complete)
+    patch("/:id", MyMediaController, :update)
+    delete("/:id", MyMediaController, :delete)
+  end
+
+  scope "/api/me/media", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :ai_suggestion_rate_limited
+    ])
+
+    post("/:id/alt-text-suggestion", MyMediaController, :suggest_alt_text)
+  end
+
+  # ADR-158: body photo uploads share the media upload limits.
+  scope "/api/me/body/photos", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :media_upload_rate_limited
+    ])
+
+    post("/uploads", MyBodyController, :upload)
+  end
+
+  # ADR-155: the door scan (any box: the door says which) and connected devices.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :check_in_rate_limited
+    ])
+
+    post("/check-in/scan", ScanCheckInController, :scan)
+    delete("/check-in/scan/:undo_token", ScanCheckInController, :undo)
+    # ADR-173: the arrival reminder's regions for the store apps.
+    get("/me/check-in/geofences", ScanCheckInController, :geofences)
+    get("/me/connected-devices", WalletController, :devices)
+    delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  scope "/api/widget", MilosTrainingWeb do
+    pipe_through([:api, :widget])
+
+    get("/snapshot", WidgetController, :snapshot)
+    post("/water", WidgetController, :add_water)
+  end
+
+  # ADR-161: Garmin in Συνδεδεμένες συσκευές and the journal's device card;
+  # ADR-172: the phone's health data.
+  scope "/api/me", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :device_rate_limited
+    ])
+
+    get("/devices", DevicesController, :index)
+    get("/devices/summary", DevicesController, :summary)
+    post("/devices/summary/seen", DevicesController, :seen)
+    post("/devices/garmin/connect", DevicesController, :connect)
+    patch("/devices/garmin", DevicesController, :update)
+    post("/devices/garmin/sync", DevicesController, :sync)
+    delete("/devices/garmin", DevicesController, :disconnect)
+    get("/devices/garmin/pending", DevicesController, :pending)
+    # ADR-172: Apple Health and Health Connect from the store apps.
+    get("/devices/export", PhoneHealthController, :export)
+    post("/devices/phone/:provider/connect", PhoneHealthController, :connect)
+    patch("/devices/phone/:provider", PhoneHealthController, :update)
+    post("/devices/phone/:provider/ingest", PhoneHealthController, :ingest)
+    delete("/devices/phone/:provider", PhoneHealthController, :disconnect)
+    post("/device-imports/:id/confirm", DevicesController, :confirm)
+    get("/daily-stats", DevicesController, :daily_stats)
+  end
+
+  # ADR-154: Γύρω μου, «Η περιοχή μου» and the gazetteer; members only.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :around_rate_limited
+    ])
+
+    post("/around/search", AroundController, :search)
+    post("/around/search/:kind", AroundController, :kind)
+    post("/around/pins", AroundController, :pins)
+    get("/places/neighbourhoods", PlacesController, :neighbourhoods)
+    get("/me/around/area", PlacesController, :area)
+    put("/me/around/area", PlacesController, :update_area)
+  end
+
+  # ADR-144, board 6 Q6: talking to a box from its page.
+  scope "/api", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :messaging_rate_limited
+    ])
+
+    get("/me/box-conversations", BoxConversationController, :index)
+    get("/boxes/:slug/conversation", BoxConversationController, :show)
+    post("/boxes/:slug/conversation", BoxConversationController, :open)
+    post("/boxes/:slug/conversation/messages", BoxConversationController, :send_message)
+    post("/boxes/:slug/conversation/read", BoxConversationController, :mark_read)
   end
 
   scope "/api/workouts", MilosTrainingWeb do

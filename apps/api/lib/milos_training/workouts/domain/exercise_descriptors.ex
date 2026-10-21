@@ -16,6 +16,7 @@ defmodule MilosTraining.Workouts.Domain.ExerciseDescriptors do
   base exercise's catalog ref.
   """
 
+  alias MilosTraining.Workouts.Domain.FreeTextExercises
   alias MilosTraining.Workouts.Domain.WorkoutDsl.ExerciseCatalog
 
   def from_workout(%{sections: sections}) when is_list(sections) do
@@ -28,6 +29,75 @@ defmodule MilosTraining.Workouts.Domain.ExerciseDescriptors do
   end
 
   def from_workout(_workout), do: []
+
+  @doc """
+  Exercises of a workout with a weight, for WOD-goal suggestion (ADR-163):
+  `%{name, exercise_ref, category, weight}`, where weight is the set count
+  when the coach gave one, else 1.
+
+  Structured and Quick Text workouts read their sections (a draft's sections
+  come from its draft data). A free-text workout without sections is read
+  line by line (`FreeTextExercises`). Names are resolved leniently (a plural
+  such as "Thrusters" matches "Thruster"); an unresolved exercise keeps a
+  `nil` ref so the caller can count it as unmatched.
+  """
+  def weighted_from_workout(workout) when is_map(workout) do
+    case section_exercises(workout) do
+      [] -> FreeTextExercises.from_text(free_text_body(workout))
+      exercises -> Enum.map(exercises, &weighted_descriptor/1)
+    end
+  end
+
+  def weighted_from_workout(_workout), do: []
+
+  # A draft keeps its body in the draft data until it is published.
+  defp free_text_body(workout),
+    do: field(workout, :free_text_body) || field(field(workout, :draft_data), :free_text_body)
+
+  defp section_exercises(workout) do
+    (field(workout, :sections) || [])
+    |> Enum.filter(&is_map/1)
+    |> Enum.flat_map(&(field(&1, :exercises) || []))
+    |> Enum.filter(&is_map/1)
+    |> Enum.reject(&(to_string(field(&1, :item_type) || "exercise") == "header"))
+    |> Enum.reject(&(field(&1, :excluded) == true))
+    |> Enum.filter(&is_binary(field(&1, :name)))
+  end
+
+  defp weighted_descriptor(exercise) do
+    name = field(exercise, :name)
+
+    entry =
+      case base_ref(exercise) && ExerciseCatalog.fetch(base_ref(exercise)) do
+        %{} = entry -> entry
+        _missing -> FreeTextExercises.resolve_name(name)
+      end
+
+    %{
+      name: name,
+      exercise_ref: entry && entry.id,
+      category: entry && entry.category,
+      weight: weight(field(exercise, :sets))
+    }
+  end
+
+  @doc """
+  The catalog entry an exercise names, as `%{id, label, category}`: the
+  given ref when it is a catalog id, else the name resolved leniently
+  (plural-tolerant), else nil.
+  """
+  def resolve_catalog_entry(exercise_ref, name) do
+    entry =
+      case is_binary(exercise_ref) && ExerciseCatalog.fetch(exercise_ref) do
+        %{} = entry -> entry
+        _missing -> FreeTextExercises.resolve_name(name)
+      end
+
+    entry && %{id: entry.id, label: entry.label, category: entry.category}
+  end
+
+  defp weight(sets) when is_integer(sets) and sets > 0, do: sets
+  defp weight(_sets), do: 1
 
   defp descriptor(exercise) do
     name = field(exercise, :name)

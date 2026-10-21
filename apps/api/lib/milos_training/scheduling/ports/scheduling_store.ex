@@ -30,6 +30,7 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
   @callback list_slot_ids_for_workout(TenantContext.t(), Ecto.UUID.t()) :: [Ecto.UUID.t()]
   @callback get_slot(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
   @callback list_slots_window(TenantContext.t(), DateTime.t(), DateTime.t(), keyword()) :: [map()]
+  @callback list_slots_by_ids(TenantContext.t(), [Ecto.UUID.t()]) :: [map()]
   @callback list_member_slots(TenantContext.t(), Ecto.UUID.t(), DateTime.t(), DateTime.t()) :: [
               map()
             ]
@@ -46,6 +47,11 @@ defmodule MilosTraining.Scheduling.Ports.SchedulingStore do
             }
   @callback record_attendance(TenantContext.t(), map()) ::
               {:ok, map()} | {:error, Ecto.Changeset.t()}
+  @callback delete_attendance(TenantContext.t(), Ecto.UUID.t()) ::
+              {:ok, map()} | {:error, term()}
+  @callback get_attendance(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
+  @callback list_recent_class_check_ins(TenantContext.t(), DateTime.t(), Ecto.UUID.t() | nil) ::
+              [map()]
   @callback list_user_attendance(TenantContext.t(), Ecto.UUID.t(), [Ecto.UUID.t()]) :: map()
   @callback get_attendance_for_user_class(TenantContext.t(), Ecto.UUID.t(), Ecto.UUID.t()) ::
               map() | nil

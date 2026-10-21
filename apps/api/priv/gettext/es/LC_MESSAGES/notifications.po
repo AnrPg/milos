@@ -252,3 +252,336 @@ msgstr "Tu acceso ha terminado. Renueva tu suscripción para volver a reservar c
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Se cancelaron tus próximas reservas: %{count}."
+
+msgid "Follow request"
+msgstr "Solicitud de seguimiento"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} quiere seguirte."
+
+msgid "Follow request accepted"
+msgstr "Solicitud de seguimiento aceptada"
+
+msgid "You now follow %{nickname}."
+msgstr "Ahora sigues a %{nickname}."
+
+msgid "Trial request"
+msgstr "Solicitud de clase de prueba"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} quiere probar %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Nueva clase de prueba"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} reservó una clase de prueba en %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Clase de prueba cancelada"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} canceló su clase de prueba en %{class}."
+
+msgid "Your trial is booked"
+msgstr "Tu clase de prueba está reservada"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Clase de prueba no aceptada"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} no puede recibirte en %{class}."
+
+msgid "Your trial is soon"
+msgstr "Tu clase de prueba es pronto"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} en %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "¿Qué tal tu clase de prueba?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "¿Quieres seguir entrenando en %{box}? Envíales un mensaje."
+
+msgid "Trial class cancelled"
+msgstr "Clase de prueba cancelada por el box"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} canceló %{class} (%{when}). Elige otra clase."
+
+msgid "New group to review"
+msgstr "Nuevo grupo para revisar"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} quiere crear «%{group}»."
+
+msgid "Your group is live"
+msgstr "Tu grupo está activo"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» está abierto. Invita a gente."
+
+msgid "Group not approved"
+msgstr "Grupo no aprobado"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "El box no aprobó «%{group}»."
+
+msgid "Request to join"
+msgstr "Solicitud para unirse"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} pide unirse a «%{group}»."
+
+msgid "You're in"
+msgstr "Ya estás dentro"
+
+msgid "You joined «%{group}»."
+msgstr "Te uniste a «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Tu grupo está tranquilo"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Nadie ha publicado en «%{group}» desde hace tiempo. Publica algo o se archivará."
+
+msgid "New report"
+msgstr "Nuevo reporte"
+
+msgid "Someone reported something in the club."
+msgstr "Alguien reportó algo en el club."
+
+msgid "A place opened up"
+msgstr "Se ha liberado una plaza"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "Vas a «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "Evento cancelado"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "«%{event}» (%{when}) se ha cancelado."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "«%{event}» (%{when}) se ha cancelado: %{reason}"
+
+msgid "Event changed"
+msgstr "Evento modificado"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "«%{event}» se ha movido a %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "«%{event}» tiene un nuevo lugar."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "«%{event}» tiene nueva hora y lugar: %{when}."
+
+msgid "Starting soon"
+msgstr "Empieza pronto"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "«%{event}» empieza en dos horas (%{when})."
+
+msgid "Your guest is coming"
+msgstr "Tu invitado viene"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} viene a «%{event}» con tu pase de invitado."
+
+msgid "Try a class"
+msgstr "Prueba una clase"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "¿Te gustó «%{event}»? %{box} te invita a una clase de prueba."
+
+msgid "Message about «%{event}»"
+msgstr "Mensaje sobre «%{event}»"
+
+msgid "Your invite"
+msgstr "Tu invitación"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} se registró con tu invitación."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} vino al evento al que le invitaste."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} vino a una clase de prueba."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} se ha suscrito."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} se ha unido al box."
+
+msgid "Referral reward"
+msgstr "Recompensa por recomendación"
+
+msgid "Your referral reward was given."
+msgstr "Tu recompensa por recomendación ya se entregó."
+
+msgid "Your referral was not approved."
+msgstr "Tu recomendación no se aprobó."
+
+msgid "Your referral reward was approved."
+msgstr "Tu recompensa por recomendación se aprobó."
+
+msgid "Referral to approve"
+msgstr "Recomendación por aprobar"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} se suscribió, invitado/a por %{referrer}."
+
+msgid "New near you"
+msgstr "Novedades cerca de ti"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Novedades para «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Visita en la puerta"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} escaneó la puerta de %{box} (%{when}) - aún no es miembro."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} escaneó la puerta de %{box} (%{when}) - aún no es miembro. Las clases de prueba están abiertas."
+
+msgid "Time for a new measurement"
+msgstr "Es hora de una nueva medición"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Una nueva instantánea te ayuda a ver tu tendencia. Solo lleva un minuto."
+
+msgid "A buddy invitation"
+msgstr "Una invitación de buddy"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} te pide ser su buddy de apoyo."
+
+msgid "You have a support buddy"
+msgstr "Tienes un buddy de apoyo"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} aceptó. Solo sabrá de ti cuando lo pidas."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} está pasando un momento difícil"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Estoy aquí · ¿Damos un paseo? · Llámame"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: ¿Damos un paseo?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Llámame"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Estoy aquí"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} respondió"
+
+msgid "No one has replied yet"
+msgstr "Nadie ha respondido todavía"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Mientras tanto, algo pequeño: dos minutos de respiración, un vaso de agua, un paseo corto."
+
+msgid "%{nickname}'s week"
+msgstr "La semana de %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} momentos difíciles, %{overcome} superados, %{requests} peticiones de apoyo."
+
+msgid "I'm here"
+msgstr "Estoy aquí"
+
+msgid "Shall we go for a walk?"
+msgstr "¿Damos un paseo?"
+
+msgid "Call me"
+msgstr "Llámame"
+
+msgid "How did it go?"
+msgstr "¿Cómo fue?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Una nota rápida sobre antes te ayuda a ver qué te funciona."
+
+msgid "A glass of water?"
+msgstr "¿Un vaso de agua?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "La tarde es un buen momento para ponerte al día con el agua."
+
+msgid "Buddy message"
+msgstr "Mensaje de tu buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: bienestar semanal"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} noches en el objetivo de sueño, %{water} días con agua, %{meals} días con comidas registradas."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin ha dejado de sincronizar"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Vuelve a conectarlo desde Dispositivos conectados para que tus entrenamientos lleguen de nuevo."
+
+msgid "Your journal export is ready"
+msgstr "Tu exportación del diario está lista"
+
+msgid "Download it within seven days from Settings."
+msgstr "Descárgala en un plazo de siete días desde Ajustes."
+
+msgid "Season request"
+msgstr "Solicitud de temporada"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} pide una plaza en %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} está en la lista de espera de %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Tu plaza está confirmada"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} empieza el %{date}. El programa está en tu Box."
+
+msgid "Season request not confirmed"
+msgstr "Solicitud de temporada no confirmada"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} no pudo confirmar tu plaza en %{season}."
+
+msgid "Season cancelled"
+msgstr "Temporada cancelada"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} canceló %{season}."
+
+msgid "You found a training partner"
+msgstr "Has encontrado compañero de entrenamiento"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Tú y %{nickname} queréis entrenar juntos. Saluda."
+
+msgid "Training partner message"
+msgstr "Mensaje de tu compañero de entrenamiento"
+
+msgid "Squad invitation"
+msgstr "Invitación a un squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} te ha invitado al squad «%{group}»."

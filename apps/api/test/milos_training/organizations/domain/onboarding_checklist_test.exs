@@ -97,4 +97,45 @@ defmodule MilosTraining.Organizations.Domain.OnboardingChecklistTest do
     assert %{"completed" => ["settings"], "dismissed_at" => nil} =
              OnboardingChecklist.from_settings(stored)
   end
+
+  test "an independent coach gets the practice steps (ADR-170)" do
+    state = OnboardingChecklist.default_state()
+
+    view =
+      OnboardingChecklist.build(state, %{"sessions" => true, "classes" => true}, "coach")
+
+    assert view["audience"] == "coach"
+
+    assert ~w(profile sessions packages team bootcamp invite tour) ==
+             Enum.map(view["steps"], & &1["id"])
+
+    assert %{"done" => true, "auto" => true} = Enum.find(view["steps"], &(&1["id"] == "sessions"))
+    assert view["total"] == 7
+
+    assert {:ok, %{"completed" => ["team"]}} =
+             OnboardingChecklist.apply_action(
+               state,
+               %{"action" => "complete", "step" => "team"},
+               @now,
+               "coach"
+             )
+
+    # A gym step is not a coach step, and the other way round.
+    assert {:error, :invalid_onboarding_action} =
+             OnboardingChecklist.apply_action(
+               state,
+               %{"action" => "skip", "step" => "classes"},
+               @now,
+               "coach"
+             )
+
+    assert {:error, :invalid_onboarding_action} =
+             OnboardingChecklist.apply_action(
+               state,
+               %{"action" => "skip", "step" => "team"},
+               @now
+             )
+
+    assert "gym" == OnboardingChecklist.audience("anything else")
+  end
 end

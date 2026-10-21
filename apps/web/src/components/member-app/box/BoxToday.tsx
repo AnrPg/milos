@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -26,8 +26,10 @@ import {
   type TrainingLogDialogState,
 } from "@/components/training-log/TrainingLog";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -63,8 +65,16 @@ export function nextBooking(slots: ScheduleSlot[], now: Date) {
  * Καταγραφή / Έναρξη ▶, then the next booking. Both keep their place with an
  * empty state, so the screen never reflows (brief §4.2).
  */
-export function BoxToday() {
+export function BoxToday({
+  nextSession,
+  emptyAction,
+}: {
+  /** ADR-170: an independent coach's Box shows the next session, not a class. */
+  nextSession?: ReactNode;
+  emptyAction?: { href: string; label: string };
+} = {}) {
   const t = useTranslations("MemberApp");
+  const tCheckIn = useTranslations("CheckIn");
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens } = useSession();
@@ -117,7 +127,9 @@ export function BoxToday() {
   function chipLabel(item: TodayTrainingItem) {
     return item.kind === "class" && item.scheduledAt
       ? t("classChip", { time: time(item.scheduledAt) })
-      : t("programmeChip", { title: item.sourceName });
+      : item.seasonTitle
+        ? t("seasonChip", { title: item.sourceName, season: item.seasonTitle })
+        : t("programmeChip", { title: item.sourceName });
   }
 
   function openLog(item: TodayTrainingItem) {
@@ -144,7 +156,7 @@ export function BoxToday() {
           <div className="flex flex-col gap-3">
             <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
             <div className="flex gap-2">
-              <HubButton href="/box/schedule">{t("bookClass")}</HubButton>
+              <HubButton href={emptyAction?.href ?? "/box/schedule"}>{emptyAction?.label ?? t("bookClass")}</HubButton>
               {today.resumeExecutionId ? (
                 <button
                   type="button"
@@ -204,6 +216,7 @@ export function BoxToday() {
               freeTextBody={selected.workout.free_text_body}
               freeTextDocument={selected.workout.free_text_document}
             />
+            <WodGoalsStrip workoutId={selected.workout.id} />
 
             {token ? (
               <MyInjuryWarningsPanel
@@ -213,6 +226,7 @@ export function BoxToday() {
                 sourceContextId={selected.injuryContext.id}
               />
             ) : null}
+            {token ? <MyWorkoutScaling token={token} workoutId={selected.workout.id} /> : null}
 
             {launcher.error ? (
               <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>
@@ -244,6 +258,7 @@ export function BoxToday() {
         )}
       </HubCard>
 
+      {nextSession ?? (
       <HubCard eyebrow={t("nextSession")}>
         {schedule.isPending ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
@@ -264,13 +279,23 @@ export function BoxToday() {
               </span>
             </div>
             <NextBookingActions slot={booking} />
-            <Link
-              href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
-              className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-              style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
-            >
-              {t("manageBooking")}
-            </Link>
+            <div className="flex gap-2">
+              <Link
+                href={`/box/schedule?open_slot=${encodeURIComponent(booking.id)}`}
+                className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              >
+                {t("manageBooking")}
+              </Link>
+              <Link
+                href="/box/check-in"
+                className="flex min-h-11 flex-1 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
+                style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px solid var(--border)" }}
+              >
+                <QrGlyph />
+                {tCheckIn("qrCheckIn")}
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="flex flex-col gap-3">
@@ -279,6 +304,7 @@ export function BoxToday() {
           </div>
         )}
       </HubCard>
+      )}
 
       {logDialog.mode !== "closed" && token ? (
         <TrainingLogDialog
@@ -289,5 +315,17 @@ export function BoxToday() {
         />
       ) : null}
     </>
+  );
+}
+
+/** The QR glyph on «QR check-in» (ADR-155). */
+function QrGlyph() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M14 14h3v3M21 14v.01M14 21h3M21 18v3h-3" />
+    </svg>
   );
 }

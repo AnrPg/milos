@@ -42,3 +42,21 @@ msgstr "Gepland"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "Boekingsstatus TrainingJournal-les: %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "Proefles bij %{box}: %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "Status proefles: %{status}."
+
+msgid "Waiting for the box"
+msgstr "Wacht op de box"
+
+msgid "Booked"
+msgstr "Geboekt"
+
+msgid "Event: %{title}"
+msgstr "Evenement: %{title}"
+
+msgid "You're going to this event."
+msgstr "Je gaat naar dit evenement."

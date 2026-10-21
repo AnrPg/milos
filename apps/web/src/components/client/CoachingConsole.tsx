@@ -398,9 +398,10 @@ function NutritionPlanCard() {
   });
   const number = new Intl.NumberFormat(locale);
   const plan = query.data;
+  // ADR-159 (board 14, Q5): calories are the staff's working number and
+  // never reach the member; the API leaves them out.
   const macros = plan
     ? [
-        { key: "calories", label: i18n("clNutritionCalories"), value: plan.daily_calories, text: (v: number) => i18n("clNutritionKcal", { count: number.format(v) }) },
         { key: "protein", label: i18n("clNutritionProtein"), value: plan.protein_grams, text: (v: number) => i18n("clNutritionGrams", { count: number.format(v) }) },
         { key: "carbs", label: i18n("clNutritionCarbs"), value: plan.carbs_grams, text: (v: number) => i18n("clNutritionGrams", { count: number.format(v) }) },
         { key: "fat", label: i18n("clNutritionFat"), value: plan.fat_grams, text: (v: number) => i18n("clNutritionGrams", { count: number.format(v) }) },

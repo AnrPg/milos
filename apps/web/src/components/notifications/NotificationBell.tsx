@@ -11,8 +11,9 @@
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useSyncExternalStore } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 import {
   fetchNotifications,
@@ -25,12 +26,15 @@ import { useSession } from "@/components/session-provider";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { subscribeToTopic } from "@/lib/realtime";
 import { notificationTargetUrl } from "@/components/notifications/notification-links";
+import { buddyNotificationText } from "@/components/buddy/buddy-links";
+import { seasonNotificationText } from "@/components/seasons/season-links";
 import {
   notificationOrigin,
   type NotificationOrigin,
 } from "@/components/notifications/notification-origin";
 import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useOrganizationSlug } from "@/lib/organization-slug";
+import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return new Intl.DateTimeFormat(uiLocale, {
@@ -54,7 +58,148 @@ function NotificationCard({
 }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
+  const tTrials = useTranslations("Trials");
+  const tClubs = useTranslations("Clubs");
+  const tReferrals = useTranslations("Referrals");
+  const tAround = useTranslations("Around");
+  const tCheckIn = useTranslations("CheckIn");
+  const tDevices = useTranslations("Devices");
+  // ADR-161: Garmin stopped answering; the notice opens Συνδεδεμένες συσκευές.
+  function deviceText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "device_sync_error") return null;
+    return tDevices(["notif", "sync_error", part].join("_"));
+  }
+  const tPartners = useTranslations("Partners");
+  // ADR-169: a new training partner, and a message from one (who, never what).
+  function partnerText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "partner_match" && notification.type !== "partner_message") return null;
+    const nickname = notification.payload.nickname;
+    const name = typeof nickname === "string" && nickname ? nickname : tPartners("someone");
+    return tPartners(["notif", notification.type, part].join("_"), { name });
+  }
+  const tBuddy = useTranslations("Buddy");
+  const tSeasons = useTranslations("Seasons");
+  // ADR-167: season requests (staff) and their answers (members).
+  function seasonText(notification: NotificationRecord, part: "title" | "body") {
+    return seasonNotificationText(notification.type, notification.payload, part, (key, values) => tSeasons(key, values));
+  }
+  // ADR-160: buddy invitations, requests, replies and the weekly counts.
+  function buddyText(notification: NotificationRecord, part: "title" | "body") {
+    return buddyNotificationText(notification.type, notification.payload, part, (key, values) => tBuddy(key, values));
+  }
+  // ADR-155: a visitor at the door names the person, the box and when, and whether trials are open.
+  function checkInText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "check_in_visitor") return null;
+    if (part === "title") return tCheckIn("notifVisitorTitle");
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const values = { name: text("person_nickname") || tCheckIn("visitorUnnamed"), box: text("box_name"), when: text("scanned_when") };
+    const trials = notification.payload.trial_available === true || notification.payload.trial_available === "true";
+    return tCheckIn(trials ? "notifVisitorBodyTrials" : "notifVisitorBody", values);
+  }
+  // ADR-154: a saved Γύρω μου filter's daily alert names the filter and how many are new.
+  function aroundText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "around_new_matches") return null;
+    if (part === "title") return tAround("notifTitle");
+    const name = typeof notification.payload.filter_name === "string" ? notification.payload.filter_name : "";
+    const count = Number(notification.payload.count ?? 0);
+    return tAround("notifBody", { name, count: Number.isFinite(count) ? count : 0 });
+  }
+  // ADR-143: group, report and open-club notifications carry their names (events: ADR-153).
+  function communityText(notification: NotificationRecord, part: "title" | "body") {
+    if (!(COMMUNITY_NOTICES as readonly string[]).includes(notification.type)) return null;
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    if (notification.type.startsWith("community_event_")) return eventText(notification.type, part, text);
+    const reason = text("reason");
+    const values = {
+      person: text("person_nickname") || tTrials("someone"),
+      group: text("group_name"),
+      club: text("club_name"),
+      reason: reason ? tClubs(`reason_${reason}`) : "",
+    };
+    return tClubs(["notif", notification.type.replace(/^community_/, ""), part].join("_"), values);
+  }
+  // ADR-153: event notifications carry the event's title and its time in the
+  // box's zone; a cancel its reason, a move what changed, staff's message its text.
+  function eventText(type: string, part: "title" | "body", text: (key: string) => string) {
+    const notice = type.replace(/^community_/, "");
+    const values = {
+      event: text("event_title"),
+      when: text("event_when"),
+      person: text("person_nickname") || tTrials("someone"),
+      box: text("box_name"),
+      reason: text("reason"),
+    };
+    if (part === "title") return tClubs(["notif", notice, "title"].join("_"), values);
+    if (notice === "event_message") return text("message");
+    let variant = "body";
+    if (notice === "event_cancelled" && values.reason) variant = "reason_body";
+    if (notice === "event_changed") {
+      const changes = text("changes").split(",");
+      variant = changes.includes("place") ? (changes.includes("time") ? "both_body" : "place_body") : "body";
+    }
+    return tClubs(["notif", notice, variant].join("_"), values);
+  }
+  // ADR-144: trial notifications carry the box, the class and its time.
+  function trialText(notification: NotificationRecord, part: "title" | "body") {
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const type = notification.type.replace(/^trial_/, "") as TrialNotice;
+    if (!TRIAL_NOTICES.includes(type)) return null;
+    const values = {
+      person: text("person_nickname") || tTrials("someone"),
+      box: text("box_name"),
+      class: text("class_name"),
+      when: text("class_when"),
+    };
+    if (part === "title") return tTrials(TRIAL_NOTICE_KEYS[type][0], values);
+    const body = tTrials(TRIAL_NOTICE_KEYS[type][1], values);
+    const reason = type === "declined" ? text("decline_reason") : "";
+    return reason ? `${body} ${reason}` : body;
+  }
+
+  // ADR-156: the inviter hears each step and the reward; staff a referral to approve.
+  function referralText(notification: NotificationRecord, part: "title" | "body") {
+    if (!notification.type.startsWith("referral_")) return null;
+    const text = (key: string) => (typeof notification.payload[key] === "string" ? (notification.payload[key] as string) : "");
+    const values = {
+      person: text("person_nickname") || tTrials("someone"),
+      referrer: text("referrer_nickname") || tTrials("someone"),
+      box: text("box_name"),
+    };
+    if (notification.type === "referral_progress") {
+      if (part === "title") return tReferrals("notif.progressTitle");
+      const stage = ["event", "trial", "joined", "paid"].includes(text("stage")) ? text("stage") : "signed_up";
+      return tReferrals(`notif.progress.${stage}`, values);
+    }
+    if (notification.type === "referral_reward") {
+      if (part === "title") return tReferrals("notif.rewardTitle");
+      const status = ["given", "rejected"].includes(text("reward_status")) ? text("reward_status") : "approved";
+      return tReferrals(`notif.reward.${status}`, values);
+    }
+    if (notification.type === "referral_review") {
+      return part === "title" ? tReferrals("notif.reviewTitle") : tReferrals("notif.reviewBody", values);
+    }
+    return null;
+  }
+
   function notificationBody(notification: NotificationRecord) {
+    const buddy = buddyText(notification, "body");
+    if (buddy !== null) return buddy;
+    const season = seasonText(notification, "body");
+    if (season !== null) return season;
+    const partner = partnerText(notification, "body");
+    if (partner !== null) return partner;
+    const device = deviceText(notification, "body");
+    if (device !== null) return device;
+    const checkIn = checkInText(notification, "body");
+    if (checkIn !== null) return checkIn;
+    const around = aroundText(notification, "body");
+    if (around !== null) return around;
+    const trial = trialText(notification, "body");
+    if (trial !== null) return trial;
+    const referral = referralText(notification, "body");
+    if (referral !== null) return referral;
+    const community = communityText(notification, "body");
+    if (community !== null) return community;
     if (typeof notification.payload.body === "string") {
       return notification.payload.body;
     }
@@ -293,6 +438,24 @@ function NotificationCard({
   }
 
   function titleFromPayload(notification: NotificationRecord) {
+    const buddy = buddyText(notification, "title");
+    if (buddy !== null) return buddy;
+    const season = seasonText(notification, "title");
+    if (season !== null) return season;
+    const partner = partnerText(notification, "title");
+    if (partner !== null) return partner;
+    const device = deviceText(notification, "title");
+    if (device !== null) return device;
+    const checkIn = checkInText(notification, "title");
+    if (checkIn !== null) return checkIn;
+    const around = aroundText(notification, "title");
+    if (around !== null) return around;
+    const trial = trialText(notification, "title");
+    if (trial !== null) return trial;
+    const referral = referralText(notification, "title");
+    if (referral !== null) return referral;
+    const community = communityText(notification, "title");
+    if (community !== null) return community;
     // The nutrition plan's own title is the body, not the notification title.
     if (notification.type === "nutrition_plan_updated") return notificationTitle(notification.type);
     if (typeof notification.payload.title === "string") return notification.payload.title;
@@ -503,6 +666,61 @@ export function openNotifications() {
   window.dispatchEvent(new Event(OPEN_EVENT));
 }
 
+// The unread count, shared with other entry points such as ♡ in the Feed
+// header (plan §5a Q11), without a second request.
+let unreadSnapshot = 0;
+const unreadListeners = new Set<() => void>();
+
+function publishUnread(count: number) {
+  if (count === unreadSnapshot) return;
+  unreadSnapshot = count;
+  unreadListeners.forEach((listener) => listener());
+}
+
+export function useUnreadNotifications() {
+  return useSyncExternalStore(
+    (listener) => {
+      unreadListeners.add(listener);
+      return () => unreadListeners.delete(listener);
+    },
+    () => unreadSnapshot,
+    () => 0,
+  );
+}
+
+const TRIAL_NOTICES = ["requested", "booked", "cancelled", "accepted", "declined", "reminder", "follow_up", "class_cancelled"] as const;
+type TrialNotice = (typeof TRIAL_NOTICES)[number];
+const TRIAL_NOTICE_KEYS = {
+  requested: ["notif_requested_title", "notif_requested_body"],
+  booked: ["notif_booked_title", "notif_booked_body"],
+  cancelled: ["notif_cancelled_title", "notif_cancelled_body"],
+  accepted: ["notif_accepted_title", "notif_accepted_body"],
+  declined: ["notif_declined_title", "notif_declined_body"],
+  reminder: ["notif_reminder_title", "notif_reminder_body"],
+  follow_up: ["notif_follow_up_title", "notif_follow_up_body"],
+  class_cancelled: ["notif_class_cancelled_title", "notif_class_cancelled_body"],
+} as const satisfies Record<TrialNotice, readonly [string, string]>;
+
+const COMMUNITY_NOTICES = [
+  "community_group_proposed",
+  "community_group_approved",
+  "community_group_declined",
+  "community_group_join_requested",
+  "community_group_join_approved",
+  "community_group_archive_warning",
+  "community_report_created",
+  "community_club_join_requested",
+  "community_club_join_approved",
+  "community_squad_invited",
+  "community_event_waitlist_promoted",
+  "community_event_cancelled",
+  "community_event_changed",
+  "community_event_reminder",
+  "community_event_guest_joined",
+  "community_event_trial_offer",
+  "community_event_message",
+] as const;
+
 export function NotificationBell({
   onUnreadChange,
   triggerClassName = "flex",
@@ -698,7 +916,9 @@ export function NotificationBell({
   }, [i18n, markAllRead.isPending, notificationQuery.data, notificationQuery.isError, notificationQuery.isPending]);
 
   useEffect(() => {
-    onUnreadChange?.(typeof unreadCount === "number" ? unreadCount : 0);
+    const count = typeof unreadCount === "number" ? unreadCount : 0;
+    onUnreadChange?.(count);
+    publishUnread(count);
   }, [onUnreadChange, unreadCount]);
 
   useEffect(() => {
@@ -786,6 +1006,8 @@ export function NotificationBell({
                 {i18n("closebbfa773")}
               </button>
             </div>
+
+            <FollowRequestsRow onNavigate={() => setOpen(false)} />
 
             <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
               {FILTER_TABS.map((tab) => (

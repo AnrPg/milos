@@ -9,7 +9,8 @@ defmodule MilosTraining.Journal.Domain.Visibility do
   """
 
   @rungs ~w(private coach_can_view coach_reply_requested rated posted)
-  @kinds ~w(execution training_log pr injury review note check_in)
+  @kinds ~w(execution training_log pr injury review note check_in body wellness craving
+            device_activity)
   # What each kind may hold, and which of those the member picks by hand
   # (`posted` comes from attaching the entry to a post, ADR-138).
   @allowed %{
@@ -19,8 +20,24 @@ defmodule MilosTraining.Journal.Domain.Visibility do
     "injury" => ~w(coach_can_view coach_reply_requested posted),
     "review" => ~w(rated),
     "note" => ~w(private coach_can_view coach_reply_requested posted),
-    "check_in" => ~w(private coach_can_view coach_reply_requested posted)
+    "check_in" => ~w(private coach_can_view coach_reply_requested posted),
+    # ADR-158: a body snapshot keeps its own visibility (private,
+    # coach_numbers, coach_full), set on the snapshot; the feed shows it as
+    # `private` or `coach_can_view` and never moves it from here.
+    "body" => ~w(private coach_can_view),
+    # ADR-159 (board 14, Q8): a «wellness» feed item is a day, which never
+    # moves itself; its entries move one by one (`wellness_entry`, not a feed
+    # kind). Wellness is never posted from the ladder: a meal photo becomes a
+    # post only through its own confirmation.
+    "wellness" => ~w(private coach_can_view),
+    "wellness_entry" => ~w(private coach_can_view coach_reply_requested),
+    "craving" => ~w(private coach_can_view coach_reply_requested),
+    # ADR-161 (board 16, Q3): a watch workout starts private whatever the
+    # member's default and is never posted from here; one tied to a booked
+    # class may be shown to that gym's coach.
+    "device_activity" => ~w(private coach_can_view)
   }
+  @self_managed ~w(body wellness)
   @manual ~w(private coach_can_view coach_reply_requested)
 
   # Kinds whose default a member chooses, and the default without a choice:
@@ -40,6 +57,8 @@ defmodule MilosTraining.Journal.Domain.Visibility do
   def default_rungs, do: @default_rungs
 
   @doc "Rungs the member may move an entry of `kind` to by hand."
+  def choosable(kind) when kind in @self_managed, do: []
+
   def choosable(kind) when is_map_key(@allowed, kind),
     do: Enum.filter(@manual, &(&1 in Map.fetch!(@allowed, kind)))
 
@@ -76,15 +95,22 @@ defmodule MilosTraining.Journal.Domain.Visibility do
     do: Map.new(@default_kinds, fn {kind, rung} -> {kind, Map.get(stored, kind, rung)} end)
 
   @doc """
-  Validates a manual move. A reply request also needs a gym, because the
-  question goes to a coach of that gym.
+  Validates a manual move. `reach` says who a coach rung would reach
+  (`CoachAudience.reach/3`): `:gym` (the entry's provider), `:audience`
+  (ADR-162: a provider-less entry shared with the member's coaches) or
+  `:none`; a boolean stands for `:gym` / `:none`. A reply request needs a
+  gym, because the question goes to a coach of that gym.
   """
-  def validate_move(kind, rung, in_gym?) do
+  def validate_move(kind, rung, reach) when is_boolean(reach),
+    do: validate_move(kind, rung, if(reach, do: :gym, else: :none))
+
+  def validate_move(kind, rung, reach) do
     cond do
-      kind not in @kinds -> {:error, :unknown_kind}
+      not is_map_key(@allowed, kind) -> {:error, :unknown_kind}
       rung not in choosable(kind) -> {:error, :visibility_not_allowed}
-      rung != "private" and not in_gym? -> {:error, :no_gym_for_entry}
-      true -> :ok
+      rung == "private" or reach == :gym -> :ok
+      reach == :audience and rung == "coach_can_view" -> :ok
+      true -> {:error, :no_gym_for_entry}
     end
   end
 

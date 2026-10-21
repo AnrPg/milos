@@ -18,4 +18,10 @@ defmodule MilosTraining.Nutrition.NutritionStore do
 
   @impl true
   def delete_plan(context, user_id), do: tenant_call(context, :delete_plan, [user_id])
+
+  # The member's own plans in their personal session (ADR-159).
+  def list_own_plans(context), do: RepoContext.run(context, fn -> adapter().list_own_plans() end)
+
+  @impl true
+  def list_own_plans, do: adapter().list_own_plans()
 end

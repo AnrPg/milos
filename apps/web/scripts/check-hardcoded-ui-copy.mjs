@@ -46,7 +46,7 @@ const technicalProperties = new Set([
 const technicalCalls = new Set([
   "addEventListener", "endsWith", "get", "getItem", "getPropertyValue", "includes", "join",
   "localeCompare", "open", "querySelector", "removeEventListener", "removeItem", "replace", "replaceAll",
-  "set", "setItem", "setProperty", "slice", "split", "startsWith", "substring", "useTranslations",
+  "set", "setItem", "setProperty", "slice", "split", "startsWith", "substring", "useTranslations", "getTranslations",
 ]);
 
 function sourceFiles(directory) {

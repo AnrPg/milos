@@ -124,6 +124,23 @@ defmodule MilosTraining.Scheduling do
   def list_user_attendance(%{organization_id: _} = context, user_id, slot_ids),
     do: MilosTraining.Scheduling.SchedulingStore.list_user_attendance(context, user_id, slot_ids)
 
+  @doc "ADR-155: one attendance record by id (undoing a scan)."
+  def get_attendance(%{organization_id: _} = context, id),
+    do: MilosTraining.Scheduling.SchedulingStore.get_attendance(context, id)
+
+  @doc "ADR-155: class check-ins (with a method) since `since`, at a location or anywhere."
+  def list_recent_class_check_ins(%{organization_id: _} = context, since, location_id \\ nil),
+    do:
+      MilosTraining.Scheduling.SchedulingStore.list_recent_class_check_ins(
+        context,
+        since,
+        location_id
+      )
+
+  @doc "ADR-155: removes an attendance record (undoing a scan within its minute)."
+  def delete_attendance(%{organization_id: _} = context, id),
+    do: MilosTraining.Scheduling.SchedulingStore.delete_attendance(context, id)
+
   defdelegate self_check_in_window(slot), to: MilosTraining.Scheduling.Domain.AttendancePolicy
 
   defdelegate self_check_in(booking, slot, existing, now),
@@ -245,6 +262,10 @@ defmodule MilosTraining.Scheduling do
 
   def list_member_slots(user_id, start_at, end_at),
     do: MilosTraining.Scheduling.SchedulingStore.list_member_slots(user_id, start_at, end_at)
+
+  @doc "Classes of the box in scope among `ids` (any order; missing ids are skipped)."
+  def list_slots_by_ids(%{organization_id: _} = context, ids),
+    do: MilosTraining.Scheduling.SchedulingStore.list_slots_by_ids(context, ids)
 
   def get_settings(context), do: MilosTraining.Scheduling.SchedulingStore.get_settings(context)
   def get_settings, do: MilosTraining.Scheduling.SchedulingStore.get_settings()

@@ -41,6 +41,23 @@ defmodule MilosTraining.Infrastructure.Nutrition.EctoNutritionStore do
     :ok
   end
 
+  # The caller's own plans across gyms, from their personal session
+  # (definer, see the migration): no calories, no plan text.
+  @impl true
+  def list_own_plans do
+    %{columns: columns, rows: rows} =
+      Repo.query!("SELECT * FROM milos_own_nutrition_plans()")
+
+    Enum.map(rows, fn row ->
+      columns
+      |> Enum.map(&String.to_existing_atom/1)
+      |> Enum.zip(row)
+      |> Map.new()
+      |> Map.update!(:id, &Ecto.UUID.load!/1)
+      |> Map.update!(:organization_id, &Ecto.UUID.load!/1)
+    end)
+  end
+
   defp fetch(organization_id, user_id),
     do: Repo.get_by(Plan, organization_id: organization_id, user_id: user_id)
 
@@ -54,6 +71,8 @@ defmodule MilosTraining.Infrastructure.Nutrition.EctoNutritionStore do
       :protein_grams,
       :carbs_grams,
       :fat_grams,
+      :portion_targets,
+      :meal_slots,
       :updated_by_id,
       :inserted_at,
       :updated_at

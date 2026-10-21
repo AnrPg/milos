@@ -343,7 +343,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         "package_code_snapshot" => package_identity_snapshot(package),
         "package_family_snapshot" => package.family,
         "billing_period_snapshot" => package.billing_period,
-        "price_cents_snapshot" => package.base_price_cents,
+        "price_cents_snapshot" => price_snapshot(params, package),
         "params_snapshot" => package.params || %{}
       })
 
@@ -355,6 +355,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       {:error, reason} -> Repo.rollback(reason)
     end
   end
+
+  # ADR-167: a season sells its package at the season's price; every other
+  # assignment takes the package's own price.
+  defp price_snapshot(%{"price_cents_snapshot" => price}, _package)
+       when is_integer(price) and price >= 0,
+       do: price
+
+  defp price_snapshot(_params, package), do: package.base_price_cents
 
   # ADR-098: add-ons attach to a compatible base and follow it; corporate
   # seats are created only by enrollment, never assigned directly.
@@ -898,27 +906,29 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         if renewal_invoice_exists?(membership.id, subscription.id, period_start, period_end) do
           {:error, :duplicate_renewal_invoice}
         else
-          case create_invoice(membership.id, %{
-                 "invoice_type" => "renewal",
-                 "membership_package_subscription_id" => subscription.id,
-                 "issue_date" => params["issue_date"],
-                 "due_date" => params["due_date"] || period_start,
-                 "service_period_start" => period_start,
-                 "service_period_end" => period_end,
-                 "notes" => params["notes"],
-                 "lines" => [
-                   %{
-                     "membership_package_subscription_id" => subscription.id,
-                     "line_type" => "membership_package",
-                     "description" => "Renewal: #{subscription.package_code_snapshot}",
-                     "quantity" => 1,
-                     "unit_amount_cents" => subscription.price_cents_snapshot || 0,
-                     "discount_cents" => 0,
-                     "package_code_snapshot" => subscription.package_code_snapshot,
-                     "package_family_snapshot" => subscription.package_family_snapshot
-                   }
-                 ]
-               }) do
+          case renewal_with_referral_discounts(membership, subscription, fn discount_cents ->
+                 %{
+                   "invoice_type" => "renewal",
+                   "membership_package_subscription_id" => subscription.id,
+                   "issue_date" => params["issue_date"],
+                   "due_date" => params["due_date"] || period_start,
+                   "service_period_start" => period_start,
+                   "service_period_end" => period_end,
+                   "notes" => params["notes"],
+                   "lines" => [
+                     %{
+                       "membership_package_subscription_id" => subscription.id,
+                       "line_type" => "membership_package",
+                       "description" => "Renewal: #{subscription.package_code_snapshot}",
+                       "quantity" => 1,
+                       "unit_amount_cents" => subscription.price_cents_snapshot || 0,
+                       "discount_cents" => discount_cents,
+                       "package_code_snapshot" => subscription.package_code_snapshot,
+                       "package_family_snapshot" => subscription.package_family_snapshot
+                     }
+                   ]
+                 }
+               end) do
             {:error, %Ecto.Changeset{} = changeset} ->
               if constraint_error?(
                    changeset,
@@ -938,6 +948,50 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       nil -> {:error, :not_found}
       {:error, reason} -> {:error, reason}
     end
+  end
+
+  # ADR-156 (board 11 Q6): the member's given discount rewards come off this
+  # renewal, each used once. The rewards are locked so two renewals can't
+  # both take the same one.
+  defp renewal_with_referral_discounts(%Membership{} = membership, subscription, invoice_params) do
+    Repo.transaction(fn ->
+      rewards =
+        ReferralReward
+        |> tenant_scope()
+        |> where(
+          [r],
+          r.recipient_user_id == ^membership.user_id and r.reward_type == "discount" and
+            r.status == "applied" and is_nil(r.renewal_invoice_id)
+        )
+        |> lock("FOR UPDATE")
+        |> Repo.all()
+
+      discount_cents =
+        ReferralRewardFulfillment.renewal_discount_cents(
+          rewards,
+          subscription.price_cents_snapshot || 0
+        )
+
+      with {:ok, invoice} <- create_invoice(membership.id, invoice_params.(discount_cents)) do
+        reward_ids = Enum.map(rewards, & &1.id)
+
+        ReferralReward
+        |> where([r], r.id in ^reward_ids)
+        |> Repo.update_all(set: [renewal_invoice_id: invoice.id, updated_at: DateTime.utc_now()])
+
+        invoice
+      else
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  # Voiding a renewal frees the discount rewards it took for the next one.
+  defp release_referral_discounts(invoice_id) do
+    ReferralReward
+    |> tenant_scope()
+    |> where([r], r.renewal_invoice_id == ^invoice_id)
+    |> Repo.update_all(set: [renewal_invoice_id: nil, updated_at: DateTime.utc_now()])
   end
 
   @impl true
@@ -998,6 +1052,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
             |> Repo.update()
             |> case do
               {:ok, updated_invoice} ->
+                release_referral_discounts(updated_invoice.id)
                 refresh_entitlement_snapshot(updated_invoice.membership_id)
                 normalize_invoice_with_balance(updated_invoice)
 
@@ -1078,6 +1133,47 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
          |> Repo.one() do
       nil -> nil
       %Membership{} = membership -> effective_entitlement(membership, Date.utc_today())
+    end
+  end
+
+  # Read-only: for each booking request, does any of the member's usable
+  # subscriptions on that local day include it (scope, not remaining count)?
+  @impl true
+  def package_coverage(_user_id, []), do: []
+
+  def package_coverage(user_id, requests) do
+    case tenant_scope(Membership) |> where([m], m.user_id == ^user_id) |> Repo.one() do
+      nil ->
+        Enum.map(requests, fn _request -> false end)
+
+      %Membership{} = membership ->
+        entitlement = entitlement_for_membership(membership)
+        requests = Enum.map(requests, &(&1 |> atom_key_map() |> put_local_start()))
+
+        subscriptions_on =
+          requests
+          |> Enum.map(&local_date/1)
+          |> Enum.uniq()
+          |> Map.new(&{&1, effective_subscriptions(membership.id, &1)})
+
+        Enum.map(requests, fn request ->
+          Enum.any?(subscriptions_on[local_date(request)], fn subscription ->
+            EntitlementPolicy.covers?(
+              entitlement,
+              subscription.params_snapshot || %{},
+              resolve_request_allowance(subscription, request)
+            )
+          end)
+        end)
+    end
+  end
+
+  defp local_date(%{starts_at: %DateTime{} = starts_at}) do
+    timezone = Map.get(get_finance_settings(), :entitlement_timezone) || "Etc/UTC"
+
+    case DateTime.shift_zone(starts_at, timezone) do
+      {:ok, local} -> DateTime.to_date(local)
+      _error -> DateTime.to_date(starts_at)
     end
   end
 
@@ -3036,10 +3132,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def create_referral_program(params) do
-    %ReferralProgram{}
-    |> ReferralProgram.changeset(params)
-    |> Repo.insert()
-    |> normalize_result(&normalize_referral_program/1)
+    changeset = ReferralProgram.changeset(%ReferralProgram{}, params)
+
+    # ADR-156: one active programme per box; activating one retires the other.
+    Repo.transaction(fn ->
+      retire_other_active_programs(changeset, nil)
+
+      case Repo.insert(changeset) do
+        {:ok, program} -> normalize_referral_program(program)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
   end
 
   @impl true
@@ -3049,12 +3152,54 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
         {:error, :not_found}
 
       %ReferralProgram{} = program ->
-        program
-        |> ReferralProgram.changeset(params)
-        |> Repo.update()
-        |> normalize_result(&normalize_referral_program/1)
+        changeset = ReferralProgram.changeset(program, params)
+
+        Repo.transaction(fn ->
+          retire_other_active_programs(changeset, program.id)
+
+          case Repo.update(changeset) do
+            {:ok, program} -> normalize_referral_program(program)
+            {:error, reason} -> Repo.rollback(reason)
+          end
+        end)
     end
   end
+
+  @impl true
+  def get_active_referral_program do
+    ReferralProgram
+    |> tenant_scope()
+    |> where([program], program.active)
+    |> Repo.one()
+    |> case do
+      nil -> nil
+      program -> normalize_referral_program(program)
+    end
+  end
+
+  @impl true
+  def get_referral_program(id) do
+    case ReferralProgram |> tenant_scope() |> Repo.get(id) do
+      nil -> nil
+      program -> normalize_referral_program(program)
+    end
+  end
+
+  defp retire_other_active_programs(%Ecto.Changeset{valid?: true} = changeset, own_id) do
+    if Ecto.Changeset.get_field(changeset, :active) do
+      ReferralProgram
+      |> tenant_scope()
+      |> where([program], program.active)
+      |> then(fn query ->
+        if own_id, do: where(query, [program], program.id != ^own_id), else: query
+      end)
+      |> Repo.update_all(set: [active: false, updated_at: utc_now()])
+    end
+
+    :ok
+  end
+
+  defp retire_other_active_programs(_changeset, _own_id), do: :ok
 
   @impl true
   def list_referral_programs do
@@ -3122,7 +3267,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
                  event.status,
                  referral_reward_exists?(event.id)
                ),
-             {:ok, program} <- active_referral_program(event.referral_program_id) do
+             {:ok, program} <- event_referral_program(event.referral_program_id) do
           params =
             params
             |> string_key_map()
@@ -3138,6 +3283,118 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
           |> normalize_result(&normalize_referral_reward/1)
         end
     end
+  end
+
+  @impl true
+  def open_attributed_referral(params) do
+    params = string_key_map(params)
+
+    Repo.transaction(fn ->
+      with %ReferralProgram{} = program <-
+             ReferralProgram |> tenant_scope() |> Repo.get(params["referral_program_id"]),
+           %Membership{} = membership <- locked_membership(params["membership_id"]),
+           :ok <-
+             ReferralPolicy.validate_event(%{
+               referrer_user_id: params["referrer_user_id"],
+               referred_user_id: params["referred_user_id"],
+               membership_user_id: membership.user_id,
+               referrer_role: params["referrer_role_snapshot"],
+               referred_role: params["referred_role_snapshot"]
+             }),
+           {:ok, event} <-
+             %ReferralEvent{}
+             |> ReferralEvent.changeset(
+               Map.merge(params, %{
+                 "referral_program_id" => program.id,
+                 "status" => "pending",
+                 "signup_source_snapshot" => "referral"
+               })
+             )
+             |> Repo.insert(),
+           {:ok, _membership} <- stamp_referred_membership(membership, event.referrer_user_id) do
+        normalize_referral_event(event)
+      else
+        nil -> Repo.rollback(:not_found)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  # The friend's Finance record says who brought them, once.
+  defp stamp_referred_membership(%Membership{referred_by_user_id: nil} = membership, referrer_id) do
+    membership
+    |> Membership.changeset(%{referred_by_user_id: referrer_id, signup_source: "referral"})
+    |> Repo.update()
+  end
+
+  defp stamp_referred_membership(membership, _referrer_id), do: {:ok, membership}
+
+  @impl true
+  def count_referral_events_since(referrer_user_id, since) do
+    ReferralEvent
+    |> tenant_scope()
+    |> where([event], event.referrer_user_id == ^referrer_user_id)
+    |> where([event], event.status != "rejected" and event.inserted_at >= ^since)
+    |> Repo.aggregate(:count)
+  end
+
+  @impl true
+  def referral_outcomes([]), do: %{}
+
+  def referral_outcomes(event_ids) do
+    rewards =
+      ReferralReward
+      |> tenant_scope()
+      |> where([reward], reward.referral_event_id in ^event_ids)
+      |> Repo.all()
+      |> Map.new(&{&1.referral_event_id, normalize_referral_reward(&1)})
+
+    ReferralEvent
+    |> tenant_scope()
+    |> where([event], event.id in ^event_ids)
+    |> Repo.all()
+    |> Map.new(fn event ->
+      {event.id,
+       %{
+         event: normalize_referral_event(event),
+         reward: Map.get(rewards, event.id)
+       }}
+    end)
+  end
+
+  @impl true
+  def extend_current_subscription(membership_id, days)
+      when is_integer(days) and days > 0 and days <= 365 do
+    Repo.transaction(fn ->
+      with %Membership{} = membership <- locked_membership(membership_id),
+           %MembershipPackageSubscription{} = subscription <-
+             current_subscription(membership.id),
+           {:ok, extended} <-
+             subscription
+             |> MembershipPackageSubscription.changeset(%{
+               "ends_on" => Date.add(subscription.ends_on, days)
+             })
+             |> Repo.update() do
+        refresh_entitlement_snapshot(membership.id)
+        %{subscription_id: extended.id, ends_on: extended.ends_on}
+      else
+        nil -> Repo.rollback(:no_active_subscription)
+        {:error, reason} -> Repo.rollback(reason)
+      end
+    end)
+  end
+
+  def extend_current_subscription(_membership_id, _days), do: {:error, :invalid_days}
+
+  defp current_subscription(membership_id) do
+    MembershipPackageSubscription
+    |> tenant_scope()
+    |> where([s], s.membership_id == ^membership_id and s.status == "active")
+    |> where([s], not is_nil(s.ends_on))
+    |> order_by([s], desc: s.ends_on)
+    |> limit(1)
+    |> lock("FOR UPDATE")
+    |> Repo.one()
   end
 
   @impl true
@@ -3206,7 +3463,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       {:ok, {:credit_grant, amount_cents}} ->
         sync_referral_reward_credit(reward, amount_cents, amount_cents)
 
-      {:ok, :lifecycle_only} ->
+      {:ok, plan} when plan in [:lifecycle_only, :renewal_discount] ->
         reward
 
       {:error, reason} ->
@@ -3219,7 +3476,7 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       {:ok, {:credit_grant, amount_cents}} ->
         sync_referral_reward_credit(reward, amount_cents, 0)
 
-      {:ok, :lifecycle_only} ->
+      {:ok, plan} when plan in [:lifecycle_only, :renewal_discount] ->
         reward
 
       {:error, reason} ->
@@ -4661,6 +4918,17 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
   defp validate_package_active(%MembershipPackage{active: true}), do: :ok
   defp validate_package_active(%MembershipPackage{}), do: {:error, :package_inactive}
 
+  # ADR-156: a reward follows the programme the referral was made under, even
+  # when the box has since switched to another one.
+  defp event_referral_program(nil), do: {:error, :referral_program_required}
+
+  defp event_referral_program(program_id) do
+    case ReferralProgram |> tenant_scope() |> Repo.get(program_id) do
+      nil -> {:error, :not_found}
+      %ReferralProgram{} = program -> {:ok, program}
+    end
+  end
+
   defp active_referral_program(nil), do: {:error, :referral_program_required}
   defp active_referral_program(""), do: {:error, :referral_program_required}
 
@@ -5164,6 +5432,14 @@ defmodule MilosTraining.Infrastructure.Finance.EctoFinanceStore do
       active: program.active,
       reward_type: program.reward_type,
       reward_value: program.reward_value,
+      reward_note: program.reward_note,
+      friend_reward_type: program.friend_reward_type,
+      friend_reward_value: program.friend_reward_value,
+      friend_reward_note: program.friend_reward_note,
+      qualifying_stage: program.qualifying_stage,
+      attribution_days: program.attribution_days,
+      yearly_cap: program.yearly_cap,
+      approval: program.approval,
       params: program.params || %{},
       inserted_at: program.inserted_at,
       updated_at: program.updated_at

@@ -7,6 +7,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { SELECTED_ORGANIZATION_SLUG_KEY } from "@/api/client";
 import { fetchOrganizationMemberships } from "@/api/organizations";
+import { selectProvider } from "@/api/providers";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 
@@ -108,6 +109,9 @@ export function OrganizationSelector({ variant = "nav", onSelect }: Organization
           } catch {}
           setStoredSlug(slug);
           queryClient.clear();
+          // ADR-162: Box opens on the same provider on the member's other
+          // devices. Staff-only gyms are not providers; the API refuses them.
+          if (tokens?.access_token) void selectProvider(tokens.access_token, membership.organization.id).catch(() => undefined);
 
           router.push(
             ["owner", "admin", "coach"].includes(membership.role)

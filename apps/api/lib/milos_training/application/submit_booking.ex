@@ -51,6 +51,13 @@ defmodule MilosTraining.Application.SubmitBooking do
           broadcast_booking_event(slot, booking)
           broadcast_entitlement_change(user_id)
 
+          MilosTraining.DomainEvents.publish(:booking_made, %{
+            organization_id: slot.organization_id,
+            booking_id: booking.id,
+            user_id: user_id,
+            at: now
+          })
+
           TrackAnalyticsEvent.call("class_booking_requested", context, booking, %{
             user_id: user_id,
             metadata: %{auto_approved: slot.auto_approve == true}

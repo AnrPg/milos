@@ -19,6 +19,16 @@ defmodule MilosTraining.Application.PostAttachment do
     end
   end
 
+  @doc """
+  The card the entry would make in a post, as readers would see it
+  (ADR-157: the compose prefills it, e.g. right after a PR is logged).
+  """
+  def preview(user_id, type, id) do
+    with {:ok, snapshot} <- snapshot(user_id, type, id) do
+      {:ok, Map.update!(snapshot, :attachment, &Map.delete(&1, "previous_visibility"))}
+    end
+  end
+
   @doc "Moves the attached entry to `posted`, remembering its rung on the post's snapshot."
   def mark_posted(_user_id, %{attachment_type: nil}), do: :ok
 

@@ -4,7 +4,13 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, InvitationPolicy, SlugRenamePolicy}
+
+  alias MilosTraining.Organizations.Domain.{
+    BrandLogoPolicy,
+    InvitationPolicy,
+    MembershipPolicy,
+    SlugRenamePolicy
+  }
 
   alias MilosTraining.Organizations.{
     Organization,
@@ -14,6 +20,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     OrganizationPurge,
     OrganizationSetting,
     OrganizationSlugAlias,
+    ProviderSelection,
     RegistrationInvitation,
     Vendor
   }
@@ -22,7 +29,10 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def create_organization(params) do
-    changeset = Organization.changeset(params)
+    changeset =
+      params
+      |> Organization.changeset()
+      |> Organization.put_initial_provider_kind(value(params, :provider_kind))
 
     Multi.new()
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
@@ -167,6 +177,61 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   @impl true
+  def slug_taken?(slug) do
+    %{rows: [[taken]]} = Repo.query!("SELECT milos_organization_slug_taken($1)", [slug])
+    taken
+  end
+
+  @impl true
+  def count_seats(organization_id, now) do
+    staff =
+      Enum.map(
+        MembershipPolicy.admin_roles() ++ MembershipPolicy.staff_roles(),
+        &Atom.to_string/1
+      )
+
+    clients = Enum.map(MembershipPolicy.client_roles(), &Atom.to_string/1)
+
+    %{staff: staff_members, clients: client_members} =
+      OrganizationMembership
+      |> where(
+        [membership],
+        membership.organization_id == ^organization_id and membership.status == :active
+      )
+      |> select([membership], %{
+        staff:
+          fragment(
+            "count(*) FILTER (WHERE ?::text[] && ?::text[])",
+            membership.roles,
+            type(^staff, {:array, :string})
+          ),
+        clients:
+          fragment(
+            "count(*) FILTER (WHERE ?::text[] && ?::text[] AND NOT ?::text[] && ?::text[])",
+            membership.roles,
+            type(^clients, {:array, :string}),
+            membership.roles,
+            type(^staff, {:array, :string})
+          )
+      })
+      |> Repo.one()
+
+    staff_atoms = MembershipPolicy.admin_roles() ++ MembershipPolicy.staff_roles()
+
+    pending_staff =
+      RegistrationInvitation
+      |> where(
+        [invitation],
+        invitation.organization_id == ^organization_id and is_nil(invitation.redeemed_at) and
+          is_nil(invitation.revoked_at) and invitation.expires_at > ^now and
+          invitation.role in ^staff_atoms
+      )
+      |> Repo.aggregate(:count)
+
+    %{staff: staff_members, clients: client_members, pending_staff_invitations: pending_staff}
+  end
+
+  @impl true
   def get_organization_by_domain(host) do
     Organization
     |> join(:inner, [organization], domain in OrganizationDomain,
@@ -268,7 +333,8 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         role: member.role,
         roles: member.roles,
         coach_scope: member.coach_scope,
-        notes_visible_to_admins: member.notes_visible_to_admins
+        notes_visible_to_admins: member.notes_visible_to_admins,
+        home_location_id: type(member.home_location_id, :binary_id)
       }
     )
     |> Repo.all()
@@ -836,13 +902,13 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     update_membership(organization_id, membership_id, %{roles: roles})
   end
 
-  # Coach scope (ADR-100) and notes visibility (ADR-101).
+  # Coach scope (ADR-100), notes visibility (ADR-101) and home location (Phase 2).
   @impl true
   def update_membership_settings(organization_id, membership_id, settings) do
     update_membership(
       organization_id,
       membership_id,
-      Map.take(settings, [:coach_scope, :notes_visible_to_admins])
+      Map.take(settings, [:coach_scope, :notes_visible_to_admins, :home_location_id])
     )
   end
 
@@ -1096,4 +1162,64 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   defp normalize_host(_host), do: ""
 
   defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
+
+  # ADR-162: one definer lookup answers the caller's memberships of any
+  # status with the organization's name and brand, which a former member's
+  # session can no longer read directly. Runs in the member's session.
+  @impl true
+  def list_my_providers do
+    keys = ~w(organization_id name slug provider_kind logo_url primary_color
+              membership_status roles joined_at ended_at organization_status)a
+
+    %{rows: rows} =
+      Repo.query!("SELECT #{Enum.join(keys, ", ")} FROM milos_my_providers()")
+
+    Enum.map(rows, fn row ->
+      keys
+      |> Enum.zip(row)
+      |> Map.new()
+      |> Map.update!(:organization_id, &Ecto.UUID.load!/1)
+    end)
+  end
+
+  @impl true
+  def get_provider_kind(organization_id) do
+    Organization
+    |> where([organization], organization.id == ^organization_id)
+    |> select([organization], organization.provider_kind)
+    |> Repo.one()
+  end
+
+  # The column's check constraint keeps it to the known kinds.
+  @impl true
+  def put_provider_kind(organization_id, kind) do
+    case Organization
+         |> where([organization], organization.id == ^organization_id)
+         |> Repo.update_all(set: [provider_kind: kind, updated_at: DateTime.utc_now()]) do
+      {1, _rows} -> :ok
+      {0, _rows} -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def get_provider_selection(user_id) do
+    ProviderSelection
+    |> where([selection], selection.user_id == ^user_id)
+    |> select([selection], selection.organization_id)
+    |> Repo.one()
+  end
+
+  @impl true
+  def put_provider_selection(user_id, organization_id) do
+    now = DateTime.utc_now()
+
+    Repo.insert_all(
+      ProviderSelection,
+      [%{user_id: user_id, organization_id: organization_id, inserted_at: now, updated_at: now}],
+      on_conflict: {:replace, [:organization_id, :updated_at]},
+      conflict_target: [:user_id]
+    )
+
+    :ok
+  end
 end

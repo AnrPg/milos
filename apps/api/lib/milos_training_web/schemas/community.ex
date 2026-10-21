@@ -19,9 +19,22 @@ defmodule MilosTrainingWeb.Schemas.Community do
         id: @uuid,
         kind: %Schema{
           type: :string,
-          enum: ~w(announcements wod challenges class_slot season custom)
+          enum:
+            ~w(announcements wod challenges class_slot season custom member_group general pt_squad)
         },
         name: %Schema{type: :string, nullable: true, description: "Null for built-in channels"},
+        description: %Schema{type: :string, nullable: true},
+        status: %Schema{
+          type: :string,
+          enum: ~w(pending active declined),
+          description: "A member group waits for staff while pending"
+        },
+        join_policy: %Schema{type: :string, enum: ~w(open request), nullable: true},
+        created_by_id: %Schema{type: :string, format: :uuid, nullable: true},
+        admin: %Schema{type: :boolean, description: "You are an admin of this member group"},
+        requested: %Schema{type: :boolean, description: "You asked to join this member group"},
+        can_moderate: %Schema{type: :boolean},
+        can_pin: %Schema{type: :boolean},
         write_policy: %Schema{
           type: :string,
           enum: ~w(staff members participants system_and_members)
@@ -48,9 +61,16 @@ defmodule MilosTrainingWeb.Schemas.Community do
       properties: %{
         id: @uuid,
         organization_id: @uuid,
-        organization_slug: %Schema{type: :string},
+        organization_slug: %Schema{
+          type: :string,
+          nullable: true,
+          description: "Null for an open club of a gym you can't see"
+        },
+        organization_name: %Schema{type: :string, nullable: true},
         kind: %Schema{type: :string, enum: ~w(gym open member_group pt_squad season)},
         name: %Schema{type: :string},
+        description: %Schema{type: :string, nullable: true},
+        join_policy: %Schema{type: :string},
         logo_url: %Schema{type: :string, nullable: true},
         primary_color: %Schema{type: :string, nullable: true},
         role: %Schema{type: :string, enum: ~w(member staff)},
@@ -114,21 +134,28 @@ defmodule MilosTrainingWeb.Schemas.Community do
     %Schema{
       title: "CommunityPost",
       type: :object,
+      description:
+        "A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)",
       properties: %{
         id: @uuid,
+        origin: %Schema{type: :string, enum: ~w(club profile)},
+        audience: %Schema{type: :string, enum: ~w(club_channel followers public)},
         club: %Schema{
           type: :object,
+          nullable: true,
           properties: %{
             id: @uuid,
+            kind: %Schema{type: :string},
             name: %Schema{type: :string},
-            organization_slug: %Schema{type: :string},
+            organization_slug: %Schema{type: :string, nullable: true},
             logo_url: %Schema{type: :string, nullable: true},
             primary_color: %Schema{type: :string, nullable: true}
           },
-          required: [:id, :name, :organization_slug]
+          required: [:id, :name]
         },
         channel: %Schema{
           type: :object,
+          nullable: true,
           properties: %{
             id: @uuid,
             kind: %Schema{type: :string, nullable: true},
@@ -147,6 +174,24 @@ defmodule MilosTrainingWeb.Schemas.Community do
           description:
             "What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on"
         },
+        event: %{
+          MilosTrainingWeb.Schemas.CommunityEvents.event()
+          | title: "CommunityPostEvent",
+            nullable: true,
+            description:
+              "The event as you see it now, when the post is an event card (attachment_type event)"
+        },
+        media: %Schema{
+          type: :array,
+          items: MilosTrainingWeb.Schemas.Media.post_media(),
+          description: "Up to ten photos or one video, in order (ADR-157)"
+        },
+        media_status: %Schema{
+          type: :string,
+          enum: MilosTraining.Community.post_media_statuses(),
+          description:
+            "ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed"
+        },
         pinned: %Schema{type: :boolean},
         hidden: %Schema{type: :boolean},
         kudos_count: %Schema{type: :integer},
@@ -155,13 +200,18 @@ defmodule MilosTrainingWeb.Schemas.Community do
         can_delete: %Schema{type: :boolean},
         can_moderate: %Schema{type: :boolean},
         can_pin: %Schema{type: :boolean},
+        can_report: %Schema{type: :boolean},
         inserted_at: @datetime
       },
       required: [
         :id,
+        :origin,
+        :audience,
         :club,
         :channel,
         :author,
+        :media,
+        :media_status,
         :pinned,
         :hidden,
         :kudos_count,
@@ -216,12 +266,33 @@ defmodule MilosTrainingWeb.Schemas.Community do
       type: :object,
       properties: %{
         channel_id: @uuid,
+        audience: %Schema{
+          type: :string,
+          enum: ~w(club_channel public),
+          description:
+            "public (staff only) also shows the post on the box page and to its followers"
+        },
         body: %Schema{type: :string, maxLength: 5000},
-        attachment_type: %Schema{type: :string, enum: attachment_types()},
+        attachment_type: %Schema{
+          type: :string,
+          enum: MilosTraining.Community.shareable_attachment_types()
+        },
         attachment_id: @uuid,
+        media_ids: media_ids(),
         client_operation_id: %Schema{type: :string, maxLength: 120}
       },
       required: [:channel_id]
+    }
+  end
+
+  @doc "ADR-157: the uploads a new post carries, in order."
+  def media_ids do
+    %Schema{
+      type: :array,
+      maxItems: MilosTraining.Community.max_post_images(),
+      items: @uuid,
+      description:
+        "Your uploads (POST /api/me/media/uploads), in order: up to ten photos or one video. They may still be processing."
     }
   end
 
@@ -244,7 +315,10 @@ defmodule MilosTrainingWeb.Schemas.Community do
         author: author(),
         body: %Schema{type: :string},
         inserted_at: @datetime,
-        can_delete: %Schema{type: :boolean}
+        hidden: %Schema{type: :boolean},
+        can_delete: %Schema{type: :boolean},
+        can_moderate: %Schema{type: :boolean},
+        can_report: %Schema{type: :boolean}
       },
       required: [:id, :post_id, :author, :body, :inserted_at, :can_delete]
     }

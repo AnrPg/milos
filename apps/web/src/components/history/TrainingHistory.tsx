@@ -6,6 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import type { TrainingHistoryEntry, TrainingHistoryKind, TrainingHistoryPage } from "@/api/training-history";
 import { exerciseText } from "@/lib/training-history";
 import { LocalizedScore } from "@/components/localized-score";
+import { SourceLabel } from "@/components/providers/SourceLabel";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
@@ -162,7 +163,8 @@ function LogEntry({ entry, kind }: { entry: TrainingHistoryEntry; kind: Training
             <p className="text-sm" style={{ color: "var(--text-soft)" }}>{entry.workout.title}</p>
           ) : null}
         </div>
-        <div className="flex flex-wrap gap-2 text-xs font-semibold">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
+          {entry.provider ? <SourceLabel source={entry.provider} /> : null}
           {kind === "classes" && entry.class?.attendance ? <Badge><SemanticLabel value={entry.class.attendance} /></Badge> : null}
           {performance ? <Badge tone="primary"><SemanticLabel value={performance.status} /></Badge> : null}
           {minutes ? <Badge>{i18n("historyMinutes", { minutes })}</Badge> : null}

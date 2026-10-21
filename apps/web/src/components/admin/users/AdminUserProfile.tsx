@@ -49,6 +49,9 @@ import { MemberRolesEditor } from "@/components/admin/users/MemberRolesEditor";
 import { CoachAssignmentPanel } from "@/components/admin/users/CoachAssignmentPanel";
 import { BoxMessagePanel } from "@/components/admin/users/BoxMessagePanel";
 import { CoachNotesPanel, type CoachNoteSubjectOption } from "@/components/admin/users/CoachNotesPanel";
+import { CoachBodyPanel } from "@/components/body/CoachBodyPanel";
+import { CoachWellnessPanel } from "@/components/buddy/CoachWellnessPanel";
+import { CoachTrainingDepthPanel } from "@/components/member-app/progress/CoachTrainingDepthPanel";
 import {
   activeProfileTab,
   SECTION_TAB,
@@ -112,6 +115,7 @@ const PROFILE_TAB_KEYS: Record<ProfileTab, string> = {
   overview: "mpTabOverview",
   training: "mpTabTraining",
   wellbeing: "mpTabWellbeing",
+  body: "mpTabBody",
   coaching: "mpTabCoaching",
   finance: "mpTabFinance",
   account: "mpTabAccount",
@@ -522,6 +526,7 @@ function PRDossier({ member, prs }: { member: AdminUserPRMember; prs: AdminUserP
 export function AdminUserProfile({ userId }: { userId: string }) {
   const i18n = useUiTranslations();
   const tPrSharing = useTranslations("PrSharing");
+  const tDepth = useTranslations("Depth");
   const { tokens, currentUser } = useSession();
   const token = tokens?.access_token;
   const organizationSlug = useOrganizationSlug();
@@ -633,6 +638,13 @@ export function AdminUserProfile({ userId }: { userId: string }) {
   if (showCoaches) tabSections.add("coaching_relationships");
   if (showCoachNotes) tabSections.add("coach_notes");
   if (showBoxMessage) tabSections.add("box_message");
+  // ADR-158: a client's coach sees the body snapshots the member shared.
+  const showBody = isClient && actorCoaches && can(actor, "view_health");
+  if (showBody) tabSections.add("body");
+  // ADR-160: and the weekly wellness summary, only when the member shares it.
+  if (showBody) tabSections.add("wellness_summary");
+  // ADR-165: coverage, qualities and load from the entries the client shares.
+  if (isClient && actorCoaches && can(actor, "view_client_training")) tabSections.add("training_depth");
   const tabs = visibleProfileTabs(tabSections);
   const tab = activeProfileTab(tabs, searchParams.get("tab"), hashSection);
   const inTab = (section: string) => SECTION_TAB[section] === tab && tabSections.has(section);
@@ -779,6 +791,12 @@ export function AdminUserProfile({ userId }: { userId: string }) {
             />
           ) : null}
 
+          {token && inTab("training_depth") ? (
+            <Panel id="training_depth" title={tDepth("coach.title")}>
+              <CoachTrainingDepthPanel userId={userId} />
+            </Panel>
+          ) : null}
+
           {inTab("prs") ? <Panel id="prs" title={i18n("personalRecords05223a0")}><div className="grid gap-3">{prs.data?.visibility === "coach_role_required" ? <Empty>{tPrSharing("dossierCoachOnly")}</Empty> : prs.data?.prs.length ? prs.data.prs.map((pr) => <PRCard key={pr.id} pr={pr} />) : <Empty>{i18n("noPersonalRecordsRecorded22a0fce")}</Empty>}</div></Panel> : null}
 
 
@@ -793,6 +811,20 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           {token && showCoachNotes && tab === "wellbeing" ? (
             <Panel id="wellbeing_notes" title={i18n("rhCoachNotes")}>
               <CoachNotesPanel userId={userId} kinds={subjectKindsFor("wellbeing")} subjects={wellbeingSubjects} />
+            </Panel>
+          ) : null}
+
+          {token && inTab("wellness_summary") ? (
+            <CoachWellnessPanel
+              userId={userId}
+              nickname={profile.identity.nickname}
+              frame={(content) => <Panel id="wellness_summary" title={i18n("mpWellnessSummary")}>{content}</Panel>}
+            />
+          ) : null}
+
+          {token && inTab("body") ? (
+            <Panel id="body" title={i18n("mpTabBody")}>
+              <CoachBodyPanel userId={userId} nickname={profile.identity.nickname} />
             </Panel>
           ) : null}
 

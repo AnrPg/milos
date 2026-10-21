@@ -62,6 +62,7 @@ defmodule Mix.Tasks.Milos.Architecture do
   @tenant_scoped_stores ~w(
     scheduling/scheduling_store
     workouts/workout_store
+    workouts/goal_store
     messaging/thread_store
     feedback/feedback_store
     analytics/analytics_store
@@ -72,9 +73,18 @@ defmodule Mix.Tasks.Milos.Architecture do
     execution/training_log_store
     wellbeing/wellbeing_store
     notifications/notification_store
+    notifications/native_push_token_store
+    widgets/widget_token_store
     coaching/coaching_store
     pantheon/pr_store
     journal/journal_store
+    journal/goal_feedback_store
+    body/body_store
+    buddies/buddy_store
+    partners/partner_store
+    wellness/wellness_store
+    insights/insight_store
+    devices/device_store
     coaching/form_review_store
     coaching/relationship_store
     coaching/note_store
@@ -85,6 +95,17 @@ defmodule Mix.Tasks.Milos.Architecture do
     appointments/appointment_store
     nutrition/nutrition_store
     community/community_store
+    community/social_store
+    community/event_store
+    trials/trial_store
+    seasons/season_store
+    media/media_store
+    identity/saved_filter_store
+    organizations/public_profile_store
+    ai_usage/ai_usage_store
+    places/discovery_store
+    places/home_area_store
+    wallet/wallet_store
   )
 
   defp tenant_scope_violations do

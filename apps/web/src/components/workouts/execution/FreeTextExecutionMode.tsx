@@ -348,6 +348,7 @@ export function FreeTextExecutionMode() {
         segments={[]}
         comments={comments}
         freeText
+        feltExecutionId={runExecutionId ?? executionId}
         isSaving={isSavingCompletion}
         feedback={completionFeedback}
         onConfirm={confirmFinish}

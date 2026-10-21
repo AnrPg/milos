@@ -200,4 +200,16 @@ defmodule MilosTraining.Execution do
 
   def purge_tenant_data(context),
     do: MilosTraining.TenantData.TableStore.purge(tenant_data_policy(), context)
+
+  # ADR-162: one Vault across providers.
+  alias MilosTraining.Execution.Domain.{VaultFilter, WorkoutIdentity}
+
+  defdelegate parse_vault_filter(params), to: VaultFilter, as: :parse
+  defdelegate vault_filter_params(filter), to: VaultFilter, as: :to_params
+  defdelegate vault_filter_active_count(filter), to: VaultFilter, as: :active_count
+  defdelegate vault_attempt_matches?(filter, attempt), to: VaultFilter, as: :match?
+  defdelegate exercise_matches?(exercise, names), to: VaultFilter, as: :exercise?
+  defdelegate workout_identity(attrs), to: WorkoutIdentity, as: :key
+  defdelegate identity_benchmark(key), to: WorkoutIdentity, as: :key_benchmark
+  defdelegate benchmark_name(slug), to: WorkoutIdentity
 end

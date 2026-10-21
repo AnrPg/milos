@@ -23,6 +23,9 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
+import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
+import { SeasonTag } from "@/components/seasons/SeasonTag";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -184,6 +187,7 @@ export function AssignedWorkoutPanel({
             >
               {assignment.workout.title}
             </h2>
+            <SeasonTag season={assignment.season} />
             {scaleLevels.length > 0 ? (
               <div className="mt-2 flex flex-wrap gap-1.5">
                 <button
@@ -278,6 +282,7 @@ export function AssignedWorkoutPanel({
                     freeTextBody={assignment.workout.free_text_body}
                     freeTextDocument={assignment.workout.free_text_document}
                   />
+                  <WodGoalsStrip workoutId={assignment.master_workout_id} className="mt-3" />
                 </section>
 
                 {/* Admin controls */}
@@ -446,6 +451,7 @@ export function AssignedWorkoutPanel({
                 surface="assignment_detail"
                 sourceContextId={assignment.id}
               />
+              <MyWorkoutScaling token={accessToken} workoutId={assignment.master_workout_id} className="mt-3" />
             </div>
           ) : null}
 

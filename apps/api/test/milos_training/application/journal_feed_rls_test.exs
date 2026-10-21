@@ -72,8 +72,11 @@ defmodule MilosTraining.Application.JournalFeedRLSTest do
              GetJournalFeed.call(ctx.member_ctx, %{"limit" => 2, "cursor" => cursor})
 
     assert last.id == older.id
-    # A personal note has no coach to show it to.
-    assert last.choosable_visibilities == ["private"]
+    # ADR-162: a personal note can go to the member's coaches (every active
+    # provider by default), but a reply request needs the entry's own gym.
+    assert last.choosable_visibilities == ["private", "coach_can_view"]
+    assert last.source == %{kind: "freeform", organization_id: nil, name: nil, former: false}
+    assert last.audience == %{custom: false, organization_ids: [ctx.gym.id]}
 
     assert {:ok, %{items: [%{kind: "pr"}]}} =
              GetJournalFeed.call(ctx.member_ctx, %{"kinds" => "pr,execution"})
@@ -100,6 +103,12 @@ defmodule MilosTraining.Application.JournalFeedRLSTest do
              })
 
     assert {:error, :no_gym_for_entry} =
+             SetJournalVisibility.call(ctx.member_ctx, "note", personal.id, %{
+               "visibility" => "coach_reply_requested",
+               "question" => "Why?"
+             })
+
+    assert {:ok, %{journal_visibility: "coach_can_view"}} =
              SetJournalVisibility.call(ctx.member_ctx, "note", personal.id, %{
                "visibility" => "coach_can_view"
              })

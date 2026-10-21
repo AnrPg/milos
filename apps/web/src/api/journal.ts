@@ -5,6 +5,7 @@ import type { PRRecord } from "@/api/gamification";
 import type { ReviewRecord } from "@/api/reviews";
 import type { TrainingLogEntry } from "@/api/training-log";
 import type { CheckInRecord, InjuryRecord } from "@/api/wellbeing";
+import type { Craving, MealPhoto, WellnessDay, WellnessEntry } from "@/api/wellness";
 
 /**
  * Ημερολόγιο (ADR-139): the feed of every entry kind, moving an entry on the
@@ -24,14 +25,44 @@ export type JournalNoteUpdate = components["schemas"]["JournalNoteUpdateRequest"
 
 /** The entry inside an item, as its own endpoint returns it, by kind. */
 export type JournalEntryOf = {
-  execution: WorkoutExecution & { workout_title?: string | null; workout_type?: string | null };
-  training_log: TrainingLogEntry;
+  execution: WorkoutExecution & {
+    workout_title?: string | null;
+    workout_type?: string | null;
+    /** ADR-167: the season of the assigned workout this execution came from. */
+    season?: { id: string; title: string } | null;
+  } & DeviceAttachment;
+  training_log: TrainingLogEntry & DeviceAttachment;
   pr: PRRecord;
   injury: InjuryRecord;
   review: ReviewRecord;
   note: JournalNote;
   check_in: CheckInRecord;
+  /** ADR-158: only ever in your own feed. */
+  body: components["schemas"]["BodySnapshot"];
+  /** ADR-159: a day of water, sleep and meals (the member's summary only in their own feed). */
+  wellness: WellnessFeedDay;
+  craving: Craving;
+  /** ADR-161: a watch workout that matched nothing (always the owner's). */
+  device_activity: components["schemas"]["DeviceActivity"];
 };
+
+/** ADR-161: the watch's numbers on an execution or training-log entry it matched. */
+export type DeviceAttachment = { device?: NonNullable<components["schemas"]["DeviceMetrics"]> | null } & FeltAttachment;
+/** ADR-163 «Ένιωσα»: felt muscles and qualities on an execution or training-log entry. */
+export type FeltAttachment = { felt?: { muscles: string[]; qualities: string[] } | null };
+
+export type WellnessFeedDay = {
+  id: string;
+  date: string;
+  organization_id: string | null;
+  journal_visibility: JournalVisibility;
+  summary: Omit<WellnessDay, "cravings" | "mood"> | null;
+  entries: WellnessEntry[];
+  photos: Record<string, MealPhoto>;
+};
+
+/** Kinds whose entries move on the ladder: feed kinds plus single wellness entries. */
+export type JournalMoveKind = JournalKind | "wellness_entry";
 
 export type TypedJournalItem = {
   [K in JournalKind]: Omit<JournalFeedItem, "kind" | "entry"> & { kind: K; entry: JournalEntryOf[K] };
@@ -41,47 +72,87 @@ export const JOURNAL_FEED_KEY = ["my", "journal"] as const;
 
 export const NOTE_TOPICS: JournalNoteTopic[] = ["technique", "thought", "mood", "goal"];
 
-export type JournalFilter = "all" | "training" | "notes" | "wellbeing";
-
-/** The kinds each Ροή filter chip lists. */
-export const JOURNAL_FILTER_KINDS: Record<JournalFilter, JournalKind[] | null> = {
-  all: null,
-  training: ["execution", "training_log", "pr"],
-  notes: ["note"],
-  wellbeing: ["check_in", "injury"],
-};
-
 export function typedItem(item: JournalFeedItem): TypedJournalItem {
   return item as TypedJournalItem;
 }
 
-function pageQuery(params: { cursor?: string | null; kinds?: JournalKind[] | null; limit?: number }) {
+/**
+ * Ημερολόγιο › Ροή filter (ADR-162 `JournalFilter`, version 1): Τύπος,
+ * Πηγή (provider ids, `freeform`, `device`), Ορατότητα, dates and text. The
+ * server echoes it in its canonical form and can remember it as the
+ * member's last-used filter.
+ */
+export type JournalFeedFilter = {
+  kinds: JournalKind[];
+  sources: string[];
+  visibilities: JournalVisibility[];
+  date_from: string | null;
+  date_to: string | null;
+  q: string | null;
+};
+
+export const EMPTY_JOURNAL_FILTER: JournalFeedFilter = {
+  kinds: [],
+  sources: [],
+  visibilities: [],
+  date_from: null,
+  date_to: null,
+  q: null,
+};
+
+type PageParams = {
+  cursor?: string | null;
+  kinds?: JournalKind[] | null;
+  limit?: number;
+  filter?: Partial<JournalFeedFilter>;
+  /** Also store the filter as the last-used Ημερολόγιο filter. */
+  remember?: boolean;
+};
+
+function localTimeZone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+  } catch {
+    return null;
+  }
+}
+
+function pageQuery(params: PageParams) {
   const query = new URLSearchParams();
+  const filter = params.filter ?? {};
   if (params.cursor) query.set("cursor", params.cursor);
   if (params.kinds?.length) query.set("kinds", params.kinds.join(","));
   if (params.limit) query.set("limit", String(params.limit));
+  if (filter.sources?.length) query.set("sources", filter.sources.join(","));
+  if (filter.visibilities?.length) query.set("visibilities", filter.visibilities.join(","));
+  if (filter.date_from) query.set("date_from", filter.date_from);
+  if (filter.date_to) query.set("date_to", filter.date_to);
+  // The range is the member's own days (ADR-162): counted in their zone.
+  if (filter.date_from || filter.date_to) {
+    const zone = localTimeZone();
+    if (zone) query.set("timezone", zone);
+  }
+  if (filter.q?.trim()) query.set("q", filter.q.trim());
+  if (params.remember) query.set("remember", "true");
   const text = query.toString();
   return text ? `?${text}` : "";
 }
 
-export function fetchJournalPage(
-  token: string,
-  params: { cursor?: string | null; kinds?: JournalKind[] | null; limit?: number } = {},
-) {
+export function fetchJournalPage(token: string, params: PageParams = {}) {
   return apiRequest<JournalFeedPage>(`/me/journal${pageQuery(params)}`, { token });
 }
 
 export function fetchClientJournalPage(
   token: string,
   clientUserId: string,
-  params: { cursor?: string | null; kinds?: JournalKind[] | null; limit?: number } = {},
+  params: Pick<PageParams, "cursor" | "kinds" | "limit"> = {},
 ) {
   return apiRequest<JournalFeedPage>(`/staff/clients/${clientUserId}/journal${pageQuery(params)}`, { token });
 }
 
 export function setJournalVisibility(
   token: string,
-  kind: JournalKind,
+  kind: JournalMoveKind,
   id: string,
   body: JournalVisibilityRequest,
 ) {
@@ -108,4 +179,52 @@ export async function updateJournalNote(token: string, id: string, body: Journal
 
 export function deleteJournalNote(token: string, id: string) {
   return apiRequest<void>(`/me/journal/notes/${id}`, { method: "DELETE", token });
+}
+
+/**
+ * «Οι coach μου» across providers (ADR-162, board 17 Q5): which providers'
+ * coaches the coach rungs reach by default, and one entry narrowed to some.
+ */
+export type CoachAudience = components["schemas"]["CoachAudience"];
+export type EntryAudience = NonNullable<components["schemas"]["EntryAudience"]>;
+export type AudienceKind = "execution" | "training_log" | "pr" | "note" | "check_in";
+export const AUDIENCE_KINDS: readonly JournalKind[] = ["execution", "training_log", "pr", "note", "check_in"];
+export const COACH_AUDIENCE_KEY = ["my", "journal", "coach-audience"] as const;
+
+export function fetchCoachAudience(token: string) {
+  return apiRequest<CoachAudience>("/me/journal/coach-audience", { token });
+}
+
+export function saveCoachAudience(token: string, organizationIds: string[]) {
+  return apiRequest<CoachAudience>("/me/journal/coach-audience", {
+    method: "PUT",
+    token,
+    body: { organization_ids: organizationIds },
+  });
+}
+
+/** `null` puts the entry back on the default audience. */
+export async function setEntryAudience(token: string, kind: AudienceKind, id: string, organizationIds: string[] | null) {
+  const data = await apiRequest<components["schemas"]["EntryAudienceResponse"]>(
+    `/me/journal/entries/${kind}/${id}/audience`,
+    { method: "PUT", token, body: { organization_ids: organizationIds } },
+  );
+  return data.audience;
+}
+
+/** «Εξαγωγή» of the whole journal, every provider (board 17 Q6 extra). */
+export type JournalExport = components["schemas"]["JournalExport"];
+export const JOURNAL_EXPORTS_KEY = ["my", "journal", "exports"] as const;
+
+export async function requestJournalExport(token: string) {
+  const data = await apiRequest<components["schemas"]["JournalExportResponse"]>("/me/journal/export", {
+    method: "POST",
+    token,
+  });
+  return data.export as JournalExport;
+}
+
+export async function fetchJournalExports(token: string) {
+  const data = await apiRequest<components["schemas"]["JournalExports"]>("/me/journal/exports", { token });
+  return (data.exports ?? []) as JournalExport[];
 }

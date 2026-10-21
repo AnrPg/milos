@@ -27,6 +27,12 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_canonical_slug_for_alias(String.t()) :: String.t() | nil
   @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
   @callback count_pending_invitations(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
+  @callback slug_taken?(String.t()) :: boolean()
+  @callback count_seats(Ecto.UUID.t(), DateTime.t()) :: %{
+              staff: non_neg_integer(),
+              clients: non_neg_integer(),
+              pending_staff_invitations: non_neg_integer()
+            }
   @callback rename_organization_slug(
               Ecto.UUID.t(),
               String.t(),
@@ -119,4 +125,11 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
               {:ok, OrganizationPurge.t()} | {:error, term()}
   @callback finalize_purge(OrganizationPurge.t(), map(), Ecto.UUID.t(), DateTime.t()) ::
               {:ok, OrganizationPurge.t()} | {:error, term()}
+
+  # ADR-162: the caller's providers (active and former) and Box ▾'s choice.
+  @callback list_my_providers() :: [map()]
+  @callback get_provider_selection(Ecto.UUID.t()) :: Ecto.UUID.t() | nil
+  @callback put_provider_selection(Ecto.UUID.t(), Ecto.UUID.t()) :: :ok | {:error, term()}
+  @callback get_provider_kind(Ecto.UUID.t()) :: String.t() | nil
+  @callback put_provider_kind(Ecto.UUID.t(), String.t()) :: :ok | {:error, term()}
 end

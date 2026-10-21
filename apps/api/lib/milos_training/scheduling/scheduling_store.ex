@@ -106,6 +106,9 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   def list_slots_window(_start_at, _end_at), do: missing_tenant()
 
   @impl true
+  def list_slots_by_ids(context, ids), do: tenant_call(context, :list_slots_by_ids, [ids])
+
+  @impl true
   def list_member_slots(context, user_id, start_at, end_at),
     do: tenant_call(context, :list_member_slots, [user_id, start_at, end_at])
 
@@ -140,6 +143,16 @@ defmodule MilosTraining.Scheduling.SchedulingStore do
   @impl true
   def record_attendance(context, params), do: tenant_call(context, :record_attendance, [params])
   def record_attendance(_params), do: missing_tenant()
+
+  @impl true
+  def delete_attendance(context, id), do: tenant_call(context, :delete_attendance, [id])
+
+  @impl true
+  def get_attendance(context, id), do: tenant_call(context, :get_attendance, [id])
+
+  @impl true
+  def list_recent_class_check_ins(context, since, location_id),
+    do: tenant_call(context, :list_recent_class_check_ins, [since, location_id])
 
   @impl true
   def list_user_attendance(context, user_id, slot_ids),

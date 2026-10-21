@@ -1,5 +1,6 @@
 defmodule MilosTraining.Application.GetScheduleCalendar do
-  alias MilosTraining.{Facility, Identity, Scheduling, Workouts}
+  alias MilosTraining.{Community, Facility, Finance, Identity, Scheduling, Workouts}
+  alias MilosTraining.Application.BookingTerms
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, actor, params) do
@@ -11,6 +12,9 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
           class_type_ids: class_type_ids
         })
         |> enrich_slots(context, actor)
+        |> put_package_coverage(context, actor)
+        |> put_cancel_free_until(context, actor)
+        |> put_friends_going(context, actor)
 
       class_types = schedule_class_types(context, slots)
 
@@ -21,6 +25,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
          days: days,
          class_types: class_types,
          locations: Facility.list_locations(context, include_archived: true),
+         coaches: schedule_coaches(slots),
          slots: slots
        }}
     end
@@ -96,10 +101,86 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       else
         base
         |> Map.put(:bookings, [])
+        |> Map.put(:raw_bookings, slot.bookings)
         |> Map.put(:my_version, my_version(variants, slot.id))
       end
     end)
   end
+
+  # Phase 2 «μόνο ό,τι καλύπτει το πακέτο μου»: for members, whether their
+  # package includes each class (scope only, not remaining visits).
+  defp put_package_coverage(slots, context, actor) do
+    if admin_role?(context, actor) do
+      slots
+    else
+      requests =
+        Enum.map(slots, fn slot ->
+          slot
+          |> BookingPolicy.entitlement_request()
+          |> Map.merge(%{starts_at: slot.scheduled_at, location_id: slot.location_id})
+        end)
+
+      slots
+      |> Enum.zip(Finance.package_coverage(context, actor.id, requests))
+      |> Enum.map(fn {slot, covered?} -> Map.put(slot, :covered_by_package, covered?) end)
+    end
+  end
+
+  # The class sheet's «ακύρωση χωρίς χρέωση έως» line: when withdrawing stops
+  # being free for this member, from the same terms WithdrawBooking applies.
+  defp put_cancel_free_until(slots, context, actor) do
+    if admin_role?(context, actor) do
+      slots
+    else
+      slots
+      |> Enum.zip(BookingTerms.cancel_free_until(context, actor.id, slots))
+      |> Enum.map(fn {slot, until} -> Map.put(slot, :cancel_free_until, until) end)
+    end
+  end
+
+  # ADR-142 decision 12 (the «Φίλοι» chip): people the member follows who
+  # share their bookings with followers and hold a place in the class. The
+  # bookings are already loaded; only who shares comes from the account side.
+  defp put_friends_going(slots, context, actor) do
+    sharers =
+      if admin_role?(context, actor),
+        do: MapSet.new(),
+        else: MapSet.new(Community.booking_sharer_ids(%{user_id: actor.id}))
+
+    going =
+      Map.new(slots, fn slot ->
+        {slot.id,
+         slot
+         |> Map.get(:raw_bookings, [])
+         |> Enum.filter(&friend_booking?(&1, sharers))
+         |> Enum.map(& &1.user_id)
+         |> Enum.uniq()}
+      end)
+
+    people =
+      going
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.uniq()
+      |> Identity.list_by_ids()
+      |> Map.new(
+        &{&1.id, %{id: &1.id, nickname: &1.nickname, avatar_url: Map.get(&1, :avatar_url)}}
+      )
+
+    Enum.map(slots, fn slot ->
+      friends =
+        going |> Map.get(slot.id, []) |> Enum.map(&Map.get(people, &1)) |> Enum.reject(&is_nil/1)
+
+      slot
+      |> Map.delete(:raw_bookings)
+      |> Map.put(:friends_going, friends)
+    end)
+  end
+
+  defp friend_booking?(booking, sharers),
+    do:
+      MapSet.member?(sharers, booking.user_id) and is_nil(Map.get(booking, :guest_name)) and
+        booking.status in [:pending, :approved]
 
   # ADR-125: per-member class variants. A member only ever receives their own
   # variant (`assignee_id` = actor); staff receive every member's.
@@ -170,6 +251,7 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       id: workout.id,
       title: workout.title,
       type: workout.type,
+      focus: Workouts.workout_focus(workout),
       sections:
         Enum.map(workout.sections || [], fn section ->
           %{
@@ -239,6 +321,8 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
       user_nickname: Map.get(nickname_cache, booking.user_id),
       status: to_string(booking.status),
       guest_name: Map.get(booking, :guest_name),
+      # ADR-144: the roster tags trial seats (board 6 Q4).
+      kind: Map.get(booking, :kind, "member"),
       entitlement_allowance: Map.get(booking, :entitlement_allowance),
       waitlist_priority: Map.get(booking, :waitlist_priority),
       admin_message: booking.admin_message,
@@ -274,6 +358,18 @@ defmodule MilosTraining.Application.GetScheduleCalendar do
     do: Enum.find_index(waitlist, &(&1.id == id)) + 1
 
   defp waitlist_position(_waitlist, _booking), do: nil
+
+  # Phase 2 Πρόγραμμα: the coaches of the window's classes, for the row and
+  # the Coach filter, so members need no staff listing.
+  defp schedule_coaches(slots) do
+    slots
+    |> Enum.map(&Map.get(&1, :coach_user_id))
+    |> Enum.reject(&is_nil/1)
+    |> Enum.uniq()
+    |> Identity.list_by_ids()
+    |> Enum.map(&%{id: &1.id, nickname: &1.nickname, avatar_url: &1.avatar_url})
+    |> Enum.sort_by(& &1.nickname)
+  end
 
   defp schedule_class_types(context, slots) do
     active =

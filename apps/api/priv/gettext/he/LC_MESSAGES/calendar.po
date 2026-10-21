@@ -42,3 +42,21 @@ msgstr "מתוזמן"
 
 msgid "TrainingJournal class booking status: %{status}."
 msgstr "סטטוס הזמנת שיעורי הדרכה במילוס: %{status}."
+
+msgid "Trial at %{box}: %{name}"
+msgstr "אימון ניסיון ב-%{box}: %{name}"
+
+msgid "Trial status: %{status}."
+msgstr "סטטוס אימון הניסיון: %{status}."
+
+msgid "Waiting for the box"
+msgstr "ממתין לתשובת המכון"
+
+msgid "Booked"
+msgstr "הוזמן"
+
+msgid "Event: %{title}"
+msgstr "אירוע: %{title}"
+
+msgid "You're going to this event."
+msgstr "אתה מגיע לאירוע הזה."

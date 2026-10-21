@@ -9,5 +9,13 @@ defmodule MilosTraining.Application.Ports.WorkoutIconSuggester do
           movements: [String.t()]
         }
 
-  @callback suggest(workout_summary()) :: {:ok, String.t()} | {:error, term()}
+  @typedoc "Who the call is made for, so its model usage is metered (ADR-152)."
+  @type metering :: %{
+          optional(:organization_id) => String.t(),
+          optional(:user_id) => String.t() | nil,
+          optional(:operation_id) => String.t(),
+          optional(:feature) => String.t()
+        }
+
+  @callback suggest(workout_summary(), metering()) :: {:ok, String.t()} | {:error, term()}
 end

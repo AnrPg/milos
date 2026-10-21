@@ -79,6 +79,40 @@ async function stubMemberApi(page: Page) {
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: tokenFor(), refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
+  await page.route("**/api/me/clubs", (route) =>
+    route.fulfill(
+      json({
+        clubs: [
+          { id: "club-1", kind: "gym", name: "Box Kypseli", organization_id: "org-1", organization_slug: "kypseli", role: "member", notify_level: "all", logo_url: null, primary_color: null, channels: [] },
+        ],
+      }),
+    ),
+  );
+  await page.route("**/api/org/kypseli/community/wod-today**", (route) =>
+    route.fulfill(
+      json({
+        date: localToday(),
+        channel_id: null,
+        classes: [{ id: "slot-1", scheduled_at: todayAt(18) }],
+        leaderboard: [],
+        logged_by_me: false,
+        score: null,
+        workout: { id: "wod-1", title: "Fran", type: "for_time", authoring_mode: "free_text", free_text_body: "21-15-9\nThrusters 43/30 kg\nPull-ups", sections: [] },
+      }),
+    ),
+  );
+  await page.route("**/api/me/feed**", (route) => route.fulfill(json({ posts: [], pinned: [], next_cursor: null })));
+  await page.route("**/api/me/social", (route) =>
+    route.fulfill(
+      json({
+        posts_count: 0,
+        followers_count: 0,
+        following_count: 0,
+        requests_count: 0,
+        booking_sharing: { enabled: false, offered: false },
+      }),
+    ),
+  );
   await page.route("**/api/memberships", (route) =>
     route.fulfill(
       json([
@@ -210,6 +244,66 @@ async function stubMemberApi(page: Page) {
       }),
     ),
   );
+  // Ημερολόγιο › Ροή reads the server's feed (ADR-139).
+  const item = (kind: string, id: string, occurredAt: string, entry: Record<string, unknown>) => ({
+    kind,
+    id,
+    occurred_at: occurredAt,
+    occurred_tz: "UTC",
+    journal_visibility: "private",
+    choosable_visibilities: ["private"],
+    entry,
+  });
+  await page.route("**/api/me/journal**", (route) =>
+    route.fulfill(
+      json({
+        items: [
+          item("review", "review-1", daysAgoAt(1, 12), {
+            id: "review-1",
+            inserted_at: daysAgoAt(1, 12),
+            target_type: "app",
+            rating: 5,
+            body: "Love the new journal",
+            status: "open",
+            sentiment: "positive",
+            tags: [],
+            answers: [],
+            params: {},
+            target_snapshot: {},
+          }),
+          item("training_log", "log-1", daysAgoAt(1, 8), {
+            id: "log-1",
+            source_type: "freeform",
+            title: "Park run",
+            performed_at_utc: daysAgoAt(1, 8),
+            performed_at_tz: "UTC",
+            duration_seconds: 1800,
+            perceived_effort: 6,
+            notes: null,
+            status: "logged",
+            lock_version: 1,
+            section_scores: [],
+            exercise_modifications: [],
+            performed_exercises: [],
+            comments: [],
+          }),
+          item("execution", "execution-1", daysAgoAt(1, 18), {
+            id: "execution-1",
+            master_workout_id: "wod-1",
+            workout_title: "Fran",
+            workout_type: "for_time",
+            completed_at_utc: daysAgoAt(1, 18),
+            completed_at_tz: "UTC",
+            source: "class_booking",
+            total_elapsed_ms: 312_000,
+            scale_level_slug: null,
+            status: "completed",
+          }),
+        ],
+        next_cursor: null,
+      }),
+    ),
+  );
   await page.route(/\/api(?:\/org\/[^/]+)?\/pr-sharing$/, (route) =>
     route.fulfill(json({ coach_visibility: true, grants: [] })),
   );
@@ -263,8 +357,8 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("heading", { name: "Journal", exact: true })).toBeVisible();
     await page.getByRole("button", { name: "New entry" }).click();
     const sheet = page.getByRole("dialog", { name: "New entry" });
-    await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Training", "Wellbeing", "Coach"]);
-    await expect(sheet.getByRole("button")).toContainText(["Workout", "PR", "Injury", "Technique video", "Review", "Cancel"]);
+    await expect(sheet.getByRole("heading", { level: 3 })).toHaveText(["Training", "Body", "Wellbeing", "Coach", "Note"]);
+    await expect(sheet.getByRole("button")).toContainText(["Workout", "PR", "Measurement", "Injury", "Technique video", "Review", "Cancel"]);
     await page.screenshot({ path: "test-results/member-app/journal-new-entry.png" });
   });
 
@@ -286,7 +380,8 @@ test.describe("member app shell", () => {
     await expect(page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
     await expect(page.getByText("Strength grows in the moments you think you can't go on.")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Fran" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Open in Box" })).toHaveAttribute("href", "/box");
+    // ADR-138 D6: the gym club's #wod-today card, with the score action.
+    await expect(page.getByRole("button", { name: "Log your score" })).toBeVisible();
     await expect(page.getByText("Posts from your club will show up here.")).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/home.png", fullPage: true });
   });
@@ -298,7 +393,7 @@ test.describe("member app shell", () => {
     await expect(flow.getByText("Fran")).toBeVisible();
     await expect(flow.getByText("Park run")).toBeVisible();
     await expect(flow.getByText("Love the new journal")).toBeVisible();
-    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Wellbeing", "Progress"]);
+    await expect(page.getByRole("navigation", { name: "Journal" }).getByRole("link")).toHaveText(["Feed", "Vault", "Body", "Wellbeing", "Progress"]);
     await expect(flow.getByRole("button", { name: /Share in Milos: Fran/ })).toBeVisible();
     await page.screenshot({ path: "test-results/member-app/journal-flow.png", fullPage: true });
 

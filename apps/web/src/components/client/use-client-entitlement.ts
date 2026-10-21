@@ -14,7 +14,7 @@ export function useClientEntitlement(enabled = true) {
   const query = useQuery({
     queryKey: CLIENT_ENTITLEMENT_QUERY_KEY,
     enabled: enabled && Boolean(token),
-    queryFn: async () => (await fetchMyEntitlement(token!)).entitlement,
+    queryFn: async () => (await fetchMyEntitlement(token!))?.entitlement ?? null,
     staleTime: 2 * 60 * 1000,
   });
   return {

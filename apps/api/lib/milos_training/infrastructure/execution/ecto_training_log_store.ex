@@ -182,7 +182,13 @@ defmodule MilosTraining.Infrastructure.Execution.EctoTrainingLogStore do
   def list_entry_items(user_id, bound, limit, scope) do
     TrainingLogEntry
     |> where([entry], entry.status == "logged")
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope,
+      kind: "training_log",
+      at: :performed_at_utc,
+      text: [:title],
+      text_exists: :comments,
+      device: :source_type
+    )
     |> FeedBound.apply(:performed_at_utc, bound)
     |> order_by([entry], desc: entry.performed_at_utc, desc: entry.id)
     |> limit(^limit)

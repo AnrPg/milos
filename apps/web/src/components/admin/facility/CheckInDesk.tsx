@@ -1,24 +1,36 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { useLocale } from "next-intl";
+import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { createCheckIn, listAdminLocations, listCheckIns, type FacilityCheckIn } from "@/api/facility";
 import type { FinanceRecord } from "@/api/finance";
 import { localizeCheckInError } from "@/components/admin/facility/check-in-errors";
+import { DeskScanner } from "@/components/check-in/DeskScanner";
+import { VisitorsPanel } from "@/components/check-in/VisitorsPanel";
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";
 import { localIsoDate } from "@/components/admin/users/membership-freezes";
 import { useSession } from "@/components/session-provider";
 import { PageHeader } from "@/components/PageHeader";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" };
 
-/** Front-desk open-gym check-ins (ADR-097): who came in on a day, and a quick manual check-in. */
+/**
+ * Front-desk check-ins (ADR-097): who came in on a day, and a quick manual
+ * check-in. ADR-155 adds «Σάρωση» of a member's QR or Wallet card, today's
+ * visitors at the door, and the way to each location's door screen.
+ */
 export function CheckInDesk() {
   const i18n = useUiTranslations();
+  const tCheckIn = useTranslations("CheckIn");
+  const slug = useOrganizationSlug();
+  const { membership } = useSelectedMembershipRole();
   const locale = useLocale();
   const queryClient = useQueryClient();
   const { tokens } = useSession();
@@ -70,6 +82,30 @@ export function CheckInDesk() {
 
         {token ? (
           <>
+            {activeLocations.length > 0 ? (
+              <nav aria-label={tCheckIn("doorScreens")} className="flex flex-wrap gap-2">
+                {activeLocations.map((location) => (
+                  <Link
+                    key={location.id}
+                    href={adminHref(`/admin/check-in/door/${location.id}`, slug)}
+                    className="flex min-h-11 items-center rounded-full px-4 text-sm font-semibold"
+                    style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+                  >
+                    {tCheckIn("doorScreenFor", { name: location.name })}
+                  </Link>
+                ))}
+                <Link
+                  href={adminHref("/admin/check-in/settings", slug)}
+                  className="flex min-h-11 items-center rounded-full px-4 text-sm font-semibold"
+                  style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                >
+                  {tCheckIn("settingsTitle")}
+                </Link>
+              </nav>
+            ) : null}
+
+            <DeskScanner token={token} locationId={locationId} />
+
             <section className="space-y-4 rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <h2 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{i18n("admCheckInMember")}</h2>
               <div className="grid gap-3 sm:grid-cols-[1fr_auto] sm:items-end">
@@ -138,6 +174,8 @@ export function CheckInDesk() {
                 ))}
               </ul>
             </section>
+
+            <VisitorsPanel token={token} organizationId={membership?.organization.id ?? null} date={today} />
           </>
         ) : (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p>

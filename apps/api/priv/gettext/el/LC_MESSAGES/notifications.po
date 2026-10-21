@@ -252,3 +252,336 @@ msgstr "Η πρόσβασή σας έληξε. Ανανεώστε τη συνδ�
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Οι επερχόμενες κρατήσεις σας ακυρώθηκαν: %{count}."
+
+msgid "Follow request"
+msgstr "Αίτημα ακολούθησης"
+
+msgid "%{nickname} wants to follow you."
+msgstr "Ο/Η %{nickname} θέλει να σε ακολουθήσει."
+
+msgid "Follow request accepted"
+msgstr "Το αίτημα ακολούθησης έγινε δεκτό"
+
+msgid "You now follow %{nickname}."
+msgstr "Τώρα ακολουθείς τον/την %{nickname}."
+
+msgid "Trial request"
+msgstr "Αίτημα δοκιμαστικού"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "Ο/Η %{nickname} ζητά δοκιμαστικό στο %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Νέο δοκιμαστικό"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "Ο/Η %{nickname} έκλεισε δοκιμαστικό στο %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Ακυρώθηκε δοκιμαστικό"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "Ο/Η %{nickname} ακύρωσε το δοκιμαστικό στο %{class}."
+
+msgid "Your trial is booked"
+msgstr "Το δοκιμαστικό σου κλείστηκε"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Το δοκιμαστικό δεν έγινε δεκτό"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "Το %{box} δεν μπορεί να σε δεχτεί στο %{class}."
+
+msgid "Your trial is soon"
+msgstr "Το δοκιμαστικό σου πλησιάζει"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} στο %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Πώς σου φάνηκε το δοκιμαστικό;"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Θες να συνεχίσεις στο %{box}; Στείλε τους μήνυμα."
+
+msgid "Trial class cancelled"
+msgstr "Ακυρώθηκε το μάθημα του δοκιμαστικού"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "Το %{box} ακύρωσε το %{class} (%{when}). Διάλεξε άλλο μάθημα."
+
+msgid "New group to review"
+msgstr "Νέα ομάδα για έγκριση"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "Ο/Η %{nickname} θέλει να ξεκινήσει την «%{group}»."
+
+msgid "Your group is live"
+msgstr "Η ομάδα σου είναι ενεργή"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "Η «%{group}» άνοιξε. Κάλεσε κόσμο."
+
+msgid "Group not approved"
+msgstr "Η ομάδα δεν εγκρίθηκε"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "Το box δεν ενέκρινε την «%{group}»."
+
+msgid "Request to join"
+msgstr "Αίτημα συμμετοχής"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "Ο/Η %{nickname} ζητά να μπει στην «%{group}»."
+
+msgid "You're in"
+msgstr "Είσαι μέσα"
+
+msgid "You joined «%{group}»."
+msgstr "Μπήκες στην «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Η ομάδα σου είναι ήσυχη"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Κανείς δεν έχει γράψει στην «%{group}» εδώ και καιρό. Γράψε κάτι, αλλιώς θα αρχειοθετηθεί."
+
+msgid "New report"
+msgstr "Νέα αναφορά"
+
+msgid "Someone reported something in the club."
+msgstr "Κάποιος ανέφερε κάτι στο club."
+
+msgid "A place opened up"
+msgstr "Άνοιξε θέση"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "Έρχεσαι στο «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "Το event ακυρώθηκε"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "Το «%{event}» (%{when}) ακυρώθηκε."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "Το «%{event}» (%{when}) ακυρώθηκε: %{reason}"
+
+msgid "Event changed"
+msgstr "Το event άλλαξε"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "Το «%{event}» μεταφέρθηκε στις %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "Το «%{event}» έχει νέο μέρος."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "Το «%{event}» έχει νέα ώρα και μέρος: %{when}."
+
+msgid "Starting soon"
+msgstr "Ξεκινά σε λίγο"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "Το «%{event}» ξεκινά σε δύο ώρες (%{when})."
+
+msgid "Your guest is coming"
+msgstr "Έρχεται ο καλεσμένος σου"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "Ο/Η %{nickname} έρχεται στο «%{event}» με την πρόσκλησή σου."
+
+msgid "Try a class"
+msgstr "Δοκίμασε ένα μάθημα"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "Σου άρεσε το «%{event}»; Το %{box} σε καλεί σε δοκιμαστικό μάθημα."
+
+msgid "Message about «%{event}»"
+msgstr "Μήνυμα για το «%{event}»"
+
+msgid "Your invite"
+msgstr "Η πρόσκλησή σου"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "Ο/Η %{nickname} έκανε εγγραφή με την πρόσκλησή σου."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "Ο/Η %{nickname} ήρθε στο event που τον/την κάλεσες."
+
+msgid "%{nickname} came to a trial."
+msgstr "Ο/Η %{nickname} ήρθε σε δοκιμαστικό."
+
+msgid "%{nickname} subscribed."
+msgstr "Ο/Η %{nickname} γράφτηκε με συνδρομή."
+
+msgid "%{nickname} joined the box."
+msgstr "Ο/Η %{nickname} έγινε μέλος του box."
+
+msgid "Referral reward"
+msgstr "Ανταμοιβή σύστασης"
+
+msgid "Your referral reward was given."
+msgstr "Η ανταμοιβή της σύστασής σου δόθηκε."
+
+msgid "Your referral was not approved."
+msgstr "Η σύστασή σου δεν εγκρίθηκε."
+
+msgid "Your referral reward was approved."
+msgstr "Η ανταμοιβή της σύστασής σου εγκρίθηκε."
+
+msgid "Referral to approve"
+msgstr "Σύσταση προς έγκριση"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "Ο/Η %{nickname} γράφτηκε, με πρόσκληση από %{referrer}."
+
+msgid "New near you"
+msgstr "Νέα γύρω σου"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Νέα για «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Επισκέπτης στην πόρτα"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "Ο/Η %{nickname} σκάναρε την πόρτα στο %{box} (%{when}) - δεν είναι ακόμη μέλος. Οι δοκιμαστικές είναι ανοιχτές."
+
+msgid "Time for a new measurement"
+msgstr "Ώρα για νέα μέτρηση"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Ένα νέο στιγμιότυπο σε βοηθά να δεις την τάση σου. Παίρνει ένα λεπτό."
+
+msgid "A buddy invitation"
+msgstr "Πρόσκληση για buddy"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "Ο/Η %{nickname} σου ζητά να γίνεις buddy στήριξης."
+
+msgid "You have a support buddy"
+msgstr "Έχεις buddy στήριξης"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "Ο/Η %{nickname} αποδέχτηκε. Θα μαθαίνει μόνο όταν το ζητάς εσύ."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "Ο/Η %{nickname} περνάει μια δύσκολη στιγμή"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Είμαι εδώ · Πάμε βόλτα; · Πάρε με τηλέφωνο"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Πάμε βόλτα;"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Πάρε με τηλέφωνο"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Είμαι εδώ"
+
+msgid "%{nickname} replied"
+msgstr "Ο/Η %{nickname} απάντησε"
+
+msgid "No one has replied yet"
+msgstr "Δεν απάντησε κανείς ακόμα"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Μέχρι τότε, κάτι μικρό: δύο λεπτά αναπνοή, ένα ποτήρι νερό, μια μικρή βόλτα."
+
+msgid "%{nickname}'s week"
+msgstr "Η εβδομάδα του/της %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "%{moments} δύσκολες στιγμές, οι %{overcome} ξεπεράστηκαν, %{requests} αιτήματα στήριξης."
+
+msgid "I'm here"
+msgstr "Είμαι εδώ"
+
+msgid "Shall we go for a walk?"
+msgstr "Πάμε βόλτα;"
+
+msgid "Call me"
+msgstr "Πάρε με τηλέφωνο"
+
+msgid "How did it go?"
+msgstr "Πώς πήγε;"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Μια σύντομη σημείωση για πριν σε βοηθά να δεις τι σου ταιριάζει."
+
+msgid "A glass of water?"
+msgstr "Ένα ποτήρι νερό;"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "Το απόγευμα είναι καλή στιγμή να προλάβεις το νερό σου."
+
+msgid "Buddy message"
+msgstr "Μήνυμα από buddy"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: εβδομαδιαία ευεξία"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} νύχτες στον στόχο ύπνου, %{water} μέρες με νερό, %{meals} μέρες με καταγραφή γευμάτων."
+
+msgid "Garmin stopped syncing"
+msgstr "Ο συγχρονισμός με το Garmin σταμάτησε"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Κάνε επανασύνδεση από τις Συνδεδεμένες συσκευές για να έρχονται ξανά οι προπονήσεις σου."
+
+msgid "Your journal export is ready"
+msgstr "Η εξαγωγή του ημερολογίου σου είναι έτοιμη"
+
+msgid "Download it within seven days from Settings."
+msgstr "Κατέβασέ την μέσα σε επτά μέρες από τις Ρυθμίσεις."
+
+msgid "Season request"
+msgstr "Αίτημα για season"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "Ο/Η %{nickname} ζητά θέση στο %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "Ο/Η %{nickname} μπήκε στη λίστα αναμονής για το %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Η θέση σου επιβεβαιώθηκε"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "Το %{season} ξεκινά στις %{date}. Το πρόγραμμα είναι στο Box σου."
+
+msgid "Season request not confirmed"
+msgstr "Το αίτημα για season δεν επιβεβαιώθηκε"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "Το %{box} δεν μπόρεσε να επιβεβαιώσει τη θέση σου στο %{season}."
+
+msgid "Season cancelled"
+msgstr "Το season ακυρώθηκε"
+
+msgid "%{box} cancelled %{season}."
+msgstr "Το %{box} ακύρωσε το %{season}."
+
+msgid "You found a training partner"
+msgstr "Βρήκες training partner"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Εσύ και το %{nickname} θέλετε να προπονηθείτε μαζί. Πείτε ένα γεια."
+
+msgid "Training partner message"
+msgstr "Μήνυμα από training partner"
+
+msgid "Squad invitation"
+msgstr "Πρόσκληση σε squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "Ο/Η %{nickname} σε προσκάλεσε στο squad «%{group}»."

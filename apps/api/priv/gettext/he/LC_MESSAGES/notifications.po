@@ -252,3 +252,336 @@ msgstr "הגישה שלך הסתיימה. חדשו את המנוי כדי להז
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "ההזמנות הקרובות שלך בוטלו: %{count}."
+
+msgid "Follow request"
+msgstr "בקשת מעקב"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} רוצה לעקוב אחריך."
+
+msgid "Follow request accepted"
+msgstr "בקשת המעקב התקבלה"
+
+msgid "You now follow %{nickname}."
+msgstr "עכשיו אתה עוקב אחרי %{nickname}."
+
+msgid "Trial request"
+msgstr "בקשה לאימון ניסיון"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} מבקש/ת לנסות את %{class} (%{when})."
+
+msgid "New trial"
+msgstr "אימון ניסיון חדש"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} הזמין/ה אימון ניסיון ב-%{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "אימון ניסיון בוטל"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} ביטל/ה את אימון הניסיון ב-%{class}."
+
+msgid "Your trial is booked"
+msgstr "אימון הניסיון שלך הוזמן"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "אימון הניסיון לא אושר"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} לא יכול לקבל אותך ב-%{class}."
+
+msgid "Your trial is soon"
+msgstr "אימון הניסיון שלך מתקרב"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} ב-%{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "איך היה אימון הניסיון?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "רוצה להמשיך להתאמן ב-%{box}? שלח/י להם הודעה."
+
+msgid "Trial class cancelled"
+msgstr "השיעור של אימון הניסיון בוטל"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} ביטל את %{class} (%{when}). בחר/י שיעור אחר."
+
+msgid "New group to review"
+msgstr "קבוצה חדשה לאישור"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} רוצה לפתוח את «%{group}»."
+
+msgid "Your group is live"
+msgstr "הקבוצה שלך פעילה"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» פתוחה. הזמינו אנשים."
+
+msgid "Group not approved"
+msgstr "הקבוצה לא אושרה"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "הבוקס לא אישר את «%{group}»."
+
+msgid "Request to join"
+msgstr "בקשת הצטרפות"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} מבקש להצטרף ל«%{group}»."
+
+msgid "You're in"
+msgstr "אתה בפנים"
+
+msgid "You joined «%{group}»."
+msgstr "הצטרפת ל«%{group}»."
+
+msgid "Your group is quiet"
+msgstr "הקבוצה שלך שקטה"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "אף אחד לא פרסם ב«%{group}» כבר זמן מה. פרסמו משהו או שהיא תועבר לארכיון."
+
+msgid "New report"
+msgstr "דיווח חדש"
+
+msgid "Someone reported something in the club."
+msgstr "מישהו דיווח על משהו במועדון."
+
+msgid "A place opened up"
+msgstr "התפנה מקום"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "אתה מגיע ל«%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "האירוע בוטל"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "«%{event}» (%{when}) בוטל."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "«%{event}» (%{when}) בוטל: %{reason}"
+
+msgid "Event changed"
+msgstr "האירוע השתנה"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "«%{event}» הועבר ל-%{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "ל«%{event}» יש מקום חדש."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "ל«%{event}» יש שעה ומקום חדשים: %{when}."
+
+msgid "Starting soon"
+msgstr "מתחיל בקרוב"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "«%{event}» מתחיל בעוד שעתיים (%{when})."
+
+msgid "Your guest is coming"
+msgstr "האורח שלך מגיע"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} מגיע ל«%{event}» עם כרטיס האורח שלך."
+
+msgid "Try a class"
+msgstr "נסה שיעור"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "אהבת את «%{event}»? %{box} מזמין אותך לשיעור ניסיון."
+
+msgid "Message about «%{event}»"
+msgstr "הודעה על «%{event}»"
+
+msgid "Your invite"
+msgstr "ההזמנה שלך"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} נרשם/ה עם ההזמנה שלך."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} הגיע/ה לאירוע שהזמנת אליו."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} הגיע/ה לאימון ניסיון."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} נרשם/ה למנוי."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} הצטרף/ה לבוקס."
+
+msgid "Referral reward"
+msgstr "פרס הפניה"
+
+msgid "Your referral reward was given."
+msgstr "פרס ההפניה שלך ניתן."
+
+msgid "Your referral was not approved."
+msgstr "ההפניה שלך לא אושרה."
+
+msgid "Your referral reward was approved."
+msgstr "פרס ההפניה שלך אושר."
+
+msgid "Referral to approve"
+msgstr "הפניה לאישור"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} נרשם/ה למנוי בהזמנת %{referrer}."
+
+msgid "New near you"
+msgstr "חדש בסביבתך"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "חדש עבור «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "מבקר בדלת"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} סרק/ה את הקוד בדלת של %{box} (%{when}) - עדיין לא חבר/ה."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} סרק/ה את הקוד בדלת של %{box} (%{when}) - עדיין לא חבר/ה. אימוני ניסיון פתוחים."
+
+msgid "Time for a new measurement"
+msgstr "הגיע הזמן למדידה חדשה"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "תמונת מצב חדשה עוזרת לך לראות את המגמה שלך. זה לוקח דקה."
+
+msgid "A buddy invitation"
+msgstr "הזמנה להיות באדי"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} מבקש/ת שתהיה הבאדי התומך/ת שלו/ה."
+
+msgid "You have a support buddy"
+msgstr "יש לך באדי תומך/ת"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} אישר/ה. ישמע/תשמע ממך רק כשתבקש/י."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} עובר/ת רגע קשה"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "אני כאן · נצא להליכה? · תתקשר אליי"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: נצא להליכה?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: תתקשר אליי"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: אני כאן"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} ענה/תה"
+
+msgid "No one has replied yet"
+msgstr "אף אחד עוד לא ענה"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "בינתיים, משהו קטן: שתי דקות נשימה, כוס מים, הליכה קצרה."
+
+msgid "%{nickname}'s week"
+msgstr "השבוע של %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "רגעים קשים: %{moments}, התגברות: %{overcome}, בקשות תמיכה: %{requests}."
+
+msgid "I'm here"
+msgstr "אני כאן"
+
+msgid "Shall we go for a walk?"
+msgstr "נצא להליכה?"
+
+msgid "Call me"
+msgstr "תתקשר אליי"
+
+msgid "How did it go?"
+msgstr "איך זה הלך?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "הערה קצרה על מה שהיה קודם עוזרת לך לראות מה עובד בשבילך."
+
+msgid "A glass of water?"
+msgstr "כוס מים?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "אחר הצהריים הוא זמן טוב להשלים מים."
+
+msgid "Buddy message"
+msgstr "הודעה מהבאדי"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: רווחה שבועית"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} לילות ביעד השינה, %{water} ימים עם מים, %{meals} ימים עם ארוחות מתועדות."
+
+msgid "Garmin stopped syncing"
+msgstr "הסנכרון עם Garmin נעצר"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "חברו אותו מחדש ממכשירים מחוברים כדי שהאימונים יגיעו שוב."
+
+msgid "Your journal export is ready"
+msgstr "ייצוא היומן שלך מוכן"
+
+msgid "Download it within seven days from Settings."
+msgstr "הורד אותו תוך שבעה ימים מההגדרות."
+
+msgid "Season request"
+msgstr "בקשה לעונה"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} מבקש/ת מקום ב-%{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} ברשימת ההמתנה ל-%{season}."
+
+msgid "Your place is confirmed"
+msgstr "המקום שלך אושר"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} מתחילה ב-%{date}. התוכנית נמצאת ב-Box שלך."
+
+msgid "Season request not confirmed"
+msgstr "הבקשה לעונה לא אושרה"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} לא יכול/ה לאשר את מקומך ב-%{season}."
+
+msgid "Season cancelled"
+msgstr "העונה בוטלה"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} ביטל/ה את %{season}."
+
+msgid "You found a training partner"
+msgstr "מצאת שותף לאימונים"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "את/ה ו-%{nickname} רוצים להתאמן יחד. תגידו שלום."
+
+msgid "Training partner message"
+msgstr "הודעה משותף לאימונים"
+
+msgid "Squad invitation"
+msgstr "הזמנה לסקוואד"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} הזמין/ה אותך לסקוואד «%{group}»."

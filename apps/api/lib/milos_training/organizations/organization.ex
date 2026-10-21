@@ -11,6 +11,9 @@ defmodule MilosTraining.Organizations.Organization do
     field :slug, :string
     field :name, :string
     field :status, Ecto.Enum, values: OrganizationPolicy.statuses(), default: :active
+    # ADR-162: `gym` or `coach` (an independent coach); set by the owner
+    # (`Organizations.put_provider_kind/2`), never through `changeset/2`.
+    field :provider_kind, :string, default: "gym"
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -26,6 +29,19 @@ defmodule MilosTraining.Organizations.Organization do
     |> validate_length(:name, min: 2, max: 120)
     |> validate_slug()
     |> unique_constraint(:slug)
+  end
+
+  @doc """
+  ADR-170: the kind an organization is created with (an independent coach's
+  practice starts as `coach`). Later changes go through
+  `Organizations.put_provider_kind/2`.
+  """
+  def put_initial_provider_kind(changeset, nil), do: changeset
+
+  def put_initial_provider_kind(changeset, kind) do
+    changeset
+    |> put_change(:provider_kind, kind)
+    |> validate_inclusion(:provider_kind, ["gym", "coach"])
   end
 
   defp derive_slug(changeset) do

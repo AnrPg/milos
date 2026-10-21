@@ -13,6 +13,8 @@ defmodule MilosTraining.Community.PostComment do
     field :author_id, :binary_id
     field :body, :string
     field :deleted_at, :utc_datetime_usec
+    field :hidden_at, :utc_datetime_usec
+    field :hidden_by_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end

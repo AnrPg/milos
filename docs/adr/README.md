@@ -146,3 +146,33 @@ must have an ADR. See `template.md` for the format.
 | ADR-138 | Community context: clubs, channels and posts | Accepted |
 | ADR-139 | Journal visibility ladder, notes and check-ins | Accepted (§8 check-ins superseded by ADR-140) |
 | ADR-140 | Journal text ontology: notes, comments, instructions, messages | Accepted |
+| ADR-141 | Places, location pins and geocoding | Accepted |
+| ADR-142 | The gym's public profile, drafts and canonical tags | Accepted |
+| ADR-143 | Open clubs, member groups and moderation | Accepted |
+| ADR-144 | Trials (and later events) | Accepted |
+| ADR-148 | Media uploads | Accepted |
+| ADR-151 | Filters and saved filters | Accepted |
+| ADR-152 | AI usage metering per call, operation and gym | Accepted |
+| ADR-153 | Club events, attendees and guest passes | Accepted |
+| ADR-154 | Γύρω μου: nearby discovery, home areas and saved-filter alerts | Accepted |
+| ADR-155 | QR check-in, the printed poster, static member codes and Wallet | Accepted |
+| ADR-156 | Member referrals («Φέρε φίλο») | Accepted |
+| ADR-157 | Photos and video in posts | Accepted |
+| ADR-158 | Body snapshots, private photos and coach access | Accepted |
+| ADR-159 | Wellness (water, sleep, meals) and cravings | Accepted |
+| ADR-160 | Buddy για στήριξη and the coach's weekly wellness summary | Accepted |
+| ADR-161 | Garmin: OAuth, push ingest, matching and the devices row | Accepted |
+| ADR-162 | One journal across providers and the Box ▾ provider switch | Accepted |
+| ADR-163 | WOD goals, «τι ένιωσες» feedback and the anatomy taxonomy | Accepted |
+| ADR-164 | Anatomy atlas, coverage weighting and the gym's exercises per muscle | Accepted |
+| ADR-165 | Muscle coverage, the qualities radar and training load in Πρόοδος | Accepted |
+| ADR-166 | Insights in Πρόοδος: rules, nightly job, sufficiency and dismissal | Accepted |
+| ADR-167 | Seasons: fixed-length programmes a gym sells | Accepted |
+| ADR-168 | PT squads | Accepted |
+| ADR-169 | Partners: training partners within a club, matches, «Κλείστε μαζί» and blocking | Accepted |
+| ADR-170 | Solo-coach tier, platform plans and the coach-centred Box | Accepted |
+| ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |
+| ADR-172 | Phone health data: Apple Health and Health Connect | Accepted |
+| ADR-173 | Widgets, the arrival reminder (geofence) and NFC door tags | Accepted |
+| ADR-174 | AI scaling suggestions with mandatory coach approval | Accepted |
+| ADR-175 | Voice logging: record, transcribe, parsed draft, confirm to save | Accepted |

@@ -178,6 +178,22 @@ describe("apiRequest tenant headers", () => {
     );
   });
 
+  it("sends account-scoped paths as they are, without a gym (ADR-162)", async () => {
+    window.history.replaceState(null, "", "/org/atlas-gym/journal");
+    const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
+    await apiRequest<{ ok: boolean }>("/me/progress?range=12w", { token: "token", scope: "account" });
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/api/me/progress?range=12w",
+      expect.objectContaining({
+        headers: expect.not.objectContaining({ "X-Organization-Slug": expect.anything() }),
+      }),
+    );
+  });
+
   it("scopes /me/reviews under the resolved organization", async () => {
     window.history.replaceState(null, "", "/org/atlas-gym/account");
     const fetchMock = vi.spyOn(window, "fetch").mockResolvedValue(

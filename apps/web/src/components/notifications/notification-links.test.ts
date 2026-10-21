@@ -3,6 +3,25 @@ import { describe, expect, it } from "vitest";
 import { notificationTargetUrl } from "./notification-links";
 
 describe("notificationTargetUrl", () => {
+  it("opens the desk's visitors on the visitor who scanned the door", () => {
+    expect(
+      notificationTargetUrl({ type: "check_in_visitor", payload: { scan_id: "scan-1", url: "/admin/check-in?visitor=scan-1" } }, "admin"),
+    ).toBe("/admin/check-in?visitor=scan-1#visitors");
+    expect(notificationTargetUrl({ type: "check_in_visitor", payload: {} }, "admin")).toBe("/admin/check-in#visitors");
+  });
+
+  it("opens Γύρω μου with the saved filter of an around alert", () => {
+    expect(
+      notificationTargetUrl({ type: "around_new_matches", payload: { filter_id: "f-1", url: "/around?filter=f-1" } }, "member"),
+    ).toBe("/around?filter=f-1");
+    expect(notificationTargetUrl({ type: "around_new_matches", payload: {} }, "member")).toBe("/around");
+  });
+
+  it("opens Συνδεδεμένες συσκευές on a Garmin sync error", () => {
+    expect(notificationTargetUrl({ type: "device_sync_error", payload: { url: "/me/devices" } }, "member")).toBe("/me/devices");
+    expect(notificationTargetUrl({ type: "device_sync_error", payload: {} }, "member")).toBe("/me/devices");
+  });
+
   it("normalizes legacy assignment links to the canonical admin route and query", () => {
     expect(
       notificationTargetUrl(
@@ -141,5 +160,30 @@ describe("notificationTargetUrl after the member-app move", () => {
     expect(
       notificationTargetUrl({ type: "pr_shared", payload: { url: "/my-workouts/pantheon" } }, "athlete"),
     ).toBe("/journal/pantheon");
+  });
+  it("opens the event page for event notifications and the trial sheet for the trial offer (ADR-153)", () => {
+    expect(
+      notificationTargetUrl({ type: "community_event_waitlist_promoted", payload: { event_id: "event-1" } }, "member"),
+    ).toBe("/events/event-1");
+    expect(notificationTargetUrl({ type: "community_event_message", payload: { event_id: "event-1" } }, "admin")).toBe(
+      "/events/event-1",
+    );
+    expect(
+      notificationTargetUrl(
+        {
+          type: "community_event_trial_offer",
+          payload: { event_id: "event-1", url: "/b/kypseli?trial=1&referral_event_id=event-1" },
+        },
+        "member",
+      ),
+    ).toBe("/b/kypseli?trial=1&referral_event_id=event-1");
+  });
+
+  it("opens «Φέρε φίλο» at the box for the inviter and the queue for staff (ADR-156)", () => {
+    expect(
+      notificationTargetUrl({ type: "referral_progress", payload: { url: "/me/referrals?tab=invites&box=kypseli" } }, "member"),
+    ).toBe("/me/referrals?tab=invites&box=kypseli");
+    expect(notificationTargetUrl({ type: "referral_reward", payload: {} }, "member")).toBe("/me/referrals?tab=invites");
+    expect(notificationTargetUrl({ type: "referral_review", payload: {} }, "admin")).toBe("/admin/finance?tab=referrals");
   });
 });

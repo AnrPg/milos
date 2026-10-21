@@ -53,6 +53,18 @@ function Icon({ name }: { name: TabIcon }) {
   }
 }
 
+/** Whether the tab bar shows here, so other fixed bars can sit above it. */
+export function useBottomTabBarVisible() {
+  const pathname = usePathname();
+  const { currentUser } = useSession();
+  const { role, memberships, isLoading } = useSelectedMembershipRole();
+  if (!currentUser || isLoading || memberships.length === 0) return false;
+  return role !== "admin" && showsBottomBar(pathname);
+}
+
+/** Height of the tab bar, safe area included. */
+export const BOTTOM_TAB_BAR_HEIGHT = "calc(4.25rem + env(safe-area-inset-bottom))";
+
 /**
  * The member app's fixed bottom bar (ADR-137, brief §6.1): four tabs that
  * never change order or hide, so the app stays predictable (brief §4.2).
@@ -60,11 +72,9 @@ function Icon({ name }: { name: TabIcon }) {
 export function BottomTabBar() {
   const t = useTranslations("Navigation");
   const pathname = usePathname();
-  const { currentUser } = useSession();
-  const { role, memberships, isLoading } = useSelectedMembershipRole();
+  const visible = useBottomTabBarVisible();
 
-  if (!currentUser || isLoading || memberships.length === 0) return null;
-  if (role === "admin" || !showsBottomBar(pathname)) return null;
+  if (!visible) return null;
 
   const items = clientNavItems();
   const active = activeItemId(pathname, items);
@@ -72,7 +82,7 @@ export function BottomTabBar() {
   return (
     <>
       {/* Keeps the last card of every page clear of the fixed bar. */}
-      <div aria-hidden="true" style={{ height: "calc(4.25rem + env(safe-area-inset-bottom))" }} />
+      <div aria-hidden="true" style={{ height: BOTTOM_TAB_BAR_HEIGHT }} />
       <nav
         aria-label={t("memberTabs")}
         className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4"

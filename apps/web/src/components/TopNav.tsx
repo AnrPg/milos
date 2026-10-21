@@ -8,6 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
+import { BODY_SETTINGS_KEY, fetchBodySettings } from "@/api/body";
 import { fetchMyFinance } from "@/api/my-finance";
 import { fetchUnreadCount } from "@/api/messaging";
 import { fetchOrganizationMemberships } from "@/api/organizations";
@@ -38,7 +39,10 @@ import { OrganizationSelector } from "@/components/organization-selector";
 
 export { adminHref } from "@/lib/organization-slug";
 
-const CANVAS_PATHS = ["/login"];
+// The public box page draws its own header over the cover (ADR-142).
+const CANVAS_PATHS = ["/login", "/b"];
+// Screens that fill the whole display (ADR-155): the door kiosk and the printed poster.
+const CANVAS_PATTERNS = [/^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/];
 
 type OrganizationMembershipSummary = {
   organization: { name: string; slug: string };
@@ -138,7 +142,20 @@ export function TopNav() {
   const hrefFor = (href: string, scoped?: boolean) => (scoped ? adminHref(href, selectedOrganizationSlug) : href);
   const navLinks = navItems.map((item) => ({ id: item.id, href: hrefFor(item.href, item.scoped), label: t(item.labelKey) }));
   const activeNavId = activeItemId(pathname, navItems);
-  const sectionGroup = sectionGroupFor(pathname, { surface: role, staffItems, features });
+  // Ρυθμίσεις › Σώμα can switch the Σώμα and Ευεξία segments off (ADR-158 §7).
+  const onJournal = role !== "admin" && stripOrganizationPrefix(pathname).startsWith("/journal");
+  const bodySettingsQuery = useQuery({
+    queryKey: BODY_SETTINGS_KEY,
+    enabled: authenticated && onJournal,
+    queryFn: () => fetchBodySettings(tokens!.access_token),
+    staleTime: 5 * 60_000,
+  });
+  const sectionGroup = sectionGroupFor(pathname, {
+    surface: role,
+    staffItems,
+    features,
+    journalSections: bodySettingsQuery.data?.settings?.journal_sections ?? null,
+  });
 
   const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
   const brandLogoUrl = tenantBrandLogoUrl(memberships, selectedOrganizationSlug);
@@ -176,7 +193,10 @@ export function TopNav() {
     return () => document.removeEventListener("mousedown", handler);
   }, [menuOpen]);
 
-  if (CANVAS_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
+  if (
+    CANVAS_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
+    CANVAS_PATTERNS.some((pattern) => pattern.test(stripOrganizationPrefix(pathname)))
+  ) {
     return null;
   }
 
@@ -186,6 +206,8 @@ export function TopNav() {
     <header
       className="sticky top-0 z-50 flex flex-col overflow-x-clip"
       style={{
+        // ADR-171: below the status bar inside the store apps (0 on the web).
+        top: "var(--safe-top, 0px)",
         background: "var(--bg)",
         borderBottom: "1px solid var(--border)",
         minHeight: "3.25rem",
@@ -235,7 +257,8 @@ export function TopNav() {
 
         <div className="ms-auto flex shrink-0 items-center gap-1 sm:gap-2">
           {/* Phones open notifications from the avatar menu (ADR-103). */}
-          {showTenantShell ? <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName="hidden sm:flex" /> : null}
+          {/* Mounted for every signed-in account: ♡ in the Feed opens it too (ADR-142). */}
+          <NotificationBell onUnreadChange={setUnreadNotifications} triggerClassName={`hidden ${showTenantShell ? "sm:flex" : ""}`} />
 
           {showTenantShell ? (
             <div className="relative shrink-0">

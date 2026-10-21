@@ -40,14 +40,28 @@ config :milos_training, Oban,
        {"41 6 * * *", MilosTraining.Workers.CorporateInvoicingJob},
        {"7 7 * * *", MilosTraining.Workers.InventoryDigestJob},
        {"30 8 * * *", MilosTraining.Workers.SubscriptionExpiryJob},
-       {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob}
+       {"13 * * * *", MilosTraining.Workers.ProvisionGymClubsJob},
+       {"52 * * * *", MilosTraining.Workers.SweepOrphanMediaJob},
+       {"37 3 * * *", MilosTraining.Workers.SweepOrphanMediaJob, args: %{"dangling" => true}},
+       {"20 4 * * *", MilosTraining.Workers.ArchiveQuietGroupsJob},
+       {"*/10 * * * *", MilosTraining.Workers.EventRemindersJob},
+       {"0 7 * * *", MilosTraining.Workers.AroundAlertsJob},
+       {"30 9 * * *", MilosTraining.Workers.BodyRemindersJob},
+       {"0,30 * * * *", MilosTraining.Workers.BuddyWeeklySummaryJob},
+       {"*/10 * * * *", MilosTraining.Workers.WellnessNudgesJob},
+       {"*/15 * * * *", MilosTraining.Workers.DeviceMaintenanceJob},
+       {"10 1 * * *", MilosTraining.Workers.SeasonSweepJob},
+       {"40 2 * * *", MilosTraining.Workers.NightlyInsightsJob},
+       {"27 * * * *", MilosTraining.Workers.ScalingSuggestionScanJob}
      ]}
   ],
   queues: [
     default: 10,
     notifications: 20,
     gamification: 5,
-    analytics: 3
+    analytics: 3,
+    # ADR-157: photo and video processing is CPU-bound.
+    media: 2
   ]
 
 config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
@@ -58,6 +72,12 @@ config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
 config :milos_training,
        :workout_icon_suggester,
        MilosTraining.Infrastructure.Ai.GeminiWorkoutIconSuggester
+
+config :milos_training, :geocoder, MilosTraining.Infrastructure.Facility.PhotonGeocoder
+
+config :milos_training,
+       :map_link_resolver,
+       MilosTraining.Infrastructure.Facility.HttpMapLinkResolver
 
 config :milos_training, :start_redix, true
 config :milos_training, :start_oban, true
@@ -101,12 +121,98 @@ config :milos_training,
        MilosTraining.Infrastructure.Community.EctoCommunityStore
 
 config :milos_training,
+       :community_social_store,
+       MilosTraining.Infrastructure.Community.EctoSocialStore
+
+config :milos_training,
+       :community_event_store,
+       MilosTraining.Infrastructure.Community.EctoEventStore
+
+config :milos_training,
+       :event_payments,
+       MilosTraining.Infrastructure.Finance.FinanceEventPayments
+
+config :milos_training, :trial_store, MilosTraining.Infrastructure.Trials.EctoTrialStore
+config :milos_training, :season_store, MilosTraining.Infrastructure.Seasons.EctoSeasonStore
+# ADR-174: AI scaling suggestions (the advisor runs on the gym's own key).
+config :milos_training, :scaling_store, MilosTraining.Infrastructure.Scaling.EctoScalingStore
+config :milos_training, :scaling_advisor, MilosTraining.Infrastructure.Ai.AnthropicScalingAdvisor
+# ADR-175: voice logging (speech to text on the platform key, parsing on the gym's key).
+config :milos_training,
+       :speech_transcriber,
+       MilosTraining.Infrastructure.Ai.GeminiSpeechTranscriber
+
+config :milos_training,
+       :log_draft_parser,
+       MilosTraining.Infrastructure.Ai.AnthropicLogDraftParser
+
+config :milos_training, :trial_scheduler, MilosTraining.Infrastructure.Trials.ObanTrialScheduler
+
+config :milos_training,
+       :referral_store,
+       MilosTraining.Infrastructure.Referrals.EctoReferralStore
+
+# ADR-144: reactions to facts other contexts announce (MilosTraining.DomainEvents).
+config :milos_training, :domain_event_handlers, %{
+  membership_activated: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.EventReactions,
+    MilosTraining.Application.ReferralReactions
+  ],
+  attendance_recorded: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.ReferralReactions,
+    MilosTraining.Application.WalletReactions
+  ],
+  # ADR-156: the invite funnel follows events, trials, joining and paying.
+  event_attendance_recorded: [MilosTraining.Application.ReferralReactions],
+  membership_payment_recorded: [MilosTraining.Application.ReferralReactions],
+  booking_cancelled: [
+    MilosTraining.Application.TrialReactions,
+    MilosTraining.Application.WalletReactions
+  ],
+  booking_made: [MilosTraining.Application.WalletReactions],
+  class_cancelled: [MilosTraining.Application.TrialReactions]
+}
+
+config :milos_training,
+       :saved_filter_store,
+       MilosTraining.Infrastructure.Identity.EctoSavedFilterStore
+
+config :milos_training, :media_store, MilosTraining.Infrastructure.Media.EctoMediaStore
+
+# ADR-157: post photos and videos. ImageMagick and ffmpeg ship in the API
+# image; alt text suggestions use Gemini when configured.
+config :milos_training,
+       :image_processor,
+       MilosTraining.Infrastructure.Media.ImageMagickProcessor
+
+config :milos_training, :video_transcoder, MilosTraining.Infrastructure.Media.FfmpegTranscoder
+config :milos_training, :image_describer, MilosTraining.Infrastructure.Ai.GeminiImageDescriber
+
+# ADR-154: Γύρω μου.
+config :milos_training,
+       :discovery_store,
+       MilosTraining.Infrastructure.Places.EctoDiscoveryStore
+
+config :milos_training, :gazetteer_store, MilosTraining.Infrastructure.Places.EctoGazetteerStore
+config :milos_training, :home_area_store, MilosTraining.Infrastructure.Places.EctoHomeAreaStore
+
+config :milos_training,
+       :public_profile_store,
+       MilosTraining.Infrastructure.Organizations.EctoPublicProfileStore
+
+config :milos_training,
        :coaching_note_store,
        MilosTraining.Infrastructure.Coaching.EctoNoteStore
 
 config :milos_training,
        :coaching_relationship_store,
        MilosTraining.Infrastructure.Coaching.EctoRelationshipStore
+
+config :milos_training,
+       :ai_usage_store,
+       MilosTraining.Infrastructure.AiUsage.EctoAiUsageStore
 
 config :milos_training,
        :nutrition_store,
@@ -133,6 +239,10 @@ config :milos_training,
 config :milos_training, :workout_store, MilosTraining.Infrastructure.Workouts.EctoWorkoutStore
 
 config :milos_training,
+       :workout_goal_store,
+       MilosTraining.Infrastructure.Workouts.EctoGoalStore
+
+config :milos_training,
        :workout_text_analyzer,
        MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer
 
@@ -148,6 +258,21 @@ config :milos_training, :pr_store, MilosTraining.Infrastructure.Pantheon.EctoPRS
 config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.EctoJournalStore
 
 config :milos_training,
+       :goal_feedback_store,
+       MilosTraining.Infrastructure.Journal.EctoGoalFeedbackStore
+
+config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
+config :milos_training, :buddy_store, MilosTraining.Infrastructure.Buddies.EctoBuddyStore
+config :milos_training, :partner_store, MilosTraining.Infrastructure.Partners.EctoPartnerStore
+
+config :milos_training,
+       :support_scheduler,
+       MilosTraining.Infrastructure.Buddies.ObanSupportScheduler
+
+# ADR-160: «Χρειάζομαι στήριξη» from Λιγούρα (the port M11 calls).
+config :milos_training, :support_requests, MilosTraining.Application.SupportRequests
+
+config :milos_training,
        :push_subscription_store,
        MilosTraining.Infrastructure.Notifications.EctoPushSubscriptionStore
 
@@ -155,11 +280,35 @@ config :milos_training,
        :notification_store,
        MilosTraining.Infrastructure.Notifications.EctoNotificationStore
 
+# ADR-171: push to the store apps. Credentials come from runtime config
+# (runtime.exs); without them a provider is off and registration answers 503.
+config :milos_training,
+       :native_push_token_store,
+       MilosTraining.Infrastructure.Notifications.EctoNativePushTokenStore
+
+# ADR-173: the app installs whose home-screen widgets hold a widget token.
+config :milos_training,
+       :widget_token_store,
+       MilosTraining.Infrastructure.Widgets.EctoWidgetTokenStore
+
+config :milos_training, :native_push_senders, %{
+  fcm: MilosTraining.Infrastructure.Notifications.FcmSender,
+  apns: MilosTraining.Infrastructure.Notifications.ApnsSender
+}
+
 config :milos_training, :feedback_store, MilosTraining.Infrastructure.Feedback.EctoFeedbackStore
 
 config :milos_training,
        :wellbeing_store,
        MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore
+
+config :milos_training,
+       :wellness_store,
+       MilosTraining.Infrastructure.Wellness.EctoWellnessStore
+
+config :milos_training,
+       :insight_store,
+       MilosTraining.Infrastructure.Insights.EctoInsightStore
 
 config :milos_training,
        :messaging_thread_store,
@@ -183,6 +332,29 @@ config :milos_training,
        MilosTraining.Infrastructure.Security.PhoenixSignedToken
 
 config :milos_training, :public_base_url, "http://localhost:4000"
+
+# ADR-155: Wallet cards. Credentials come from runtime config (runtime.exs);
+# without them each platform reports wallet_not_configured.
+config :milos_training, :wallet_store, MilosTraining.Infrastructure.Wallet.EctoWalletStore
+
+config :milos_training, :wallet_pass_builders, %{
+  apple: MilosTraining.Infrastructure.Wallet.ApplePassBuilder,
+  google: MilosTraining.Infrastructure.Wallet.GooglePassBuilder
+}
+
+config :milos_training, :wallet_pass_updaters, %{
+  apple: MilosTraining.Infrastructure.Wallet.ApnsPassUpdater,
+  google: MilosTraining.Infrastructure.Wallet.GoogleWalletUpdater
+}
+
+config :milos_training,
+       :wallet_image_source,
+       MilosTraining.Infrastructure.Wallet.HttpImageSource
+
+# ADR-155: door codes, member codes and Wallet barcodes.
+config :milos_training,
+       :key_derivation,
+       MilosTraining.Infrastructure.Security.PhoenixKeyDerivation
 
 config :milos_training,
        :realtime_publisher,
@@ -238,6 +410,8 @@ config :logger, :default_formatter,
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
+# Request parameters never logged: keys, and ADR-175 voice clips and transcripts.
+config :phoenix, :filter_parameters, ["password", "secret", "api_key", "audio", "transcript"]
 
 config :open_api_spex, :json_render_error_v2, true
 

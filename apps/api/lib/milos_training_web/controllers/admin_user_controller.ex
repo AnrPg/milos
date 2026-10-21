@@ -284,7 +284,8 @@ defmodule MilosTrainingWeb.AdminUserController do
           role: %Schema{type: :string},
           roles: %Schema{type: :array, items: %Schema{type: :string}},
           coach_scope: %Schema{type: :string, enum: ["own", "all"]},
-          status: %Schema{type: :string}
+          status: %Schema{type: :string},
+          home_location_id: %Schema{type: :string, format: :uuid, nullable: true}
         },
         required: [:user_id, :role, :roles, :coach_scope]
       }
@@ -635,7 +636,11 @@ defmodule MilosTrainingWeb.AdminUserController do
 
     # Role is a property of the membership, not of the account (F-29): this
     # only ever changes what the target is inside the acting organization.
-    case MilosTraining.Organizations.set_membership_role(conn.assigns.tenant_context, id, role) do
+    case MilosTraining.Application.ChangeMembershipRoles.set_role(
+           conn.assigns.tenant_context,
+           id,
+           role
+         ) do
       {:ok, membership} ->
         user = MilosTraining.Identity.find_by_id(membership.user_id)
 
@@ -693,7 +698,7 @@ defmodule MilosTrainingWeb.AdminUserController do
     roles = Map.get(conn.body_params, :roles) || Map.get(conn.body_params, "roles")
 
     with {:ok, membership} <-
-           MilosTraining.Organizations.set_membership_roles(
+           MilosTraining.Application.ChangeMembershipRoles.set_roles(
              conn.assigns.tenant_context,
              id,
              roles
@@ -788,7 +793,8 @@ defmodule MilosTrainingWeb.AdminUserController do
       role: to_string(membership.role),
       roles: Enum.map(membership.roles, &to_string/1),
       coach_scope: to_string(membership.coach_scope),
-      status: to_string(membership.status)
+      status: to_string(membership.status),
+      home_location_id: membership.home_location_id
     }
   end
 

@@ -6,7 +6,7 @@ defmodule MilosTraining.Application.WithdrawBooking do
     TrackAnalyticsEvent
   }
 
-  alias MilosTraining.{Finance, Notifications, Scheduling}
+  alias MilosTraining.{Notifications, Scheduling}
   alias MilosTraining.Scheduling.Domain.BookingPolicy
 
   def call(context, user_id, booking_id) do
@@ -17,6 +17,15 @@ defmodule MilosTraining.Application.WithdrawBooking do
            Scheduling.withdraw_booking(context, booking_id, reconciliation(booking, late?)) do
       reconcile_now(context, booking, late?)
       PromoteClassWaitlist.call(context, booking.scheduled_class_id)
+
+      MilosTraining.DomainEvents.publish(:booking_cancelled, %{
+        organization_id: booking.organization_id,
+        booking_id: booking.id,
+        user_id: booking.user_id,
+        kind: Map.get(booking, :kind, "member"),
+        by: :member,
+        at: DateTime.utc_now()
+      })
 
       TrackAnalyticsEvent.call("class_booking_cancelled", context, withdrawn_booking, %{
         metadata: %{
@@ -83,19 +92,17 @@ defmodule MilosTraining.Application.WithdrawBooking do
     _result =
       if late?,
         do:
-          Finance.finalize_entitlement_source(
+          BookingEntitlement.finalize(
             context,
             booking.user_id,
-            "scheduling",
             booking.scheduled_class_id,
             allowance,
             params
           ),
         else:
-          Finance.release_entitlement_source(
+          BookingEntitlement.release(
             context,
             booking.user_id,
-            "scheduling",
             booking.scheduled_class_id,
             allowance,
             params

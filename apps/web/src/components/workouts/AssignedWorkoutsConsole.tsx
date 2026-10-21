@@ -52,6 +52,7 @@ import { usesManualTimer } from "@/lib/workout-execution-mode";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { PageHeader } from "@/components/PageHeader";
+import { SeasonTag } from "@/components/seasons/SeasonTag";
 
 type ViewMode = "3day" | "week" | "month";
 
@@ -1153,6 +1154,7 @@ export function AssignedWorkoutsConsole({
                       <h2 className="mt-1.5 text-base font-semibold" style={{ color: isRejected ? "var(--dim)" : "var(--text)" }}>
                         {assignment.workout.title}
                       </h2>
+                      <SeasonTag season={assignment.season} />
                       <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
                         {i18n("featureSectionCount", { count: assignment.workout.sections.length })}
                         {" · "}

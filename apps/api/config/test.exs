@@ -39,6 +39,17 @@ config :phoenix, :plug_init_mode, :runtime
 config :milos_training, :start_redix, false
 config :milos_training, :start_oban, false
 config :milos_training, :workout_icon_suggester, MilosTraining.FakeWorkoutIconSuggester
+config :milos_training, :scaling_advisor, MilosTraining.FakeScalingAdvisor
+config :milos_training, :speech_transcriber, MilosTraining.FakeSpeechTranscriber
+config :milos_training, :log_draft_parser, MilosTraining.FakeLogDraftParser
+
+# ADR-157: deterministic media adapters; tests tagged :imagemagick / :ffmpeg
+# drive the real ones when the tools are installed.
+config :milos_training, :image_processor, MilosTraining.FakeImageProcessor
+config :milos_training, :video_transcoder, MilosTraining.FakeVideoTranscoder
+config :milos_training, :image_describer, MilosTraining.FakeImageDescriber
+config :milos_training, :geocoder, MilosTraining.FakeGeocoder
+config :milos_training, :map_link_resolver, MilosTraining.FakeMapLinkResolver
 config :milos_training, :start_storage_reconciler, false
 config :milos_training, :rate_limiter, MilosTraining.Infrastructure.Security.MemoryRateLimiter
 config :milos_training, :token_store, MilosTraining.Infrastructure.Security.MemoryTokenStore
@@ -55,3 +66,21 @@ config :milos_training, :meilisearch,
 # ADR-117: tenant export/purge object operations run against an in-memory store.
 config :milos_training, :tenant_object_store, MilosTraining.TestSupport.MemoryObjectStore
 config :milos_training, :workout_text_analyzer, MilosTraining.Test.FakeWorkoutTextAnalyzer
+
+# ADR-155: Wallet platforms are told about changes through recording fakes;
+# a box logo is never fetched.
+config :milos_training, :wallet_pass_updaters, %{
+  apple: MilosTraining.FakeWalletUpdater,
+  google: MilosTraining.FakeWalletUpdater
+}
+
+config :milos_training, :wallet_image_source, MilosTraining.FakeWalletImageSource
+
+# ADR-171: native push goes to recording fakes; tests switch providers on.
+config :milos_training, :native_push_senders, %{
+  fcm: MilosTraining.FakeNativePushSender.Fcm,
+  apns: MilosTraining.FakeNativePushSender.Apns
+}
+
+# ADR-161: Garmin is faked; tests turn it on and script its answers.
+config :milos_training, :garmin_client, MilosTraining.FakeGarminClient

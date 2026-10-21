@@ -10,6 +10,17 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-163: WOD goals or «τι ένιωσες» feedback outside the taxonomy.
+  def call(conn, {:error, {:invalid_goals, details}}) when is_map(details) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_goals",
+      error: "Check the muscles and qualities",
+      errors: Map.new(details, fn {field, message} -> {to_string(field), [message]} end)
+    })
+  end
+
   def call(conn, {:error, errors}) when is_list(errors) do
     normalized_errors =
       errors
@@ -52,6 +63,46 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # ADR-154: Γύρω μου.
+  def call(conn, {:error, :origin_required}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "origin_required",
+      error: "Choose where to search from: your area, your position or a place"
+    })
+  end
+
+  def call(conn, {:error, :place_not_found}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "place_not_found", error: "No place matches that name"})
+  end
+
+  def call(conn, {:error, :filter_alerts_unsupported}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "filter_alerts_unsupported", error: "Only Γύρω μου filters have alerts"})
+  end
+
+  def call(conn, {:error, :geocoder_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{code: "geocoder_unavailable", error: "Address search is unavailable right now"})
+  end
+
+  def call(conn, {:error, reason}) when reason in [:not_a_map_link, :map_link_unresolved] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: Atom.to_string(reason), error: "No map point could be read from this link"})
+  end
+
+  def call(conn, {:error, :invalid_provider_kind}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_provider_kind", error: "Provider kind must be gym or coach"})
+  end
+
   def call(conn, {:error, :invalid_timezone}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -68,6 +119,25 @@ defmodule MilosTrainingWeb.FallbackController do
     conn
     |> put_status(:forbidden)
     |> json(%{code: "cannot_post_in_channel", error: "You cannot post in this channel"})
+  end
+
+  # ADR-142: audiences and follows.
+  def call(conn, {:error, :invalid_audience}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_audience", error: "You cannot post to this audience"})
+  end
+
+  def call(conn, {:error, :invalid_follow_target}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_follow_target", error: "This cannot be followed"})
+  end
+
+  def call(conn, {:error, :cannot_follow_self}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "cannot_follow_self", error: "You cannot follow yourself"})
   end
 
   def call(conn, {:error, :attachment_not_shareable}) do
@@ -1002,6 +1072,57 @@ defmodule MilosTrainingWeb.FallbackController do
     })
   end
 
+  # Member referrals (ADR-156).
+  def call(conn, {:error, :referral_code_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{
+      code: "referral_code_unavailable",
+      error: "No invite code could be made; try again"
+    })
+  end
+
+  def call(conn, {:error, :referrer_not_member}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "referrer_not_member", error: "The new inviter must be a member of the box"})
+  end
+
+  def call(conn, {:error, :self_referral}), do: call(conn, {:error, :self_referral_not_allowed})
+
+  def call(conn, {:error, :referral_already_qualified}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "referral_already_qualified",
+      error: "The invite already counted and can no longer move to another member"
+    })
+  end
+
+  def call(conn, {:error, :referral_gift_already_applied}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "referral_gift_already_applied",
+      error: "The friend's gift was already applied"
+    })
+  end
+
+  def call(conn, {:error, :referral_no_friend_gift}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "referral_no_friend_gift", error: "The programme gives the friend nothing"})
+  end
+
+  def call(conn, {:error, :no_active_subscription}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "no_active_subscription",
+      error: "The member has no active package with an end date to extend"
+    })
+  end
+
   def call(conn, {:error, :recipient_membership_not_found}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1511,6 +1632,55 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: "already_completed", error: "Execution already completed"})
   end
 
+  # ADR-148 media uploads and ADR-142 public profiles.
+  def call(conn, {:error, reason})
+      when reason in [
+             :invalid_media_purpose,
+             :invalid_media_type,
+             :invalid_media_size,
+             :media_too_large,
+             :media_type_mismatch,
+             :media_has_metadata,
+             :media_unreadable,
+             :media_upload_missing,
+             :invalid_media,
+             :too_many_photos,
+             :public_profile_empty,
+             :unknown_filter_surface,
+             :invalid_filter,
+             :filter_too_large,
+             :invalid_filter_name,
+             :too_many_saved_filters
+           ] do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: to_string(reason), error: "The upload or profile was rejected."})
+  end
+
+  def call(conn, {:error, :media_not_found}) do
+    conn
+    |> put_status(:not_found)
+    |> json(%{code: "media_not_found", error: "Media not found."})
+  end
+
+  def call(conn, {:error, :media_key_forbidden}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{code: "media_key_forbidden", error: "Forbidden."})
+  end
+
+  def call(conn, {:error, :media_storage_unavailable}) do
+    conn
+    |> put_status(:service_unavailable)
+    |> json(%{code: "media_storage_unavailable", error: "Storage is unavailable; try again."})
+  end
+
+  def call(conn, {:error, :stale_profile}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{code: "stale_profile", error: "The profile changed meanwhile; reload it."})
+  end
+
   def call(conn, {:error, :forbidden}) do
     conn
     |> put_status(:forbidden)
@@ -1748,7 +1918,14 @@ defmodule MilosTrainingWeb.FallbackController do
     question_required: {:unprocessable_entity, "Ask your coach a question"},
     question_too_long: {:unprocessable_entity, "The question is too long"},
     note_organization_unavailable: {:unprocessable_entity, "That gym is not available"},
-    stale: {:conflict, "This entry changed meanwhile; reload it"}
+    stale: {:conflict, "This entry changed meanwhile; reload it"},
+    # ADR-162: one journal across providers.
+    unknown_provider: {:unprocessable_entity, "That is not one of your active providers"},
+    empty_audience:
+      {:unprocessable_entity, "Choose at least one coach, or keep the entry private"},
+    audience_not_supported: {:unprocessable_entity, "This entry cannot be shared that way"},
+    export_in_progress: {:conflict, "An export is already being prepared"},
+    invalid_history_kind: {:unprocessable_entity, "Use workouts or classes"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@journal_errors, reason) do
@@ -1779,6 +1956,126 @@ defmodule MilosTrainingWeb.FallbackController do
       code: "check_in_organization_unavailable",
       error: "Check-ins can only be recorded in a gym you are an active member of"
     })
+  end
+
+  # ADR-160 Buddy για στήριξη.
+  @buddy_errors %{
+    buddy_limit_reached: {:conflict, "You can have up to two buddies or invitations"},
+    buddy_already_invited: {:conflict, "You already invited this person"},
+    buddy_invite_expired: {:conflict, "This invitation has expired"},
+    buddy_link_closed: {:conflict, "This buddy link has already ended"},
+    buddy_invite_unavailable: {:conflict, "This invitation link no longer works"},
+    cannot_buddy_self: {:unprocessable_entity, "You cannot be your own buddy"},
+    not_eligible_for_buddy:
+      {:forbidden,
+       "Invite your coach, someone from your clubs or someone you follow, or send a link"},
+    invalid_buddy_link: {:unprocessable_entity, "Check the invitation"},
+    invalid_receives_weekly_summary:
+      {:unprocessable_entity, "receives_weekly_summary must be true or false"},
+    message_too_long: {:unprocessable_entity, "The message is at most 280 characters"},
+    invalid_support_source: {:unprocessable_entity, "Use craving or quick"},
+    support_rate_limited:
+      {:too_many_requests, "You asked for support a few times this hour; your buddies have it"},
+    no_active_buddies: {:conflict, "Add a buddy first"},
+    already_undone: {:conflict, "This request was already taken back"},
+    undo_window_passed: {:conflict, "Your buddies have already been told"},
+    invalid_reply_kind: {:unprocessable_entity, "Use here, walk, call or text"},
+    reply_text_required: {:unprocessable_entity, "Write a few words"},
+    reply_too_long: {:unprocessable_entity, "A reply is at most 500 characters"},
+    invalid_reply_text: {:unprocessable_entity, "Check the reply"},
+    invalid_reply: {:unprocessable_entity, "Check the reply"},
+    invalid_quiet_hours: {:unprocessable_entity, "Quiet hours are two different times, HH:MM"},
+    invalid_phone: {:unprocessable_entity, "Check the phone number"},
+    invalid_share_phone: {:unprocessable_entity, "share_phone must be true or false"},
+    phone_required: {:unprocessable_entity, "Add a phone number to share it"},
+    summary_required: {:unprocessable_entity, "Turn on the weekly summary first"},
+    invalid_summary_sharing: {:unprocessable_entity, "Use true or false"},
+    message_body_required: {:unprocessable_entity, "Write a message"},
+    message_too_long_body: {:unprocessable_entity, "A message is at most 2000 characters"},
+    buddy_link_read_only: {:conflict, "This buddy link has ended; the conversation is read-only"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@buddy_errors, reason) do
+    {status, message} = Map.fetch!(@buddy_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-169 Partners.
+  @partner_errors %{
+    partners_disabled: {:forbidden, "This gym has switched Partners off"},
+    partners_not_offered:
+      {:forbidden, "Partners is only in clubs whose members the gym verified"},
+    not_club_member: {:forbidden, "Only members of this club take part"},
+    partner_profile_required: {:conflict, "Turn on your Partners profile in this club first"},
+    partner_profile_suspended:
+      {:forbidden, "Staff have hidden your Partners profile in this club"},
+    invalid_partner_level: {:unprocessable_entity, "Choose your level"},
+    invalid_partner_times: {:unprocessable_entity, "Choose when you train"},
+    invalid_partner_goals: {:unprocessable_entity, "Choose one to three goals"},
+    invalid_partner_gender: {:unprocessable_entity, "Unknown gender"},
+    invalid_partner_gender_preference: {:unprocessable_entity, "Unknown preference"},
+    invalid_partner_active: {:unprocessable_entity, "active must be true or false"},
+    partner_about_too_long: {:unprocessable_entity, "At most 140 characters"},
+    invalid_direction: {:unprocessable_entity, "Like or pass"},
+    invalid_swipe: {:unprocessable_entity, "That swipe isn't possible"},
+    invalid_match: {:conflict, "That match isn't possible"},
+    partner_swipe_limit: {:too_many_requests, "That's enough swiping for today"},
+    partner_already_matched: {:conflict, "You are already partners"},
+    partner_match_ended: {:conflict, "This match has ended"},
+    invalid_end_reason: {:unprocessable_entity, "Unknown reason"},
+    partner_match_read_only: {:conflict, "This conversation is read-only"},
+    partner_plans_unavailable: {:unprocessable_entity, "Class plans are for a gym's own clubs"},
+    invalid_partner_message: {:unprocessable_entity, "Check the message"},
+    invalid_partners_visible: {:unprocessable_entity, "visible must be true or false"},
+    invalid_partners_enabled: {:unprocessable_entity, "partners_enabled must be true or false"},
+    cannot_block_self: {:unprocessable_entity, "You can't block yourself"},
+    invalid_user: {:unprocessable_entity, "Unknown person"}
+  }
+
+  def call(conn, {:error, reason}) when is_map_key(@partner_errors, reason) do
+    {status, message} = Map.fetch!(@partner_errors, reason)
+
+    conn
+    |> put_status(status)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
+  # ADR-159 Ευεξία and Λιγούρα.
+  def call(conn, {:error, {:invalid_wellness_value, errors}}) when is_map(errors) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_wellness_value", error: "The entry is not valid", errors: errors})
+  end
+
+  @wellness_errors %{
+    unknown_wellness_kind: "Use water, sleep or meal",
+    wellness_organization_unavailable: "Entries can only name a gym you are an active member of",
+    unknown_time_zone: "The time zone is not known",
+    invalid_occurred_at: "occurred_at must be an ISO-8601 date-time",
+    occurred_in_future: "An entry cannot be in the future",
+    occurred_too_long_ago: "Entries can be added or moved at most 7 days back",
+    invalid_craving_trigger: "Use stress, fatigue, boredom, social, hunger or other",
+    invalid_date: "Dates must be ISO-8601 (YYYY-MM-DD), from before to",
+    date_window_too_long: "Ask for at most 92 days at a time",
+    unknown_wellness_section: "Use the sections wellness and cravings"
+  }
+
+  def call(conn, {:error, :health_data_consent_required}) do
+    conn
+    |> put_status(:forbidden)
+    |> json(%{
+      code: "health_data_consent_required",
+      error: "Agree to keep health data first; it stays private unless you share it"
+    })
+  end
+
+  def call(conn, {:error, reason}) when is_map_key(@wellness_errors, reason) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: Atom.to_string(reason), error: Map.fetch!(@wellness_errors, reason)})
   end
 
   def call(conn, {:error, :invalid_range}) do
@@ -1907,7 +2204,82 @@ defmodule MilosTrainingWeb.FallbackController do
     add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
     last_owner: {:conflict, "A gym needs at least one owner"},
     owner_required: {:forbidden, "Only gym owners can create gyms"},
+    # ADR-170: platform plans and the solo-coach tier.
+    vendor_required: {:forbidden, "Only the platform team can do this"},
+    coach_practice_exists: {:conflict, "You already run a practice as an independent coach"},
+    plan_limit_reached:
+      {:conflict, "Your plan has no free staff seat; ask us about a bigger plan"},
+    unknown_plan: {:unprocessable_entity, "Choose one of the platform plans"},
+    invalid_plan_audience: {:unprocessable_entity, "Audience must be gym or coach"},
+    invalid_subscription_status:
+      {:unprocessable_entity, "Choose trialing, active, past_due, cancelled or comped"},
+    trial_end_required: {:unprocessable_entity, "A trial needs an end date in the future"},
+    invalid_price: {:unprocessable_entity, "A price is a whole number of cents, zero or more"},
+    invalid_name: {:unprocessable_entity, "A name has 2 to 120 characters"},
     machine_retired: {:unprocessable_entity, "This machine is retired"},
+    # ADR-144: trials.
+    trials_disabled: {:unprocessable_entity, "This box doesn't offer trials right now"},
+    class_not_open_to_trials: {:unprocessable_entity, "This class doesn't take trials"},
+    beyond_trial_horizon: {:unprocessable_entity, "Trials can't be booked this far ahead"},
+    no_trial_seats: {:conflict, "No trial seats left in this class"},
+    weekly_trial_limit_reached: {:conflict, "This week's trials are full"},
+    already_member: {:unprocessable_entity, "You're already a member of this box"},
+    trial_for_first_timers_only:
+      {:unprocessable_entity, "Trials here are for people who were never members"},
+    trial_already_used: {:conflict, "You've already had your trial here"},
+    trial_already_open: {:conflict, "You already have a trial booked here"},
+    invalid_trial_transition: {:conflict, "The trial can't take this step now"},
+    class_not_found: {:not_found, "The class no longer exists"},
+    # ADR-167: seasons.
+    season_not_open: {:conflict, "This season isn't taking requests"},
+    season_full: {:conflict, "Every place in this season is taken"},
+    season_already_requested: {:conflict, "You already asked for a place in this season"},
+    season_place_confirmed: {:conflict, "Your place is confirmed; talk to the box to cancel it"},
+    invalid_season_transition: {:conflict, "This request can't take this step now"},
+    invalid_season_status: {:unprocessable_entity, "Choose draft, published or cancelled"},
+    season_closed: {:conflict, "This season has ended or was cancelled"},
+    season_schedule_locked:
+      {:conflict, "The dates and programme are fixed once a participant is confirmed"},
+    capacity_below_participants:
+      {:unprocessable_entity, "Capacity can't go below the confirmed participants"},
+    season_has_enrollments:
+      {:conflict, "Members already asked for this season; cancel it instead"},
+    programme_workout_unavailable:
+      {:unprocessable_entity, "Every programme workout must be a published workout of this box"},
+    # ADR-143: member groups, open clubs and reports.
+    member_groups_disabled: {:forbidden, "This box doesn't let members start groups"},
+    group_not_open: {:unprocessable_entity, "This group isn't open to join"},
+    hand_over_first: {:unprocessable_entity, "Make someone else an admin before you leave"},
+    invalid_decision: {:unprocessable_entity, "Approve or decline"},
+    invalid_member_groups: {:unprocessable_entity, "Unknown group rule"},
+    invalid_join_policy: {:unprocessable_entity, "Unknown way to join"},
+    cannot_report_own: {:unprocessable_entity, "You can't report your own post"},
+    invalid_reason: {:unprocessable_entity, "Choose a reason"},
+    invalid_target: {:unprocessable_entity, "That can't be reported"},
+    invalid_action: {:unprocessable_entity, "That action doesn't apply here"},
+    package_not_found: {:unprocessable_entity, "Choose an active package of this box"},
+    # ADR-168: PT squads.
+    too_many_squads: {:unprocessable_entity, "You already run the most squads you can"},
+    squad_full: {:unprocessable_entity, "This squad is full"},
+    squad_archived: {:conflict, "This squad is archived"},
+    coach_archives_instead: {:unprocessable_entity, "Archive the squad instead of leaving it"},
+    # ADR-153: club events.
+    event_cancelled: {:conflict, "This event was cancelled"},
+    event_started: {:conflict, "This event has already started"},
+    event_not_over: {:conflict, "The event hasn't ended yet"},
+    not_invited: {:forbidden, "This event is for the club's members"},
+    guests_not_allowed: {:forbidden, "This event doesn't take guests"},
+    inviter_not_going: {:conflict, "The friend who invited you isn't going any more"},
+    guest_limit_reached: {:conflict, "This invitation has no places left"},
+    invalid_invite: {:not_found, "This invitation link isn't valid"},
+    invalid_scope: {:unprocessable_entity, "Choose this event or this and following"},
+    invalid_repeat: {:unprocessable_entity, "Repeat until a date on or after the first event"},
+    event_is_free: {:unprocessable_entity, "This event is free"},
+    already_paid: {:conflict, "Already marked as paid"},
+    not_going: {:conflict, "This person doesn't hold a place"},
+    trial_offer_already_sent: {:conflict, "The trial offer was already sent"},
+    event_not_found: {:not_found, "No such event at this box"},
+    nobody_to_offer: {:unprocessable_entity, "Nobody who came is waiting for a trial offer"},
     invalid_machine_event: {:unprocessable_entity, "Unknown machine log entry"},
     not_enough_stock: {:unprocessable_entity, "There is not that much in stock"},
     invalid_movement: {:unprocessable_entity, "Unknown stock change"},
@@ -1924,7 +2296,93 @@ defmodule MilosTrainingWeb.FallbackController do
     invalid_payment_amount: {:unprocessable_entity, "Enter an amount above zero"},
     payment_exceeds_balance: {:unprocessable_entity, "The payment is more than the balance due"},
     corporate_invoice_has_payments: {:conflict, "Reverse the payments before voiding"},
-    corporate_billing_email_missing: {:unprocessable_entity, "The client has no billing email"}
+    corporate_billing_email_missing: {:unprocessable_entity, "The client has no billing email"},
+    # ADR-155: QR check-in and Wallet.
+    invalid_door_code: {:unprocessable_entity, "This door code has expired; scan it again"},
+    invalid_scan_token: {:unprocessable_entity, "Scan the door again"},
+    booking_not_in_window: {:unprocessable_entity, "That booking isn't open for check-in now"},
+    undo_expired: {:conflict, "It's too late to undo this check-in"},
+    invalid_undo_token: {:unprocessable_entity, "Nothing to undo"},
+    invalid_member_code: {:unprocessable_entity, "This code isn't valid here or has expired"},
+    not_a_member: {:unprocessable_entity, "This person isn't a member of the box"},
+    invalid_pass: {:unprocessable_entity, "This Wallet card isn't valid here"},
+    pass_revoked: {:unprocessable_entity, "This Wallet card was revoked"},
+    override_not_allowed: {:forbidden, "The box doesn't allow checking in despite a problem"},
+    check_in_problems: {:conflict, "There is a problem with this member's package"},
+    choose_booking: {:conflict, "Choose which booking to check in to"},
+    invalid_check_in_method: {:unprocessable_entity, "Unknown check-in method"},
+    invalid_wallet_platform: {:unprocessable_entity, "Choose Apple or Google Wallet"},
+    wallet_not_configured: {:service_unavailable, "Wallet cards aren't available on this server"},
+    invalid_download_link: {:unprocessable_entity, "This download link has expired"},
+    wallet_pass_conflict: {:conflict, "The card is being created; try again"},
+    wallet_requires_static_code:
+      {:conflict, "This box uses rotating codes, so its check-in card can't go in a Wallet"},
+    member_code_not_static:
+      {:conflict, "This box uses rotating codes; there is nothing to reset"},
+    member_code_revoked: {:unprocessable_entity, "This code was revoked"},
+    invalid_poster_setting: {:unprocessable_entity, "Say whether the poster is on"},
+    # ADR-173: NFC door tags and widgets.
+    invalid_nfc_setting: {:unprocessable_entity, "Say whether the NFC tag is on"},
+    invalid_widget_token: {:unauthorized, "Open the app to refresh the widget"},
+    # ADR-157: photos and videos in posts.
+    too_many_media: {:unprocessable_entity, "A post carries up to ten photos or one video"},
+    mixed_media: {:unprocessable_entity, "A post carries photos or a video, not both"},
+    media_quota_exceeded:
+      {:unprocessable_entity, "You have too many uploads waiting; post or remove some first"},
+    video_unavailable: {:service_unavailable, "Videos aren't available on this server"},
+    media_in_post: {:conflict, "This upload is in a post; delete the post instead"},
+    media_not_ready: {:conflict, "The photo is still processing"},
+    invalid_alt_text: {:unprocessable_entity, "Alternative text is at most 500 characters"},
+    alt_text_unavailable: {:service_unavailable, "Suggestions aren't available right now"},
+    # ADR-158: Σώμα.
+    invalid_metric: {:unprocessable_entity, "Check this measurement"},
+    snapshot_empty: {:unprocessable_entity, "Add at least one measurement or photo"},
+    invalid_body_visibility: {:unprocessable_entity, "Choose who sees this snapshot"},
+    body_notes_too_long: {:unprocessable_entity, "Notes are at most 2000 characters"},
+    invalid_pose: {:unprocessable_entity, "Choose front, side, back or other"},
+    too_many_body_photos: {:unprocessable_entity, "A snapshot holds up to four photos"},
+    pose_taken: {:conflict, "This snapshot already has a photo of that pose"},
+    body_photo_consent_required:
+      {:forbidden, "Agree to keep body photos first; they stay private unless you share them"},
+    invalid_consent_scope: {:unprocessable_entity, "Unknown consent"},
+    invalid_units: {:unprocessable_entity, "Choose metric or imperial units"},
+    invalid_taken_at: {:unprocessable_entity, "Check the date of the measurement"},
+    unknown_metric: {:unprocessable_entity, "Unknown measurement"},
+    invalid_range: {:unprocessable_entity, "Choose 1m, 3m, 1y or all"},
+    invalid_body_settings: {:unprocessable_entity, "Check your body settings"},
+    share_confirmation_required:
+      {:unprocessable_entity, "Confirm that you want to post these photos"},
+    share_needs_two_snapshots: {:unprocessable_entity, "Choose two different snapshots"},
+    share_photo_missing:
+      {:unprocessable_entity, "Both snapshots need a ready photo of that pose"},
+    # ADR-161: Garmin and connected devices.
+    garmin_not_configured: {:service_unavailable, "Garmin isn't available on this server yet"},
+    garmin_unavailable:
+      {:service_unavailable, "Garmin isn't answering right now; try again later"},
+    device_already_connected: {:conflict, "Garmin is already connected"},
+    device_not_connected: {:unprocessable_entity, "Garmin isn't connected"},
+    device_reconnect_required: {:conflict, "Reconnect Garmin to sync again"},
+    sync_too_soon:
+      {:too_many_requests, "Garmin was synced a moment ago; try again in a few minutes"},
+    invalid_sync_prefs:
+      {:unprocessable_entity,
+       "Choose on or off for workouts, sleep, weight and resting heart rate"},
+    invalid_backfill_days: {:unprocessable_entity, "Choose 0, 30 or 90 days of history"},
+    import_already_settled: {:conflict, "This workout was already sorted out"},
+    unknown_device_candidate:
+      {:unprocessable_entity, "Choose one of the suggested classes or workouts"},
+    device_confirmation_required:
+      {:unprocessable_entity, "Choose a class or workout, or keep it as its own entry"},
+    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr or steps"},
+    # ADR-172: Apple Health and Health Connect from the store apps.
+    phone_health_not_connected:
+      {:unprocessable_entity, "Connect it in the app first, under Connected devices"},
+    phone_health_batch_too_large:
+      {:unprocessable_entity, "Send at most 500 records per list in one batch"},
+    invalid_phone_health_batch: {:unprocessable_entity, "Send the records as lists"},
+    # ADR-171: push to the store apps.
+    native_push_not_configured:
+      {:service_unavailable, "Push to the app isn't available on this server yet"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

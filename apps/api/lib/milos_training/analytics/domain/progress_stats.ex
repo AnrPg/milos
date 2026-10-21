@@ -60,16 +60,16 @@ defmodule MilosTraining.Analytics.Domain.ProgressStats do
   defp score_history(completed) do
     completed
     |> Enum.flat_map(&score_points/1)
-    |> Enum.group_by(&{&1.workout_id, &1.section_id})
+    |> Enum.group_by(&{&1.workout_id, &1.section_key})
     |> Enum.filter(fn {_key, points} -> length(points) > 1 end)
-    |> Enum.map(fn {{workout_id, section_id}, points} ->
+    |> Enum.map(fn {{workout_id, _section_key}, points} ->
       points = Enum.sort_by(points, & &1.completed_on, Date)
       first = hd(points)
 
       %{
         workout_id: workout_id,
         workout_title: first.workout_title,
-        section_id: section_id,
+        section_id: first.section_id,
         section_name: first.section_name,
         unit: first.unit,
         points: Enum.map(points, &Map.take(&1, [:execution_id, :completed_on, :value]))
@@ -88,6 +88,8 @@ defmodule MilosTraining.Analytics.Domain.ProgressStats do
         workout_id: value(execution, :master_workout_id),
         workout_title: value(execution, :workout_title),
         section_id: value(score, :section_id),
+        # ADR-162: across providers, sections of one identity match by key.
+        section_key: value(score, :section_key) || value(score, :section_id),
         section_name: value(score, :section_name),
         execution_id: value(execution, :id),
         completed_on: execution.completed_on,

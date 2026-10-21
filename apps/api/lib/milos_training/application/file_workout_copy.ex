@@ -26,7 +26,7 @@ defmodule MilosTraining.Application.FileWorkoutCopy do
   defp reuse_or_copy(context, workout_id, folder_id, true) do
     case Workouts.find_filed_copy(context, workout_id, folder_id) do
       nil ->
-        copy(context, workout_id, folder_id)
+        copy(context, workout_id, folder_id, copy_goals: false)
 
       # Marked so a failed follow-up step never deletes a copy other classes use.
       copy_id ->
@@ -35,7 +35,7 @@ defmodule MilosTraining.Application.FileWorkoutCopy do
   end
 
   defp reuse_or_copy(context, workout_id, folder_id, false),
-    do: copy(context, workout_id, folder_id)
+    do: copy(context, workout_id, folder_id, copy_goals: false)
 
   @doc "Deletes a copy made by `ensure_in_folder/3` when the step it was made for failed."
   def discard(_context, %{id: id}, id), do: :ok
@@ -46,14 +46,19 @@ defmodule MilosTraining.Application.FileWorkoutCopy do
     :ok
   end
 
-  @doc "Copies a workout into `folder_id` (`nil` = library root)."
-  def copy(context, workout_id, folder_id) do
+  @doc """
+  Copies a workout into `folder_id` (`nil` = library root). An explicit copy
+  takes the original's WOD goals; the programming copies `ensure_in_folder/4`
+  makes pass `copy_goals: false` and inherit them instead (ADR-163).
+  """
+  def copy(context, workout_id, folder_id, opts \\ []) do
     with %{} = source <-
            Workouts.get_workout_for_admin(context, workout_id) || {:error, :workout_not_found},
          {:ok, draft} <-
            DuplicateWorkout.call(context, workout_id,
              folder_id: folder_id,
-             title_suffix: title_suffix(source, folder_id)
+             title_suffix: title_suffix(source, folder_id),
+             copy_goals: Keyword.get(opts, :copy_goals, true)
            ) do
       maybe_publish(context, source, draft)
     end

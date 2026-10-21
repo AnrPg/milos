@@ -13,10 +13,14 @@ defmodule MilosTraining.Journal.Domain.TenantDataPolicy do
             purge_order: 45,
             disposition: :purge,
             basis:
-              "Journal notes are member-written personal data; coach-read audit rows only matter while the gym exists.",
+              "Journal notes are member-written personal data; coach-read audit rows and the member's per-provider coach audiences (ADR-162) only matter while the gym exists.",
             tables: [
+              %{table: "journal_entry_audiences", rls: :user},
+              %{table: "journal_coach_audience_exclusions", rls: :user},
               %{table: "journal_coach_reads"},
               %{table: "journal_comments", rls: :user},
+              # ADR-163: «τι ένιωσες» rows follow their entry like comments.
+              %{table: "goal_feedback", rls: :user},
               %{table: "journal_notes", rls: :user}
             ]
           })

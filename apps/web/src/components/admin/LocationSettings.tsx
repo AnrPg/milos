@@ -1,6 +1,9 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 import { ApiError } from "@/api/client";
@@ -8,20 +11,25 @@ import {
   archiveLocation,
   createLocation,
   listAdminLocations,
-  updateLocation,
   type FacilityLocation,
 } from "@/api/facility";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 
-/** Gym locations (ADR-097). Optional: single-site gyms never need one. */
+/**
+ * Gym locations (ADR-097). Optional: single-site gyms never need one. Each
+ * location is edited on its own page with its map pin and hours (ADR-141).
+ */
 export function LocationSettings({ token }: { token: string }) {
   const i18n = useUiTranslations();
+  const t = useTranslations("AdminLocation");
+  const router = useRouter();
+  const organizationSlug = useOrganizationSlug();
   const queryClient = useQueryClient();
-  const [draft, setDraft] = useState({ name: "", address: "" });
-  const [editing, setEditing] = useState<{ id: string; name: string; address: string } | null>(null);
+  const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const query = useQuery({
@@ -42,21 +50,15 @@ export function LocationSettings({ token }: { token: string }) {
         : localizeError(cause, i18n),
     );
 
-  const createMutation = useMutation({
-    mutationFn: () => createLocation(token, { name: draft.name.trim(), address: draft.address.trim() || null }),
-    onSuccess: async () => {
-      setDraft({ name: "", address: "" });
-      await refresh();
-    },
-    onError: fail,
-  });
+  const editorHref = (id: string) => adminHref(`/admin/settings/locations/${id}`, organizationSlug);
 
-  const updateMutation = useMutation({
-    mutationFn: (target: { id: string; name: string; address: string }) =>
-      updateLocation(token, target.id, { name: target.name.trim(), address: target.address.trim() || null }),
-    onSuccess: async () => {
-      setEditing(null);
+  // A new location opens straight on its page, where the pin and hours are set.
+  const createMutation = useMutation({
+    mutationFn: () => createLocation(token, { name: name.trim() }),
+    onSuccess: async (location) => {
+      setName("");
       await refresh();
+      router.push(editorHref(location.id));
     },
     onError: fail,
   });
@@ -88,23 +90,15 @@ export function LocationSettings({ token }: { token: string }) {
           aria-label={i18n("admLocationName")}
           className="min-w-0 flex-1 rounded-2xl px-4 py-3 text-sm outline-none"
           maxLength={80}
-          onChange={(event) => setDraft({ ...draft, name: event.target.value })}
+          onChange={(event) => setName(event.target.value)}
           placeholder={i18n("admLocationName")}
           style={fieldStyle}
-          value={draft.name}
+          value={name}
         />
-        <input
-          aria-label={i18n("admLocationAddressOptional")}
-          className="min-w-0 flex-1 rounded-2xl px-4 py-3 text-sm outline-none"
-          maxLength={200}
-          onChange={(event) => setDraft({ ...draft, address: event.target.value })}
-          placeholder={i18n("admLocationAddressOptional")}
-          style={fieldStyle}
-          value={draft.address}
-        />
+
         <button
           className="rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
-          disabled={createMutation.isPending || draft.name.trim().length < 2}
+          disabled={createMutation.isPending || name.trim().length < 2}
           style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           type="submit"
         >
@@ -121,78 +115,35 @@ export function LocationSettings({ token }: { token: string }) {
             key={location.id}
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
           >
-            {editing?.id === location.id ? (
-              <div className="flex min-w-0 flex-1 flex-col gap-2 sm:flex-row">
-                <input
-                  aria-label={i18n("admLocationName")}
-                  autoFocus
-                  className="min-w-0 flex-1 rounded-xl px-3 py-2 text-sm outline-none"
-                  maxLength={80}
-                  onChange={(event) => setEditing({ ...editing, name: event.target.value })}
-                  style={{ ...fieldStyle, background: "var(--bg)" }}
-                  value={editing.name}
-                />
-                <input
-                  aria-label={i18n("admLocationAddressOptional")}
-                  className="min-w-0 flex-1 rounded-xl px-3 py-2 text-sm outline-none"
-                  maxLength={200}
-                  onChange={(event) => setEditing({ ...editing, address: event.target.value })}
-                  placeholder={i18n("admLocationAddressOptional")}
-                  style={{ ...fieldStyle, background: "var(--bg)" }}
-                  value={editing.address}
-                />
-              </div>
-            ) : (
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{location.name}</p>
-                {location.address ? <p className="mt-1 truncate text-xs" style={{ color: "var(--dim)" }}>{location.address}</p> : null}
-              </div>
-            )}
+            <Link href={editorHref(location.id)} className="min-w-0 flex-1">
+              <p className="truncate text-sm font-semibold" style={{ color: "var(--text)" }}>{location.name}</p>
+              <p className="mt-1 truncate text-xs" style={{ color: "var(--dim)" }}>
+                {[location.address, location.neighbourhood].filter(Boolean).join(" · ") || t("noAddress")}
+              </p>
+              {location.latitude == null ? (
+                <p className="mt-1 text-xs font-semibold" style={{ color: "var(--warning)" }}>{t("noPinShort")}</p>
+              ) : null}
+            </Link>
 
             <div className="flex gap-2">
-              {editing?.id === location.id ? (
-                <>
-                  <button
-                    className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
-                    disabled={updateMutation.isPending || editing.name.trim().length < 2}
-                    onClick={() => updateMutation.mutate(editing)}
-                    style={{ background: "var(--text)", color: "var(--bg)" }}
-                    type="button"
-                  >
-                    {i18n("saveefc007a")}
-                  </button>
-                  <button
-                    className="rounded-full px-4 py-2 text-xs font-semibold"
-                    onClick={() => setEditing(null)}
-                    style={{ background: "var(--border)", color: "var(--muted)" }}
-                    type="button"
-                  >
-                    {i18n("cancel77dfd21")}
-                  </button>
-                </>
-              ) : (
-                <>
-                  <button
-                    className="rounded-full px-4 py-2 text-xs font-semibold"
-                    onClick={() => setEditing({ id: location.id, name: location.name, address: location.address ?? "" })}
-                    style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                    type="button"
-                  >
-                    {i18n("admLocationEdit")}
-                  </button>
-                  <button
-                    className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
-                    disabled={archiveMutation.isPending}
-                    onClick={() => {
-                      if (window.confirm(i18n("admLocationArchiveConfirm", { name: location.name }))) archiveMutation.mutate(location);
-                    }}
-                    style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--danger)" }}
-                    type="button"
-                  >
-                    {i18n("admLocationArchive")}
-                  </button>
-                </>
-              )}
+              <Link
+                href={editorHref(location.id)}
+                className="rounded-full px-4 py-2 text-xs font-semibold"
+                style={{ background: "var(--border)", color: "var(--text-soft)" }}
+              >
+                {i18n("admLocationEdit")}
+              </Link>
+              <button
+                className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
+                disabled={archiveMutation.isPending}
+                onClick={() => {
+                  if (window.confirm(i18n("admLocationArchiveConfirm", { name: location.name }))) archiveMutation.mutate(location);
+                }}
+                style={{ background: "color-mix(in srgb, var(--danger) 12%, transparent)", color: "var(--danger)" }}
+                type="button"
+              >
+                {i18n("admLocationArchive")}
+              </button>
             </div>
           </div>
         ))}

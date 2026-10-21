@@ -21,6 +21,22 @@ describe("configuredMediaOrigins", () => {
     ).toBe("https://s3-milos.4kq.net");
   });
 
+  test("lets the app itself ask for the device position (Γύρω μου, location picker)", async () => {
+    const response = await proxy(new NextRequest("http://localhost/around"));
+    expect(response.headers.get("Permissions-Policy")).toContain("geolocation=(self)");
+  });
+
+  test("lets the app itself use the camera for the desk's QR scan, and nobody else", async () => {
+    const response = await proxy(new NextRequest("http://localhost/admin/check-in"));
+    const policy = response.headers.get("Permissions-Policy") ?? "";
+    expect(policy).toContain("camera=(self)");
+  });
+
+  test("lets the app itself use the microphone for voice logging (ADR-175), and nobody else", async () => {
+    const response = await proxy(new NextRequest("http://localhost/journal"));
+    expect(response.headers.get("Permissions-Policy")).toContain("microphone=(self)");
+  });
+
   test("rewrites tenant-prefixed RSC and prefetch requests too", () => {
     expect(config.matcher[0]).not.toHaveProperty("missing");
   });
@@ -57,5 +73,18 @@ describe("retired organization slugs (ADR-122)", () => {
 
     expect(response.status).toBe(200);
     expect(response.headers.get("x-middleware-rewrite")).toBe("https://gym.example/schedule");
+  });
+});
+
+describe("map origins", () => {
+  test("allow the map style's origin plus any extra tile origins", async () => {
+    const { configuredMapOrigins } = await import("@/lib/map-style");
+    expect(configuredMapOrigins({})).toBe("https://tiles.openfreemap.org");
+    expect(
+      configuredMapOrigins({
+        NEXT_PUBLIC_MAP_STYLE_URL: "https://maps.example.net/style.json",
+        NEXT_PUBLIC_MAP_ORIGINS: "https://tiles.example.net",
+      }),
+    ).toBe("https://maps.example.net https://tiles.example.net");
   });
 });

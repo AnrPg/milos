@@ -2,12 +2,12 @@ import type { PRTimelineEntry } from "@/api/content";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import type { PRUnit } from "@/api/gamification";
 
-export type PRTimelineMonth = { month: string; entries: PRTimelineEntry[] };
+export type PRTimelineMonth<T extends PRTimelineEntry = PRTimelineEntry> = { month: string; entries: T[] };
 
 /** Timeline entries grouped by `YYYY-MM`, newest month and newest entry first. */
-export function groupPRTimelineByMonth(entries: PRTimelineEntry[]): PRTimelineMonth[] {
+export function groupPRTimelineByMonth<T extends PRTimelineEntry>(entries: T[]): PRTimelineMonth<T>[] {
   const ordered = [...entries].sort((a, b) => b.beaten_on.localeCompare(a.beaten_on));
-  const months: PRTimelineMonth[] = [];
+  const months: PRTimelineMonth<T>[] = [];
   for (const entry of ordered) {
     const month = entry.beaten_on.slice(0, 7);
     const last = months[months.length - 1];

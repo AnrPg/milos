@@ -1,6 +1,5 @@
-
 import { AuthGuard } from "@/components/auth-guard";
-import { ScheduleConsole } from "@/components/schedule/ScheduleConsole";
+import { BoxSchedule } from "@/components/member-app/box/schedule/BoxSchedule";
 
 export const dynamic = "force-dynamic";
 
@@ -9,12 +8,10 @@ export default async function SchedulePage({
 }: {
   searchParams: Promise<Record<string, string>>;
 }) {
-  
   const params = await searchParams;
-  const initialOpenSlotId = params.open_slot ?? null;
   return (
     <AuthGuard roles={["member", "admin"]}>
-      <ScheduleConsole initialOpenSlotId={initialOpenSlotId} />
+      <BoxSchedule initialOpenSlotId={params.open_slot ?? null} />
     </AuthGuard>
   );
 }

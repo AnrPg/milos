@@ -75,6 +75,55 @@ defmodule MilosTraining.Application.FacilityTest do
     assert {:ok, _} = Facility.create_location(context, %{name: "Downtown East"})
   end
 
+  test "a location stores where it is and when it is open (ADR-141)", %{
+    context: context,
+    harbour: harbour
+  } do
+    assert {:ok, location} =
+             Facility.update_location(context, harbour.id, %{
+               "latitude" => 37.9969,
+               "longitude" => 23.7349,
+               "neighbourhood" => " Κυψέλη ",
+               "city" => "Αθήνα",
+               "country_code" => "gr",
+               "opening_hours" => [
+                 %{"weekday" => 6, "opens" => "09:00", "closes" => "13:00"},
+                 %{"weekday" => 1, "opens" => "07:00", "closes" => "22:00"}
+               ],
+               "accessibility" => ["step_free", "showers"]
+             })
+
+    assert %{
+             latitude: 37.9969,
+             longitude: 23.7349,
+             neighbourhood: "Κυψέλη",
+             country_code: "GR",
+             opening_hours: [%{"weekday" => 1}, %{"weekday" => 6}],
+             accessibility: ["step_free", "showers"]
+           } = location
+
+    assert {:error, %Ecto.Changeset{errors: errors}} =
+             Facility.update_location(context, harbour.id, %{
+               "latitude" => 37.9,
+               "longitude" => nil
+             })
+
+    assert Keyword.has_key?(errors, :latitude)
+
+    assert {:error, %Ecto.Changeset{errors: errors}} =
+             Facility.update_location(context, harbour.id, %{"accessibility" => ["moat"]})
+
+    assert Keyword.has_key?(errors, :accessibility)
+
+    %{rows: [[distance]]} =
+      Repo.query!(
+        "SELECT ST_Distance(milos_geo_point(latitude, longitude), milos_geo_point($1, $2)) FROM facility_locations WHERE id = $3",
+        [37.9838, 23.7275, Ecto.UUID.dump!(harbour.id)]
+      )
+
+    assert_in_delta distance, 1_590, 60
+  end
+
   test "classes at a location outside the package scope cannot be booked", %{
     admin: admin,
     downtown: downtown,

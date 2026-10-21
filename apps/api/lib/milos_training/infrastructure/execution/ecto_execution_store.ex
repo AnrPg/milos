@@ -235,7 +235,11 @@ defmodule MilosTraining.Infrastructure.Execution.EctoExecutionStore do
   def list_execution_items(user_id, bound, limit, scope) do
     WorkoutExecution
     |> where([e], not is_nil(e.completed_at_utc))
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope,
+      kind: "execution",
+      at: :completed_at_utc,
+      text_exists: :comments
+    )
     |> FeedBound.apply(:completed_at_utc, bound)
     |> order_by([e], desc: e.completed_at_utc, desc: e.id)
     |> limit(^limit)

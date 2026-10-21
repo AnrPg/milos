@@ -4,8 +4,12 @@ defmodule MilosTraining.Community.Post do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias MilosTraining.Community.Domain.PostMediaPolicy
+
   @audiences ~w(club_channel followers public)
-  @attachment_types ~w(training_log_entry workout_execution pr)
+  # Journal entries a member shares, and the card of a club event (ADR-153).
+  @shareable_attachment_types ~w(training_log_entry workout_execution pr)
+  @attachment_types @shareable_attachment_types ++ ["event"]
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -21,6 +25,9 @@ defmodule MilosTraining.Community.Post do
     field :attachment_id, :binary_id
     field :attachment, :map
     field :client_operation_id, :string
+    # ADR-157: the post's photos or video, in order, and whether it shows yet.
+    field :media, {:array, :map}, default: []
+    field :media_status, :string, default: "ready"
     field :pinned_at, :utc_datetime_usec
     field :hidden_at, :utc_datetime_usec
     field :hidden_by_id, :binary_id
@@ -41,6 +48,8 @@ defmodule MilosTraining.Community.Post do
       :attachment_type,
       :attachment_id,
       :attachment,
+      :media,
+      :media_status,
       :client_operation_id,
       :pinned_at
     ])
@@ -50,6 +59,8 @@ defmodule MilosTraining.Community.Post do
     |> validate_inclusion(:attachment_type, @attachment_types)
     |> validate_length(:body, max: 5_000)
     |> validate_length(:client_operation_id, max: 120)
+    |> validate_length(:media, max: PostMediaPolicy.max_images())
+    |> validate_inclusion(:media_status, PostMediaPolicy.statuses())
     |> validate_content()
     |> check_constraint(:body, name: :community_posts_content_check)
     |> check_constraint(:attachment_type, name: :community_posts_attachment_check)
@@ -60,6 +71,16 @@ defmodule MilosTraining.Community.Post do
     do: cast(post, attrs, [:hidden_at, :hidden_by_id, :deleted_at, :pinned_at])
 
   def attachment_types, do: @attachment_types
+  def shareable_attachment_types, do: @shareable_attachment_types
+
+  @doc "ADR-157: the post's media snapshot and status."
+  def media_changeset(post, attrs) do
+    post
+    |> cast(attrs, [:media, :media_status])
+    |> validate_required([:media_status])
+    |> validate_length(:media, max: PostMediaPolicy.max_images())
+    |> validate_inclusion(:media_status, PostMediaPolicy.statuses())
+  end
 
   defp trim(nil), do: nil
 
@@ -71,8 +92,9 @@ defmodule MilosTraining.Community.Post do
   end
 
   defp validate_content(changeset) do
-    if is_nil(get_field(changeset, :body)) and is_nil(get_field(changeset, :attachment_type)),
-      do: add_error(changeset, :body, "can't be blank"),
-      else: changeset
+    if is_nil(get_field(changeset, :body)) and is_nil(get_field(changeset, :attachment_type)) and
+         get_field(changeset, :media) in [nil, []],
+       do: add_error(changeset, :body, "can't be blank"),
+       else: changeset
   end
 end

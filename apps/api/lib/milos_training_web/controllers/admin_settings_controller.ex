@@ -104,15 +104,41 @@ defmodule MilosTrainingWeb.AdminSettingsController do
     required: [:default_capacity, :default_auto_approve, :default_booking_timeout_minutes]
   }
 
+  @provider_settings_schema %Schema{
+    type: :object,
+    description:
+      "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
+    properties: %{
+      kind: %Schema{type: :string, enum: ["gym", "coach"]},
+      editable: %Schema{type: :boolean}
+    },
+    required: [:kind, :editable]
+  }
+
+  @wod_goals_visible_by_default_schema %Schema{
+    type: :boolean,
+    description:
+      "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own"
+  }
+
+  @workout_settings_schema %Schema{
+    type: :object,
+    description: "ADR-163: workout-authoring defaults",
+    properties: %{wod_goals_visible_by_default: @wod_goals_visible_by_default_schema},
+    required: [:wod_goals_visible_by_default]
+  }
+
   @admin_settings_response_schema %Schema{
     type: :object,
     properties: %{
       gamification: @gamification_settings_schema,
       finance: @finance_settings_schema,
       notifications: @notification_push_settings_schema,
-      scheduling: @scheduling_settings_schema
+      scheduling: @scheduling_settings_schema,
+      workouts: @workout_settings_schema,
+      provider: @provider_settings_schema
     },
-    required: [:gamification, :finance, :notifications, :scheduling]
+    required: [:gamification, :finance, :notifications, :scheduling, :workouts, :provider]
   }
 
   @admin_settings_update_schema %Schema{
@@ -182,6 +208,16 @@ defmodule MilosTrainingWeb.AdminSettingsController do
             description: "Withdrawals closer to the class than this use the visit"
           }
         },
+        required: []
+      },
+      workouts: %Schema{
+        type: :object,
+        properties: %{wod_goals_visible_by_default: @wod_goals_visible_by_default_schema},
+        required: []
+      },
+      provider: %Schema{
+        type: :object,
+        properties: %{kind: %Schema{type: :string, enum: ["gym", "coach"]}},
         required: []
       }
     },

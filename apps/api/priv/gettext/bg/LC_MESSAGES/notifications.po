@@ -252,3 +252,336 @@ msgstr "Достъпът ви изтече. Подновете абонамен�
 
 msgid "Your upcoming bookings were cancelled: %{count}."
 msgstr "Предстоящите ви записвания бяха отменени: %{count}."
+
+msgid "Follow request"
+msgstr "Заявка за следване"
+
+msgid "%{nickname} wants to follow you."
+msgstr "%{nickname} иска да те следва."
+
+msgid "Follow request accepted"
+msgstr "Заявката за следване е приета"
+
+msgid "You now follow %{nickname}."
+msgstr "Вече следваш %{nickname}."
+
+msgid "Trial request"
+msgstr "Заявка за пробна тренировка"
+
+msgid "%{nickname} asks to try %{class} (%{when})."
+msgstr "%{nickname} иска да пробва %{class} (%{when})."
+
+msgid "New trial"
+msgstr "Нова пробна тренировка"
+
+msgid "%{nickname} booked a trial in %{class} (%{when})."
+msgstr "%{nickname} запази пробна тренировка в %{class} (%{when})."
+
+msgid "Trial cancelled"
+msgstr "Пробната тренировка е отменена"
+
+msgid "%{nickname} cancelled their trial in %{class}."
+msgstr "%{nickname} отмени пробната тренировка в %{class}."
+
+msgid "Your trial is booked"
+msgstr "Пробната ти тренировка е запазена"
+
+msgid "%{box}: %{class} (%{when})."
+msgstr "%{box}: %{class} (%{when})."
+
+msgid "Trial not accepted"
+msgstr "Пробната тренировка не е приета"
+
+msgid "%{box} couldn't take you in %{class}."
+msgstr "%{box} не може да те приеме в %{class}."
+
+msgid "Your trial is soon"
+msgstr "Пробната ти тренировка наближава"
+
+msgid "%{class} at %{box} (%{when})."
+msgstr "%{class} в %{box} (%{when})."
+
+msgid "How was your trial?"
+msgstr "Как мина пробната тренировка?"
+
+msgid "Want to keep training at %{box}? Send them a message."
+msgstr "Искаш ли да продължиш в %{box}? Пиши им."
+
+msgid "Trial class cancelled"
+msgstr "Тренировката е отменена"
+
+msgid "%{box} cancelled %{class} (%{when}). Pick another class."
+msgstr "%{box} отмени %{class} (%{when}). Избери друга тренировка."
+
+msgid "New group to review"
+msgstr "Нова група за одобрение"
+
+msgid "%{nickname} wants to start «%{group}»."
+msgstr "%{nickname} иска да създаде «%{group}»."
+
+msgid "Your group is live"
+msgstr "Групата ти е активна"
+
+msgid "«%{group}» is open. Invite people in."
+msgstr "«%{group}» е отворена. Покани хора."
+
+msgid "Group not approved"
+msgstr "Групата не е одобрена"
+
+msgid "The box didn't approve «%{group}»."
+msgstr "Боксът не одобри «%{group}»."
+
+msgid "Request to join"
+msgstr "Заявка за присъединяване"
+
+msgid "%{nickname} asks to join «%{group}»."
+msgstr "%{nickname} иска да се присъедини към «%{group}»."
+
+msgid "You're in"
+msgstr "Вътре си"
+
+msgid "You joined «%{group}»."
+msgstr "Присъедини се към «%{group}»."
+
+msgid "Your group is quiet"
+msgstr "Групата ти е тиха"
+
+msgid "Nobody has posted in «%{group}» for a while. Post something or it will be archived."
+msgstr "Никой не е писал в «%{group}» от известно време. Напиши нещо, иначе ще бъде архивирана."
+
+msgid "New report"
+msgstr "Нов сигнал"
+
+msgid "Someone reported something in the club."
+msgstr "Някой подаде сигнал за нещо в клуба."
+
+msgid "A place opened up"
+msgstr "Освободи се място"
+
+msgid "You're going to «%{event}» (%{when})."
+msgstr "Идваш на «%{event}» (%{when})."
+
+msgid "Event cancelled"
+msgstr "Събитието е отменено"
+
+msgid "«%{event}» (%{when}) was cancelled."
+msgstr "«%{event}» (%{when}) е отменено."
+
+msgid "«%{event}» (%{when}) was cancelled: %{reason}"
+msgstr "«%{event}» (%{when}) е отменено: %{reason}"
+
+msgid "Event changed"
+msgstr "Събитието е променено"
+
+msgid "«%{event}» moved to %{when}."
+msgstr "«%{event}» е преместено за %{when}."
+
+msgid "«%{event}» has a new place."
+msgstr "«%{event}» има ново място."
+
+msgid "«%{event}» has a new time and place: %{when}."
+msgstr "«%{event}» има нов час и място: %{when}."
+
+msgid "Starting soon"
+msgstr "Започва скоро"
+
+msgid "«%{event}» starts in two hours (%{when})."
+msgstr "«%{event}» започва след два часа (%{when})."
+
+msgid "Your guest is coming"
+msgstr "Гостът ти идва"
+
+msgid "%{nickname} is coming to «%{event}» with your guest pass."
+msgstr "%{nickname} идва на «%{event}» с твоята гост покана."
+
+msgid "Try a class"
+msgstr "Пробвай тренировка"
+
+msgid "Liked «%{event}»? %{box} invites you to a trial class."
+msgstr "Хареса ли ти «%{event}»? %{box} те кани на пробна тренировка."
+
+msgid "Message about «%{event}»"
+msgstr "Съобщение за «%{event}»"
+
+msgid "Your invite"
+msgstr "Твоята покана"
+
+msgid "%{nickname} signed up with your invite."
+msgstr "%{nickname} се регистрира с твоята покана."
+
+msgid "%{nickname} came to the event you invited them to."
+msgstr "%{nickname} дойде на събитието, на което го покани."
+
+msgid "%{nickname} came to a trial."
+msgstr "%{nickname} дойде на пробна тренировка."
+
+msgid "%{nickname} subscribed."
+msgstr "%{nickname} се абонира."
+
+msgid "%{nickname} joined the box."
+msgstr "%{nickname} се присъедини към залата."
+
+msgid "Referral reward"
+msgstr "Награда за препоръка"
+
+msgid "Your referral reward was given."
+msgstr "Наградата ти за препоръка е дадена."
+
+msgid "Your referral was not approved."
+msgstr "Препоръката ти не беше одобрена."
+
+msgid "Your referral reward was approved."
+msgstr "Наградата ти за препоръка е одобрена."
+
+msgid "Referral to approve"
+msgstr "Препоръка за одобрение"
+
+msgid "%{nickname} subscribed, invited by %{referrer}."
+msgstr "%{nickname} се абонира по покана на %{referrer}."
+
+msgid "New near you"
+msgstr "Ново близо до теб"
+
+msgid "New for «%{name}»: %{count}"
+msgstr "Ново за «%{name}»: %{count}"
+
+msgid "Visitor at the door"
+msgstr "Посетител на входа"
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet."
+msgstr "%{nickname} сканира кода на входа в %{box} (%{when}) - все още не е член."
+
+msgid "%{nickname} scanned the door at %{box} (%{when}) - not a member yet. Trials are open."
+msgstr "%{nickname} сканира кода на входа в %{box} (%{when}) - все още не е член. Пробните тренировки са отворени."
+
+msgid "Time for a new measurement"
+msgstr "Време е за ново измерване"
+
+msgid "A new snapshot helps you see your trend. It takes a minute."
+msgstr "Нов запис ти помага да видиш тенденцията си. Отнема минута."
+
+msgid "A buddy invitation"
+msgstr "Покана за бъди"
+
+msgid "%{nickname} asks you to be their support buddy."
+msgstr "%{nickname} те моли да бъдеш негов/неин бъди за подкрепа."
+
+msgid "You have a support buddy"
+msgstr "Имаш бъди за подкрепа"
+
+msgid "%{nickname} accepted. They hear from you only when you ask."
+msgstr "%{nickname} прие. Ще научава за теб само когато поискаш."
+
+msgid "%{nickname} is having a hard moment"
+msgstr "%{nickname} преминава през труден момент"
+
+msgid "I'm here · Shall we go for a walk? · Call me"
+msgstr "Тук съм · Да се разходим? · Обади ми се"
+
+msgid "%{nickname}: Shall we go for a walk?"
+msgstr "%{nickname}: Да се разходим?"
+
+msgid "%{nickname}: Call me"
+msgstr "%{nickname}: Обади ми се"
+
+msgid "%{nickname}: I'm here"
+msgstr "%{nickname}: Тук съм"
+
+msgid "%{nickname} replied"
+msgstr "%{nickname} отговори"
+
+msgid "No one has replied yet"
+msgstr "Още никой не е отговорил"
+
+msgid "Until then, something small: two minutes of breathing, a glass of water, a short walk."
+msgstr "Дотогава нещо малко: две минути дишане, чаша вода, кратка разходка."
+
+msgid "%{nickname}'s week"
+msgstr "Седмицата на %{nickname}"
+
+msgid "%{moments} hard moments, %{overcome} overcome, %{requests} requests for support."
+msgstr "Трудни моменти: %{moments}, преодолени: %{overcome}, молби за подкрепа: %{requests}."
+
+msgid "I'm here"
+msgstr "Тук съм"
+
+msgid "Shall we go for a walk?"
+msgstr "Да се разходим?"
+
+msgid "Call me"
+msgstr "Обади ми се"
+
+msgid "How did it go?"
+msgstr "Как мина?"
+
+msgid "A quick note on earlier helps you see what works for you."
+msgstr "Кратка бележка за по-рано ти помага да видиш какво работи за теб."
+
+msgid "A glass of water?"
+msgstr "Чаша вода?"
+
+msgid "The afternoon is a good moment to catch up on water."
+msgstr "Следобедът е добър момент да наваксаш с водата."
+
+msgid "Buddy message"
+msgstr "Съобщение от бъди"
+
+msgid "%{nickname}: weekly wellness"
+msgstr "%{nickname}: седмично благосъстояние"
+
+msgid "%{sleep} nights at the sleep goal, %{water} days on water, %{meals} days with meals logged."
+msgstr "%{sleep} нощи с цел за сън, %{water} дни с вода, %{meals} дни със записани хранения."
+
+msgid "Garmin stopped syncing"
+msgstr "Garmin спря да се синхронизира"
+
+msgid "Reconnect it from Connected devices to bring your workouts in again."
+msgstr "Свържи го отново от Свързани устройства, за да идват пак тренировките ти."
+
+msgid "Your journal export is ready"
+msgstr "Експортът на дневника ти е готов"
+
+msgid "Download it within seven days from Settings."
+msgstr "Изтегли го до седем дни от Настройки."
+
+msgid "Season request"
+msgstr "Заявка за сезон"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} иска място в %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} е в листата на чакащите за %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Мястото ти е потвърдено"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} започва на %{date}. Програмата е в твоя Box."
+
+msgid "Season request not confirmed"
+msgstr "Заявката за сезон не е потвърдена"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} не можа да потвърди мястото ти в %{season}."
+
+msgid "Season cancelled"
+msgstr "Сезонът е отменен"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} отмени %{season}."
+
+msgid "You found a training partner"
+msgstr "Намерихте партньор за тренировки"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Вие и %{nickname} искате да тренирате заедно. Кажете здравей."
+
+msgid "Training partner message"
+msgstr "Съобщение от партньор за тренировки"
+
+msgid "Squad invitation"
+msgstr "Покана за скуад"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} те покани в скуада «%{group}»."

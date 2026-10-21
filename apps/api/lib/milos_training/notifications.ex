@@ -2,14 +2,19 @@ defmodule MilosTraining.Notifications do
   require Logger
 
   alias MilosTraining.{Identity, Organizations}
+  alias MilosTraining.Notifications.Commands.DeleteNativePushToken
   alias MilosTraining.Notifications.Commands.DeletePushSubscription
   alias MilosTraining.Notifications.Commands.DispatchNotification
   alias MilosTraining.Notifications.Commands.EnqueueNotificationEvent
   alias MilosTraining.Notifications.Commands.MarkAllRead
   alias MilosTraining.Notifications.Commands.MarkNotificationRead
+  alias MilosTraining.Notifications.Commands.SaveNativePushToken
   alias MilosTraining.Notifications.Commands.SavePushSubscription
   alias MilosTraining.Notifications.Domain.NotificationDedupe
+  alias MilosTraining.Notifications.NativePush
+  alias MilosTraining.Notifications.NativePushTokenStore
   alias MilosTraining.Notifications.PushConfig
+  alias MilosTraining.Notifications.Queries.ListNativePushTokens
   alias MilosTraining.Notifications.Queries.GetUnreadCount
   alias MilosTraining.Notifications.Queries.ListInboxPage
   alias MilosTraining.Notifications.Queries.GetPushSubscriptionStatus
@@ -17,6 +22,23 @@ defmodule MilosTraining.Notifications do
   alias MilosTraining.Notifications.NotificationStore
   alias MilosTraining.Notifications.PushSubscriptionStore
   alias MilosTraining.Notifications.Queries.ListNotifications
+
+  @community_types ~w(
+    community_group_proposed community_group_approved community_group_declined
+    community_group_join_requested community_group_join_approved community_group_archive_warning
+    community_report_created community_club_join_requested community_club_join_approved
+    community_squad_invited
+  )
+
+  @event_types ~w(
+    community_event_waitlist_promoted community_event_cancelled community_event_changed
+    community_event_reminder community_event_guest_joined community_event_trial_offer
+    community_event_message
+  )
+
+  @referral_types ~w(referral_progress referral_reward referral_review)
+
+  @season_types ~w(season_requested season_confirmed season_declined season_cancelled)
 
   def create_notification(params), do: create_and_broadcast_notification(params)
 
@@ -74,8 +96,69 @@ defmodule MilosTraining.Notifications do
   def push_config do
     %{
       enabled: PushConfig.enabled?(),
-      vapid_public_key: PushConfig.public_key()
+      vapid_public_key: PushConfig.public_key(),
+      native_providers: NativePush.configured_providers()
     }
+  end
+
+  # ADR-171: push to the store apps (FCM on Android, APNs on iOS).
+
+  @doc """
+  Registers a store app install's push token for the person. Answers
+  `{:error, :native_push_not_configured}` while the provider has no
+  credentials, so nothing is stored that could not be used.
+  """
+  def register_native_push_token(user_id, attrs) when is_map(attrs) do
+    provider = attr(attrs, :provider)
+
+    if NativePush.configured?(provider) do
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        SaveNativePushToken.call(%{
+          user_id: user_id,
+          provider: provider,
+          platform: attr(attrs, :platform),
+          token: attr(attrs, :token),
+          app_id: attr(attrs, :app_id),
+          app_version: attr(attrs, :app_version),
+          apns_environment:
+            if(provider == "apns", do: attr(attrs, :apns_environment) || "production"),
+          last_registered_at: DateTime.utc_now()
+        })
+      end)
+    else
+      {:error, :native_push_not_configured}
+    end
+  end
+
+  def list_native_push_tokens(user_id),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        ListNativePushTokens.call(user_id)
+      end)
+
+  def get_native_push_token(user_id, id),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        ListNativePushTokens.get(user_id, id)
+      end)
+
+  def delete_native_push_token(user_id, token) when is_binary(token),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        DeleteNativePushToken.call(user_id, token)
+      end)
+
+  def delete_native_push_token_by_id(user_id, id),
+    do:
+      NativePushTokenStore.with_user_context(%{user_id: user_id}, fn ->
+        DeleteNativePushToken.by_id(user_id, id)
+      end)
+
+  defp attr(attrs, key) do
+    case Map.get(attrs, key) || Map.get(attrs, Atom.to_string(key)) do
+      value when is_binary(value) -> String.trim(value)
+      _other -> nil
+    end
   end
 
   def get_push_settings, do: NotificationStore.get_push_settings()
@@ -144,6 +227,310 @@ defmodule MilosTraining.Notifications do
 
   def process_event("box_message", payload), do: enqueue_message_to_member(:box_message, payload)
   def process_event("challenge_completed", payload), do: enqueue_challenge_completed(payload)
+
+  # ADR-142: follows of people.
+  def process_event("follow_requested", payload),
+    do:
+      enqueue_simple(:follow_requested, payload, %{
+        follow_id: field(payload, :follow_id),
+        follower_id: field(payload, :follower_id),
+        follower_nickname: field(payload, :follower_nickname),
+        dedupe_key: "follow_requested:#{field(payload, :follow_id)}",
+        url: "/me/follow-requests"
+      })
+
+  def process_event("follow_accepted", payload),
+    do:
+      enqueue_simple(:follow_accepted, payload, %{
+        follow_id: field(payload, :follow_id),
+        person_id: field(payload, :person_id),
+        person_nickname: field(payload, :person_nickname),
+        dedupe_key: "follow_accepted:#{field(payload, :follow_id)}",
+        url: "/people/#{field(payload, :person_id)}"
+      })
+
+  # ADR-144: trials. Staff hear about new and cancelled trials; the person
+  # hears the box's answer, a reminder before the class and a follow-up after.
+  def process_event(type, payload)
+      when type in ~w(trial_requested trial_booked trial_cancelled) do
+    organization_id = field(payload, :organization_id)
+
+    organization_id
+    |> Organizations.list_staff_user_ids()
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case enqueue_simple(
+             String.to_existing_atom(type),
+             %{user_id: staff_id},
+             trial_payload(type, payload, "staff:#{staff_id}", "/admin/trials")
+           ) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
+  def process_event(type, payload)
+      when type in ~w(trial_accepted trial_declined trial_reminder trial_follow_up trial_class_cancelled),
+      do:
+        enqueue_simple(
+          String.to_existing_atom(type),
+          payload,
+          trial_payload(type, payload, "person", "/trials/#{field(payload, :trial_id)}")
+        )
+
+  # ADR-143: member groups, open clubs and reports. Each event names its one
+  # recipient; the use case fans out to staff or a group's admins.
+  def process_event(type, payload) when type in @community_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        community_payload(type, payload)
+      )
+
+  # ADR-153: club events. Each event names its one recipient; the use case
+  # fans out to the people going.
+  def process_event(type, payload) when type in @event_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        event_payload(type, payload)
+      )
+
+  # ADR-156: invites. The inviter hears each friend's step and their reward;
+  # the box's owners and admins hear a referral waiting for approval.
+  def process_event(type, payload) when type in @referral_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        referral_payload(type, payload)
+      )
+
+  # ADR-167: seasons. Each event names its one recipient; the use case fans a
+  # request out to the staff who confirm places and the season's coaches.
+  def process_event(type, payload) when type in @season_types,
+    do:
+      enqueue_simple(
+        String.to_existing_atom(type),
+        payload,
+        season_payload(type, payload)
+      )
+
+  # ADR-154: a saved Γύρω μου filter found something new (at most daily).
+  def process_event("around_new_matches", payload),
+    do:
+      enqueue_simple(:around_new_matches, payload, %{
+        filter_id: field(payload, :filter_id),
+        filter_name: field(payload, :filter_name),
+        count: field(payload, :count),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/around?filter=#{field(payload, :filter_id)}"
+      })
+
+  # ADR-158: the opt-in reminder to take a new body measurement.
+  def process_event("body_measure_reminder", payload),
+    do:
+      enqueue_simple(:body_measure_reminder, payload, %{
+        weeks: field(payload, :weeks),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/journal/body/new"
+      })
+
+  # ADR-160: Buddy για στήριξη. Leaving or declining sends nothing.
+  def process_event("buddy_invite", payload),
+    do:
+      enqueue_simple(:buddy_invite, payload, %{
+        link_id: field(payload, :link_id),
+        inviter_id: field(payload, :inviter_id),
+        nickname: field(payload, :inviter_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies"
+      })
+
+  def process_event("buddy_accepted", payload),
+    do:
+      enqueue_simple(:buddy_accepted, payload, %{
+        link_id: field(payload, :link_id),
+        buddy_id: field(payload, :buddy_id),
+        nickname: field(payload, :buddy_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies"
+      })
+
+  # Inside the buddy's quiet hours it lands in the inbox without a push.
+  def process_event("support_request", payload),
+    do:
+      enqueue_simple(:support_request, payload, %{
+        request_id: field(payload, :request_id),
+        sender_id: field(payload, :sender_id),
+        nickname: field(payload, :sender_nickname),
+        message: field(payload, :message),
+        quick_replies: field(payload, :quick_replies) || [],
+        silent: field(payload, :silent) == true,
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  def process_event("support_reply", payload),
+    do:
+      enqueue_simple(:support_reply, payload, %{
+        request_id: field(payload, :request_id),
+        reply_id: field(payload, :reply_id),
+        buddy_id: field(payload, :buddy_id),
+        nickname: field(payload, :buddy_nickname),
+        kind: field(payload, :kind),
+        text: field(payload, :text),
+        link_id: field(payload, :link_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  # ADR-160 §2: a message in the pair's buddy conversation. The push names
+  # who wrote, never what.
+  def process_event("buddy_message", payload),
+    do:
+      enqueue_simple(:buddy_message, payload, %{
+        link_id: field(payload, :link_id),
+        message_id: field(payload, :message_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies/#{field(payload, :link_id)}/messages"
+      })
+
+  # ADR-169: a mutual like in a club; a message in the pair's conversation
+  # (the push names who wrote, never what).
+  def process_event("partner_match", payload),
+    do:
+      enqueue_simple(:partner_match, payload, %{
+        match_id: field(payload, :match_id),
+        club_id: field(payload, :club_id),
+        club_name: field(payload, :club_name),
+        nickname: field(payload, :partner_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/#{field(payload, :match_id)}"
+      })
+
+  def process_event("partner_message", payload),
+    do:
+      enqueue_simple(:partner_message, payload, %{
+        match_id: field(payload, :match_id),
+        message_id: field(payload, :message_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/#{field(payload, :match_id)}"
+      })
+
+  # ADR-160 §4: the coach's Sunday wellness summary of a client who shares
+  # it. Counts only; the craving moments stay on the client page.
+  def process_event("coach_wellness_summary", payload),
+    do:
+      enqueue_simple(:coach_wellness_summary, payload, %{
+        organization_id: field(payload, :organization_id),
+        client_user_id: field(payload, :client_user_id),
+        client_nickname: field(payload, :client_nickname),
+        week_start: field(payload, :week_start),
+        week_end: field(payload, :week_end),
+        sleep_nights: field(payload, :sleep_nights),
+        water_days: field(payload, :water_days),
+        meal_days: field(payload, :meal_days),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/admin/users/#{field(payload, :client_user_id)}"
+      })
+
+  def process_event("support_no_reply_nudge", payload),
+    do:
+      enqueue_simple(:support_no_reply_nudge, payload, %{
+        request_id: field(payload, :request_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/support-requests/#{field(payload, :request_id)}"
+      })
+
+  # Counts only, never times, causes or foods.
+  def process_event("buddy_weekly_summary", payload),
+    do:
+      enqueue_simple(:buddy_weekly_summary, payload, %{
+        member_id: field(payload, :member_id),
+        nickname: field(payload, :member_nickname),
+        week_start: field(payload, :week_start),
+        week_end: field(payload, :week_end),
+        hard_moments: field(payload, :hard_moments),
+        overcome: field(payload, :overcome),
+        support_requests: field(payload, :support_requests),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/buddies"
+      })
+
+  # ADR-159 (board 14, Q6): «Πώς πήγε;» once for a craving left open. The
+  # push never names the craving; the page does, once unlocked.
+  def process_event("craving_follow_up", payload),
+    do:
+      enqueue_simple(:craving_follow_up, payload, %{
+        craving_id: field(payload, :craving_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/journal/wellbeing?craving=#{field(payload, :craving_id)}"
+      })
+
+  # ADR-162 (board 17 extra): the whole-journal export is ready to download.
+  def process_event("journal_export_ready", payload),
+    do:
+      enqueue_simple(:journal_export_ready, payload, %{
+        export_id: field(payload, :export_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/settings/export"
+      })
+
+  # ADR-161 (board 16, Q6): a device stopped syncing; once per spell.
+  def process_event("device_sync_error", payload),
+    do:
+      enqueue_simple(:device_sync_error, payload, %{
+        provider: field(payload, :provider),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/devices"
+      })
+
+  # ADR-159 (board 14, Q2): the opt-in afternoon water reminder.
+  def process_event("water_reminder", payload),
+    do:
+      enqueue_simple(:water_reminder, payload, %{
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/journal/wellbeing"
+      })
+
+  # ADR-155 (board 10, Q3): a person who is not a member scanned the door.
+  # Staff who check people in hear about it, so the desk can follow up and
+  # sell a walk-in or a trial; the caller keeps it to once an hour per
+  # person and box, and the dedupe key holds that per staff member too.
+  def process_event("check_in_visitor", payload) do
+    organization_id = field(payload, :organization_id)
+    visitor_id = field(payload, :visitor_id)
+
+    organization_id
+    |> Organizations.list_user_ids_with_capability(:check_in)
+    |> Enum.reduce_while(:ok, fn staff_id, :ok ->
+      case enqueue_simple(:check_in_visitor, %{user_id: staff_id}, %{
+             organization_id: organization_id,
+             scan_id: field(payload, :scan_id),
+             visitor_id: visitor_id,
+             person_nickname: field(payload, :person_nickname),
+             box_name: field(payload, :box_name),
+             location_name: field(payload, :location_name),
+             scanned_at: field(payload, :scanned_at),
+             scanned_when: field(payload, :scanned_when),
+             trial_available: field(payload, :trial_available) in [true, "true"],
+             dedupe_key:
+               "check_in_visitor:#{organization_id}:#{visitor_id}:#{field(payload, :hour)}:#{staff_id}",
+             url: field(payload, :url) || "/admin/check-in"
+           }) do
+        :ok -> {:cont, :ok}
+        error -> {:halt, error}
+      end
+    end)
+  end
+
   def process_event("workout_rejected", payload), do: enqueue_workout_rejected(payload)
   def process_event("athlete_message_sent", payload), do: enqueue_athlete_message(payload)
   def process_event("chat_message", payload), do: enqueue_chat_message(payload)
@@ -637,6 +1024,147 @@ defmodule MilosTraining.Notifications do
 
         error
     end
+  end
+
+  defp trial_payload(type, payload, audience, default_url) do
+    trial_id = field(payload, :trial_id)
+
+    %{
+      organization_id: field(payload, :organization_id),
+      trial_id: trial_id,
+      person_nickname: field(payload, :person_nickname),
+      box_name: field(payload, :box_name),
+      class_name: field(payload, :class_name),
+      class_starts_at: field(payload, :class_starts_at),
+      class_when: field(payload, :class_when),
+      decline_reason: field(payload, :decline_reason),
+      dedupe_key: "#{type}:#{trial_id}:#{audience}",
+      url: field(payload, :url) || default_url
+    }
+  end
+
+  defp community_payload(type, payload) do
+    club_id = field(payload, :club_id)
+    group_id = field(payload, :group_id)
+
+    {dedupe, url} =
+      case type do
+        "community_group_proposed" ->
+          {group_id, "/admin/community"}
+
+        "community_group_declined" ->
+          {group_id, "/clubs/#{club_id}"}
+
+        "community_group_join_requested" ->
+          {"#{group_id}:#{field(payload, :person_id)}", "/clubs/#{club_id}/groups/#{group_id}"}
+
+        "community_group_archive_warning" ->
+          {"#{group_id}:#{field(payload, :warned_on)}", "/clubs/#{club_id}/groups/#{group_id}"}
+
+        "community_report_created" ->
+          {"#{field(payload, :target_type)}:#{field(payload, :target_id)}",
+           "/admin/community?tab=reports"}
+
+        "community_club_join_requested" ->
+          {"#{club_id}:#{field(payload, :person_id)}", "/admin/community?tab=clubs"}
+
+        "community_club_join_approved" ->
+          {club_id, "/clubs/#{club_id}"}
+
+        "community_squad_invited" ->
+          {"#{group_id}:#{field(payload, :user_id)}", "/clubs/#{club_id}/squads/#{group_id}"}
+
+        _group_answer ->
+          {group_id, "/clubs/#{club_id}/groups/#{group_id}"}
+      end
+
+    %{
+      organization_id: field(payload, :organization_id),
+      club_id: club_id,
+      club_name: field(payload, :club_name),
+      group_id: group_id,
+      group_name: field(payload, :group_name),
+      person_nickname: field(payload, :person_nickname),
+      target_type: field(payload, :target_type),
+      reason: field(payload, :reason),
+      dedupe_key: "#{type}:#{dedupe}",
+      url: url
+    }
+  end
+
+  defp season_payload(type, payload) do
+    season_id = field(payload, :season_id)
+
+    url =
+      if type == "season_requested",
+        do: "/admin/finance?tab=seasons&season=#{season_id}",
+        else: "/box?season=#{season_id}"
+
+    %{
+      organization_id: field(payload, :organization_id),
+      season_id: season_id,
+      season_title: field(payload, :season_title),
+      starts_on: field(payload, :starts_on),
+      person_nickname: field(payload, :person_nickname),
+      box_name: field(payload, :box_name),
+      enrollment_status: field(payload, :enrollment_status),
+      reason: field(payload, :reason),
+      dedupe_key: "#{type}:#{season_id}:#{field(payload, :enrollment_id)}:#{field(payload, :at)}",
+      url: url
+    }
+  end
+
+  defp event_payload(type, payload) do
+    event_id = field(payload, :event_id)
+
+    %{
+      organization_id: field(payload, :organization_id),
+      club_id: field(payload, :club_id),
+      event_id: event_id,
+      event_title: field(payload, :event_title),
+      event_starts_at: field(payload, :event_starts_at),
+      event_when: field(payload, :event_when),
+      changes: field(payload, :changes),
+      reason: field(payload, :reason),
+      person_nickname: field(payload, :person_nickname),
+      box_name: field(payload, :box_name),
+      message: field(payload, :message),
+      dedupe_key: "#{type}:#{event_id}:#{field(payload, :dedupe)}",
+      url: field(payload, :url) || "/events/#{event_id}"
+    }
+  end
+
+  # ADR-156: the member's notices open «Φέρε φίλο» › «Οι προσκλήσεις σου»
+  # at that box (board 11 Q2 B); staff's open the Finance › Συστάσεις queue.
+  defp referral_payload(type, payload) do
+    attribution_id = field(payload, :attribution_id)
+    box = field(payload, :box) || %{}
+    box_slug = field(box, :box_slug)
+
+    mine =
+      if box_slug,
+        do: "/me/referrals?tab=invites&box=#{URI.encode_www_form(box_slug)}",
+        else: "/me/referrals?tab=invites"
+
+    {dedupe, url} =
+      case type do
+        "referral_progress" -> {"#{attribution_id}:#{field(payload, :stage)}", mine}
+        "referral_reward" -> {"#{attribution_id}:#{field(payload, :reward_status)}", mine}
+        "referral_review" -> {attribution_id, "/admin/finance?tab=referrals"}
+      end
+
+    %{
+      organization_id: field(payload, :organization_id),
+      attribution_id: attribution_id,
+      stage: field(payload, :stage),
+      reward_status: field(payload, :reward_status),
+      person_nickname: field(payload, :person_nickname),
+      referrer_nickname: field(payload, :referrer_nickname),
+      box_name: field(box, :box_name),
+      box_slug: box_slug,
+      dedupe_key: "#{type}:#{dedupe}",
+      url: field(payload, :url) || url
+    }
   end
 
   # ADR-097 notifications with a fixed payload shape.

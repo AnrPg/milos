@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.AdminWorkoutController => [:manage_workouts],
     W.AdminWorkoutDslController => [:manage_workouts],
     W.AdminWorkoutFolderController => [:manage_workouts],
+    W.AdminWorkoutGoalsController => [:manage_workouts],
     W.AdminChallengeController => [:manage_challenges],
     W.AdminAssignedWorkoutController => [:manage_coaching],
     W.AdminContentController => [:manage_content],
@@ -34,9 +35,16 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.OwnerOrganizationController => [:manage_organization_lifecycle],
     W.AdminWorkoutTimerPreviewController => [:manage_workouts],
     W.AdminBrandingController => [:manage_settings],
+    W.AdminPublicProfileController => [:manage_settings],
+    W.HomeLocationController => [:manage_memberships],
     W.AdminWorkoutFreeTextController => [:manage_workouts],
     W.AdminOnboardingController => [:manage_settings],
-    W.TrainingHistoryController => [:view_client_training]
+    # ADR-170: the platform plan card (owners and admins hold manage_settings).
+    W.AdminPlanController => [:manage_settings],
+    W.TrainingHistoryController => [:view_client_training],
+    # ADR-174: the queue also requires view_health per athlete (service).
+    W.StaffScalingController => [:manage_coaching],
+    W.AdminAiSettingsController => [:manage_settings]
   }
 
   @actions %{
@@ -77,14 +85,67 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFacilityController, :create_location} => [:manage_settings],
     {W.AdminFacilityController, :update_location} => [:manage_settings],
     {W.AdminFacilityController, :archive_location} => [:manage_settings],
+    {W.AdminFacilityController, :search_addresses} => [:manage_settings],
+    {W.AdminFacilityController, :reverse_geocode} => [:manage_settings],
+    {W.AdminFacilityController, :resolve_map_link} => [:manage_settings],
     {W.AdminFacilityController, :index_check_ins} => [:check_in],
     {W.AdminFacilityController, :create_check_in} => [:check_in],
+    # ADR-155: QR check-in desk, door display and rules.
+    {W.AdminCheckInController, :door} => [:check_in],
+    {W.AdminCheckInController, :rotate_door} => [:check_in, :manage_settings],
+    {W.AdminCheckInController, :poster} => [:check_in, :manage_settings],
+    {W.AdminCheckInController, :update_poster} => [:manage_settings],
+    {W.AdminCheckInController, :rotate_poster} => [:manage_settings],
+    {W.AdminCheckInController, :nfc_tag} => [:check_in, :manage_settings],
+    {W.AdminCheckInController, :update_nfc_tag} => [:manage_settings],
+    {W.AdminCheckInController, :rotate_nfc_tag} => [:manage_settings],
+    {W.AdminCheckInController, :revoke_member_code} => [:check_in],
+    {W.AdminCheckInController, :scan_member} => [:check_in],
+    {W.AdminCheckInController, :check_in_member} => [:check_in],
+    {W.AdminCheckInController, :visitors} => [:check_in],
+    {W.AdminCheckInController, :settings} => [:manage_settings, :check_in],
+    {W.AdminCheckInController, :update_settings} => [:manage_settings],
     {W.AdminClassTypeController, :index} => [:manage_schedule, :run_classes, :manage_workouts],
     {W.AdminClassTypeController, :create} => [:manage_settings],
     {W.AdminClassTypeController, :update} => [:manage_settings],
     {W.AdminClassTypeController, :delete} => [:manage_settings],
     {W.AdminScaleLevelController, :index} => [:manage_workouts, :manage_settings],
     {W.AdminScaleLevelController, :update} => [:manage_settings],
+
+    # Trials (ADR-144)
+    {W.AdminTrialController, :policy} => [:manage_settings],
+    {W.AdminTrialController, :update_policy} => [:manage_settings],
+    {W.AdminTrialController, :queue} => [:run_classes, :manage_memberships, :manage_settings],
+    {W.AdminTrialController, :accept} => [:run_classes, :manage_memberships],
+    {W.AdminTrialController, :decline} => [:run_classes, :manage_memberships],
+    {W.AdminTrialController, :attendance} => [:run_classes],
+
+    # «Κοινότητα» (ADR-143)
+    {W.AdminCommunityController, :groups} => [:moderate_community],
+    {W.AdminCommunityController, :decide_group} => [:moderate_community],
+    {W.AdminCommunityController, :reopen_group} => [:moderate_community],
+    {W.AdminCommunityController, :update_settings} => [:manage_community],
+    {W.AdminCommunityController, :reports} => [:moderate_community],
+    {W.AdminCommunityController, :act_on_report} => [:moderate_community],
+    {W.AdminCommunityController, :clubs} => [:moderate_community],
+    {W.AdminCommunityController, :create_club} => [:manage_community],
+    {W.AdminCommunityController, :club} => [:moderate_community],
+    {W.AdminCommunityController, :update_club} => [:manage_community],
+    {W.AdminCommunityController, :archive_club} => [:manage_community],
+    {W.AdminCommunityController, :answer_club_request} => [:moderate_community],
+    {W.AdminCommunityController, :remove_club_member} => [:moderate_community],
+
+    # Club events (ADR-153): the desk works the door of an event.
+    {W.AdminCommunityEventController, :index} => [:manage_events, :check_in, :take_payments],
+    {W.AdminCommunityEventController, :show} => [:manage_events, :check_in, :take_payments],
+    {W.AdminCommunityEventController, :create} => [:manage_events],
+    {W.AdminCommunityEventController, :update} => [:manage_events],
+    {W.AdminCommunityEventController, :cancel} => [:manage_events],
+    {W.AdminCommunityEventController, :check_in} => [:manage_events, :check_in],
+    {W.AdminCommunityEventController, :mark_paid} => [:manage_events, :take_payments],
+    {W.AdminCommunityEventController, :remove} => [:manage_events],
+    {W.AdminCommunityEventController, :message} => [:manage_events],
+    {W.AdminCommunityEventController, :trial_offer} => [:manage_events],
 
     # Schedule
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],
@@ -94,6 +155,9 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminScheduleController, :approve_booking} => [:run_classes],
     {W.AdminScheduleController, :reject_booking} => [:run_classes],
     {W.AdminScheduleController, :record_attendance} => [:run_classes],
+    # ADR-163: coach totals of a class's «τι ένιωσες»; row security decides
+    # which entries count (a coach of the gym, the entry's rung).
+    {W.AdminWorkoutGoalsController, :class_feedback_summary} => [:manage_workouts, :run_classes],
 
     # Finance
     {W.AdminFinanceAccountingController, :refund_receipts} => [
@@ -133,6 +197,14 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFinanceController, :cleanup_records} => [:manage_billing],
     {W.AdminFinanceController, :purge_record} => [:manage_billing],
     {W.AdminFinanceController, :packages} => [:view_package_catalog],
+    # ADR-167: seasons are sold like packages; places are answered like payments.
+    {W.AdminSeasonController, :index} => [:view_package_catalog, :take_payments],
+    {W.AdminSeasonController, :show} => [:view_package_catalog, :take_payments],
+    {W.AdminSeasonController, :create} => [:manage_packages],
+    {W.AdminSeasonController, :update} => [:manage_packages],
+    {W.AdminSeasonController, :confirm} => [:take_payments, :manage_memberships],
+    {W.AdminSeasonController, :decline} => [:take_payments, :manage_memberships],
+    {W.AdminSeasonController, :remove} => [:take_payments, :manage_memberships],
     {W.AdminFinanceController, :package_catalog} => [:view_package_catalog],
     {W.AdminFinanceController, :package} => [:view_package_catalog],
     {W.AdminFinanceController, :create_package} => [:manage_packages],
@@ -172,6 +244,13 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     {W.AdminFinanceController, :referral_rewards} => [:manage_promotions, :view_promotions],
     {W.AdminFinanceController, :create_referral_reward} => [:manage_promotions],
     {W.AdminFinanceController, :update_referral_reward_status} => [:manage_promotions],
+    # ADR-156: invites.
+    {W.AdminReferralController, :index} => [:manage_promotions, :view_promotions],
+    {W.AdminReferralController, :approve} => [:manage_promotions],
+    {W.AdminReferralController, :reject} => [:manage_promotions],
+    {W.AdminReferralController, :given} => [:manage_promotions],
+    {W.AdminReferralController, :reassign} => [:manage_promotions],
+    {W.AdminReferralController, :friend_gift} => [:manage_promotions],
 
     # Staff appointments: front desk books and cancels for clients.
     {W.AppointmentsController, :slots} => [:manage_appointments, :book_for_clients],
@@ -180,6 +259,16 @@ defmodule MilosTrainingWeb.RouteCapabilities do
 
     # A client's journal through the coach seam (ADR-139 §6)
     {W.JournalController, :client_journal} => [:manage_coaching],
+    # ADR-158: health data; the use case also requires the coach role.
+    {W.ClientBodyController, :index} => [:view_health],
+    {W.ClientBodyController, :show} => [:view_health],
+    {W.ClientBodyController, :series} => [:view_health],
+    # ADR-160: the weekly wellness summary; the use case also requires the
+    # coach role and the client's grant.
+    {W.ClientWellnessSummaryController, :show} => [:view_health],
+    # ADR-165: coverage, qualities and load from shared entries; the use
+    # case also requires the coach role and the client in scope.
+    {W.TrainingDepthController, :client} => [:view_client_training],
 
     # Private coach notes (ADR-101)
     {W.CoachNotesController, :index} => [:write_coach_notes, :read_coach_notes],

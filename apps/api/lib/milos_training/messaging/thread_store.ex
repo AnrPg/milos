@@ -33,6 +33,10 @@ defmodule MilosTraining.Messaging.ThreadStore do
   @impl true
   def count_unread_threads(user_id), do: impl().count_unread_threads(user_id)
 
+  @impl true
+  def list_box_conversation_organization_ids,
+    do: impl().list_box_conversation_organization_ids()
+
   defp impl do
     Application.fetch_env!(:milos_training, :messaging_thread_store)
   end
