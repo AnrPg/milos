@@ -9630,6 +9630,284 @@
         "title": "AthleteInjuryWarningsRequest",
         "type": "object"
       },
+      "AtlasExerciseCounts": {
+        "properties": {
+          "recognized": {
+            "type": "integer"
+          },
+          "unrecognized": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recognized",
+          "unrecognized"
+        ],
+        "title": "AtlasExerciseCounts",
+        "type": "object"
+      },
+      "AtlasExerciseVideo": {
+        "properties": {
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "video_url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "video_url",
+          "duration_minutes"
+        ],
+        "title": "AtlasExerciseVideo",
+        "type": "object"
+      },
+      "AtlasNodeCoverage": {
+        "properties": {
+          "felt": {
+            "description": "Entries in the range the member felt it in",
+            "type": "integer"
+          },
+          "id": {
+            "description": "Taxonomy node id (region, group or head)",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "region",
+              "group",
+              "head"
+            ],
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ],
+            "type": "string"
+          },
+          "per_week": {
+            "type": "number"
+          },
+          "sets": {
+            "description": "Weighted sets in the range: primary 1, secondary 0.5, stabilizer 0",
+            "type": "number"
+          },
+          "top_exercises": {
+            "items": {
+              "properties": {
+                "exercise_ref": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "sets": {
+                  "type": "number"
+                }
+              },
+              "required": [
+                "exercise_ref",
+                "label",
+                "sets"
+              ],
+              "title": "AtlasTopExercise",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "sets",
+          "per_week",
+          "level",
+          "felt",
+          "top_exercises"
+        ],
+        "title": "AtlasNodeCoverage",
+        "type": "object"
+      },
+      "AtlasNodeExercise": {
+        "properties": {
+          "exercise_ref": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "role": {
+            "enum": [
+              "primary",
+              "secondary"
+            ],
+            "type": "string"
+          },
+          "videos": {
+            "items": {
+              "properties": {
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "video_url": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "title",
+                "video_url",
+                "duration_minutes"
+              ],
+              "title": "AtlasExerciseVideo",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "exercise_ref",
+          "label",
+          "role",
+          "videos"
+        ],
+        "title": "AtlasNodeExercise",
+        "type": "object"
+      },
+      "AtlasNodeExercises": {
+        "properties": {
+          "exercises": {
+            "items": {
+              "properties": {
+                "exercise_ref": {
+                  "type": "string"
+                },
+                "label": {
+                  "type": "string"
+                },
+                "role": {
+                  "enum": [
+                    "primary",
+                    "secondary"
+                  ],
+                  "type": "string"
+                },
+                "videos": {
+                  "items": {
+                    "properties": {
+                      "duration_minutes": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      },
+                      "video_url": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "title",
+                      "video_url",
+                      "duration_minutes"
+                    ],
+                    "title": "AtlasExerciseVideo",
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "exercise_ref",
+                "label",
+                "role",
+                "videos"
+              ],
+              "title": "AtlasNodeExercise",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "node_id": {
+            "type": "string"
+          },
+          "videos_included": {
+            "description": "False when the member's package does not include on-demand videos",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "node_id",
+          "videos_included",
+          "exercises"
+        ],
+        "title": "AtlasNodeExercises",
+        "type": "object"
+      },
+      "AtlasThresholds": {
+        "description": "Weighted sets per week from which medium and high start; any set is low",
+        "properties": {
+          "high": {
+            "type": "number"
+          },
+          "medium": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "medium",
+          "high"
+        ],
+        "title": "AtlasThresholds",
+        "type": "object"
+      },
+      "AtlasTopExercise": {
+        "properties": {
+          "exercise_ref": {
+            "type": "string"
+          },
+          "label": {
+            "type": "string"
+          },
+          "sets": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "exercise_ref",
+          "label",
+          "sets"
+        ],
+        "title": "AtlasTopExercise",
+        "type": "object"
+      },
       "BodyAccessLog": {
         "properties": {
           "entries": {
@@ -34933,6 +35211,160 @@
           "goals"
         ],
         "title": "MemberWorkoutGoalsResponse",
+        "type": "object"
+      },
+      "MyAtlas": {
+        "properties": {
+          "exercises": {
+            "properties": {
+              "recognized": {
+                "type": "integer"
+              },
+              "unrecognized": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "recognized",
+              "unrecognized"
+            ],
+            "title": "AtlasExerciseCounts",
+            "type": "object"
+          },
+          "felt_entries": {
+            "type": "integer"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "nodes": {
+            "description": "Only nodes with sets or felt entries, in tree order",
+            "items": {
+              "properties": {
+                "felt": {
+                  "description": "Entries in the range the member felt it in",
+                  "type": "integer"
+                },
+                "id": {
+                  "description": "Taxonomy node id (region, group or head)",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "region",
+                    "group",
+                    "head"
+                  ],
+                  "type": "string"
+                },
+                "level": {
+                  "enum": [
+                    "none",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "per_week": {
+                  "type": "number"
+                },
+                "sets": {
+                  "description": "Weighted sets in the range: primary 1, secondary 0.5, stabilizer 0",
+                  "type": "number"
+                },
+                "top_exercises": {
+                  "items": {
+                    "properties": {
+                      "exercise_ref": {
+                        "type": "string"
+                      },
+                      "label": {
+                        "type": "string"
+                      },
+                      "sets": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "exercise_ref",
+                      "label",
+                      "sets"
+                    ],
+                    "title": "AtlasTopExercise",
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "sets",
+                "per_week",
+                "level",
+                "felt",
+                "top_exercises"
+              ],
+              "title": "AtlasNodeCoverage",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "range": {
+            "enum": [
+              "1w",
+              "4w",
+              "12w"
+            ],
+            "type": "string"
+          },
+          "sessions": {
+            "description": "Workouts done in the range",
+            "type": "integer"
+          },
+          "taxonomy_version": {
+            "type": "integer"
+          },
+          "thresholds": {
+            "description": "Weighted sets per week from which medium and high start; any set is low",
+            "properties": {
+              "high": {
+                "type": "number"
+              },
+              "medium": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "medium",
+              "high"
+            ],
+            "title": "AtlasThresholds",
+            "type": "object"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          },
+          "weeks": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "range",
+          "weeks",
+          "from",
+          "to",
+          "taxonomy_version",
+          "thresholds",
+          "sessions",
+          "felt_entries",
+          "exercises",
+          "nodes"
+        ],
+        "title": "MyAtlas",
         "type": "object"
       },
       "MyInjuryWarningsAcknowledged": {
@@ -62201,6 +62633,200 @@
         "summary": "Set «Η περιοχή μου» (up to 5 neighbourhoods; the first is the main one)",
         "tags": [
           "Around"
+        ]
+      }
+    },
+    "/api/me/atlas": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AnatomyAtlasController.show",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "4w",
+              "enum": [
+                "1w",
+                "4w",
+                "12w"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exercises": {
+                      "properties": {
+                        "recognized": {
+                          "type": "integer"
+                        },
+                        "unrecognized": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "recognized",
+                        "unrecognized"
+                      ],
+                      "title": "AtlasExerciseCounts",
+                      "type": "object"
+                    },
+                    "felt_entries": {
+                      "type": "integer"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "nodes": {
+                      "description": "Only nodes with sets or felt entries, in tree order",
+                      "items": {
+                        "properties": {
+                          "felt": {
+                            "description": "Entries in the range the member felt it in",
+                            "type": "integer"
+                          },
+                          "id": {
+                            "description": "Taxonomy node id (region, group or head)",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "region",
+                              "group",
+                              "head"
+                            ],
+                            "type": "string"
+                          },
+                          "level": {
+                            "enum": [
+                              "none",
+                              "low",
+                              "medium",
+                              "high"
+                            ],
+                            "type": "string"
+                          },
+                          "per_week": {
+                            "type": "number"
+                          },
+                          "sets": {
+                            "description": "Weighted sets in the range: primary 1, secondary 0.5, stabilizer 0",
+                            "type": "number"
+                          },
+                          "top_exercises": {
+                            "items": {
+                              "properties": {
+                                "exercise_ref": {
+                                  "type": "string"
+                                },
+                                "label": {
+                                  "type": "string"
+                                },
+                                "sets": {
+                                  "type": "number"
+                                }
+                              },
+                              "required": [
+                                "exercise_ref",
+                                "label",
+                                "sets"
+                              ],
+                              "title": "AtlasTopExercise",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "sets",
+                          "per_week",
+                          "level",
+                          "felt",
+                          "top_exercises"
+                        ],
+                        "title": "AtlasNodeCoverage",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "range": {
+                      "enum": [
+                        "1w",
+                        "4w",
+                        "12w"
+                      ],
+                      "type": "string"
+                    },
+                    "sessions": {
+                      "description": "Workouts done in the range",
+                      "type": "integer"
+                    },
+                    "taxonomy_version": {
+                      "type": "integer"
+                    },
+                    "thresholds": {
+                      "description": "Weighted sets per week from which medium and high start; any set is low",
+                      "properties": {
+                        "high": {
+                          "type": "number"
+                        },
+                        "medium": {
+                          "type": "number"
+                        }
+                      },
+                      "required": [
+                        "medium",
+                        "high"
+                      ],
+                      "title": "AtlasThresholds",
+                      "type": "object"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "weeks": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "range",
+                    "weeks",
+                    "from",
+                    "to",
+                    "taxonomy_version",
+                    "thresholds",
+                    "sessions",
+                    "felt_entries",
+                    "exercises",
+                    "nodes"
+                  ],
+                  "title": "MyAtlas",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Atlas coverage"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your muscle coverage across every provider, for the anatomy atlas",
+        "tags": [
+          "Anatomy"
         ]
       }
     },
@@ -142025,6 +142651,131 @@
         "summary": "Reopen a published workout for editing",
         "tags": [
           "Admin Workouts"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/anatomy/nodes/{node_id}/exercises": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AnatomyAtlasController.exercises",
+        "parameters": [
+          {
+            "description": "Taxonomy node id (region, group or head)",
+            "in": "path",
+            "name": "node_id",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exercises": {
+                      "items": {
+                        "properties": {
+                          "exercise_ref": {
+                            "type": "string"
+                          },
+                          "label": {
+                            "type": "string"
+                          },
+                          "role": {
+                            "enum": [
+                              "primary",
+                              "secondary"
+                            ],
+                            "type": "string"
+                          },
+                          "videos": {
+                            "items": {
+                              "properties": {
+                                "duration_minutes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                },
+                                "video_url": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "title",
+                                "video_url",
+                                "duration_minutes"
+                              ],
+                              "title": "AtlasExerciseVideo",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "exercise_ref",
+                          "label",
+                          "role",
+                          "videos"
+                        ],
+                        "title": "AtlasNodeExercise",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "node_id": {
+                      "type": "string"
+                    },
+                    "videos_included": {
+                      "description": "False when the member's package does not include on-demand videos",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "node_id",
+                    "videos_included",
+                    "exercises"
+                  ],
+                  "title": "AtlasNodeExercises",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Node exercises"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Exercises that train an atlas node, with the gym's videos",
+        "tags": [
+          "Anatomy"
         ]
       }
     },

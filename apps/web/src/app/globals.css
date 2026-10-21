@@ -44,6 +44,10 @@
   --anatomy-secondary: #EFA36F;
   --anatomy-stabilizer: #F3CDB0;
   --anatomy-felt: #3FA37A;
+  /* Atlas heat map (ADR-164): one warm hue, darker and more saturated with volume. */
+  --anatomy-heat-low: #D9A27E;
+  --anatomy-heat-medium: #E07A3C;
+  --anatomy-heat-high: #C2361F;
   --anatomy-base: #8E7A75;
   --anatomy-bone: #E3DACB;
 }
@@ -76,6 +80,9 @@ html[data-theme="sunset"] {
   color-scheme: light;
   --anatomy-base: #AE9891;
   --anatomy-bone: #D8CDBB;
+  --anatomy-heat-low: #E6B48F;
+  --anatomy-heat-medium: #DD6F2E;
+  --anatomy-heat-high: #A82A17;
 }
 
 html:not([data-theme="daybreak"]):not([data-theme="paper"]):not([data-theme="lagoon"]):not([data-theme="sunset"]) {

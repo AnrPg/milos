@@ -130,6 +130,14 @@ defmodule MilosTraining.Workouts do
   """
   def goal_exercises(workout), do: ExerciseDescriptors.weighted_from_workout(workout)
 
+  @doc """
+  The Quick Text catalog entry (`%{id, label, category}`) an exercise names:
+  its `exercise_ref` when known, else its name read leniently (plurals),
+  else nil (ADR-164: performed exercises of log entries, tagged videos).
+  """
+  def resolve_catalog_exercise(exercise_ref, name),
+    do: ExerciseDescriptors.resolve_catalog_entry(exercise_ref, name)
+
   @doc "The saved WOD goals of a workout in the context's gym, or nil (ADR-163)."
   def get_workout_goals(context, workout_id), do: GoalStore.get_goals(context, workout_id)
 

@@ -495,6 +495,8 @@ defmodule MilosTrainingWeb.Router do
     get("/workouts/:id/goals", WorkoutGoalsController, :show)
     get("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :show)
     put("/me/goal-feedback/:entry_kind/:entry_id", GoalFeedbackController, :update)
+    # ADR-164: the gym's exercises (and videos) for an atlas node.
+    get("/anatomy/nodes/:node_id/exercises", AnatomyAtlasController, :exercises)
   end
 
   scope "/api/org/:organization_slug", MilosTrainingWeb do
@@ -1182,6 +1184,8 @@ defmodule MilosTrainingWeb.Router do
     get("/me/history", AccountTrainingController, :history)
     get("/me/progress", AccountTrainingController, :progress)
     get("/me/vault", AccountTrainingController, :vault)
+    # ADR-164: the anatomy atlas, the member's coverage across providers.
+    get("/me/atlas", AnatomyAtlasController, :show)
     get("/me/filters/:surface", SavedFilterController, :show)
     put("/me/filters/:surface/last-used", SavedFilterController, :remember)
     post("/me/filters/:surface", SavedFilterController, :save)

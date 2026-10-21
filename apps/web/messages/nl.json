@@ -8032,7 +8032,10 @@
       "primary": "Primair",
       "secondary": "Secundair",
       "stabilizer": "Stabilisator",
-      "felt": "Gevoeld"
+      "felt": "Gevoeld",
+      "heat-low": "Lage dekking",
+      "heat-medium": "Gemiddelde dekking",
+      "heat-high": "Hoge dekking"
     },
     "quality": {
       "cardiorespiratory-endurance": "Cardiorespiratoir uithoudingsvermogen",
@@ -8138,6 +8141,43 @@
       "soleus": "Scholspier",
       "tibialis-anterior": "Voorste scheenbeenspier",
       "fibularis": "Kuitbeenspieren"
+    },
+    "about": {
+      "sternocleidomastoid": "Draait en kantelt het hoofd en helpt bij zware ademhaling.",
+      "scalenes": "Kantelen de nek opzij en tillen bij inademen de bovenste ribben op.",
+      "splenius": "Strekt en draait het hoofd en houdt het rechtop.",
+      "deltoid": "Heft de arm naar voren, opzij en naar achteren; vormt de schouder.",
+      "rotator-cuff": "Vier kleine spieren die de schouder centreren en de arm draaien.",
+      "pectoralis-major": "Brengt de arm voor het lichaam en duwt naar voren, zoals bij een push-up.",
+      "pectoralis-minor": "Trekt het schouderblad naar voren en omlaag.",
+      "serratus-anterior": "Houdt het schouderblad tegen de ribben en draait het omhoog.",
+      "trapezius": "Heft, knijpt en laat de schouderbladen zakken en steunt de nek.",
+      "rhomboids": "Knijpen de schouderbladen samen, zoals bij roeien.",
+      "levator-scapulae": "Heft het schouderblad en kantelt de nek.",
+      "latissimus-dorsi": "Trekt de arm omlaag en naar achteren, zoals bij een pull-up; de breedste rugspier.",
+      "teres-major": "Helpt de lats de arm omlaag en naar binnen te trekken.",
+      "erector-spinae": "Strekt de wervelkolom en houdt die rechtop bij het tillen.",
+      "multifidus": "Kleine diepe spieren die elke wervel stabiliseren.",
+      "quadratus-lumborum": "Buigt de romp opzij en stabiliseert bekken en onderrug.",
+      "biceps-brachii": "Buigt de elleboog en draait de handpalm omhoog.",
+      "brachialis": "De belangrijkste elleboogbuiger, hoe de hand ook staat.",
+      "triceps-brachii": "Strekt de elleboog, zoals bij drukken of een push-up.",
+      "brachioradialis": "Buigt de elleboog met de duim omhoog, zoals bij een hammer curl.",
+      "forearm-flexors": "Buigen pols en vingers en geven je grip.",
+      "forearm-extensors": "Strekken pols en vingers en houden de grip in balans.",
+      "rectus-abdominis": "Buigt de romp naar voren en spant de voorkant van de core aan.",
+      "obliques": "Draaien en kantelen de romp en weerstaan rotatie.",
+      "transversus-abdominis": "De diepste buikspier; trekt de taille aan als een riem.",
+      "diaphragm": "De belangrijkste ademhalingsspier; helpt ook de romp onder belasting aan te spannen.",
+      "glutes": "Strekken en openen de heup en houden het bekken recht; essentieel bij squats en sprongen.",
+      "hip-flexors": "Brengen de knie naar de borst en buigen de romp in de heup.",
+      "hip-rotators": "Draaien de dij naar buiten en stabiliseren de heup.",
+      "quadriceps": "Strekken de knie; ze drijven squats, lunges en sprongen aan.",
+      "hamstrings": "Buigen de knie en strekken de heup, zoals bij een deadlift.",
+      "adductors": "Brengen de benen naar elkaar en helpen de heup bij diepe squats.",
+      "calves": "Heffen de hiel; ze zetten af bij rennen en springen.",
+      "tibialis-anterior": "Heft de tenen en controleert de voet bij de landing.",
+      "fibularis": "Draait de voetzool naar buiten en stabiliseert de enkel."
     }
   },
   "WodGoals": {
@@ -8209,7 +8249,9 @@
     },
     "sheet": {
       "title": "Trainingsdoelen",
-      "close": "Sluiten"
+      "close": "Sluiten",
+      "atlas": "Atlas ›",
+      "openInAtlas": "{muscle} openen in de atlas"
     },
     "felt": {
       "title": "Wat voelde je?",
@@ -8237,6 +8279,60 @@
       "entries": "{count, plural, one {# registratie} other {# registraties}}",
       "notShown": "Zichtbaar vanaf 3 registraties.",
       "notFelt": "Doelen die niemand voelde: {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Anatomische atlas",
+    "back": "Voortgang",
+    "mode": {
+      "label": "Weergave",
+      "explore": "Verkennen",
+      "heat": "Mijn dekking"
+    },
+    "range": {
+      "label": "Periode",
+      "1w": "1 wk",
+      "4w": "4 wk",
+      "12w": "12 wk"
+    },
+    "crumbs": {
+      "label": "Niveau",
+      "body": "Lichaam"
+    },
+    "body": {
+      "title": "Hele lichaam",
+      "hint": "Tik op een regio of direct op een spier in de figuur. Tik nog eens voor de spierkop."
+    },
+    "regions": "Regio’s",
+    "groups": "Spiergroepen",
+    "heads": "Spierkoppen",
+    "level": {
+      "none": "Geen",
+      "low": "Laag",
+      "medium": "Gemiddeld",
+      "high": "Hoog"
+    },
+    "levelLine": "Dekking: {level}",
+    "sets": "{sets} sets",
+    "perWeek": "{perWeek} sets/wk",
+    "yours": "Van jou · {range}",
+    "from": "Vooral door: {exercises}",
+    "felt": "{count, plural, one {Gevoeld in # training} other {Gevoeld in # trainingen}}",
+    "noData": "Nog geen trainingen in deze periode.",
+    "noneHere": "Geen sets hier in deze periode.",
+    "legendNote": "Een indicatie van je trainingsvolume, geen doel.",
+    "unrecognized": "{count, plural, one {# oefening werd niet herkend en telt niet mee.} other {# oefeningen werden niet herkend en tellen niet mee.}}",
+    "exercises": {
+      "title": "Oefeningen uit de box-bibliotheek",
+      "empty": "Geen oefeningen voor deze spier.",
+      "unavailable": "Oefeningen verschijnen zodra een box is gekozen.",
+      "more": "Alle ({count})",
+      "less": "Minder",
+      "video": "Video: {title}",
+      "role": {
+        "primary": "Hoofd",
+        "secondary": "Ondersteunend"
+      }
     }
   },
   "Seasons": {
