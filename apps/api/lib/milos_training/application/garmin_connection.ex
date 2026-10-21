@@ -314,8 +314,16 @@ defmodule MilosTraining.Application.GarminConnection do
     end
   end
 
-  defp param(params, key) when is_map(params),
-    do: Map.get(params, key, Map.get(params, String.to_existing_atom(key)))
+  # Request bodies arrive with string keys, or atom keys once cast by OpenApiSpex.
+  defp param(params, key) when is_map(params) do
+    case Map.fetch(params, key) do
+      {:ok, value} ->
+        value
+
+      :error ->
+        Enum.find_value(params, fn {k, v} -> if is_atom(k) and Atom.to_string(k) == key, do: v end)
+    end
+  end
 
   defp param(_params, _key), do: nil
 end

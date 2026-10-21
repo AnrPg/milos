@@ -140,6 +140,23 @@ defmodule MilosTrainingWeb.Router do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 300, interval: 60_000, bucket: "wallet")
   end
 
+  # ADR-161: Garmin's OAuth return (a browser redirect) and its push and
+  # deregistration calls; no app session, Garmin may send in bursts.
+  pipeline :garmin_public do
+    plug(OpenApiSpex.Plug.PutApiSpec, module: MilosTrainingWeb.ApiSpec)
+    plug(MilosTrainingWeb.Plugs.RateLimit, max: 600, interval: 60_000, bucket: "garmin-public")
+  end
+
+  # ADR-161: connecting, syncing and confirming device imports.
+  pipeline :device_rate_limited do
+    plug(MilosTrainingWeb.Plugs.RateLimit,
+      max: 30,
+      interval: 60_000,
+      bucket: "devices",
+      methods: ["POST", "PATCH", "DELETE"]
+    )
+  end
+
   pipeline :search_rate_limited do
     plug(MilosTrainingWeb.Plugs.RateLimit, max: 120, interval: 60_000, bucket: "search")
   end
@@ -261,6 +278,14 @@ defmodule MilosTrainingWeb.Router do
     get("/apple/v1/devices/:device_id/registrations/:pass_type_id", PassKitController, :serials)
     get("/apple/v1/passes/:pass_type_id/:serial", PassKitController, :latest)
     post("/apple/v1/log", PassKitController, :log)
+  end
+
+  scope "/api/integrations/garmin", MilosTrainingWeb do
+    pipe_through([:garmin_public])
+
+    get("/callback", GarminIntegrationController, :callback)
+    post("/push", GarminIntegrationController, :push)
+    post("/deregistration", GarminIntegrationController, :deregistration)
   end
 
   # ADR-122: unauthenticated retired-slug lookup behind the web proxy's 308.
@@ -1250,6 +1275,27 @@ defmodule MilosTrainingWeb.Router do
     delete("/check-in/scan/:undo_token", ScanCheckInController, :undo)
     get("/me/connected-devices", WalletController, :devices)
     delete("/me/wallet-passes/:id", WalletController, :revoke)
+  end
+
+  # ADR-161: Garmin in Συνδεδεμένες συσκευές and the journal's device card.
+  scope "/api/me", MilosTrainingWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :device_rate_limited
+    ])
+
+    get("/devices", DevicesController, :index)
+    get("/devices/summary", DevicesController, :summary)
+    post("/devices/summary/seen", DevicesController, :seen)
+    post("/devices/garmin/connect", DevicesController, :connect)
+    patch("/devices/garmin", DevicesController, :update)
+    post("/devices/garmin/sync", DevicesController, :sync)
+    delete("/devices/garmin", DevicesController, :disconnect)
+    get("/devices/garmin/pending", DevicesController, :pending)
+    post("/device-imports/:id/confirm", DevicesController, :confirm)
   end
 
   # ADR-154: Γύρω μου, «Η περιοχή μου» and the gazetteer; members only.
