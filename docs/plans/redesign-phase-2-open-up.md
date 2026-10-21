@@ -640,6 +640,32 @@ sleep (Q3) open (built as recommended: bedtime and wake time), and ticked every 
    Extras: the first visit asks which items you want (with the health-data consent); delete-all
    and export per section (JSON with meal photos).
 
+### One journal across providers (2026-10-21, [board 17](https://claude.ai/artifact/EhqyBbgVT7sqq539ab1kXS))
+
+Apostolos picked the recommended option on all six questions and ticked the export extra.
+
+1. **Switching provider (Q1, A):** «Box Κυψέλη ▾» opens «Οι πάροχοί σου»: logo, kind (Box ·
+   Personal coach), next booking or session, unread coach messages, ✓ on the current one; the
+   choice is remembered on the account (a new device opens on it). «Πρόσθεσε box ή coach» goes to
+   joining by code or link. With one provider there is no ▾.
+2. **Today (Q2, A):** with more than one provider, the top card of Box is «Σήμερα» from all of
+   them in time order (untimed programme and WOD first), each with its source; an item from
+   another provider switches Box to it. The rest of Box belongs to the selected provider.
+3. **One journal (Q3, A):** Ροή shows every entry from every provider, freeform and devices,
+   with a small source label once there is more than one provider (always for freeform, devices
+   and past providers). «Φίλτρα (n)» · Πηγή · Τύπος · Ορατότητα chips, dates and text search in
+   the page; the filter is remembered on the account.
+4. **Vault and Πρόοδος (Q4, A):** the Vault groups the same workout across providers into one
+   trend, each attempt labelled; Πρόοδος shows «Όλοι» by default with a provider chip next to the
+   time range, sessions per source, labelled PRs and score points. No package gate on the account
+   view (it is the member's own data).
+5. **What each provider sees (Q5, A):** a provider always sees what you did with them; on a coach
+   rung the picker asks once whose coaches «Οι coach μου» means (all active by default, «Να
+   ισχύει από εδώ και πέρα»), and any entry can be narrowed; the default is also in Ρυθμίσεις.
+6. **Leaving (Q6, A):** history stays, labelled «(πρώην)»; the provider loses access from the end
+   date and moves to «Παλιοί πάροχοι» in the sheet. Extra: «Εξαγωγή ημερολογίου» in Ρυθμίσεις
+   prepares every entry from every provider as files in the background.
+
 ## 6. Ethics and safety checklist (brief §8.6, applies to M10–M12)
 - [ ] No calories by default; macros only with a coach plan and hideable
 - [x] Weight as trend only option

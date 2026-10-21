@@ -160,3 +160,18 @@ organizations in their personal session, and coaches read through
   A boolean still means gym or none.
 - The ADR-139 journal test now expects that a personal note can go to the
   member's coaches.
+- Web (board 17, all recommended): `apiRequest` takes `scope: "account"` so
+  `/me/history` and `/me/progress` reach the account read model instead of
+  their per-gym paths. Box ▾ (`ProviderTitle`, `ProviderSheet`) switches via
+  `PUT /me/providers/selected`, then remembers the slug on the device and
+  clears the per-gym cache; a device without a remembered gym adopts the
+  account's choice. The merged «Σήμερα» card shows only with two or more
+  providers. Source labels show once there is more than one provider, and
+  always for freeform, device and past-provider entries.
+- The Ροή, Vault and Πρόοδος filters share `useRememberedFilter` (ADR-151).
+  Ροή stores its filter through `remember=true` on the feed, the others
+  through `PUT /me/filters/:surface/last-used`.
+- «Οι coach μου» is asked in the visibility picker the first time a coach
+  rung is chosen with several providers (once per device). The default can
+  also be changed in Ρυθμίσεις, next to «Εξαγωγή ημερολογίου».
+
