@@ -128,6 +128,14 @@ defmodule MilosTraining.Workouts do
   @doc "The saved WOD goals of a workout in the context's gym, or nil (ADR-163)."
   def get_workout_goals(context, workout_id), do: GoalStore.get_goals(context, workout_id)
 
+  @doc """
+  The WOD goals a workout uses (ADR-163): its own, else those of the nearest
+  workout it was copied from (`source_workout_id`: class variants, member
+  versions, filed copies), as `%{goals, inherited_from}`.
+  """
+  def resolve_workout_goals(context, workout_id),
+    do: GoalStore.resolve_goals(context, workout_id)
+
   @doc "Upserts a workout's WOD goals; attrs are already normalised (ADR-163)."
   def put_workout_goals(context, workout_id, attrs),
     do: GoalStore.put_goals(context, workout_id, attrs)

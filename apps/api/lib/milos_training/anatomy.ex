@@ -7,6 +7,7 @@ defmodule MilosTraining.Anatomy do
 
   alias MilosTraining.Anatomy.Domain.{
     ExerciseTargets,
+    FeedbackSummary,
     FitnessQualities,
     GoalSet,
     GoalSuggestion,
@@ -39,6 +40,12 @@ defmodule MilosTraining.Anatomy do
 
   @doc "Suggested goals from `[%{exercise_ref, weight}]` (deterministic, ADR-163 D3)."
   def suggest_goals(exercises), do: GoalSuggestion.suggest(exercises)
+
+  @doc """
+  Coach totals of goal feedback (ADR-163): counts per muscle group and
+  quality and the goal groups nobody felt, only from three entries up.
+  """
+  def summarize_feedback(rows, goal_muscles), do: FeedbackSummary.summarize(rows, goal_muscles)
 
   def normalize_goals(params), do: GoalSet.normalize_goals(params)
   def normalize_feedback(params), do: GoalSet.normalize_feedback(params)

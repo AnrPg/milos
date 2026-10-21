@@ -12,6 +12,12 @@ defmodule MilosTrainingWeb.Schemas.Body do
   @uuid %Schema{type: :string, format: :uuid}
   @datetime %Schema{type: :string, format: :"date-time"}
 
+  @felt_prompt_schema %Schema{
+    type: :boolean,
+    description:
+      "ADR-163: offer «Τι ένιωσες;» after a workout without goals (workouts with goals always offer it)"
+  }
+
   def uuid, do: @uuid
 
   def body(schema),
@@ -263,7 +269,8 @@ defmodule MilosTrainingWeb.Schemas.Body do
         :measure_reminder_weeks,
         :default_visibility,
         :blur_photos,
-        :compare_mode
+        :compare_mode,
+        :felt_prompt_without_goals
       ],
       properties: %{
         units: %Schema{type: :string, enum: Body.unit_systems()},
@@ -277,7 +284,8 @@ defmodule MilosTrainingWeb.Schemas.Body do
         },
         default_visibility: %Schema{type: :string, enum: Body.visibilities()},
         blur_photos: %Schema{type: :boolean, description: "Photos show blurred until tapped"},
-        compare_mode: %Schema{type: :string, enum: Body.compare_modes()}
+        compare_mode: %Schema{type: :string, enum: Body.compare_modes()},
+        felt_prompt_without_goals: @felt_prompt_schema
       }
     }
   end
@@ -349,7 +357,8 @@ defmodule MilosTrainingWeb.Schemas.Body do
         },
         default_visibility: %Schema{type: :string, enum: Body.visibilities()},
         blur_photos: %Schema{type: :boolean, description: "Photos show blurred until tapped"},
-        compare_mode: %Schema{type: :string, enum: Body.compare_modes()}
+        compare_mode: %Schema{type: :string, enum: Body.compare_modes()},
+        felt_prompt_without_goals: @felt_prompt_schema
       }
     }
   end

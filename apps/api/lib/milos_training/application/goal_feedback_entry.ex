@@ -5,7 +5,8 @@ defmodule MilosTraining.Application.GoalFeedbackEntry do
 
   The entry must be the acting member's own execution or training-log
   entry; anyone else's (or a missing one) is `:not_found`. The goals shown
-  are the member-visible goals of the entry's workout, read in the
+  are the member-visible goals of the entry's workout (its own or inherited,
+  see `GetMemberWorkoutGoals`), read in the
   request's gym: an entry done in another gym, or without a workout, has
   none.
   """
@@ -42,10 +43,7 @@ defmodule MilosTraining.Application.GoalFeedbackEntry do
          master_workout_id: workout_id
        })
        when is_binary(workout_id) do
-    case Workouts.get_workout_goals(context, workout_id) do
-      nil -> nil
-      saved -> Presenter.member_goals(saved)
-    end
+    Presenter.member_goals(workout_id, Workouts.resolve_workout_goals(context, workout_id))
   end
 
   defp goals(_context, _entry), do: nil

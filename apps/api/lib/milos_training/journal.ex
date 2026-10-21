@@ -91,6 +91,14 @@ defmodule MilosTraining.Journal do
 
   def put_goal_feedback(context, attrs), do: GoalFeedbackStore.put_feedback(context, attrs)
 
+  @doc """
+  Feedback rows on the non-voided entries of `{:workout, id}` or
+  `{:scheduled_class, id}` that the acting person may read: queried in their
+  session, so a coach only gets rows whose entry's rung reaches them.
+  """
+  def list_goal_feedback_for(context, scope),
+    do: GoalFeedbackStore.list_feedback_for(context, scope)
+
   # ADR-162: one journal across providers.
   alias MilosTraining.Journal.Domain.{CoachAudience, EntrySource, JournalFilter}
 

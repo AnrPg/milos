@@ -6,10 +6,14 @@ defmodule MilosTraining.Application.SaveWorkoutGoals do
   live suggestion (muscles and qualities), otherwise `edited`.
 
   `visible_to_members` is the editor's toggle; when the request leaves it
-  out, the saved value is kept (hidden for a first save).
+  out, the workout's own saved value is kept; a first save takes the value
+  of the goals it inherits (a class variant), else the gym's
+  `wod_goals_visible_by_default`. A save on a variant always writes the
+  variant's own row: the coach can change goals per variant.
   """
 
   alias MilosTraining.Anatomy
+  alias MilosTraining.Application.GetWorkoutGoals
   alias MilosTraining.Application.WorkoutGoalsPresenter, as: Presenter
   alias MilosTraining.Workouts
 
@@ -19,14 +23,14 @@ defmodule MilosTraining.Application.SaveWorkoutGoals do
          {:ok, goals} <- Anatomy.normalize_goals(params),
          {:ok, visible} <- visibility(params) do
       suggestion = Presenter.suggestion(workout)
-      current = Workouts.get_workout_goals(context, workout_id)
+      resolved = Workouts.resolve_workout_goals(context, workout_id)
       muscles = Enum.map(goals.muscles, &Presenter.muscle/1)
 
       attrs = %{
         muscles: muscles,
         qualities: goals.qualities,
         stimulus: goals.stimulus,
-        visible_to_members: visible_value(visible, current),
+        visible_to_members: visible_value(context, visible, resolved),
         source: source(muscles, goals.qualities, suggestion),
         taxonomy_version: Anatomy.taxonomy_version(),
         updated_by_id: context.user_id
@@ -35,7 +39,13 @@ defmodule MilosTraining.Application.SaveWorkoutGoals do
       with {:ok, saved} <- Workouts.put_workout_goals(context, workout_id, attrs) do
         {:ok,
          %{
-           goals: Presenter.staff_goals(workout_id, saved, suggestion),
+           goals:
+             Presenter.staff_goals(
+               workout_id,
+               %{goals: saved, inherited_from: nil},
+               suggestion,
+               false
+             ),
            suggestion: suggestion
          }}
       end
@@ -59,9 +69,11 @@ defmodule MilosTraining.Application.SaveWorkoutGoals do
     end
   end
 
-  defp visible_value(:keep, nil), do: false
-  defp visible_value(:keep, current), do: current.visible_to_members
-  defp visible_value(value, _current), do: value
+  defp visible_value(context, :keep, %{goals: nil} = resolved),
+    do: GetWorkoutGoals.default_visible(context, resolved)
+
+  defp visible_value(_context, :keep, %{goals: goals}), do: goals.visible_to_members
+  defp visible_value(_context, value, _resolved), do: value
 
   defp source(muscles, qualities, suggestion) do
     if Enum.sort(muscles) == Enum.sort(suggestion.muscles) and

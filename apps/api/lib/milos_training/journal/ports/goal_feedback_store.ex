@@ -23,4 +23,14 @@ defmodule MilosTraining.Journal.Ports.GoalFeedbackStore do
   @callback feedback_entry(entry_kind :: String.t(), entry_id :: Ecto.UUID.t()) :: entry() | nil
   @callback get_feedback(String.t(), Ecto.UUID.t(), user_id :: Ecto.UUID.t()) :: feedback() | nil
   @callback put_feedback(attrs :: map()) :: {:ok, feedback()} | {:error, Ecto.Changeset.t()}
+
+  @doc """
+  The felt muscles and qualities of every feedback row the session may read
+  (row security: the member's own rows and, for a coach, rows whose entry's
+  rung reaches them) on non-voided entries of one workout or one scheduled
+  class. One row per entry.
+  """
+  @callback list_feedback_for(
+              scope :: {:workout, Ecto.UUID.t()} | {:scheduled_class, Ecto.UUID.t()}
+            ) :: [%{felt_muscles: [String.t()], felt_qualities: [String.t()]}]
 end

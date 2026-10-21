@@ -14,6 +14,9 @@ defmodule MilosTraining.Anatomy.Domain.GoalSet do
   @max_muscles 40
   @max_stimulus 280
   @roles ~w(primary secondary stabilizer)
+  # A literal map, not String.to_existing_atom/1: the role atoms may not be
+  # loaded yet when nothing has touched ExerciseTargets.
+  @role_atoms %{"primary" => :primary, "secondary" => :secondary, "stabilizer" => :stabilizer}
 
   @doc "Normalises coach-authored goals or returns `{:error, {:invalid_goals, details}}`."
   def normalize_goals(params) when is_map(params) do
@@ -51,7 +54,7 @@ defmodule MilosTraining.Anatomy.Domain.GoalSet do
           {:halt, {:error, {:invalid_goals, %{muscles: "invalid role #{inspect(role)}"}}}}
 
         true ->
-          role = String.to_existing_atom(role)
+          role = Map.fetch!(@role_atoms, role)
           {:cont, {:ok, Map.update(acc, id, role, &stronger(&1, role))}}
       end
     end)

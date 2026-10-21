@@ -29,7 +29,15 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
       workout_id: %Schema{type: :string, format: :uuid},
       saved: %Schema{
         type: :boolean,
-        description: "False when nothing is saved yet and these are the live suggestion"
+        description:
+          "False when this workout has no goals of its own: these are inherited (inherited_from) or the live suggestion"
+      },
+      inherited_from: %Schema{
+        type: :string,
+        format: :uuid,
+        nullable: true,
+        description:
+          "The workout these goals are inherited from (this one is a class variant or copy without goals of its own); a save gives this workout its own"
       },
       muscles: %Schema{type: :array, items: @muscle},
       qualities: @ids,
@@ -43,6 +51,7 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
     required: [
       :workout_id,
       :saved,
+      :inherited_from,
       :muscles,
       :qualities,
       :stimulus,
@@ -92,7 +101,8 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
       stimulus: %Schema{type: :string, nullable: true, maxLength: 280},
       visible_to_members: %Schema{
         type: :boolean,
-        description: "Left out: keep the saved value (hidden on a first save)"
+        description:
+          "Left out: keep the saved value; a first save takes the inherited goals' value, else the gym's wod_goals_visible_by_default"
       }
     },
     required: [:muscles, :qualities]
@@ -162,6 +172,44 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
     required: [:felt_muscles, :felt_qualities]
   }
 
+  @count %Schema{
+    title: "GoalFeedbackCount",
+    type: :object,
+    properties: %{id: %Schema{type: :string}, count: %Schema{type: :integer, minimum: 1}},
+    required: [:id, :count],
+    additionalProperties: false
+  }
+
+  @feedback_summary %Schema{
+    title: "GoalFeedbackSummary",
+    type: :object,
+    description:
+      "Coach totals of «τι ένιωσες» over the entries the caller may read (non-voided). Lists are empty and shown is false below 3 entries.",
+    properties: %{
+      workout_id: %Schema{type: :string, format: :uuid, nullable: true},
+      scheduled_class_id: %Schema{
+        type: :string,
+        format: :uuid,
+        description: "Only on the scheduled-class summary"
+      },
+      entries: %Schema{type: :integer, minimum: 0},
+      shown: %Schema{type: :boolean},
+      felt_muscles: %Schema{
+        type: :array,
+        items: @count,
+        description: "Muscle groups (heads rolled up), most felt first"
+      },
+      felt_qualities: %Schema{type: :array, items: @count, description: "Most felt first"},
+      goals_not_felt: %Schema{
+        type: :array,
+        items: %Schema{type: :string},
+        description: "Groups of the goal's primary and secondary muscles nobody felt"
+      }
+    },
+    required: [:workout_id, :entries, :shown, :felt_muscles, :felt_qualities, :goals_not_felt],
+    additionalProperties: false
+  }
+
   @node %Schema{
     title: "AnatomyNode",
     type: :object,
@@ -199,4 +247,5 @@ defmodule MilosTrainingWeb.Schemas.WorkoutGoals do
   def feedback_response, do: @feedback_response
   def feedback_request, do: @feedback_request
   def taxonomy, do: @taxonomy
+  def feedback_summary, do: @feedback_summary
 end

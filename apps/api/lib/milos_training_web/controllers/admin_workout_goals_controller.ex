@@ -1,10 +1,13 @@
 defmodule MilosTrainingWeb.AdminWorkoutGoalsController do
-  @moduledoc "Staff read and save of a workout's WOD goals (ADR-163)."
+  @moduledoc """
+  Staff read and save of a workout's WOD goals, and the coach totals of
+  «τι ένιωσες» on a workout or a scheduled class (ADR-163).
+  """
 
   use MilosTrainingWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias MilosTraining.Application.{GetWorkoutGoals, SaveWorkoutGoals}
+  alias MilosTraining.Application.{GetGoalFeedbackSummary, GetWorkoutGoals, SaveWorkoutGoals}
   alias MilosTrainingWeb.Schemas.WorkoutGoals
   alias OpenApiSpex.{MediaType, Parameter, RequestBody, Schema}
 
@@ -63,6 +66,41 @@ defmodule MilosTrainingWeb.AdminWorkoutGoalsController do
   def update(conn, %{id: id}) do
     with {:ok, result} <-
            SaveWorkoutGoals.call(conn.assigns.tenant_context, id, conn.body_params) do
+      json(conn, result)
+    end
+  end
+
+  operation(:feedback_summary,
+    summary: "Coach totals of «τι ένιωσες» on a workout",
+    description:
+      "Counts only feedback on non-voided entries whose visibility reaches the caller as a coach; shown only from 3 entries.",
+    parameters: [@id],
+    responses: [
+      ok: {"Goal feedback summary", "application/json", WorkoutGoals.feedback_summary()},
+      not_found: {"Not found", "application/json", @error}
+    ]
+  )
+
+  def feedback_summary(conn, %{id: id}) do
+    with {:ok, result} <- GetGoalFeedbackSummary.for_workout(conn.assigns.tenant_context, id) do
+      json(conn, result)
+    end
+  end
+
+  operation(:class_feedback_summary,
+    summary: "Coach totals of «τι ένιωσες» on a scheduled class",
+    description:
+      "Entries logged from the class or timed from its bookings, whatever workout version they followed; same rules as the workout summary.",
+    parameters: [%{@id | description: "Scheduled class (slot) ID"}],
+    responses: [
+      ok: {"Goal feedback summary", "application/json", WorkoutGoals.feedback_summary()},
+      not_found: {"Not found", "application/json", @error}
+    ]
+  )
+
+  def class_feedback_summary(conn, %{id: id}) do
+    with {:ok, result} <-
+           GetGoalFeedbackSummary.for_scheduled_class(conn.assigns.tenant_context, id) do
       json(conn, result)
     end
   end

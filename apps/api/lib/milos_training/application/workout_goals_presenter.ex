@@ -24,15 +24,23 @@ defmodule MilosTraining.Application.WorkoutGoalsPresenter do
     }
   end
 
-  @doc "Staff view: the saved goals, or the suggestion when none are saved."
-  def staff_goals(workout_id, nil, suggestion) do
+  @doc """
+  Staff view of a workout's goals, from `Workouts.resolve_workout_goals/2`:
+  its own saved goals (`saved: true`); else those it inherits from the
+  workout it was copied from (`saved: false`, `inherited_from` set); else
+  the live suggestion, with the toggle at the gym's default.
+  """
+  def staff_goals(workout_id, resolved, suggestion, default_visible)
+
+  def staff_goals(workout_id, %{goals: nil}, suggestion, default_visible) do
     %{
       workout_id: workout_id,
       saved: false,
+      inherited_from: nil,
       muscles: suggestion.muscles,
       qualities: suggestion.qualities,
       stimulus: nil,
-      visible_to_members: false,
+      visible_to_members: default_visible,
       source: "suggested",
       taxonomy_version: suggestion.taxonomy_version,
       updated_by_id: nil,
@@ -40,10 +48,11 @@ defmodule MilosTraining.Application.WorkoutGoalsPresenter do
     }
   end
 
-  def staff_goals(workout_id, saved, _suggestion) do
+  def staff_goals(workout_id, %{goals: saved, inherited_from: inherited_from}, _suggestion, _) do
     %{
       workout_id: workout_id,
-      saved: true,
+      saved: is_nil(inherited_from),
+      inherited_from: inherited_from,
       muscles: Enum.map(saved.muscles, &muscle/1),
       qualities: saved.qualities,
       stimulus: saved.stimulus,
@@ -55,10 +64,14 @@ defmodule MilosTraining.Application.WorkoutGoalsPresenter do
     }
   end
 
-  @doc "Member view: only goals the coach saved and made visible, else nil."
-  def member_goals(%{visible_to_members: true} = saved) do
+  @doc """
+  Member view of a workout's resolved goals (its own or inherited): only
+  goals the coach saved and made visible, else nil. `workout_id` is the
+  workout asked about, also when its goals are inherited.
+  """
+  def member_goals(workout_id, %{goals: %{visible_to_members: true} = saved}) do
     %{
-      workout_id: saved.workout_id,
+      workout_id: workout_id,
       muscles: Enum.map(saved.muscles, &muscle/1),
       qualities: saved.qualities,
       stimulus: saved.stimulus,
@@ -67,7 +80,7 @@ defmodule MilosTraining.Application.WorkoutGoalsPresenter do
     }
   end
 
-  def member_goals(_saved), do: nil
+  def member_goals(_workout_id, _resolved), do: nil
 
   def muscle(%{id: id, role: role}), do: %{id: id, role: to_string(role)}
 end

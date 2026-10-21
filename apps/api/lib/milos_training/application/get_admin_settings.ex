@@ -11,6 +11,8 @@ defmodule MilosTraining.Application.GetAdminSettings do
        finance: Finance.get_finance_settings(context),
        notifications: Notifications.get_push_settings(),
        scheduling: Scheduling.get_settings(context),
+       # ADR-163: workout-authoring defaults (the WOD-goals toggle).
+       workouts: Organizations.get_workout_settings(context),
        provider: provider(context)
      }}
   end

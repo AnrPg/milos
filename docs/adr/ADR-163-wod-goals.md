@@ -103,7 +103,7 @@ athletes included), `GET/PUT /api/org/:slug/me/goal-feedback/:entry_kind/:entry_
   itself); RLS confines rows to the gym.
 - A goal-feedback row written on a voided training-log entry stays (the entry is kept
   too) but can no longer change; feeds and analytics must ignore voided entries.
-- Coach reads of feedback have no endpoint yet; P3-M3 analytics read it through the
+- Coach reads of feedback go through the totals endpoints (addendum); P3-M3 analytics read it through the
   existing rung predicates.
 
 ## Implementation Notes
@@ -121,3 +121,44 @@ athletes included), `GET/PUT /api/org/:slug/me/goal-feedback/:entry_kind/:entry_
   ADR-124 `from_workout/1` is unchanged.
 - Feedback saved on an entry done in another gym, or without a workout, returns
   `goals: null` (goals are read in the request's gym).
+
+## Addendum (2026-10-21): board 18 extras
+The owner took every recommended extra on board 18 (plan §5a). Backend:
+
+- **Gym default.** `wod_goals_visible_by_default` (default false) lives in
+  `organization_settings.settings["workouts"]` (`Organizations.Domain.WorkoutSettingsPolicy`,
+  like the join link), read by any staff member, changed with `manage_settings` through the
+  admin settings section `workouts` (`GET`/`PATCH /api/org/:slug/admin/settings`). A workout
+  with no goals of its own and nothing to inherit shows the suggestion with the toggle at this
+  default, and a first save without `visible_to_members` stores it. No migration.
+- **Inheritance.** A workout without goals of its own uses those of the nearest workout it was
+  copied from along `source_workout_id` (at most five levels, only within the gym), with their
+  visibility (`Workouts.resolve_workout_goals/2`). Member, feedback and staff reads resolve it;
+  the staff read answers `saved: false, inherited_from: <workout id>`, and a save on the variant
+  writes its own row (a first save keeps the inherited visibility). Class variants and member
+  versions are such copies (ADR-125, `ProgramUserWorkout`), and so are the filed class and
+  athlete copies (`FileWorkoutCopy.ensure_in_folder`); these now pass `copy_goals: false` so they
+  follow later edits of the base instead of a snapshot. An explicit duplicate or "copy to
+  folder" still copies the goals (decision 4). Scale levels are materialised on the fly from the
+  same workout (`WorkoutMaterializer`, ADR-128), so every scale shares its goals.
+- **Coach totals.** `GET /api/org/:slug/admin/workouts/:id/goal-feedback-summary`
+  (`manage_workouts`) and `GET /api/org/:slug/admin/schedule/slots/:id/goal-feedback-summary`
+  (`manage_workouts` or `run_classes`) return `{workout_id, [scheduled_class_id], entries, shown,
+  felt_muscles: [{id, count}], felt_qualities: [{id, count}], goals_not_felt}`. Feedback rows are
+  read in the caller's own session, so the existing `goal_feedback` coach read policies decide
+  what counts (no second visibility model): staff without the coach role in the gym count
+  nothing. Voided entries never count. Below three entries only `entries` is returned
+  (`shown: false`, empty lists). Muscles roll up to groups, each entry counting a group once;
+  `goals_not_felt` lists the groups of the goal's primary and secondary muscles nobody felt
+  (stabilizers are not expected to be felt). A class's entries are training-log entries logged
+  from it and executions timed from one of its bookings, whichever workout version they
+  followed; its goals are those of the class's workout. Migration
+  `20261111100000_add_goal_feedback_entry_scope.exs` adds the SECURITY DEFINER
+  `milos_goal_feedback_entry_scope(kind, id)` (workout, class, voided of one entry); its body
+  uses `$1/$2` because `bookings.kind` would shadow the `kind` argument.
+- **Member switch.** `felt_prompt_without_goals` (default true) on `body_settings`, next to
+  `journal_sections`, in `GET/PUT /api/me/body/settings` (migration
+  `20261111100100_add_felt_prompt_without_goals_to_body_settings.exs`; the table's owner-only
+  policy already covers it). Workouts with goals always offer «Τι ένιωσες;».
+- Open: an owner or admin who is not also a coach sees `entries: 0` on the totals, as on any
+  coach read of the journal; widening that is a journal-visibility decision, not a goals one.
