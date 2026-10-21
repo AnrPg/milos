@@ -169,3 +169,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-168 | PT squads | Accepted |
 | ADR-169 | Partners: training partners within a club, matches, «Κλείστε μαζί» and blocking | Accepted |
 | ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |
+| ADR-174 | AI scaling suggestions with mandatory coach approval | Accepted |
