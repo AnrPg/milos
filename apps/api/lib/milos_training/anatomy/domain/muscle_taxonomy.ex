@@ -128,8 +128,7 @@ defmodule MilosTraining.Anatomy.Domain.MuscleTaxonomy do
           {"tensor-fasciae-latae", "Tensor fasciae latae", ["2602"]},
           {"sartorius", "Sartorius", ["2610"]}
         ]},
-       {"hip-rotators", "Deep hip rotators",
-        ["2604", "2605", "2606", "2607", "2608", "2636"], []}
+       {"hip-rotators", "Deep hip rotators", ["2604", "2605", "2606", "2607", "2608", "2636"], []}
      ]},
     {"thighs", "Thighs",
      [
@@ -206,7 +205,8 @@ defmodule MilosTraining.Anatomy.Domain.MuscleTaxonomy do
                 parent_id: nil,
                 region_id: region_id,
                 group_id: nil,
-                ta2_ids: Enum.flat_map(group_nodes, &if(&1.kind == :group, do: &1.ta2_ids, else: []))
+                ta2_ids:
+                  Enum.flat_map(group_nodes, &if(&1.kind == :group, do: &1.ta2_ids, else: []))
               }
 
               acc ++ [region | group_nodes]

@@ -42,7 +42,8 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
 
   # id => {primary, secondary, stabilizer, qualities}
   @targets %{
-    "air-squat" => {["quadriceps", "gluteus-maximus"], ["adductor-magnus"], @squat_core, [:sta, :flex]},
+    "air-squat" =>
+      {["quadriceps", "gluteus-maximus"], ["adductor-magnus"], @squat_core, [:sta, :flex]},
     "back-squat" =>
       {["quadriceps", "gluteus-maximus"], ["adductor-magnus", "hamstrings"], @squat_core, [:str]},
     "front-squat" =>
@@ -56,9 +57,11 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["quadriceps", "gluteus-maximus"], ["adductor-magnus"], @squat_core ++ ["biceps-brachii"],
        [:str, :flex]},
     "box-squat" =>
-      {["gluteus-maximus", "quadriceps"], ["hamstrings", "adductor-magnus"], @squat_core, [:str, :pow]},
+      {["gluteus-maximus", "quadriceps"], ["hamstrings", "adductor-magnus"], @squat_core,
+       [:str, :pow]},
     "split-squat" =>
-      {["quadriceps", "gluteus-maximus"], ["adductors"], ["gluteus-medius" | @brace], [:str, :bal]},
+      {["quadriceps", "gluteus-maximus"], ["adductors"], ["gluteus-medius" | @brace],
+       [:str, :bal]},
     "bulgarian-split-squat" =>
       {["quadriceps", "gluteus-maximus"], ["adductors", "hamstrings"],
        ["gluteus-medius" | @brace], [:str, :bal]},
@@ -76,17 +79,19 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["hamstrings", "gluteus-maximus"], ["erector-spinae", "adductor-magnus"],
        @grip ++ ["latissimus-dorsi", "trapezius-middle" | @brace], [:str, :flex]},
     "stiff-leg-deadlift" =>
-      {["hamstrings", "gluteus-maximus"], ["erector-spinae"], @grip ++ ["latissimus-dorsi" | @brace],
-       [:str, :flex]},
+      {["hamstrings", "gluteus-maximus"], ["erector-spinae"],
+       @grip ++ ["latissimus-dorsi" | @brace], [:str, :flex]},
     "single-leg-deadlift" =>
-      {["hamstrings", "gluteus-maximus"], ["erector-spinae"], ["gluteus-medius", "calves" | @brace],
-       [:str, :bal]},
+      {["hamstrings", "gluteus-maximus"], ["erector-spinae"],
+       ["gluteus-medius", "calves" | @brace], [:str, :bal]},
     "clean" =>
-      {["gluteus-maximus", "hamstrings", "quadriceps"], ["trapezius-upper", "erector-spinae", "calves"],
-       ["deltoid", "rhomboids" | @brace], [:pow, :str, :spd, :coord]},
+      {["gluteus-maximus", "hamstrings", "quadriceps"],
+       ["trapezius-upper", "erector-spinae", "calves"], ["deltoid", "rhomboids" | @brace],
+       [:pow, :str, :spd, :coord]},
     "power-clean" =>
-      {["gluteus-maximus", "hamstrings", "trapezius-upper"], ["quadriceps", "erector-spinae", "calves"],
-       ["deltoid", "rhomboids" | @brace], [:pow, :spd, :coord]},
+      {["gluteus-maximus", "hamstrings", "trapezius-upper"],
+       ["quadriceps", "erector-spinae", "calves"], ["deltoid", "rhomboids" | @brace],
+       [:pow, :spd, :coord]},
     "hang-clean" =>
       {["gluteus-maximus", "hamstrings", "trapezius-upper"], ["quadriceps", "erector-spinae"],
        ["deltoid", "rhomboids" | @brace], [:pow, :spd, :coord]},
@@ -99,14 +104,14 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
        ["deltoid", "erector-spinae", "calves"], @overhead_stab,
        [:pow, :spd, :coord, :flex, :bal, :acc]},
     "power-snatch" =>
-      {["gluteus-maximus", "hamstrings", "trapezius-upper"], ["deltoid", "quadriceps", "erector-spinae"],
-       @overhead_stab, [:pow, :spd, :coord, :acc]},
+      {["gluteus-maximus", "hamstrings", "trapezius-upper"],
+       ["deltoid", "quadriceps", "erector-spinae"], @overhead_stab, [:pow, :spd, :coord, :acc]},
     "hang-snatch" =>
-      {["gluteus-maximus", "hamstrings", "trapezius-upper"], ["deltoid", "quadriceps"], @overhead_stab,
-       [:pow, :spd, :coord, :acc]},
+      {["gluteus-maximus", "hamstrings", "trapezius-upper"], ["deltoid", "quadriceps"],
+       @overhead_stab, [:pow, :spd, :coord, :acc]},
     "muscle-snatch" =>
-      {["trapezius-upper", "deltoid"], ["gluteus-maximus", "hamstrings", "rotator-cuff"], @overhead_stab,
-       [:pow, :coord, :flex]},
+      {["trapezius-upper", "deltoid"], ["gluteus-maximus", "hamstrings", "rotator-cuff"],
+       @overhead_stab, [:pow, :coord, :flex]},
     "jerk" =>
       {["quadriceps", "gluteus-maximus", "deltoid-anterior", "triceps-brachii"], ["calves"],
        @overhead_stab, [:pow, :spd, :coord, :bal]},
@@ -114,11 +119,12 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["quadriceps", "deltoid-anterior", "triceps-brachii"], ["gluteus-maximus", "calves"],
        @overhead_stab, [:pow, :spd, :coord]},
     "push-press" =>
-      {["deltoid-anterior", "triceps-brachii", "quadriceps"], ["deltoid-lateral", "gluteus-maximus"],
-       @overhead_stab, [:pow, :str]},
+      {["deltoid-anterior", "triceps-brachii", "quadriceps"],
+       ["deltoid-lateral", "gluteus-maximus"], @overhead_stab, [:pow, :str]},
     "strict-press" =>
-      {["deltoid-anterior", "triceps-brachii"], ["deltoid-lateral", "pectoralis-major-clavicular"],
-       @overhead_stab ++ ["gluteus-maximus"], [:str]},
+      {["deltoid-anterior", "triceps-brachii"],
+       ["deltoid-lateral", "pectoralis-major-clavicular"], @overhead_stab ++ ["gluteus-maximus"],
+       [:str]},
     "bench-press" =>
       {["pectoralis-major", "triceps-brachii"], ["deltoid-anterior"],
        ["latissimus-dorsi", "rotator-cuff", "rhomboids"], [:str]},
@@ -131,26 +137,31 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["pectoralis-major", "triceps-brachii"], ["deltoid-anterior"],
        ["rotator-cuff", "serratus-anterior"], [:str, :bal]},
     "dumbbell-row" =>
-      {["latissimus-dorsi", "rhomboids", "trapezius-middle"], ["deltoid-posterior", "biceps-brachii", "brachialis"],
+      {["latissimus-dorsi", "rhomboids", "trapezius-middle"],
+       ["deltoid-posterior", "biceps-brachii", "brachialis"],
        @grip ++ ["obliques", "erector-spinae"], [:str]},
     "barbell-row" =>
-      {["latissimus-dorsi", "rhomboids", "trapezius-middle"], ["deltoid-posterior", "biceps-brachii", "teres-major"],
+      {["latissimus-dorsi", "rhomboids", "trapezius-middle"],
+       ["deltoid-posterior", "biceps-brachii", "teres-major"],
        @grip ++ @hinge_back ++ ["hamstrings"], [:str]},
     "pendlay-row" =>
-      {["latissimus-dorsi", "rhomboids", "trapezius-middle"], ["deltoid-posterior", "biceps-brachii"],
-       @grip ++ @hinge_back ++ ["hamstrings"], [:str, :pow]},
+      {["latissimus-dorsi", "rhomboids", "trapezius-middle"],
+       ["deltoid-posterior", "biceps-brachii"], @grip ++ @hinge_back ++ ["hamstrings"],
+       [:str, :pow]},
     "upright-row" =>
-      {["trapezius-upper", "deltoid-lateral"], ["deltoid-anterior", "biceps-brachii"], @grip, [:str]},
+      {["trapezius-upper", "deltoid-lateral"], ["deltoid-anterior", "biceps-brachii"], @grip,
+       [:str]},
     "good-morning" =>
-      {["hamstrings", "erector-spinae"], ["gluteus-maximus", "adductor-magnus"], @brace, [:str, :flex]},
+      {["hamstrings", "erector-spinae"], ["gluteus-maximus", "adductor-magnus"], @brace,
+       [:str, :flex]},
     "hip-thrust" => {["gluteus-maximus"], ["hamstrings", "quadriceps"], @brace, [:str]},
     "glute-bridge" => {["gluteus-maximus"], ["hamstrings"], ["rectus-abdominis"], [:sta]},
     "lunge" =>
-      {["quadriceps", "gluteus-maximus"], ["adductors", "hamstrings"], ["gluteus-medius" | @brace],
-       [:str, :bal, :coord]},
+      {["quadriceps", "gluteus-maximus"], ["adductors", "hamstrings"],
+       ["gluteus-medius" | @brace], [:str, :bal, :coord]},
     "reverse-lunge" =>
-      {["gluteus-maximus", "quadriceps"], ["hamstrings", "adductors"], ["gluteus-medius" | @brace],
-       [:str, :bal]},
+      {["gluteus-maximus", "quadriceps"], ["hamstrings", "adductors"],
+       ["gluteus-medius" | @brace], [:str, :bal]},
     "walking-lunge" =>
       {["quadriceps", "gluteus-maximus"], ["adductors", "hamstrings", "calves"],
        ["gluteus-medius" | @brace], [:sta, :bal, :coord]},
@@ -164,8 +175,8 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
     "lateral-raise" => {["deltoid-lateral"], ["trapezius-upper", "supraspinatus"], [], [:str]},
     "front-raise" => {["deltoid-anterior"], ["pectoralis-major-clavicular"], @brace, [:str]},
     "face-pull" =>
-      {["deltoid-posterior", "trapezius-middle"], ["infraspinatus", "teres-minor", "rhomboids"], [],
-       [:str, :coord]},
+      {["deltoid-posterior", "trapezius-middle"], ["infraspinatus", "teres-minor", "rhomboids"],
+       [], [:str, :coord]},
     "farmer-carry" =>
       {["forearm-flexors", "trapezius-upper"], ["obliques", "gluteus-medius"],
        ["quadratus-lumborum", "erector-spinae", "calves"], [:str, :sta]},
@@ -188,14 +199,14 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["gluteus-maximus", "hamstrings"], ["erector-spinae", "deltoid", "trapezius-upper"],
        @grip ++ ["latissimus-dorsi", "serratus-anterior" | @brace], [:pow, :sta, :end, :flex]},
     "russian-kettlebell-swing" =>
-      {["gluteus-maximus", "hamstrings"], ["erector-spinae"], @grip ++ ["latissimus-dorsi" | @brace],
-       [:pow, :sta]},
+      {["gluteus-maximus", "hamstrings"], ["erector-spinae"],
+       @grip ++ ["latissimus-dorsi" | @brace], [:pow, :sta]},
     "turkish-get-up" =>
       {["deltoid", "obliques", "gluteus-maximus"], ["triceps-brachii", "quadriceps"],
        ["rotator-cuff", "serratus-anterior", "trapezius" | @brace], [:str, :bal, :coord, :flex]},
     "thruster" =>
-      {["quadriceps", "gluteus-maximus", "deltoid-anterior"], ["triceps-brachii", "deltoid-lateral"],
-       @overhead_stab, [:sta, :pow, :end, :coord]},
+      {["quadriceps", "gluteus-maximus", "deltoid-anterior"],
+       ["triceps-brachii", "deltoid-lateral"], @overhead_stab, [:sta, :pow, :end, :coord]},
     "wall-ball" =>
       {["quadriceps", "gluteus-maximus", "deltoid-anterior"], ["triceps-brachii"], @overhead_stab,
        [:sta, :end, :coord, :acc]},
@@ -206,14 +217,14 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["pectoralis-major", "latissimus-dorsi", "quadriceps", "deltoid"],
        ["triceps-brachii", "gluteus-maximus", "rhomboids"], @overhead_stab, [:sta, :str, :coord]},
     "push-up" =>
-      {["pectoralis-major", "triceps-brachii"], ["deltoid-anterior"], ["serratus-anterior" | @brace],
-       [:str, :sta]},
+      {["pectoralis-major", "triceps-brachii"], ["deltoid-anterior"],
+       ["serratus-anterior" | @brace], [:str, :sta]},
     "hand-release-push-up" =>
       {["pectoralis-major", "triceps-brachii"], ["deltoid-anterior", "rhomboids"],
        ["serratus-anterior" | @brace], [:sta, :str]},
     "diamond-push-up" =>
-      {["triceps-brachii", "pectoralis-major"], ["deltoid-anterior"], ["serratus-anterior" | @brace],
-       [:str]},
+      {["triceps-brachii", "pectoralis-major"], ["deltoid-anterior"],
+       ["serratus-anterior" | @brace], [:str]},
     "dip" =>
       {["triceps-brachii", "pectoralis-major-sternocostal"], ["deltoid-anterior"],
        ["pectoralis-minor", "rhomboids"], [:str]},
@@ -221,69 +232,83 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["triceps-brachii", "pectoralis-major-sternocostal"], ["deltoid-anterior"],
        ["rotator-cuff", "pectoralis-minor", "biceps-brachii" | @brace], [:str, :bal, :coord]},
     "pull-up" =>
-      {["latissimus-dorsi", "biceps-brachii"], ["teres-major", "rhomboids", "trapezius-lower", "brachialis"],
+      {["latissimus-dorsi", "biceps-brachii"],
+       ["teres-major", "rhomboids", "trapezius-lower", "brachialis"],
        @grip ++ ["rectus-abdominis"], [:str, :sta]},
     "strict-pull-up" =>
-      {["latissimus-dorsi", "biceps-brachii"], ["teres-major", "rhomboids", "trapezius-lower", "brachialis"],
-       @grip ++ @brace, [:str]},
+      {["latissimus-dorsi", "biceps-brachii"],
+       ["teres-major", "rhomboids", "trapezius-lower", "brachialis"], @grip ++ @brace, [:str]},
     "chest-to-bar-pull-up" =>
-      {["latissimus-dorsi", "rhomboids", "biceps-brachii"], ["trapezius-middle", "trapezius-lower", "teres-major"],
+      {["latissimus-dorsi", "rhomboids", "biceps-brachii"],
+       ["trapezius-middle", "trapezius-lower", "teres-major"],
        @grip ++ ["rectus-abdominis", "hip-flexors"], [:str, :sta, :coord]},
     "chin-up" =>
       {["latissimus-dorsi", "biceps-brachii"], ["brachialis", "teres-major", "rhomboids"],
        @grip ++ ["rectus-abdominis"], [:str]},
     "ring-row" =>
-      {["latissimus-dorsi", "rhomboids", "trapezius-middle"], ["biceps-brachii", "deltoid-posterior"],
-       @grip ++ ["gluteus-maximus" | @brace], [:str, :sta]},
+      {["latissimus-dorsi", "rhomboids", "trapezius-middle"],
+       ["biceps-brachii", "deltoid-posterior"], @grip ++ ["gluteus-maximus" | @brace],
+       [:str, :sta]},
     "muscle-up" =>
-      {["latissimus-dorsi", "triceps-brachii", "pectoralis-major"], ["biceps-brachii", "deltoid-anterior"],
-       @grip ++ ["rotator-cuff", "hip-flexors" | @brace], [:str, :pow, :coord, :agi]},
+      {["latissimus-dorsi", "triceps-brachii", "pectoralis-major"],
+       ["biceps-brachii", "deltoid-anterior"], @grip ++ ["rotator-cuff", "hip-flexors" | @brace],
+       [:str, :pow, :coord, :agi]},
     "ring-muscle-up" =>
-      {["latissimus-dorsi", "triceps-brachii", "pectoralis-major"], ["biceps-brachii", "deltoid-anterior"],
-       @grip ++ ["rotator-cuff", "hip-flexors" | @brace], [:str, :pow, :coord, :bal]},
+      {["latissimus-dorsi", "triceps-brachii", "pectoralis-major"],
+       ["biceps-brachii", "deltoid-anterior"], @grip ++ ["rotator-cuff", "hip-flexors" | @brace],
+       [:str, :pow, :coord, :bal]},
     "bar-muscle-up" =>
-      {["latissimus-dorsi", "triceps-brachii"], ["pectoralis-major", "biceps-brachii", "deltoid-anterior"],
+      {["latissimus-dorsi", "triceps-brachii"],
+       ["pectoralis-major", "biceps-brachii", "deltoid-anterior"],
        @grip ++ ["hip-flexors" | @brace], [:str, :pow, :coord, :agi]},
     "rope-climb" =>
       {["latissimus-dorsi", "biceps-brachii", "forearm-flexors"], ["brachialis", "rhomboids"],
        ["quadriceps", "adductors" | @brace], [:str, :coord]},
     "legless-rope-climb" =>
-      {["latissimus-dorsi", "biceps-brachii", "forearm-flexors"], ["brachialis", "rhomboids", "teres-major"],
-       @brace ++ ["hip-flexors"], [:str, :coord]},
+      {["latissimus-dorsi", "biceps-brachii", "forearm-flexors"],
+       ["brachialis", "rhomboids", "teres-major"], @brace ++ ["hip-flexors"], [:str, :coord]},
     "toes-to-bar" =>
-      {["rectus-abdominis", "hip-flexors"], ["obliques", "latissimus-dorsi"], @grip ++ ["serratus-anterior"],
-       [:sta, :coord, :flex]},
+      {["rectus-abdominis", "hip-flexors"], ["obliques", "latissimus-dorsi"],
+       @grip ++ ["serratus-anterior"], [:sta, :coord, :flex]},
     "knees-to-elbows" =>
-      {["rectus-abdominis", "hip-flexors"], ["obliques", "latissimus-dorsi"], @grip, [:sta, :coord]},
+      {["rectus-abdominis", "hip-flexors"], ["obliques", "latissimus-dorsi"], @grip,
+       [:sta, :coord]},
     "sit-up" => {["rectus-abdominis", "hip-flexors"], ["obliques"], [], [:sta]},
     "ghd-sit-up" =>
       {["rectus-abdominis", "hip-flexors"], ["obliques", "quadriceps"], ["transversus-abdominis"],
        [:str, :sta]},
-    "v-up" => {["rectus-abdominis", "hip-flexors"], ["obliques"], ["transversus-abdominis"], [:sta, :coord]},
-    "hollow-hold" => {["rectus-abdominis", "transversus-abdominis"], ["hip-flexors", "obliques"], [], [:sta]},
+    "v-up" =>
+      {["rectus-abdominis", "hip-flexors"], ["obliques"], ["transversus-abdominis"],
+       [:sta, :coord]},
+    "hollow-hold" =>
+      {["rectus-abdominis", "transversus-abdominis"], ["hip-flexors", "obliques"], [], [:sta]},
     "arch-hold" =>
-      {["erector-spinae", "gluteus-maximus"], ["hamstrings", "trapezius-lower"], ["multifidus"], [:sta]},
+      {["erector-spinae", "gluteus-maximus"], ["hamstrings", "trapezius-lower"], ["multifidus"],
+       [:sta]},
     "plank" =>
       {["rectus-abdominis", "transversus-abdominis"], ["obliques"],
        ["serratus-anterior", "gluteus-maximus", "deltoid-anterior"], [:sta]},
     "side-plank" =>
-      {["obliques", "quadratus-lumborum"], ["gluteus-medius"], ["transversus-abdominis", "deltoid-lateral"],
-       [:sta, :bal]},
+      {["obliques", "quadratus-lumborum"], ["gluteus-medius"],
+       ["transversus-abdominis", "deltoid-lateral"], [:sta, :bal]},
     "pallof-press" =>
-      {["obliques", "transversus-abdominis"], ["rectus-abdominis"], ["gluteus-medius", "deltoid-anterior"],
-       [:str, :bal]},
+      {["obliques", "transversus-abdominis"], ["rectus-abdominis"],
+       ["gluteus-medius", "deltoid-anterior"], [:str, :bal]},
     "back-extension" =>
       {["erector-spinae", "gluteus-maximus"], ["hamstrings"], ["multifidus"], [:str, :sta]},
     "burpee" =>
-      {["pectoralis-major", "quadriceps", "gluteus-maximus"], ["triceps-brachii", "deltoid-anterior", "calves"],
-       @brace ++ ["hip-flexors"], [:end, :sta, :agi, :coord]},
+      {["pectoralis-major", "quadriceps", "gluteus-maximus"],
+       ["triceps-brachii", "deltoid-anterior", "calves"], @brace ++ ["hip-flexors"],
+       [:end, :sta, :agi, :coord]},
     "burpee-box-jump" =>
-      {["quadriceps", "gluteus-maximus", "pectoralis-major"], ["calves", "triceps-brachii", "hamstrings"],
-       @brace ++ ["hip-flexors"], [:end, :sta, :pow, :agi, :coord]},
+      {["quadriceps", "gluteus-maximus", "pectoralis-major"],
+       ["calves", "triceps-brachii", "hamstrings"], @brace ++ ["hip-flexors"],
+       [:end, :sta, :pow, :agi, :coord]},
     "box-jump" =>
       {["quadriceps", "gluteus-maximus", "calves"], ["hamstrings"], @brace, [:pow, :coord, :acc]},
     "box-jump-over" =>
-      {["quadriceps", "gluteus-maximus", "calves"], ["hamstrings"], @brace, [:pow, :sta, :agi, :coord]},
+      {["quadriceps", "gluteus-maximus", "calves"], ["hamstrings"], @brace,
+       [:pow, :sta, :agi, :coord]},
     "broad-jump" =>
       {["gluteus-maximus", "quadriceps", "hamstrings"], ["calves"], @brace, [:pow, :coord, :bal]},
     "double-under" =>
@@ -297,33 +322,38 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {["deltoid", "triceps-brachii"], ["trapezius-upper", "serratus-anterior"],
        ["forearm-flexors", "rotator-cuff" | @brace], [:str, :bal, :coord, :acc]},
     "handstand-push-up" =>
-      {["deltoid-anterior", "triceps-brachii"], ["trapezius-upper", "pectoralis-major-clavicular", "deltoid-lateral"],
+      {["deltoid-anterior", "triceps-brachii"],
+       ["trapezius-upper", "pectoralis-major-clavicular", "deltoid-lateral"],
        ["serratus-anterior", "rotator-cuff" | @brace], [:str, :bal]},
     "wall-walk" =>
       {["deltoid", "triceps-brachii"], ["pectoralis-major-clavicular", "trapezius-upper"],
        ["serratus-anterior" | @brace], [:str, :bal, :coord]},
     "run" =>
-      {["quadriceps", "hamstrings", "calves"], ["gluteus-maximus", "hip-flexors"], ["gluteus-medius" | @brace],
-       [:end, :sta]},
+      {["quadriceps", "hamstrings", "calves"], ["gluteus-maximus", "hip-flexors"],
+       ["gluteus-medius" | @brace], [:end, :sta]},
     "sprint" =>
       {["hamstrings", "gluteus-maximus", "quadriceps", "calves"], ["hip-flexors"],
        ["gluteus-medius" | @brace], [:spd, :pow, :agi]},
     "row" =>
-      {["quadriceps", "latissimus-dorsi", "gluteus-maximus"], ["hamstrings", "rhomboids", "biceps-brachii", "erector-spinae"],
+      {["quadriceps", "latissimus-dorsi", "gluteus-maximus"],
+       ["hamstrings", "rhomboids", "biceps-brachii", "erector-spinae"],
        @grip ++ ["rectus-abdominis"], [:end, :sta, :pow]},
     "bike" =>
       {["quadriceps", "gluteus-maximus"], ["hamstrings", "calves"], ["hip-flexors"], [:end, :sta]},
     "air-bike" =>
-      {["quadriceps", "gluteus-maximus"], ["hamstrings", "deltoid", "triceps-brachii", "latissimus-dorsi"],
-       @brace, [:end, :sta, :pow]},
+      {["quadriceps", "gluteus-maximus"],
+       ["hamstrings", "deltoid", "triceps-brachii", "latissimus-dorsi"], @brace,
+       [:end, :sta, :pow]},
     "ski-erg" =>
-      {["latissimus-dorsi", "triceps-brachii"], ["rectus-abdominis", "gluteus-maximus", "hamstrings", "teres-major"],
+      {["latissimus-dorsi", "triceps-brachii"],
+       ["rectus-abdominis", "gluteus-maximus", "hamstrings", "teres-major"],
        @grip ++ ["serratus-anterior"], [:end, :sta, :pow]},
     "swim" =>
       {["latissimus-dorsi", "deltoid"], ["triceps-brachii", "pectoralis-major", "quadriceps"],
        @brace ++ ["rotator-cuff"], [:end, :sta, :coord]},
     "stair-climb" =>
-      {["quadriceps", "gluteus-maximus"], ["calves", "hamstrings"], ["gluteus-medius"], [:end, :sta]},
+      {["quadriceps", "gluteus-maximus"], ["calves", "hamstrings"], ["gluteus-medius"],
+       [:end, :sta]},
     "jumping-jack" =>
       {["calves", "deltoid-lateral"], ["gluteus-medius", "adductors"], [], [:end, :coord]},
     "mountain-climber" =>
@@ -345,8 +375,8 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
     "shoulder-dislocate" =>
       {["deltoid", "rotator-cuff"], ["pectoralis-major", "trapezius"], [], [:flex]},
     "band-pull-apart" =>
-      {["deltoid-posterior", "rhomboids", "trapezius-middle"], ["infraspinatus", "teres-minor"], [],
-       [:flex, :coord]},
+      {["deltoid-posterior", "rhomboids", "trapezius-middle"], ["infraspinatus", "teres-minor"],
+       [], [:flex, :coord]},
     "foam-roll" => {[], [], [], [:flex]}
   }
 
@@ -365,7 +395,8 @@ defmodule MilosTraining.Anatomy.Domain.ExerciseTargets do
       {:ok, {primary, secondary, stabilizer, qualities}} ->
         %{
           muscles: merge_roles(primary: primary, secondary: secondary, stabilizer: stabilizer),
-          qualities: qualities |> Enum.map(&Map.fetch!(@qualities, &1)) |> FitnessQualities.normalize()
+          qualities:
+            qualities |> Enum.map(&Map.fetch!(@qualities, &1)) |> FitnessQualities.normalize()
         }
 
       :error ->

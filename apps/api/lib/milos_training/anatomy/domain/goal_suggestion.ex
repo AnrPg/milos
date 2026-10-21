@@ -49,13 +49,18 @@ defmodule MilosTraining.Anatomy.Domain.GoalSuggestion do
     scores =
       Enum.reduce(resolved, %{}, fn {%{muscles: muscles}, weight}, acc ->
         Enum.reduce(muscles, acc, fn %{id: id, role: role}, acc ->
-          Map.update(acc, id, %{role: role, weight: weight, by_role: %{role => weight}}, fn entry ->
-            %{
-              role: stronger(entry.role, role),
-              weight: entry.weight + weight,
-              by_role: Map.update(entry.by_role, role, weight, &(&1 + weight))
-            }
-          end)
+          Map.update(
+            acc,
+            id,
+            %{role: role, weight: weight, by_role: %{role => weight}},
+            fn entry ->
+              %{
+                role: stronger(entry.role, role),
+                weight: entry.weight + weight,
+                by_role: Map.update(entry.by_role, role, weight, &(&1 + weight))
+              }
+            end
+          )
         end)
       end)
 
@@ -81,8 +86,11 @@ defmodule MilosTraining.Anatomy.Domain.GoalSuggestion do
     case MuscleTaxonomy.fetch(id) do
       %{kind: :head, group_id: group_id} ->
         case Map.fetch(goals, group_id) do
-          {:ok, group_role} -> ExerciseTargets.role_rank(group_role) >= ExerciseTargets.role_rank(role)
-          :error -> false
+          {:ok, group_role} ->
+            ExerciseTargets.role_rank(group_role) >= ExerciseTargets.role_rank(role)
+
+          :error ->
+            false
         end
 
       _other ->
@@ -94,10 +102,14 @@ defmodule MilosTraining.Anatomy.Domain.GoalSuggestion do
 
   defp qualities(resolved, total) do
     resolved
-    |> Enum.flat_map(fn {%{qualities: qualities}, weight} -> Enum.map(qualities, &{&1, weight}) end)
+    |> Enum.flat_map(fn {%{qualities: qualities}, weight} ->
+      Enum.map(qualities, &{&1, weight})
+    end)
     |> Enum.reduce(%{}, fn {id, weight}, acc -> Map.update(acc, id, weight, &(&1 + weight)) end)
     |> Enum.filter(fn {_id, weight} -> weight / total >= @quality_share end)
-    |> Enum.sort_by(fn {id, weight} -> {-weight, Enum.find_index(FitnessQualities.all(), &(&1 == id))} end)
+    |> Enum.sort_by(fn {id, weight} ->
+      {-weight, Enum.find_index(FitnessQualities.all(), &(&1 == id))}
+    end)
     |> Enum.take(@max_qualities)
     |> Enum.map(&elem(&1, 0))
   end

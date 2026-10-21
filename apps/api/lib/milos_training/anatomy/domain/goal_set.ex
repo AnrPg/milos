@@ -60,7 +60,9 @@ defmodule MilosTraining.Anatomy.Domain.GoalSet do
         {:ok,
          by_id
          |> Enum.map(fn {id, role} -> %{id: id, role: role} end)
-         |> Enum.sort_by(fn %{id: id, role: role} -> {-ExerciseTargets.role_rank(role), order(id)} end)}
+         |> Enum.sort_by(fn %{id: id, role: role} ->
+           {-ExerciseTargets.role_rank(role), order(id)}
+         end)}
 
       error ->
         error
@@ -71,11 +73,14 @@ defmodule MilosTraining.Anatomy.Domain.GoalSet do
     do: {:error, {:invalid_goals, %{muscles: "must be a list of at most #{@max_muscles}"}}}
 
   defp felt_muscles(list) when is_list(list) and length(list) <= @max_muscles do
-    ids = Enum.map(list, &(if is_map(&1), do: field(&1, :id), else: &1))
+    ids = Enum.map(list, &if(is_map(&1), do: field(&1, :id), else: &1))
 
     case Enum.reject(ids, &MuscleTaxonomy.targetable?/1) do
-      [] -> {:ok, ids |> Enum.uniq() |> Enum.sort_by(&order/1)}
-      [bad | _rest] -> {:error, {:invalid_goals, %{felt_muscles: "unknown muscle #{inspect(bad)}"}}}
+      [] ->
+        {:ok, ids |> Enum.uniq() |> Enum.sort_by(&order/1)}
+
+      [bad | _rest] ->
+        {:error, {:invalid_goals, %{felt_muscles: "unknown muscle #{inspect(bad)}"}}}
     end
   end
 
