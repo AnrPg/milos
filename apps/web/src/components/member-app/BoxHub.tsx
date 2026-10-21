@@ -8,6 +8,7 @@ import { AnnouncementsCard } from "@/components/community/AnnouncementsCard";
 import { gymClubFor } from "@/components/community/community";
 import { useMyClubs } from "@/components/community/use-community";
 import { AccessNotice, EntitlementCard } from "@/components/finance/MembershipEntitlement";
+import { BOX_EXTENSIONS } from "@/components/member-app/box/box-extensions";
 import { BoxToday } from "@/components/member-app/box/BoxToday";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
 import { ProviderTitle } from "@/components/providers/ProviderSwitcher";
@@ -18,7 +19,8 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
  * Fixed order: «Σήμερα» across providers (ADR-162, only with more than one)
  * · today's workout · next booking · actions · membership (with «Φέρε φίλο»,
- * ADR-156) · announcements (the gym club's #ανακοινώσεις, ADR-138). The title
+ * ADR-156) · extensions (PT squads, ADR-168) · announcements (the gym club's
+ * #ανακοινώσεις, ADR-138). The title
  * ▾ switches provider (board 17 Q1); everything below it is that provider's.
  */
 export function BoxHub() {
@@ -63,6 +65,10 @@ export function BoxHub() {
           ) : null}
         </div>
       </HubCard>
+
+      {BOX_EXTENSIONS.filter((extension) => extension.kinds.includes("gym")).map(({ id, Component }) => (
+        <Component key={id} membership={membership} providerKind="gym" />
+      ))}
 
       {gymClub ? <AnnouncementsCard club={gymClub} /> : null}
     </HubPage>

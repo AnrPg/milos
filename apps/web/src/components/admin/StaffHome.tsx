@@ -26,6 +26,7 @@ import { roleErrorKey, staffHomeLayout, takeableAthletes } from "@/components/ad
 import { formatDateTime } from "@/components/client/format";
 import { useSession } from "@/components/session-provider";
 import { CleaningLog } from "@/components/staff/CleaningLog";
+import { SquadsSection } from "@/components/community/squads/SquadsSection";
 import { FormReviewQueue } from "@/components/staff/FormReviewQueue";
 import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import {
@@ -82,6 +83,7 @@ export function StaffHome() {
       {frontDesk ? <FrontDeskCard membership={membership} /> : null}
       {accountant ? <AccountsCard membership={membership} /> : null}
       {coach ? <MyClientsSection membership={membership} /> : null}
+      {coach ? <SquadsSection membership={membership} /> : null}
       {coach && has("manage_appointments") ? <MyAppointments /> : null}
       {coach && has("manage_coaching") ? <ReplyQueue /> : null}
       {coach && has("manage_coaching") ? <FormReviewQueue /> : null}

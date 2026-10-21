@@ -5377,7 +5377,8 @@
       "season": "temporada",
       "custom": "canal",
       "general": "general",
-      "member_group": "grupo"
+      "member_group": "grupo",
+      "pt_squad": "squad"
     },
     "notify": {
       "all": "Todo",
@@ -6202,7 +6203,9 @@
     "notif_event_trial_offer_title": "Prueba una clase",
     "notif_event_trial_offer_body": "¿Te gustó «{event}»? {box} te invita a una clase de prueba.",
     "notif_event_message_title": "Mensaje sobre «{event}»",
-    "findNearbyLater": "Los clubs cerca de ti llegarán con Cerca de mí."
+    "findNearbyLater": "Los clubs cerca de ti llegarán con Cerca de mí.",
+    "notif_squad_invited_title": "Invitación a un squad",
+    "notif_squad_invited_body": "{person} te ha invitado al squad «{group}»."
   },
   "CommunityAdmin": {
     "title": "Comunidad",
@@ -8237,5 +8240,54 @@
       "notShown": "Se muestra a partir de 3 registros.",
       "notFelt": "Objetivos que nadie sintió: {muscles}"
     }
+  },
+  "Squads": {
+    "title": "Squads",
+    "label": "Squad de PT",
+    "loading": "Cargando…",
+    "newSquad": "Nuevo squad",
+    "newSquadHint": "Un canal pequeño con algunos de tus clientes. Cada uno entra cuando acepta.",
+    "name": "Nombre",
+    "namePlaceholder": "p. ej. PT de mañana",
+    "about": "Descripción (opcional)",
+    "pickClients": "Invitar clientes",
+    "searchClients": "Busca entre tus clientes",
+    "placesLeft": "{count, plural, one {# plaza libre} other {# plazas libres}}",
+    "noClients": "Aún no tienes clientes para invitar.",
+    "noMoreClients": "Todos tus clientes ya están dentro o invitados.",
+    "create": "Crear",
+    "cancel": "Cancelar",
+    "save": "Guardar",
+    "edit": "Editar",
+    "members": "{count, plural, one {# miembro} other {# miembros}}",
+    "invitesOpen": "{count, plural, one {# invitación pendiente} other {# invitaciones pendientes}}",
+    "coachedEmpty": "Crea un squad para hablar con varios de tus clientes a la vez.",
+    "coachedBy": "Con {coach}",
+    "coachLabel": "Coach",
+    "invitesTitle": "Invitaciones",
+    "invitedBy": "{coach} te ha invitado",
+    "accept": "Unirme",
+    "decline": "Rechazar",
+    "invite": "Invitar",
+    "inviteTitle": "Invitar clientes",
+    "followsCoaching": "Solo pueden estar tus clientes activos. Cuando termina el coaching, salen del squad.",
+    "privacyNote": "Solo {coach} y los miembros del squad ven lo que se publica aquí.",
+    "invitedBanner": "{coach} te ha invitado a este squad. Únete para ver sus publicaciones y su gente.",
+    "archive": "Archivar",
+    "archiveTitle": "¿Archivar este squad?",
+    "archiveBody": "Los miembros ya no podrán leer ni publicar en él. Puedes recuperarlo más tarde.",
+    "reopen": "Recuperar",
+    "leave": "Salir",
+    "leaveTitle": "¿Salir de este squad?",
+    "leaveBody": "Dejarás de ver sus publicaciones. Tu coach puede volver a invitarte.",
+    "remove": "Quitar del squad",
+    "withdraw": "Retirar",
+    "memberActions": "Acciones para esta persona",
+    "statusInvited": "Invitación enviada",
+    "noMembersYet": "Todavía no se ha unido nadie.",
+    "tabFeed": "Publicaciones",
+    "tabMembers": "Personas",
+    "notFound": "Este squad no está disponible.",
+    "backToClub": "Volver al club"
   }
 }
