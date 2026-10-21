@@ -218,6 +218,15 @@ All recommended options, with every recommended extra.
 6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
    entries; also lists goals nobody felt.
 
+### PT squads (2026-10-21, no board: ANR's Phase 3 rule, recommended options)
+1. **Where:** a channel in the gym's club (not a separate club), so no extra club-bar bubble and every channel feature
+   applies; the coach starts it from «Πελάτες μου» (and a solo coach from Box).
+2. **Joining:** invitation with consent; the client sees it in Box, in Κανάλια and as a notification, and accepts or declines.
+   Only active clients can be invited; ending coaching removes them, re-checked on every read.
+3. **Privacy:** only the coach and members see the squad; other staff don't. Members see members, the coach also open
+   invitations.
+4. **Size:** up to 30 people per squad, 20 live squads per coach; no auto-archive.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
