@@ -157,6 +157,8 @@ export class FigureController {
     const token = ++this.focusToken;
     const focus = this.options.focus;
     this.zoom = 1;
+    // Exposed for tests and callers: which framing the camera has settled on.
+    this.container.dataset.anatomyFramed = "";
     if (!focus) {
       this.moveTo({ yaw: 0, distance: this.fullDistance(), target: new THREE.Vector3(0, BODY.centerY, 0) }, animate);
       return;
@@ -168,7 +170,7 @@ export class FigureController {
         if (!bounds) return;
         const tan = Math.tan(THREE.MathUtils.degToRad(FOV / 2));
         const fit = Math.max(bounds.size[1] / 2, bounds.size[0] / 2 / this.slotAspect()) / tan;
-        const distance = THREE.MathUtils.clamp(fit * 1.35 + bounds.size[2], 0.9, this.fullDistance());
+        const distance = THREE.MathUtils.clamp(fit * 1.6 + bounds.size[2], 0.9, this.fullDistance());
         const yaw = this.options.view === "both" ? 0 : (bounds.posterior ? Math.PI : 0) - viewYaws(this.options.view)[0];
         const target = new THREE.Vector3(0, bounds.center[1], 0);
         this.moveTo({ yaw: wrapAngle(yaw, this.current.yaw), distance, target }, animate);
@@ -181,11 +183,16 @@ export class FigureController {
     if (!animate || this.options.reducedMotion) {
       this.current = { yaw: goal.yaw, distance: goal.distance, target: goal.target.clone() };
       this.tween = null;
+      this.settled();
       this.requestRender();
       return;
     }
     this.tween = { from: { ...this.current, target: this.current.target.clone() }, start: performance.now() };
     this.requestRender();
+  }
+
+  private settled() {
+    this.container.dataset.anatomyFramed = this.options.focus ?? "body";
   }
 
   private requestRender() {
@@ -205,7 +212,10 @@ export class FigureController {
         distance: from.distance + (this.goal.distance - from.distance) * k,
         target: from.target.clone().lerp(this.goal.target, k),
       };
-      if (t >= 1) this.tween = null;
+      if (t >= 1) {
+        this.tween = null;
+        this.settled();
+      }
     }
     const framing = { ...this.current, distance: this.current.distance / this.zoom };
     drawViews(this.renderer, this.scene, this.cameras, this.options.view, framing, this.width, this.height);

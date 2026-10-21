@@ -90,6 +90,13 @@ export class AnatomyScene {
   });
   private readonly roleMaterials = new Map<string, THREE.MeshPhysicalMaterial>();
   private environment: THREE.Texture | null = null;
+  private readonly lights: Array<{ light: THREE.DirectionalLight; base: THREE.Vector3 }>;
+  private static readonly yAxis = new THREE.Vector3(0, 1, 0);
+
+  /** Turns the lights with a camera that orbits the body by `yaw`. */
+  orientLights(yaw: number) {
+    for (const { light, base } of this.lights) light.position.copy(base).applyAxisAngle(AnatomyScene.yAxis, yaw);
+  }
 
   constructor(atlas: Atlas) {
     const muscles = atlas.muscles.clone(true);
@@ -106,11 +113,16 @@ export class AnatomyScene {
     this.model.add(bones, muscles);
     this.scene.add(this.model);
 
-    const key = new THREE.DirectionalLight(0xffffff, 2.0);
-    key.position.set(1, 2, 3);
-    const rim = new THREE.DirectionalLight(0xbfd0ff, 0.9);
-    rim.position.set(-2, 1, -2);
-    this.scene.add(key, rim);
+    // Key and rim light as in the approved render; they follow each camera (orientLights)
+    // so the back view is lit like the front.
+    this.lights = [
+      { light: new THREE.DirectionalLight(0xffffff, 2.0), base: new THREE.Vector3(1, 2, 3) },
+      { light: new THREE.DirectionalLight(0xbfd0ff, 0.9), base: new THREE.Vector3(-2, 1, -2) },
+    ];
+    for (const { light, base } of this.lights) {
+      light.position.copy(base);
+      this.scene.add(light);
+    }
   }
 
   /** Image-based lighting; needs the renderer, once. */

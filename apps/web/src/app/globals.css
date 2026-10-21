@@ -74,7 +74,7 @@ html[data-theme="paper"],
 html[data-theme="lagoon"],
 html[data-theme="sunset"] {
   color-scheme: light;
-  --anatomy-base: #B9A49D;
+  --anatomy-base: #AE9891;
   --anatomy-bone: #D8CDBB;
 }
 

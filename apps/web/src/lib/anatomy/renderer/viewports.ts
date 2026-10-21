@@ -31,6 +31,7 @@ export function drawViews(
     camera.aspect = slot / height;
     camera.updateProjectionMatrix();
     placeCamera(camera, yaw + framing.yaw, framing.distance, framing.target);
+    scene.orientLights(yaw + framing.yaw);
     renderer.setViewport(i * slot, 0, slot, height);
     renderer.setScissor(i * slot, 0, slot, height);
     renderer.render(scene.scene, camera);
