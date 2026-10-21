@@ -120,6 +120,107 @@ defmodule MilosTrainingWeb.DevicesControllerTest do
              |> json_response(409)
   end
 
+  test "workouts alone need no health consent; turning on health data does", %{
+    conn: conn,
+    user: user
+  } do
+    FakeGarminClient.configure()
+    workouts_only = %{activities: true, sleep: false, weight: false, resting_hr: false}
+
+    connect!(conn, user, %{backfill_days: 0, sync_prefs: workouts_only})
+
+    assert %{"connection" => %{"sync_prefs" => %{"activities" => true, "sleep" => false}}} =
+             garmin_row(conn, user)
+
+    assert %{"code" => "health_data_consent_required"} =
+             conn
+             |> again(user)
+             |> patch("/api/me/devices/garmin", %{sync_prefs: %{sleep: true}})
+             |> json_response(403)
+
+    assert %{"garmin" => %{"sync_prefs" => %{"sleep" => false, "activities" => false}}} =
+             conn
+             |> again(user)
+             |> patch("/api/me/devices/garmin", %{sync_prefs: %{activities: false}})
+             |> json_response(200)
+
+    assert %{"garmin" => %{"sync_prefs" => %{"sleep" => true}}} =
+             conn
+             |> again(user)
+             |> patch("/api/me/devices/garmin", %{
+               sync_prefs: %{sleep: true},
+               health_data_consent: true
+             })
+             |> json_response(200)
+
+    # Once given, the consent covers later changes.
+    assert %{"garmin" => %{"sync_prefs" => %{"weight" => true}}} =
+             conn
+             |> again(user)
+             |> patch("/api/me/devices/garmin", %{sync_prefs: %{weight: true}})
+             |> json_response(200)
+  end
+
+  test "Πρόοδος reads the member's own resting heart rate, labelled with its source", %{
+    conn: conn,
+    user: user
+  } do
+    FakeGarminClient.configure()
+
+    assert %{"points" => [], "latest" => nil, "average" => nil, "range" => "3m"} =
+             conn |> again(user) |> get("/api/me/daily-stats") |> json_response(200)
+
+    connect!(conn, user)
+    today = Date.utc_today()
+
+    daily = fn id, days_ago, bpm ->
+      %{
+        "userId" => "garmin-user-1",
+        "summaryId" => id,
+        "calendarDate" => Date.to_iso8601(Date.add(today, -days_ago)),
+        "restingHeartRateInBeatsPerMinute" => bpm
+      }
+    end
+
+    garmin_push(%{
+      "dailies" => [daily.("d-1", 1, 52), daily.("d-2", 0, 49), daily.("d-3", 60, 55)]
+    })
+    |> json_response(200)
+
+    assert %{
+             "metric" => "resting_hr",
+             "range" => "1m",
+             "points" => [
+               %{"value" => 52, "source" => "garmin"},
+               %{"value" => 49, "source" => "garmin"}
+             ],
+             "latest" => %{"value" => 49, "source" => "garmin"},
+             "average" => 51,
+             "sources" => ["garmin"]
+           } =
+             conn
+             |> again(user)
+             |> get("/api/me/daily-stats?metric=resting_hr&range=1m")
+             |> json_response(200)
+
+    assert %{"points" => points} =
+             conn |> again(user) |> get("/api/me/daily-stats?range=3m") |> json_response(200)
+
+    assert length(points) == 3
+
+    # Someone else sees none of it.
+    other = user_fixture(%{role: :member})
+
+    assert %{"points" => []} =
+             build_conn()
+             |> put_bearer_token(other)
+             |> get("/api/me/daily-stats")
+             |> json_response(200)
+
+    conn |> again(user) |> get("/api/me/daily-stats?range=5y") |> json_response(422)
+    conn |> again(user) |> get("/api/me/daily-stats?metric=steps") |> json_response(422)
+  end
+
   test "Garmin's refusal at sign-in comes back as an error", %{conn: conn, user: user} do
     FakeGarminClient.configure()
 

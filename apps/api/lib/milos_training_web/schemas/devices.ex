@@ -100,7 +100,8 @@ defmodule MilosTrainingWeb.Schemas.Devices do
         },
         health_data_consent: %Schema{
           type: :boolean,
-          description: "Grants the health-data consent in the same step when it is missing"
+          description:
+            "Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync"
         }
       }
     }
@@ -122,7 +123,14 @@ defmodule MilosTrainingWeb.Schemas.Devices do
     %Schema{
       title: "GarminUpdateRequest",
       type: :object,
-      properties: %{sync_prefs: sync_prefs()},
+      properties: %{
+        sync_prefs: sync_prefs(),
+        health_data_consent: %Schema{
+          type: :boolean,
+          description:
+            "Grants the health-data consent when this change turns on sleep, weight or resting heart rate"
+        }
+      },
       required: [:sync_prefs]
     }
   end
@@ -207,15 +215,16 @@ defmodule MilosTrainingWeb.Schemas.Devices do
       nullable: true,
       properties: %{
         id: @uuid,
-        provider: %Schema{type: :string},
-        sport: %Schema{type: :string},
+        provider: %Schema{type: :string, enum: ~w(garmin apple_health health_connect)},
+        sport: %Schema{type: :string, enum: MilosTraining.Devices.Domain.Sport.sports()},
         started_at: @datetime,
         duration_seconds: %Schema{type: :integer},
         distance_meters: @maybe_number,
         avg_heart_rate: @maybe_integer,
         max_heart_rate: @maybe_integer,
         calories: @maybe_integer
-      }
+      },
+      required: [:id, :provider, :sport, :started_at, :duration_seconds]
     }
   end
 
@@ -288,6 +297,41 @@ defmodule MilosTrainingWeb.Schemas.Devices do
         backfill_progress: @maybe_integer
       },
       required: [:provider, :connected, :visible, :new_total, :new_counts, :needs_confirmation]
+    }
+  end
+
+  def daily_stats_response do
+    point = %Schema{
+      title: "DailyStatPoint",
+      type: :object,
+      properties: %{
+        on: %Schema{type: :string, format: :date},
+        value: %Schema{type: :integer, description: "Beats per minute for resting_hr"},
+        source: %Schema{
+          type: :string,
+          enum: ~w(garmin apple_health health_connect),
+          description: "The device that sent it («από Garmin»)"
+        }
+      },
+      required: [:on, :value, :source]
+    }
+
+    %Schema{
+      title: "DailyStats",
+      type: :object,
+      description:
+        "Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data",
+      properties: %{
+        metric: %Schema{type: :string, enum: ["resting_hr"]},
+        range: %Schema{type: :string, enum: ~w(1m 3m 1y)},
+        from: %Schema{type: :string, format: :date},
+        to: %Schema{type: :string, format: :date},
+        points: %Schema{type: :array, items: point},
+        latest: %{point | nullable: true, title: "DailyStatLatest"},
+        average: @maybe_integer,
+        sources: %Schema{type: :array, items: %Schema{type: :string}}
+      },
+      required: [:metric, :range, :from, :to, :points, :latest, :average, :sources]
     }
   end
 

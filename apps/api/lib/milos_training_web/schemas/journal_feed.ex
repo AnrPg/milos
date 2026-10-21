@@ -64,7 +64,19 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
               enum: ~w(private coach_can_view coach_reply_requested)
             }
           },
-          entry: %Schema{type: :object, additionalProperties: true}
+          entry: %Schema{
+            description:
+              "The entry, chosen by `kind`. ADR-161: a `device_activity` entry is a DeviceActivity; an execution or training-log entry a watch matched carries its numbers as `device` (DeviceMetrics).",
+            anyOf: [
+              MilosTrainingWeb.Schemas.Devices.activity(),
+              %Schema{
+                title: "JournalFeedEntry",
+                type: :object,
+                additionalProperties: true,
+                properties: %{device: MilosTrainingWeb.Schemas.Devices.merged_metrics()}
+              }
+            ]
+          }
         }
       },
       struct?: false

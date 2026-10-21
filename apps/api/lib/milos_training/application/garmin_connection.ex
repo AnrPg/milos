@@ -37,9 +37,9 @@ defmodule MilosTraining.Application.GarminConnection do
 
   def connect(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
     with :ok <- configured(),
-         :ok <- consent(context, params, now),
          {:ok, days} <- Devices.validate_backfill_days(param(params, "backfill_days")),
-         {:ok, prefs} <- Devices.merge_prefs(%{}, param(params, "sync_prefs")) do
+         {:ok, prefs} <- Devices.merge_prefs(%{}, param(params, "sync_prefs")),
+         :ok <- consent(context, prefs, params, now) do
       verifier = Devices.pkce_verifier(:crypto.strong_rand_bytes(48))
       state = Devices.oauth_state(:crypto.strong_rand_bytes(32))
 
@@ -183,15 +183,27 @@ defmodule MilosTraining.Application.GarminConnection do
     })
   end
 
-  @doc "Changes what syncs (`sync_prefs`)."
-  def update(%{user_id: user_id} = context, params) do
+  @doc """
+  Changes what syncs (`sync_prefs`). Turning on sleep, weight or resting
+  heart rate needs the health-data consent, which the request may grant
+  (`health_data_consent`).
+  """
+  def update(%{user_id: user_id} = context, params, now \\ DateTime.utc_now()) do
+    with {:ok, current} <- current_prefs(context, user_id),
+         {:ok, prefs} <- Devices.merge_prefs(current, param(params, "sync_prefs")),
+         :ok <- consent(context, prefs, params, now) do
+      Devices.with_context(context, fn ->
+        with {:ok, connection} <- live(user_id),
+             {:ok, updated} <- Devices.update_connection(connection, %{sync_prefs: prefs}) do
+          {:ok, DevicePresenter.garmin_row(updated, true)}
+        end
+      end)
+    end
+  end
+
+  defp current_prefs(context, user_id) do
     Devices.with_context(context, fn ->
-      with {:ok, connection} <- live(user_id),
-           {:ok, prefs} <-
-             Devices.merge_prefs(connection.sync_prefs, param(params, "sync_prefs")),
-           {:ok, updated} <- Devices.update_connection(connection, %{sync_prefs: prefs}) do
-        {:ok, DevicePresenter.garmin_row(updated, true)}
-      end
+      with {:ok, connection} <- live(user_id), do: {:ok, connection.sync_prefs}
     end)
   end
 
@@ -303,9 +315,13 @@ defmodule MilosTraining.Application.GarminConnection do
     if Devices.garmin().configured?(), do: :ok, else: {:error, :garmin_not_configured}
   end
 
-  # Board 16 brings sleep, weight and heart rate in: health data (plan D8).
-  defp consent(%{user_id: user_id} = context, params, now) do
+  # Sleep, weight and resting heart rate are health data (plan D8); workouts
+  # alone are training data and need no consent.
+  defp consent(%{user_id: user_id} = context, prefs, params, now) do
     cond do
+      not Devices.health_data?(prefs) ->
+        :ok
+
       WellnessConsent.active?(context, user_id) ->
         :ok
 

@@ -11,6 +11,7 @@ defmodule MilosTrainingWeb.DevicesController do
 
   alias MilosTraining.Application.{
     ConnectedDevices,
+    DailyStats,
     DeviceImports,
     GarminConnection
   }
@@ -59,6 +60,7 @@ defmodule MilosTrainingWeb.DevicesController do
     request_body: S.body(S.update_request()),
     responses: [
       ok: {"The Garmin row", "application/json", S.garmin_row_response()},
+      forbidden: {"Health-data consent needed", "application/json", S.error()},
       unprocessable_entity: {"Not connected or invalid", "application/json", S.error()}
     ]
   )
@@ -146,6 +148,37 @@ defmodule MilosTrainingWeb.DevicesController do
   def summary(conn, _params) do
     with {:ok, summary} <- DeviceImports.summary(conn.assigns.user_context),
          do: json(conn, summary)
+  end
+
+  operation(:daily_stats,
+    summary: "Πρόοδος: the member's own daily stats from a device (resting heart rate)",
+    parameters: [
+      %Parameter{
+        name: :metric,
+        in: :query,
+        required: false,
+        schema: %Schema{type: :string, enum: DailyStats.metrics(), default: "resting_hr"}
+      },
+      %Parameter{
+        name: :range,
+        in: :query,
+        required: false,
+        schema: %Schema{
+          type: :string,
+          enum: DailyStats.ranges(),
+          default: DailyStats.default_range()
+        }
+      }
+    ],
+    responses: [
+      ok: {"Daily stats", "application/json", S.daily_stats_response()},
+      unprocessable_entity: {"Unknown metric or range", "application/json", S.error()}
+    ]
+  )
+
+  def daily_stats(conn, params) do
+    with {:ok, series} <- DailyStats.series(conn.assigns.user_context, params),
+         do: json(conn, series)
   end
 
   operation(:seen,

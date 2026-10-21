@@ -163,7 +163,7 @@ export function JournalFlow() {
                         </li>
                       );
                     case "training_log": {
-                      const device = deviceOf(item.entry);
+                      const device = item.entry.device;
                       return (
                         <TrainingLogEntryCard
                           key={key}
@@ -182,7 +182,7 @@ export function JournalFlow() {
                     }
                     case "execution": {
                       const entry = executionHistoryEntry(item, day.day);
-                      const device = deviceOf(item.entry);
+                      const device = item.entry.device;
                       return (
                         <ExecutionRow
                           key={key}
@@ -383,12 +383,6 @@ function FeedCard({
       </div>
     </li>
   );
-}
-
-/** The watch's numbers a class or workout carries once Garmin matched it (ADR-161). */
-function deviceOf(entry: object): DeviceMetrics | null {
-  const device = (entry as { device?: DeviceMetrics | null }).device;
-  return device && typeof device.duration_seconds === "number" ? device : null;
 }
 
 /** «Ευεξία · Τρίτη»: one line for the day, plain counts, no grading words. */

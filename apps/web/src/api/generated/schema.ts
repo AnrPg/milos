@@ -1266,6 +1266,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/daily-stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Πρόοδος: the member's own daily stats from a device (resting heart rate) */
+        get: operations["MilosTrainingWeb.DevicesController.daily_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/device-imports/{id}/confirm": {
         parameters: {
             query?: never;
@@ -16464,6 +16481,69 @@ export interface components {
                 updated_at?: string;
             };
         };
+        /** DailyStatLatest */
+        DailyStatLatest: {
+            /** Format: date */
+            on: string;
+            /**
+             * @description The device that sent it («από Garmin»)
+             * @enum {string}
+             */
+            source: "garmin" | "apple_health" | "health_connect";
+            /** @description Beats per minute for resting_hr */
+            value: number;
+        } | null;
+        /** DailyStatPoint */
+        DailyStatPoint: {
+            /** Format: date */
+            on: string;
+            /**
+             * @description The device that sent it («από Garmin»)
+             * @enum {string}
+             */
+            source: "garmin" | "apple_health" | "health_connect";
+            /** @description Beats per minute for resting_hr */
+            value: number;
+        };
+        /**
+         * DailyStats
+         * @description Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data
+         */
+        DailyStats: {
+            average: number | null;
+            /** Format: date */
+            from: string;
+            /** DailyStatLatest */
+            latest: {
+                /** Format: date */
+                on: string;
+                /**
+                 * @description The device that sent it («από Garmin»)
+                 * @enum {string}
+                 */
+                source: "garmin" | "apple_health" | "health_connect";
+                /** @description Beats per minute for resting_hr */
+                value: number;
+            } | null;
+            /** @enum {string} */
+            metric: "resting_hr";
+            points: {
+                /** Format: date */
+                on: string;
+                /**
+                 * @description The device that sent it («από Garmin»)
+                 * @enum {string}
+                 */
+                source: "garmin" | "apple_health" | "health_connect";
+                /** @description Beats per minute for resting_hr */
+                value: number;
+            }[];
+            /** @enum {string} */
+            range: "1m" | "3m" | "1y";
+            sources: string[];
+            /** Format: date */
+            to: string;
+        };
         /**
          * DeviceActivity
          * @description A workout from a watch: its own journal entry, or waiting for confirmation (pending)
@@ -16582,6 +16662,22 @@ export interface components {
             /** Format: uuid */
             target_id?: string;
         };
+        /** DeviceMetrics */
+        DeviceMetrics: {
+            avg_heart_rate?: number | null;
+            calories?: number | null;
+            distance_meters?: number | null;
+            duration_seconds: number;
+            /** Format: uuid */
+            id: string;
+            max_heart_rate?: number | null;
+            /** @enum {string} */
+            provider: "garmin" | "apple_health" | "health_connect";
+            /** @enum {string} */
+            sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+            /** Format: date-time */
+            started_at: string;
+        } | null;
         /** DevicePendingImports */
         DevicePendingImports: {
             imports: {
@@ -17489,7 +17585,7 @@ export interface components {
              * @enum {integer}
              */
             backfill_days?: 0 | 30 | 90;
-            /** @description Grants the health-data consent in the same step when it is missing */
+            /** @description Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync */
             health_data_consent?: boolean;
             /**
              * DeviceSyncPrefs
@@ -17662,6 +17758,8 @@ export interface components {
         };
         /** GarminUpdateRequest */
         GarminUpdateRequest: {
+            /** @description Grants the health-data consent when this change turns on sleep, weight or resting heart rate */
+            health_data_consent?: boolean;
             /**
              * DeviceSyncPrefs
              * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
@@ -17976,12 +18074,92 @@ export interface components {
         JournalCommentsResponse: {
             comments: components["schemas"]["JournalComment"][];
         };
+        /** JournalFeedEntry */
+        JournalFeedEntry: {
+            /** DeviceMetrics */
+            device?: {
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                max_heart_rate?: number | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /** @enum {string} */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+            } | null;
+        } & {
+            [key: string]: unknown;
+        };
         /** JournalFeedItem */
         JournalFeedItem: {
             choosable_visibilities: ("private" | "coach_can_view" | "coach_reply_requested")[];
+            /** @description The entry, chosen by `kind`. ADR-161: a `device_activity` entry is a DeviceActivity; an execution or training-log entry a watch matched carries its numbers as `device` (DeviceMetrics). */
             entry: {
+                activity_type?: string | null;
+                avg_heart_rate?: number | null;
+                calories?: number | null;
+                candidates?: {
+                    /** Format: date-time */
+                    ends_at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "training_log" | "execution" | "class";
+                    /** Format: uuid */
+                    organization_id?: string | null;
+                    /** Format: date-time */
+                    starts_at: string;
+                    title?: string | null;
+                }[];
+                /** Format: uuid */
+                class_id?: string | null;
+                distance_meters?: number | null;
+                duration_seconds: number;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                journal_visibility?: "private" | "coach_can_view";
+                max_heart_rate?: number | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                /** @enum {string} */
+                provider: "garmin" | "apple_health" | "health_connect";
+                /**
+                 * @description Localized by the client; the raw type is `activity_type`
+                 * @enum {string}
+                 */
+                sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                /** Format: date-time */
+                started_at: string;
+                started_tz?: string;
+                /** @enum {string} */
+                state: "own" | "merged" | "pending";
+                title: string;
+            } | ({
+                /** DeviceMetrics */
+                device?: {
+                    avg_heart_rate?: number | null;
+                    calories?: number | null;
+                    distance_meters?: number | null;
+                    duration_seconds: number;
+                    /** Format: uuid */
+                    id: string;
+                    max_heart_rate?: number | null;
+                    /** @enum {string} */
+                    provider: "garmin" | "apple_health" | "health_connect";
+                    /** @enum {string} */
+                    sport: "run" | "ride" | "swim" | "walk" | "hike" | "strength" | "cardio" | "hiit" | "yoga" | "row" | "ski" | "other";
+                    /** Format: date-time */
+                    started_at: string;
+                } | null;
+            } & {
                 [key: string]: unknown;
-            };
+            });
             /** Format: uuid */
             id: string;
             /** @enum {string} */
@@ -30007,6 +30185,74 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.DevicesController.daily_stats": {
+        parameters: {
+            query?: {
+                metric?: "resting_hr";
+                range?: "1m" | "1y" | "3m";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Daily stats */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        average: number | null;
+                        /** Format: date */
+                        from: string;
+                        /** DailyStatLatest */
+                        latest: {
+                            /** Format: date */
+                            on: string;
+                            /**
+                             * @description The device that sent it («από Garmin»)
+                             * @enum {string}
+                             */
+                            source: "garmin" | "apple_health" | "health_connect";
+                            /** @description Beats per minute for resting_hr */
+                            value: number;
+                        } | null;
+                        /** @enum {string} */
+                        metric: "resting_hr";
+                        points: {
+                            /** Format: date */
+                            on: string;
+                            /**
+                             * @description The device that sent it («από Garmin»)
+                             * @enum {string}
+                             */
+                            source: "garmin" | "apple_health" | "health_connect";
+                            /** @description Beats per minute for resting_hr */
+                            value: number;
+                        }[];
+                        /** @enum {string} */
+                        range: "1m" | "3m" | "1y";
+                        sources: string[];
+                        /** Format: date */
+                        to: string;
+                    };
+                };
+            };
+            /** @description Unknown metric or range */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.DevicesController.confirm": {
         parameters: {
             query?: never;
@@ -30262,6 +30508,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description Grants the health-data consent when this change turns on sleep, weight or resting heart rate */
+                    health_data_consent?: boolean;
                     /**
                      * DeviceSyncPrefs
                      * @description What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)
@@ -30337,6 +30585,17 @@ export interface operations {
                     };
                 };
             };
+            /** @description Health-data consent needed */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
             /** @description Not connected or invalid */
             422: {
                 headers: {
@@ -30365,7 +30624,7 @@ export interface operations {
                      * @enum {integer}
                      */
                     backfill_days?: 0 | 30 | 90;
-                    /** @description Grants the health-data consent in the same step when it is missing */
+                    /** @description Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync */
                     health_data_consent?: boolean;
                     /**
                      * DeviceSyncPrefs

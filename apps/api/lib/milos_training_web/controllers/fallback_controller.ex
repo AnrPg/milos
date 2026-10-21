@@ -2227,7 +2227,8 @@ defmodule MilosTrainingWeb.FallbackController do
     unknown_device_candidate:
       {:unprocessable_entity, "Choose one of the suggested classes or workouts"},
     device_confirmation_required:
-      {:unprocessable_entity, "Choose a class or workout, or keep it as its own entry"}
+      {:unprocessable_entity, "Choose a class or workout, or keep it as its own entry"},
+    invalid_daily_stat_metric: {:unprocessable_entity, "Choose resting_hr"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@phase_b_errors, reason) do

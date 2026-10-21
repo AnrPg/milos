@@ -7616,6 +7616,18 @@
     "loading": "Laden…",
     "manageDevices": "Verbonden apparaten",
     "notif_sync_error_title": "Garmin synchroniseert niet meer",
-    "notif_sync_error_body": "Verbind het opnieuw bij Verbonden apparaten zodat je gegevens blijven binnenkomen."
+    "notif_sync_error_body": "Verbind het opnieuw bij Verbonden apparaten zodat je gegevens blijven binnenkomen.",
+    "return_garmin_account_in_use": "Dat Garmin-account is al gekoppeld aan een ander Milos-account.",
+    "return_garmin_connect_failed": "Garmin kon de verbinding niet afronden. Probeer het opnieuw.",
+    "restingTitle": "Rusthartslag",
+    "restingRange": "Periode",
+    "restingRange_1m": "1 maand",
+    "restingRange_3m": "3 maanden",
+    "restingRange_1y": "1 jaar",
+    "bpmValue": "{value} bpm",
+    "restingLatest": "Laatste meting · {date}",
+    "restingAverage": "Gemiddeld {value} bpm over {days, plural, one {# dag} other {# dagen}}",
+    "restingSpread": "tussen {low} en {high}",
+    "restingNote": "Een indicatie van je apparaat, geen medische meting."
   }
 }

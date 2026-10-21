@@ -183,6 +183,19 @@ defmodule MilosTraining.Devices.DomainTest do
   end
 
   describe "sync preferences and backfill" do
+    test "only sleep, weight and resting heart rate are health data" do
+      refute Catalog.health_data?(%{
+               "activities" => true,
+               "sleep" => false,
+               "weight" => false,
+               "resting_hr" => false
+             })
+
+      assert Catalog.health_data?(%{"activities" => true, "sleep" => false, "weight" => false})
+      assert Catalog.health_data?(%{"resting_hr" => true})
+      assert Catalog.health_data?(Catalog.default_prefs())
+    end
+
     test "everything is on by default; changes are booleans of known keys" do
       assert Catalog.default_prefs() == %{
                "activities" => true,

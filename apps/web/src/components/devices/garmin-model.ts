@@ -147,7 +147,14 @@ export function garminReturn(params: URLSearchParams | null | undefined): Garmin
 }
 
 /** Reasons that get their own words; anything else reads as a generic failure. */
-const RETURN_REASONS = ["garmin_access_denied", "oauth_sign_in_expired", "invalid_oauth_state", "garmin_unavailable"] as const;
+const RETURN_REASONS = [
+  "garmin_access_denied",
+  "oauth_sign_in_expired",
+  "invalid_oauth_state",
+  "garmin_unavailable",
+  "garmin_account_in_use",
+  "garmin_connect_failed",
+] as const;
 
 export function returnReasonKey(reason: string | null): string {
   return reason && (RETURN_REASONS as readonly string[]).includes(reason) ? reason : "generic";

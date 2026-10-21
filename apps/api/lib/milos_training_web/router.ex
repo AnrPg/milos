@@ -1296,6 +1296,7 @@ defmodule MilosTrainingWeb.Router do
     delete("/devices/garmin", DevicesController, :disconnect)
     get("/devices/garmin/pending", DevicesController, :pending)
     post("/device-imports/:id/confirm", DevicesController, :confirm)
+    get("/daily-stats", DevicesController, :daily_stats)
   end
 
   # ADR-154: Γύρω μου, «Η περιοχή μου» and the gazetteer; members only.

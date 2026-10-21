@@ -21,25 +21,16 @@ export type DeviceActivityCandidate = Schemas["DeviceActivityCandidate"];
 export type DevicePendingImport = Schemas["DevicePendingImports"]["imports"][number];
 export type DeviceSport = DeviceActivity["sport"];
 
-/**
- * The watch's numbers on a class or workout they merged into (`device` on
- * execution and training-log feed entries; the feed's entry is untyped).
- */
-export type DeviceMetrics = {
-  id: string;
-  provider: string;
-  sport: DeviceSport | string;
-  started_at: string;
-  duration_seconds: number;
-  distance_meters?: number | null;
-  avg_heart_rate?: number | null;
-  max_heart_rate?: number | null;
-  calories?: number | null;
-};
+/** The watch's numbers on a class or workout they merged into (`device` on execution and training-log entries). */
+export type DeviceMetrics = NonNullable<Schemas["DeviceMetrics"]>;
+export type DailyStats = Schemas["DailyStats"];
+export type DailyStatPoint = DailyStats["points"][number];
+export type DailyStatsRange = DailyStats["range"];
 
 export const DEVICES_KEY = ["me", "devices"] as const;
 export const DEVICE_SUMMARY_KEY = ["me", "devices", "summary"] as const;
 export const DEVICE_PENDING_KEY = ["me", "devices", "garmin", "pending"] as const;
+export const dailyStatsKey = (range: DailyStatsRange) => ["me", "daily-stats", "resting_hr", range] as const;
 
 export function fetchDevices(token: string) {
   return apiRequest<ConnectedDevices>("/me/devices", { token });
@@ -49,8 +40,10 @@ export function connectGarmin(token: string, body: GarminConnectRequest) {
   return apiRequest<GarminConnectResponse>("/me/devices/garmin/connect", { method: "POST", token, body });
 }
 
-export async function updateGarmin(token: string, syncPrefs: DeviceSyncPrefs) {
-  return (await apiRequest<{ garmin: GarminRow }>("/me/devices/garmin", { method: "PATCH", token, body: { sync_prefs: syncPrefs } })).garmin;
+export async function updateGarmin(token: string, syncPrefs: DeviceSyncPrefs, healthDataConsent = false) {
+  const body: Schemas["GarminUpdateRequest"] = { sync_prefs: syncPrefs };
+  if (healthDataConsent) body.health_data_consent = true;
+  return (await apiRequest<{ garmin: GarminRow }>("/me/devices/garmin", { method: "PATCH", token, body })).garmin;
 }
 
 export async function syncGarmin(token: string) {
@@ -62,6 +55,11 @@ export function disconnectGarmin(token: string, deleteData: boolean) {
     method: "DELETE",
     token,
   });
+}
+
+/** Πρόοδος: the member's own resting heart rate from a device. */
+export function fetchRestingHeartRate(token: string, range: DailyStatsRange = "3m") {
+  return apiRequest<DailyStats>(`/me/daily-stats?metric=resting_hr&range=${range}`, { token });
 }
 
 export function fetchDeviceSummary(token: string) {

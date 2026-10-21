@@ -7616,6 +7616,18 @@
     "loading": "Загрузка…",
     "manageDevices": "Подключённые устройства",
     "notif_sync_error_title": "Garmin перестал синхронизироваться",
-    "notif_sync_error_body": "Переподключите его в разделе «Подключённые устройства», чтобы данные продолжали поступать."
+    "notif_sync_error_body": "Переподключите его в разделе «Подключённые устройства», чтобы данные продолжали поступать.",
+    "return_garmin_account_in_use": "Этот аккаунт Garmin уже привязан к другому аккаунту Milos.",
+    "return_garmin_connect_failed": "Garmin не смог завершить подключение. Попробуйте снова.",
+    "restingTitle": "Пульс покоя",
+    "restingRange": "Период",
+    "restingRange_1m": "1 месяц",
+    "restingRange_3m": "3 месяца",
+    "restingRange_1y": "1 год",
+    "bpmValue": "{value} уд/мин",
+    "restingLatest": "Последнее значение · {date}",
+    "restingAverage": "В среднем {value} уд/мин за {days, plural, one {# день} few {# дня} many {# дней} other {# дня}}",
+    "restingSpread": "от {low} до {high}",
+    "restingNote": "Ориентир от вашего устройства, а не медицинское измерение."
   }
 }

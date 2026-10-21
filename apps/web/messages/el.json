@@ -7616,6 +7616,18 @@
     "loading": "Φόρτωση…",
     "manageDevices": "Συνδεδεμένες συσκευές",
     "notif_sync_error_title": "Το Garmin σταμάτησε να συγχρονίζει",
-    "notif_sync_error_body": "Κάνε επανασύνδεση από τις Συνδεδεμένες συσκευές για να συνεχίσουν να έρχονται τα δεδομένα σου."
+    "notif_sync_error_body": "Κάνε επανασύνδεση από τις Συνδεδεμένες συσκευές για να συνεχίσουν να έρχονται τα δεδομένα σου.",
+    "return_garmin_account_in_use": "Αυτός ο λογαριασμός Garmin είναι ήδη συνδεδεμένος με άλλον λογαριασμό Milos.",
+    "return_garmin_connect_failed": "Η σύνδεση με το Garmin δεν ολοκληρώθηκε. Δοκίμασε ξανά.",
+    "restingTitle": "Ρυθμός ηρεμίας",
+    "restingRange": "Περίοδος",
+    "restingRange_1m": "1 μήνας",
+    "restingRange_3m": "3 μήνες",
+    "restingRange_1y": "1 χρόνος",
+    "bpmValue": "{value} bpm",
+    "restingLatest": "Τελευταία μέτρηση · {date}",
+    "restingAverage": "Μέσος όρος {value} bpm σε {days, plural, one {# μέρα} other {# μέρες}}",
+    "restingSpread": "από {low} έως {high}",
+    "restingNote": "Ενδεικτική τιμή από τη συσκευή σου, όχι ιατρική μέτρηση."
   }
 }

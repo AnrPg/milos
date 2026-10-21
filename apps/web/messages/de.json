@@ -7616,6 +7616,18 @@
     "loading": "Lädt…",
     "manageDevices": "Verbundene Geräte",
     "notif_sync_error_title": "Garmin synchronisiert nicht mehr",
-    "notif_sync_error_body": "Verbinde es unter Verbundene Geräte neu, damit deine Daten weiter ankommen."
+    "notif_sync_error_body": "Verbinde es unter Verbundene Geräte neu, damit deine Daten weiter ankommen.",
+    "return_garmin_account_in_use": "Dieses Garmin-Konto ist bereits mit einem anderen Milos-Konto verknüpft.",
+    "return_garmin_connect_failed": "Garmin konnte die Verbindung nicht abschließen. Versuche es erneut.",
+    "restingTitle": "Ruhepuls",
+    "restingRange": "Zeitraum",
+    "restingRange_1m": "1 Monat",
+    "restingRange_3m": "3 Monate",
+    "restingRange_1y": "1 Jahr",
+    "bpmValue": "{value} bpm",
+    "restingLatest": "Letzter Wert · {date}",
+    "restingAverage": "Durchschnitt {value} bpm an {days, plural, one {# Tag} other {# Tagen}}",
+    "restingSpread": "zwischen {low} und {high}",
+    "restingNote": "Ein Richtwert deines Geräts, keine medizinische Messung."
   }
 }

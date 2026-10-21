@@ -7616,6 +7616,18 @@
     "loading": "Зареждане…",
     "manageDevices": "Свързани устройства",
     "notif_sync_error_title": "Garmin спря да се синхронизира",
-    "notif_sync_error_body": "Свържи го отново от Свързани устройства, за да продължат да идват данните ти."
+    "notif_sync_error_body": "Свържи го отново от Свързани устройства, за да продължат да идват данните ти.",
+    "return_garmin_account_in_use": "Този профил в Garmin вече е свързан с друг профил в Milos.",
+    "return_garmin_connect_failed": "Garmin не успя да завърши свързването. Опитай пак.",
+    "restingTitle": "Пулс в покой",
+    "restingRange": "Период",
+    "restingRange_1m": "1 месец",
+    "restingRange_3m": "3 месеца",
+    "restingRange_1y": "1 година",
+    "bpmValue": "{value} уд/мин",
+    "restingLatest": "Последно измерване · {date}",
+    "restingAverage": "Средно {value} уд/мин за {days, plural, one {# ден} other {# дни}}",
+    "restingSpread": "между {low} и {high}",
+    "restingNote": "Ориентир от устройството ти, не медицинско измерване."
   }
 }

@@ -7,7 +7,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { ConnectedDevices } from "@/api/check-in";
 import { DEVICE_SUMMARY_KEY, DEVICES_KEY, syncGarmin, updateGarmin, type GarminRow } from "@/api/devices";
 import { JOURNAL_FEED_KEY } from "@/api/journal";
-import { deviceErrorKey, PrefSwitches, ProgressBar } from "@/components/devices/DeviceBits";
+import { deviceErrorCode, deviceErrorKey, PrefSwitches, ProgressBar } from "@/components/devices/DeviceBits";
 import { GarminConnectSheet } from "@/components/devices/GarminConnectSheet";
 import { GarminDisconnectSheet } from "@/components/devices/GarminDisconnectSheet";
 import {
@@ -50,6 +50,9 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
   const [sheet, setSheet] = useState<"connect" | "reconnect" | "disconnect" | null>(null);
   const [editing, setEditing] = useState<FullSyncPrefs | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  // The server asks for the health-data consent when a change turns on sleep, weight or resting HR.
+  const [askConsent, setAskConsent] = useState(false);
+  const [consentTicked, setConsentTicked] = useState(false);
   const state = garminRowState(row);
   const connection = row.connection ?? null;
 
@@ -66,13 +69,18 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
     onError: (error) => setNotice(t(deviceErrorKey(error))),
   });
   const save = useMutation({
-    mutationFn: (prefs: FullSyncPrefs) => updateGarmin(token, prefs),
+    mutationFn: (prefs: FullSyncPrefs) => updateGarmin(token, prefs, askConsent && consentTicked),
     onSuccess: (next) => {
       store(next);
       setEditing(null);
+      setAskConsent(false);
+      setConsentTicked(false);
       setNotice(t("prefsSaved"));
     },
-    onError: (error) => setNotice(t(deviceErrorKey(error))),
+    onError: (error) => {
+      if (deviceErrorCode(error) === "health_data_consent_required") setAskConsent(true);
+      setNotice(t(deviceErrorKey(error)));
+    },
   });
 
   const percent = backfillPercent(connection);
@@ -128,13 +136,19 @@ export function GarminRowItem({ row, token, onMessage }: { row: GarminRow; token
           {editing ? (
             <div className="flex flex-col gap-2" data-testid="garmin-prefs">
               <PrefSwitches prefs={editing} onToggle={(pref) => setEditing((current) => (current ? togglePref(current, pref) : current))} disabled={save.isPending} />
+              {askConsent ? (
+                <label className="flex items-start gap-3 rounded-2xl p-3 text-sm" style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}>
+                  <input type="checkbox" checked={consentTicked} onChange={(event) => setConsentTicked(event.target.checked)} className="mt-0.5 h-5 w-5 shrink-0" />
+                  <span>{t("consent")}</span>
+                </label>
+              ) : null}
               <div className="flex flex-wrap gap-2">
-                <button type="button" onClick={() => setEditing(null)} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
+                <button type="button" onClick={() => { setEditing(null); setAskConsent(false); }} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
                   {t("cancel")}
                 </button>
                 <button
                   type="button"
-                  disabled={save.isPending}
+                  disabled={save.isPending || (askConsent && !consentTicked)}
                   onClick={() => save.mutate(editing)}
                   className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
                   style={{ background: "var(--primary)", color: "var(--bg)" }}

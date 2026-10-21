@@ -415,3 +415,79 @@ test.describe("Garmin in the journal", () => {
     await expect(question).toBeHidden();
   });
 });
+
+test.describe("Garmin in Πρόοδος and the sync choices", () => {
+  const point = (daysAgo: number, value: number) => {
+    const date = new Date();
+    date.setDate(date.getDate() - daysAgo);
+    return { on: date.toISOString().slice(0, 10), value, source: "garmin" };
+  };
+
+  test("the resting heart rate card shows only with data, as an indicator", async ({ page }) => {
+    await common(page);
+    const ranges: string[] = [];
+    await page.route("**/api/me/daily-stats?**", (route) => {
+      const url = new URL(route.request().url());
+      const range = url.searchParams.get("range") ?? "3m";
+      ranges.push(`${url.searchParams.get("metric")}:${range}`);
+      const points = range === "1m" ? [point(2, 52), point(1, 50), point(0, 49)] : [point(40, 55), point(2, 52), point(1, 50), point(0, 49)];
+      return route.fulfill(
+        json({ metric: "resting_hr", range, from: points[0].on, to: point(0, 0).on, points, latest: points[points.length - 1], average: range === "1m" ? 50 : 52, sources: ["garmin"] }),
+      );
+    });
+
+    await page.goto("/journal/progress");
+    const card = page.getByTestId("resting-hr-card");
+    await expect(card).toContainText("Resting heart rate");
+    await expect(card).toContainText("49 bpm");
+    await expect(card).toContainText("Average 52 bpm over 4 days");
+    await expect(card).toContainText("from Garmin");
+    await expect(card).toContainText("not a medical reading");
+    await card.getByRole("button", { name: "1 month" }).click();
+    await expect(card).toContainText("Average 50 bpm over 3 days");
+    expect(ranges).toEqual(["resting_hr:3m", "resting_hr:1m"]);
+  });
+
+  test("no data, no card", async ({ page }) => {
+    await common(page);
+    await page.route("**/api/me/daily-stats?**", (route) =>
+      route.fulfill(json({ metric: "resting_hr", range: "3m", from: "2026-07-24", to: "2026-10-21", points: [], latest: null, average: null, sources: [] })),
+    );
+    const read = page.waitForRequest((request) => request.url().includes("/me/daily-stats"));
+    await page.goto("/journal/progress");
+    await read;
+    await expect(page.getByTestId("resting-hr-card")).toHaveCount(0);
+  });
+
+  test("turning on sleep asks for the health-data consent when the server needs it", async ({ page }) => {
+    const workoutsOnly = { activities: true, sleep: false, weight: false, resting_hr: false };
+    await devicesPage(page, () =>
+      garminRow("connected", { status: "active", last_synced_at: minutesAgo(5), backfill_status: "done", backfill_progress: 100, needs_reconnect: false, sync_prefs: workoutsOnly }),
+    );
+    const bodies: Record<string, unknown>[] = [];
+    await page.route("**/api/me/devices/garmin", (route) => {
+      if (route.request().method() !== "PATCH") return route.fallback();
+      const body = bodyOf(route.request());
+      bodies.push(body);
+      if (!body.health_data_consent) return route.fulfill(json({ code: "health_data_consent_required", error: "consent" }, 403));
+      return route.fulfill(
+        json({ garmin: garminRow("connected", { status: "active", last_synced_at: minutesAgo(5), backfill_status: "done", backfill_progress: 100, needs_reconnect: false, sync_prefs: { ...workoutsOnly, sleep: true } }) }),
+      );
+    });
+
+    await page.goto("/me/devices");
+    const row = page.getByTestId("garmin-row");
+    await row.getByRole("button", { name: "What syncs" }).click();
+    await row.getByRole("switch", { name: "Sleep" }).click();
+    await row.getByRole("button", { name: "Save" }).click();
+    await expect(row.getByRole("status")).toHaveText("Tick the health-data line to continue.");
+    await expect(row.getByRole("button", { name: "Save" })).toBeDisabled();
+    await row.getByRole("checkbox").check();
+    await row.getByRole("button", { name: "Save" }).click();
+    await expect(row).toContainText("Workouts, Sleep");
+    expect(bodies).toEqual([
+      { sync_prefs: { ...workoutsOnly, sleep: true } },
+      { sync_prefs: { ...workoutsOnly, sleep: true }, health_data_consent: true },
+    ]);
+  });
+});

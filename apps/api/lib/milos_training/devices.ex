@@ -29,6 +29,7 @@ defmodule MilosTraining.Devices do
   defdelegate merge_prefs(current, changes), to: Catalog
   defdelegate validate_backfill_days(days), to: Catalog
   defdelegate wanted?(prefs, kind), to: Catalog
+  defdelegate health_data?(prefs), to: Catalog
 
   # Connection life.
   defdelegate sign_in_expired?(started_at, now), to: ConnectionPolicy

@@ -7616,6 +7616,18 @@
     "loading": "Loading…",
     "manageDevices": "Connected devices",
     "notif_sync_error_title": "Garmin stopped syncing",
-    "notif_sync_error_body": "Reconnect it in Connected devices to keep your data coming in."
+    "notif_sync_error_body": "Reconnect it in Connected devices to keep your data coming in.",
+    "return_garmin_account_in_use": "That Garmin account is already linked to another Milos account.",
+    "return_garmin_connect_failed": "Garmin couldn't finish connecting. Try again.",
+    "restingTitle": "Resting heart rate",
+    "restingRange": "Period",
+    "restingRange_1m": "1 month",
+    "restingRange_3m": "3 months",
+    "restingRange_1y": "1 year",
+    "bpmValue": "{value} bpm",
+    "restingLatest": "Latest reading · {date}",
+    "restingAverage": "Average {value} bpm over {days, plural, one {# day} other {# days}}",
+    "restingSpread": "between {low} and {high}",
+    "restingNote": "An indicator from your device, not a medical reading."
   }
 }

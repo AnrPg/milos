@@ -7616,6 +7616,18 @@
     "loading": "Cargando…",
     "manageDevices": "Dispositivos conectados",
     "notif_sync_error_title": "Garmin dejó de sincronizar",
-    "notif_sync_error_body": "Reconéctalo en Dispositivos conectados para que tus datos sigan llegando."
+    "notif_sync_error_body": "Reconéctalo en Dispositivos conectados para que tus datos sigan llegando.",
+    "return_garmin_account_in_use": "Esa cuenta de Garmin ya está vinculada a otra cuenta de Milos.",
+    "return_garmin_connect_failed": "Garmin no pudo terminar la conexión. Inténtalo de nuevo.",
+    "restingTitle": "Frecuencia cardiaca en reposo",
+    "restingRange": "Periodo",
+    "restingRange_1m": "1 mes",
+    "restingRange_3m": "3 meses",
+    "restingRange_1y": "1 año",
+    "bpmValue": "{value} ppm",
+    "restingLatest": "Última lectura · {date}",
+    "restingAverage": "Media {value} ppm en {days, plural, one {# día} other {# días}}",
+    "restingSpread": "entre {low} y {high}",
+    "restingNote": "Un indicador de tu dispositivo, no una medición médica."
   }
 }

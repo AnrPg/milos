@@ -7616,6 +7616,18 @@
     "loading": "جارٍ التحميل…",
     "manageDevices": "الأجهزة المتصلة",
     "notif_sync_error_title": "توقف Garmin عن المزامنة",
-    "notif_sync_error_body": "أعد ربطه من الأجهزة المتصلة لتستمر بياناتك في الوصول."
+    "notif_sync_error_body": "أعد ربطه من الأجهزة المتصلة لتستمر بياناتك في الوصول.",
+    "return_garmin_account_in_use": "حساب Garmin هذا مرتبط بالفعل بحساب Milos آخر.",
+    "return_garmin_connect_failed": "تعذّر على Garmin إكمال الربط. حاول مجددًا.",
+    "restingTitle": "نبض الراحة",
+    "restingRange": "الفترة",
+    "restingRange_1m": "شهر",
+    "restingRange_3m": "3 أشهر",
+    "restingRange_1y": "سنة",
+    "bpmValue": "{value} ن/د",
+    "restingLatest": "آخر قراءة · {date}",
+    "restingAverage": "المتوسط {value} ن/د خلال {days, plural, one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}",
+    "restingSpread": "بين {low} و{high}",
+    "restingNote": "مؤشر من جهازك، وليس قياسًا طبيًا."
   }
 }

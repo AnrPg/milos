@@ -40,6 +40,14 @@ defmodule MilosTraining.Devices.Domain.Catalog do
   @doc "Board 16, Q5 (A): «Τελευταίες 30 μέρες» is preselected."
   def default_backfill_days, do: 30
 
+  # Sleep, weight and resting heart rate are health data (plan D8); a
+  # workout is training data and syncs without the consent.
+  @health_pref_keys ~w(sleep weight resting_hr)
+
+  @doc "Whether `prefs` bring in health data (sleep, weight or resting heart rate)."
+  def health_data?(prefs) when is_map(prefs),
+    do: Enum.any?(@health_pref_keys, &(Map.get(prefs, &1, true) != false))
+
   @doc "The sync preference that lets an import kind in."
   def pref_of_kind(kind), do: Map.fetch!(@pref_of_kind, kind)
 

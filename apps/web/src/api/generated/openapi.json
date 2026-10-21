@@ -25172,6 +25172,172 @@
         "title": "CravingResponse",
         "type": "object"
       },
+      "DailyStatLatest": {
+        "nullable": true,
+        "properties": {
+          "on": {
+            "format": "date",
+            "type": "string"
+          },
+          "source": {
+            "description": "The device that sent it («από Garmin»)",
+            "enum": [
+              "garmin",
+              "apple_health",
+              "health_connect"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "description": "Beats per minute for resting_hr",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "on",
+          "value",
+          "source"
+        ],
+        "title": "DailyStatLatest",
+        "type": "object"
+      },
+      "DailyStatPoint": {
+        "properties": {
+          "on": {
+            "format": "date",
+            "type": "string"
+          },
+          "source": {
+            "description": "The device that sent it («από Garmin»)",
+            "enum": [
+              "garmin",
+              "apple_health",
+              "health_connect"
+            ],
+            "type": "string"
+          },
+          "value": {
+            "description": "Beats per minute for resting_hr",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "on",
+          "value",
+          "source"
+        ],
+        "title": "DailyStatPoint",
+        "type": "object"
+      },
+      "DailyStats": {
+        "description": "Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data",
+        "properties": {
+          "average": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "latest": {
+            "nullable": true,
+            "properties": {
+              "on": {
+                "format": "date",
+                "type": "string"
+              },
+              "source": {
+                "description": "The device that sent it («από Garmin»)",
+                "enum": [
+                  "garmin",
+                  "apple_health",
+                  "health_connect"
+                ],
+                "type": "string"
+              },
+              "value": {
+                "description": "Beats per minute for resting_hr",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "on",
+              "value",
+              "source"
+            ],
+            "title": "DailyStatLatest",
+            "type": "object"
+          },
+          "metric": {
+            "enum": [
+              "resting_hr"
+            ],
+            "type": "string"
+          },
+          "points": {
+            "items": {
+              "properties": {
+                "on": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "source": {
+                  "description": "The device that sent it («από Garmin»)",
+                  "enum": [
+                    "garmin",
+                    "apple_health",
+                    "health_connect"
+                  ],
+                  "type": "string"
+                },
+                "value": {
+                  "description": "Beats per minute for resting_hr",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "on",
+                "value",
+                "source"
+              ],
+              "title": "DailyStatPoint",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "range": {
+            "enum": [
+              "1m",
+              "3m",
+              "1y"
+            ],
+            "type": "string"
+          },
+          "sources": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "metric",
+          "range",
+          "from",
+          "to",
+          "points",
+          "latest",
+          "average",
+          "sources"
+        ],
+        "title": "DailyStats",
+        "type": "object"
+      },
       "DeviceActivity": {
         "description": "A workout from a watch: its own journal entry, or waiting for confirmation (pending)",
         "properties": {
@@ -25530,6 +25696,72 @@
           }
         },
         "title": "DeviceImportConfirmRequest",
+        "type": "object"
+      },
+      "DeviceMetrics": {
+        "nullable": true,
+        "properties": {
+          "avg_heart_rate": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "calories": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "distance_meters": {
+            "nullable": true,
+            "type": "number"
+          },
+          "duration_seconds": {
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "max_heart_rate": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "provider": {
+            "enum": [
+              "garmin",
+              "apple_health",
+              "health_connect"
+            ],
+            "type": "string"
+          },
+          "sport": {
+            "enum": [
+              "run",
+              "ride",
+              "swim",
+              "walk",
+              "hike",
+              "strength",
+              "cardio",
+              "hiit",
+              "yoga",
+              "row",
+              "ski",
+              "other"
+            ],
+            "type": "string"
+          },
+          "started_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "provider",
+          "sport",
+          "started_at",
+          "duration_seconds"
+        ],
+        "title": "DeviceMetrics",
         "type": "object"
       },
       "DevicePendingImports": {
@@ -28552,7 +28784,7 @@
             "type": "integer"
           },
           "health_data_consent": {
-            "description": "Grants the health-data consent in the same step when it is missing",
+            "description": "Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync",
             "type": "boolean"
           },
           "sync_prefs": {
@@ -29030,6 +29262,10 @@
       },
       "GarminUpdateRequest": {
         "properties": {
+          "health_data_consent": {
+            "description": "Grants the health-data consent when this change turns on sleep, weight or resting heart rate",
+            "type": "boolean"
+          },
           "sync_prefs": {
             "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
             "properties": {
@@ -30140,6 +30376,79 @@
         "title": "JournalCommentsResponse",
         "type": "object"
       },
+      "JournalFeedEntry": {
+        "additionalProperties": true,
+        "properties": {
+          "device": {
+            "nullable": true,
+            "properties": {
+              "avg_heart_rate": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "calories": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "distance_meters": {
+                "nullable": true,
+                "type": "number"
+              },
+              "duration_seconds": {
+                "type": "integer"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "max_heart_rate": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "provider": {
+                "enum": [
+                  "garmin",
+                  "apple_health",
+                  "health_connect"
+                ],
+                "type": "string"
+              },
+              "sport": {
+                "enum": [
+                  "run",
+                  "ride",
+                  "swim",
+                  "walk",
+                  "hike",
+                  "strength",
+                  "cardio",
+                  "hiit",
+                  "yoga",
+                  "row",
+                  "ski",
+                  "other"
+                ],
+                "type": "string"
+              },
+              "started_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "provider",
+              "sport",
+              "started_at",
+              "duration_seconds"
+            ],
+            "title": "DeviceMetrics",
+            "type": "object"
+          }
+        },
+        "title": "JournalFeedEntry",
+        "type": "object"
+      },
       "JournalFeedItem": {
         "properties": {
           "choosable_visibilities": {
@@ -30154,8 +30463,230 @@
             "type": "array"
           },
           "entry": {
-            "additionalProperties": true,
-            "type": "object"
+            "anyOf": [
+              {
+                "description": "A workout from a watch: its own journal entry, or waiting for confirmation (pending)",
+                "properties": {
+                  "activity_type": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "avg_heart_rate": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "calories": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "candidates": {
+                    "items": {
+                      "properties": {
+                        "ends_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "training_log",
+                            "execution",
+                            "class"
+                          ],
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "starts_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "id",
+                        "starts_at",
+                        "ends_at"
+                      ],
+                      "title": "DeviceActivityCandidate",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
+                  "class_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "distance_meters": {
+                    "nullable": true,
+                    "type": "number"
+                  },
+                  "duration_seconds": {
+                    "type": "integer"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "journal_visibility": {
+                    "enum": [
+                      "private",
+                      "coach_can_view"
+                    ],
+                    "type": "string"
+                  },
+                  "max_heart_rate": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "organization_id": {
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "provider": {
+                    "enum": [
+                      "garmin",
+                      "apple_health",
+                      "health_connect"
+                    ],
+                    "type": "string"
+                  },
+                  "sport": {
+                    "description": "Localized by the client; the raw type is `activity_type`",
+                    "enum": [
+                      "run",
+                      "ride",
+                      "swim",
+                      "walk",
+                      "hike",
+                      "strength",
+                      "cardio",
+                      "hiit",
+                      "yoga",
+                      "row",
+                      "ski",
+                      "other"
+                    ],
+                    "type": "string"
+                  },
+                  "started_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "started_tz": {
+                    "type": "string"
+                  },
+                  "state": {
+                    "enum": [
+                      "own",
+                      "merged",
+                      "pending"
+                    ],
+                    "type": "string"
+                  },
+                  "title": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "provider",
+                  "state",
+                  "sport",
+                  "title",
+                  "started_at",
+                  "duration_seconds"
+                ],
+                "title": "DeviceActivity",
+                "type": "object"
+              },
+              {
+                "additionalProperties": true,
+                "properties": {
+                  "device": {
+                    "nullable": true,
+                    "properties": {
+                      "avg_heart_rate": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "calories": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "distance_meters": {
+                        "nullable": true,
+                        "type": "number"
+                      },
+                      "duration_seconds": {
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "max_heart_rate": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "provider": {
+                        "enum": [
+                          "garmin",
+                          "apple_health",
+                          "health_connect"
+                        ],
+                        "type": "string"
+                      },
+                      "sport": {
+                        "enum": [
+                          "run",
+                          "ride",
+                          "swim",
+                          "walk",
+                          "hike",
+                          "strength",
+                          "cardio",
+                          "hiit",
+                          "yoga",
+                          "row",
+                          "ski",
+                          "other"
+                        ],
+                        "type": "string"
+                      },
+                      "started_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "provider",
+                      "sport",
+                      "started_at",
+                      "duration_seconds"
+                    ],
+                    "title": "DeviceMetrics",
+                    "type": "object"
+                  }
+                },
+                "title": "JournalFeedEntry",
+                "type": "object"
+              }
+            ],
+            "description": "The entry, chosen by `kind`. ADR-161: a `device_activity` entry is a DeviceActivity; an execution or training-log entry a watch matched carries its numbers as `device` (DeviceMetrics)."
           },
           "id": {
             "format": "uuid",
@@ -64669,6 +65200,178 @@
         ]
       }
     },
+    "/api/me/daily-stats": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.DevicesController.daily_stats",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "metric",
+            "required": false,
+            "schema": {
+              "default": "resting_hr",
+              "enum": [
+                "resting_hr"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "3m",
+              "enum": [
+                "1m",
+                "1y",
+                "3m"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data",
+                  "properties": {
+                    "average": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "latest": {
+                      "nullable": true,
+                      "properties": {
+                        "on": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "source": {
+                          "description": "The device that sent it («από Garmin»)",
+                          "enum": [
+                            "garmin",
+                            "apple_health",
+                            "health_connect"
+                          ],
+                          "type": "string"
+                        },
+                        "value": {
+                          "description": "Beats per minute for resting_hr",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "on",
+                        "value",
+                        "source"
+                      ],
+                      "title": "DailyStatLatest",
+                      "type": "object"
+                    },
+                    "metric": {
+                      "enum": [
+                        "resting_hr"
+                      ],
+                      "type": "string"
+                    },
+                    "points": {
+                      "items": {
+                        "properties": {
+                          "on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "source": {
+                            "description": "The device that sent it («από Garmin»)",
+                            "enum": [
+                              "garmin",
+                              "apple_health",
+                              "health_connect"
+                            ],
+                            "type": "string"
+                          },
+                          "value": {
+                            "description": "Beats per minute for resting_hr",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "on",
+                          "value",
+                          "source"
+                        ],
+                        "title": "DailyStatPoint",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "range": {
+                      "enum": [
+                        "1m",
+                        "3m",
+                        "1y"
+                      ],
+                      "type": "string"
+                    },
+                    "sources": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "metric",
+                    "range",
+                    "from",
+                    "to",
+                    "points",
+                    "latest",
+                    "average",
+                    "sources"
+                  ],
+                  "title": "DailyStats",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Daily stats"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown metric or range"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Πρόοδος: the member's own daily stats from a device (resting heart rate)",
+        "tags": [
+          "Connected devices"
+        ]
+      }
+    },
     "/api/me/device-imports/{id}/confirm": {
       "post": {
         "callbacks": {},
@@ -65282,6 +65985,10 @@
             "application/json": {
               "schema": {
                 "properties": {
+                  "health_data_consent": {
+                    "description": "Grants the health-data consent when this change turns on sleep, weight or resting heart rate",
+                    "type": "boolean"
+                  },
                   "sync_prefs": {
                     "description": "What is brought in: workouts (Ημερολόγιο), sleep (Ευεξία), weight (Σώμα), resting heart rate (Πρόοδος)",
                     "properties": {
@@ -65474,6 +66181,17 @@
             },
             "description": "The Garmin row"
           },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health-data consent needed"
+          },
           "422": {
             "content": {
               "application/json": {
@@ -65517,7 +66235,7 @@
                     "type": "integer"
                   },
                   "health_data_consent": {
-                    "description": "Grants the health-data consent in the same step when it is missing",
+                    "description": "Grants the health-data consent in the same step when it is missing; needed only when sleep, weight or resting heart rate sync",
                     "type": "boolean"
                   },
                   "sync_prefs": {

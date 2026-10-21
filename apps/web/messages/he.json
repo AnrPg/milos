@@ -7616,6 +7616,18 @@
     "loading": "טוען…",
     "manageDevices": "מכשירים מחוברים",
     "notif_sync_error_title": "Garmin הפסיק לסנכרן",
-    "notif_sync_error_body": "חבר אותו מחדש במכשירים מחוברים כדי שהנתונים שלך ימשיכו להגיע."
+    "notif_sync_error_body": "חבר אותו מחדש במכשירים מחוברים כדי שהנתונים שלך ימשיכו להגיע.",
+    "return_garmin_account_in_use": "חשבון Garmin הזה כבר מקושר לחשבון Milos אחר.",
+    "return_garmin_connect_failed": "Garmin לא הצליח להשלים את החיבור. נסה שוב.",
+    "restingTitle": "דופק במנוחה",
+    "restingRange": "תקופה",
+    "restingRange_1m": "חודש",
+    "restingRange_3m": "3 חודשים",
+    "restingRange_1y": "שנה",
+    "bpmValue": "{value} פעימות/דקה",
+    "restingLatest": "מדידה אחרונה · {date}",
+    "restingAverage": "ממוצע {value} פעימות/דקה {days, plural, one {ביום אחד} two {ביומיים} other {ב-# ימים}}",
+    "restingSpread": "בין {low} ל-{high}",
+    "restingNote": "ערך מנחה מהמכשיר שלך, לא מדידה רפואית."
   }
 }
