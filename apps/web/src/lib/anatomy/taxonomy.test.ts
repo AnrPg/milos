@@ -1,6 +1,8 @@
 import fs from "node:fs";
 import path from "node:path";
 
+import { describe, expect, it } from "vitest";
+
 import { parseElixirTaxonomy } from "./elixir-taxonomy";
 import { FITNESS_QUALITIES } from "./qualities";
 import {
