@@ -218,7 +218,21 @@ defmodule MilosTraining.Journal.CrossProviderDomainTest do
       query = JournalFilter.to_query(dated)
       assert query.from == ~U[2026-10-01 00:00:00Z]
       assert query.to == ~U[2026-10-02 00:00:00Z]
+      assert {query.from_date, query.to_date} == {~D[2026-10-01], ~D[2026-10-02]}
       assert JournalFilter.active_count(dated) == 1
+
+      # The member's own day: Athens is UTC+3 in summer time.
+      athens = JournalFilter.to_query(dated, "Europe/Athens")
+      assert athens.from == ~U[2026-09-30 21:00:00Z]
+      assert athens.to == ~U[2026-10-01 21:00:00Z]
+      assert {athens.from_date, athens.to_date} == {~D[2026-10-01], ~D[2026-10-02]}
+
+      # A day that starts in a DST gap starts when the clocks resume.
+      {:ok, gap} = JournalFilter.parse(%{"date_from" => "2026-09-06"})
+      assert JournalFilter.to_query(gap, "America/Santiago").from == ~U[2026-09-06 04:00:00Z]
+
+      assert JournalFilter.valid_time_zone?("Europe/Athens")
+      refute JournalFilter.valid_time_zone?("Mars/Olympus")
     end
   end
 

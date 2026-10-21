@@ -8,6 +8,7 @@ defmodule MilosTraining.Application.GetJournalFeed do
   `date_to`, `q`; `Journal.Domain.JournalFilter`) narrows every source in
   SQL. With `remember=true` the filter is also stored as the member's
   last-used Ημερολόγιο filter (ADR-151), so it follows them across devices.
+  Dates are the member's days in `timezone` (an IANA zone, UTC by default).
   Each item carries its `source` label and, for shareable kinds, its
   coach `audience`.
   """
@@ -21,6 +22,7 @@ defmodule MilosTraining.Application.GetJournalFeed do
     params = Map.new(params, fn {key, value} -> {to_string(key), value} end)
 
     with {:ok, filter} <- parse(Map.take(params, @filter_keys)),
+         {:ok, time_zone} <- time_zone(params["timezone"]),
          :ok <- remember(context, filter, params["remember"]) do
       providers = Organizations.list_my_providers(context)
       member = JournalAudience.member(context, providers)
@@ -28,7 +30,7 @@ defmodule MilosTraining.Application.GetJournalFeed do
       scope =
         if Journal.filter_default?(filter),
           do: :owner,
-          else: {:owner, Journal.filter_query(filter)}
+          else: {:owner, Journal.filter_query(filter, time_zone)}
 
       Journal.with_context(context, fn ->
         with {:ok, page} <- JournalFeed.page(user_id, scope, feed_params(params, filter)) do
@@ -48,6 +50,12 @@ defmodule MilosTraining.Application.GetJournalFeed do
       {:error, [kinds: _message]} -> {:error, :unknown_kind}
       result -> result
     end
+  end
+
+  defp time_zone(zone) when zone in [nil, ""], do: {:ok, "Etc/UTC"}
+
+  defp time_zone(zone) do
+    if Journal.valid_filter_time_zone?(zone), do: {:ok, zone}, else: {:error, :invalid_timezone}
   end
 
   # The kinds a page asks for: narrowed by the filter, never empty (an

@@ -8,7 +8,9 @@ defmodule MilosTraining.Journal.Domain.JournalFilter do
   * **Τύπος** `kinds`: feed kinds (none = every kind).
   * **Πηγή** `sources`: provider ids, `freeform`, `device` (none = all).
   * **Ορατότητα** `visibilities`: ladder rungs (none = all).
-  * **Ημερομηνίες** `date_from` / `date_to`: calendar days, inclusive, UTC.
+  * **Ημερομηνίες** `date_from` / `date_to`: calendar days, inclusive, in
+    the member's time zone (sent with each request, not stored: the same
+    saved filter means the member's own days wherever they are).
   * **Αναζήτηση** `q`: 2–100 characters, matched (case-insensitive, by
     substring, trigram indexed) against the entry's own text and its
     Σχόλια; kinds without text drop out while it is set.
@@ -105,19 +107,42 @@ defmodule MilosTraining.Journal.Domain.JournalFilter do
   @doc """
   What each journal source applies in SQL: provider ids and whether
   freeform / device entries pass (`sources?: false` means no source filter),
-  rungs, the half-open `[from, to)` UTC window and the text pattern.
+  rungs, the window and the text pattern. The window is the half-open
+  `[from, to)` span of the member's days in `time_zone`, as UTC instants for
+  timestamped entries and as dates (`from_date`, `to_date`) for day-dated
+  ones.
   """
-  def to_query(%__MODULE__{} = filter) do
+  def to_query(%__MODULE__{} = filter, time_zone \\ "Etc/UTC") do
+    to_date = filter.date_to && Date.add(filter.date_to, 1)
+
     %{
       sources?: filter.sources != [],
       organization_ids: Enum.reject(filter.sources, &(&1 in ~w(freeform device))),
       freeform?: "freeform" in filter.sources,
       device?: "device" in filter.sources,
       visibilities: filter.visibilities,
-      from: filter.date_from && DateTime.new!(filter.date_from, ~T[00:00:00], "Etc/UTC"),
-      to: filter.date_to && DateTime.new!(Date.add(filter.date_to, 1), ~T[00:00:00], "Etc/UTC"),
+      from: filter.date_from && day_start(filter.date_from, time_zone),
+      to: to_date && day_start(to_date, time_zone),
+      from_date: filter.date_from,
+      to_date: to_date,
       q: filter.q && like_pattern(filter.q)
     }
+  end
+
+  @doc "Whether `zone` is a time zone the window can be counted in."
+  def valid_time_zone?(zone) when is_binary(zone), do: match?({:ok, _now}, DateTime.now(zone))
+  def valid_time_zone?(_zone), do: false
+
+  # Midnight of `date` in `zone`, in UTC; a day starting inside a DST gap
+  # starts when the clocks resume, an ambiguous one at its first instant.
+  defp day_start(date, zone) do
+    case DateTime.new(date, ~T[00:00:00], zone) do
+      {:ok, start} -> start
+      {:gap, _before, resumed} -> resumed
+      {:ambiguous, first, _second} -> first
+      {:error, _reason} -> DateTime.new!(date, ~T[00:00:00], "Etc/UTC")
+    end
+    |> DateTime.shift_zone!("Etc/UTC")
   end
 
   @doc "A `LIKE` pattern matching `text` anywhere, with wildcards escaped."

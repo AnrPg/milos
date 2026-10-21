@@ -166,6 +166,26 @@ defmodule MilosTrainingWeb.CrossProviderControllerTest do
     assert authed(ctx) |> get("/api/me/journal?q=zzzz") |> json_response(200) |> Map.get("items") ==
              []
 
+    # Dates are the member's own days: today in Kiritimati (UTC+14) is
+    # never the same calendar day as in Pago Pago (UTC-11).
+    day = DateTime.now!("Pacific/Kiritimati") |> DateTime.to_date() |> Date.to_iso8601()
+    dated = "/api/me/journal?q=tempo&date_from=#{day}&date_to=#{day}&timezone="
+
+    assert [%{"id" => ^id}] =
+             authed(ctx)
+             |> get(dated <> "Pacific/Kiritimati")
+             |> json_response(200)
+             |> Map.get("items")
+
+    assert authed(ctx)
+           |> get(dated <> "Pacific/Pago_Pago")
+           |> json_response(200)
+           |> Map.get("items") ==
+             []
+
+    assert %{"code" => "invalid_timezone"} =
+             authed(ctx) |> get(dated <> "Mars/Olympus") |> json_response(422)
+
     audience = authed(ctx) |> get("/api/me/journal/coach-audience") |> json_response(200)
     assert length(audience["providers"]) == 2
 

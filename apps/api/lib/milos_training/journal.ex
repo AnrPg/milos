@@ -86,7 +86,8 @@ defmodule MilosTraining.Journal do
   defdelegate filter_active_count(filter), to: JournalFilter, as: :active_count
   defdelegate filter_default?(filter), to: JournalFilter, as: :default?
   defdelegate filter_kinds(filter, requested), to: JournalFilter, as: :kinds
-  defdelegate filter_query(filter), to: JournalFilter, as: :to_query
+  defdelegate filter_query(filter, time_zone), to: JournalFilter, as: :to_query
+  defdelegate valid_filter_time_zone?(zone), to: JournalFilter, as: :valid_time_zone?
   defdelegate entry_source(organization_id, device_source, directory), to: EntrySource, as: :label
   defdelegate device_source?(source), to: EntrySource
   defdelegate shareable_kind?(kind), to: CoachAudience, as: :shareable?

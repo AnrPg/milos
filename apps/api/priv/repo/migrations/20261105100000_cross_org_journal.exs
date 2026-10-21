@@ -277,8 +277,13 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
       execute("DROP POLICY IF EXISTS #{table}_coach_shared_read_policy ON #{table}")
     end
 
-    execute("DROP FUNCTION IF EXISTS milos_entry_shared_with_acting_coach(text, uuid, uuid, uuid, text)")
-    execute("DROP FUNCTION IF EXISTS milos_journal_entry_shared_with_org(text, uuid, uuid, uuid, uuid)")
+    execute(
+      "DROP FUNCTION IF EXISTS milos_entry_shared_with_acting_coach(text, uuid, uuid, uuid, text)"
+    )
+
+    execute(
+      "DROP FUNCTION IF EXISTS milos_journal_entry_shared_with_org(text, uuid, uuid, uuid, uuid)"
+    )
 
     drop table(:journal_exports)
     drop table(:journal_entry_audiences)
@@ -286,7 +291,11 @@ defmodule MilosTraining.Repo.Migrations.CrossOrgJournal do
     drop table(:account_provider_selections)
 
     execute("DROP FUNCTION IF EXISTS milos_my_providers()")
-    execute("DROP TRIGGER IF EXISTS organization_memberships_track_end ON organization_memberships")
+
+    execute(
+      "DROP TRIGGER IF EXISTS organization_memberships_track_end ON organization_memberships"
+    )
+
     execute("DROP FUNCTION IF EXISTS milos_membership_track_end()")
 
     alter table(:organization_memberships) do

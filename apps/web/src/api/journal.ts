@@ -97,6 +97,14 @@ type PageParams = {
   remember?: boolean;
 };
 
+function localTimeZone() {
+  try {
+    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
+  } catch {
+    return null;
+  }
+}
+
 function pageQuery(params: PageParams) {
   const query = new URLSearchParams();
   const filter = params.filter ?? {};
@@ -107,6 +115,11 @@ function pageQuery(params: PageParams) {
   if (filter.visibilities?.length) query.set("visibilities", filter.visibilities.join(","));
   if (filter.date_from) query.set("date_from", filter.date_from);
   if (filter.date_to) query.set("date_to", filter.date_to);
+  // The range is the member's own days (ADR-162): counted in their zone.
+  if (filter.date_from || filter.date_to) {
+    const zone = localTimeZone();
+    if (zone) query.set("timezone", zone);
+  }
   if (filter.q?.trim()) query.set("q", filter.q.trim());
   if (params.remember) query.set("remember", "true");
   const text = query.toString();

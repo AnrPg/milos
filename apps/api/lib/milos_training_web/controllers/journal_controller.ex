@@ -87,6 +87,13 @@ defmodule MilosTrainingWeb.JournalController do
       schema: %Schema{type: :string}
     },
     %Parameter{
+      name: :timezone,
+      in: :query,
+      required: false,
+      description: "IANA zone the date range's days are counted in (UTC by default)",
+      schema: %Schema{type: :string}
+    },
+    %Parameter{
       name: :remember,
       in: :query,
       required: false,
@@ -320,6 +327,7 @@ defmodule MilosTrainingWeb.JournalController do
         :date_from,
         :date_to,
         :q,
+        :timezone,
         :remember
       ])
 

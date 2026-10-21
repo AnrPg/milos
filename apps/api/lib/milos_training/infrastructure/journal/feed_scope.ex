@@ -130,10 +130,7 @@ defmodule MilosTraining.Infrastructure.Journal.FeedScope do
     |> then(&if(filter.to, do: where(&1, [row], field(row, ^field) < ^filter.to), else: &1))
   end
 
-  defp date_window(query, field, filter) do
-    from = filter.from && DateTime.to_date(filter.from)
-    to = filter.to && DateTime.to_date(filter.to)
-
+  defp date_window(query, field, %{from_date: from, to_date: to}) do
     query
     |> then(&if(from, do: where(&1, [row], field(row, ^field) >= ^from), else: &1))
     |> then(&if(to, do: where(&1, [row], field(row, ^field) < ^to), else: &1))
