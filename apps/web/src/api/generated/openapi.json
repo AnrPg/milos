@@ -15446,6 +15446,8 @@
                 "enum": [
                   "door_qr",
                   "door_poster",
+                  "door_nfc",
+                  "geofence",
                   "member_qr",
                   "wallet",
                   "desk_search",
@@ -15762,6 +15764,106 @@
         "title": "CheckInDoorDisplay",
         "type": "object"
       },
+      "CheckInGeofences": {
+        "description": "Where the phone reminds the member to check in (ADR-173): locations with a booking in the next hours, only in boxes that allow it",
+        "properties": {
+          "regions": {
+            "items": {
+              "properties": {
+                "box_name": {
+                  "type": "string"
+                },
+                "id": {
+                  "description": "Stable per location, for the phone's region list",
+                  "type": "string"
+                },
+                "latitude": {
+                  "type": "number"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "location_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "longitude": {
+                  "type": "number"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "radius_m": {
+                  "type": "integer"
+                },
+                "token": {
+                  "description": "`geofence_token` for POST /api/check-in/scan",
+                  "type": "string"
+                },
+                "windows": {
+                  "items": {
+                    "properties": {
+                      "booking_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "class_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "closes_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "opens_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "starts_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "booking_id",
+                      "starts_at",
+                      "opens_at",
+                      "closes_at"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "id",
+                "organization_id",
+                "box_name",
+                "location_id",
+                "latitude",
+                "longitude",
+                "radius_m",
+                "token",
+                "windows"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "valid_until": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "regions",
+          "valid_until"
+        ],
+        "title": "CheckInGeofences",
+        "type": "object"
+      },
       "CheckInLocation": {
         "properties": {
           "id": {
@@ -15841,6 +15943,51 @@
           "revoked_passes"
         ],
         "title": "CheckInMemberCodeRevoked",
+        "type": "object"
+      },
+      "CheckInNfcTag": {
+        "description": "The NFC door tag of a location (ADR-173): a static link that only checks in bookings",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "deep_link": {
+            "description": "`/c/<location>/n/<code>`, what the tag holds",
+            "type": "string"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "location": {
+            "properties": {
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "name"
+            ],
+            "title": "CheckInLocation",
+            "type": "object"
+          },
+          "rotated_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "location",
+          "enabled",
+          "code",
+          "deep_link"
+        ],
+        "title": "CheckInNfcTag",
         "type": "object"
       },
       "CheckInPackage": {
@@ -16014,6 +16161,8 @@
             "enum": [
               "door_qr",
               "door_poster",
+              "door_nfc",
+              "geofence",
               "member_qr",
               "wallet",
               "desk_search",
@@ -16044,6 +16193,10 @@
               60
             ],
             "type": "integer"
+          },
+          "geofence_reminder": {
+            "description": "Members may get an arrival reminder in the app that checks in their booking (ADR-173)",
+            "type": "boolean"
           },
           "member_code_mode": {
             "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
@@ -16088,6 +16241,10 @@
                 ],
                 "type": "integer"
               },
+              "geofence_reminder": {
+                "description": "Members may get an arrival reminder in the app that checks in their booking (ADR-173)",
+                "type": "boolean"
+              },
               "member_code_mode": {
                 "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
                 "enum": [
@@ -16124,7 +16281,7 @@
         "type": "object"
       },
       "CheckInScanRequest": {
-        "description": "`location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer",
+        "description": "`location_id` + `code` (the door's rotating QR), `poster_code` (the printed poster) or `nfc_code` (an NFC door tag); or `geofence_token` (the arrival reminder), or `scan_token` from a `choose` answer",
         "properties": {
           "booking_id": {
             "format": "uuid",
@@ -16134,8 +16291,18 @@
             "maxLength": 64,
             "type": "string"
           },
+          "geofence_token": {
+            "description": "From GET /api/me/check-in/geofences (ADR-173): checks in a booking in its window only",
+            "maxLength": 1024,
+            "type": "string"
+          },
           "location_id": {
             "format": "uuid",
+            "type": "string"
+          },
+          "nfc_code": {
+            "description": "An NFC door tag's static code (ADR-173): checks in a booking in its window only",
+            "maxLength": 64,
             "type": "string"
           },
           "poster_code": {
@@ -16257,6 +16424,8 @@
                 "enum": [
                   "door_qr",
                   "door_poster",
+                  "door_nfc",
+                  "geofence",
                   "member_qr",
                   "wallet",
                   "desk_search",
@@ -58173,6 +58342,188 @@
         "title": "WellnessSummarySharingResponse",
         "type": "object"
       },
+      "WidgetSnapshot": {
+        "description": "What the three widgets show: water today (null when hidden), the first items of «Σήμερα» and the next booked class",
+        "properties": {
+          "generated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "next_class": {
+            "nullable": true,
+            "properties": {
+              "at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "box_name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "class",
+                  "appointment",
+                  "program",
+                  "wod"
+                ],
+                "type": "string"
+              },
+              "status": {
+                "nullable": true,
+                "type": "string"
+              },
+              "title": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind"
+            ],
+            "type": "object"
+          },
+          "today": {
+            "items": {
+              "properties": {
+                "at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "box_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "class",
+                    "appointment",
+                    "program",
+                    "wod"
+                  ],
+                  "type": "string"
+                },
+                "status": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "water": {
+            "nullable": true,
+            "properties": {
+              "can_add": {
+                "description": "False until the health-data consent is given in the app",
+                "type": "boolean"
+              },
+              "count": {
+                "type": "integer"
+              },
+              "glass_ml": {
+                "type": "integer"
+              },
+              "goal_ml": {
+                "type": "integer"
+              },
+              "ml": {
+                "type": "integer"
+              },
+              "status": {
+                "enum": [
+                  "none",
+                  "partial",
+                  "full"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "ml",
+              "goal_ml",
+              "glass_ml",
+              "count",
+              "status",
+              "can_add"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "water",
+          "today",
+          "next_class",
+          "generated_at"
+        ],
+        "title": "WidgetSnapshot",
+        "type": "object"
+      },
+      "WidgetToken": {
+        "description": "A token only the widget endpoints accept; the app stores it for its widgets",
+        "properties": {
+          "expires_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "token",
+          "expires_at"
+        ],
+        "title": "WidgetToken",
+        "type": "object"
+      },
+      "WidgetTokenRequest": {
+        "properties": {
+          "platform": {
+            "enum": [
+              "ios",
+              "android"
+            ],
+            "type": "string"
+          },
+          "replaces_id": {
+            "description": "This install's previous token, revoked when the new one is issued",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "platform"
+        ],
+        "title": "WidgetTokenRequest",
+        "type": "object"
+      },
+      "WidgetWaterRequest": {
+        "properties": {
+          "timezone": {
+            "description": "The phone's IANA zone",
+            "type": "string"
+          }
+        },
+        "title": "WidgetWaterRequest",
+        "type": "object"
+      },
       "WodLeaderboardEntry": {
         "properties": {
           "avatar_url": {
@@ -66534,7 +66885,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "description": "`location_id` + `code` (the door's rotating QR) or `poster_code` (the printed poster), or `scan_token` from a `choose` answer",
+                "description": "`location_id` + `code` (the door's rotating QR), `poster_code` (the printed poster) or `nfc_code` (an NFC door tag); or `geofence_token` (the arrival reminder), or `scan_token` from a `choose` answer",
                 "properties": {
                   "booking_id": {
                     "format": "uuid",
@@ -66544,8 +66895,18 @@
                     "maxLength": 64,
                     "type": "string"
                   },
+                  "geofence_token": {
+                    "description": "From GET /api/me/check-in/geofences (ADR-173): checks in a booking in its window only",
+                    "maxLength": 1024,
+                    "type": "string"
+                  },
                   "location_id": {
                     "format": "uuid",
+                    "type": "string"
+                  },
+                  "nfc_code": {
+                    "description": "An NFC door tag's static code (ADR-173): checks in a booking in its window only",
+                    "maxLength": 64,
                     "type": "string"
                   },
                   "poster_code": {
@@ -66675,6 +67036,8 @@
                           "enum": [
                             "door_qr",
                             "door_poster",
+                            "door_nfc",
+                            "geofence",
                             "member_qr",
                             "wallet",
                             "desk_search",
@@ -75471,6 +75834,131 @@
         "summary": "Claim an invite link: you become that person's buddy",
         "tags": [
           "Buddies"
+        ]
+      }
+    },
+    "/api/me/check-in/geofences": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.ScanCheckInController.geofences",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Where the phone reminds the member to check in (ADR-173): locations with a booking in the next hours, only in boxes that allow it",
+                  "properties": {
+                    "regions": {
+                      "items": {
+                        "properties": {
+                          "box_name": {
+                            "type": "string"
+                          },
+                          "id": {
+                            "description": "Stable per location, for the phone's region list",
+                            "type": "string"
+                          },
+                          "latitude": {
+                            "type": "number"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "location_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "longitude": {
+                            "type": "number"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "radius_m": {
+                            "type": "integer"
+                          },
+                          "token": {
+                            "description": "`geofence_token` for POST /api/check-in/scan",
+                            "type": "string"
+                          },
+                          "windows": {
+                            "items": {
+                              "properties": {
+                                "booking_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "class_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "closes_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "opens_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "starts_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "booking_id",
+                                "starts_at",
+                                "opens_at",
+                                "closes_at"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "organization_id",
+                          "box_name",
+                          "location_id",
+                          "latitude",
+                          "longitude",
+                          "radius_m",
+                          "token",
+                          "windows"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "valid_until": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "regions",
+                    "valid_until"
+                  ],
+                  "title": "CheckInGeofences",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Regions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Where the store app reminds the member to check in: locations with a booking soon (ADR-173)",
+        "tags": [
+          "Check-in"
         ]
       }
     },
@@ -101810,6 +102298,136 @@
         ]
       }
     },
+    "/api/me/widget-tokens": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WidgetController.create_token",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "platform": {
+                    "enum": [
+                      "ios",
+                      "android"
+                    ],
+                    "type": "string"
+                  },
+                  "replaces_id": {
+                    "description": "This install's previous token, revoked when the new one is issued",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "platform"
+                ],
+                "title": "WidgetTokenRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "A token only the widget endpoints accept; the app stores it for its widgets",
+                  "properties": {
+                    "expires_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "token",
+                    "expires_at"
+                  ],
+                  "title": "WidgetToken",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Widget token"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown platform"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Issue this app install's widget token (replacing its previous one)",
+        "tags": [
+          "Widgets"
+        ]
+      }
+    },
+    "/api/me/widget-tokens/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WidgetController.delete_token",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Revoked"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Revoke a widget token (sign-out on that install)",
+        "tags": [
+          "Widgets"
+        ]
+      }
+    },
     "/api/memberships": {
       "get": {
         "callbacks": {},
@@ -105204,6 +105822,296 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/nfc": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.nfc_tag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The NFC door tag of a location (ADR-173): a static link that only checks in bookings",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "deep_link": {
+                      "description": "`/c/<location>/n/<code>`, what the tag holds",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "enabled",
+                    "code",
+                    "deep_link"
+                  ],
+                  "title": "CheckInNfcTag",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "NFC tag"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The NFC door tag of a location: the link to write and whether it is on",
+        "tags": [
+          "Admin Check-in"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.update_nfc_tag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "enabled": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "enabled"
+                ],
+                "title": "CheckInPosterRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The NFC door tag of a location (ADR-173): a static link that only checks in bookings",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "deep_link": {
+                      "description": "`/c/<location>/n/<code>`, what the tag holds",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "enabled",
+                    "code",
+                    "deep_link"
+                  ],
+                  "title": "CheckInNfcTag",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "NFC tag"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Turn the NFC door tag of a location on or off",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/check-in/door/{location_id}/nfc/rotate": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminCheckInController.rotate_nfc_tag",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "location_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "The NFC door tag of a location (ADR-173): a static link that only checks in bookings",
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "deep_link": {
+                      "description": "`/c/<location>/n/<code>`, what the tag holds",
+                      "type": "string"
+                    },
+                    "enabled": {
+                      "type": "boolean"
+                    },
+                    "location": {
+                      "properties": {
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "name"
+                      ],
+                      "title": "CheckInLocation",
+                      "type": "object"
+                    },
+                    "rotated_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "location",
+                    "enabled",
+                    "code",
+                    "deep_link"
+                  ],
+                  "title": "CheckInNfcTag",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "NFC tag"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "No such location"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«Νέος κωδικός ετικέτας»: every written tag stops working",
+        "tags": [
+          "Admin Check-in"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/check-in/door/{location_id}/poster": {
       "get": {
         "callbacks": {},
@@ -105885,6 +106793,8 @@
                           "enum": [
                             "door_qr",
                             "door_poster",
+                            "door_nfc",
+                            "geofence",
                             "member_qr",
                             "wallet",
                             "desk_search",
@@ -106296,6 +107206,8 @@
                           "enum": [
                             "door_qr",
                             "door_poster",
+                            "door_nfc",
+                            "geofence",
                             "member_qr",
                             "wallet",
                             "desk_search",
@@ -106487,6 +107399,10 @@
                           ],
                           "type": "integer"
                         },
+                        "geofence_reminder": {
+                          "description": "Members may get an arrival reminder in the app that checks in their booking (ADR-173)",
+                          "type": "boolean"
+                        },
                         "member_code_mode": {
                           "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
                           "enum": [
@@ -106557,6 +107473,10 @@
                     ],
                     "type": "integer"
                   },
+                  "geofence_reminder": {
+                    "description": "Members may get an arrival reminder in the app that checks in their booking (ADR-173)",
+                    "type": "boolean"
+                  },
                   "member_code_mode": {
                     "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
                     "enum": [
@@ -106607,6 +107527,10 @@
                             60
                           ],
                           "type": "integer"
+                        },
+                        "geofence_reminder": {
+                          "description": "Members may get an arrival reminder in the app that checks in their booking (ADR-173)",
+                          "type": "boolean"
                         },
                         "member_code_mode": {
                           "description": "Personal QR: rotating (no Wallet) or static (Wallet). Back to rotating revokes static codes and cards.",
@@ -194167,6 +195091,370 @@
         "summary": "Reopen a healed injury",
         "tags": [
           "Wellbeing"
+        ]
+      }
+    },
+    "/api/widget/snapshot": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WidgetController.snapshot",
+        "parameters": [
+          {
+            "description": "The phone's IANA zone (UTC by default)",
+            "in": "query",
+            "name": "timezone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "What the three widgets show: water today (null when hidden), the first items of «Σήμερα» and the next booked class",
+                  "properties": {
+                    "generated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "next_class": {
+                      "nullable": true,
+                      "properties": {
+                        "at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "box_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "appointment",
+                            "program",
+                            "wod"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "type": "object"
+                    },
+                    "today": {
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "box_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "class",
+                              "appointment",
+                              "program",
+                              "wod"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "title": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "water": {
+                      "nullable": true,
+                      "properties": {
+                        "can_add": {
+                          "description": "False until the health-data consent is given in the app",
+                          "type": "boolean"
+                        },
+                        "count": {
+                          "type": "integer"
+                        },
+                        "glass_ml": {
+                          "type": "integer"
+                        },
+                        "goal_ml": {
+                          "type": "integer"
+                        },
+                        "ml": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "none",
+                            "partial",
+                            "full"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "ml",
+                        "goal_ml",
+                        "glass_ml",
+                        "count",
+                        "status",
+                        "can_add"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "water",
+                    "today",
+                    "next_class",
+                    "generated_at"
+                  ],
+                  "title": "WidgetSnapshot",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Snapshot"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Revoked or expired widget token"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What the widgets show now (widget token)",
+        "tags": [
+          "Widgets"
+        ]
+      }
+    },
+    "/api/widget/water": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.WidgetController.add_water",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "timezone": {
+                    "description": "The phone's IANA zone",
+                    "type": "string"
+                  }
+                },
+                "title": "WidgetWaterRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "What the three widgets show: water today (null when hidden), the first items of «Σήμερα» and the next booked class",
+                  "properties": {
+                    "generated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "next_class": {
+                      "nullable": true,
+                      "properties": {
+                        "at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "box_name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "class",
+                            "appointment",
+                            "program",
+                            "wod"
+                          ],
+                          "type": "string"
+                        },
+                        "status": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind"
+                      ],
+                      "type": "object"
+                    },
+                    "today": {
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "box_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "class",
+                              "appointment",
+                              "program",
+                              "wod"
+                            ],
+                            "type": "string"
+                          },
+                          "status": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "title": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "water": {
+                      "nullable": true,
+                      "properties": {
+                        "can_add": {
+                          "description": "False until the health-data consent is given in the app",
+                          "type": "boolean"
+                        },
+                        "count": {
+                          "type": "integer"
+                        },
+                        "glass_ml": {
+                          "type": "integer"
+                        },
+                        "goal_ml": {
+                          "type": "integer"
+                        },
+                        "ml": {
+                          "type": "integer"
+                        },
+                        "status": {
+                          "enum": [
+                            "none",
+                            "partial",
+                            "full"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "ml",
+                        "goal_ml",
+                        "glass_ml",
+                        "count",
+                        "status",
+                        "can_add"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "water",
+                    "today",
+                    "next_class",
+                    "generated_at"
+                  ],
+                  "title": "WidgetSnapshot",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Snapshot"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Revoked or expired widget token"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Health-data consent needed (open the app)"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«+1 νερό» from the widget: one glass of the member's size (widget token)",
+        "tags": [
+          "Widgets"
         ]
       }
     },
