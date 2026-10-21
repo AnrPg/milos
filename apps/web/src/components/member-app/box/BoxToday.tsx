@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
@@ -64,7 +64,14 @@ export function nextBooking(slots: ScheduleSlot[], now: Date) {
  * Καταγραφή / Έναρξη ▶, then the next booking. Both keep their place with an
  * empty state, so the screen never reflows (brief §4.2).
  */
-export function BoxToday() {
+export function BoxToday({
+  nextSession,
+  emptyAction,
+}: {
+  /** ADR-170: an independent coach's Box shows the next session, not a class. */
+  nextSession?: ReactNode;
+  emptyAction?: { href: string; label: string };
+} = {}) {
   const t = useTranslations("MemberApp");
   const tCheckIn = useTranslations("CheckIn");
   const i18n = useUiTranslations();
@@ -148,7 +155,7 @@ export function BoxToday() {
           <div className="flex flex-col gap-3">
             <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("todayEmpty")}</p>
             <div className="flex gap-2">
-              <HubButton href="/box/schedule">{t("bookClass")}</HubButton>
+              <HubButton href={emptyAction?.href ?? "/box/schedule"}>{emptyAction?.label ?? t("bookClass")}</HubButton>
               {today.resumeExecutionId ? (
                 <button
                   type="button"
@@ -249,6 +256,7 @@ export function BoxToday() {
         )}
       </HubCard>
 
+      {nextSession ?? (
       <HubCard eyebrow={t("nextSession")}>
         {schedule.isPending ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p>
@@ -294,6 +302,7 @@ export function BoxToday() {
           </div>
         )}
       </HubCard>
+      )}
 
       {logDialog.mode !== "closed" && token ? (
         <TrainingLogDialog

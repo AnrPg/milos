@@ -844,6 +844,13 @@
       },
       "AdminOnboardingChecklist": {
         "properties": {
+          "audience": {
+            "enum": [
+              "gym",
+              "coach"
+            ],
+            "type": "string"
+          },
           "completed_count": {
             "type": "integer"
           },
@@ -869,7 +876,11 @@
                     "packages",
                     "workout",
                     "invite",
-                    "tour"
+                    "tour",
+                    "profile",
+                    "sessions",
+                    "team",
+                    "bootcamp"
                   ],
                   "type": "string"
                 },
@@ -895,6 +906,7 @@
           }
         },
         "required": [
+          "audience",
           "steps",
           "completed_count",
           "total",
@@ -1184,6 +1196,17 @@
           "location_id": {
             "format": "uuid",
             "nullable": true,
+            "type": "string"
+          },
+          "meeting_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "mode": {
+            "enum": [
+              "in_person",
+              "online"
+            ],
             "type": "string"
           },
           "notes": {
@@ -17664,6 +17687,34 @@
         "title": "CoachNoteRead",
         "type": "object"
       },
+      "CoachPractice": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provider_kind": {
+            "enum": [
+              "coach"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "provider_kind"
+        ],
+        "title": "CoachPractice",
+        "type": "object"
+      },
       "CoachingRelationship": {
         "properties": {
           "client_nickname": {
@@ -33679,6 +33730,216 @@
         "title": "HealthConsents",
         "type": "object"
       },
+      "Insight": {
+        "properties": {
+          "params": {
+            "description": "The numbers of the finding; which keys appear depends on the rule and variant",
+            "properties": {
+              "delta": {
+                "description": "RPE points harder on average",
+                "nullable": true,
+                "type": "number"
+              },
+              "hours": {
+                "description": "The member's sleep goal in hours",
+                "nullable": true,
+                "type": "number"
+              },
+              "logged_days": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "on_goal_days": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "part": {
+                "enum": [
+                  "morning",
+                  "afternoon",
+                  "evening",
+                  "night",
+                  null
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "part_count": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "percent": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "pr_days": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "ratio": {
+                "description": "How many times as often",
+                "nullable": true,
+                "type": "number"
+              },
+              "rest_percent": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "total": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "training_percent": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "trigger": {
+                "enum": [
+                  "stress",
+                  "fatigue",
+                  "boredom",
+                  "social",
+                  "hunger",
+                  null
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "trigger_count": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "with_trigger": {
+                "nullable": true,
+                "type": "integer"
+              }
+            },
+            "title": "InsightParams",
+            "type": "object"
+          },
+          "period_end": {
+            "format": "date",
+            "type": "string"
+          },
+          "period_start": {
+            "format": "date",
+            "type": "string"
+          },
+          "rule": {
+            "enum": [
+              "sleep_prs",
+              "sleep_effort",
+              "time_of_day",
+              "cravings",
+              "hydration"
+            ],
+            "type": "string"
+          },
+          "variant": {
+            "description": "Copy key: insights.<rule>.<variant>",
+            "type": "string"
+          },
+          "weeks": {
+            "description": "Weeks of data behind the finding",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "rule",
+          "variant",
+          "params",
+          "weeks",
+          "period_start",
+          "period_end"
+        ],
+        "title": "Insight",
+        "type": "object"
+      },
+      "InsightParams": {
+        "description": "The numbers of the finding; which keys appear depends on the rule and variant",
+        "properties": {
+          "delta": {
+            "description": "RPE points harder on average",
+            "nullable": true,
+            "type": "number"
+          },
+          "hours": {
+            "description": "The member's sleep goal in hours",
+            "nullable": true,
+            "type": "number"
+          },
+          "logged_days": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "on_goal_days": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "part": {
+            "enum": [
+              "morning",
+              "afternoon",
+              "evening",
+              "night",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "part_count": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "percent": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "pr_days": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "ratio": {
+            "description": "How many times as often",
+            "nullable": true,
+            "type": "number"
+          },
+          "rest_percent": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "total": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "training_percent": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "trigger": {
+            "enum": [
+              "stress",
+              "fatigue",
+              "boredom",
+              "social",
+              "hunger",
+              null
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "trigger_count": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "with_trigger": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "title": "InsightParams",
+        "type": "object"
+      },
       "InventoryLowReport": {
         "properties": {
           "id": {
@@ -36758,6 +37019,186 @@
         "title": "MyInjuryWarningsAcknowledgement",
         "type": "object"
       },
+      "MyInsights": {
+        "properties": {
+          "computed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "data_weeks": {
+            "description": "Weeks of data so far (at most window_weeks)",
+            "type": "integer"
+          },
+          "hidden_count": {
+            "description": "Findings the member dismissed",
+            "type": "integer"
+          },
+          "insights": {
+            "description": "At most max_shown findings, in the rules' fixed order",
+            "items": {
+              "properties": {
+                "params": {
+                  "description": "The numbers of the finding; which keys appear depends on the rule and variant",
+                  "properties": {
+                    "delta": {
+                      "description": "RPE points harder on average",
+                      "nullable": true,
+                      "type": "number"
+                    },
+                    "hours": {
+                      "description": "The member's sleep goal in hours",
+                      "nullable": true,
+                      "type": "number"
+                    },
+                    "logged_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "on_goal_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "part": {
+                      "enum": [
+                        "morning",
+                        "afternoon",
+                        "evening",
+                        "night",
+                        null
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "part_count": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "percent": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "pr_days": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "ratio": {
+                      "description": "How many times as often",
+                      "nullable": true,
+                      "type": "number"
+                    },
+                    "rest_percent": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "total": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "training_percent": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "trigger": {
+                      "enum": [
+                        "stress",
+                        "fatigue",
+                        "boredom",
+                        "social",
+                        "hunger",
+                        null
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "trigger_count": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "with_trigger": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "title": "InsightParams",
+                  "type": "object"
+                },
+                "period_end": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "period_start": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "rule": {
+                  "enum": [
+                    "sleep_prs",
+                    "sleep_effort",
+                    "time_of_day",
+                    "cravings",
+                    "hydration"
+                  ],
+                  "type": "string"
+                },
+                "variant": {
+                  "description": "Copy key: insights.<rule>.<variant>",
+                  "type": "string"
+                },
+                "weeks": {
+                  "description": "Weeks of data behind the finding",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "rule",
+                "variant",
+                "params",
+                "weeks",
+                "period_start",
+                "period_end"
+              ],
+              "title": "Insight",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "max_shown": {
+            "description": "Findings shown at a time",
+            "type": "integer"
+          },
+          "min_weeks": {
+            "description": "Weeks of data before any insight",
+            "type": "integer"
+          },
+          "state": {
+            "description": "insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet",
+            "enum": [
+              "insights",
+              "all_hidden",
+              "no_pattern",
+              "collecting"
+            ],
+            "type": "string"
+          },
+          "window_weeks": {
+            "description": "Weeks the rules look back",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "state",
+          "insights",
+          "hidden_count",
+          "data_weeks",
+          "min_weeks",
+          "window_weeks",
+          "max_shown",
+          "computed_at"
+        ],
+        "title": "MyInsights",
+        "type": "object"
+      },
       "MyProviders": {
         "properties": {
           "former": {
@@ -38597,6 +39038,325 @@
           "byte_size"
         ],
         "title": "OrganizationLogoUploadRequest",
+        "type": "object"
+      },
+      "OrganizationPlan": {
+        "properties": {
+          "notice": {
+            "enum": [
+              "trial_ending",
+              "trial_expired",
+              "past_due",
+              "cancelled"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "plan": {
+            "allOf": [
+              {
+                "properties": {
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "annual_price_cents": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "audience": {
+                    "enum": [
+                      "gym",
+                      "coach"
+                    ],
+                    "type": "string"
+                  },
+                  "code": {
+                    "type": "string"
+                  },
+                  "currency": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "limits": {
+                    "additionalProperties": false,
+                    "description": "Absent key = unlimited",
+                    "properties": {
+                      "active_clients": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "staff_seats": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "PlatformPlanLimits",
+                    "type": "object"
+                  },
+                  "monthly_price_cents": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "integer"
+                  },
+                  "price_status": {
+                    "enum": [
+                      "placeholder",
+                      "confirmed"
+                    ],
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  },
+                  "trial_days": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "code",
+                  "audience",
+                  "name",
+                  "description",
+                  "limits",
+                  "monthly_price_cents",
+                  "annual_price_cents",
+                  "currency",
+                  "price_status",
+                  "trial_days",
+                  "is_default",
+                  "public",
+                  "active",
+                  "position"
+                ],
+                "title": "PlatformPlan",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "price_override_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "trialing",
+              "active",
+              "past_due",
+              "cancelled",
+              "comped",
+              "trial_expired"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "trial_days_left": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "trial_ends_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "usage": {
+            "items": {
+              "properties": {
+                "hard": {
+                  "type": "boolean"
+                },
+                "key": {
+                  "enum": [
+                    "staff_seats",
+                    "active_clients"
+                  ],
+                  "type": "string"
+                },
+                "limit": {
+                  "description": "null = unlimited",
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "state": {
+                  "enum": [
+                    "ok",
+                    "near",
+                    "reached",
+                    "over"
+                  ],
+                  "type": "string"
+                },
+                "used": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "key",
+                "used",
+                "limit",
+                "hard",
+                "state"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "plan",
+          "status",
+          "notice",
+          "trial_ends_at",
+          "trial_days_left",
+          "price_override_cents",
+          "usage"
+        ],
+        "title": "OrganizationPlan",
+        "type": "object"
+      },
+      "OrganizationPlatformSubscription": {
+        "properties": {
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "plan_code": {
+            "type": "string"
+          },
+          "price_override_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "status": {
+            "enum": [
+              "trialing",
+              "active",
+              "past_due",
+              "cancelled",
+              "comped",
+              "trial_expired"
+            ],
+            "type": "string"
+          },
+          "stored_status": {
+            "enum": [
+              "trialing",
+              "active",
+              "past_due",
+              "cancelled",
+              "comped"
+            ],
+            "type": "string"
+          },
+          "trial_ends_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "plan_code",
+          "status",
+          "stored_status",
+          "trial_ends_at",
+          "price_override_cents",
+          "notes",
+          "updated_at"
+        ],
+        "title": "OrganizationPlatformSubscription",
+        "type": "object"
+      },
+      "OrganizationPlatformSubscriptions": {
+        "properties": {
+          "subscriptions": {
+            "items": {
+              "properties": {
+                "notes": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "plan_code": {
+                  "type": "string"
+                },
+                "price_override_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "status": {
+                  "enum": [
+                    "trialing",
+                    "active",
+                    "past_due",
+                    "cancelled",
+                    "comped",
+                    "trial_expired"
+                  ],
+                  "type": "string"
+                },
+                "stored_status": {
+                  "enum": [
+                    "trialing",
+                    "active",
+                    "past_due",
+                    "cancelled",
+                    "comped"
+                  ],
+                  "type": "string"
+                },
+                "trial_ends_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "updated_at": {
+                  "format": "date-time",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "plan_code",
+                "status",
+                "stored_status",
+                "trial_ends_at",
+                "price_override_cents",
+                "notes",
+                "updated_at"
+              ],
+              "title": "OrganizationPlatformSubscription",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "subscriptions"
+        ],
+        "title": "OrganizationPlatformSubscriptions",
         "type": "object"
       },
       "PRTimelineEntry": {
@@ -41935,6 +42695,210 @@
           "kg"
         ],
         "title": "PhoneHealthWeight",
+        "type": "object"
+      },
+      "PlatformPlan": {
+        "properties": {
+          "active": {
+            "type": "boolean"
+          },
+          "annual_price_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "audience": {
+            "enum": [
+              "gym",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "limits": {
+            "additionalProperties": false,
+            "description": "Absent key = unlimited",
+            "properties": {
+              "active_clients": {
+                "minimum": 1,
+                "type": "integer"
+              },
+              "staff_seats": {
+                "minimum": 1,
+                "type": "integer"
+              }
+            },
+            "title": "PlatformPlanLimits",
+            "type": "object"
+          },
+          "monthly_price_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "price_status": {
+            "enum": [
+              "placeholder",
+              "confirmed"
+            ],
+            "type": "string"
+          },
+          "public": {
+            "type": "boolean"
+          },
+          "trial_days": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "code",
+          "audience",
+          "name",
+          "description",
+          "limits",
+          "monthly_price_cents",
+          "annual_price_cents",
+          "currency",
+          "price_status",
+          "trial_days",
+          "is_default",
+          "public",
+          "active",
+          "position"
+        ],
+        "title": "PlatformPlan",
+        "type": "object"
+      },
+      "PlatformPlanLimits": {
+        "additionalProperties": false,
+        "description": "Absent key = unlimited",
+        "properties": {
+          "active_clients": {
+            "minimum": 1,
+            "type": "integer"
+          },
+          "staff_seats": {
+            "minimum": 1,
+            "type": "integer"
+          }
+        },
+        "title": "PlatformPlanLimits",
+        "type": "object"
+      },
+      "PlatformPlans": {
+        "properties": {
+          "plans": {
+            "items": {
+              "properties": {
+                "active": {
+                  "type": "boolean"
+                },
+                "annual_price_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "audience": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "is_default": {
+                  "type": "boolean"
+                },
+                "limits": {
+                  "additionalProperties": false,
+                  "description": "Absent key = unlimited",
+                  "properties": {
+                    "active_clients": {
+                      "minimum": 1,
+                      "type": "integer"
+                    },
+                    "staff_seats": {
+                      "minimum": 1,
+                      "type": "integer"
+                    }
+                  },
+                  "title": "PlatformPlanLimits",
+                  "type": "object"
+                },
+                "monthly_price_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer"
+                },
+                "price_status": {
+                  "enum": [
+                    "placeholder",
+                    "confirmed"
+                  ],
+                  "type": "string"
+                },
+                "public": {
+                  "type": "boolean"
+                },
+                "trial_days": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "code",
+                "audience",
+                "name",
+                "description",
+                "limits",
+                "monthly_price_cents",
+                "annual_price_cents",
+                "currency",
+                "price_status",
+                "trial_days",
+                "is_default",
+                "public",
+                "active",
+                "position"
+              ],
+              "title": "PlatformPlan",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "plans"
+        ],
+        "title": "PlatformPlans",
         "type": "object"
       },
       "PostAttachmentPreview": {
@@ -61975,6 +62939,13 @@
                         "name": {
                           "type": "string"
                         },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        },
                         "slug": {
                           "type": "string"
                         }
@@ -62039,6 +63010,13 @@
                           "type": "string"
                         },
                         "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
                           "type": "string"
                         },
                         "slug": {
@@ -66197,6 +67175,92 @@
         "summary": "Undo a scan's check-in within its minute",
         "tags": [
           "Check-in"
+        ]
+      }
+    },
+    "/api/coach-practices": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.CoachPracticeController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "default_locale": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "name": {
+                    "maxLength": 120,
+                    "minLength": 2,
+                    "type": "string"
+                  },
+                  "team_name": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "provider_kind": {
+                      "enum": [
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "slug",
+                    "name",
+                    "provider_kind"
+                  ],
+                  "title": "CoachPractice",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Practice"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Open your practice as an independent coach (one per account)",
+        "tags": [
+          "Coach practice"
         ]
       }
     },
@@ -89151,6 +90215,652 @@
         ]
       }
     },
+    "/api/me/insights": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InsightsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "computed_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "data_weeks": {
+                      "description": "Weeks of data so far (at most window_weeks)",
+                      "type": "integer"
+                    },
+                    "hidden_count": {
+                      "description": "Findings the member dismissed",
+                      "type": "integer"
+                    },
+                    "insights": {
+                      "description": "At most max_shown findings, in the rules' fixed order",
+                      "items": {
+                        "properties": {
+                          "params": {
+                            "description": "The numbers of the finding; which keys appear depends on the rule and variant",
+                            "properties": {
+                              "delta": {
+                                "description": "RPE points harder on average",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "hours": {
+                                "description": "The member's sleep goal in hours",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "logged_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "on_goal_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "part": {
+                                "enum": [
+                                  "morning",
+                                  "afternoon",
+                                  "evening",
+                                  "night",
+                                  null
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "part_count": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "pr_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "ratio": {
+                                "description": "How many times as often",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "rest_percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "total": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "training_percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "trigger": {
+                                "enum": [
+                                  "stress",
+                                  "fatigue",
+                                  "boredom",
+                                  "social",
+                                  "hunger",
+                                  null
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "trigger_count": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "with_trigger": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "title": "InsightParams",
+                            "type": "object"
+                          },
+                          "period_end": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "period_start": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "rule": {
+                            "enum": [
+                              "sleep_prs",
+                              "sleep_effort",
+                              "time_of_day",
+                              "cravings",
+                              "hydration"
+                            ],
+                            "type": "string"
+                          },
+                          "variant": {
+                            "description": "Copy key: insights.<rule>.<variant>",
+                            "type": "string"
+                          },
+                          "weeks": {
+                            "description": "Weeks of data behind the finding",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rule",
+                          "variant",
+                          "params",
+                          "weeks",
+                          "period_start",
+                          "period_end"
+                        ],
+                        "title": "Insight",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "max_shown": {
+                      "description": "Findings shown at a time",
+                      "type": "integer"
+                    },
+                    "min_weeks": {
+                      "description": "Weeks of data before any insight",
+                      "type": "integer"
+                    },
+                    "state": {
+                      "description": "insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet",
+                      "enum": [
+                        "insights",
+                        "all_hidden",
+                        "no_pattern",
+                        "collecting"
+                      ],
+                      "type": "string"
+                    },
+                    "window_weeks": {
+                      "description": "Weeks the rules look back",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "insights",
+                    "hidden_count",
+                    "data_weeks",
+                    "min_weeks",
+                    "window_weeks",
+                    "max_shown",
+                    "computed_at"
+                  ],
+                  "title": "MyInsights",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Insights"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your insights (indicators, never medical advice)",
+        "tags": [
+          "Progress"
+        ]
+      }
+    },
+    "/api/me/insights/restore": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InsightsController.restore",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "computed_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "data_weeks": {
+                      "description": "Weeks of data so far (at most window_weeks)",
+                      "type": "integer"
+                    },
+                    "hidden_count": {
+                      "description": "Findings the member dismissed",
+                      "type": "integer"
+                    },
+                    "insights": {
+                      "description": "At most max_shown findings, in the rules' fixed order",
+                      "items": {
+                        "properties": {
+                          "params": {
+                            "description": "The numbers of the finding; which keys appear depends on the rule and variant",
+                            "properties": {
+                              "delta": {
+                                "description": "RPE points harder on average",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "hours": {
+                                "description": "The member's sleep goal in hours",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "logged_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "on_goal_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "part": {
+                                "enum": [
+                                  "morning",
+                                  "afternoon",
+                                  "evening",
+                                  "night",
+                                  null
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "part_count": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "pr_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "ratio": {
+                                "description": "How many times as often",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "rest_percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "total": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "training_percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "trigger": {
+                                "enum": [
+                                  "stress",
+                                  "fatigue",
+                                  "boredom",
+                                  "social",
+                                  "hunger",
+                                  null
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "trigger_count": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "with_trigger": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "title": "InsightParams",
+                            "type": "object"
+                          },
+                          "period_end": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "period_start": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "rule": {
+                            "enum": [
+                              "sleep_prs",
+                              "sleep_effort",
+                              "time_of_day",
+                              "cravings",
+                              "hydration"
+                            ],
+                            "type": "string"
+                          },
+                          "variant": {
+                            "description": "Copy key: insights.<rule>.<variant>",
+                            "type": "string"
+                          },
+                          "weeks": {
+                            "description": "Weeks of data behind the finding",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rule",
+                          "variant",
+                          "params",
+                          "weeks",
+                          "period_start",
+                          "period_end"
+                        ],
+                        "title": "Insight",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "max_shown": {
+                      "description": "Findings shown at a time",
+                      "type": "integer"
+                    },
+                    "min_weeks": {
+                      "description": "Weeks of data before any insight",
+                      "type": "integer"
+                    },
+                    "state": {
+                      "description": "insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet",
+                      "enum": [
+                        "insights",
+                        "all_hidden",
+                        "no_pattern",
+                        "collecting"
+                      ],
+                      "type": "string"
+                    },
+                    "window_weeks": {
+                      "description": "Weeks the rules look back",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "insights",
+                    "hidden_count",
+                    "data_weeks",
+                    "min_weeks",
+                    "window_weeks",
+                    "max_shown",
+                    "computed_at"
+                  ],
+                  "title": "MyInsights",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Insights"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Show every dismissed insight again",
+        "tags": [
+          "Progress"
+        ]
+      }
+    },
+    "/api/me/insights/{rule}/dismiss": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.InsightsController.dismiss",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "rule",
+            "required": true,
+            "schema": {
+              "enum": [
+                "sleep_prs",
+                "sleep_effort",
+                "time_of_day",
+                "cravings",
+                "hydration"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "computed_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "data_weeks": {
+                      "description": "Weeks of data so far (at most window_weeks)",
+                      "type": "integer"
+                    },
+                    "hidden_count": {
+                      "description": "Findings the member dismissed",
+                      "type": "integer"
+                    },
+                    "insights": {
+                      "description": "At most max_shown findings, in the rules' fixed order",
+                      "items": {
+                        "properties": {
+                          "params": {
+                            "description": "The numbers of the finding; which keys appear depends on the rule and variant",
+                            "properties": {
+                              "delta": {
+                                "description": "RPE points harder on average",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "hours": {
+                                "description": "The member's sleep goal in hours",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "logged_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "on_goal_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "part": {
+                                "enum": [
+                                  "morning",
+                                  "afternoon",
+                                  "evening",
+                                  "night",
+                                  null
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "part_count": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "pr_days": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "ratio": {
+                                "description": "How many times as often",
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "rest_percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "total": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "training_percent": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "trigger": {
+                                "enum": [
+                                  "stress",
+                                  "fatigue",
+                                  "boredom",
+                                  "social",
+                                  "hunger",
+                                  null
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "trigger_count": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "with_trigger": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "title": "InsightParams",
+                            "type": "object"
+                          },
+                          "period_end": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "period_start": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "rule": {
+                            "enum": [
+                              "sleep_prs",
+                              "sleep_effort",
+                              "time_of_day",
+                              "cravings",
+                              "hydration"
+                            ],
+                            "type": "string"
+                          },
+                          "variant": {
+                            "description": "Copy key: insights.<rule>.<variant>",
+                            "type": "string"
+                          },
+                          "weeks": {
+                            "description": "Weeks of data behind the finding",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "rule",
+                          "variant",
+                          "params",
+                          "weeks",
+                          "period_start",
+                          "period_end"
+                        ],
+                        "title": "Insight",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "max_shown": {
+                      "description": "Findings shown at a time",
+                      "type": "integer"
+                    },
+                    "min_weeks": {
+                      "description": "Weeks of data before any insight",
+                      "type": "integer"
+                    },
+                    "state": {
+                      "description": "insights: findings to show; all_hidden: every finding dismissed; no_pattern: enough data, nothing clear; collecting: not enough data yet",
+                      "enum": [
+                        "insights",
+                        "all_hidden",
+                        "no_pattern",
+                        "collecting"
+                      ],
+                      "type": "string"
+                    },
+                    "window_weeks": {
+                      "description": "Weeks the rules look back",
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "state",
+                    "insights",
+                    "hidden_count",
+                    "data_weeks",
+                    "min_weeks",
+                    "window_weeks",
+                    "max_shown",
+                    "computed_at"
+                  ],
+                  "title": "MyInsights",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Insights"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Hide one insight until its finding changes",
+        "tags": [
+          "Progress"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -100149,6 +101859,13 @@
                           "name": {
                             "type": "string"
                           },
+                          "provider_kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
                           "slug": {
                             "type": "string"
                           }
@@ -100272,6 +101989,13 @@
                         "name": {
                           "type": "string"
                         },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        },
                         "slug": {
                           "type": "string"
                         }
@@ -100364,6 +102088,13 @@
                           "type": "string"
                         },
                         "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
                           "type": "string"
                         },
                         "slug": {
@@ -100497,6 +102228,13 @@
                           "type": "string"
                         },
                         "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
                           "type": "string"
                         },
                         "slug": {
@@ -126172,6 +127910,13 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "audience": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
                     "completed_count": {
                       "type": "integer"
                     },
@@ -126197,7 +127942,11 @@
                               "packages",
                               "workout",
                               "invite",
-                              "tour"
+                              "tour",
+                              "profile",
+                              "sessions",
+                              "team",
+                              "bootcamp"
                             ],
                             "type": "string"
                           },
@@ -126223,6 +127972,7 @@
                     }
                   },
                   "required": [
+                    "audience",
                     "steps",
                     "completed_count",
                     "total",
@@ -126275,7 +128025,11 @@
                       "packages",
                       "workout",
                       "invite",
-                      "tour"
+                      "tour",
+                      "profile",
+                      "sessions",
+                      "team",
+                      "bootcamp"
                     ],
                     "type": "string"
                   }
@@ -126295,6 +128049,13 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "audience": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
                     "completed_count": {
                       "type": "integer"
                     },
@@ -126320,7 +128081,11 @@
                               "packages",
                               "workout",
                               "invite",
-                              "tour"
+                              "tour",
+                              "profile",
+                              "sessions",
+                              "team",
+                              "bootcamp"
                             ],
                             "type": "string"
                           },
@@ -126346,6 +128111,7 @@
                     }
                   },
                   "required": [
+                    "audience",
                     "steps",
                     "completed_count",
                     "total",
@@ -126504,6 +128270,216 @@
         "summary": "Hand ownership to an active member; the former owner stays as admin",
         "tags": [
           "Organization ownership"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/plan": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AdminPlanController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "notice": {
+                      "enum": [
+                        "trial_ending",
+                        "trial_expired",
+                        "past_due",
+                        "cancelled"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "plan": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "active": {
+                              "type": "boolean"
+                            },
+                            "annual_price_cents": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "audience": {
+                              "enum": [
+                                "gym",
+                                "coach"
+                              ],
+                              "type": "string"
+                            },
+                            "code": {
+                              "type": "string"
+                            },
+                            "currency": {
+                              "type": "string"
+                            },
+                            "description": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "is_default": {
+                              "type": "boolean"
+                            },
+                            "limits": {
+                              "additionalProperties": false,
+                              "description": "Absent key = unlimited",
+                              "properties": {
+                                "active_clients": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                },
+                                "staff_seats": {
+                                  "minimum": 1,
+                                  "type": "integer"
+                                }
+                              },
+                              "title": "PlatformPlanLimits",
+                              "type": "object"
+                            },
+                            "monthly_price_cents": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "position": {
+                              "type": "integer"
+                            },
+                            "price_status": {
+                              "enum": [
+                                "placeholder",
+                                "confirmed"
+                              ],
+                              "type": "string"
+                            },
+                            "public": {
+                              "type": "boolean"
+                            },
+                            "trial_days": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "code",
+                            "audience",
+                            "name",
+                            "description",
+                            "limits",
+                            "monthly_price_cents",
+                            "annual_price_cents",
+                            "currency",
+                            "price_status",
+                            "trial_days",
+                            "is_default",
+                            "public",
+                            "active",
+                            "position"
+                          ],
+                          "title": "PlatformPlan",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "price_override_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "trialing",
+                        "active",
+                        "past_due",
+                        "cancelled",
+                        "comped",
+                        "trial_expired"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "trial_days_left": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "trial_ends_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "usage": {
+                      "items": {
+                        "properties": {
+                          "hard": {
+                            "type": "boolean"
+                          },
+                          "key": {
+                            "enum": [
+                              "staff_seats",
+                              "active_clients"
+                            ],
+                            "type": "string"
+                          },
+                          "limit": {
+                            "description": "null = unlimited",
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "state": {
+                            "enum": [
+                              "ok",
+                              "near",
+                              "reached",
+                              "over"
+                            ],
+                            "type": "string"
+                          },
+                          "used": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "key",
+                          "used",
+                          "limit",
+                          "hard",
+                          "state"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "plan",
+                    "status",
+                    "notice",
+                    "trial_ends_at",
+                    "trial_days_left",
+                    "price_override_cents",
+                    "usage"
+                  ],
+                  "title": "OrganizationPlan",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The organization's platform plan with seats used",
+        "tags": [
+          "Admin plan"
         ]
       }
     },
@@ -160984,6 +162960,13 @@
                         "name": {
                           "type": "string"
                         },
+                        "provider_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        },
                         "slug": {
                           "type": "string"
                         }
@@ -161967,6 +163950,17 @@
                           "location_id": {
                             "format": "uuid",
                             "nullable": true,
+                            "type": "string"
+                          },
+                          "meeting_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "mode": {
+                            "enum": [
+                              "in_person",
+                              "online"
+                            ],
                             "type": "string"
                           },
                           "notes": {
@@ -168996,6 +170990,17 @@
                             "nullable": true,
                             "type": "string"
                           },
+                          "meeting_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "mode": {
+                            "enum": [
+                              "in_person",
+                              "online"
+                            ],
+                            "type": "string"
+                          },
                           "notes": {
                             "nullable": true,
                             "type": "string"
@@ -169086,6 +171091,18 @@
                   "location_id": {
                     "format": "uuid",
                     "nullable": true,
+                    "type": "string"
+                  },
+                  "meeting_url": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "mode": {
+                    "enum": [
+                      "in_person",
+                      "online"
+                    ],
                     "type": "string"
                   },
                   "notes": {
@@ -169222,6 +171239,17 @@
                         "location_id": {
                           "format": "uuid",
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "meeting_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mode": {
+                          "enum": [
+                            "in_person",
+                            "online"
+                          ],
                           "type": "string"
                         },
                         "notes": {
@@ -169540,6 +171568,17 @@
                         "location_id": {
                           "format": "uuid",
                           "nullable": true,
+                          "type": "string"
+                        },
+                        "meeting_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "mode": {
+                          "enum": [
+                            "in_person",
+                            "online"
+                          ],
                           "type": "string"
                         },
                         "notes": {
@@ -184485,6 +186524,146 @@
         ]
       }
     },
+    "/api/platform/organizations/{id}/plan": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformPlanController.assign",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "notes": {
+                    "maxLength": 1000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "plan_code": {
+                    "type": "string"
+                  },
+                  "price_override_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "status": {
+                    "enum": [
+                      "trialing",
+                      "active",
+                      "past_due",
+                      "cancelled",
+                      "comped"
+                    ],
+                    "type": "string"
+                  },
+                  "trial_ends_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "plan_code",
+                  "status"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "notes": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "plan_code": {
+                      "type": "string"
+                    },
+                    "price_override_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "status": {
+                      "enum": [
+                        "trialing",
+                        "active",
+                        "past_due",
+                        "cancelled",
+                        "comped",
+                        "trial_expired"
+                      ],
+                      "type": "string"
+                    },
+                    "stored_status": {
+                      "enum": [
+                        "trialing",
+                        "active",
+                        "past_due",
+                        "cancelled",
+                        "comped"
+                      ],
+                      "type": "string"
+                    },
+                    "trial_ends_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "updated_at": {
+                      "format": "date-time",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "plan_code",
+                    "status",
+                    "stored_status",
+                    "trial_ends_at",
+                    "price_override_cents",
+                    "notes",
+                    "updated_at"
+                  ],
+                  "title": "OrganizationPlatformSubscription",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Subscription"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Put an organization on a plan with a status (vendors)",
+        "tags": [
+          "Platform plans"
+        ]
+      }
+    },
     "/api/platform/organizations/{id}/purge": {
       "get": {
         "callbacks": {},
@@ -185901,6 +188080,641 @@
         "summary": "Summarize what renaming an organization's path slug affects (ADR-122)",
         "tags": [
           "Platform Organizations"
+        ]
+      }
+    },
+    "/api/platform/plans": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformPlanController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "plans": {
+                      "items": {
+                        "properties": {
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "annual_price_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "audience": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "is_default": {
+                            "type": "boolean"
+                          },
+                          "limits": {
+                            "additionalProperties": false,
+                            "description": "Absent key = unlimited",
+                            "properties": {
+                              "active_clients": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "staff_seats": {
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "title": "PlatformPlanLimits",
+                            "type": "object"
+                          },
+                          "monthly_price_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "position": {
+                            "type": "integer"
+                          },
+                          "price_status": {
+                            "enum": [
+                              "placeholder",
+                              "confirmed"
+                            ],
+                            "type": "string"
+                          },
+                          "public": {
+                            "type": "boolean"
+                          },
+                          "trial_days": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "audience",
+                          "name",
+                          "description",
+                          "limits",
+                          "monthly_price_cents",
+                          "annual_price_cents",
+                          "currency",
+                          "price_status",
+                          "trial_days",
+                          "is_default",
+                          "public",
+                          "active",
+                          "position"
+                        ],
+                        "title": "PlatformPlan",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "plans"
+                  ],
+                  "title": "PlatformPlans",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plans"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Every platform plan (vendors)",
+        "tags": [
+          "Platform plans"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformPlanController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "annual_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "audience": {
+                    "enum": [
+                      "gym",
+                      "coach"
+                    ],
+                    "type": "string"
+                  },
+                  "code": {
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$",
+                    "type": "string"
+                  },
+                  "currency": {
+                    "pattern": "^[A-Za-z]{3}$",
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "limits": {
+                    "additionalProperties": false,
+                    "description": "Absent key = unlimited",
+                    "properties": {
+                      "active_clients": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "staff_seats": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "PlatformPlanLimits",
+                    "type": "object"
+                  },
+                  "monthly_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "integer"
+                  },
+                  "price_status": {
+                    "enum": [
+                      "placeholder",
+                      "confirmed"
+                    ],
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  },
+                  "trial_days": {
+                    "maximum": 365,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "code",
+                  "audience",
+                  "name"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "annual_price_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "audience": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "is_default": {
+                      "type": "boolean"
+                    },
+                    "limits": {
+                      "additionalProperties": false,
+                      "description": "Absent key = unlimited",
+                      "properties": {
+                        "active_clients": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "staff_seats": {
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "title": "PlatformPlanLimits",
+                      "type": "object"
+                    },
+                    "monthly_price_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "position": {
+                      "type": "integer"
+                    },
+                    "price_status": {
+                      "enum": [
+                        "placeholder",
+                        "confirmed"
+                      ],
+                      "type": "string"
+                    },
+                    "public": {
+                      "type": "boolean"
+                    },
+                    "trial_days": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "audience",
+                    "name",
+                    "description",
+                    "limits",
+                    "monthly_price_cents",
+                    "annual_price_cents",
+                    "currency",
+                    "price_status",
+                    "trial_days",
+                    "is_default",
+                    "public",
+                    "active",
+                    "position"
+                  ],
+                  "title": "PlatformPlan",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Add a platform plan (vendors)",
+        "tags": [
+          "Platform plans"
+        ]
+      }
+    },
+    "/api/platform/plans/{code}": {
+      "patch": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformPlanController.update",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "code",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "annual_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "audience": {
+                    "enum": [
+                      "gym",
+                      "coach"
+                    ],
+                    "type": "string"
+                  },
+                  "code": {
+                    "pattern": "^[a-z][a-z0-9_]{1,39}$",
+                    "type": "string"
+                  },
+                  "currency": {
+                    "pattern": "^[A-Za-z]{3}$",
+                    "type": "string"
+                  },
+                  "description": {
+                    "maxLength": 500,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "is_default": {
+                    "type": "boolean"
+                  },
+                  "limits": {
+                    "additionalProperties": false,
+                    "description": "Absent key = unlimited",
+                    "properties": {
+                      "active_clients": {
+                        "minimum": 1,
+                        "type": "integer"
+                      },
+                      "staff_seats": {
+                        "minimum": 1,
+                        "type": "integer"
+                      }
+                    },
+                    "title": "PlatformPlanLimits",
+                    "type": "object"
+                  },
+                  "monthly_price_cents": {
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "maxLength": 80,
+                    "minLength": 1,
+                    "type": "string"
+                  },
+                  "position": {
+                    "type": "integer"
+                  },
+                  "price_status": {
+                    "enum": [
+                      "placeholder",
+                      "confirmed"
+                    ],
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  },
+                  "trial_days": {
+                    "maximum": 365,
+                    "minimum": 0,
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "active": {
+                      "type": "boolean"
+                    },
+                    "annual_price_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "audience": {
+                      "enum": [
+                        "gym",
+                        "coach"
+                      ],
+                      "type": "string"
+                    },
+                    "code": {
+                      "type": "string"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "is_default": {
+                      "type": "boolean"
+                    },
+                    "limits": {
+                      "additionalProperties": false,
+                      "description": "Absent key = unlimited",
+                      "properties": {
+                        "active_clients": {
+                          "minimum": 1,
+                          "type": "integer"
+                        },
+                        "staff_seats": {
+                          "minimum": 1,
+                          "type": "integer"
+                        }
+                      },
+                      "title": "PlatformPlanLimits",
+                      "type": "object"
+                    },
+                    "monthly_price_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "position": {
+                      "type": "integer"
+                    },
+                    "price_status": {
+                      "enum": [
+                        "placeholder",
+                        "confirmed"
+                      ],
+                      "type": "string"
+                    },
+                    "public": {
+                      "type": "boolean"
+                    },
+                    "trial_days": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "audience",
+                    "name",
+                    "description",
+                    "limits",
+                    "monthly_price_cents",
+                    "annual_price_cents",
+                    "currency",
+                    "price_status",
+                    "trial_days",
+                    "is_default",
+                    "public",
+                    "active",
+                    "position"
+                  ],
+                  "title": "PlatformPlan",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plan"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Change a plan's name, limits, prices, trial or visibility (vendors)",
+        "tags": [
+          "Platform plans"
+        ]
+      }
+    },
+    "/api/platform/subscriptions": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformPlanController.subscriptions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "subscriptions": {
+                      "items": {
+                        "properties": {
+                          "notes": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "plan_code": {
+                            "type": "string"
+                          },
+                          "price_override_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "status": {
+                            "enum": [
+                              "trialing",
+                              "active",
+                              "past_due",
+                              "cancelled",
+                              "comped",
+                              "trial_expired"
+                            ],
+                            "type": "string"
+                          },
+                          "stored_status": {
+                            "enum": [
+                              "trialing",
+                              "active",
+                              "past_due",
+                              "cancelled",
+                              "comped"
+                            ],
+                            "type": "string"
+                          },
+                          "trial_ends_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "updated_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "plan_code",
+                          "status",
+                          "stored_status",
+                          "trial_ends_at",
+                          "price_override_cents",
+                          "notes",
+                          "updated_at"
+                        ],
+                        "title": "OrganizationPlatformSubscription",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "subscriptions"
+                  ],
+                  "title": "OrganizationPlatformSubscriptions",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Subscriptions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The plan every organization is on (vendors)",
+        "tags": [
+          "Platform plans"
         ]
       }
     },
@@ -189300,6 +192114,140 @@
         "summary": "A published box: who it is, its «Σχετικά» and its locations",
         "tags": [
           "Public box page"
+        ]
+      }
+    },
+    "/api/public/platform-plans": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PlatformPlanController.index_public",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "audience",
+            "required": false,
+            "schema": {
+              "enum": [
+                "gym",
+                "coach"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "plans": {
+                      "items": {
+                        "properties": {
+                          "active": {
+                            "type": "boolean"
+                          },
+                          "annual_price_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "audience": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "code": {
+                            "type": "string"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "is_default": {
+                            "type": "boolean"
+                          },
+                          "limits": {
+                            "additionalProperties": false,
+                            "description": "Absent key = unlimited",
+                            "properties": {
+                              "active_clients": {
+                                "minimum": 1,
+                                "type": "integer"
+                              },
+                              "staff_seats": {
+                                "minimum": 1,
+                                "type": "integer"
+                              }
+                            },
+                            "title": "PlatformPlanLimits",
+                            "type": "object"
+                          },
+                          "monthly_price_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "position": {
+                            "type": "integer"
+                          },
+                          "price_status": {
+                            "enum": [
+                              "placeholder",
+                              "confirmed"
+                            ],
+                            "type": "string"
+                          },
+                          "public": {
+                            "type": "boolean"
+                          },
+                          "trial_days": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "code",
+                          "audience",
+                          "name",
+                          "description",
+                          "limits",
+                          "monthly_price_cents",
+                          "annual_price_cents",
+                          "currency",
+                          "price_status",
+                          "trial_days",
+                          "is_default",
+                          "public",
+                          "active",
+                          "position"
+                        ],
+                        "title": "PlatformPlan",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "plans"
+                  ],
+                  "title": "PlatformPlans",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Plans"
+          }
+        },
+        "security": [],
+        "summary": "Active public platform plans (pricing, coach onboarding)",
+        "tags": [
+          "Platform plans"
         ]
       }
     },

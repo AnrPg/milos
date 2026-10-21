@@ -4,7 +4,13 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   import Ecto.Query
 
   alias Ecto.Multi
-  alias MilosTraining.Organizations.Domain.{BrandLogoPolicy, InvitationPolicy, SlugRenamePolicy}
+
+  alias MilosTraining.Organizations.Domain.{
+    BrandLogoPolicy,
+    InvitationPolicy,
+    MembershipPolicy,
+    SlugRenamePolicy
+  }
 
   alias MilosTraining.Organizations.{
     Organization,
@@ -23,7 +29,10 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
 
   @impl true
   def create_organization(params) do
-    changeset = Organization.changeset(params)
+    changeset =
+      params
+      |> Organization.changeset()
+      |> Organization.put_initial_provider_kind(value(params, :provider_kind))
 
     Multi.new()
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
@@ -165,6 +174,61 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
         is_nil(invitation.revoked_at) and invitation.expires_at > ^now
     )
     |> Repo.aggregate(:count)
+  end
+
+  @impl true
+  def slug_taken?(slug) do
+    %{rows: [[taken]]} = Repo.query!("SELECT milos_organization_slug_taken($1)", [slug])
+    taken
+  end
+
+  @impl true
+  def count_seats(organization_id, now) do
+    staff =
+      Enum.map(
+        MembershipPolicy.admin_roles() ++ MembershipPolicy.staff_roles(),
+        &Atom.to_string/1
+      )
+
+    clients = Enum.map(MembershipPolicy.client_roles(), &Atom.to_string/1)
+
+    %{staff: staff_members, clients: client_members} =
+      OrganizationMembership
+      |> where(
+        [membership],
+        membership.organization_id == ^organization_id and membership.status == :active
+      )
+      |> select([membership], %{
+        staff:
+          fragment(
+            "count(*) FILTER (WHERE ?::text[] && ?::text[])",
+            membership.roles,
+            type(^staff, {:array, :string})
+          ),
+        clients:
+          fragment(
+            "count(*) FILTER (WHERE ?::text[] && ?::text[] AND NOT ?::text[] && ?::text[])",
+            membership.roles,
+            type(^clients, {:array, :string}),
+            membership.roles,
+            type(^staff, {:array, :string})
+          )
+      })
+      |> Repo.one()
+
+    staff_atoms = MembershipPolicy.admin_roles() ++ MembershipPolicy.staff_roles()
+
+    pending_staff =
+      RegistrationInvitation
+      |> where(
+        [invitation],
+        invitation.organization_id == ^organization_id and is_nil(invitation.redeemed_at) and
+          is_nil(invitation.revoked_at) and invitation.expires_at > ^now and
+          invitation.role in ^staff_atoms
+      )
+      |> Repo.aggregate(:count)
+
+    %{staff: staff_members, clients: client_members, pending_staff_invitations: pending_staff}
   end
 
   @impl true

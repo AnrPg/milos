@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "Portions go from 0 to 20, in halves.",
     "stfMealSlots": "Meals in the day",
     "stfMealSlotsHint": "The meals the member logs against. Leave empty for breakfast, lunch, dinner and a snack.",
-    "mpWellnessSummary": "Weekly wellness summary"
+    "mpWellnessSummary": "Weekly wellness summary",
+    "apiErrorCoachPracticeExists": "You already run a coach practice from this account.",
+    "apiErrorPlanLimitReached": "Your plan has no free staff seats. Free a seat or ask us to change the plan.",
+    "apiErrorUnknownPlan": "This plan does not exist.",
+    "apiErrorTrialEndRequired": "A trial needs an end date.",
+    "apiErrorInvalidName": "The name must be 2 to 120 characters."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4742,6 +4747,26 @@
         "title": "Take the 1-minute tour",
         "body": "See where everything lives.",
         "cta": "Start tour"
+      },
+      "profile": {
+        "title": "Publish your profile",
+        "body": "Your photo, what you coach and where. Clients find you through it.",
+        "cta": "Edit profile"
+      },
+      "sessions": {
+        "title": "Open session times",
+        "body": "One-to-one or small-group times, in person or online.",
+        "cta": "Add sessions"
+      },
+      "team": {
+        "title": "Meet your Team",
+        "body": "Your clients’ club: announcements, chat and shared training.",
+        "cta": "Open Team"
+      },
+      "bootcamp": {
+        "title": "Run an open bootcamp",
+        "body": "An outdoor or online session anyone can join. A good way to meet new clients.",
+        "cta": "Create bootcamp"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "See your membership in {billing}. Change language and notifications in your profile."
         }
       }
-    }
+    },
+    "popupTitleCoach": "Welcome, coach! Let’s set up your practice",
+    "popupIntroCoach": "Seven short steps. Stop anytime: this list waits for you in {path}."
   },
   "MemberApp": {
     "journal": {
@@ -8727,6 +8754,160 @@
       "title": "Coverage, qualities, load",
       "range": "Period",
       "sharedOnly": "Only from entries the client shares with the box's coaches."
+    }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Hide",
+    "restore": "Show again",
+    "hidden": "Hidden: {count}",
+    "note": "An indicator, not medical advice.",
+    "noteWithWeeks": "From {weeks} weeks of data · An indicator, not medical advice.",
+    "empty": {
+      "collecting": "Insights appear after {min} weeks of entries (sleep, water, cravings, workouts). So far: {weeks} of {min}.",
+      "moreEntries": "A few more entries are needed before a pattern shows.",
+      "noPattern": "No clear pattern in the last {window} weeks. Insights update every night.",
+      "allHidden": "You hid every insight."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "You set PRs {ratio}× more often after {hours}+ hours of sleep.",
+        "all_after_goal": "All {count} of your PRs came after {hours}+ hours of sleep."
+      },
+      "sleep_effort": {
+        "harder_after_short": "After less than {hours} hours of sleep, you rate workouts {delta} RPE points harder."
+      },
+      "time_of_day": {
+        "best_part": "You set PRs {ratio}× more often in {part, select, morning {morning} afternoon {afternoon} evening {evening} other {late-night}} workouts.",
+        "only_part": "All {count} of your PRs came in {part, select, morning {morning} afternoon {afternoon} evening {evening} other {late-night}} workouts."
+      },
+      "cravings": {
+        "part_and_trigger": "Most of your cravings ({count} of {total}) come {part, select, morning {in the morning} afternoon {in the afternoon} evening {in the evening} other {late at night}}, usually with {trigger, select, stress {stress} fatigue {tiredness} boredom {boredom} social {company} other {hunger}}.",
+        "part": "Most of your cravings ({count} of {total}) come {part, select, morning {in the morning} afternoon {in the afternoon} evening {in the evening} other {late at night}}.",
+        "trigger": "With your cravings you most often note {trigger, select, stress {stress} fatigue {tiredness} boredom {boredom} social {company} other {hunger}} ({count} of {total})."
+      },
+      "hydration": {
+        "on_goal": "You reached your water goal on {onGoal} of the {logged} days you logged.",
+        "training_more": "On training days you reach your water goal more often ({training}% vs {rest}% on other days).",
+        "training_less": "On training days you reach your water goal less often ({training}% vs {rest}% on other days)."
+      }
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "Coach actions",
+      "sessions": "Sessions",
+      "nutrition": "Nutrition",
+      "messages": "Messages",
+      "package": "Session package",
+      "assessment": "Assessment",
+      "ptSession": "Personal session",
+      "online": "Online",
+      "inPerson": "In person",
+      "minutes": "{minutes} min",
+      "join": "Join call",
+      "manage": "Manage",
+      "noSession": "No session booked yet.",
+      "bookSession": "Book a session",
+      "noPackage": "No session package yet. Ask your coach.",
+      "sessionsLeft": "{remaining} of {limit} sessions left",
+      "sessionsUnlimited": "Unlimited sessions"
+    },
+    "start": {
+      "title": "Start as a coach",
+      "intro": "Coach your own clients: sessions, programmes, nutrition and a Team club, all in Milos.",
+      "includes": "What you get",
+      "include": {
+        "clients": "Your own client list and programmes",
+        "sessions": "Bookable sessions, in person or online",
+        "team": "A Team club for your clients",
+        "bootcamps": "Open bootcamps anyone can join"
+      },
+      "trial": "{days} days free",
+      "price": "then {price}/month",
+      "priceSoon": "Pricing will be announced before the trial ends",
+      "nameLabel": "Practice name",
+      "namePlaceholder": "e.g. Nikos Papadopoulos Coaching",
+      "nameHint": "Clients see this name. You can change it later.",
+      "teamLabel": "Team club name",
+      "teamHint": "Your clients’ club. You can rename it later.",
+      "submit": "Start my practice",
+      "creating": "Starting…",
+      "alreadyOpen": "You already run a coach practice. Switch to it from the provider menu."
+    },
+    "me": {
+      "row": "Coach your own clients",
+      "rowHint": "Open your practice as an independent coach"
+    },
+    "slot": {
+      "mode": "Where",
+      "meetingUrl": "Call link"
+    },
+    "plan": {
+      "title": "Milos plan",
+      "description": "Your plan, its limits and what you use.",
+      "loading": "Loading plan…",
+      "status": {
+        "trialing": "Trial",
+        "active": "Active",
+        "past_due": "Payment due",
+        "cancelled": "Cancelled",
+        "comped": "Complimentary",
+        "trial_expired": "Trial ended"
+      },
+      "trialLeft": "{days, plural, one {# day} other {# days}} of trial left",
+      "price": "{price}/month",
+      "priceSoon": "Pricing to be announced",
+      "limit": {
+        "staff_seats": "Staff seats",
+        "active_clients": "Active clients"
+      },
+      "unlimited": "{used} · no limit",
+      "used": "{used} of {limit}",
+      "contact": "Need more room? Contact us and we’ll change your plan.",
+      "notice": {
+        "trial_ending": "Your trial ends in {days, plural, one {# day} other {# days}}.",
+        "trial_expired": "Your trial has ended. Everything keeps working; we’ll be in touch about your plan.",
+        "past_due": "A payment for your Milos plan is overdue.",
+        "cancelled": "Your Milos plan is cancelled. Contact us to restart it.",
+        "staff_full": "All staff seats on your plan are taken."
+      }
+    },
+    "console": {
+      "back": "Organizations",
+      "title": "Plans",
+      "subtitle": "Plan limits, trials and prices, and the plan each organization is on. A price stays a placeholder until you confirm it; customers only see confirmed prices.",
+      "forbidden": "Only the platform team can manage plans.",
+      "plans": "Catalog",
+      "audience": {
+        "gym": "Gyms",
+        "coach": "Coaches"
+      },
+      "audienceLabel": "For",
+      "placeholder": "Placeholder price",
+      "name": "Name",
+      "monthly": "Monthly ({currency})",
+      "annual": "Yearly ({currency})",
+      "trialDays": "Trial days",
+      "unlimitedHint": "Empty means no limit",
+      "confirmed": "Price confirmed",
+      "default": "Default for new organizations",
+      "public": "Shown publicly",
+      "active": "Active",
+      "save": "Save",
+      "saved": "Saved",
+      "newPlan": "New plan",
+      "code": "Code",
+      "codeHint": "Lowercase letters, digits and _. Cannot change later.",
+      "add": "Add plan",
+      "subscriptions": "Organizations",
+      "noPlan": "No plan",
+      "plan": "Plan",
+      "status": "Status",
+      "trialEnds": "Trial ends",
+      "override": "Custom monthly price",
+      "overrideHint": "Empty uses the plan price",
+      "notes": "Notes"
     }
   }
 }

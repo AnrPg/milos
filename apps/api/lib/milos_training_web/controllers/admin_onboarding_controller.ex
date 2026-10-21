@@ -10,16 +10,20 @@ defmodule MilosTrainingWeb.AdminOnboardingController do
   tags(["Admin Onboarding"])
   security([%{"bearerAuth" => []}])
 
+  # Gym steps and an independent coach's (ADR-170).
+  @steps ~w(settings classes packages workout invite tour profile sessions team bootcamp)
+
   @checklist_schema %Schema{
     title: "AdminOnboardingChecklist",
     type: :object,
     properties: %{
+      audience: %Schema{type: :string, enum: ["gym", "coach"]},
       steps: %Schema{
         type: :array,
         items: %Schema{
           type: :object,
           properties: %{
-            id: %Schema{type: :string, enum: ~w(settings classes packages workout invite tour)},
+            id: %Schema{type: :string, enum: @steps},
             done: %Schema{type: :boolean},
             auto: %Schema{type: :boolean},
             skipped: %Schema{type: :boolean}
@@ -33,7 +37,15 @@ defmodule MilosTrainingWeb.AdminOnboardingController do
       dismissed: %Schema{type: :boolean},
       tour_completed: %Schema{type: :boolean}
     },
-    required: [:steps, :completed_count, :total, :finished, :dismissed, :tour_completed]
+    required: [
+      :audience,
+      :steps,
+      :completed_count,
+      :total,
+      :finished,
+      :dismissed,
+      :tour_completed
+    ]
   }
 
   operation(:show,
@@ -56,7 +68,7 @@ defmodule MilosTrainingWeb.AdminOnboardingController do
               },
               step: %Schema{
                 type: :string,
-                enum: ~w(settings classes packages workout invite tour)
+                enum: @steps
               }
             },
             required: [:action]

@@ -40,6 +40,15 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     end)
   end
 
+  @impl true
+  def name_gym_club(%{organization_id: organization_id}, name) do
+    Club
+    |> where([c], c.organization_id == ^organization_id and c.kind == "gym" and is_nil(c.name))
+    |> Repo.update_all(set: [name: name, updated_at: DateTime.utc_now()])
+
+    :ok
+  end
+
   defp gym_club(organization_id),
     do: Repo.one(from c in Club, where: c.organization_id == ^organization_id and c.kind == "gym")
 

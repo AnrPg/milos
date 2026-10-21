@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "המנות הן מ־0 עד 20, בחצאים.",
     "stfMealSlots": "ארוחות היום",
     "stfMealSlotsHint": "הארוחות שאליהן המתאמן רושם. השאר/י ריק לבוקר, צהריים, ערב ונשנוש.",
-    "mpWellnessSummary": "סיכום רווחה שבועי"
+    "mpWellnessSummary": "סיכום רווחה שבועי",
+    "apiErrorCoachPracticeExists": "כבר יש לך עסק אימון מהחשבון הזה.",
+    "apiErrorPlanLimitReached": "אין בתוכנית שלך מקומות פנויים לצוות. פנה מקום או בקש מאיתנו לשנות תוכנית.",
+    "apiErrorUnknownPlan": "התוכנית הזו לא קיימת.",
+    "apiErrorTrialEndRequired": "תקופת ניסיון צריכה תאריך סיום.",
+    "apiErrorInvalidName": "השם חייב להכיל 2 עד 120 תווים."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4742,6 +4747,26 @@
         "title": "סיור של דקה",
         "body": "ראו איפה נמצא כל דבר.",
         "cta": "התחלת הסיור"
+      },
+      "profile": {
+        "title": "פרסם את הפרופיל שלך",
+        "body": "התמונה שלך, מה אתה מאמן ואיפה. כך לקוחות מוצאים אותך.",
+        "cta": "עריכת פרופיל"
+      },
+      "sessions": {
+        "title": "פתח זמנים לאימונים",
+        "body": "אימון אישי או בקבוצה קטנה, פנים אל פנים או אונליין.",
+        "cta": "הוספת אימונים"
+      },
+      "team": {
+        "title": "הכר את ה־Team שלך",
+        "body": "המועדון של הלקוחות שלך: הודעות, צ׳אט ואימון משותף.",
+        "cta": "פתיחת Team"
+      },
+      "bootcamp": {
+        "title": "הפעל בוטקאמפ פתוח",
+        "body": "אימון בחוץ או אונליין פתוח לכולם. דרך טובה להכיר לקוחות חדשים.",
+        "cta": "יצירת בוטקאמפ"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "את המנוי רואים ב{billing}. שפה והתראות משנים בפרופיל."
         }
       }
-    }
+    },
+    "popupTitleCoach": "ברוך הבא, מאמן! בוא נכין את העסק שלך",
+    "popupIntroCoach": "שבעה צעדים קצרים. אפשר לעצור מתי שרוצים: הרשימה מחכה לך ב־{path}."
   },
   "MemberApp": {
     "journal": {
@@ -8727,6 +8754,160 @@
       "title": "כיסוי, תכונות, עומס",
       "range": "תקופה",
       "sharedOnly": "רק מרשומות שהלקוח משתף עם המאמנים של הבוקס."
+    }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "הסתרה",
+    "restore": "הצגה מחדש",
+    "hidden": "מוסתרים: {count}",
+    "note": "מדד, לא ייעוץ רפואי.",
+    "noteWithWeeks": "מתוך {weeks} שבועות של נתונים · מדד, לא ייעוץ רפואי.",
+    "empty": {
+      "collecting": "ה-insights מופיעים אחרי {min} שבועות של רישומים (שינה, מים, חשקים, אימונים). עד עכשיו: {weeks} מתוך {min}.",
+      "moreEntries": "צריך עוד כמה רישומים כדי שיופיע דפוס.",
+      "noPattern": "אין דפוס ברור ב-{window} השבועות האחרונים. ה-insights מתעדכנים כל לילה.",
+      "allHidden": "הסתרת את כל ה-insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "את/ה שובר/ת שיא אישי פי {ratio} יותר אחרי {hours}+ שעות שינה.",
+        "all_after_goal": "כל {count} השיאים האישיים שלך הגיעו אחרי {hours}+ שעות שינה."
+      },
+      "sleep_effort": {
+        "harder_after_short": "אחרי פחות מ-{hours} שעות שינה, את/ה מדרג/ת אימונים קשים יותר ב-{delta} נקודות RPE."
+      },
+      "time_of_day": {
+        "best_part": "את/ה שובר/ת שיא אישי פי {ratio} יותר באימוני {part, select, morning {בוקר} afternoon {צהריים} evening {ערב} other {לילה}}.",
+        "only_part": "כל {count} השיאים האישיים שלך הגיעו באימוני {part, select, morning {בוקר} afternoon {צהריים} evening {ערב} other {לילה}}."
+      },
+      "cravings": {
+        "part_and_trigger": "רוב החשקים שלך ({count} מתוך {total}) מגיעים {part, select, morning {בבוקר} afternoon {אחר הצהריים} evening {בערב} other {מאוחר בלילה}}, בדרך כלל עם {trigger, select, stress {לחץ} fatigue {עייפות} boredom {שעמום} social {חברה} other {רעב}}.",
+        "part": "רוב החשקים שלך ({count} מתוך {total}) מגיעים {part, select, morning {בבוקר} afternoon {אחר הצהריים} evening {בערב} other {מאוחר בלילה}}.",
+        "trigger": "בחשקים שלך את/ה מציין/ת הכי הרבה {trigger, select, stress {לחץ} fatigue {עייפות} boredom {שעמום} social {חברה} other {רעב}} ({count} מתוך {total})."
+      },
+      "hydration": {
+        "on_goal": "הגעת ליעד המים שלך ב-{onGoal} מתוך {logged} הימים שרשמת.",
+        "training_more": "בימי אימון את/ה מגיע/ה ליעד המים לעתים קרובות יותר ({training}% לעומת {rest}% בשאר הימים).",
+        "training_less": "בימי אימון את/ה מגיע/ה ליעד המים לעתים רחוקות יותר ({training}% לעומת {rest}% בשאר הימים)."
+      }
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "פעולות מאמן",
+      "sessions": "אימונים",
+      "nutrition": "תזונה",
+      "messages": "הודעות",
+      "package": "חבילת אימונים",
+      "assessment": "הערכה",
+      "ptSession": "אימון אישי",
+      "online": "אונליין",
+      "inPerson": "פנים אל פנים",
+      "minutes": "{minutes} דק׳",
+      "join": "הצטרפות לשיחה",
+      "manage": "ניהול",
+      "noSession": "עוד לא הזמנת אימון.",
+      "bookSession": "הזמנת אימון",
+      "noPackage": "עוד אין לך חבילת אימונים. שאל את המאמן שלך.",
+      "sessionsLeft": "נותרו {remaining} מתוך {limit} אימונים",
+      "sessionsUnlimited": "אימונים ללא הגבלה"
+    },
+    "start": {
+      "title": "התחל כמאמן",
+      "intro": "אמן את הלקוחות שלך: אימונים, תוכניות, תזונה ומועדון Team, הכול ב־Milos.",
+      "includes": "מה מקבלים",
+      "include": {
+        "clients": "רשימת לקוחות ותוכניות משלך",
+        "sessions": "אימונים עם הזמנה, פנים אל פנים או אונליין",
+        "team": "מועדון Team ללקוחות שלך",
+        "bootcamps": "בוטקאמפים פתוחים לכולם"
+      },
+      "trial": "{days} ימים חינם",
+      "price": "ואז {price} לחודש",
+      "priceSoon": "המחיר יפורסם לפני סוף תקופת הניסיון",
+      "nameLabel": "שם העסק",
+      "namePlaceholder": "למשל Nikos Papadopoulos Coaching",
+      "nameHint": "הלקוחות רואים את השם הזה. אפשר לשנות אותו אחר כך.",
+      "teamLabel": "שם מועדון ה־Team",
+      "teamHint": "המועדון של הלקוחות שלך. אפשר לשנות את שמו אחר כך.",
+      "submit": "פתיחת העסק שלי",
+      "creating": "פותחים…",
+      "alreadyOpen": "כבר יש לך עסק אימון. עבור אליו מתפריט הספקים."
+    },
+    "me": {
+      "row": "אמן לקוחות משלך",
+      "rowHint": "פתח עסק כמאמן עצמאי"
+    },
+    "slot": {
+      "mode": "איפה",
+      "meetingUrl": "קישור לשיחה"
+    },
+    "plan": {
+      "title": "תוכנית Milos",
+      "description": "התוכנית שלך, המגבלות שלה והשימוש שלך.",
+      "loading": "טוען תוכנית…",
+      "status": {
+        "trialing": "ניסיון",
+        "active": "פעילה",
+        "past_due": "תשלום באיחור",
+        "cancelled": "בוטלה",
+        "comped": "ללא עלות",
+        "trial_expired": "תקופת הניסיון הסתיימה"
+      },
+      "trialLeft": "{days, plural, one {נותר יום אחד} other {נותרו # ימים}} לתקופת הניסיון",
+      "price": "{price} לחודש",
+      "priceSoon": "המחיר יפורסם",
+      "limit": {
+        "staff_seats": "מקומות צוות",
+        "active_clients": "לקוחות פעילים"
+      },
+      "unlimited": "{used} · ללא הגבלה",
+      "used": "{used} מתוך {limit}",
+      "contact": "צריך יותר? צור קשר ונשנה את התוכנית שלך.",
+      "notice": {
+        "trial_ending": "תקופת הניסיון שלך מסתיימת {days, plural, one {בעוד יום אחד} other {בעוד # ימים}}.",
+        "trial_expired": "תקופת הניסיון שלך הסתיימה. הכול ממשיך לעבוד; ניצור קשר לגבי התוכנית.",
+        "past_due": "תשלום עבור תוכנית Milos שלך באיחור.",
+        "cancelled": "תוכנית Milos שלך בוטלה. צור קשר כדי לחדש אותה.",
+        "staff_full": "כל מקומות הצוות בתוכנית שלך תפוסים."
+      }
+    },
+    "console": {
+      "back": "ארגונים",
+      "title": "תוכניות",
+      "subtitle": "מגבלות, תקופות ניסיון ומחירים של התוכניות, והתוכנית של כל ארגון. מחיר נשאר זמני עד שתאשר אותו; לקוחות רואים רק מחירים מאושרים.",
+      "forbidden": "רק צוות הפלטפורמה יכול לנהל תוכניות.",
+      "plans": "קטלוג",
+      "audience": {
+        "gym": "חדרי כושר",
+        "coach": "מאמנים"
+      },
+      "audienceLabel": "עבור",
+      "placeholder": "מחיר זמני",
+      "name": "שם",
+      "monthly": "חודשי ({currency})",
+      "annual": "שנתי ({currency})",
+      "trialDays": "ימי ניסיון",
+      "unlimitedHint": "ריק פירושו ללא הגבלה",
+      "confirmed": "המחיר מאושר",
+      "default": "ברירת מחדל לארגונים חדשים",
+      "public": "גלוי לציבור",
+      "active": "פעילה",
+      "save": "שמירה",
+      "saved": "נשמר",
+      "newPlan": "תוכנית חדשה",
+      "code": "קוד",
+      "codeHint": "אותיות לטיניות קטנות, ספרות ו־_. לא ניתן לשנות אחר כך.",
+      "add": "הוספת תוכנית",
+      "subscriptions": "ארגונים",
+      "noPlan": "ללא תוכנית",
+      "plan": "תוכנית",
+      "status": "מצב",
+      "trialEnds": "סיום הניסיון",
+      "override": "מחיר חודשי מותאם",
+      "overrideHint": "ריק: מחיר התוכנית",
+      "notes": "הערות"
     }
   }
 }

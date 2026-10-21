@@ -20,6 +20,9 @@ export type BookingSlot = {
   duration_minutes?: number;
   location_id?: string | null;
   notes?: string | null;
+  /** ADR-170: in person (a gym, a park) or online with the call link. */
+  mode?: "in_person" | "online";
+  meeting_url?: string | null;
   cancelled_at?: string | null;
 };
 

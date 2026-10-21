@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "الحصص من 0 إلى 20، بالأنصاف.",
     "stfMealSlots": "وجبات اليوم",
     "stfMealSlotsHint": "الوجبات التي يسجّل فيها العضو. اتركها فارغة للفطور والغداء والعشاء ووجبة خفيفة.",
-    "mpWellnessSummary": "ملخص العافية الأسبوعي"
+    "mpWellnessSummary": "ملخص العافية الأسبوعي",
+    "apiErrorCoachPracticeExists": "لديك بالفعل نشاط مدرب من هذا الحساب.",
+    "apiErrorPlanLimitReached": "لا توجد مقاعد فريق شاغرة في خطتك. حرّر مقعدًا أو اطلب منا تغيير الخطة.",
+    "apiErrorUnknownPlan": "هذه الخطة غير موجودة.",
+    "apiErrorTrialEndRequired": "تحتاج الفترة التجريبية إلى تاريخ انتهاء.",
+    "apiErrorInvalidName": "يجب أن يتكون الاسم من 2 إلى 120 حرفًا."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4742,6 +4747,26 @@
         "title": "جولة في دقيقة واحدة",
         "body": "تعرّف على مكان كل شيء.",
         "cta": "بدء الجولة"
+      },
+      "profile": {
+        "title": "انشر ملفك الشخصي",
+        "body": "صورتك وما تدرّبه وأين. هكذا يجدك العملاء.",
+        "cta": "تعديل الملف"
+      },
+      "sessions": {
+        "title": "افتح مواعيد للجلسات",
+        "body": "جلسات فردية أو لمجموعات صغيرة، حضوريًا أو عبر الإنترنت.",
+        "cta": "إضافة جلسات"
+      },
+      "team": {
+        "title": "تعرّف على فريقك Team",
+        "body": "نادي عملائك: إعلانات ودردشة وتدريب مشترك.",
+        "cta": "فتح Team"
+      },
+      "bootcamp": {
+        "title": "نظّم معسكرًا تدريبيًا مفتوحًا",
+        "body": "حصة في الهواء الطلق أو عبر الإنترنت مفتوحة للجميع. طريقة جيدة للتعرف على عملاء جدد.",
+        "cta": "إنشاء معسكر"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "اطّلع على اشتراكك في {billing}. غيّر اللغة والإشعارات من ملفك الشخصي."
         }
       }
-    }
+    },
+    "popupTitleCoach": "أهلًا بك أيها المدرب! لنجهّز نشاطك",
+    "popupIntroCoach": "سبع خطوات قصيرة. توقف متى شئت: القائمة تنتظرك في {path}."
   },
   "MemberApp": {
     "journal": {
@@ -8727,6 +8754,160 @@
       "title": "التغطية والصفات والحمل",
       "range": "الفترة",
       "sharedOnly": "فقط من الإدخالات التي يشاركها العميل مع مدربي الصالة."
+    }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "إخفاء",
+    "restore": "إظهار مجددًا",
+    "hidden": "مخفية: {count}",
+    "note": "مؤشر، وليس نصيحة طبية.",
+    "noteWithWeeks": "من بيانات {weeks} أسابيع · مؤشر، وليس نصيحة طبية.",
+    "empty": {
+      "collecting": "تظهر الـ insights بعد {min} أسابيع من التسجيلات (النوم، الماء، الرغبة الشديدة في الأكل، التمارين). حتى الآن: {weeks} من {min}.",
+      "moreEntries": "يلزم بعض التسجيلات الإضافية حتى يظهر نمط ما.",
+      "noPattern": "لا يوجد نمط واضح في آخر {window} أسبوعًا. تُحدَّث الـ insights كل ليلة.",
+      "allHidden": "أخفيت كل الـ insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "تحقق أرقامًا شخصية أكثر بـ {ratio}× بعد {hours}+ ساعات من النوم.",
+        "all_after_goal": "جاءت كل أرقامك الشخصية ({count}) بعد {hours}+ ساعات من النوم."
+      },
+      "sleep_effort": {
+        "harder_after_short": "بعد نوم أقل من {hours} ساعات، تقيّم التمارين أصعب بـ {delta} نقاط RPE."
+      },
+      "time_of_day": {
+        "best_part": "تحقق أرقامًا شخصية أكثر بـ {ratio}× في تمارين {part, select, morning {الصباح} afternoon {بعد الظهر} evening {المساء} other {الليل}}.",
+        "only_part": "جاءت كل أرقامك الشخصية ({count}) في تمارين {part, select, morning {الصباح} afternoon {بعد الظهر} evening {المساء} other {الليل}}."
+      },
+      "cravings": {
+        "part_and_trigger": "تأتي معظم رغباتك الشديدة في الأكل ({count} من {total}) {part, select, morning {في الصباح} afternoon {بعد الظهر} evening {في المساء} other {في وقت متأخر من الليل}}، غالبًا مع {trigger, select, stress {التوتر} fatigue {التعب} boredom {الملل} social {الصحبة} other {الجوع}}.",
+        "part": "تأتي معظم رغباتك الشديدة في الأكل ({count} من {total}) {part, select, morning {في الصباح} afternoon {بعد الظهر} evening {في المساء} other {في وقت متأخر من الليل}}.",
+        "trigger": "مع رغباتك الشديدة في الأكل تسجّل غالبًا {trigger, select, stress {التوتر} fatigue {التعب} boredom {الملل} social {الصحبة} other {الجوع}} ({count} من {total})."
+      },
+      "hydration": {
+        "on_goal": "بلغت هدفك من الماء في {onGoal} من أصل {logged} يومًا سجّلتها.",
+        "training_more": "في أيام التمرين تبلغ هدفك من الماء أكثر ({training}% مقابل {rest}% في الأيام الأخرى).",
+        "training_less": "في أيام التمرين تبلغ هدفك من الماء أقل ({training}% مقابل {rest}% في الأيام الأخرى)."
+      }
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "إجراءات المدرب",
+      "sessions": "الجلسات",
+      "nutrition": "التغذية",
+      "messages": "الرسائل",
+      "package": "باقة الجلسات",
+      "assessment": "تقييم",
+      "ptSession": "جلسة شخصية",
+      "online": "عبر الإنترنت",
+      "inPerson": "حضوري",
+      "minutes": "{minutes} د",
+      "join": "انضم إلى المكالمة",
+      "manage": "إدارة",
+      "noSession": "لم تحجز أي جلسة بعد.",
+      "bookSession": "احجز جلسة",
+      "noPackage": "لا توجد باقة جلسات بعد. اسأل مدربك.",
+      "sessionsLeft": "تبقّى {remaining} من {limit} جلسات",
+      "sessionsUnlimited": "جلسات غير محدودة"
+    },
+    "start": {
+      "title": "ابدأ كمدرب",
+      "intro": "درّب عملاءك: جلسات وبرامج وتغذية ونادي Team، كلها في Milos.",
+      "includes": "ما الذي تحصل عليه",
+      "include": {
+        "clients": "قائمة عملائك وبرامجك الخاصة",
+        "sessions": "جلسات قابلة للحجز، حضوريًا أو عبر الإنترنت",
+        "team": "نادي Team لعملائك",
+        "bootcamps": "معسكرات مفتوحة للجميع"
+      },
+      "trial": "{days} يومًا مجانًا",
+      "price": "ثم {price}/شهريًا",
+      "priceSoon": "سيُعلن السعر قبل انتهاء الفترة التجريبية",
+      "nameLabel": "اسم النشاط",
+      "namePlaceholder": "مثلًا Nikos Papadopoulos Coaching",
+      "nameHint": "يرى العملاء هذا الاسم. يمكنك تغييره لاحقًا.",
+      "teamLabel": "اسم نادي Team",
+      "teamHint": "نادي عملائك. يمكنك إعادة تسميته لاحقًا.",
+      "submit": "ابدأ نشاطي",
+      "creating": "جارٍ البدء…",
+      "alreadyOpen": "لديك نشاط مدرب بالفعل. انتقل إليه من قائمة مقدمي الخدمة."
+    },
+    "me": {
+      "row": "درّب عملاءك الخاصين",
+      "rowHint": "افتح نشاطك كمدرب مستقل"
+    },
+    "slot": {
+      "mode": "أين",
+      "meetingUrl": "رابط المكالمة"
+    },
+    "plan": {
+      "title": "خطة Milos",
+      "description": "خطتك وحدودها واستخدامك.",
+      "loading": "جارٍ تحميل الخطة…",
+      "status": {
+        "trialing": "تجريبية",
+        "active": "نشطة",
+        "past_due": "دفعة متأخرة",
+        "cancelled": "ملغاة",
+        "comped": "مجانية",
+        "trial_expired": "انتهت الفترة التجريبية"
+      },
+      "trialLeft": "{days, plural, zero {لم يتبقَّ أي يوم} one {يتبقى يوم واحد} two {يتبقى يومان} few {يتبقى # أيام} many {يتبقى # يومًا} other {يتبقى # يوم}} من الفترة التجريبية",
+      "price": "{price}/شهريًا",
+      "priceSoon": "السعر سيُعلن لاحقًا",
+      "limit": {
+        "staff_seats": "مقاعد الفريق",
+        "active_clients": "العملاء النشطون"
+      },
+      "unlimited": "{used} · بلا حد",
+      "used": "{used} من {limit}",
+      "contact": "تحتاج إلى المزيد؟ تواصل معنا وسنغيّر خطتك.",
+      "notice": {
+        "trial_ending": "تنتهي فترتك التجريبية خلال {days, plural, zero {# يوم} one {يوم واحد} two {يومين} few {# أيام} many {# يومًا} other {# يوم}}.",
+        "trial_expired": "انتهت فترتك التجريبية. كل شيء يستمر في العمل؛ سنتواصل معك بشأن خطتك.",
+        "past_due": "هناك دفعة متأخرة لخطة Milos الخاصة بك.",
+        "cancelled": "تم إلغاء خطة Milos الخاصة بك. تواصل معنا لإعادة تفعيلها.",
+        "staff_full": "جميع مقاعد الفريق في خطتك مشغولة."
+      }
+    },
+    "console": {
+      "back": "المؤسسات",
+      "title": "الخطط",
+      "subtitle": "حدود الخطط وفتراتها التجريبية وأسعارها، والخطة التي تتبعها كل مؤسسة. يبقى السعر مؤقتًا حتى تؤكده؛ لا يرى العملاء إلا الأسعار المؤكدة.",
+      "forbidden": "فريق المنصة فقط يمكنه إدارة الخطط.",
+      "plans": "الكتالوج",
+      "audience": {
+        "gym": "الصالات",
+        "coach": "المدربون"
+      },
+      "audienceLabel": "لـ",
+      "placeholder": "سعر مؤقت",
+      "name": "الاسم",
+      "monthly": "شهريًا ({currency})",
+      "annual": "سنويًا ({currency})",
+      "trialDays": "أيام التجربة",
+      "unlimitedHint": "الفراغ يعني بلا حد",
+      "confirmed": "السعر مؤكد",
+      "default": "افتراضية للمؤسسات الجديدة",
+      "public": "ظاهرة للعامة",
+      "active": "نشطة",
+      "save": "حفظ",
+      "saved": "تم الحفظ",
+      "newPlan": "خطة جديدة",
+      "code": "الرمز",
+      "codeHint": "أحرف لاتينية صغيرة وأرقام و _. لا يمكن تغييره لاحقًا.",
+      "add": "إضافة خطة",
+      "subscriptions": "المؤسسات",
+      "noPlan": "بلا خطة",
+      "plan": "الخطة",
+      "status": "الحالة",
+      "trialEnds": "نهاية التجربة",
+      "override": "سعر شهري مخصص",
+      "overrideHint": "فارغ: سعر الخطة",
+      "notes": "ملاحظات"
     }
   }
 }

@@ -18,7 +18,9 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
   nil when not recognised). Each performance also carries its `source`
   token (the organization id, `freeform` or `device`, as the Πρόοδος source
   filter takes it), its `minutes` and its perceived effort `rpe` (training
-  log only; executions record no effort), for training load (ADR-165).
+  log only; executions record no effort), for training load (ADR-165), and
+  the zone it was recorded in (`tz`), for the part of the day insights read
+  (ADR-166).
 
   A coach of one gym reads a client through `scope: {:coach, organization_id}`
   in the coach's tenant session (ADR-165): only the client's executions and
@@ -37,6 +39,7 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
           id: Ecto.UUID.t(),
           organization_id: Ecto.UUID.t() | nil,
           at: DateTime.t(),
+          tz: String.t() | nil,
           source: String.t(),
           minutes: float() | nil,
           rpe: 1..10 | nil,
@@ -125,6 +128,7 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
       id: execution.id,
       organization_id: execution.organization_id,
       at: execution.completed_at_utc,
+      tz: Map.get(execution, :completed_at_tz) || Map.get(execution, :started_at_tz),
       source: source(execution.organization_id, nil),
       minutes: minutes_from_ms(Map.get(execution, :total_elapsed_ms)),
       rpe: nil,
@@ -144,6 +148,7 @@ defmodule MilosTraining.Application.AthleteTrainingVolume do
       id: entry.id,
       organization_id: entry.organization_id,
       at: entry.performed_at_utc,
+      tz: Map.get(entry, :performed_at_tz),
       source: source(entry.organization_id, Map.get(entry, :source_type)),
       minutes: minutes_from_seconds(Map.get(entry, :duration_seconds)),
       rpe: rpe(Map.get(entry, :perceived_effort)),

@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "Le porzioni vanno da 0 a 20, a metà.",
     "stfMealSlots": "Pasti della giornata",
     "stfMealSlotsHint": "I pasti su cui registra il membro. Lascia vuoto per colazione, pranzo, cena e spuntino.",
-    "mpWellnessSummary": "Riepilogo settimanale del benessere"
+    "mpWellnessSummary": "Riepilogo settimanale del benessere",
+    "apiErrorCoachPracticeExists": "Gestisci già un’attività da coach con questo account.",
+    "apiErrorPlanLimitReached": "Il tuo piano non ha posti staff liberi. Libera un posto o chiedici di cambiare piano.",
+    "apiErrorUnknownPlan": "Questo piano non esiste.",
+    "apiErrorTrialEndRequired": "Una prova richiede una data di fine.",
+    "apiErrorInvalidName": "Il nome deve avere da 2 a 120 caratteri."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -4742,6 +4747,26 @@
         "title": "Fai il tour di 1 minuto",
         "body": "Scopri dove si trova ogni cosa.",
         "cta": "Inizia il tour"
+      },
+      "profile": {
+        "title": "Pubblica il tuo profilo",
+        "body": "La tua foto, cosa alleni e dove. Così i clienti ti trovano.",
+        "cta": "Modifica profilo"
+      },
+      "sessions": {
+        "title": "Apri orari per le sessioni",
+        "body": "Sessioni individuali o di piccolo gruppo, in presenza o online.",
+        "cta": "Aggiungi sessioni"
+      },
+      "team": {
+        "title": "Scopri il tuo Team",
+        "body": "Il club dei tuoi clienti: annunci, chat e allenamento condiviso.",
+        "cta": "Apri Team"
+      },
+      "bootcamp": {
+        "title": "Organizza un bootcamp aperto",
+        "body": "Una sessione all’aperto o online aperta a tutti. Un buon modo per conoscere nuovi clienti.",
+        "cta": "Crea bootcamp"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "Vedi il tuo abbonamento in {billing}. Cambia lingua e notifiche nel tuo profilo."
         }
       }
-    }
+    },
+    "popupTitleCoach": "Benvenuto, coach! Prepariamo la tua attività",
+    "popupIntroCoach": "Sette brevi passaggi. Fermati quando vuoi: la lista ti aspetta in {path}."
   },
   "MemberApp": {
     "journal": {
@@ -8727,6 +8754,160 @@
       "title": "Copertura, qualità, carico",
       "range": "Periodo",
       "sharedOnly": "Solo dalle voci che il cliente condivide con i coach del box."
+    }
+  },
+  "Insights": {
+    "title": "Insights",
+    "dismiss": "Nascondi",
+    "restore": "Mostra di nuovo",
+    "hidden": "Nascosti: {count}",
+    "note": "Un indicatore, non un consiglio medico.",
+    "noteWithWeeks": "Da {weeks} settimane di dati · Un indicatore, non un consiglio medico.",
+    "empty": {
+      "collecting": "Gli insights compaiono dopo {min} settimane di registrazioni (sonno, acqua, voglie, allenamenti). Finora: {weeks} di {min}.",
+      "moreEntries": "Servono ancora alcune registrazioni prima che emerga uno schema.",
+      "noPattern": "Nessuno schema chiaro nelle ultime {window} settimane. Gli insights si aggiornano ogni notte.",
+      "allHidden": "Hai nascosto tutti gli insights."
+    },
+    "rules": {
+      "sleep_prs": {
+        "more_after_goal": "Fai PR {ratio}× più spesso dopo {hours}+ ore di sonno.",
+        "all_after_goal": "Tutti i tuoi {count} PR sono arrivati dopo {hours}+ ore di sonno."
+      },
+      "sleep_effort": {
+        "harder_after_short": "Dopo meno di {hours} ore di sonno, valuti gli allenamenti più duri di {delta} punti RPE."
+      },
+      "time_of_day": {
+        "best_part": "Fai PR {ratio}× più spesso negli allenamenti {part, select, morning {del mattino} afternoon {del pomeriggio} evening {della sera} other {notturni}}.",
+        "only_part": "Tutti i tuoi {count} PR sono arrivati in allenamenti {part, select, morning {del mattino} afternoon {del pomeriggio} evening {della sera} other {notturni}}."
+      },
+      "cravings": {
+        "part_and_trigger": "La maggior parte delle tue voglie ({count} su {total}) arriva {part, select, morning {al mattino} afternoon {al pomeriggio} evening {la sera} other {a notte fonda}}, di solito con {trigger, select, stress {stress} fatigue {stanchezza} boredom {noia} social {compagnia} other {fame}}.",
+        "part": "La maggior parte delle tue voglie ({count} su {total}) arriva {part, select, morning {al mattino} afternoon {al pomeriggio} evening {la sera} other {a notte fonda}}.",
+        "trigger": "Nelle tue voglie annoti più spesso {trigger, select, stress {stress} fatigue {stanchezza} boredom {noia} social {compagnia} other {fame}} ({count} su {total})."
+      },
+      "hydration": {
+        "on_goal": "Hai raggiunto il tuo obiettivo d'acqua in {onGoal} dei {logged} giorni registrati.",
+        "training_more": "Nei giorni di allenamento raggiungi l'obiettivo d'acqua più spesso ({training}% contro {rest}% negli altri).",
+        "training_less": "Nei giorni di allenamento raggiungi l'obiettivo d'acqua meno spesso ({training}% contro {rest}% negli altri)."
+      }
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "Azioni del coach",
+      "sessions": "Sessioni",
+      "nutrition": "Nutrizione",
+      "messages": "Messaggi",
+      "package": "Pacchetto sessioni",
+      "assessment": "Valutazione",
+      "ptSession": "Sessione personale",
+      "online": "Online",
+      "inPerson": "In presenza",
+      "minutes": "{minutes} min",
+      "join": "Partecipa alla chiamata",
+      "manage": "Gestisci",
+      "noSession": "Nessuna sessione prenotata.",
+      "bookSession": "Prenota una sessione",
+      "noPackage": "Nessun pacchetto sessioni. Chiedi al tuo coach.",
+      "sessionsLeft": "Restano {remaining} sessioni su {limit}",
+      "sessionsUnlimited": "Sessioni illimitate"
+    },
+    "start": {
+      "title": "Inizia come coach",
+      "intro": "Allena i tuoi clienti: sessioni, programmi, nutrizione e un club Team, tutto in Milos.",
+      "includes": "Cosa include",
+      "include": {
+        "clients": "La tua lista clienti e i tuoi programmi",
+        "sessions": "Sessioni prenotabili, in presenza o online",
+        "team": "Un club Team per i tuoi clienti",
+        "bootcamps": "Bootcamp aperti a tutti"
+      },
+      "trial": "{days} giorni gratis",
+      "price": "poi {price}/mese",
+      "priceSoon": "Il prezzo sarà annunciato prima della fine della prova",
+      "nameLabel": "Nome dell’attività",
+      "namePlaceholder": "es. Nikos Papadopoulos Coaching",
+      "nameHint": "I clienti vedono questo nome. Puoi cambiarlo in seguito.",
+      "teamLabel": "Nome del club Team",
+      "teamHint": "Il club dei tuoi clienti. Puoi rinominarlo in seguito.",
+      "submit": "Avvia la mia attività",
+      "creating": "Avvio…",
+      "alreadyOpen": "Gestisci già un’attività da coach. Passaci dal menu dei fornitori."
+    },
+    "me": {
+      "row": "Allena i tuoi clienti",
+      "rowHint": "Apri la tua attività da coach indipendente"
+    },
+    "slot": {
+      "mode": "Dove",
+      "meetingUrl": "Link della chiamata"
+    },
+    "plan": {
+      "title": "Piano Milos",
+      "description": "Il tuo piano, i suoi limiti e il tuo utilizzo.",
+      "loading": "Caricamento piano…",
+      "status": {
+        "trialing": "Prova",
+        "active": "Attivo",
+        "past_due": "Pagamento scaduto",
+        "cancelled": "Annullato",
+        "comped": "Omaggio",
+        "trial_expired": "Prova terminata"
+      },
+      "trialLeft": "{days, plural, one {Manca # giorno} other {Mancano # giorni}} di prova",
+      "price": "{price}/mese",
+      "priceSoon": "Prezzo da annunciare",
+      "limit": {
+        "staff_seats": "Posti staff",
+        "active_clients": "Clienti attivi"
+      },
+      "unlimited": "{used} · senza limite",
+      "used": "{used} su {limit}",
+      "contact": "Ti serve di più? Contattaci e cambieremo il tuo piano.",
+      "notice": {
+        "trial_ending": "La tua prova termina tra {days, plural, one {# giorno} other {# giorni}}.",
+        "trial_expired": "La tua prova è terminata. Tutto continua a funzionare; ti contatteremo per il piano.",
+        "past_due": "Un pagamento del tuo piano Milos è scaduto.",
+        "cancelled": "Il tuo piano Milos è annullato. Contattaci per riattivarlo.",
+        "staff_full": "Tutti i posti staff del tuo piano sono occupati."
+      }
+    },
+    "console": {
+      "back": "Organizzazioni",
+      "title": "Piani",
+      "subtitle": "Limiti, prove e prezzi dei piani, e il piano di ogni organizzazione. Un prezzo resta provvisorio finché non lo confermi; i clienti vedono solo prezzi confermati.",
+      "forbidden": "Solo il team della piattaforma può gestire i piani.",
+      "plans": "Catalogo",
+      "audience": {
+        "gym": "Palestre",
+        "coach": "Coach"
+      },
+      "audienceLabel": "Per",
+      "placeholder": "Prezzo provvisorio",
+      "name": "Nome",
+      "monthly": "Mensile ({currency})",
+      "annual": "Annuale ({currency})",
+      "trialDays": "Giorni di prova",
+      "unlimitedHint": "Vuoto significa senza limite",
+      "confirmed": "Prezzo confermato",
+      "default": "Predefinito per le nuove organizzazioni",
+      "public": "Visibile pubblicamente",
+      "active": "Attivo",
+      "save": "Salva",
+      "saved": "Salvato",
+      "newPlan": "Nuovo piano",
+      "code": "Codice",
+      "codeHint": "Lettere minuscole, cifre e _. Non modificabile in seguito.",
+      "add": "Aggiungi piano",
+      "subscriptions": "Organizzazioni",
+      "noPlan": "Nessun piano",
+      "plan": "Piano",
+      "status": "Stato",
+      "trialEnds": "Fine prova",
+      "override": "Prezzo mensile personalizzato",
+      "overrideHint": "Vuoto: prezzo del piano",
+      "notes": "Note"
     }
   }
 }

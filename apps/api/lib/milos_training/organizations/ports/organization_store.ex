@@ -27,6 +27,12 @@ defmodule MilosTraining.Organizations.Ports.OrganizationStore do
   @callback get_canonical_slug_for_alias(String.t()) :: String.t() | nil
   @callback list_slug_aliases(Ecto.UUID.t()) :: [OrganizationSlugAlias.t()]
   @callback count_pending_invitations(Ecto.UUID.t(), DateTime.t()) :: non_neg_integer()
+  @callback slug_taken?(String.t()) :: boolean()
+  @callback count_seats(Ecto.UUID.t(), DateTime.t()) :: %{
+              staff: non_neg_integer(),
+              clients: non_neg_integer(),
+              pending_staff_invitations: non_neg_integer()
+            }
   @callback rename_organization_slug(
               Ecto.UUID.t(),
               String.t(),
