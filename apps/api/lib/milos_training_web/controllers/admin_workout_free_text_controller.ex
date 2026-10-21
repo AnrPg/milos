@@ -136,7 +136,8 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
     responses: [
       ok: {"Analysis", "application/json", @response_schema},
       unprocessable_entity: {"Invalid text", "application/json", @error_schema},
-      bad_gateway: {"Assistant unavailable", "application/json", @error_schema},
+      failed_dependency:
+        {"Assistant unavailable, out of credits or unclear", "application/json", @error_schema},
       service_unavailable: {"Assistant not configured", "application/json", @error_schema}
     ]
   )
@@ -148,6 +149,8 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
     end
   end
 
+  # Provider failures answer 424, not 502: the edge gateway swallows upstream
+  # 502 responses and replaces them with an HTML page, hiding the code below.
   defp render_error(conn, reason) do
     {status, code, message} =
       case reason do
@@ -161,10 +164,15 @@ defmodule MilosTrainingWeb.AdminWorkoutFreeTextController do
           {:service_unavailable, "analyzer_not_configured", "The workout assistant is not set up"}
 
         :analyzer_invalid_response ->
-          {:bad_gateway, "analyzer_invalid_response", "The workout assistant answered unclearly"}
+          {:failed_dependency, "analyzer_invalid_response",
+           "The workout assistant answered unclearly"}
+
+        :analyzer_quota_exhausted ->
+          {:failed_dependency, "analyzer_quota_exhausted",
+           "The workout assistant has run out of credits"}
 
         _other ->
-          {:bad_gateway, "analyzer_unavailable", "The workout assistant is unavailable"}
+          {:failed_dependency, "analyzer_unavailable", "The workout assistant is unavailable"}
       end
 
     conn

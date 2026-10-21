@@ -167,6 +167,11 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
       %{"error" => "tool_failed", "tool" => name}
   end
 
+  # 402 (prepaid credits depleted) and 429 (rate or quota limit) are operator
+  # problems the coach can be told about; everything else is a plain outage.
+  defp failure_reason(status) when status in [402, 429], do: :analyzer_quota_exhausted
+  defp failure_reason(_status), do: :analyzer_unavailable
+
   defp post(body, config, context) do
     model = Keyword.get(config, :model) || @default_model
 
@@ -193,7 +198,7 @@ defmodule MilosTraining.Infrastructure.Workouts.GeminiWorkoutTextAnalyzer do
           "Gemini #{context.agent} failed with HTTP #{status}: #{inspect(body, limit: 5)}"
         )
 
-        {:error, :analyzer_unavailable}
+        {:error, failure_reason(status)}
 
       {:error, exception} ->
         Logger.warning("Gemini #{context.agent} failed: #{Exception.message(exception)}")

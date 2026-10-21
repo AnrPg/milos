@@ -4482,6 +4482,7 @@
     "errors": {
       "notConfigured": "Der Assistent ist auf diesem Server noch nicht eingerichtet. Du kannst den Text trotzdem so veröffentlichen.",
       "unavailable": "Der Assistent ist ausgelastet oder offline. Versuch es gleich noch einmal. Dein Text ist gespeichert.",
+      "quotaExhausted": "Dem Assistenten sind die Credits ausgegangen. Bitte die App-Administration, das KI-Konto aufzuladen. Dein Text ist gespeichert und kann unverändert veröffentlicht werden.",
       "textRequired": "Schreib zuerst das Training und prüfe es dann.",
       "textTooLong": "Der Text ist zu lang für eine Prüfung. Teile ihn in einzelne Trainings auf."
     },

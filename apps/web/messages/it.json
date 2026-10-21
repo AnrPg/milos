@@ -4482,6 +4482,7 @@
     "errors": {
       "notConfigured": "L’assistente non è ancora configurato su questo server. Puoi comunque pubblicare il testo così com’è.",
       "unavailable": "L’assistente è occupato o non in linea. Riprova tra poco. Il tuo testo è salvato.",
+      "quotaExhausted": "L’assistente ha esaurito i crediti. Chiedi all’amministratore dell’app di ricaricare l’account IA. Il tuo testo è salvato e puoi comunque pubblicarlo così com’è.",
       "textRequired": "Scrivi prima l’allenamento, poi controllalo.",
       "textTooLong": "Il testo è troppo lungo per un unico controllo. Dividilo in allenamenti separati."
     },

@@ -30978,7 +30978,7 @@
             },
             "description": "Invalid text"
           },
-          "502": {
+          "424": {
             "content": {
               "application/json": {
                 "schema": {
@@ -30998,7 +30998,7 @@
                 }
               }
             },
-            "description": "Assistant unavailable"
+            "description": "Assistant unavailable, out of credits or unclear"
           },
           "503": {
             "content": {

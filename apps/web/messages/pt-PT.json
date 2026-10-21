@@ -4482,6 +4482,7 @@
     "errors": {
       "notConfigured": "O assistente ainda não está configurado neste servidor. Podes publicar o texto tal como está.",
       "unavailable": "O assistente está ocupado ou offline. Tenta daqui a pouco. O teu texto está guardado.",
+      "quotaExhausted": "O assistente ficou sem créditos. Pede ao administrador da aplicação que carregue a conta de IA. O teu texto está guardado e ainda podes publicá-lo tal como está.",
       "textRequired": "Escreve primeiro o treino e depois verifica-o.",
       "textTooLong": "O texto é demasiado longo para uma só verificação. Divide-o em treinos separados."
     },

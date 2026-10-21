@@ -4482,6 +4482,7 @@
     "errors": {
       "notConfigured": "The assistant isn’t set up on this server yet. You can still publish the text as it is.",
       "unavailable": "The assistant is busy or offline. Try again in a moment. Your text is saved.",
+      "quotaExhausted": "The assistant has run out of credits. Ask the app administrator to top up the AI account. Your text is saved and you can still publish it as it is.",
       "textRequired": "Write the workout first, then check it.",
       "textTooLong": "This text is too long to check at once. Split it into separate workouts."
     },

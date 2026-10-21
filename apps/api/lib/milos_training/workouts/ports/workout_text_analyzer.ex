@@ -20,7 +20,11 @@ defmodule MilosTraining.Workouts.Ports.WorkoutTextAnalyzer do
           optional(:repair) => %{previous: map(), violations: [map()]},
           optional(:outline) => %{String.t() => [map()]}
         }
-  @type error :: :analyzer_not_configured | :analyzer_unavailable | :analyzer_invalid_response
+  @type error ::
+          :analyzer_not_configured
+          | :analyzer_unavailable
+          | :analyzer_quota_exhausted
+          | :analyzer_invalid_response
 
   @callback outline(text :: String.t(), options()) :: {:ok, map()} | {:error, error()}
   @callback parse(text :: String.t(), options()) :: {:ok, map()} | {:error, error()}
