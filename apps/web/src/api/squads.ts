@@ -18,8 +18,19 @@ export const squadKey = (squadId: string) => ["community", "squad", squadId] as 
 const base = (slug: string) => `/org/${encodeURIComponent(slug)}/community/squads`;
 const id = (value: string) => encodeURIComponent(value);
 
-export function fetchSquads(token: string, slug: string) {
-  return apiRequest<PtSquadsOverview>(base(slug), { token });
+/** Lists default to empty so a partial answer never breaks the screens that read them. */
+export async function fetchSquads(token: string, slug: string): Promise<PtSquadsOverview> {
+  const data = await apiRequest<Partial<PtSquadsOverview>>(base(slug), { token });
+  return {
+    organization_id: data.organization_id ?? "",
+    can_create: data.can_create === true,
+    limits: data.limits ?? { max_members: 30, max_live_squads: 20 },
+    coached: data.coached ?? [],
+    archived: data.archived ?? [],
+    joined: data.joined ?? [],
+    invites: data.invites ?? [],
+    clients: data.clients ?? [],
+  };
 }
 
 export async function fetchSquad(token: string, slug: string, squadId: string) {
