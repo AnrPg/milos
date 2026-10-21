@@ -543,3 +543,30 @@ msgstr "Η εξαγωγή του ημερολογίου σου είναι έτο
 
 msgid "Download it within seven days from Settings."
 msgstr "Κατέβασέ την μέσα σε επτά μέρες από τις Ρυθμίσεις."
+
+msgid "Season request"
+msgstr "Αίτημα για season"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "Ο/Η %{nickname} ζητά θέση στο %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "Ο/Η %{nickname} μπήκε στη λίστα αναμονής για το %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Η θέση σου επιβεβαιώθηκε"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "Το %{season} ξεκινά στις %{date}. Το πρόγραμμα είναι στο Box σου."
+
+msgid "Season request not confirmed"
+msgstr "Το αίτημα για season δεν επιβεβαιώθηκε"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "Το %{box} δεν μπόρεσε να επιβεβαιώσει τη θέση σου στο %{season}."
+
+msgid "Season cancelled"
+msgstr "Το season ακυρώθηκε"
+
+msgid "%{box} cancelled %{season}."
+msgstr "Το %{box} ακύρωσε το %{season}."

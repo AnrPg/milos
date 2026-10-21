@@ -591,6 +591,51 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-167: seasons.
+  def build("season_requested", payload, localize) do
+    key =
+      if payload["enrollment_status"] == "waitlisted",
+        do: "%{nickname} joined the waitlist of %{season}.",
+        else: "%{nickname} asks for a place in %{season}."
+
+    %{
+      title: localize.("Season request", %{}),
+      body:
+        localize.(key, %{nickname: payload["person_nickname"], season: payload["season_title"]}),
+      url: payload["url"] || "/admin/finance?tab=seasons"
+    }
+  end
+
+  def build("season_confirmed", payload, localize) do
+    %{
+      title: localize.("Your place is confirmed", %{}),
+      body:
+        localize.("%{season} starts on %{date}. The programme is in your Box.", %{
+          season: payload["season_title"],
+          date: payload["starts_on"]
+        }),
+      url: payload["url"] || "/box"
+    }
+  end
+
+  def build("season_declined", payload, localize) do
+    body = localize.("%{box} could not confirm your place in %{season}.", season_values(payload))
+
+    %{
+      title: localize.("Season request not confirmed", %{}),
+      body: append_note(body, payload["reason"]),
+      url: payload["url"] || "/box"
+    }
+  end
+
+  def build("season_cancelled", payload, localize) do
+    %{
+      title: localize.("Season cancelled", %{}),
+      body: localize.("%{box} cancelled %{season}.", season_values(payload)),
+      url: payload["url"] || "/box"
+    }
+  end
+
   def build("support_no_reply_nudge", payload, localize) do
     %{
       title: localize.("No one has replied yet", %{}),
@@ -1026,4 +1071,7 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       String.replace(copy, "%{#{key}}", to_string(value))
     end)
   end
+
+  defp season_values(payload),
+    do: %{box: payload["box_name"] || "", season: payload["season_title"] || ""}
 end

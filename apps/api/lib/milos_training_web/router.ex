@@ -394,6 +394,10 @@ defmodule MilosTrainingWeb.Router do
     post("/reviews", ReviewController, :create)
     get("/search/users", MeController, :search_users)
     put("/home-location", HomeLocationController, :update_mine)
+    # ADR-167: Box › Συνδρομή › seasons.
+    get("/seasons", SeasonController, :index)
+    post("/seasons/:id/request", SeasonController, :request)
+    post("/seasons/:id/cancel", SeasonController, :cancel)
     # ADR-156: «Φέρε φίλο».
     get("/referrals", ReferralController, :mine)
     post("/referrals/code", ReferralController, :rotate_code)
@@ -852,6 +856,14 @@ defmodule MilosTrainingWeb.Router do
     get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)
+    # ADR-167: seasons.
+    get("/seasons", AdminSeasonController, :index)
+    post("/seasons", AdminSeasonController, :create)
+    get("/seasons/:id", AdminSeasonController, :show)
+    patch("/seasons/:id", AdminSeasonController, :update)
+    post("/season-enrollments/:id/confirm", AdminSeasonController, :confirm)
+    post("/season-enrollments/:id/decline", AdminSeasonController, :decline)
+    post("/season-enrollments/:id/remove", AdminSeasonController, :remove)
     get("/finance/packages", AdminFinanceController, :packages)
     get("/finance/package-catalog", AdminFinanceController, :package_catalog)
     get("/finance/subscriptions/:id/beneficiaries", PaymentModelsController, :beneficiaries)

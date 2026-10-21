@@ -543,3 +543,30 @@ msgstr "Экспорт дневника готов"
 
 msgid "Download it within seven days from Settings."
 msgstr "Скачайте его в течение семи дней в Настройках."
+
+msgid "Season request"
+msgstr "Запрос на сезон"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} просит место в %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} в листе ожидания на %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Твоё место подтверждено"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} начинается %{date}. Программа в твоём Box."
+
+msgid "Season request not confirmed"
+msgstr "Запрос на сезон не подтверждён"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} не смог подтвердить твоё место в %{season}."
+
+msgid "Season cancelled"
+msgstr "Сезон отменён"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} отменил %{season}."

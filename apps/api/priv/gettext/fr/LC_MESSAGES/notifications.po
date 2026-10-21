@@ -543,3 +543,30 @@ msgstr "L’export de ton journal est prêt"
 
 msgid "Download it within seven days from Settings."
 msgstr "Télécharge-le sous sept jours depuis les Réglages."
+
+msgid "Season request"
+msgstr "Demande de saison"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} demande une place dans %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} est sur la liste d'attente de %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Ta place est confirmée"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} commence le %{date}. Le programme est dans ta Box."
+
+msgid "Season request not confirmed"
+msgstr "Demande de saison non confirmée"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} n'a pas pu confirmer ta place dans %{season}."
+
+msgid "Season cancelled"
+msgstr "Saison annulée"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} a annulé %{season}."

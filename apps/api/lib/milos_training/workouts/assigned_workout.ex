@@ -14,6 +14,9 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
     # ADR-125: set when the assignment is a per-member variant of a class
     # occurrence (loose reference to a Scheduling-owned scheduled class).
     field :source_scheduled_class_id, :binary_id
+    # ADR-167: set when the assignment is part of a season's programme (loose
+    # reference to a Seasons-owned offering); members see the season's name.
+    field :season_offering_id, :binary_id
 
     belongs_to :master_workout, MasterWorkout
     has_many :athlete_links, AssignedWorkoutAthlete
@@ -28,7 +31,8 @@ defmodule MilosTraining.Workouts.AssignedWorkout do
       :master_workout_id,
       :scheduled_for,
       :instructions,
-      :source_scheduled_class_id
+      :source_scheduled_class_id,
+      :season_offering_id
     ])
     |> update_change(:instructions, &normalize_instructions/1)
     |> validate_required([:organization_id, :master_workout_id, :scheduled_for])

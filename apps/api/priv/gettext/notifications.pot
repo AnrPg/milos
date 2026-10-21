@@ -541,3 +541,30 @@ msgstr ""
 
 msgid "Download it within seven days from Settings."
 msgstr ""
+
+msgid "Season request"
+msgstr ""
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr ""
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr ""
+
+msgid "Your place is confirmed"
+msgstr ""
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr ""
+
+msgid "Season request not confirmed"
+msgstr ""
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr ""
+
+msgid "Season cancelled"
+msgstr ""
+
+msgid "%{box} cancelled %{season}."
+msgstr ""

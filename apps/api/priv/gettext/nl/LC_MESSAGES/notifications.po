@@ -543,3 +543,30 @@ msgstr "Je dagboekexport staat klaar"
 
 msgid "Download it within seven days from Settings."
 msgstr "Download hem binnen zeven dagen via Instellingen."
+
+msgid "Season request"
+msgstr "Seizoensaanvraag"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} vraagt een plek in %{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} staat op de wachtlijst voor %{season}."
+
+msgid "Your place is confirmed"
+msgstr "Je plek is bevestigd"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} begint op %{date}. Het programma staat in je Box."
+
+msgid "Season request not confirmed"
+msgstr "Seizoensaanvraag niet bevestigd"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} kon je plek in %{season} niet bevestigen."
+
+msgid "Season cancelled"
+msgstr "Seizoen geannuleerd"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} heeft %{season} geannuleerd."

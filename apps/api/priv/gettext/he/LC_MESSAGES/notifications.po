@@ -543,3 +543,30 @@ msgstr "ייצוא היומן שלך מוכן"
 
 msgid "Download it within seven days from Settings."
 msgstr "הורד אותו תוך שבעה ימים מההגדרות."
+
+msgid "Season request"
+msgstr "בקשה לעונה"
+
+msgid "%{nickname} asks for a place in %{season}."
+msgstr "%{nickname} מבקש/ת מקום ב-%{season}."
+
+msgid "%{nickname} joined the waitlist of %{season}."
+msgstr "%{nickname} ברשימת ההמתנה ל-%{season}."
+
+msgid "Your place is confirmed"
+msgstr "המקום שלך אושר"
+
+msgid "%{season} starts on %{date}. The programme is in your Box."
+msgstr "%{season} מתחילה ב-%{date}. התוכנית נמצאת ב-Box שלך."
+
+msgid "Season request not confirmed"
+msgstr "הבקשה לעונה לא אושרה"
+
+msgid "%{box} could not confirm your place in %{season}."
+msgstr "%{box} לא יכול/ה לאשר את מקומך ב-%{season}."
+
+msgid "Season cancelled"
+msgstr "העונה בוטלה"
+
+msgid "%{box} cancelled %{season}."
+msgstr "%{box} ביטל/ה את %{season}."

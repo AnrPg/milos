@@ -236,6 +236,10 @@ defmodule MilosTraining.Application.ClubScope do
     end
   end
 
+  # ADR-167: a season's channel is for its participants (and staff).
+  defp visible?(%{kind: "season"} = channel, role, _user_id),
+    do: channel.participant or role == "staff"
+
   defp visible?(_channel, _role, _user_id), do: true
 
   defp present_channel(channel, role, membership) do
