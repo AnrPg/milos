@@ -408,22 +408,25 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
   def get_community_settings(_context) do
     case Repo.one(CommunitySettings) do
       nil -> CommunitySettings.defaults()
-      settings -> Map.take(settings, [:member_groups])
+      settings -> Map.take(settings, CommunitySettings.fields())
     end
   end
 
   @impl true
   def put_community_settings(%{organization_id: organization_id}, attrs) do
+    # Only the fields given change: the others keep what the gym chose.
+    changed = Map.keys(Map.take(attrs, CommunitySettings.fields()))
+
     attrs
     |> Map.put(:organization_id, organization_id)
     |> CommunitySettings.changeset()
     |> Repo.insert(
-      on_conflict: {:replace, [:member_groups, :updated_at]},
+      on_conflict: {:replace, changed ++ [:updated_at]},
       conflict_target: [:organization_id],
       returning: true
     )
     |> case do
-      {:ok, settings} -> {:ok, Map.take(settings, [:member_groups])}
+      {:ok, settings} -> {:ok, Map.take(settings, CommunitySettings.fields())}
       error -> error
     end
   end

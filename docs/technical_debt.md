@@ -60,6 +60,7 @@ the original wording and dates for traceability.
 | TD-089–TD-090 | Open |
 | TD-091–TD-094 | Resolved |
 | TD-095–TD-103 | Open |
+| TD-104–TD-106 | Open |
 
 ## Detailed Ledger
 
@@ -170,3 +171,4 @@ the original wording and dates for traceability.
 | TD-103 | Roles / Navigation follow-ups | (1) "My training" (staff ↔ client view) is stored per browser, not per account. (2) The coach home has no Invite link because there is no web page for gym invitations; front desk "New client" links to Finance › Members instead. (3) The coach home reads `coach_user_id` on schedule slots, which the generated `ScheduleSlot` type does not declare. (4) The member home's collapsed leaderboard popover is invisible but still widens the page on 360 px phones (pre-existing). (5) Live 360 px checks covered admin and janitor+member only; coach, front desk and accountant views were verified by tests and type-checks | Found while finishing ADR-099..104 and ADR-103's phone header | Low | 2026-10-13 |
 | TD-104 | Member app (Box) | Box's today card aggregates schedule, assignments, executions and training-log sources on the web (`components/member-app/box/today-training.ts`); replace with one server read model (`GetMemberToday`) | The API toolchain was unavailable in the cloud session when ADR-137 shipped | Medium | 2026-10-15 |
 | TD-105 | Member app follow-ups | (1) ~~Box next-booking card has no live class-timer link or check-in button yet~~ done in Phase 1 M9 (class self check-in, live timer link). (2) Moved pages still render their own page title under the Journal header. (3) Redirects are 307; make them permanent after `v2.0.0` has been out a release | Deferred from ADR-137 M3/M4 to keep the shell PR reviewable | Low | 2026-10-15 |
+| TD-106 | Partners | (1) Staff can hide a reported partner profile but not lift the suspension; a staff view of a member's Partners profiles is the place. (2) No gym-level Partners statistics card. (3) A plan bubble opens `/box/schedule` in the selected gym, so a pair whose club belongs to another gym than the one selected lands on the wrong schedule. | Outside ADR-169's first slice | Low | 2026-10-21 |
