@@ -62,12 +62,15 @@ async function devicesPage(page: Page) {
   );
 }
 
-// What Capacitor's native shell injects before the page runs (no plugins).
-const IOS_BRIDGE = `window.Capacitor = {
+// What Capacitor's iOS shell injects before the page runs: the bridge object
+// and the WebKit message handler @capacitor/core detects iOS by (no plugins).
+const IOS_BRIDGE = `window.webkit = { messageHandlers: { bridge: { postMessage() {} } } };
+window.Capacitor = {
   isNativePlatform: () => true,
   getPlatform: () => "ios",
   isPluginAvailable: () => false,
   Plugins: {},
+  PluginHeaders: [],
 };`;
 
 test.describe("store app wrapper", () => {
