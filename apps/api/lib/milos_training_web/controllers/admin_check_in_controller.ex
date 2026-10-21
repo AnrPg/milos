@@ -213,7 +213,7 @@ defmodule MilosTrainingWeb.AdminCheckInController do
              conn.assigns.tenant_context,
              staff(conn),
              user_id,
-             conn.body_params || %{}
+             body_params(conn)
            ),
          do: json(conn, result)
   end
@@ -265,4 +265,7 @@ defmodule MilosTrainingWeb.AdminCheckInController do
   end
 
   defp staff(conn), do: GuardianPlug.current_resource(conn)
+
+  defp body_params(%Plug.Conn{body_params: %Plug.Conn.Unfetched{}}), do: %{}
+  defp body_params(%Plug.Conn{body_params: params}), do: params
 end

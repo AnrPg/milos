@@ -21,7 +21,6 @@ defmodule MilosTraining.Workers.SupportRequestJob do
 
   def perform(_job), do: {:cancel, :unknown_step}
 
-  defp ok({:error, :not_found}), do: :ok
-  defp ok({:error, reason}), do: {:error, reason}
+  # Both steps answer :ok or {:error, :not_found}; a vanished request is done.
   defp ok(_result), do: :ok
 end

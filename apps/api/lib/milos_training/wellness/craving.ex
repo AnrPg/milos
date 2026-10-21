@@ -13,6 +13,8 @@ defmodule MilosTraining.Wellness.Craving do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "craving_entries" do
     field(:user_id, :binary_id)
     field(:organization_id, :binary_id)

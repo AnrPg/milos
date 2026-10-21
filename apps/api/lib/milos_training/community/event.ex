@@ -31,6 +31,8 @@ defmodule MilosTraining.Community.Event do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "community_events" do
     field :organization_id, :binary_id, read_after_writes: true
     field :club_id, :binary_id

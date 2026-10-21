@@ -9,6 +9,8 @@ defmodule MilosTraining.Wellness.Preferences do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "wellness_preferences" do
     field(:user_id, :binary_id)
     field(:water_goal_ml, :integer, default: 2_000)

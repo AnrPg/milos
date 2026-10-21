@@ -18,6 +18,8 @@ defmodule MilosTraining.Seasons.SeasonOffering do
   @editable ~w(title description welcome_message starts_on weeks capacity price_cents currency
                membership_package_id programme coach_ids)a
 
+  @type t :: %__MODULE__{}
+
   schema "season_offerings" do
     field :organization_id, :binary_id, read_after_writes: true
     field :title, :string
