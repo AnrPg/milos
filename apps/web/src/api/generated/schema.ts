@@ -1527,6 +1527,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/history": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your training log across every provider (workouts or booked classes) */
+        get: operations["MilosTrainingWeb.AccountTrainingController.history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -1534,9 +1551,44 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Your journal: every entry kind, newest first */
+        /** Your journal across every provider: every entry kind, newest first */
         get: operations["MilosTrainingWeb.JournalController.index"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/coach-audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Who «Οι coach μου» means across your providers */
+        get: operations["MilosTrainingWeb.JournalController.coach_audience"];
+        /** Choose which providers' coaches «Οι coach μου» means */
+        put: operations["MilosTrainingWeb.JournalController.put_coach_audience"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/entries/{kind}/{id}/audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Share one entry with specific providers (or reset it) */
+        put: operations["MilosTrainingWeb.JournalController.entry_audience"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1554,6 +1606,40 @@ export interface paths {
         get?: never;
         /** Move one of your entries on the visibility ladder */
         put: operations["MilosTrainingWeb.JournalController.set_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Export your whole journal across providers (JSON and training CSV) */
+        post: operations["MilosTrainingWeb.JournalController.export"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/journal/exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your journal exports, with short-lived download links */
+        get: operations["MilosTrainingWeb.JournalController.exports"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1789,6 +1875,57 @@ export interface paths {
         patch: operations["MilosTrainingWeb.MeController.update_profile"];
         trace?: never;
     };
+    "/api/me/progress": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Πρόοδος across every provider */
+        get: operations["MilosTrainingWeb.AccountTrainingController.progress"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/providers": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your providers (gyms and independent coaches), active and former */
+        get: operations["MilosTrainingWeb.MyProvidersController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/providers/selected": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Remember the provider Box opens on */
+        put: operations["MilosTrainingWeb.MyProvidersController.select"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/search/users": {
         parameters: {
             query?: never;
@@ -1867,6 +2004,23 @@ export interface paths {
         get?: never;
         /** Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1) */
         put: operations["MilosTrainingWeb.FollowController.member_visibility"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/today": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Today across every provider, in time order, each with its source */
+        get: operations["MilosTrainingWeb.MyProvidersController.today"];
+        put?: never;
         post?: never;
         delete?: never;
         options?: never;
@@ -1953,6 +2107,23 @@ export interface paths {
         put?: never;
         /** After the trial: «Θέλω να γραφτώ» opens a chat with the box, «Όχι τώρα» hides the card */
         post: operations["MilosTrainingWeb.TrialController.follow_up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/vault": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Vault across every provider: one trend per workout, every attempt labelled */
+        get: operations["MilosTrainingWeb.AccountTrainingController.vault"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -8439,6 +8610,278 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** AccountHistoryPage */
+        AccountHistoryPage: {
+            entries: {
+                class?: {
+                    attendance?: string | null;
+                    duration_minutes?: number | null;
+                    name?: string | null;
+                    type_name?: string | null;
+                } | null;
+                execution_source?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                occurred_at: string | null;
+                performance?: {
+                    /** Format: date-time */
+                    completed_at?: string | null;
+                    elapsed_ms?: number | null;
+                    /** Format: uuid */
+                    execution_id?: string;
+                    scale_level_slug?: string | null;
+                    scores?: {
+                        section_id?: string | null;
+                        section_name?: string | null;
+                        unit?: string | null;
+                        value?: unknown;
+                    }[];
+                    /** Format: date-time */
+                    started_at?: string | null;
+                    status?: string;
+                } | null;
+                /**
+                 * EntrySource
+                 * @description Where an entry came from; `former` once the membership there ended.
+                 */
+                source: {
+                    former: boolean;
+                    /** @enum {string} */
+                    kind: "organization" | "freeform" | "device";
+                    name: string | null;
+                    /** Format: uuid */
+                    organization_id: string | null;
+                };
+                workout?: {
+                    /** Format: uuid */
+                    id?: string | null;
+                    title?: string | null;
+                    type?: string | null;
+                } | null;
+            }[];
+            /** @enum {string} */
+            kind: "workouts" | "classes";
+            next_offset: number | null;
+            offset: number;
+            total: number;
+        };
+        /** AccountProgress */
+        AccountProgress: {
+            active_filter_count: number;
+            by_source: {
+                sessions: number;
+                /**
+                 * EntrySource
+                 * @description Where an entry came from; `former` once the membership there ended.
+                 */
+                source: {
+                    former: boolean;
+                    /** @enum {string} */
+                    kind: "organization" | "freeform" | "device";
+                    name: string | null;
+                    /** Format: uuid */
+                    organization_id: string | null;
+                };
+            }[];
+            consistency: {
+                [key: string]: unknown;
+            };
+            filter: {
+                [key: string]: unknown;
+            };
+            pr_timeline: ({
+                /**
+                 * EntrySource
+                 * @description Where an entry came from; `former` once the membership there ended.
+                 */
+                source?: {
+                    former: boolean;
+                    /** @enum {string} */
+                    kind: "organization" | "freeform" | "device";
+                    name: string | null;
+                    /** Format: uuid */
+                    organization_id: string | null;
+                };
+            } & {
+                [key: string]: unknown;
+            })[];
+            score_history: {
+                points?: {
+                    /** Format: date */
+                    completed_on?: string;
+                    /** Format: uuid */
+                    execution_id?: string;
+                    /**
+                     * EntrySource
+                     * @description Where an entry came from; `former` once the membership there ended.
+                     */
+                    source?: {
+                        former: boolean;
+                        /** @enum {string} */
+                        kind: "organization" | "freeform" | "device";
+                        name: string | null;
+                        /** Format: uuid */
+                        organization_id: string | null;
+                    };
+                    value?: unknown;
+                }[];
+                section_id?: string | null;
+                section_name?: string | null;
+                unit?: string | null;
+                /** @description The canonical workout identity (benchmark:…, library:…, title:…). */
+                workout_id?: string;
+                workout_title?: string | null;
+            }[];
+            /** @description Sessions by how they started (class_booking, assigned, …). */
+            sources: {
+                [key: string]: number;
+            };
+            totals: {
+                [key: string]: unknown;
+            };
+            weekly: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** AccountProgressResponse */
+        AccountProgressResponse: {
+            /** AccountProgress */
+            progress: {
+                active_filter_count: number;
+                by_source: {
+                    sessions: number;
+                    /**
+                     * EntrySource
+                     * @description Where an entry came from; `former` once the membership there ended.
+                     */
+                    source: {
+                        former: boolean;
+                        /** @enum {string} */
+                        kind: "organization" | "freeform" | "device";
+                        name: string | null;
+                        /** Format: uuid */
+                        organization_id: string | null;
+                    };
+                }[];
+                consistency: {
+                    [key: string]: unknown;
+                };
+                filter: {
+                    [key: string]: unknown;
+                };
+                pr_timeline: ({
+                    /**
+                     * EntrySource
+                     * @description Where an entry came from; `former` once the membership there ended.
+                     */
+                    source?: {
+                        former: boolean;
+                        /** @enum {string} */
+                        kind: "organization" | "freeform" | "device";
+                        name: string | null;
+                        /** Format: uuid */
+                        organization_id: string | null;
+                    };
+                } & {
+                    [key: string]: unknown;
+                })[];
+                score_history: {
+                    points?: {
+                        /** Format: date */
+                        completed_on?: string;
+                        /** Format: uuid */
+                        execution_id?: string;
+                        /**
+                         * EntrySource
+                         * @description Where an entry came from; `former` once the membership there ended.
+                         */
+                        source?: {
+                            former: boolean;
+                            /** @enum {string} */
+                            kind: "organization" | "freeform" | "device";
+                            name: string | null;
+                            /** Format: uuid */
+                            organization_id: string | null;
+                        };
+                        value?: unknown;
+                    }[];
+                    section_id?: string | null;
+                    section_name?: string | null;
+                    unit?: string | null;
+                    /** @description The canonical workout identity (benchmark:…, library:…, title:…). */
+                    workout_id?: string;
+                    workout_title?: string | null;
+                }[];
+                /** @description Sessions by how they started (class_booking, assigned, …). */
+                sources: {
+                    [key: string]: number;
+                };
+                totals: {
+                    [key: string]: unknown;
+                };
+                weekly: {
+                    [key: string]: unknown;
+                }[];
+            };
+        };
+        /** AccountVault */
+        AccountVault: {
+            active_filter_count: number;
+            filter: {
+                [key: string]: unknown;
+            };
+            groups: {
+                attempt_count: number;
+                attempts: {
+                    /** Format: date-time */
+                    at: string;
+                    duration_seconds?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "execution" | "training_log";
+                    /** Format: date */
+                    on?: string;
+                    scale_level_slug?: string | null;
+                    scores?: {
+                        section_id?: string | null;
+                        section_name?: string | null;
+                        unit?: string | null;
+                        value?: unknown;
+                    }[];
+                    /**
+                     * EntrySource
+                     * @description Where an entry came from; `former` once the membership there ended.
+                     */
+                    source: {
+                        former: boolean;
+                        /** @enum {string} */
+                        kind: "organization" | "freeform" | "device";
+                        name: string | null;
+                        /** Format: uuid */
+                        organization_id: string | null;
+                    };
+                    title?: string | null;
+                    type?: string | null;
+                    tz?: string | null;
+                }[];
+                benchmark?: string | null;
+                identity: string;
+                /** Format: date-time */
+                last_at: string;
+                sources: {
+                    former: boolean;
+                    /** @enum {string} */
+                    kind: "organization" | "freeform" | "device";
+                    name: string | null;
+                    /** Format: uuid */
+                    organization_id: string | null;
+                }[];
+                title: string | null;
+                workout_type?: string | null;
+            }[];
+        };
         /** AdminOnboardingChecklist */
         AdminOnboardingChecklist: {
             completed_count: number;
@@ -12844,6 +13287,23 @@ export interface components {
             /** Format: uuid */
             user_id?: string | null;
         };
+        /** CoachAudience */
+        CoachAudience: {
+            /** @description Providers «Οι coach μου» means by default. */
+            organization_ids: string[];
+            providers: {
+                included: boolean;
+                /** @enum {string} */
+                kind: "gym" | "coach";
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+            }[];
+        };
+        /** CoachAudienceRequest */
+        CoachAudienceRequest: {
+            organization_ids: string[];
+        };
         /** CoachNote */
         CoachNote: {
             body: string;
@@ -16235,6 +16695,45 @@ export interface components {
                 updated_at?: string;
             };
         };
+        /**
+         * EntryAudience
+         * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+         */
+        EntryAudience: {
+            custom: boolean;
+            organization_ids: string[];
+        } | null;
+        /** EntryAudienceRequest */
+        EntryAudienceRequest: {
+            /** @description Providers this entry is shared with; null resets to the default. */
+            organization_ids: string[] | null;
+        };
+        /** EntryAudienceResponse */
+        EntryAudienceResponse: {
+            /**
+             * EntryAudience
+             * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+             */
+            audience: {
+                custom: boolean;
+                organization_ids: string[];
+            } | null;
+            /** Format: uuid */
+            id: string;
+            kind: string;
+        };
+        /**
+         * EntrySource
+         * @description Where an entry came from; `former` once the membership there ended.
+         */
+        EntrySource: {
+            former: boolean;
+            /** @enum {string} */
+            kind: "organization" | "freeform" | "device";
+            name: string | null;
+            /** Format: uuid */
+            organization_id: string | null;
+        };
         /** ExecutionInteractionBatch */
         ExecutionInteractionBatch: {
             events: {
@@ -17349,8 +17848,84 @@ export interface components {
         JournalCommentsResponse: {
             comments: components["schemas"]["JournalComment"][];
         };
+        /** JournalExport */
+        JournalExport: {
+            /** Format: date-time */
+            completed_at?: string | null;
+            entry_count?: number | null;
+            /** Format: date-time */
+            expires_at?: string | null;
+            files: {
+                bytes?: number | null;
+                content_type: string;
+                /** @description Short-lived; ask again for a fresh one. */
+                download_url: string | null;
+                name: string;
+            }[];
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            requested_at: string;
+            /** @enum {string} */
+            status: "pending" | "ready" | "failed" | "expired";
+        };
+        /** JournalExportResponse */
+        JournalExportResponse: {
+            /** JournalExport */
+            export: {
+                /** Format: date-time */
+                completed_at?: string | null;
+                entry_count?: number | null;
+                /** Format: date-time */
+                expires_at?: string | null;
+                files: {
+                    bytes?: number | null;
+                    content_type: string;
+                    /** @description Short-lived; ask again for a fresh one. */
+                    download_url: string | null;
+                    name: string;
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                requested_at: string;
+                /** @enum {string} */
+                status: "pending" | "ready" | "failed" | "expired";
+            };
+        };
+        /** JournalExports */
+        JournalExports: {
+            exports: {
+                /** Format: date-time */
+                completed_at?: string | null;
+                entry_count?: number | null;
+                /** Format: date-time */
+                expires_at?: string | null;
+                files: {
+                    bytes?: number | null;
+                    content_type: string;
+                    /** @description Short-lived; ask again for a fresh one. */
+                    download_url: string | null;
+                    name: string;
+                }[];
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                requested_at: string;
+                /** @enum {string} */
+                status: "pending" | "ready" | "failed" | "expired";
+            }[];
+        };
         /** JournalFeedItem */
         JournalFeedItem: {
+            /**
+             * EntryAudience
+             * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+             */
+            audience?: {
+                custom: boolean;
+                organization_ids: string[];
+            } | null;
             choosable_visibilities: ("private" | "coach_can_view" | "coach_reply_requested")[];
             entry: {
                 [key: string]: unknown;
@@ -17371,9 +17946,26 @@ export interface components {
             occurred_tz?: string | null;
             /** Format: uuid */
             organization_id?: string | null;
+            /**
+             * EntrySource
+             * @description Where an entry came from; `former` once the membership there ended.
+             */
+            source?: {
+                former: boolean;
+                /** @enum {string} */
+                kind: "organization" | "freeform" | "device";
+                name: string | null;
+                /** Format: uuid */
+                organization_id: string | null;
+            };
         };
         /** JournalFeedPage */
         JournalFeedPage: {
+            active_filter_count?: number;
+            /** @description The Ροή filter applied, in its canonical (saved) form. */
+            filter?: {
+                [key: string]: unknown;
+            };
             items: components["schemas"]["JournalFeedItem"][];
             next_cursor?: string | null;
         };
@@ -17433,6 +18025,8 @@ export interface components {
         };
         /** JournalVisibilityRequest */
         JournalVisibilityRequest: {
+            /** @description ADR-162: providers to share with besides the entry's own; null resets to the default. */
+            audience?: string[] | null;
             /**
              * Format: uuid
              * @description Which coach answers, when the member has several.
@@ -17445,6 +18039,14 @@ export interface components {
         };
         /** JournalVisibilityResponse */
         JournalVisibilityResponse: {
+            /**
+             * EntryAudience
+             * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+             */
+            audience?: {
+                custom: boolean;
+                organization_ids: string[];
+            } | null;
             choosable_visibilities: string[];
             /** Format: uuid */
             id: string;
@@ -17574,6 +18176,85 @@ export interface components {
             source_context_id?: string | null;
             /** @enum {string|null} */
             surface?: "assignment_detail" | "class_detail" | "pre_start" | null;
+        };
+        /** MyProviders */
+        MyProviders: {
+            former: {
+                /** Format: date-time */
+                ended_at?: string | null;
+                /** @enum {string} */
+                kind: "gym" | "coach";
+                logo_url?: string | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                primary_color?: string | null;
+                slug?: string;
+            }[];
+            providers: {
+                /** @enum {string} */
+                kind: "gym" | "coach";
+                logo_url?: string | null;
+                name: string;
+                next?: {
+                    /** Format: date-time */
+                    at: string;
+                    /** Format: uuid */
+                    id: string;
+                    /** @enum {string} */
+                    kind: "class" | "appointment";
+                    title?: string | null;
+                } | null;
+                /** Format: uuid */
+                organization_id: string;
+                /** @description Live facts could not be read. */
+                partial?: boolean;
+                primary_color?: string | null;
+                roles?: string[];
+                selected: boolean;
+                slug: string;
+                unread_messages: number;
+            }[];
+            /** Format: uuid */
+            selected_organization_id: string | null;
+        };
+        /** MyToday */
+        MyToday: {
+            /** Format: date */
+            date: string;
+            failed_organization_ids: string[];
+            items: {
+                /**
+                 * Format: date-time
+                 * @description Null for untimed items (programme of the day, WOD), listed first.
+                 */
+                at: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "class" | "appointment" | "program" | "wod";
+                /**
+                 * EntrySource
+                 * @description Where an entry came from; `former` once the membership there ended.
+                 */
+                source: {
+                    former: boolean;
+                    /** @enum {string} */
+                    kind: "organization" | "freeform" | "device";
+                    name: string | null;
+                    /** Format: uuid */
+                    organization_id: string | null;
+                };
+                status?: string | null;
+                target: {
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug: string;
+                };
+                title?: string | null;
+            }[];
+            partial: boolean;
+            timezone: string;
         };
         /** MyTrial */
         MyTrial: {
@@ -19475,6 +20156,11 @@ export interface components {
             }[];
             /** @enum {string} */
             surface: "around_me" | "box_schedule" | "feed" | "club" | "journal" | "vault" | "progress" | "partners";
+        };
+        /** SelectProviderRequest */
+        SelectProviderRequest: {
+            /** Format: uuid */
+            organization_id: string;
         };
         /** @description Stable machine-readable API failure with English compatibility copy. */
         SemanticError: {
@@ -31022,6 +31708,88 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AccountTrainingController.history": {
+        parameters: {
+            query?: {
+                kind?: "workouts" | "classes";
+                offset?: number;
+                limit?: number;
+                /** @description Comma-separated provider ids, `freeform`, `device` (all when absent) */
+                sources?: string;
+                date_from?: string;
+                date_to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description History page */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        entries: {
+                            class?: {
+                                attendance?: string | null;
+                                duration_minutes?: number | null;
+                                name?: string | null;
+                                type_name?: string | null;
+                            } | null;
+                            execution_source?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            occurred_at: string | null;
+                            performance?: {
+                                /** Format: date-time */
+                                completed_at?: string | null;
+                                elapsed_ms?: number | null;
+                                /** Format: uuid */
+                                execution_id?: string;
+                                scale_level_slug?: string | null;
+                                scores?: {
+                                    section_id?: string | null;
+                                    section_name?: string | null;
+                                    unit?: string | null;
+                                    value?: unknown;
+                                }[];
+                                /** Format: date-time */
+                                started_at?: string | null;
+                                status?: string;
+                            } | null;
+                            /**
+                             * EntrySource
+                             * @description Where an entry came from; `former` once the membership there ended.
+                             */
+                            source: {
+                                former: boolean;
+                                /** @enum {string} */
+                                kind: "organization" | "freeform" | "device";
+                                name: string | null;
+                                /** Format: uuid */
+                                organization_id: string | null;
+                            };
+                            workout?: {
+                                /** Format: uuid */
+                                id?: string | null;
+                                title?: string | null;
+                                type?: string | null;
+                            } | null;
+                        }[];
+                        /** @enum {string} */
+                        kind: "workouts" | "classes";
+                        next_offset: number | null;
+                        offset: number;
+                        total: number;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.JournalController.index": {
         parameters: {
             query?: {
@@ -31030,6 +31798,16 @@ export interface operations {
                 /** @description Comma-separated kinds to list (all when absent) */
                 kinds?: string;
                 limit?: number;
+                /** @description Comma-separated provider ids, `freeform`, `device` */
+                sources?: string;
+                /** @description Comma-separated rungs */
+                visibilities?: string;
+                date_from?: string;
+                date_to?: string;
+                /** @description Text search (2–100 characters) over entries and their comments */
+                q?: string;
+                /** @description Also remember this filter as your last-used Ημερολόγιο filter */
+                remember?: boolean;
             };
             header?: never;
             path?: never;
@@ -31044,9 +31822,151 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        active_filter_count?: number;
+                        /** @description The Ροή filter applied, in its canonical (saved) form. */
+                        filter?: {
+                            [key: string]: unknown;
+                        };
                         items: components["schemas"]["JournalFeedItem"][];
                         next_cursor?: string | null;
                     };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.coach_audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Audience */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Providers «Οι coach μου» means by default. */
+                        organization_ids: string[];
+                        providers: {
+                            included: boolean;
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.put_coach_audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    organization_ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Audience */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Providers «Οι coach μου» means by default. */
+                        organization_ids: string[];
+                        providers: {
+                            included: boolean;
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                        }[];
+                    };
+                };
+            };
+            /** @description Unknown provider */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.entry_audience": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                kind: "execution" | "training_log" | "pr" | "note" | "check_in";
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @description Providers this entry is shared with; null resets to the default. */
+                    organization_ids: string[] | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Audience */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * EntryAudience
+                         * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+                         */
+                        audience: {
+                            custom: boolean;
+                            organization_ids: string[];
+                        } | null;
+                        /** Format: uuid */
+                        id: string;
+                        kind: string;
+                    };
+                };
+            };
+            /** @description Entry not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+            /** @description Not allowed */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };
@@ -31064,6 +31984,8 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    /** @description ADR-162: providers to share with besides the entry's own; null resets to the default. */
+                    audience?: string[] | null;
                     /**
                      * Format: uuid
                      * @description Which coach answers, when the member has several.
@@ -31084,6 +32006,14 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /**
+                         * EntryAudience
+                         * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+                         */
+                        audience?: {
+                            custom: boolean;
+                            organization_ids: string[];
+                        } | null;
                         choosable_visibilities: string[];
                         /** Format: uuid */
                         id: string;
@@ -31117,6 +32047,98 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Export requested */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** JournalExport */
+                        export: {
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            entry_count?: number | null;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            files: {
+                                bytes?: number | null;
+                                content_type: string;
+                                /** @description Short-lived; ask again for a fresh one. */
+                                download_url: string | null;
+                                name: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "pending" | "ready" | "failed" | "expired";
+                        };
+                    };
+                };
+            };
+            /** @description An export is pending */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.JournalController.exports": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Exports */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        exports: {
+                            /** Format: date-time */
+                            completed_at?: string | null;
+                            entry_count?: number | null;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            files: {
+                                bytes?: number | null;
+                                content_type: string;
+                                /** @description Short-lived; ask again for a fresh one. */
+                                download_url: string | null;
+                                name: string;
+                            }[];
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            requested_at: string;
+                            /** @enum {string} */
+                            status: "pending" | "ready" | "failed" | "expired";
+                        }[];
+                    };
                 };
             };
         };
@@ -31897,6 +32919,245 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.AccountTrainingController.progress": {
+        parameters: {
+            query?: {
+                range?: "4w" | "12w" | "6m" | "1y" | "all";
+                /** @description Comma-separated provider ids, `freeform`, `device` (all when absent) */
+                sources?: string;
+                /** @description An exercise name (matched by substring) */
+                exercise?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Progress */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** AccountProgress */
+                        progress: {
+                            active_filter_count: number;
+                            by_source: {
+                                sessions: number;
+                                /**
+                                 * EntrySource
+                                 * @description Where an entry came from; `former` once the membership there ended.
+                                 */
+                                source: {
+                                    former: boolean;
+                                    /** @enum {string} */
+                                    kind: "organization" | "freeform" | "device";
+                                    name: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string | null;
+                                };
+                            }[];
+                            consistency: {
+                                [key: string]: unknown;
+                            };
+                            filter: {
+                                [key: string]: unknown;
+                            };
+                            pr_timeline: ({
+                                /**
+                                 * EntrySource
+                                 * @description Where an entry came from; `former` once the membership there ended.
+                                 */
+                                source?: {
+                                    former: boolean;
+                                    /** @enum {string} */
+                                    kind: "organization" | "freeform" | "device";
+                                    name: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string | null;
+                                };
+                            } & {
+                                [key: string]: unknown;
+                            })[];
+                            score_history: {
+                                points?: {
+                                    /** Format: date */
+                                    completed_on?: string;
+                                    /** Format: uuid */
+                                    execution_id?: string;
+                                    /**
+                                     * EntrySource
+                                     * @description Where an entry came from; `former` once the membership there ended.
+                                     */
+                                    source?: {
+                                        former: boolean;
+                                        /** @enum {string} */
+                                        kind: "organization" | "freeform" | "device";
+                                        name: string | null;
+                                        /** Format: uuid */
+                                        organization_id: string | null;
+                                    };
+                                    value?: unknown;
+                                }[];
+                                section_id?: string | null;
+                                section_name?: string | null;
+                                unit?: string | null;
+                                /** @description The canonical workout identity (benchmark:…, library:…, title:…). */
+                                workout_id?: string;
+                                workout_title?: string | null;
+                            }[];
+                            /** @description Sessions by how they started (class_booking, assigned, …). */
+                            sources: {
+                                [key: string]: number;
+                            };
+                            totals: {
+                                [key: string]: unknown;
+                            };
+                            weekly: {
+                                [key: string]: unknown;
+                            }[];
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyProvidersController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Providers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        former: {
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            slug?: string;
+                        }[];
+                        providers: {
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            logo_url?: string | null;
+                            name: string;
+                            next?: {
+                                /** Format: date-time */
+                                at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "appointment";
+                                title?: string | null;
+                            } | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** @description Live facts could not be read. */
+                            partial?: boolean;
+                            primary_color?: string | null;
+                            roles?: string[];
+                            selected: boolean;
+                            slug: string;
+                            unread_messages: number;
+                        }[];
+                        /** Format: uuid */
+                        selected_organization_id: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyProvidersController.select": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    organization_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Providers */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        former: {
+                            /** Format: date-time */
+                            ended_at?: string | null;
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            logo_url?: string | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            primary_color?: string | null;
+                            slug?: string;
+                        }[];
+                        providers: {
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            logo_url?: string | null;
+                            name: string;
+                            next?: {
+                                /** Format: date-time */
+                                at: string;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "class" | "appointment";
+                                title?: string | null;
+                            } | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** @description Live facts could not be read. */
+                            partial?: boolean;
+                            primary_color?: string | null;
+                            roles?: string[];
+                            selected: boolean;
+                            slug: string;
+                            unread_messages: number;
+                        }[];
+                        /** Format: uuid */
+                        selected_organization_id: string | null;
+                    };
+                };
+            };
+            /** @description Not an active provider */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.MeController.search_users (2)": {
         parameters: {
             query?: {
@@ -32057,6 +33318,66 @@ export interface operations {
                 content: {
                     "application/json": {
                         hidden: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyProvidersController.today": {
+        parameters: {
+            query?: {
+                date?: string;
+                /** @description IANA zone the day is counted in (UTC by default) */
+                timezone?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Today */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date */
+                        date: string;
+                        failed_organization_ids: string[];
+                        items: {
+                            /**
+                             * Format: date-time
+                             * @description Null for untimed items (programme of the day, WOD), listed first.
+                             */
+                            at: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "class" | "appointment" | "program" | "wod";
+                            /**
+                             * EntrySource
+                             * @description Where an entry came from; `former` once the membership there ended.
+                             */
+                            source: {
+                                former: boolean;
+                                /** @enum {string} */
+                                kind: "organization" | "freeform" | "device";
+                                name: string | null;
+                                /** Format: uuid */
+                                organization_id: string | null;
+                            };
+                            status?: string | null;
+                            target: {
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug: string;
+                            };
+                            title?: string | null;
+                        }[];
+                        partial: boolean;
+                        timezone: string;
                     };
                 };
             };
@@ -32559,6 +33880,92 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AccountTrainingController.vault": {
+        parameters: {
+            query?: {
+                /** @description Comma-separated workout types */
+                disciplines?: string;
+                /** @description A benchmark slug such as `fran` */
+                benchmark?: string;
+                /** @description An exercise name (matched by substring) */
+                exercise?: string;
+                /** @description Comma-separated provider ids, `freeform`, `device` (all when absent) */
+                sources?: string;
+                date_from?: string;
+                date_to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Vault */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active_filter_count: number;
+                        filter: {
+                            [key: string]: unknown;
+                        };
+                        groups: {
+                            attempt_count: number;
+                            attempts: {
+                                /** Format: date-time */
+                                at: string;
+                                duration_seconds?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "execution" | "training_log";
+                                /** Format: date */
+                                on?: string;
+                                scale_level_slug?: string | null;
+                                scores?: {
+                                    section_id?: string | null;
+                                    section_name?: string | null;
+                                    unit?: string | null;
+                                    value?: unknown;
+                                }[];
+                                /**
+                                 * EntrySource
+                                 * @description Where an entry came from; `former` once the membership there ended.
+                                 */
+                                source: {
+                                    former: boolean;
+                                    /** @enum {string} */
+                                    kind: "organization" | "freeform" | "device";
+                                    name: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string | null;
+                                };
+                                title?: string | null;
+                                type?: string | null;
+                                tz?: string | null;
+                            }[];
+                            benchmark?: string | null;
+                            identity: string;
+                            /** Format: date-time */
+                            last_at: string;
+                            sources: {
+                                former: boolean;
+                                /** @enum {string} */
+                                kind: "organization" | "freeform" | "device";
+                                name: string | null;
+                                /** Format: uuid */
+                                organization_id: string | null;
+                            }[];
+                            title: string | null;
+                            workout_type?: string | null;
+                        }[];
+                    };
                 };
             };
         };
@@ -57698,6 +59105,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        active_filter_count?: number;
+                        /** @description The Ροή filter applied, in its canonical (saved) form. */
+                        filter?: {
+                            [key: string]: unknown;
+                        };
                         items: components["schemas"]["JournalFeedItem"][];
                         next_cursor?: string | null;
                     };
