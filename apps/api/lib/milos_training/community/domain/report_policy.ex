@@ -18,11 +18,12 @@ defmodule MilosTraining.Community.Domain.ReportPolicy do
     "dismiss" => {"dismissed", "none"}
   }
 
+  # ADR-169: hiding a Partners profile suspends it in that club.
   @targets_by_action %{
-    "hide" => ~w(post comment),
+    "hide" => ~w(post comment partner),
     "delete" => ~w(post comment),
     "archive" => ~w(channel),
-    "dismiss" => ~w(post comment channel)
+    "dismiss" => ~w(post comment channel partner)
   }
 
   def reasons, do: Report.reasons()

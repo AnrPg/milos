@@ -69,6 +69,14 @@ function NotificationCard({
     if (notification.type !== "device_sync_error") return null;
     return tDevices(["notif", "sync_error", part].join("_"));
   }
+  const tPartners = useTranslations("Partners");
+  // ADR-169: a new training partner, and a message from one (who, never what).
+  function partnerText(notification: NotificationRecord, part: "title" | "body") {
+    if (notification.type !== "partner_match" && notification.type !== "partner_message") return null;
+    const nickname = notification.payload.nickname;
+    const name = typeof nickname === "string" && nickname ? nickname : tPartners("someone");
+    return tPartners(["notif", notification.type, part].join("_"), { name });
+  }
   const tBuddy = useTranslations("Buddy");
   const tSeasons = useTranslations("Seasons");
   // ADR-167: season requests (staff) and their answers (members).
@@ -178,6 +186,8 @@ function NotificationCard({
     if (buddy !== null) return buddy;
     const season = seasonText(notification, "body");
     if (season !== null) return season;
+    const partner = partnerText(notification, "body");
+    if (partner !== null) return partner;
     const device = deviceText(notification, "body");
     if (device !== null) return device;
     const checkIn = checkInText(notification, "body");
@@ -432,6 +442,8 @@ function NotificationCard({
     if (buddy !== null) return buddy;
     const season = seasonText(notification, "title");
     if (season !== null) return season;
+    const partner = partnerText(notification, "title");
+    if (partner !== null) return partner;
     const device = deviceText(notification, "title");
     if (device !== null) return device;
     const checkIn = checkInText(notification, "title");

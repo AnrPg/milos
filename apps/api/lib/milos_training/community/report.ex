@@ -1,7 +1,7 @@
 defmodule MilosTraining.Community.Report do
   @moduledoc """
   Something a member flagged in a club (ADR-143, board 7 Q4–Q5): a post, a
-  comment or a whole group. It stays `open` until staff act on the item or
+  comment, a whole group, or a person's Partners profile (ADR-169). It stays `open` until staff act on the item or
   decide nothing is needed; every open report on the same item closes
   together.
   """
@@ -9,7 +9,7 @@ defmodule MilosTraining.Community.Report do
   use Ecto.Schema
   import Ecto.Changeset
 
-  @target_types ~w(post comment channel)
+  @target_types ~w(post comment channel partner)
   @reasons ~w(spam harassment inappropriate other)
   @statuses ~w(open actioned dismissed)
   @resolutions ~w(hidden deleted archived none)

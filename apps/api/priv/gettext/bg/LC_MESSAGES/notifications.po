@@ -570,3 +570,12 @@ msgstr "Сезонът е отменен"
 
 msgid "%{box} cancelled %{season}."
 msgstr "%{box} отмени %{season}."
+
+msgid "You found a training partner"
+msgstr "Намерихте партньор за тренировки"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Вие и %{nickname} искате да тренирате заедно. Кажете здравей."
+
+msgid "Training partner message"
+msgstr "Съобщение от партньор за тренировки"

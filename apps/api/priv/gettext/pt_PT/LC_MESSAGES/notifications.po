@@ -570,3 +570,12 @@ msgstr "Temporada cancelada"
 
 msgid "%{box} cancelled %{season}."
 msgstr "%{box} cancelou %{season}."
+
+msgid "You found a training partner"
+msgstr "Encontraste um parceiro de treino"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Tu e %{nickname} querem treinar juntos. Diz olá."
+
+msgid "Training partner message"
+msgstr "Mensagem do teu parceiro de treino"

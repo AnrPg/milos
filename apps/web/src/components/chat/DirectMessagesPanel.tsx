@@ -29,6 +29,7 @@ import { MessageComposer } from "./MessageComposer";
 import { TOPIC_KEYS } from "./message-topics";
 import { TypingIndicator } from "./TypingIndicator";
 import { SemanticLabel } from "@/components/semantic-label";
+import { PartnerThreads } from "@/components/partners/PartnerThreads";
 import { BoxConversationsList } from "@/components/trials/BoxConversationsList";
 
 interface SearchResult {
@@ -237,6 +238,11 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
           <div className="scroll-area flex-1 overflow-y-auto">
             {searchResults.length === 0 ? <BoxConversationsList token={accessToken} /> : null}
+            {searchResults.length === 0 ? (
+              <div className="px-3 py-2">
+                <PartnerThreads onNavigate={onClose} />
+              </div>
+            ) : null}
             {searchResults.length > 0 ? (
               searchResults.map((u) => (
                 <button

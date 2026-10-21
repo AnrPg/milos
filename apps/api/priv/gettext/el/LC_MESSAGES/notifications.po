@@ -570,3 +570,12 @@ msgstr "Το season ακυρώθηκε"
 
 msgid "%{box} cancelled %{season}."
 msgstr "Το %{box} ακύρωσε το %{season}."
+
+msgid "You found a training partner"
+msgstr "Βρήκες training partner"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Εσύ και το %{nickname} θέλετε να προπονηθείτε μαζί. Πείτε ένα γεια."
+
+msgid "Training partner message"
+msgstr "Μήνυμα από training partner"

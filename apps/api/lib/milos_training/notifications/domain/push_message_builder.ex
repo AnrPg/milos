@@ -676,6 +676,26 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-169: framed as a training partner, never a date.
+  def build("partner_match", payload, localize) do
+    %{
+      title: localize.("You found a training partner", %{}),
+      body:
+        localize.("You and %{nickname} both want to train together. Say hi.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/partners"
+    }
+  end
+
+  def build("partner_message", payload, localize) do
+    %{
+      title: localize.("Training partner message", %{}),
+      body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
+      url: payload["url"] || "/partners"
+    }
+  end
+
   # ADR-160 §4: counts only, never craving times.
   def build("coach_wellness_summary", payload, localize) do
     bindings = %{

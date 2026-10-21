@@ -249,6 +249,7 @@ config :milos_training,
 
 config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
 config :milos_training, :buddy_store, MilosTraining.Infrastructure.Buddies.EctoBuddyStore
+config :milos_training, :partner_store, MilosTraining.Infrastructure.Partners.EctoPartnerStore
 
 config :milos_training,
        :support_scheduler,

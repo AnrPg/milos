@@ -130,4 +130,17 @@ defmodule MilosTraining.Community.SocialStore do
 
   @impl true
   def hidden_member_ids(ids), do: adapter().hidden_member_ids(ids)
+
+  @impl true
+  def insert_block(context, attrs), do: call(context, :insert_block, [attrs])
+
+  @impl true
+  def delete_block(context, user_id, blocked_id),
+    do: call(context, :delete_block, [user_id, blocked_id])
+
+  @impl true
+  def list_blocks(context, user_id), do: call(context, :list_blocks, [user_id])
+
+  @impl true
+  def blocked_user_ids(context), do: call(context, :blocked_user_ids, [])
 end

@@ -31,6 +31,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
     Notifications,
     Nutrition,
     Pantheon,
+    Partners,
     Referrals,
     Scheduling,
     Seasons,
@@ -46,6 +47,7 @@ defmodule MilosTraining.Application.TenantDataContexts do
   @purgeable [
     AiUsage,
     Analytics,
+    Partners,
     Community,
     Media,
     Notifications,

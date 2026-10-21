@@ -567,4 +567,12 @@ msgid "Season cancelled"
 msgstr ""
 
 msgid "%{box} cancelled %{season}."
+
+msgid "You found a training partner"
+msgstr ""
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr ""
+
+msgid "Training partner message"
 msgstr ""
