@@ -130,7 +130,8 @@ export function builtInChannel(club: CommunityClub | null, kind: "announcements"
 
 /**
  * Channels grouped as the club page lists them: the box's own, then class
- * groups, then the rest. Member groups have their own card (board 7 Q2).
+ * groups, then the rest. Member groups (board 7 Q2) and PT squads (ADR-168)
+ * have their own cards.
  */
 export function channelSections(channels: CommunityChannel[]) {
   const box = channels.filter((channel) => BUILT_IN.has(channel.kind));
@@ -138,7 +139,8 @@ export function channelSections(channels: CommunityChannel[]) {
     .filter((channel) => channel.kind === "class_slot")
     .sort((a, b) => Number(Boolean(b.suggested)) - Number(Boolean(a.suggested)) || (a.name ?? "").localeCompare(b.name ?? ""));
   const other = channels.filter(
-    (channel) => !BUILT_IN.has(channel.kind) && channel.kind !== "class_slot" && channel.kind !== "member_group",
+    (channel) =>
+      !BUILT_IN.has(channel.kind) && channel.kind !== "class_slot" && channel.kind !== "member_group" && channel.kind !== "pt_squad",
   );
   return { box, classes, other };
 }

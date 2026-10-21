@@ -94,6 +94,9 @@ defmodule MilosTraining.Community.Domain.ChannelPolicy do
   # In a member group only its members write, staff included (ADR-143).
   def can_post?(%{kind: "member_group"}, _role, joined?), do: joined? == true
 
+  # In a PT squad only its coach and members write (ADR-168).
+  def can_post?(%{kind: "pt_squad"}, _role, joined?), do: joined? == true
+
   def can_post?(%{write_policy: "staff"}, role, _joined?), do: role == "staff"
   def can_post?(%{write_policy: "members"}, _role, _joined?), do: true
   def can_post?(%{write_policy: "system_and_members"}, _role, _joined?), do: true
@@ -115,12 +118,14 @@ defmodule MilosTraining.Community.Domain.ChannelPolicy do
   """
   def channel_role("staff", _channel), do: "staff"
   def channel_role(_role, %{kind: "member_group", admin: true}), do: "staff"
+  def channel_role(_role, %{kind: "pt_squad", admin: true}), do: "staff"
   def channel_role(role, _channel), do: role
 
-  @doc "Staff pin in channels staff write to; group admins pin in their group."
+  @doc "Staff pin in channels staff write to; group admins and squad coaches pin in theirs."
   def can_pin?(%{write_policy: "staff"}, "staff"), do: true
   def can_pin?(%{kind: "member_group"}, "staff"), do: true
   def can_pin?(%{kind: "season"}, "staff"), do: true
+  def can_pin?(%{kind: "pt_squad"}, "staff"), do: true
   def can_pin?(_channel, _role), do: false
 
   defp to_role(role) when is_atom(role), do: role

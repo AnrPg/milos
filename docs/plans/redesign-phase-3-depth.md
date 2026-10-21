@@ -274,6 +274,15 @@ No board; decided for least clutter (owner's standing instruction), full list in
 5. **Owner actions:** Apple developer account and team id, APNs key, Firebase project and `google-services.json`, Play
    Console and signing keys (fingerprints), icons and store listings (ADR-171 «Owner actions»).
 
+### PT squads (2026-10-21, no board: ANR's Phase 3 rule, recommended options)
+1. **Where:** a channel in the gym's club (not a separate club), so no extra club-bar bubble and every channel feature
+   applies; the coach starts it from «Πελάτες μου» (and a solo coach from Box).
+2. **Joining:** invitation with consent; the client sees it in Box, in Κανάλια and as a notification, and accepts or declines.
+   Only active clients can be invited; ending coaching removes them, re-checked on every read.
+3. **Privacy:** only the coach and members see the squad; other staff don't. Members see members, the coach also open
+   invitations.
+4. **Size:** up to 30 people per squad, 20 live squads per coach; no auto-archive.
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
@@ -291,5 +300,5 @@ No board; decided for least clutter (owner's standing instruction), full list in
 
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
-- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [ ] P3-M3 · [ ] P3-M4 · [x] P3-M5 (ADR-167) · [ ] P3-M6 · [x] P3-M7 (ADR-169)
+- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [ ] P3-M3 · [ ] P3-M4 · [x] P3-M5 (ADR-167) · [x] P3-M6 (ADR-168) · [x] P3-M7 (ADR-169)
 - [ ] P3-M8 · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13

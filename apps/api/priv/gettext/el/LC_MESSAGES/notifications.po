@@ -579,3 +579,9 @@ msgstr "Εσύ και το %{nickname} θέλετε να προπονηθείτ�
 
 msgid "Training partner message"
 msgstr "Μήνυμα από training partner"
+
+msgid "Squad invitation"
+msgstr "Πρόσκληση σε squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "Ο/Η %{nickname} σε προσκάλεσε στο squad «%{group}»."

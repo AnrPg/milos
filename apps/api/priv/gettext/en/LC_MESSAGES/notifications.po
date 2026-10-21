@@ -579,3 +579,9 @@ msgstr "You and %{nickname} both want to train together. Say hi."
 
 msgid "Training partner message"
 msgstr "Training partner message"
+
+msgid "Squad invitation"
+msgstr "Squad invitation"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} invited you to the squad «%{group}»."

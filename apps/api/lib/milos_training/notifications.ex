@@ -27,6 +27,7 @@ defmodule MilosTraining.Notifications do
     community_group_proposed community_group_approved community_group_declined
     community_group_join_requested community_group_join_approved community_group_archive_warning
     community_report_created community_club_join_requested community_club_join_approved
+    community_squad_invited
   )
 
   @event_types ~w(
@@ -1069,6 +1070,9 @@ defmodule MilosTraining.Notifications do
 
         "community_club_join_approved" ->
           {club_id, "/clubs/#{club_id}"}
+
+        "community_squad_invited" ->
+          {"#{group_id}:#{field(payload, :user_id)}", "/clubs/#{club_id}/squads/#{group_id}"}
 
         _group_answer ->
           {group_id, "/clubs/#{club_id}/groups/#{group_id}"}
