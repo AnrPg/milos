@@ -4997,7 +4997,8 @@
       "measure": "Messung",
       "wellness": "Wasser · Schlaf · Mahlzeit",
       "craving": "Heißhunger",
-      "support": "Ich brauche Unterstützung"
+      "support": "Ich brauche Unterstützung",
+      "voice": "Per Sprache"
     },
     "entryKindHint": {
       "workout": "Ergebnis, RPE, Notizen",
@@ -5010,7 +5011,8 @@
       "measure": "Gewicht, Umfänge, Fotos",
       "wellness": "Ein Glas, die letzte Nacht, eine Mahlzeit",
       "craving": "Notieren oder Unterstützung holen",
-      "support": "Eine kurze Nachricht an deinen Buddy"
+      "support": "Eine kurze Nachricht an deinen Buddy",
+      "voice": "Sag, was du gemacht hast"
     },
     "homeTitle": "Start",
     "wodToday": "WOD des Tages in der Box",
@@ -8964,6 +8966,34 @@
       "ankle": "Knöchel",
       "chest": "Brust",
       "core": "Rumpf"
+    }
+  },
+  "VoiceLog": {
+    "title": "Per Sprache erfassen",
+    "hint": "Sag, was du gemacht hast, bis zu {seconds}″. Du siehst einen Entwurf, bevor etwas gespeichert wird.",
+    "record": "Aufnahme starten",
+    "stop": "Aufnahme beenden",
+    "tapToStart": "Zum Starten tippen",
+    "recording": "Aufnahme {elapsed} / {max}",
+    "working": "Entwurf wird erstellt…",
+    "privacy": "Die Aufnahme wird nicht gespeichert. Gespeichert wird nur, was du im Formular bestätigst.",
+    "cancel": "Abbrechen",
+    "defaultTitle": "Training",
+    "draftNotice": "Entwurf aus deiner Sprache. Prüfe und korrigiere ihn vor dem Speichern.",
+    "heard": "Was erkannt wurde",
+    "errors": {
+      "unsupported": "Aufnahmen werden auf diesem Gerät nicht unterstützt.",
+      "permission": "Kein Zugriff auf das Mikrofon. Erlaube ihn in den Geräteeinstellungen.",
+      "recordFailed": "Die Aufnahme wurde nicht abgeschlossen. Versuch es erneut.",
+      "noSpeech": "Es wurde keine Sprache erkannt. Versuch es erneut.",
+      "tooLong": "Die Aufnahme ist zu lang.",
+      "dailyLimit": "Du hast das heutige Aufnahmelimit erreicht.",
+      "off": "Spracherfassung ist in diesem Studio nicht aktiv.",
+      "unavailable": "Die Umwandlung ist gerade nicht verfügbar. Versuch es später."
+    },
+    "settings": {
+      "enable": "Spracherfassung",
+      "enableHint": "Mitglieder sprechen ihr Training ein und prüfen einen Entwurf vor dem Speichern. Audio wird nicht gespeichert."
     }
   }
 }

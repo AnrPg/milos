@@ -76,6 +76,9 @@
     <!-- Permissions -->
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- ADR-175: voice logging records in the web view (getUserMedia). -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
 
     <!-- ADR-172: read-only Health Connect access, asked per kind from the app. -->
     <uses-permission android:name="android.permission.health.READ_EXERCISE" />

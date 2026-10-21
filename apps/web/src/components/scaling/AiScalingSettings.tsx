@@ -22,6 +22,37 @@ const fieldStyle = { background: "var(--panel-raised)", border: "1px solid var(-
  * gym's own key (write-only, shown as «•••• last4»), an optional model and
  * this month's usage. One switch, one key field: no other controls.
  */
+// ADR-175: voice logging has its own switch next to scaling, same key.
+function VoiceLogSwitch({
+  data,
+  save,
+}: {
+  data: GymAiSettings;
+  save: { isPending: boolean; variables?: GymAiSettingsUpdate; mutate: (body: GymAiSettingsUpdate) => void };
+}) {
+  const t = useTranslations("VoiceLog");
+  const enabled = data.voice_enabled === true;
+  const pending = save.isPending && save.variables?.voice_enabled !== undefined;
+  return (
+    <label className="flex min-h-11 items-center justify-between gap-3">
+      <span className="flex flex-col">
+        <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("settings.enable")}</span>
+        <span className="text-xs" style={{ color: "var(--dim)" }}>{t("settings.enableHint")}</span>
+      </span>
+      <input
+        type="checkbox"
+        role="switch"
+        aria-label={t("settings.enable")}
+        checked={pending ? Boolean(save.variables?.voice_enabled) : enabled}
+        disabled={save.isPending || (!data.key_configured && !enabled)}
+        onChange={(event) => save.mutate({ voice_enabled: event.target.checked })}
+        className="h-5 w-5 shrink-0"
+        style={{ accentColor: "var(--primary)" }}
+      />
+    </label>
+  );
+}
+
 export function AiScalingSettings({ token }: { token: string }) {
   const t = useTranslations("Scaling");
   const i18n = useUiTranslations();
@@ -69,6 +100,8 @@ export function AiScalingSettings({ token }: { token: string }) {
           style={{ accentColor: "var(--primary)" }}
         />
       </label>
+
+      <VoiceLogSwitch data={data} save={save} />
 
       <form
         className="space-y-2"

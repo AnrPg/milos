@@ -30,7 +30,11 @@ describe("configuredMediaOrigins", () => {
     const response = await proxy(new NextRequest("http://localhost/admin/check-in"));
     const policy = response.headers.get("Permissions-Policy") ?? "";
     expect(policy).toContain("camera=(self)");
-    expect(policy).toContain("microphone=()");
+  });
+
+  test("lets the app itself use the microphone for voice logging (ADR-175), and nobody else", async () => {
+    const response = await proxy(new NextRequest("http://localhost/journal"));
+    expect(response.headers.get("Permissions-Policy")).toContain("microphone=(self)");
   });
 
   test("rewrites tenant-prefixed RSC and prefetch requests too", () => {

@@ -162,6 +162,7 @@ defmodule MilosTrainingWeb.Schemas.Scaling do
       properties: %{
         provider: %Schema{type: :string, enum: ["anthropic"]},
         scaling_enabled: %Schema{type: :boolean},
+        voice_enabled: %Schema{type: :boolean},
         key_configured: %Schema{type: :boolean},
         key_last4: @maybe_string,
         key_status: %Schema{type: :string, enum: ~w(unknown valid rejected)},
@@ -178,7 +179,14 @@ defmodule MilosTrainingWeb.Schemas.Scaling do
           required: [:since, :suggestions, :cost_usd]
         }
       },
-      required: [:scaling_enabled, :key_configured, :key_status, :default_model, :usage]
+      required: [
+        :scaling_enabled,
+        :voice_enabled,
+        :key_configured,
+        :key_status,
+        :default_model,
+        :usage
+      ]
     }
   end
 
@@ -198,6 +206,7 @@ defmodule MilosTrainingWeb.Schemas.Scaling do
       additionalProperties: false,
       properties: %{
         scaling_enabled: %Schema{type: :boolean},
+        voice_enabled: %Schema{type: :boolean},
         api_key: %Schema{type: :string, minLength: 20, maxLength: 300, writeOnly: true},
         remove_key: %Schema{type: :boolean},
         model: %Schema{type: :string, nullable: true, maxLength: 80}

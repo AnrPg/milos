@@ -24,6 +24,14 @@ describe("newEntryGroups", () => {
     expect(newEntryGroups({ canRequestFormReview: false, body: false }).map((entry) => entry.group)).not.toContain("body");
   });
 
+  it("adds «Με φωνή» to Προπόνηση only when voice logging is available", () => {
+    expect(newEntryGroups({ canRequestFormReview: false, voice: true })[0]).toEqual({
+      group: "training",
+      kinds: ["workout", "pr", "voice"],
+    });
+    expect(newEntryGroups({ canRequestFormReview: false, voice: false })[0].kinds).toEqual(["workout", "pr"]);
+  });
+
   it("adds technique videos to Coach when the package allows them", () => {
     expect(newEntryGroups({ canRequestFormReview: true }).find((entry) => entry.group === "coach")?.kinds).toEqual([
       "formReview",

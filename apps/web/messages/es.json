@@ -4997,7 +4997,8 @@
       "measure": "Medición",
       "wellness": "Agua · Sueño · Comida",
       "craving": "Antojo",
-      "support": "Necesito apoyo"
+      "support": "Necesito apoyo",
+      "voice": "Por voz"
     },
     "entryKindHint": {
       "workout": "Resultado, RPE, notas",
@@ -5010,7 +5011,8 @@
       "measure": "Peso, perímetros, fotos",
       "wellness": "Un vaso, anoche, una comida",
       "craving": "Anótalo o pide apoyo",
-      "support": "Un mensaje rápido a tu buddy"
+      "support": "Un mensaje rápido a tu buddy",
+      "voice": "Di lo que hiciste"
     },
     "homeTitle": "Inicio",
     "wodToday": "El WOD de hoy en el box",
@@ -8964,6 +8966,34 @@
       "ankle": "tobillo",
       "chest": "pecho",
       "core": "core"
+    }
+  },
+  "VoiceLog": {
+    "title": "Registrar por voz",
+    "hint": "Di lo que hiciste, hasta {seconds}″. Verás un borrador antes de guardar nada.",
+    "record": "Empezar a grabar",
+    "stop": "Detener grabación",
+    "tapToStart": "Toca para empezar",
+    "recording": "Grabando {elapsed} / {max}",
+    "working": "Creando el borrador…",
+    "privacy": "La grabación no se guarda. Solo se guarda lo que confirmes en el formulario.",
+    "cancel": "Cancelar",
+    "defaultTitle": "Entrenamiento",
+    "draftNotice": "Borrador a partir de tu voz. Revísalo y corrígelo antes de guardar.",
+    "heard": "Lo que se escuchó",
+    "errors": {
+      "unsupported": "La grabación no es compatible con este dispositivo.",
+      "permission": "No hay acceso al micrófono. Permítelo en los ajustes del dispositivo.",
+      "recordFailed": "La grabación no terminó. Inténtalo de nuevo.",
+      "noSpeech": "No se escuchó ninguna voz. Inténtalo de nuevo.",
+      "tooLong": "La grabación es demasiado larga.",
+      "dailyLimit": "Has llegado al límite de grabaciones de hoy.",
+      "off": "El registro por voz no está activo en este gimnasio.",
+      "unavailable": "La transcripción no está disponible ahora. Inténtalo más tarde."
+    },
+    "settings": {
+      "enable": "Registro por voz",
+      "enableHint": "Los miembros graban su entrenamiento y revisan un borrador antes de guardarlo. El audio no se guarda."
     }
   }
 }
