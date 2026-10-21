@@ -14,7 +14,8 @@ export function FilterPage({
   children,
 }: {
   title: string;
-  resultCount: number;
+  /** Unknown for paged lists (Ημερολόγιο): the button then reads «Δείξε». */
+  resultCount?: number;
   onClose: () => void;
   onClear: () => void;
   children: ReactNode;
@@ -86,7 +87,7 @@ export function FilterPage({
           className="min-h-12 rounded-2xl text-sm font-bold"
           style={{ background: "var(--primary)", color: "var(--bg)" }}
         >
-          {t("showResults", { count: resultCount })}
+          {resultCount === undefined ? t("show") : t("showResults", { count: resultCount })}
         </button>
       </footer>
     </div>

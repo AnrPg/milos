@@ -67,7 +67,7 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
     latest =
       Entry
       |> where([e], is_nil(e.deleted_at))
-      |> FeedScope.apply(user_id, scope)
+      |> FeedScope.apply(user_id, scope, kind: "wellness", at: :occurred_at, device: :source)
       |> distinct([e], e.occurred_on)
       |> order_by([e], asc: e.occurred_on, desc: e.occurred_at, desc: e.id)
       |> select([e], %{occurred_on: e.occurred_on, at: e.occurred_at, id: e.id})
@@ -84,7 +84,7 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
     entries =
       Entry
       |> where([e], is_nil(e.deleted_at) and e.occurred_on in ^on)
-      |> FeedScope.apply(user_id, scope)
+      |> FeedScope.apply(user_id, scope, kind: "wellness", at: :occurred_at, device: :source)
       |> order_by([e], asc: e.occurred_at, asc: e.id)
       |> Repo.all()
       |> Enum.group_by(& &1.occurred_on)
@@ -96,7 +96,7 @@ defmodule MilosTraining.Infrastructure.Wellness.EctoWellnessStore do
   def list_craving_items(user_id, bound, limit, scope) do
     Craving
     |> where([c], is_nil(c.deleted_at))
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope, kind: "craving", at: :occurred_at, text: [:note])
     |> FeedBound.apply(:occurred_at, bound)
     |> order_by([c], desc: c.occurred_at, desc: c.id)
     |> limit(^limit)

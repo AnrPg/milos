@@ -1,17 +1,31 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
 import {
+  COACH_AUDIENCE_KEY,
+  saveCoachAudience,
+  setEntryAudience,
   setJournalVisibility,
+  type AudienceKind,
   type ChoosableVisibility,
+  type EntryAudience,
   type JournalFeedItem,
   type JournalMoveKind,
   type JournalVisibilityResult,
 } from "@/api/journal";
+import {
+  audienceApplies,
+  audienceAsked,
+  AudienceChooser,
+  isCoachRung,
+  markAudienceAsked,
+  sameIds,
+  useCoachAudience,
+} from "@/components/journal/EntryAudience";
 import { orderedChoices, needsQuestion, VISIBILITY_ICON } from "@/components/journal/visibility";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
@@ -19,14 +33,22 @@ import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 /**
  * The visibility badge every journal entry carries (vision §7.7, ADR-139).
  * Its rung and the rungs it may move to come from the server; tapping it
- * opens the picker when the entry can move at all.
+ * opens the picker when the entry can move at all. With more than one
+ * provider, a coach rung also says whose coaches (ADR-162, board 17 Q5).
  */
+type BadgeItem = Pick<JournalFeedItem, "id" | "journal_visibility" | "choosable_visibilities"> & {
+  kind: JournalMoveKind;
+  audience?: EntryAudience | null;
+};
+
 export function VisibilityBadge({
   item,
   onChanged,
+  onAudienceChanged,
 }: {
-  item: Pick<JournalFeedItem, "id" | "journal_visibility" | "choosable_visibilities"> & { kind: JournalMoveKind };
+  item: BadgeItem;
   onChanged?: (result: JournalVisibilityResult) => void;
+  onAudienceChanged?: (audience: EntryAudience | null) => void;
 }) {
   const t = useTranslations("MemberApp.journal");
   const [open, setOpen] = useState(false);
@@ -70,9 +92,10 @@ export function VisibilityBadge({
           item={item}
           choices={choices}
           onClose={() => setOpen(false)}
-          onChanged={(result) => {
+          onChanged={(result, audience) => {
             setOpen(false);
             onChanged?.(result);
+            if (audience !== undefined) onAudienceChanged?.(audience);
           }}
         />
       ) : null}
@@ -86,10 +109,11 @@ function VisibilityPicker({
   onClose,
   onChanged,
 }: {
-  item: Pick<JournalFeedItem, "id" | "journal_visibility"> & { kind: JournalMoveKind };
+  item: Omit<BadgeItem, "choosable_visibilities">;
   choices: ChoosableVisibility[];
   onClose: () => void;
-  onChanged: (result: JournalVisibilityResult) => void;
+  /** `audience` is undefined when the entry's audience was not touched. */
+  onChanged: (result: JournalVisibilityResult, audience?: EntryAudience | null) => void;
 }) {
   const t = useTranslations("MemberApp.journal");
   const tApp = useTranslations("MemberApp");
@@ -101,13 +125,41 @@ function VisibilityPicker({
       : choices[0],
   );
   const [question, setQuestion] = useState("");
+  const queryClient = useQueryClient();
+  const coachAudience = useCoachAudience();
+  const defaults = coachAudience.data?.organization_ids ?? [];
+  const [picked, setPicked] = useState<string[] | null>(null);
+  const [makeDefault, setMakeDefault] = useState<boolean | null>(() => (audienceAsked() ? null : true));
+  const selected = picked ?? item.audience?.organization_ids ?? defaults;
+  const choosing =
+    coachAudience.multiple &&
+    (coachAudience.data?.providers?.length ?? 0) > 1 &&
+    audienceApplies(item.kind) &&
+    isCoachRung(choice);
+
   const mutation = useMutation({
-    mutationFn: () =>
-      setJournalVisibility(tokens!.access_token, item.kind, item.id, {
+    mutationFn: async () => {
+      const token = tokens!.access_token;
+      const result = await setJournalVisibility(token, item.kind, item.id, {
         visibility: choice,
         ...(needsQuestion(choice) ? { question: question.trim() } : {}),
-      }),
-    onSuccess: onChanged,
+      });
+      if (!choosing || selected.length === 0) return { result, audience: undefined };
+      markAudienceAsked();
+      const kind = item.kind as AudienceKind;
+      if (makeDefault) {
+        if (!sameIds(selected, defaults)) {
+          await saveCoachAudience(token, selected);
+          void queryClient.invalidateQueries({ queryKey: COACH_AUDIENCE_KEY });
+        }
+        const audience = item.audience?.custom ? await setEntryAudience(token, kind, item.id, null) : undefined;
+        return { result, audience };
+      }
+      if (!sameIds(selected, defaults)) return { result, audience: await setEntryAudience(token, kind, item.id, selected) };
+      if (item.audience?.custom) return { result, audience: await setEntryAudience(token, kind, item.id, null) };
+      return { result, audience: undefined };
+    },
+    onSuccess: ({ result, audience }) => onChanged(result, audience),
   });
   const blocked = !tokens?.access_token || (needsQuestion(choice) && question.trim() === "");
   const errorCode = mutation.error instanceof ApiError ? mutation.error.payload.code : null;
@@ -134,6 +186,15 @@ function VisibilityPicker({
           question={question}
           onQuestionChange={setQuestion}
         />
+        {choosing && coachAudience.data ? (
+          <AudienceChooser
+            audience={coachAudience.data}
+            selected={selected}
+            onChange={setPicked}
+            makeDefault={makeDefault}
+            onMakeDefaultChange={setMakeDefault}
+          />
+        ) : null}
         {mutation.isError ? (
           <p role="alert" className="mt-3 text-sm font-semibold" style={{ color: "var(--danger)" }}>
             {errorCode === "no_active_coach" ? t("noCoach") : t("visibilityFailed")}

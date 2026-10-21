@@ -13,7 +13,7 @@ defmodule MilosTraining.Organizations.Domain.TenantDataPolicy do
             purge_order: 1000,
             disposition: :purge,
             basis:
-              "Memberships, invitations, settings, the public profile and its tag suggestions, retired slug aliases and provisioning events are removed with the organization row; the platform purge record replaces them as the audit trail.",
+              "Memberships, invitations, settings, the public profile and its tag suggestions, retired slug aliases, provisioning events and members' remembered provider selections (ADR-162) are removed with the organization row; the platform purge record replaces them as the audit trail.",
             excluded_columns: ["token_digest", "intended_email_digest"],
             tables: [
               %{table: "profile_tag_suggestions"},
@@ -23,6 +23,7 @@ defmodule MilosTraining.Organizations.Domain.TenantDataPolicy do
               %{table: "organization_slug_aliases"},
               %{table: "organization_settings"},
               %{table: "organization_provisioning_events"},
+              %{table: "account_provider_selections", rls: :user},
               %{table: "organization_memberships"}
             ]
           })

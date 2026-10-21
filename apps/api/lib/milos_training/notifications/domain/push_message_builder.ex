@@ -660,6 +660,15 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-162: the export holds the whole journal, so the push says nothing more.
+  def build("journal_export_ready", payload, localize) do
+    %{
+      title: localize.("Your journal export is ready", %{}),
+      body: localize.("Download it within seven days from Settings.", %{}),
+      url: payload["url"] || "/me/settings/export"
+    }
+  end
+
   # ADR-161: names the provider, never what failed.
   def build("device_sync_error", payload, localize) do
     %{

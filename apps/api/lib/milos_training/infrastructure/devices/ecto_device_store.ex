@@ -163,7 +163,12 @@ defmodule MilosTraining.Infrastructure.Devices.EctoDeviceStore do
   def list_activity_items(user_id, bound, limit, scope) do
     DeviceActivity
     |> where([a], a.state == "own")
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope,
+      kind: "device_activity",
+      at: :started_at,
+      text: [:title],
+      device: :provider
+    )
     |> FeedBound.apply(:started_at, bound)
     |> order_by([a], desc: a.started_at, desc: a.id)
     |> limit(^limit)

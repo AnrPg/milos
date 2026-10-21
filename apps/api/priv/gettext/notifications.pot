@@ -535,3 +535,9 @@ msgstr ""
 
 msgid "Reconnect it from Connected devices to bring your workouts in again."
 msgstr ""
+
+msgid "Your journal export is ready"
+msgstr ""
+
+msgid "Download it within seven days from Settings."
+msgstr ""

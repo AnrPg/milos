@@ -428,7 +428,11 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   def list_check_in_items(user_id, bound, limit, scope) do
     CheckIn
     |> where([check_in], is_nil(check_in.deleted_at))
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope,
+      kind: "check_in",
+      at: :recorded_at,
+      text_exists: :check_in_answers
+    )
     |> FeedBound.apply(:recorded_at, bound)
     |> order_by([check_in], desc: check_in.recorded_at, desc: check_in.id)
     |> limit(^limit)
@@ -443,7 +447,12 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
   @impl true
   def list_injury_items(user_id, bound, limit, scope) do
     InjuryReport
-    |> FeedScope.apply(user_id, scope, rung?: false)
+    |> FeedScope.apply(user_id, scope,
+      rung?: false,
+      kind: "injury",
+      at: :inserted_at,
+      text: [:description]
+    )
     |> owner_audience(scope)
     |> FeedBound.apply(:inserted_at, bound)
     |> order_by([injury], desc: injury.inserted_at, desc: injury.id)
@@ -468,6 +477,8 @@ defmodule MilosTraining.Infrastructure.Wellbeing.EctoWellbeingStore do
       _missing -> {:error, :not_found}
     end
   end
+
+  defp owner_audience(query, {:owner, _filter}), do: owner_audience(query, :owner)
 
   defp owner_audience(query, :owner),
     do: where(query, [injury], injury.visibility == "user_and_admin")

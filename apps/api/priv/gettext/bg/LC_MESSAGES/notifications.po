@@ -537,3 +537,9 @@ msgstr "Garmin спря да се синхронизира"
 
 msgid "Reconnect it from Connected devices to bring your workouts in again."
 msgstr "Свържи го отново от Свързани устройства, за да идват пак тренировките ти."
+
+msgid "Your journal export is ready"
+msgstr "Експортът на дневника ти е готов"
+
+msgid "Download it within seven days from Settings."
+msgstr "Изтегли го до седем дни от Настройки."

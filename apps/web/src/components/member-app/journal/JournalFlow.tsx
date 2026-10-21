@@ -7,11 +7,10 @@ import { useTranslations } from "next-intl";
 
 import { fetchExecution } from "@/api/executions";
 import {
+  EMPTY_JOURNAL_FILTER,
   fetchJournalPage,
   JOURNAL_FEED_KEY,
-  JOURNAL_FILTER_KINDS,
   type JournalFeedPage,
-  type JournalFilter,
   type JournalVisibilityResult,
   type TypedJournalItem,
   type WellnessFeedDay,
@@ -28,7 +27,12 @@ import { formatElapsed, type HistoryEntry } from "@/components/client/vault";
 import { CommentList } from "@/components/journal/CommentList";
 import { NoteSheet } from "@/components/journal/NoteSheet";
 import { VisibilityBadge } from "@/components/journal/VisibilityBadge";
-import { executionHistoryEntry, journalFlow, withVisibility } from "@/components/member-app/journal/journal-flow";
+import { executionHistoryEntry, journalFlow, withAudience, withVisibility } from "@/components/member-app/journal/journal-flow";
+import { JournalFilters } from "@/components/member-app/journal/JournalFilters";
+import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
+import { EntryAudienceNote } from "@/components/journal/EntryAudience";
+import { SourceLabel } from "@/components/providers/SourceLabel";
+import { useSourceDirectory } from "@/components/providers/use-providers";
 import { CHECK_IN_FACES, type CheckInValue } from "@/components/member-app/wellbeing/check-in";
 import { BodyFeedCard } from "@/components/body/BodyFeedCard";
 import type { DeviceMetrics } from "@/api/devices";
@@ -43,8 +47,8 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
 import { buildExecutionDocument, renderText } from "@/lib/document-export";
 import { latestCommentBody, sortComments } from "@/lib/journal-comments";
+import { effectiveJournalFilter, journalFilterCount, journalFilterKey, parseJournalFilter } from "@/lib/journal-filter";
 
-const FILTERS: JournalFilter[] = ["all", "training", "notes", "wellbeing"];
 const PAGE_SIZE = 30;
 
 /**
@@ -57,20 +61,34 @@ const PAGE_SIZE = 30;
 export function JournalFlow() {
   const i18n = useUiTranslations();
   const t = useTranslations("MemberApp.journal");
+  const tProviders = useTranslations("Providers");
   const locale = useUiLocale();
   const queryClient = useQueryClient();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const [filter, setFilter] = useState<JournalFilter>("all");
-  const queryKey = [...JOURNAL_FEED_KEY, filter] as const;
+  const directory = useSourceDirectory();
+  // Starts from the filter remembered on the account (ADR-151, ADR-162), so
+  // it follows the member across devices; a change is remembered with the
+  // first page it asks for.
+  const { filter, setFilter, changed } = useRememberedFilter("journal", parseJournalFilter, EMPTY_JOURNAL_FILTER, false);
+  const queryKey = [...JOURNAL_FEED_KEY, filter ? journalFilterKey(filter) : "pending"] as const;
   const feed = useInfiniteQuery({
     queryKey,
-    enabled: Boolean(token),
+    enabled: Boolean(token) && filter !== null,
     initialPageParam: null as string | null,
-    queryFn: ({ pageParam }) =>
-      fetchJournalPage(token!, { cursor: pageParam, kinds: JOURNAL_FILTER_KINDS[filter], limit: PAGE_SIZE }),
+    queryFn: ({ pageParam }) => {
+      const effective = effectiveJournalFilter(filter!);
+      return fetchJournalPage(token!, {
+        cursor: pageParam,
+        kinds: effective.kinds,
+        filter: effective,
+        limit: PAGE_SIZE,
+        remember: changed && !pageParam,
+      });
+    },
     getNextPageParam: (last) => last.next_cursor ?? undefined,
   });
+  const filtered = filter !== null && journalFilterCount(filter) > 0;
   const { repeat, pendingId, error } = useRepeatWorkout();
   const [performance, setPerformance] = useState<HistoryEntry | null>(null);
   const [sharingId, setSharingId] = useState<string | null>(null);
@@ -90,8 +108,24 @@ export function JournalFlow() {
     refresh();
   }
 
+  // The rung, the source (board 17 Q3) and, on a coach rung, which
+  // providers' coaches it reaches (board 17 Q5).
   function badge(item: TypedJournalItem) {
-    return <VisibilityBadge item={item} onChanged={moved} />;
+    return (
+      <span className="flex flex-wrap items-center gap-2">
+        <VisibilityBadge
+          item={item}
+          onChanged={moved}
+          onAudienceChanged={(audience) =>
+            queryClient.setQueryData<InfiniteData<JournalFeedPage>>(queryKey, (data) =>
+              data ? { ...data, pages: withAudience(data.pages, item, audience) } : data,
+            )
+          }
+        />
+        <SourceLabel source={item.source} directory={directory} />
+        <EntryAudienceNote item={item} />
+      </span>
+    );
   }
 
   return (
@@ -110,24 +144,7 @@ export function JournalFlow() {
     >
       <DeviceJournalCard token={token} locale={locale} />
 
-      <div role="group" aria-label={t("filterLabel")} className="flex flex-wrap gap-2">
-        {FILTERS.map((option) => (
-          <button
-            key={option}
-            type="button"
-            aria-pressed={filter === option}
-            onClick={() => setFilter(option)}
-            className="rounded-full px-3 py-1.5 text-sm font-semibold"
-            style={{
-              background: filter === option ? "var(--primary)" : "var(--panel-raised)",
-              color: filter === option ? "var(--bg)" : "var(--text)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            {t(`filter.${option}`)}
-          </button>
-        ))}
-      </div>
+      {filter ? <JournalFilters filter={filter} onChange={setFilter} /> : null}
 
       {error ? (
         <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
@@ -135,12 +152,26 @@ export function JournalFlow() {
         </p>
       ) : null}
 
-      {feed.isPending ? (
+      {filter === null || feed.isPending ? (
         <LoadingLine />
       ) : feed.isError ? (
         <QueryProblem error={feed.error} onRetry={() => void feed.refetch()} />
       ) : days.length === 0 ? (
-        <EmptyLine>{i18n("clHistoryEmpty")}</EmptyLine>
+        filtered ? (
+          <div className="flex flex-col items-start gap-3">
+            <EmptyLine>{tProviders("filter.empty")}</EmptyLine>
+            <button
+              type="button"
+              onClick={() => setFilter(EMPTY_JOURNAL_FILTER)}
+              className="rounded-full px-4 py-2 text-sm font-semibold"
+              style={{ background: "var(--border)", color: "var(--text)" }}
+            >
+              {tProviders("filter.clear")}
+            </button>
+          </div>
+        ) : (
+          <EmptyLine>{i18n("clHistoryEmpty")}</EmptyLine>
+        )
       ) : (
         <ol className="flex flex-col gap-5">
           {days.map((day) => (

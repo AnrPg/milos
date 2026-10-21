@@ -658,6 +658,31 @@ built and can still be changed (ADR-160).
 6. **Summaries (Q6):** buddies get counts only; the coach summary follows board 14 (wellness counts,
    craving count and times only with the second toggle); coach reads are logged for the member.
 7. **Boundaries (Q7):** leave quietly, quiet hours, a rate limit; updates arrive in real time.
+### One journal across providers (2026-10-21, [board 17](https://claude.ai/artifact/EhqyBbgVT7sqq539ab1kXS))
+
+Apostolos picked the recommended option on all six questions and ticked the export extra.
+
+1. **Switching provider (Q1, A):** «Box Κυψέλη ▾» opens «Οι πάροχοί σου»: logo, kind (Box ·
+   Personal coach), next booking or session, unread coach messages, ✓ on the current one; the
+   choice is remembered on the account (a new device opens on it). «Πρόσθεσε box ή coach» goes to
+   joining by code or link. With one provider there is no ▾.
+2. **Today (Q2, A):** with more than one provider, the top card of Box is «Σήμερα» from all of
+   them in time order (untimed programme and WOD first), each with its source; an item from
+   another provider switches Box to it. The rest of Box belongs to the selected provider.
+3. **One journal (Q3, A):** Ροή shows every entry from every provider, freeform and devices,
+   with a small source label once there is more than one provider (always for freeform, devices
+   and past providers). «Φίλτρα (n)» · Πηγή · Τύπος · Ορατότητα chips, dates and text search in
+   the page; the filter is remembered on the account.
+4. **Vault and Πρόοδος (Q4, A):** the Vault groups the same workout across providers into one
+   trend, each attempt labelled; Πρόοδος shows «Όλοι» by default with a provider chip next to the
+   time range, sessions per source, labelled PRs and score points. No package gate on the account
+   view (it is the member's own data).
+5. **What each provider sees (Q5, A):** a provider always sees what you did with them; on a coach
+   rung the picker asks once whose coaches «Οι coach μου» means (all active by default, «Να
+   ισχύει από εδώ και πέρα»), and any entry can be narrowed; the default is also in Ρυθμίσεις.
+6. **Leaving (Q6, A):** history stays, labelled «(πρώην)»; the provider loses access from the end
+   date and moves to «Παλιοί πάροχοι» in the sheet. Extra: «Εξαγωγή ημερολογίου» in Ρυθμίσεις
+   prepares every entry from every provider as files in the background.
 
 ### Garmin (2026-10-21, [board 16](https://claude.ai/artifact/2Rz72RpiPnHVmk3kTGvvUp))
 
@@ -698,4 +723,4 @@ still be changed (ADR-161).
 ## 9. Progress
 - [x] Step 1 explore · [x] Step 2 decisions (cards posted, defaults in §3) · [x] Step 3 plan
 - [x] P2-M1 (ADR-141, ADR-142, ADR-148, ADR-151) · [x] P2-M2 (ADR-142 extended) · [x] P2-M3 (ADR-144, trials) · [x] P2-M4 (ADR-143) · [x] P2-M5 (ADR-153) · [x] P2-M6 (ADR-154) · [x] P2-M7 (ADR-155) · [x] P2-M8 (ADR-156)
-- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [x] P2-M12 (ADR-160) · [x] P2-M13 (ADR-161) · [ ] P2-M14
+- [x] P2-M9 (ADR-157) · [x] P2-M10 (ADR-158) · [x] P2-M11 (ADR-159) · [x] P2-M12 (ADR-160) · [x] P2-M13 (ADR-161) · [x] P2-M14 (ADR-162)

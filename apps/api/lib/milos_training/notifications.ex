@@ -371,6 +371,15 @@ defmodule MilosTraining.Notifications do
         url: "/journal/wellbeing?craving=#{field(payload, :craving_id)}"
       })
 
+  # ADR-162 (board 17 extra): the whole-journal export is ready to download.
+  def process_event("journal_export_ready", payload),
+    do:
+      enqueue_simple(:journal_export_ready, payload, %{
+        export_id: field(payload, :export_id),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/me/settings/export"
+      })
+
   # ADR-161 (board 16, Q6): a device stopped syncing; once per spell.
   def process_event("device_sync_error", payload),
     do:

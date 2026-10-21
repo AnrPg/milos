@@ -162,3 +162,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-159 | Wellness (water, sleep, meals) and cravings | Accepted |
 | ADR-160 | Buddy για στήριξη and the coach's weekly wellness summary | Accepted |
 | ADR-161 | Garmin: OAuth, push ingest, matching and the devices row | Accepted |
+| ADR-162 | One journal across providers and the Box ▾ provider switch | Accepted |

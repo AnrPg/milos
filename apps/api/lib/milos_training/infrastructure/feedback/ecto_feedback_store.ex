@@ -57,7 +57,12 @@ defmodule MilosTraining.Infrastructure.Feedback.EctoFeedbackStore do
   @impl true
   def list_review_items(user_id, bound, limit, scope) do
     Review
-    |> FeedScope.apply(user_id, scope, rung?: false)
+    |> FeedScope.apply(user_id, scope,
+      rung?: false,
+      kind: "review",
+      at: :inserted_at,
+      visibility: {:fixed, "rated"}
+    )
     |> FeedBound.apply(:inserted_at, bound)
     |> order_by([review], desc: review.inserted_at, desc: review.id)
     |> limit(^limit)

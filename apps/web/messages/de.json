@@ -5428,7 +5428,8 @@
     "clearAll": "Alle Filter zurücksetzen",
     "clear": "Zurücksetzen",
     "back": "Zurück",
-    "showResults": "{count, plural, =0 {Keine Ergebnisse} other {# anzeigen}}"
+    "showResults": "{count, plural, =0 {Keine Ergebnisse} other {# anzeigen}}",
+    "show": "Anzeigen"
   },
   "BoxSchedule": {
     "title": "Stundenplan",
@@ -7902,6 +7903,119 @@
       "message_body_required": "Schreib eine Nachricht.",
       "message_too_long_body": "Eine Nachricht hat höchstens 2000 Zeichen.",
       "buddy_link_read_only": "Diese Buddy-Verbindung ist beendet; die Unterhaltung ist nur lesbar."
+    }
+  },
+  "Providers": {
+    "loading": "Wird geladen…",
+    "switchLabel": "{name}, Anbieter wechseln",
+    "sheetTitle": "Wer dich trainiert",
+    "switching": "Wird gewechselt…",
+    "current": "Wird gerade angezeigt",
+    "add": "Box oder Coach hinzufügen",
+    "kind": {
+      "gym": "Box",
+      "coach": "Personal Coach"
+    },
+    "nextToday": "Heute {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# Nachricht} other {# Nachrichten}}",
+    "formerTitle": "Frühere Anbieter ({count})",
+    "formerHint": "Was du mit ihnen gemacht hast, bleibt in deinem Journal, im Vault und in deinem Fortschritt. Sie sehen deine Einträge nicht mehr.",
+    "formerSince": "Beendet am {date} · sieht deine Einträge nicht mehr",
+    "todayTitle": "Heute",
+    "todayEmpty": "Heute ist bei keinem deiner Anbieter etwas geplant.",
+    "todayPartial": "Heute konnte von {names} nicht geladen werden.",
+    "todayKind": {
+      "class": "Kurs",
+      "appointment": "Termin",
+      "program": "Programm",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Gebucht",
+      "pending": "Wartet auf Bestätigung",
+      "waitlisted": "Warteliste",
+      "booked": "Gebucht",
+      "completed": "Erledigt",
+      "in_progress": "Läuft",
+      "logged": "Eingetragen"
+    },
+    "source": {
+      "freeform": "Frei",
+      "device": "Gerät",
+      "unknown": "Anbieter",
+      "former": "{name} (früher)"
+    },
+    "filter": {
+      "title": "Filter",
+      "source": "Quelle",
+      "allSources": "Alle",
+      "kind": "Art",
+      "visibility": "Sichtbarkeit",
+      "dates": "Zeitraum",
+      "from": "Von",
+      "to": "Bis",
+      "search": "Suche",
+      "searchPlaceholder": "Wörter in Einträgen und Kommentaren",
+      "clearSearch": "Suche „{q}“ löschen",
+      "discipline": "Disziplin",
+      "benchmark": "Benchmark",
+      "exercise": "Übung",
+      "exercisePlaceholder": "z. B. Back Squat",
+      "empty": "Nichts passt zu diesen Filtern.",
+      "clear": "Filter zurücksetzen"
+    },
+    "range": {
+      "4w": "4 Wochen",
+      "12w": "3 Monate",
+      "6m": "6 Monate",
+      "1y": "1 Jahr",
+      "all": "Gesamt"
+    },
+    "progress": {
+      "bySource": "Einheiten nach Quelle"
+    },
+    "vault": {
+      "intro": "Jedes Workout, das du abgeschlossen hast, bei jedem Anbieter. Dasselbe Workout an verschiedenen Orten ergibt einen gemeinsamen Verlauf.",
+      "sources": "Gemacht bei"
+    },
+    "audience": {
+      "title": "Meine Coaches heißt",
+      "askTitle": "Wen meinst du mit „Meine Coaches“?",
+      "hint": "Jeder Anbieter sieht immer, was du bei ihm gemacht hast. Wähle, wessen Coaches diesen Eintrag sehen.",
+      "makeDefault": "Ab jetzt für meine Coaches verwenden",
+      "only": "Nur {names}",
+      "settingTitle": "Meine Coaches",
+      "settingDescription": "Welche Anbieter-Coaches Einträge sehen, die du mit „Meine Coaches“ teilst.",
+      "settingHint": "Wenn du einen Eintrag mit deinen Coaches teilst, sehen ihn die Coaches dieser Anbieter. Du kannst das für jeden Eintrag einzeln einschränken.",
+      "ownAlways": "Ein Anbieter sieht immer, was du bei ihm gemacht hast (seine Kurse und Programme)."
+    },
+    "export": {
+      "title": "Mein Journal exportieren",
+      "description": "Dein ganzes Journal, von allen Anbietern, als Dateien.",
+      "hint": "Wir erstellen eine Datei mit allen Einträgen von allen Anbietern, inklusive freier Einträge und Geräte. Das dauert einen Moment; du kannst diese Seite verlassen.",
+      "request": "Exportieren",
+      "preparing": "Wird vorbereitet…",
+      "inProgress": "Ein Export wird bereits vorbereitet.",
+      "history": "Deine Exporte",
+      "status": {
+        "pending": "Wird vorbereitet",
+        "ready": "Bereit",
+        "failed": "Fehlgeschlagen",
+        "expired": "Abgelaufen"
+      },
+      "entries": "{count, plural, one {# Eintrag} other {# Einträge}}",
+      "download": "{name} herunterladen",
+      "expires": "Verfügbar bis {date}"
+    },
+    "kindSetting": {
+      "title": "Box oder Personal Coach",
+      "description": "Wie dich deine Mitglieder in ihrer App sehen.",
+      "gym": "Eine Box oder ein Studio mit Kursen und einem Coach-Team.",
+      "coach": "Ein unabhängiger Coach, der einzeln oder in kleinen Gruppen trainiert.",
+      "ownerOnly": "Nur der Inhaber kann das ändern.",
+      "save": "Speichern",
+      "cancel": "Abbrechen"
     }
   }
 }

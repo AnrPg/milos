@@ -537,3 +537,9 @@ msgstr "הסנכרון עם Garmin נעצר"
 
 msgid "Reconnect it from Connected devices to bring your workouts in again."
 msgstr "חברו אותו מחדש ממכשירים מחוברים כדי שהאימונים יגיעו שוב."
+
+msgid "Your journal export is ready"
+msgstr "ייצוא היומן שלך מוכן"
+
+msgid "Download it within seven days from Settings."
+msgstr "הורד אותו תוך שבעה ימים מההגדרות."

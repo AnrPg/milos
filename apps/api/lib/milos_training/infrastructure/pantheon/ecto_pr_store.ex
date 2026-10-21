@@ -183,7 +183,12 @@ defmodule MilosTraining.Infrastructure.Pantheon.EctoPRStore do
   @impl true
   def list_record_items(user_id, bound, limit, scope) do
     PRRecord
-    |> FeedScope.apply(user_id, scope)
+    |> FeedScope.apply(user_id, scope,
+      kind: "pr",
+      at: {:date, :beaten_on},
+      text: [:name],
+      text_exists: :comments
+    )
     |> beaten_bound(bound)
     |> order_by([r], desc: r.beaten_on, desc: r.id)
     |> limit(^limit)

@@ -86,6 +86,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
     buddy_messages
     wellness_summary_grants
     device_connections device_activities device_imports daily_stats
+    account_provider_selections journal_coach_audience_exclusions journal_entry_audiences
   )
 
   def report do

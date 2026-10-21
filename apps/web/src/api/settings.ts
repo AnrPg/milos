@@ -47,11 +47,16 @@ export type SchedulingSettings = {
   updated_at?: string | null;
 };
 
+/** ADR-162: how members see the organization; only the owner edits it. */
+export type ProviderKind = "gym" | "coach";
+export type ProviderSettings = { kind: ProviderKind; editable: boolean };
+
 export type AdminSettingsPayload = {
   gamification: GamificationSettings;
   finance: FinanceSettings;
   notifications: NotificationPushSettings;
   scheduling: SchedulingSettings;
+  provider?: ProviderSettings;
 };
 
 export type GamificationUpdate = Partial<
@@ -67,6 +72,7 @@ export type NotificationPushUpdate = Partial<{
 }>;
 
 export type AdminSettingsUpdate = {
+  provider?: { kind: ProviderKind };
   gamification?: GamificationUpdate;
   finance?: FinanceUpdate;
   notifications?: NotificationPushUpdate;

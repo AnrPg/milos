@@ -537,3 +537,9 @@ msgstr "توقفت مزامنة Garmin"
 
 msgid "Reconnect it from Connected devices to bring your workouts in again."
 msgstr "أعد ربطه من الأجهزة المتصلة لتصل تمارينك من جديد."
+
+msgid "Your journal export is ready"
+msgstr "تصدير يومياتك جاهز"
+
+msgid "Download it within seven days from Settings."
+msgstr "نزّله خلال سبعة أيام من الإعدادات."

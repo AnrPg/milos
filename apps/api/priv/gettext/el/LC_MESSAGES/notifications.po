@@ -537,3 +537,9 @@ msgstr "Ο συγχρονισμός με το Garmin σταμάτησε"
 
 msgid "Reconnect it from Connected devices to bring your workouts in again."
 msgstr "Κάνε επανασύνδεση από τις Συνδεδεμένες συσκευές για να έρχονται ξανά οι προπονήσεις σου."
+
+msgid "Your journal export is ready"
+msgstr "Η εξαγωγή του ημερολογίου σου είναι έτοιμη"
+
+msgid "Download it within seven days from Settings."
+msgstr "Κατέβασέ την μέσα σε επτά μέρες από τις Ρυθμίσεις."

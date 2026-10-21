@@ -5428,7 +5428,8 @@
     "clearAll": "Quitar todos los filtros",
     "clear": "Quitar",
     "back": "Atrás",
-    "showResults": "{count, plural, =0 {Sin resultados} other {Mostrar #}}"
+    "showResults": "{count, plural, =0 {Sin resultados} other {Mostrar #}}",
+    "show": "Mostrar"
   },
   "BoxSchedule": {
     "title": "Horario",
@@ -7902,6 +7903,119 @@
       "message_body_required": "Escribe un mensaje.",
       "message_too_long_body": "Un mensaje tiene como máximo 2000 caracteres.",
       "buddy_link_read_only": "Este vínculo buddy terminó; la conversación es de solo lectura."
+    }
+  },
+  "Providers": {
+    "loading": "Cargando…",
+    "switchLabel": "{name}, cambiar de proveedor",
+    "sheetTitle": "Quién te entrena",
+    "switching": "Cambiando…",
+    "current": "Mostrando ahora",
+    "add": "Añade un box o entrenador",
+    "kind": {
+      "gym": "Box",
+      "coach": "Entrenador personal"
+    },
+    "nextToday": "Hoy a las {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# mensaje} other {# mensajes}}",
+    "formerTitle": "Proveedores anteriores ({count})",
+    "formerHint": "Lo que hiciste con ellos se queda en tu diario, en el Vault y en tu progreso. Ya no ven tus entradas.",
+    "formerSince": "Terminó el {date} · ya no ve tus entradas",
+    "todayTitle": "Hoy",
+    "todayEmpty": "Hoy no tienes nada planificado con ninguno de tus proveedores.",
+    "todayPartial": "No se pudo cargar lo de hoy de {names}.",
+    "todayKind": {
+      "class": "Clase",
+      "appointment": "Cita",
+      "program": "Programa",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Reservado",
+      "pending": "Pendiente de aprobación",
+      "waitlisted": "Lista de espera",
+      "booked": "Reservado",
+      "completed": "Hecho",
+      "in_progress": "En curso",
+      "logged": "Registrado"
+    },
+    "source": {
+      "freeform": "Libre",
+      "device": "Dispositivo",
+      "unknown": "Proveedor",
+      "former": "{name} (anterior)"
+    },
+    "filter": {
+      "title": "Filtros",
+      "source": "Origen",
+      "allSources": "Todos",
+      "kind": "Tipo",
+      "visibility": "Visibilidad",
+      "dates": "Fechas",
+      "from": "Desde",
+      "to": "Hasta",
+      "search": "Buscar",
+      "searchPlaceholder": "Palabras en entradas y comentarios",
+      "clearSearch": "Borrar búsqueda «{q}»",
+      "discipline": "Disciplina",
+      "benchmark": "Benchmark",
+      "exercise": "Ejercicio",
+      "exercisePlaceholder": "p. ej. sentadilla trasera",
+      "empty": "Nada coincide con estos filtros.",
+      "clear": "Borrar filtros"
+    },
+    "range": {
+      "4w": "4 semanas",
+      "12w": "3 meses",
+      "6m": "6 meses",
+      "1y": "1 año",
+      "all": "Todo"
+    },
+    "progress": {
+      "bySource": "Sesiones por origen"
+    },
+    "vault": {
+      "intro": "Cada entrenamiento que has terminado, con cada proveedor. El mismo entrenamiento hecho en sitios distintos es una sola tendencia.",
+      "sources": "Hecho con"
+    },
+    "audience": {
+      "title": "«Mis entrenadores» significa",
+      "askTitle": "¿A quién te refieres con «Mis entrenadores»?",
+      "hint": "Cada proveedor siempre ve lo que hiciste con él. Elige qué entrenadores ven esta entrada.",
+      "makeDefault": "Usar esto para mis entrenadores a partir de ahora",
+      "only": "Solo {names}",
+      "settingTitle": "Mis entrenadores",
+      "settingDescription": "Qué entrenadores de tus proveedores ven las entradas que compartes con «Mis entrenadores».",
+      "settingHint": "Cuando compartes una entrada con tus entrenadores, la ven los entrenadores de estos proveedores. Puedes limitarlo en cada entrada.",
+      "ownAlways": "Un proveedor siempre ve lo que hiciste con él (sus clases y programas)."
+    },
+    "export": {
+      "title": "Exportar mi diario",
+      "description": "Todo tu diario, de todos tus proveedores, en archivos.",
+      "hint": "Preparamos un archivo con todas tus entradas de todos tus proveedores, incluidas las libres y las de dispositivos. Tarda un poco; puedes salir de esta página.",
+      "request": "Exportar",
+      "preparing": "Preparando…",
+      "inProgress": "Ya se está preparando una exportación.",
+      "history": "Tus exportaciones",
+      "status": {
+        "pending": "Preparando",
+        "ready": "Lista",
+        "failed": "Error",
+        "expired": "Caducada"
+      },
+      "entries": "{count, plural, one {# entrada} other {# entradas}}",
+      "download": "Descargar {name}",
+      "expires": "Disponible hasta el {date}"
+    },
+    "kindSetting": {
+      "title": "Box o entrenador personal",
+      "description": "Cómo te ven tus miembros en su app.",
+      "gym": "Un box o gimnasio con clases y un equipo de entrenadores.",
+      "coach": "Un entrenador independiente que entrena de forma individual o en grupos pequeños.",
+      "ownerOnly": "Solo el propietario puede cambiar esto.",
+      "save": "Guardar",
+      "cancel": "Cancelar"
     }
   }
 }

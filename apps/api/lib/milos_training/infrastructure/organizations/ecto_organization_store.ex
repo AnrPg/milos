@@ -14,6 +14,7 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
     OrganizationPurge,
     OrganizationSetting,
     OrganizationSlugAlias,
+    ProviderSelection,
     RegistrationInvitation,
     Vendor
   }
@@ -1097,4 +1098,64 @@ defmodule MilosTraining.Infrastructure.Organizations.EctoOrganizationStore do
   defp normalize_host(_host), do: ""
 
   defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
+
+  # ADR-162: one definer lookup answers the caller's memberships of any
+  # status with the organization's name and brand, which a former member's
+  # session can no longer read directly. Runs in the member's session.
+  @impl true
+  def list_my_providers do
+    keys = ~w(organization_id name slug provider_kind logo_url primary_color
+              membership_status roles joined_at ended_at organization_status)a
+
+    %{rows: rows} =
+      Repo.query!("SELECT #{Enum.join(keys, ", ")} FROM milos_my_providers()")
+
+    Enum.map(rows, fn row ->
+      keys
+      |> Enum.zip(row)
+      |> Map.new()
+      |> Map.update!(:organization_id, &Ecto.UUID.load!/1)
+    end)
+  end
+
+  @impl true
+  def get_provider_kind(organization_id) do
+    Organization
+    |> where([organization], organization.id == ^organization_id)
+    |> select([organization], organization.provider_kind)
+    |> Repo.one()
+  end
+
+  # The column's check constraint keeps it to the known kinds.
+  @impl true
+  def put_provider_kind(organization_id, kind) do
+    case Organization
+         |> where([organization], organization.id == ^organization_id)
+         |> Repo.update_all(set: [provider_kind: kind, updated_at: DateTime.utc_now()]) do
+      {1, _rows} -> :ok
+      {0, _rows} -> {:error, :not_found}
+    end
+  end
+
+  @impl true
+  def get_provider_selection(user_id) do
+    ProviderSelection
+    |> where([selection], selection.user_id == ^user_id)
+    |> select([selection], selection.organization_id)
+    |> Repo.one()
+  end
+
+  @impl true
+  def put_provider_selection(user_id, organization_id) do
+    now = DateTime.utc_now()
+
+    Repo.insert_all(
+      ProviderSelection,
+      [%{user_id: user_id, organization_id: organization_id, inserted_at: now, updated_at: now}],
+      on_conflict: {:replace, [:organization_id, :updated_at]},
+      conflict_target: [:user_id]
+    )
+
+    :ok
+  end
 end

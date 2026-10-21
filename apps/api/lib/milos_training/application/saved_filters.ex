@@ -10,7 +10,7 @@ defmodule MilosTraining.Application.SavedFilters do
   """
 
   alias MilosTraining.Application.AroundMe
-  alias MilosTraining.{Identity, Places}
+  alias MilosTraining.{Analytics, Execution, Identity, Journal, Places}
 
   @around "around_me"
 
@@ -81,6 +81,21 @@ defmodule MilosTraining.Application.SavedFilters do
     with {:ok, filter} <- Places.parse_filter(params, AroundMe.vocabulary()) do
       {:ok, Places.filter_params(filter)}
     end
+  end
+
+  # ADR-162: the journal, Vault and Πρόοδος filters are typed and versioned.
+  defp normalize("journal", params) do
+    with {:ok, filter} <- Journal.parse_filter(params), do: {:ok, Journal.filter_params(filter)}
+  end
+
+  defp normalize("vault", params) do
+    with {:ok, filter} <- Execution.parse_vault_filter(params),
+         do: {:ok, Execution.vault_filter_params(filter)}
+  end
+
+  defp normalize("progress", params) do
+    with {:ok, filter} <- Analytics.parse_progress_filter(params),
+         do: {:ok, Analytics.progress_filter_params(filter)}
   end
 
   defp normalize(_surface, params), do: {:ok, params}

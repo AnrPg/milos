@@ -86,6 +86,12 @@ defmodule MilosTrainingWeb.FallbackController do
     |> json(%{code: Atom.to_string(reason), error: "No map point could be read from this link"})
   end
 
+  def call(conn, {:error, :invalid_provider_kind}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: "invalid_provider_kind", error: "Provider kind must be gym or coach"})
+  end
+
   def call(conn, {:error, :invalid_timezone}) do
     conn
     |> put_status(:unprocessable_entity)
@@ -1901,7 +1907,14 @@ defmodule MilosTrainingWeb.FallbackController do
     question_required: {:unprocessable_entity, "Ask your coach a question"},
     question_too_long: {:unprocessable_entity, "The question is too long"},
     note_organization_unavailable: {:unprocessable_entity, "That gym is not available"},
-    stale: {:conflict, "This entry changed meanwhile; reload it"}
+    stale: {:conflict, "This entry changed meanwhile; reload it"},
+    # ADR-162: one journal across providers.
+    unknown_provider: {:unprocessable_entity, "That is not one of your active providers"},
+    empty_audience:
+      {:unprocessable_entity, "Choose at least one coach, or keep the entry private"},
+    audience_not_supported: {:unprocessable_entity, "This entry cannot be shared that way"},
+    export_in_progress: {:conflict, "An export is already being prepared"},
+    invalid_history_kind: {:unprocessable_entity, "Use workouts or classes"}
   }
 
   def call(conn, {:error, reason}) when is_map_key(@journal_errors, reason) do

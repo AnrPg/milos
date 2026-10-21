@@ -5,6 +5,7 @@
 
 
 import {useUiTranslations} from "@/i18n/ui";
+import { useTranslations } from "next-intl";
 import { localizeError } from "@/i18n/presentation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
@@ -42,6 +43,7 @@ import { IntegerInput } from "@/components/integer-input";
 import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
 import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
+import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -1313,6 +1315,15 @@ function NotificationsSection({ token }: { token: string }) {
   );
 }
 
+function ProviderKindSection({ token }: { token: string }) {
+  const t = useTranslations("Providers");
+  return (
+    <CollapsibleSection id="provider-kind" title={t("kindSetting.title")} description={t("kindSetting.description")}>
+      <ProviderKindSetting token={token} />
+    </CollapsibleSection>
+  );
+}
+
 export function AdminSettingsHub() {
   const i18n = useUiTranslations();
   const { tokens, currentUser } = useSession();
@@ -1344,6 +1355,8 @@ export function AdminSettingsHub() {
             >
               <BrandingSection token={token} />
             </CollapsibleSection>
+
+            <ProviderKindSection token={token} />
 
             <CollapsibleSection
               id="gamification"

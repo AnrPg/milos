@@ -537,3 +537,9 @@ msgstr "O Garmin deixou de sincronizar"
 
 msgid "Reconnect it from Connected devices to bring your workouts in again."
 msgstr "Volta a ligá-lo em Dispositivos ligados para receberes de novo os teus treinos."
+
+msgid "Your journal export is ready"
+msgstr "A exportação do teu diário está pronta"
+
+msgid "Download it within seven days from Settings."
+msgstr "Descarrega-a no prazo de sete dias nas Definições."

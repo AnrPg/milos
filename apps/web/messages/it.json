@@ -5428,7 +5428,8 @@
     "clearAll": "Rimuovi tutti i filtri",
     "clear": "Rimuovi",
     "back": "Indietro",
-    "showResults": "{count, plural, =0 {Nessun risultato} other {Mostra #}}"
+    "showResults": "{count, plural, =0 {Nessun risultato} other {Mostra #}}",
+    "show": "Mostra"
   },
   "BoxSchedule": {
     "title": "Orario",
@@ -7902,6 +7903,119 @@
       "message_body_required": "Scrivi un messaggio.",
       "message_too_long_body": "Un messaggio è di massimo 2000 caratteri.",
       "buddy_link_read_only": "Questo legame buddy è terminato; la conversazione è di sola lettura."
+    }
+  },
+  "Providers": {
+    "loading": "Caricamento…",
+    "switchLabel": "{name}, cambia provider",
+    "sheetTitle": "Chi ti allena",
+    "switching": "Cambio in corso…",
+    "current": "In vista ora",
+    "add": "Aggiungi un box o un coach",
+    "kind": {
+      "gym": "Box",
+      "coach": "Personal coach"
+    },
+    "nextToday": "Oggi alle {time}",
+    "nextOn": "{day} {time}",
+    "unread": "{count, plural, one {# messaggio} other {# messaggi}}",
+    "formerTitle": "Provider passati ({count})",
+    "formerHint": "Quello che hai fatto con loro resta nel tuo diario, nel Vault e nei progressi. Non vedono più le tue voci.",
+    "formerSince": "Terminato il {date} · non vede più le tue voci",
+    "todayTitle": "Oggi",
+    "todayEmpty": "Niente in programma oggi con i tuoi provider.",
+    "todayPartial": "Impossibile caricare oggi da {names}.",
+    "todayKind": {
+      "class": "Lezione",
+      "appointment": "Appuntamento",
+      "program": "Programma",
+      "wod": "WOD"
+    },
+    "todayStatus": {
+      "approved": "Prenotato",
+      "pending": "In attesa di approvazione",
+      "waitlisted": "Lista d'attesa",
+      "booked": "Prenotato",
+      "completed": "Fatto",
+      "in_progress": "In corso",
+      "logged": "Registrato"
+    },
+    "source": {
+      "freeform": "Libero",
+      "device": "Dispositivo",
+      "unknown": "Provider",
+      "former": "{name} (passato)"
+    },
+    "filter": {
+      "title": "Filtri",
+      "source": "Fonte",
+      "allSources": "Tutti",
+      "kind": "Tipo",
+      "visibility": "Visibilità",
+      "dates": "Date",
+      "from": "Da",
+      "to": "A",
+      "search": "Cerca",
+      "searchPlaceholder": "Parole in voci e commenti",
+      "clearSearch": "Cancella ricerca «{q}»",
+      "discipline": "Disciplina",
+      "benchmark": "Benchmark",
+      "exercise": "Esercizio",
+      "exercisePlaceholder": "es. back squat",
+      "empty": "Nessun risultato con questi filtri.",
+      "clear": "Cancella filtri"
+    },
+    "range": {
+      "4w": "4 settimane",
+      "12w": "3 mesi",
+      "6m": "6 mesi",
+      "1y": "1 anno",
+      "all": "Sempre"
+    },
+    "progress": {
+      "bySource": "Sessioni per fonte"
+    },
+    "vault": {
+      "intro": "Ogni allenamento che hai completato, con ogni provider. Lo stesso allenamento fatto in posti diversi è un unico andamento.",
+      "sources": "Fatto con"
+    },
+    "audience": {
+      "title": "«I miei coach» significa",
+      "askTitle": "Chi intendi con «I miei coach»?",
+      "hint": "Ogni provider vede sempre quello che hai fatto con lui. Scegli di chi sono i coach che vedono questa voce.",
+      "makeDefault": "Usa questa scelta per i miei coach d'ora in poi",
+      "only": "Solo {names}",
+      "settingTitle": "I miei coach",
+      "settingDescription": "I coach di quali provider vedono le voci che condividi con «I miei coach».",
+      "settingHint": "Quando condividi una voce con i tuoi coach, la vedono i coach di questi provider. Puoi restringere ogni singola voce.",
+      "ownAlways": "Un provider vede sempre quello che hai fatto con lui (le sue lezioni e i suoi programmi)."
+    },
+    "export": {
+      "title": "Esporta il mio diario",
+      "description": "Tutto il tuo diario, da ogni provider, in file.",
+      "hint": "Prepariamo un file con ogni voce di ogni provider, incluse quelle libere e dei dispositivi. Ci vuole un attimo; puoi lasciare questa pagina.",
+      "request": "Esporta",
+      "preparing": "Preparazione…",
+      "inProgress": "Un'esportazione è già in preparazione.",
+      "history": "Le tue esportazioni",
+      "status": {
+        "pending": "In preparazione",
+        "ready": "Pronta",
+        "failed": "Non riuscita",
+        "expired": "Scaduta"
+      },
+      "entries": "{count, plural, one {# voce} other {# voci}}",
+      "download": "Scarica {name}",
+      "expires": "Disponibile fino al {date}"
+    },
+    "kindSetting": {
+      "title": "Box o personal coach",
+      "description": "Come ti vedono i tuoi membri nella loro app.",
+      "gym": "Un box o una palestra con lezioni e un team di coach.",
+      "coach": "Un coach indipendente che allena individualmente o in piccoli gruppi.",
+      "ownerOnly": "Solo il proprietario può modificarlo.",
+      "save": "Salva",
+      "cancel": "Annulla"
     }
   }
 }

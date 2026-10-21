@@ -2,6 +2,846 @@
   "components": {
     "responses": {},
     "schemas": {
+      "AccountHistoryPage": {
+        "properties": {
+          "entries": {
+            "items": {
+              "properties": {
+                "class": {
+                  "nullable": true,
+                  "properties": {
+                    "attendance": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "duration_minutes": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "type_name": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "execution_source": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "occurred_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "performance": {
+                  "nullable": true,
+                  "properties": {
+                    "completed_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "elapsed_ms": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "execution_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "scale_level_slug": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "scores": {
+                      "items": {
+                        "properties": {
+                          "section_id": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "section_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "unit": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "value": {
+                            "nullable": true
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "started_at": {
+                      "format": "date-time",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "source": {
+                  "description": "Where an entry came from; `former` once the membership there ended.",
+                  "properties": {
+                    "former": {
+                      "type": "boolean"
+                    },
+                    "kind": {
+                      "enum": [
+                        "organization",
+                        "freeform",
+                        "device"
+                      ],
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_id",
+                    "name",
+                    "former"
+                  ],
+                  "title": "EntrySource",
+                  "type": "object"
+                },
+                "workout": {
+                  "nullable": true,
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "title": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "type": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              },
+              "required": [
+                "id",
+                "occurred_at",
+                "source"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "workouts",
+              "classes"
+            ],
+            "type": "string"
+          },
+          "next_offset": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "offset": {
+            "type": "integer"
+          },
+          "total": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "kind",
+          "total",
+          "offset",
+          "next_offset",
+          "entries"
+        ],
+        "title": "AccountHistoryPage",
+        "type": "object"
+      },
+      "AccountProgress": {
+        "properties": {
+          "active_filter_count": {
+            "type": "integer"
+          },
+          "by_source": {
+            "items": {
+              "properties": {
+                "sessions": {
+                  "type": "integer"
+                },
+                "source": {
+                  "description": "Where an entry came from; `former` once the membership there ended.",
+                  "properties": {
+                    "former": {
+                      "type": "boolean"
+                    },
+                    "kind": {
+                      "enum": [
+                        "organization",
+                        "freeform",
+                        "device"
+                      ],
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_id",
+                    "name",
+                    "former"
+                  ],
+                  "title": "EntrySource",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "source",
+                "sessions"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "consistency": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "filter": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "pr_timeline": {
+            "items": {
+              "additionalProperties": true,
+              "properties": {
+                "source": {
+                  "description": "Where an entry came from; `former` once the membership there ended.",
+                  "properties": {
+                    "former": {
+                      "type": "boolean"
+                    },
+                    "kind": {
+                      "enum": [
+                        "organization",
+                        "freeform",
+                        "device"
+                      ],
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_id",
+                    "name",
+                    "former"
+                  ],
+                  "title": "EntrySource",
+                  "type": "object"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "score_history": {
+            "items": {
+              "properties": {
+                "points": {
+                  "items": {
+                    "properties": {
+                      "completed_on": {
+                        "format": "date",
+                        "type": "string"
+                      },
+                      "execution_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "source": {
+                        "description": "Where an entry came from; `former` once the membership there ended.",
+                        "properties": {
+                          "former": {
+                            "type": "boolean"
+                          },
+                          "kind": {
+                            "enum": [
+                              "organization",
+                              "freeform",
+                              "device"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "organization_id",
+                          "name",
+                          "former"
+                        ],
+                        "title": "EntrySource",
+                        "type": "object"
+                      },
+                      "value": {
+                        "nullable": true
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "section_id": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "section_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "unit": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_id": {
+                  "description": "The canonical workout identity (benchmark:…, library:…, title:…).",
+                  "type": "string"
+                },
+                "workout_title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sources": {
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Sessions by how they started (class_booking, assigned, …).",
+            "type": "object"
+          },
+          "totals": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "weekly": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "totals",
+          "weekly",
+          "consistency",
+          "sources",
+          "score_history",
+          "pr_timeline",
+          "by_source",
+          "filter",
+          "active_filter_count"
+        ],
+        "title": "AccountProgress",
+        "type": "object"
+      },
+      "AccountProgressResponse": {
+        "properties": {
+          "progress": {
+            "properties": {
+              "active_filter_count": {
+                "type": "integer"
+              },
+              "by_source": {
+                "items": {
+                  "properties": {
+                    "sessions": {
+                      "type": "integer"
+                    },
+                    "source": {
+                      "description": "Where an entry came from; `former` once the membership there ended.",
+                      "properties": {
+                        "former": {
+                          "type": "boolean"
+                        },
+                        "kind": {
+                          "enum": [
+                            "organization",
+                            "freeform",
+                            "device"
+                          ],
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "organization_id",
+                        "name",
+                        "former"
+                      ],
+                      "title": "EntrySource",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "source",
+                    "sessions"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "consistency": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "filter": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "pr_timeline": {
+                "items": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "source": {
+                      "description": "Where an entry came from; `former` once the membership there ended.",
+                      "properties": {
+                        "former": {
+                          "type": "boolean"
+                        },
+                        "kind": {
+                          "enum": [
+                            "organization",
+                            "freeform",
+                            "device"
+                          ],
+                          "type": "string"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "organization_id",
+                        "name",
+                        "former"
+                      ],
+                      "title": "EntrySource",
+                      "type": "object"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "score_history": {
+                "items": {
+                  "properties": {
+                    "points": {
+                      "items": {
+                        "properties": {
+                          "completed_on": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "execution_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "source": {
+                            "description": "Where an entry came from; `former` once the membership there ended.",
+                            "properties": {
+                              "former": {
+                                "type": "boolean"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "organization",
+                                  "freeform",
+                                  "device"
+                                ],
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "organization_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "organization_id",
+                              "name",
+                              "former"
+                            ],
+                            "title": "EntrySource",
+                            "type": "object"
+                          },
+                          "value": {
+                            "nullable": true
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "section_id": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "section_name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "unit": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "workout_id": {
+                      "description": "The canonical workout identity (benchmark:…, library:…, title:…).",
+                      "type": "string"
+                    },
+                    "workout_title": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sources": {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "description": "Sessions by how they started (class_booking, assigned, …).",
+                "type": "object"
+              },
+              "totals": {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              "weekly": {
+                "items": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "totals",
+              "weekly",
+              "consistency",
+              "sources",
+              "score_history",
+              "pr_timeline",
+              "by_source",
+              "filter",
+              "active_filter_count"
+            ],
+            "title": "AccountProgress",
+            "type": "object"
+          }
+        },
+        "required": [
+          "progress"
+        ],
+        "title": "AccountProgressResponse",
+        "type": "object"
+      },
+      "AccountVault": {
+        "properties": {
+          "active_filter_count": {
+            "type": "integer"
+          },
+          "filter": {
+            "additionalProperties": true,
+            "type": "object"
+          },
+          "groups": {
+            "items": {
+              "properties": {
+                "attempt_count": {
+                  "type": "integer"
+                },
+                "attempts": {
+                  "items": {
+                    "properties": {
+                      "at": {
+                        "format": "date-time",
+                        "type": "string"
+                      },
+                      "duration_seconds": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "kind": {
+                        "enum": [
+                          "execution",
+                          "training_log"
+                        ],
+                        "type": "string"
+                      },
+                      "master_workout_id": {
+                        "description": "Workout to repeat, when the attempt has one.",
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "on": {
+                        "format": "date",
+                        "type": "string"
+                      },
+                      "organization_id": {
+                        "description": "Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first.",
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "scale_level_slug": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "scores": {
+                        "items": {
+                          "properties": {
+                            "section_id": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "section_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "unit": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "value": {
+                              "nullable": true
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "source": {
+                        "description": "Where an entry came from; `former` once the membership there ended.",
+                        "properties": {
+                          "former": {
+                            "type": "boolean"
+                          },
+                          "kind": {
+                            "enum": [
+                              "organization",
+                              "freeform",
+                              "device"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "organization_id",
+                          "name",
+                          "former"
+                        ],
+                        "title": "EntrySource",
+                        "type": "object"
+                      },
+                      "title": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "tz": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "id",
+                      "organization_id",
+                      "master_workout_id",
+                      "at",
+                      "source"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "benchmark": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "identity": {
+                  "type": "string"
+                },
+                "last_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "sources": {
+                  "items": {
+                    "description": "Where an entry came from; `former` once the membership there ended.",
+                    "properties": {
+                      "former": {
+                        "type": "boolean"
+                      },
+                      "kind": {
+                        "enum": [
+                          "organization",
+                          "freeform",
+                          "device"
+                        ],
+                        "type": "string"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "organization_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "kind",
+                      "organization_id",
+                      "name",
+                      "former"
+                    ],
+                    "title": "EntrySource",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "title": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "workout_type": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "identity",
+                "title",
+                "attempt_count",
+                "last_at",
+                "sources",
+                "attempts"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "groups",
+          "filter",
+          "active_filter_count"
+        ],
+        "title": "AccountVault",
+        "type": "object"
+      },
       "AdminOnboardingChecklist": {
         "properties": {
           "completed_count": {
@@ -15794,6 +16634,72 @@
         "title": "ClientWellnessSummary",
         "type": "object"
       },
+      "CoachAudience": {
+        "properties": {
+          "organization_ids": {
+            "description": "Providers «Οι coach μου» means by default.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "providers": {
+            "items": {
+              "properties": {
+                "included": {
+                  "type": "boolean"
+                },
+                "kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "name",
+                "kind",
+                "included"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "organization_ids",
+          "providers"
+        ],
+        "title": "CoachAudience",
+        "type": "object"
+      },
+      "CoachAudienceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "organization_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "organization_ids"
+        ],
+        "title": "CoachAudienceRequest",
+        "type": "object"
+      },
       "CoachNote": {
         "properties": {
           "body": {
@@ -27300,6 +28206,120 @@
         "title": "DeviceSyncPrefs",
         "type": "object"
       },
+      "EntryAudience": {
+        "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+        "nullable": true,
+        "properties": {
+          "custom": {
+            "type": "boolean"
+          },
+          "organization_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "custom",
+          "organization_ids"
+        ],
+        "title": "EntryAudience",
+        "type": "object"
+      },
+      "EntryAudienceRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "organization_ids": {
+            "description": "Providers this entry is shared with; null resets to the default.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          }
+        },
+        "required": [
+          "organization_ids"
+        ],
+        "title": "EntryAudienceRequest",
+        "type": "object"
+      },
+      "EntryAudienceResponse": {
+        "properties": {
+          "audience": {
+            "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+            "nullable": true,
+            "properties": {
+              "custom": {
+                "type": "boolean"
+              },
+              "organization_ids": {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "custom",
+              "organization_ids"
+            ],
+            "title": "EntryAudience",
+            "type": "object"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "id",
+          "audience"
+        ],
+        "title": "EntryAudienceResponse",
+        "type": "object"
+      },
+      "EntrySource": {
+        "description": "Where an entry came from; `former` once the membership there ended.",
+        "properties": {
+          "former": {
+            "type": "boolean"
+          },
+          "kind": {
+            "enum": [
+              "organization",
+              "freeform",
+              "device"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "kind",
+          "organization_id",
+          "name",
+          "former"
+        ],
+        "title": "EntrySource",
+        "type": "object"
+      },
       "ExecutionInteractionBatch": {
         "properties": {
           "events": {
@@ -31646,6 +32666,240 @@
         "title": "JournalCommentsResponse",
         "type": "object"
       },
+      "JournalExport": {
+        "properties": {
+          "completed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "entry_count": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "expires_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "files": {
+            "items": {
+              "properties": {
+                "bytes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "content_type": {
+                  "type": "string"
+                },
+                "download_url": {
+                  "description": "Short-lived; ask again for a fresh one.",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "name",
+                "content_type",
+                "download_url"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "requested_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pending",
+              "ready",
+              "failed",
+              "expired"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "requested_at",
+          "files"
+        ],
+        "title": "JournalExport",
+        "type": "object"
+      },
+      "JournalExportResponse": {
+        "properties": {
+          "export": {
+            "properties": {
+              "completed_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "entry_count": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "expires_at": {
+                "format": "date-time",
+                "nullable": true,
+                "type": "string"
+              },
+              "files": {
+                "items": {
+                  "properties": {
+                    "bytes": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "content_type": {
+                      "type": "string"
+                    },
+                    "download_url": {
+                      "description": "Short-lived; ask again for a fresh one.",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "content_type",
+                    "download_url"
+                  ],
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "requested_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "ready",
+                  "failed",
+                  "expired"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "status",
+              "requested_at",
+              "files"
+            ],
+            "title": "JournalExport",
+            "type": "object"
+          }
+        },
+        "required": [
+          "export"
+        ],
+        "title": "JournalExportResponse",
+        "type": "object"
+      },
+      "JournalExports": {
+        "properties": {
+          "exports": {
+            "items": {
+              "properties": {
+                "completed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "entry_count": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "expires_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "files": {
+                  "items": {
+                    "properties": {
+                      "bytes": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "content_type": {
+                        "type": "string"
+                      },
+                      "download_url": {
+                        "description": "Short-lived; ask again for a fresh one.",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "name",
+                      "content_type",
+                      "download_url"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "requested_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "status": {
+                  "enum": [
+                    "pending",
+                    "ready",
+                    "failed",
+                    "expired"
+                  ],
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "requested_at",
+                "files"
+              ],
+              "title": "JournalExport",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "exports"
+        ],
+        "title": "JournalExports",
+        "type": "object"
+      },
       "JournalFeedEntry": {
         "additionalProperties": true,
         "properties": {
@@ -31721,6 +32975,28 @@
       },
       "JournalFeedItem": {
         "properties": {
+          "audience": {
+            "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+            "nullable": true,
+            "properties": {
+              "custom": {
+                "type": "boolean"
+              },
+              "organization_ids": {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "custom",
+              "organization_ids"
+            ],
+            "title": "EntryAudience",
+            "type": "object"
+          },
           "choosable_visibilities": {
             "items": {
               "enum": [
@@ -32006,6 +33282,39 @@
             "format": "uuid",
             "nullable": true,
             "type": "string"
+          },
+          "source": {
+            "description": "Where an entry came from; `former` once the membership there ended.",
+            "properties": {
+              "former": {
+                "type": "boolean"
+              },
+              "kind": {
+                "enum": [
+                  "organization",
+                  "freeform",
+                  "device"
+                ],
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "kind",
+              "organization_id",
+              "name",
+              "former"
+            ],
+            "title": "EntrySource",
+            "type": "object"
           }
         },
         "required": [
@@ -32021,6 +33330,14 @@
       },
       "JournalFeedPage": {
         "properties": {
+          "active_filter_count": {
+            "type": "integer"
+          },
+          "filter": {
+            "additionalProperties": true,
+            "description": "The Ροή filter applied, in its canonical (saved) form.",
+            "type": "object"
+          },
           "items": {
             "items": {
               "$ref": "#/components/schemas/JournalFeedItem"
@@ -32220,6 +33537,15 @@
       "JournalVisibilityRequest": {
         "additionalProperties": false,
         "properties": {
+          "audience": {
+            "description": "ADR-162: providers to share with besides the entry's own; null resets to the default.",
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
           "coach_user_id": {
             "description": "Which coach answers, when the member has several.",
             "format": "uuid",
@@ -32247,6 +33573,28 @@
       },
       "JournalVisibilityResponse": {
         "properties": {
+          "audience": {
+            "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+            "nullable": true,
+            "properties": {
+              "custom": {
+                "type": "boolean"
+              },
+              "organization_ids": {
+                "items": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "custom",
+              "organization_ids"
+            ],
+            "title": "EntryAudience",
+            "type": "object"
+          },
           "choosable_visibilities": {
             "items": {
               "type": "string"
@@ -32661,6 +34009,273 @@
           }
         },
         "title": "MyInjuryWarningsAcknowledgement",
+        "type": "object"
+      },
+      "MyProviders": {
+        "properties": {
+          "former": {
+            "items": {
+              "properties": {
+                "ended_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "logo_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "primary_color": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "name",
+                "kind"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "providers": {
+            "items": {
+              "properties": {
+                "kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "logo_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "next": {
+                  "nullable": true,
+                  "properties": {
+                    "at": {
+                      "format": "date-time",
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "enum": [
+                        "class",
+                        "appointment"
+                      ],
+                      "type": "string"
+                    },
+                    "title": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "at",
+                    "id"
+                  ],
+                  "type": "object"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "partial": {
+                  "description": "Live facts could not be read.",
+                  "type": "boolean"
+                },
+                "primary_color": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "roles": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "selected": {
+                  "type": "boolean"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "unread_messages": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "organization_id",
+                "name",
+                "slug",
+                "kind",
+                "selected",
+                "unread_messages"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "selected_organization_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "selected_organization_id",
+          "providers",
+          "former"
+        ],
+        "title": "MyProviders",
+        "type": "object"
+      },
+      "MyToday": {
+        "properties": {
+          "date": {
+            "format": "date",
+            "type": "string"
+          },
+          "failed_organization_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "properties": {
+                "at": {
+                  "description": "Null for untimed items (programme of the day, WOD), listed first.",
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "class",
+                    "appointment",
+                    "program",
+                    "wod"
+                  ],
+                  "type": "string"
+                },
+                "source": {
+                  "description": "Where an entry came from; `former` once the membership there ended.",
+                  "properties": {
+                    "former": {
+                      "type": "boolean"
+                    },
+                    "kind": {
+                      "enum": [
+                        "organization",
+                        "freeform",
+                        "device"
+                      ],
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "organization_id",
+                    "name",
+                    "former"
+                  ],
+                  "title": "EntrySource",
+                  "type": "object"
+                },
+                "status": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "target": {
+                  "properties": {
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "slug": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "slug"
+                  ],
+                  "type": "object"
+                },
+                "title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "kind",
+                "id",
+                "at",
+                "source",
+                "target"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "partial": {
+            "type": "boolean"
+          },
+          "timezone": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "date",
+          "timezone",
+          "items",
+          "partial",
+          "failed_organization_ids"
+        ],
+        "title": "MyToday",
         "type": "object"
       },
       "MyTrial": {
@@ -38734,6 +40349,20 @@
           "saved"
         ],
         "title": "SavedFilters",
+        "type": "object"
+      },
+      "SelectProviderRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id"
+        ],
+        "title": "SelectProviderRequest",
         "type": "object"
       },
       "SemanticError": {
@@ -76350,6 +77979,272 @@
         ]
       }
     },
+    "/api/me/history": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AccountTrainingController.history",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "kind",
+            "schema": {
+              "default": "workouts",
+              "enum": [
+                "workouts",
+                "classes"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Comma-separated provider ids, `freeform`, `device` (all when absent)",
+            "in": "query",
+            "name": "sources",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "entries": {
+                      "items": {
+                        "properties": {
+                          "class": {
+                            "nullable": true,
+                            "properties": {
+                              "attendance": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "duration_minutes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type_name": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "execution_source": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "occurred_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "performance": {
+                            "nullable": true,
+                            "properties": {
+                              "completed_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "elapsed_ms": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "execution_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "scale_level_slug": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "scores": {
+                                "items": {
+                                  "properties": {
+                                    "section_id": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "section_name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "unit": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "value": {
+                                      "nullable": true
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "started_at": {
+                                "format": "date-time",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "source": {
+                            "description": "Where an entry came from; `former` once the membership there ended.",
+                            "properties": {
+                              "former": {
+                                "type": "boolean"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "organization",
+                                  "freeform",
+                                  "device"
+                                ],
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "organization_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "organization_id",
+                              "name",
+                              "former"
+                            ],
+                            "title": "EntrySource",
+                            "type": "object"
+                          },
+                          "workout": {
+                            "nullable": true,
+                            "properties": {
+                              "id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "type": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "occurred_at",
+                          "source"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "kind": {
+                      "enum": [
+                        "workouts",
+                        "classes"
+                      ],
+                      "type": "string"
+                    },
+                    "next_offset": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "offset": {
+                      "type": "integer"
+                    },
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "total",
+                    "offset",
+                    "next_offset",
+                    "entries"
+                  ],
+                  "title": "AccountHistoryPage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "History page"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your training log across every provider (workouts or booked classes)",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -76382,6 +78277,69 @@
               "minimum": 1,
               "type": "integer"
             }
+          },
+          {
+            "description": "Comma-separated provider ids, `freeform`, `device`",
+            "in": "query",
+            "name": "sources",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated rungs",
+            "in": "query",
+            "name": "visibilities",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Text search (2–100 characters) over entries and their comments",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "IANA zone the date range's days are counted in (UTC by default)",
+            "in": "query",
+            "name": "timezone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Also remember this filter as your last-used Ημερολόγιο filter",
+            "in": "query",
+            "name": "remember",
+            "required": false,
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {
@@ -76390,6 +78348,14 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "active_filter_count": {
+                      "type": "integer"
+                    },
+                    "filter": {
+                      "additionalProperties": true,
+                      "description": "The Ροή filter applied, in its canonical (saved) form.",
+                      "type": "object"
+                    },
                     "items": {
                       "items": {
                         "$ref": "#/components/schemas/JournalFeedItem"
@@ -76417,7 +78383,323 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Your journal: every entry kind, newest first",
+        "summary": "Your journal across every provider: every entry kind, newest first",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/coach-audience": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.coach_audience",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization_ids": {
+                      "description": "Providers «Οι coach μου» means by default.",
+                      "items": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "providers": {
+                      "items": {
+                        "properties": {
+                          "included": {
+                            "type": "boolean"
+                          },
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "kind",
+                          "included"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "organization_ids",
+                    "providers"
+                  ],
+                  "title": "CoachAudience",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Audience"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Who «Οι coach μου» means across your providers",
+        "tags": [
+          "Journal"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.put_coach_audience",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "organization_ids": {
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "organization_ids"
+                ],
+                "title": "CoachAudienceRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization_ids": {
+                      "description": "Providers «Οι coach μου» means by default.",
+                      "items": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "providers": {
+                      "items": {
+                        "properties": {
+                          "included": {
+                            "type": "boolean"
+                          },
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "kind",
+                          "included"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "organization_ids",
+                    "providers"
+                  ],
+                  "title": "CoachAudience",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Audience"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unknown provider"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Choose which providers' coaches «Οι coach μου» means",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/entries/{kind}/{id}/audience": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.entry_audience",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "kind",
+            "required": true,
+            "schema": {
+              "enum": [
+                "execution",
+                "training_log",
+                "pr",
+                "note",
+                "check_in"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "organization_ids": {
+                    "description": "Providers this entry is shared with; null resets to the default.",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nullable": true,
+                    "type": "array"
+                  }
+                },
+                "required": [
+                  "organization_ids"
+                ],
+                "title": "EntryAudienceRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "audience": {
+                      "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+                      "nullable": true,
+                      "properties": {
+                        "custom": {
+                          "type": "boolean"
+                        },
+                        "organization_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "custom",
+                        "organization_ids"
+                      ],
+                      "title": "EntryAudience",
+                      "type": "object"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "kind": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "kind",
+                    "id",
+                    "audience"
+                  ],
+                  "title": "EntryAudienceResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Audience"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Entry not found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not allowed"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Share one entry with specific providers (or reset it)",
         "tags": [
           "Journal"
         ]
@@ -76466,6 +78748,15 @@
               "schema": {
                 "additionalProperties": false,
                 "properties": {
+                  "audience": {
+                    "description": "ADR-162: providers to share with besides the entry's own; null resets to the default.",
+                    "items": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nullable": true,
+                    "type": "array"
+                  },
                   "coach_user_id": {
                     "description": "Which coach answers, when the member has several.",
                     "format": "uuid",
@@ -76501,6 +78792,28 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "audience": {
+                      "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+                      "nullable": true,
+                      "properties": {
+                        "custom": {
+                          "type": "boolean"
+                        },
+                        "organization_ids": {
+                          "items": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "custom",
+                        "organization_ids"
+                      ],
+                      "title": "EntryAudience",
+                      "type": "object"
+                    },
                     "choosable_visibilities": {
                       "items": {
                         "type": "string"
@@ -76593,6 +78906,229 @@
           }
         ],
         "summary": "Move one of your entries on the visibility ladder",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/export": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.export",
+        "parameters": [],
+        "responses": {
+          "202": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "export": {
+                      "properties": {
+                        "completed_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "entry_count": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "expires_at": {
+                          "format": "date-time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "files": {
+                          "items": {
+                            "properties": {
+                              "bytes": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "content_type": {
+                                "type": "string"
+                              },
+                              "download_url": {
+                                "description": "Short-lived; ask again for a fresh one.",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "content_type",
+                              "download_url"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "requested_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "ready",
+                            "failed",
+                            "expired"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "status",
+                        "requested_at",
+                        "files"
+                      ],
+                      "title": "JournalExport",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "export"
+                  ],
+                  "title": "JournalExportResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Export requested"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "An export is pending"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Export your whole journal across providers (JSON and training CSV)",
+        "tags": [
+          "Journal"
+        ]
+      }
+    },
+    "/api/me/journal/exports": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.JournalController.exports",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "exports": {
+                      "items": {
+                        "properties": {
+                          "completed_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "entry_count": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "expires_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "files": {
+                            "items": {
+                              "properties": {
+                                "bytes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "content_type": {
+                                  "type": "string"
+                                },
+                                "download_url": {
+                                  "description": "Short-lived; ask again for a fresh one.",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "name",
+                                "content_type",
+                                "download_url"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "requested_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "status": {
+                            "enum": [
+                              "pending",
+                              "ready",
+                              "failed",
+                              "expired"
+                            ],
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "status",
+                          "requested_at",
+                          "files"
+                        ],
+                        "title": "JournalExport",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "exports"
+                  ],
+                  "title": "JournalExports",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Exports"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your journal exports, with short-lived download links",
         "tags": [
           "Journal"
         ]
@@ -78624,6 +81160,663 @@
         ]
       }
     },
+    "/api/me/progress": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AccountTrainingController.progress",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "range",
+            "schema": {
+              "default": "all",
+              "enum": [
+                "4w",
+                "12w",
+                "6m",
+                "1y",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated provider ids, `freeform`, `device` (all when absent)",
+            "in": "query",
+            "name": "sources",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "An exercise name (matched by substring)",
+            "in": "query",
+            "name": "exercise",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "progress": {
+                      "properties": {
+                        "active_filter_count": {
+                          "type": "integer"
+                        },
+                        "by_source": {
+                          "items": {
+                            "properties": {
+                              "sessions": {
+                                "type": "integer"
+                              },
+                              "source": {
+                                "description": "Where an entry came from; `former` once the membership there ended.",
+                                "properties": {
+                                  "former": {
+                                    "type": "boolean"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "organization",
+                                      "freeform",
+                                      "device"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "organization_id",
+                                  "name",
+                                  "former"
+                                ],
+                                "title": "EntrySource",
+                                "type": "object"
+                              }
+                            },
+                            "required": [
+                              "source",
+                              "sessions"
+                            ],
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "consistency": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "filter": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "pr_timeline": {
+                          "items": {
+                            "additionalProperties": true,
+                            "properties": {
+                              "source": {
+                                "description": "Where an entry came from; `former` once the membership there ended.",
+                                "properties": {
+                                  "former": {
+                                    "type": "boolean"
+                                  },
+                                  "kind": {
+                                    "enum": [
+                                      "organization",
+                                      "freeform",
+                                      "device"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "organization_id": {
+                                    "format": "uuid",
+                                    "nullable": true,
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "kind",
+                                  "organization_id",
+                                  "name",
+                                  "former"
+                                ],
+                                "title": "EntrySource",
+                                "type": "object"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "score_history": {
+                          "items": {
+                            "properties": {
+                              "points": {
+                                "items": {
+                                  "properties": {
+                                    "completed_on": {
+                                      "format": "date",
+                                      "type": "string"
+                                    },
+                                    "execution_id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "source": {
+                                      "description": "Where an entry came from; `former` once the membership there ended.",
+                                      "properties": {
+                                        "former": {
+                                          "type": "boolean"
+                                        },
+                                        "kind": {
+                                          "enum": [
+                                            "organization",
+                                            "freeform",
+                                            "device"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "name": {
+                                          "nullable": true,
+                                          "type": "string"
+                                        },
+                                        "organization_id": {
+                                          "format": "uuid",
+                                          "nullable": true,
+                                          "type": "string"
+                                        }
+                                      },
+                                      "required": [
+                                        "kind",
+                                        "organization_id",
+                                        "name",
+                                        "former"
+                                      ],
+                                      "title": "EntrySource",
+                                      "type": "object"
+                                    },
+                                    "value": {
+                                      "nullable": true
+                                    }
+                                  },
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "section_id": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "section_name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "unit": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "workout_id": {
+                                "description": "The canonical workout identity (benchmark:…, library:…, title:…).",
+                                "type": "string"
+                              },
+                              "workout_title": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sources": {
+                          "additionalProperties": {
+                            "type": "integer"
+                          },
+                          "description": "Sessions by how they started (class_booking, assigned, …).",
+                          "type": "object"
+                        },
+                        "totals": {
+                          "additionalProperties": true,
+                          "type": "object"
+                        },
+                        "weekly": {
+                          "items": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "totals",
+                        "weekly",
+                        "consistency",
+                        "sources",
+                        "score_history",
+                        "pr_timeline",
+                        "by_source",
+                        "filter",
+                        "active_filter_count"
+                      ],
+                      "title": "AccountProgress",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "progress"
+                  ],
+                  "title": "AccountProgressResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Progress"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Πρόοδος across every provider",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
+    "/api/me/providers": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyProvidersController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "former": {
+                      "items": {
+                        "properties": {
+                          "ended_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "kind"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "providers": {
+                      "items": {
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "next": {
+                            "nullable": true,
+                            "properties": {
+                              "at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "class",
+                                  "appointment"
+                                ],
+                                "type": "string"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "at",
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "partial": {
+                            "description": "Live facts could not be read.",
+                            "type": "boolean"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "roles": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "selected": {
+                            "type": "boolean"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "unread_messages": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "slug",
+                          "kind",
+                          "selected",
+                          "unread_messages"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "selected_organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "selected_organization_id",
+                    "providers",
+                    "former"
+                  ],
+                  "title": "MyProviders",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Providers"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your providers (gyms and independent coaches), active and former",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/providers/selected": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyProvidersController.select",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "organization_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "organization_id"
+                ],
+                "title": "SelectProviderRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "former": {
+                      "items": {
+                        "properties": {
+                          "ended_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "kind"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "providers": {
+                      "items": {
+                        "properties": {
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "next": {
+                            "nullable": true,
+                            "properties": {
+                              "at": {
+                                "format": "date-time",
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "class",
+                                  "appointment"
+                                ],
+                                "type": "string"
+                              },
+                              "title": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "at",
+                              "id"
+                            ],
+                            "type": "object"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "partial": {
+                            "description": "Live facts could not be read.",
+                            "type": "boolean"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "roles": {
+                            "items": {
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "selected": {
+                            "type": "boolean"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "unread_messages": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "slug",
+                          "kind",
+                          "selected",
+                          "unread_messages"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "selected_organization_id": {
+                      "format": "uuid",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "selected_organization_id",
+                    "providers",
+                    "former"
+                  ],
+                  "title": "MyProviders",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Providers"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Not an active provider"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Remember the provider Box opens on",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/me/search/users": {
       "get": {
         "callbacks": {},
@@ -80393,6 +83586,171 @@
         ]
       }
     },
+    "/api/me/today": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyProvidersController.today",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "date",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "IANA zone the day is counted in (UTC by default)",
+            "in": "query",
+            "name": "timezone",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "date": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "failed_organization_ids": {
+                      "items": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "items": {
+                      "items": {
+                        "properties": {
+                          "at": {
+                            "description": "Null for untimed items (programme of the day, WOD), listed first.",
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "class",
+                              "appointment",
+                              "program",
+                              "wod"
+                            ],
+                            "type": "string"
+                          },
+                          "source": {
+                            "description": "Where an entry came from; `former` once the membership there ended.",
+                            "properties": {
+                              "former": {
+                                "type": "boolean"
+                              },
+                              "kind": {
+                                "enum": [
+                                  "organization",
+                                  "freeform",
+                                  "device"
+                                ],
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "organization_id": {
+                                "format": "uuid",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "kind",
+                              "organization_id",
+                              "name",
+                              "former"
+                            ],
+                            "title": "EntrySource",
+                            "type": "object"
+                          },
+                          "status": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "target": {
+                            "properties": {
+                              "organization_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "slug": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "organization_id",
+                              "slug"
+                            ],
+                            "type": "object"
+                          },
+                          "title": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "kind",
+                          "id",
+                          "at",
+                          "source",
+                          "target"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "partial": {
+                      "type": "boolean"
+                    },
+                    "timezone": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "date",
+                    "timezone",
+                    "items",
+                    "partial",
+                    "failed_organization_ids"
+                  ],
+                  "title": "MyToday",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Today"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Today across every provider, in time order, each with its source",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/me/tours/{audience}/complete": {
       "post": {
         "callbacks": {},
@@ -81725,6 +85083,301 @@
         "summary": "After the trial: «Θέλω να γραφτώ» opens a chat with the box, «Όχι τώρα» hides the card",
         "tags": [
           "Trials"
+        ]
+      }
+    },
+    "/api/me/vault": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.AccountTrainingController.vault",
+        "parameters": [
+          {
+            "description": "Comma-separated workout types",
+            "in": "query",
+            "name": "disciplines",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "A benchmark slug such as `fran`",
+            "in": "query",
+            "name": "benchmark",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "An exercise name (matched by substring)",
+            "in": "query",
+            "name": "exercise",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated provider ids, `freeform`, `device` (all when absent)",
+            "in": "query",
+            "name": "sources",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "date_to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "active_filter_count": {
+                      "type": "integer"
+                    },
+                    "filter": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "groups": {
+                      "items": {
+                        "properties": {
+                          "attempt_count": {
+                            "type": "integer"
+                          },
+                          "attempts": {
+                            "items": {
+                              "properties": {
+                                "at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                },
+                                "duration_seconds": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "execution",
+                                    "training_log"
+                                  ],
+                                  "type": "string"
+                                },
+                                "master_workout_id": {
+                                  "description": "Workout to repeat, when the attempt has one.",
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "on": {
+                                  "format": "date",
+                                  "type": "string"
+                                },
+                                "organization_id": {
+                                  "description": "Provider the attempt belongs to (null for a freeform or device entry); «Ξανά» switches to it first.",
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scale_level_slug": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scores": {
+                                  "items": {
+                                    "properties": {
+                                      "section_id": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "section_name": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "unit": {
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "value": {
+                                        "nullable": true
+                                      }
+                                    },
+                                    "type": "object"
+                                  },
+                                  "type": "array"
+                                },
+                                "source": {
+                                  "description": "Where an entry came from; `former` once the membership there ended.",
+                                  "properties": {
+                                    "former": {
+                                      "type": "boolean"
+                                    },
+                                    "kind": {
+                                      "enum": [
+                                        "organization",
+                                        "freeform",
+                                        "device"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "name": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "organization_id": {
+                                      "format": "uuid",
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "kind",
+                                    "organization_id",
+                                    "name",
+                                    "former"
+                                  ],
+                                  "title": "EntrySource",
+                                  "type": "object"
+                                },
+                                "title": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "type": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "tz": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "id",
+                                "organization_id",
+                                "master_workout_id",
+                                "at",
+                                "source"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "benchmark": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "identity": {
+                            "type": "string"
+                          },
+                          "last_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "sources": {
+                            "items": {
+                              "description": "Where an entry came from; `former` once the membership there ended.",
+                              "properties": {
+                                "former": {
+                                  "type": "boolean"
+                                },
+                                "kind": {
+                                  "enum": [
+                                    "organization",
+                                    "freeform",
+                                    "device"
+                                  ],
+                                  "type": "string"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "organization_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "kind",
+                                "organization_id",
+                                "name",
+                                "former"
+                              ],
+                              "title": "EntrySource",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "title": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "workout_type": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "identity",
+                          "title",
+                          "attempt_count",
+                          "last_at",
+                          "sources",
+                          "attempts"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "groups",
+                    "filter",
+                    "active_filter_count"
+                  ],
+                  "title": "AccountVault",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Vault"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The Vault across every provider: one trend per workout, every attempt labelled",
+        "tags": [
+          "Training Log"
         ]
       }
     },
@@ -116575,6 +120228,26 @@
                       ],
                       "type": "object"
                     },
+                    "provider": {
+                      "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
+                      "properties": {
+                        "editable": {
+                          "type": "boolean"
+                        },
+                        "kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "editable"
+                      ],
+                      "type": "object"
+                    },
                     "scheduling": {
                       "properties": {
                         "default_auto_approve": {
@@ -116630,7 +120303,8 @@
                     "gamification",
                     "finance",
                     "notifications",
-                    "scheduling"
+                    "scheduling",
+                    "provider"
                   ],
                   "type": "object"
                 }
@@ -116748,6 +120422,18 @@
                       },
                       "vapid_subject": {
                         "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "provider": {
+                    "properties": {
+                      "kind": {
+                        "enum": [
+                          "gym",
+                          "coach"
+                        ],
                         "type": "string"
                       }
                     },
@@ -116945,6 +120631,26 @@
                       ],
                       "type": "object"
                     },
+                    "provider": {
+                      "description": "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
+                      "properties": {
+                        "editable": {
+                          "type": "boolean"
+                        },
+                        "kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "kind",
+                        "editable"
+                      ],
+                      "type": "object"
+                    },
                     "scheduling": {
                       "properties": {
                         "default_auto_approve": {
@@ -117000,7 +120706,8 @@
                     "gamification",
                     "finance",
                     "notifications",
-                    "scheduling"
+                    "scheduling",
+                    "provider"
                   ],
                   "type": "object"
                 }
@@ -149217,6 +152924,14 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "active_filter_count": {
+                      "type": "integer"
+                    },
+                    "filter": {
+                      "additionalProperties": true,
+                      "description": "The Ροή filter applied, in its canonical (saved) form.",
+                      "type": "object"
+                    },
                     "items": {
                       "items": {
                         "$ref": "#/components/schemas/JournalFeedItem"

@@ -11,8 +11,13 @@ defmodule MilosTraining.Application.GetTrainingHistory do
       performance on that class's workout, when they logged it.
 
   Paged with `offset`/`limit` so the UI can reveal history progressively.
+
+  Staff read it only while the user is an active member (ADR-162 §7): for a
+  former member the workouts page is empty and booked classes come without
+  the performance; the gym keeps its bookings and attendance.
   """
 
+  alias MilosTraining.Application.StaffJournalAccess
   alias MilosTraining.Execution
   alias MilosTraining.Execution.ExecutionStore
   alias MilosTraining.{Scheduling, Workouts}
@@ -25,12 +30,18 @@ defmodule MilosTraining.Application.GetTrainingHistory do
     limit = params |> param("limit") |> to_int(@default_limit) |> min(@max_limit) |> max(1)
     offset = params |> param("offset") |> to_int(0) |> max(0)
 
+    readable? = kind in ["workouts", "classes"] and StaffJournalAccess.readable?(context, user_id)
+
     case kind do
-      "workouts" -> {:ok, workouts(context, user_id, limit, offset)}
-      "classes" -> {:ok, classes(context, user_id, limit, offset)}
+      "workouts" when readable? -> {:ok, workouts(context, user_id, limit, offset)}
+      "workouts" -> {:ok, empty_page("workouts", offset)}
+      "classes" -> {:ok, classes(context, user_id, limit, offset, readable?)}
       _other -> {:error, :invalid_history_kind}
     end
   end
+
+  defp empty_page(kind, offset),
+    do: %{kind: kind, total: 0, offset: offset, next_offset: nil, entries: []}
 
   ## Workouts
 
@@ -63,23 +74,14 @@ defmodule MilosTraining.Application.GetTrainingHistory do
 
   ## Classes
 
-  defp classes(context, user_id, limit, offset) do
+  defp classes(context, user_id, limit, offset, readable?) do
     %{entries: bookings, total: total} =
       Scheduling.list_class_history(context, user_id, %{limit: limit, offset: offset})
 
     booking_ids = MapSet.new(bookings, & &1.booking_id)
 
     executions =
-      ExecutionStore.with_user_context(context, fn ->
-        user_id
-        |> Execution.list_executions_for_user()
-        |> Enum.filter(&(to_string(&1.source) == "class_booking"))
-        |> Enum.filter(&MapSet.member?(booking_ids, &1.source_reference_id))
-        # Newest first: keep the latest attempt per booking.
-        |> Enum.reduce(%{}, fn execution, acc ->
-          Map.put_new(acc, execution.source_reference_id, execution)
-        end)
-      end)
+      if readable?, do: class_executions(context, user_id, booking_ids), else: %{}
 
     workouts = load_workouts(context, Enum.map(bookings, & &1.master_workout_id))
 
@@ -107,6 +109,19 @@ defmodule MilosTraining.Application.GetTrainingHistory do
           }
         end)
     }
+  end
+
+  defp class_executions(context, user_id, booking_ids) do
+    ExecutionStore.with_user_context(context, fn ->
+      user_id
+      |> Execution.list_executions_for_user()
+      |> Enum.filter(&(to_string(&1.source) == "class_booking"))
+      |> Enum.filter(&MapSet.member?(booking_ids, &1.source_reference_id))
+      # Newest first: keep the latest attempt per booking.
+      |> Enum.reduce(%{}, fn execution, acc ->
+        Map.put_new(acc, execution.source_reference_id, execution)
+      end)
+    end)
   end
 
   ## Shared
