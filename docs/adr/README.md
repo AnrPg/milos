@@ -165,3 +165,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-162 | One journal across providers and the Box ▾ provider switch | Accepted |
 | ADR-163 | WOD goals, «τι ένιωσες» feedback and the anatomy taxonomy | Accepted |
 | ADR-171 | Native wrapper: Capacitor store apps, app links and native push | Accepted |
+| ADR-172 | Phone health data: Apple Health and Health Connect | Accepted |

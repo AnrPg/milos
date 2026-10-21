@@ -240,7 +240,7 @@ All recommended options, with every recommended extra.
 - [ ] Partners hidden unless the member opts in, per club
 - [ ] AI suggestions never reach an athlete without coach approval
 - [ ] Voice recordings deleted after transcription
-- [ ] Phone health data follows D8/D11 of Phase 2 (consent, delete, export)
+- [x] Phone health data follows D8/D11 of Phase 2 (consent, delete, export; ADR-172)
 
 ## 7. Open questions
 1. Brief §10 Q2: prices for gym tiers and the solo-coach tier (ANR).
@@ -251,4 +251,4 @@ All recommended options, with every recommended extra.
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
 - [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
-- [ ] P3-M8 · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
+- [ ] P3-M8 · [x] P3-M9 (ADR-171) · [x] P3-M10 (ADR-172) · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
