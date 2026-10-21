@@ -181,7 +181,7 @@ async function uploads(page: Page, calls: Calls, gate: Promise<void>) {
   await page.route("**/__upload/**", async (route: Route) => {
     const id = route.request().url().split("/").pop()!;
     calls.puts.push(id);
-    if (id === "m1") await gate;
+    await gate;
     return route.fulfill({ status: 200, body: "" });
   });
   await page.route("**/api/me/media/*/complete", (route) => {
@@ -242,7 +242,7 @@ test.describe("photos and video in posts", () => {
     await compose.getByTestId("media-input").setInputFiles(pngs(3));
     const tiles = compose.getByTestId("media-tile");
     await expect(tiles).toHaveCount(3);
-    // The first PUT is held: its tile shows progress and publishing waits.
+    // The PUTs are held: the tiles show progress and publishing waits.
     await expect(tiles.first()).toHaveAttribute("data-phase", "uploading");
     await expect(tiles.first().getByRole("progressbar")).toBeVisible();
     await compose.getByLabel("What's on your mind?").or(compose.locator("#compose-body")).first().fill("Partner WOD with Eleni");
@@ -250,6 +250,10 @@ test.describe("photos and video in posts", () => {
     await expect(compose.getByText("Wait for the files to upload.")).toBeVisible();
     release();
     for (const index of [0, 1, 2]) await expect(tiles.nth(index)).toHaveAttribute("data-phase", /processing|ready/);
+    // The uploads start in parallel, so which tile got which id is up to the
+    // browser; read it off the tiles instead of assuming file order.
+    const ids = await tiles.evaluateAll((nodes) => nodes.map((node) => node.getAttribute("data-media-id")));
+    expect(new Set(ids)).toEqual(new Set(["m1", "m2", "m3"]));
     expect(calls.uploads).toEqual(Array(3).fill(expect.objectContaining({ purpose: "post_photo", content_type: "image/jpeg" })));
 
     // Move the first photo one place later (keyboard-reachable buttons).
@@ -268,11 +272,11 @@ test.describe("photos and video in posts", () => {
     await alt.getByRole("button", { name: "Save" }).click();
     await expect(alt).toBeHidden();
     await expect(compose).toBeVisible();
-    expect(calls.patches).toEqual([{ id: "m1", body: { alt_text: "Two athletes high-five after a workout" } }]);
+    expect(calls.patches).toEqual([{ id: ids[0], body: { alt_text: "Two athletes high-five after a workout" } }]);
 
     await compose.getByRole("button", { name: "Publish" }).click();
     await expect(compose).toBeHidden();
-    expect(calls.posts[0]).toMatchObject({ channel_id: "ch-wod", body: "Partner WOD with Eleni", media_ids: ["m2", "m1", "m3"] });
+    expect(calls.posts[0]).toMatchObject({ channel_id: "ch-wod", body: "Partner WOD with Eleni", media_ids: [ids[1], ids[0], ids[2]] });
 
     const card = page.getByRole("article").filter({ hasText: "Partner WOD with Eleni" });
     await expect(card.getByText("Processing…", { exact: true })).toBeVisible();

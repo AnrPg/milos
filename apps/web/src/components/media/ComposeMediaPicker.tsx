@@ -292,6 +292,7 @@ function Tile({
       style={{ transform: CSS.Transform.toString(transform), transition, zIndex: isDragging ? 2 : undefined }}
       data-testid="media-tile"
       data-phase={phase}
+      data-media-id={item.mediaId ?? undefined}
     >
       <button
         type="button"

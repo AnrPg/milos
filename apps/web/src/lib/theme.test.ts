@@ -24,6 +24,10 @@ const TEXT_PAIRS: [keyof ThemeTokens, keyof ThemeTokens][] = [
   ["textSoft", "panel"],
   ["muted", "bg"],
   ["muted", "panel"],
+  // Hints, timestamps and idle nav labels are small text (THEME.md).
+  ["dim", "bg"],
+  ["dim", "panel"],
+  ["dim", "panelMuted"],
   ["primaryContrast", "primary"],
   ["sparkContrast", "spark"],
   ["heatContrast", "heat"],

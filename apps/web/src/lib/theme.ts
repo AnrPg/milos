@@ -173,7 +173,7 @@ export const APP_THEMES: Record<ThemeSlug, AppTheme> = {
       text: GRAPHITE,
       textSoft: "#3A3D45",
       muted: "#5E6470",
-      dim: "#6B717C",
+      dim: "#646A75",
       placeholder: "#8A909B",
       primary: DOJO,
       primaryStrong: "#1F45E0",
