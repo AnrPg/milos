@@ -355,8 +355,14 @@ defmodule MilosTraining.Organizations do
     do: MilosTraining.Organizations.Commands.UpdateOnboarding.call(context, params, now)
 
   @doc "Builds the onboarding checklist view from stored state and setup signals."
-  def onboarding_checklist(state, signals),
-    do: MilosTraining.Organizations.Domain.OnboardingChecklist.build(state, signals)
+  def onboarding_checklist(state, signals, audience \\ "gym"),
+    do: MilosTraining.Organizations.Domain.OnboardingChecklist.build(state, signals, audience)
+
+  @doc "ADR-170: which onboarding checklist the context's organization gets (`gym` | `coach`)."
+  def onboarding_audience(%{organization: %{provider_kind: kind}}),
+    do: MilosTraining.Organizations.Domain.OnboardingChecklist.audience(kind)
+
+  def onboarding_audience(_context), do: "gym"
 
   def inspect_join_link(slug), do: MilosTraining.Organizations.Queries.InspectJoinLink.call(slug)
 
@@ -469,6 +475,52 @@ defmodule MilosTraining.Organizations do
   def create_owned_organization(account, params, opts \\ []),
     do:
       MilosTraining.Organizations.Commands.OwnerOrganizationActions.create(account, params, opts)
+
+  @doc """
+  ADR-170: an account opens its own practice as an independent coach (a
+  one-person organization of kind `coach`). `opts[:seed_defaults]` as in
+  `create_owned_organization/3`.
+  """
+  def create_coach_practice(account, params, opts \\ []),
+    do: MilosTraining.Organizations.Commands.CreateCoachPractice.call(account, params, opts)
+
+  @doc """
+  ADR-170: seats the organization uses, keyed like the plan limits:
+  `staff_seats` (active owners, admins and staff plus staff invitations not
+  yet redeemed) and `active_clients` (active members and athletes without a
+  staff role). Owners and admins only.
+  """
+  def seat_usage(%{organization_id: organization_id} = context, now \\ DateTime.utc_now()) do
+    with :ok <- TenantAuthorization.authorize(context, [:owner, :admin]) do
+      seats =
+        RepoContext.run(context, fn -> OrganizationStore.count_seats(organization_id, now) end)
+
+      {:ok,
+       %{
+         "staff_seats" => seats.staff + seats.pending_staff_invitations,
+         "active_clients" => seats.clients
+       }}
+    end
+  end
+
+  @doc "Whether the account already holds an owner, admin or staff role in the context's gym."
+  def staff_member?(%{organization_id: organization_id} = context, user_id)
+      when is_binary(user_id) do
+    RepoContext.run(context, fn ->
+      case OrganizationStore.get_membership(organization_id, user_id) do
+        %{status: :active, roles: roles} -> Enum.any?(roles, &(&1 in staff_and_admin_roles()))
+        _other -> false
+      end
+    end)
+  end
+
+  def staff_member?(_context, _user_id), do: false
+
+  @doc "Roles that take a staff seat (ADR-170)."
+  def staff_and_admin_roles,
+    do:
+      MilosTraining.Organizations.Domain.MembershipPolicy.admin_roles() ++
+        MilosTraining.Organizations.Domain.MembershipPolicy.staff_roles()
 
   def transfer_ownership(context, to_user_id),
     do:

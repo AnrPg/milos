@@ -30,6 +30,11 @@ const STEP_LINKS: Partial<Record<OnboardingStepId, string>> = {
   classes: "/admin/class-schedule",
   packages: "/admin/finance/packages",
   workout: "/admin/workouts/new",
+  // ADR-170: an independent coach's practice.
+  profile: "/admin/public-page",
+  sessions: "/admin/appointments",
+  team: "/clubs",
+  bootcamp: "/admin/community?tab=events",
 };
 
 /** Lets any button (profile, settings) replay the tour for the current role. */
@@ -213,8 +218,8 @@ function AdminChecklistDialog({
           <span aria-hidden="true">⚠</span>
           {t("popupEyebrow")}
         </p>
-        <h2 id="onboarding-title" className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{t("popupTitle")}</h2>
-        <p id="onboarding-intro" className="mt-1 text-sm leading-6" style={{ color: "var(--muted)" }}>{t("popupIntro", navParams)}</p>
+        <h2 id="onboarding-title" className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{t(checklist.audience === "coach" ? "popupTitleCoach" : "popupTitle")}</h2>
+        <p id="onboarding-intro" className="mt-1 text-sm leading-6" style={{ color: "var(--muted)" }}>{t(checklist.audience === "coach" ? "popupIntroCoach" : "popupIntro", navParams)}</p>
         <div className="mt-4">
           <ChecklistView checklist={checklist} slug={slug} busy={busy} onAction={onAction} onNavigate={onLater} onTour={onTour} onInvite={onInvite} />
         </div>

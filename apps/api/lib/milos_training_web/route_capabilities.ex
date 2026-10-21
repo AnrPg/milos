@@ -39,6 +39,8 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.HomeLocationController => [:manage_memberships],
     W.AdminWorkoutFreeTextController => [:manage_workouts],
     W.AdminOnboardingController => [:manage_settings],
+    # ADR-170: the platform plan card (owners and admins hold manage_settings).
+    W.AdminPlanController => [:manage_settings],
     W.TrainingHistoryController => [:view_client_training]
   }
 

@@ -10,6 +10,7 @@ defmodule MilosTraining.Community.Ports.CommunityStore do
 
   # Clubs and channels.
   @callback ensure_gym_club(context(), [map()]) :: {:ok, map()} | {:error, term()}
+  @callback name_gym_club(context(), String.t()) :: :ok
   @callback list_clubs(context(), [id()]) :: [map()]
   @callback get_club(context(), id()) :: map() | nil
   @callback get_channel(context(), id()) :: map() | nil

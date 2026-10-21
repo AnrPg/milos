@@ -501,6 +501,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/coach-practices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open your practice as an independent coach (one per account) */
+        post: operations["MilosTrainingWeb.CoachPracticeController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/executions": {
         parameters: {
             query?: never;
@@ -5226,6 +5243,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The organization's platform plan with seats used */
+        get: operations["MilosTrainingWeb.AdminPlanController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/pr-members": {
         parameters: {
             query?: never;
@@ -9248,6 +9282,23 @@ export interface paths {
         patch: operations["MilosTrainingWeb.PlatformOrganizationController.rename"];
         trace?: never;
     };
+    "/api/platform/organizations/{id}/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Put an organization on a plan with a status (vendors) */
+        put: operations["MilosTrainingWeb.PlatformPlanController.assign"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/platform/organizations/{id}/purge": {
         parameters: {
             query?: never;
@@ -9363,6 +9414,58 @@ export interface paths {
         };
         /** Summarize what renaming an organization's path slug affects (ADR-122) */
         get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Every platform plan (vendors) */
+        get: operations["MilosTrainingWeb.PlatformPlanController.index"];
+        put?: never;
+        /** Add a platform plan (vendors) */
+        post: operations["MilosTrainingWeb.PlatformPlanController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/platform/plans/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a plan's name, limits, prices, trial or visibility (vendors) */
+        patch: operations["MilosTrainingWeb.PlatformPlanController.update"];
+        trace?: never;
+    };
+    "/api/platform/subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The plan every organization is on (vendors) */
+        get: operations["MilosTrainingWeb.PlatformPlanController.subscriptions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9692,6 +9795,23 @@ export interface paths {
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
         get: operations["MilosTrainingWeb.PublicBoxController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/public/platform-plans": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Active public platform plans (pricing, coach onboarding) */
+        get: operations["MilosTrainingWeb.PlatformPlanController.index_public"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10177,6 +10297,8 @@ export interface components {
         };
         /** AdminOnboardingChecklist */
         AdminOnboardingChecklist: {
+            /** @enum {string} */
+            audience: "gym" | "coach";
             completed_count: number;
             dismissed: boolean;
             finished: boolean;
@@ -10184,7 +10306,7 @@ export interface components {
                 auto: boolean;
                 done: boolean;
                 /** @enum {string} */
-                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 skipped: boolean;
             }[];
             total: number;
@@ -10273,6 +10395,9 @@ export interface components {
             kind: "pt_session" | "assessment";
             /** Format: uuid */
             location_id?: string | null;
+            meeting_url?: string | null;
+            /** @enum {string} */
+            mode?: "in_person" | "online";
             notes?: string | null;
             spots_remaining?: number | null;
             /** Format: date-time */
@@ -15283,6 +15408,15 @@ export interface components {
             reader_nickname?: string | null;
             /** Format: uuid */
             reader_user_id: string;
+        };
+        /** CoachPractice */
+        CoachPractice: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            provider_kind: "coach";
+            slug: string;
         };
         /** CoachingRelationship */
         CoachingRelationship: {
@@ -21701,6 +21835,86 @@ export interface components {
             /** @enum {string} */
             content_type: "image/png" | "image/jpeg" | "image/webp";
         };
+        /** OrganizationPlan */
+        OrganizationPlan: {
+            /** @enum {string|null} */
+            notice: "trial_ending" | "trial_expired" | "past_due" | "cancelled" | null;
+            plan: {
+                active: boolean;
+                annual_price_cents: number | null;
+                /** @enum {string} */
+                audience: "gym" | "coach";
+                code: string;
+                currency: string;
+                description: string | null;
+                is_default: boolean;
+                /**
+                 * PlatformPlanLimits
+                 * @description Absent key = unlimited
+                 */
+                limits: {
+                    active_clients?: number;
+                    staff_seats?: number;
+                };
+                monthly_price_cents: number | null;
+                name: string;
+                position: number;
+                /** @enum {string} */
+                price_status: "placeholder" | "confirmed";
+                public: boolean;
+                trial_days: number;
+            } | null;
+            price_override_cents: number | null;
+            /** @enum {string|null} */
+            status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired" | null;
+            trial_days_left: number | null;
+            /** Format: date-time */
+            trial_ends_at: string | null;
+            usage: {
+                hard: boolean;
+                /** @enum {string} */
+                key: "staff_seats" | "active_clients";
+                /** @description null = unlimited */
+                limit: number | null;
+                /** @enum {string} */
+                state: "ok" | "near" | "reached" | "over";
+                used: number;
+            }[];
+        };
+        /** OrganizationPlatformSubscription */
+        OrganizationPlatformSubscription: {
+            notes: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            plan_code: string;
+            price_override_cents: number | null;
+            /** @enum {string} */
+            status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+            /** @enum {string} */
+            stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+            /** Format: date-time */
+            trial_ends_at: string | null;
+            /** Format: date-time */
+            updated_at: string;
+        };
+        /** OrganizationPlatformSubscriptions */
+        OrganizationPlatformSubscriptions: {
+            subscriptions: {
+                notes: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                plan_code: string;
+                price_override_cents: number | null;
+                /** @enum {string} */
+                status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+                /** @enum {string} */
+                stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                /** Format: date-time */
+                trial_ends_at: string | null;
+                /** Format: date-time */
+                updated_at: string;
+            }[];
+        };
         /** PRTimelineEntry */
         PRTimelineEntry: {
             /** Format: date */
@@ -22413,6 +22627,68 @@ export interface components {
             /** Format: uuid */
             id: string;
             nickname?: string | null;
+        };
+        /** PlatformPlan */
+        PlatformPlan: {
+            active: boolean;
+            annual_price_cents: number | null;
+            /** @enum {string} */
+            audience: "gym" | "coach";
+            code: string;
+            currency: string;
+            description: string | null;
+            is_default: boolean;
+            /**
+             * PlatformPlanLimits
+             * @description Absent key = unlimited
+             */
+            limits: {
+                active_clients?: number;
+                staff_seats?: number;
+            };
+            monthly_price_cents: number | null;
+            name: string;
+            position: number;
+            /** @enum {string} */
+            price_status: "placeholder" | "confirmed";
+            public: boolean;
+            trial_days: number;
+        };
+        /**
+         * PlatformPlanLimits
+         * @description Absent key = unlimited
+         */
+        PlatformPlanLimits: {
+            active_clients?: number;
+            staff_seats?: number;
+        };
+        /** PlatformPlans */
+        PlatformPlans: {
+            plans: {
+                active: boolean;
+                annual_price_cents: number | null;
+                /** @enum {string} */
+                audience: "gym" | "coach";
+                code: string;
+                currency: string;
+                description: string | null;
+                is_default: boolean;
+                /**
+                 * PlatformPlanLimits
+                 * @description Absent key = unlimited
+                 */
+                limits: {
+                    active_clients?: number;
+                    staff_seats?: number;
+                };
+                monthly_price_cents: number | null;
+                name: string;
+                position: number;
+                /** @enum {string} */
+                price_status: "placeholder" | "confirmed";
+                public: boolean;
+                trial_days: number;
+            }[];
         };
         /** PostAttachmentPreview */
         PostAttachmentPreview: {
@@ -28742,6 +29018,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -28773,6 +29051,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         /** @enum {string} */
@@ -30496,6 +30776,42 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.CoachPracticeController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    default_locale?: string | null;
+                    name: string;
+                    team_name?: string | null;
+                    timezone?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Practice */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        /** @enum {string} */
+                        provider_kind: "coach";
+                        slug: string;
                     };
                 };
             };
@@ -42754,6 +43070,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -42805,6 +43123,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -42843,6 +43163,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -42899,6 +43221,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -52711,6 +53035,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
                         completed_count: number;
                         dismissed: boolean;
                         finished: boolean;
@@ -52718,7 +53044,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -52741,7 +53067,7 @@ export interface operations {
                     /** @enum {string} */
                     action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
                     /** @enum {string} */
-                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 };
             };
         };
@@ -52753,6 +53079,8 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
                         completed_count: number;
                         dismissed: boolean;
                         finished: boolean;
@@ -52760,7 +53088,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour";
+                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -52830,6 +53158,70 @@ export interface operations {
                         name: string;
                         slug: string;
                         status: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.AdminPlanController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string|null} */
+                        notice: "trial_ending" | "trial_expired" | "past_due" | "cancelled" | null;
+                        plan: {
+                            active: boolean;
+                            annual_price_cents: number | null;
+                            /** @enum {string} */
+                            audience: "gym" | "coach";
+                            code: string;
+                            currency: string;
+                            description: string | null;
+                            is_default: boolean;
+                            /**
+                             * PlatformPlanLimits
+                             * @description Absent key = unlimited
+                             */
+                            limits: {
+                                active_clients?: number;
+                                staff_seats?: number;
+                            };
+                            monthly_price_cents: number | null;
+                            name: string;
+                            position: number;
+                            /** @enum {string} */
+                            price_status: "placeholder" | "confirmed";
+                            public: boolean;
+                            trial_days: number;
+                        } | null;
+                        price_override_cents: number | null;
+                        /** @enum {string|null} */
+                        status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired" | null;
+                        trial_days_left: number | null;
+                        /** Format: date-time */
+                        trial_ends_at: string | null;
+                        usage: {
+                            hard: boolean;
+                            /** @enum {string} */
+                            key: "staff_seats" | "active_clients";
+                            /** @description null = unlimited */
+                            limit: number | null;
+                            /** @enum {string} */
+                            state: "ok" | "near" | "reached" | "over";
+                            used: number;
+                        }[];
                     };
                 };
             };
@@ -65077,6 +65469,8 @@ export interface operations {
                             /** Format: uuid */
                             id: string;
                             name: string;
+                            /** @enum {string} */
+                            provider_kind?: "gym" | "coach";
                             slug: string;
                         };
                         role: string;
@@ -65478,6 +65872,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -68396,6 +68793,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -68426,6 +68826,9 @@ export interface operations {
                     kind: "pt_session" | "assessment";
                     /** Format: uuid */
                     location_id?: string | null;
+                    meeting_url?: string | null;
+                    /** @enum {string} */
+                    mode?: "in_person" | "online";
                     notes?: string | null;
                     /** Format: date-time */
                     starts_at: string;
@@ -68477,6 +68880,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -68614,6 +69020,9 @@ export interface operations {
                             kind: "pt_session" | "assessment";
                             /** Format: uuid */
                             location_id?: string | null;
+                            meeting_url?: string | null;
+                            /** @enum {string} */
+                            mode?: "in_person" | "online";
                             notes?: string | null;
                             spots_remaining?: number | null;
                             /** Format: date-time */
@@ -73654,6 +74063,54 @@ export interface operations {
             };
         };
     };
+    "MilosTrainingWeb.PlatformPlanController.assign": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    notes?: string | null;
+                    plan_code: string;
+                    price_override_cents?: number | null;
+                    /** @enum {string} */
+                    status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                    /** Format: date-time */
+                    trial_ends_at?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Subscription */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        notes: string | null;
+                        /** Format: uuid */
+                        organization_id: string;
+                        plan_code: string;
+                        price_override_cents: number | null;
+                        /** @enum {string} */
+                        status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+                        /** @enum {string} */
+                        stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                        /** Format: date-time */
+                        trial_ends_at: string | null;
+                        /** Format: date-time */
+                        updated_at: string;
+                    };
+                };
+            };
+        };
+    };
     "MilosTrainingWeb.PlatformOrganizationPurgeController.show": {
         parameters: {
             query?: never;
@@ -74195,6 +74652,234 @@ export interface operations {
                             slug: string;
                         }[];
                         purge_open: boolean;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plans */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        plans: {
+                            active: boolean;
+                            annual_price_cents: number | null;
+                            /** @enum {string} */
+                            audience: "gym" | "coach";
+                            code: string;
+                            currency: string;
+                            description: string | null;
+                            is_default: boolean;
+                            /**
+                             * PlatformPlanLimits
+                             * @description Absent key = unlimited
+                             */
+                            limits: {
+                                active_clients?: number;
+                                staff_seats?: number;
+                            };
+                            monthly_price_cents: number | null;
+                            name: string;
+                            position: number;
+                            /** @enum {string} */
+                            price_status: "placeholder" | "confirmed";
+                            public: boolean;
+                            trial_days: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active?: boolean;
+                    annual_price_cents?: number | null;
+                    /** @enum {string} */
+                    audience: "gym" | "coach";
+                    code: string;
+                    currency?: string;
+                    description?: string | null;
+                    is_default?: boolean;
+                    /**
+                     * PlatformPlanLimits
+                     * @description Absent key = unlimited
+                     */
+                    limits?: {
+                        active_clients?: number;
+                        staff_seats?: number;
+                    };
+                    monthly_price_cents?: number | null;
+                    name: string;
+                    position?: number;
+                    /** @enum {string} */
+                    price_status?: "placeholder" | "confirmed";
+                    public?: boolean;
+                    trial_days?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Plan */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active: boolean;
+                        annual_price_cents: number | null;
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
+                        code: string;
+                        currency: string;
+                        description: string | null;
+                        is_default: boolean;
+                        /**
+                         * PlatformPlanLimits
+                         * @description Absent key = unlimited
+                         */
+                        limits: {
+                            active_clients?: number;
+                            staff_seats?: number;
+                        };
+                        monthly_price_cents: number | null;
+                        name: string;
+                        position: number;
+                        /** @enum {string} */
+                        price_status: "placeholder" | "confirmed";
+                        public: boolean;
+                        trial_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active?: boolean;
+                    annual_price_cents?: number | null;
+                    /** @enum {string} */
+                    audience?: "gym" | "coach";
+                    code?: string;
+                    currency?: string;
+                    description?: string | null;
+                    is_default?: boolean;
+                    /**
+                     * PlatformPlanLimits
+                     * @description Absent key = unlimited
+                     */
+                    limits?: {
+                        active_clients?: number;
+                        staff_seats?: number;
+                    };
+                    monthly_price_cents?: number | null;
+                    name?: string;
+                    position?: number;
+                    /** @enum {string} */
+                    price_status?: "placeholder" | "confirmed";
+                    public?: boolean;
+                    trial_days?: number;
+                };
+            };
+        };
+        responses: {
+            /** @description Plan */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        active: boolean;
+                        annual_price_cents: number | null;
+                        /** @enum {string} */
+                        audience: "gym" | "coach";
+                        code: string;
+                        currency: string;
+                        description: string | null;
+                        is_default: boolean;
+                        /**
+                         * PlatformPlanLimits
+                         * @description Absent key = unlimited
+                         */
+                        limits: {
+                            active_clients?: number;
+                            staff_seats?: number;
+                        };
+                        monthly_price_cents: number | null;
+                        name: string;
+                        position: number;
+                        /** @enum {string} */
+                        price_status: "placeholder" | "confirmed";
+                        public: boolean;
+                        trial_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.subscriptions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Subscriptions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        subscriptions: {
+                            notes: string | null;
+                            /** Format: uuid */
+                            organization_id: string;
+                            plan_code: string;
+                            price_override_cents: number | null;
+                            /** @enum {string} */
+                            status: "trialing" | "active" | "past_due" | "cancelled" | "comped" | "trial_expired";
+                            /** @enum {string} */
+                            stored_status: "trialing" | "active" | "past_due" | "cancelled" | "comped";
+                            /** Format: date-time */
+                            trial_ends_at: string | null;
+                            /** Format: date-time */
+                            updated_at: string;
+                        }[];
                     };
                 };
             };
@@ -75607,6 +76292,54 @@ export interface operations {
                 };
                 content: {
                     "application/json": Record<string, never>;
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PlatformPlanController.index_public": {
+        parameters: {
+            query?: {
+                audience?: "gym" | "coach";
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Plans */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        plans: {
+                            active: boolean;
+                            annual_price_cents: number | null;
+                            /** @enum {string} */
+                            audience: "gym" | "coach";
+                            code: string;
+                            currency: string;
+                            description: string | null;
+                            is_default: boolean;
+                            /**
+                             * PlatformPlanLimits
+                             * @description Absent key = unlimited
+                             */
+                            limits: {
+                                active_clients?: number;
+                                staff_seats?: number;
+                            };
+                            monthly_price_cents: number | null;
+                            name: string;
+                            position: number;
+                            /** @enum {string} */
+                            price_status: "placeholder" | "confirmed";
+                            public: boolean;
+                            trial_days: number;
+                        }[];
+                    };
                 };
             };
         };

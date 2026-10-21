@@ -9,7 +9,8 @@ defmodule MilosTraining.Organizations.Commands.UpdateOnboarding do
         settings = OrganizationStore.get_organization_settings(context.organization_id)
         current = OnboardingChecklist.from_settings(settings && settings.settings)
 
-        with {:ok, state} <- OnboardingChecklist.apply_action(current, params, now),
+        with {:ok, state} <-
+               OnboardingChecklist.apply_action(current, params, now, audience(context)),
              {:ok, _settings} <-
                OrganizationStore.put_organization_settings_entry(
                  context.organization_id,
@@ -21,4 +22,8 @@ defmodule MilosTraining.Organizations.Commands.UpdateOnboarding do
       end)
     end
   end
+
+  # ADR-170: the checklist an independent coach sees.
+  defp audience(%{organization: %{provider_kind: kind}}), do: OnboardingChecklist.audience(kind)
+  defp audience(_context), do: "gym"
 end

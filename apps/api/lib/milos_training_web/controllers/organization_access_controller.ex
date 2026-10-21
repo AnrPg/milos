@@ -54,7 +54,9 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       name: %Schema{type: :string},
-      slug: %Schema{type: :string}
+      slug: %Schema{type: :string},
+      # ADR-170: a gym or an independent coach's practice (memberships only).
+      provider_kind: %Schema{type: :string, enum: ["gym", "coach"]}
     },
     required: [:id, :name, :slug]
   }
@@ -386,7 +388,12 @@ defmodule MilosTrainingWeb.OrganizationAccessController do
           role_grants(Map.get(entry, :settings))
         )
         |> Map.new(fn {capability, scope} -> {to_string(capability), to_string(scope)} end),
-      organization: %{id: organization.id, name: organization.name, slug: organization.slug},
+      organization: %{
+        id: organization.id,
+        name: organization.name,
+        slug: organization.slug,
+        provider_kind: Map.get(organization, :provider_kind) || "gym"
+      },
       settings: serialize_settings(Map.get(entry, :settings))
     }
   end

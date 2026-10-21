@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 
@@ -252,6 +253,12 @@ export function PlatformOrganizationsPage() {
             className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
           >
             {copy.tagSuggestions}
+          </Link>
+          <Link
+            href="/platform/plans"
+            className="border border-[var(--border)] px-4 py-3 text-sm font-semibold text-[var(--text-soft)]"
+          >
+            {copy.plans}
           </Link>
           <button
             type="button"

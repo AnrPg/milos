@@ -4342,7 +4342,12 @@
     "stfInvalidPortions": "Les portions vont de 0 à 20, par demi.",
     "stfMealSlots": "Repas de la journée",
     "stfMealSlotsHint": "Les repas sur lesquels le membre note. Laisse vide pour petit-déjeuner, déjeuner, dîner et collation.",
-    "mpWellnessSummary": "Résumé bien-être hebdomadaire"
+    "mpWellnessSummary": "Résumé bien-être hebdomadaire",
+    "apiErrorCoachPracticeExists": "Tu gères déjà une activité de coach avec ce compte.",
+    "apiErrorPlanLimitReached": "Ton forfait n’a plus de place pour l’équipe. Libère une place ou demande-nous de changer de forfait.",
+    "apiErrorUnknownPlan": "Ce forfait n’existe pas.",
+    "apiErrorTrialEndRequired": "Un essai a besoin d’une date de fin.",
+    "apiErrorInvalidName": "Le nom doit comporter de 2 à 120 caractères."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -4742,6 +4747,26 @@
         "title": "Fais la visite d’une minute",
         "body": "Découvre où se trouve chaque chose.",
         "cta": "Commencer la visite"
+      },
+      "profile": {
+        "title": "Publie ton profil",
+        "body": "Ta photo, ce que tu coaches et où. C’est ainsi que les clients te trouvent.",
+        "cta": "Modifier le profil"
+      },
+      "sessions": {
+        "title": "Ouvre des créneaux",
+        "body": "Séances individuelles ou en petit groupe, en présentiel ou en ligne.",
+        "cta": "Ajouter des séances"
+      },
+      "team": {
+        "title": "Découvre ta Team",
+        "body": "Le club de tes clients : annonces, discussion et entraînement partagé.",
+        "cta": "Ouvrir la Team"
+      },
+      "bootcamp": {
+        "title": "Organise un bootcamp ouvert",
+        "body": "Une séance en plein air ou en ligne ouverte à tous. Un bon moyen de rencontrer de nouveaux clients.",
+        "cta": "Créer un bootcamp"
       }
     },
     "tour": {
@@ -4823,7 +4848,9 @@
           "body": "Consulte ton adhésion dans {billing}. Change la langue et les notifications dans ton profil."
         }
       }
-    }
+    },
+    "popupTitleCoach": "Bienvenue, coach ! Préparons ton activité",
+    "popupIntroCoach": "Sept étapes courtes. Arrête-toi quand tu veux : la liste t’attend dans {path}."
   },
   "MemberApp": {
     "journal": {
@@ -8698,6 +8725,123 @@
       "title": "Couverture, qualités, charge",
       "range": "Période",
       "sharedOnly": "Uniquement à partir des entrées que le client partage avec les coachs de la box."
+    }
+  },
+  "SoloCoach": {
+    "box": {
+      "actionsLabel": "Actions du coach",
+      "sessions": "Séances",
+      "nutrition": "Nutrition",
+      "messages": "Messages",
+      "package": "Forfait de séances",
+      "assessment": "Bilan",
+      "ptSession": "Séance individuelle",
+      "online": "En ligne",
+      "inPerson": "En présentiel",
+      "minutes": "{minutes} min",
+      "join": "Rejoindre l’appel",
+      "manage": "Gérer",
+      "noSession": "Aucune séance réservée pour l’instant.",
+      "bookSession": "Réserver une séance",
+      "noPackage": "Pas encore de forfait de séances. Demande à ton coach.",
+      "sessionsLeft": "{remaining} séances restantes sur {limit}",
+      "sessionsUnlimited": "Séances illimitées"
+    },
+    "start": {
+      "title": "Commencer comme coach",
+      "intro": "Coache tes propres clients : séances, programmes, nutrition et un club Team, le tout dans Milos.",
+      "includes": "Ce qui est inclus",
+      "include": {
+        "clients": "Ta propre liste de clients et tes programmes",
+        "sessions": "Des séances réservables, en présentiel ou en ligne",
+        "team": "Un club Team pour tes clients",
+        "bootcamps": "Des bootcamps ouverts à tous"
+      },
+      "trial": "{days} jours gratuits",
+      "price": "puis {price}/mois",
+      "priceSoon": "Le prix sera annoncé avant la fin de l’essai",
+      "nameLabel": "Nom de l’activité",
+      "namePlaceholder": "ex. Nikos Papadopoulos Coaching",
+      "nameHint": "Tes clients voient ce nom. Tu pourras le changer plus tard.",
+      "teamLabel": "Nom du club Team",
+      "teamHint": "Le club de tes clients. Tu pourras le renommer plus tard.",
+      "submit": "Lancer mon activité",
+      "creating": "Lancement…",
+      "alreadyOpen": "Tu gères déjà une activité de coach. Passe-y depuis le menu des prestataires."
+    },
+    "me": {
+      "row": "Coacher tes propres clients",
+      "rowHint": "Ouvre ton activité de coach indépendant"
+    },
+    "slot": {
+      "mode": "Où",
+      "meetingUrl": "Lien de l’appel"
+    },
+    "plan": {
+      "title": "Forfait Milos",
+      "description": "Ton forfait, ses limites et ton utilisation.",
+      "loading": "Chargement du forfait…",
+      "status": {
+        "trialing": "Essai",
+        "active": "Actif",
+        "past_due": "Paiement en retard",
+        "cancelled": "Résilié",
+        "comped": "Offert",
+        "trial_expired": "Essai terminé"
+      },
+      "trialLeft": "{days, plural, one {# jour} other {# jours}} d’essai restant(s)",
+      "price": "{price}/mois",
+      "priceSoon": "Prix à venir",
+      "limit": {
+        "staff_seats": "Places équipe",
+        "active_clients": "Clients actifs"
+      },
+      "unlimited": "{used} · sans limite",
+      "used": "{used} sur {limit}",
+      "contact": "Besoin de plus ? Contacte-nous et nous changerons ton forfait.",
+      "notice": {
+        "trial_ending": "Ton essai se termine dans {days, plural, one {# jour} other {# jours}}.",
+        "trial_expired": "Ton essai est terminé. Tout continue de fonctionner ; nous te contacterons au sujet de ton forfait.",
+        "past_due": "Un paiement de ton forfait Milos est en retard.",
+        "cancelled": "Ton forfait Milos est résilié. Contacte-nous pour le relancer.",
+        "staff_full": "Toutes les places équipe de ton forfait sont prises."
+      }
+    },
+    "console": {
+      "back": "Organisations",
+      "title": "Forfaits",
+      "subtitle": "Limites, essais et prix des forfaits, et le forfait de chaque organisation. Un prix reste provisoire tant que tu ne l’as pas confirmé ; les clients ne voient que les prix confirmés.",
+      "forbidden": "Seule l’équipe de la plateforme peut gérer les forfaits.",
+      "plans": "Catalogue",
+      "audience": {
+        "gym": "Salles",
+        "coach": "Coachs"
+      },
+      "audienceLabel": "Pour",
+      "placeholder": "Prix provisoire",
+      "name": "Nom",
+      "monthly": "Mensuel ({currency})",
+      "annual": "Annuel ({currency})",
+      "trialDays": "Jours d’essai",
+      "unlimitedHint": "Vide : sans limite",
+      "confirmed": "Prix confirmé",
+      "default": "Par défaut pour les nouvelles organisations",
+      "public": "Visible publiquement",
+      "active": "Actif",
+      "save": "Enregistrer",
+      "saved": "Enregistré",
+      "newPlan": "Nouveau forfait",
+      "code": "Code",
+      "codeHint": "Minuscules, chiffres et _. Non modifiable ensuite.",
+      "add": "Ajouter le forfait",
+      "subscriptions": "Organisations",
+      "noPlan": "Aucun forfait",
+      "plan": "Forfait",
+      "status": "Statut",
+      "trialEnds": "Fin de l’essai",
+      "override": "Prix mensuel personnalisé",
+      "overrideHint": "Vide : prix du forfait",
+      "notes": "Notes"
     }
   }
 }
