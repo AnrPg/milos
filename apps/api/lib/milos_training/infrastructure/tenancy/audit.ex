@@ -75,6 +75,7 @@ defmodule MilosTraining.Infrastructure.Tenancy.Audit do
 
   @ready_personal_tables ~w(
     workout_executions execution_progress_operations notifications push_subscriptions
+    native_push_tokens
     community_follows community_profile_posts community_profile_post_reactions
     community_profile_post_comments community_social_settings
     user_pr_records user_stats user_achievements user_gamification_preferences

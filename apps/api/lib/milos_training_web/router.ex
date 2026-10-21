@@ -1134,6 +1134,15 @@ defmodule MilosTrainingWeb.Router do
     )
 
     delete("/notifications/push-subscriptions", NotificationController, :delete_push_subscription)
+    # ADR-171: push to the store apps.
+    post("/notifications/native-push-tokens", NotificationController, :create_native_push_token)
+
+    post(
+      "/notifications/native-push-tokens/unregister",
+      NotificationController,
+      :delete_native_push_token
+    )
+
     get("/wellbeing/injuries", WellbeingController, :index)
     post("/wellbeing/injuries", WellbeingController, :create)
     patch("/wellbeing/injuries/:id/heal", WellbeingController, :heal)
