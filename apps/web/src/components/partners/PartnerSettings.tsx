@@ -31,10 +31,11 @@ export function PartnerVisibilitySetting() {
     },
   });
   if (!settings.data) return null;
-  const visible = save.isPending && save.variables !== undefined ? save.variables : settings.data.visible;
+  const clubs = settings.data.clubs ?? 0;
+  const visible = save.isPending && save.variables !== undefined ? save.variables : Boolean(settings.data.visible);
   return (
     <div className="flex flex-col gap-2" data-testid="partner-visibility">
-      {settings.data.clubs === 0 ? (
+      {clubs === 0 ? (
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("settingsNone")}</p>
       ) : (
         <SwitchRow
@@ -42,7 +43,7 @@ export function PartnerVisibilitySetting() {
           disabled={save.isPending}
           onChange={(next) => save.mutate(next)}
           label={t("settingsSwitch")}
-          hint={t("settingsSwitchHint", { count: settings.data.clubs })}
+          hint={t("settingsSwitchHint", { count: clubs })}
         />
       )}
       <ErrorLine message={partnerErrorMessage(save.error, t, tUi)} />
