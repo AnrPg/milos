@@ -50,6 +50,7 @@ defmodule MilosTrainingWeb.AnatomyAtlasControllerTest do
       quads = Enum.find(body["nodes"], &(&1["id"] == "quadriceps"))
       # The fixture's Air Squats: 3 sets, quadriceps primary.
       assert %{"sets" => 3.0, "level" => "low", "kind" => "group", "felt" => 0} = quads
+
       assert [%{"exercise_ref" => "air-squat", "label" => "Air Squat", "sets" => 3.0}] =
                quads["top_exercises"]
 
