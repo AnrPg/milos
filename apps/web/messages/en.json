@@ -8065,13 +8065,14 @@
     "audience": {
       "title": "My coaches means",
       "askTitle": "Who do you mean by «My coaches»?",
-      "hint": "Each provider always sees what you did with them. Pick whose coaches see this entry.",
+      "hint": "Pick which coaches see this entry.",
       "makeDefault": "Use this for my coaches from now on",
       "only": "Only {names}",
       "settingTitle": "My coaches",
-      "settingDescription": "Which providers' coaches see entries you share with «My coaches».",
-      "settingHint": "When you share an entry with your coaches, these providers' coaches see it. You can narrow any single entry.",
-      "ownAlways": "A provider always sees what you did with them (their classes and programmes)."
+      "settingDescription": "Which coaches see entries you share with «My coaches».",
+      "settingHint": "When you share an entry with your coaches, these coaches see it. You can narrow any single entry.",
+      "ownAlways": "A provider's coaches always see what you did with them (their classes and programmes).",
+      "homeAlways": "Coaches at {name} always see it. Pick who else does."
     },
     "export": {
       "title": "Export my journal",

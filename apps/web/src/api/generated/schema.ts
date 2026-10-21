@@ -2307,7 +2307,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Share one entry with specific providers (or reset it) */
+        /** Share one entry with specific coaches (or reset it) */
         put: operations["MilosTrainingWeb.JournalController.entry_audience"];
         post?: never;
         delete?: never;
@@ -15780,9 +15780,23 @@ export interface components {
         };
         /** CoachAudience */
         CoachAudience: {
-            /** @description Providers «Οι coach μου» means by default. */
+            /** @description The coaches «Οι coach μου» means by default. */
+            coaches: {
+                /** Format: uuid */
+                organization_id: string;
+                /** Format: uuid */
+                user_id: string;
+            }[];
+            /** @description Providers with at least one coach «Οι coach μου» means by default. */
             organization_ids: string[];
             providers: {
+                coaches: {
+                    avatar_url?: string | null;
+                    included: boolean;
+                    name: string | null;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
                 included: boolean;
                 /** @enum {string} */
                 kind: "gym" | "coach";
@@ -15791,9 +15805,18 @@ export interface components {
                 organization_id: string;
             }[];
         };
-        /** CoachAudienceRequest */
+        /**
+         * CoachAudienceRequest
+         * @description The coaches «Οι coach μου» means; a provider id means all its coaches.
+         */
         CoachAudienceRequest: {
-            organization_ids: string[];
+            coaches?: {
+                /** Format: uuid */
+                organization_id: string;
+                /** Format: uuid */
+                user_id: string;
+            }[];
+            organization_ids?: string[];
         };
         /** CoachNote */
         CoachNote: {
@@ -15837,6 +15860,13 @@ export interface components {
             /** @enum {string} */
             provider_kind: "coach";
             slug: string;
+        };
+        /** CoachRef */
+        CoachRef: {
+            /** Format: uuid */
+            organization_id: string;
+            /** Format: uuid */
+            user_id: string;
         };
         /** CoachingRelationship */
         CoachingRelationship: {
@@ -19786,24 +19816,44 @@ export interface components {
         };
         /**
          * EntryAudience
-         * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+         * @description Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.
          */
         EntryAudience: {
+            coaches: {
+                /** Format: uuid */
+                organization_id: string;
+                /** Format: uuid */
+                user_id: string;
+            }[];
             custom: boolean;
             organization_ids: string[];
         } | null;
-        /** EntryAudienceRequest */
+        /**
+         * EntryAudienceRequest
+         * @description Who this entry is shared with: coaches, and providers meaning all their coaches. Both null resets to the default.
+         */
         EntryAudienceRequest: {
-            /** @description Providers this entry is shared with; null resets to the default. */
-            organization_ids: string[] | null;
+            coaches?: {
+                /** Format: uuid */
+                organization_id: string;
+                /** Format: uuid */
+                user_id: string;
+            }[] | null;
+            organization_ids?: string[] | null;
         };
         /** EntryAudienceResponse */
         EntryAudienceResponse: {
             /**
              * EntryAudience
-             * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+             * @description Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.
              */
             audience: {
+                coaches: {
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
                 custom: boolean;
                 organization_ids: string[];
             } | null;
@@ -21442,9 +21492,15 @@ export interface components {
         JournalFeedItem: {
             /**
              * EntryAudience
-             * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+             * @description Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.
              */
             audience?: {
+                coaches: {
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
                 custom: boolean;
                 organization_ids: string[];
             } | null;
@@ -21611,8 +21667,15 @@ export interface components {
         };
         /** JournalVisibilityRequest */
         JournalVisibilityRequest: {
-            /** @description ADR-162: providers to share with besides the entry's own; null resets to the default. */
+            /** @description ADR-162: providers (all their coaches) to share with besides the entry's own; null resets to the default. */
             audience?: string[] | null;
+            /** @description ADR-162: individual coaches to share with, with or instead of `audience`. */
+            audience_coaches?: {
+                /** Format: uuid */
+                organization_id: string;
+                /** Format: uuid */
+                user_id: string;
+            }[] | null;
             /**
              * Format: uuid
              * @description Which coach answers, when the member has several.
@@ -21627,9 +21690,15 @@ export interface components {
         JournalVisibilityResponse: {
             /**
              * EntryAudience
-             * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+             * @description Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.
              */
             audience?: {
+                coaches: {
+                    /** Format: uuid */
+                    organization_id: string;
+                    /** Format: uuid */
+                    user_id: string;
+                }[];
                 custom: boolean;
                 organization_ids: string[];
             } | null;
@@ -41219,9 +41288,23 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description Providers «Οι coach μου» means by default. */
+                        /** @description The coaches «Οι coach μου» means by default. */
+                        coaches: {
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** @description Providers with at least one coach «Οι coach μου» means by default. */
                         organization_ids: string[];
                         providers: {
+                            coaches: {
+                                avatar_url?: string | null;
+                                included: boolean;
+                                name: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
                             included: boolean;
                             /** @enum {string} */
                             kind: "gym" | "coach";
@@ -41244,7 +41327,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    organization_ids: string[];
+                    coaches?: {
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** Format: uuid */
+                        user_id: string;
+                    }[];
+                    organization_ids?: string[];
                 };
             };
         };
@@ -41256,9 +41345,23 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        /** @description Providers «Οι coach μου» means by default. */
+                        /** @description The coaches «Οι coach μου» means by default. */
+                        coaches: {
+                            /** Format: uuid */
+                            organization_id: string;
+                            /** Format: uuid */
+                            user_id: string;
+                        }[];
+                        /** @description Providers with at least one coach «Οι coach μου» means by default. */
                         organization_ids: string[];
                         providers: {
+                            coaches: {
+                                avatar_url?: string | null;
+                                included: boolean;
+                                name: string | null;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
                             included: boolean;
                             /** @enum {string} */
                             kind: "gym" | "coach";
@@ -41293,8 +41396,13 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description Providers this entry is shared with; null resets to the default. */
-                    organization_ids: string[] | null;
+                    coaches?: {
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** Format: uuid */
+                        user_id: string;
+                    }[] | null;
+                    organization_ids?: string[] | null;
                 };
             };
         };
@@ -41308,9 +41416,15 @@ export interface operations {
                     "application/json": {
                         /**
                          * EntryAudience
-                         * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+                         * @description Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.
                          */
                         audience: {
+                            coaches: {
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
                             custom: boolean;
                             organization_ids: string[];
                         } | null;
@@ -41353,8 +41467,15 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
-                    /** @description ADR-162: providers to share with besides the entry's own; null resets to the default. */
+                    /** @description ADR-162: providers (all their coaches) to share with besides the entry's own; null resets to the default. */
                     audience?: string[] | null;
+                    /** @description ADR-162: individual coaches to share with, with or instead of `audience`. */
+                    audience_coaches?: {
+                        /** Format: uuid */
+                        organization_id: string;
+                        /** Format: uuid */
+                        user_id: string;
+                    }[] | null;
                     /**
                      * Format: uuid
                      * @description Which coach answers, when the member has several.
@@ -41377,9 +41498,15 @@ export interface operations {
                     "application/json": {
                         /**
                          * EntryAudience
-                         * @description Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.
+                         * @description Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.
                          */
                         audience?: {
+                            coaches: {
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** Format: uuid */
+                                user_id: string;
+                            }[];
                             custom: boolean;
                             organization_ids: string[];
                         } | null;

@@ -92,21 +92,25 @@ organizations in their personal session, and coaches read through
    - Anyone else reads only when the entry is shared with them, either
      through the entry's own audience (`journal_entry_audiences`), or,
      for a provider-less entry, through the member's default audience.
-     The default is every active provider minus
-     `journal_coach_audience_exclusions`, so a new provider is included by
-     default.
+     Readers are individual coaches (`{organization_id, coach_user_id}`,
+     ANR's call of 2026-10-21). The default is every coach of every active
+     provider minus `journal_coach_audience_exclusions`, so a new provider
+     or a newly hired coach is included by default.
    Freeform and device entries start private. A provider-less entry can
    move to `coach_can_view` once it has an audience. A reply request still
    needs the entry's own gym. Shareable kinds: execution, training_log, pr,
    note and check_in.
-   - The SQL twin is `milos_journal_entry_shared_with_org`. It is used by
+   - The SQL twin is `milos_journal_entry_shared_with_coach`, checked
+     against the acting coach. It is used by
      `FeedScope`'s coach scope and by additive `…_coach_shared_read_policy`
      row policies on `journal_notes`, `wellbeing_check_ins`,
      `user_pr_records`, `workout_executions` and `training_log_entries`.
    - Endpoints: `GET|PUT /api/me/journal/coach-audience`,
      `PUT /api/me/journal/entries/:kind/:id/audience`, and an optional
-     `audience` on the visibility move. Feed items carry `audience`
-     (`custom` and the providers a coach rung reaches).
+     `audience` / `audience_coaches` on the visibility move. Requests name
+     `coaches` (`{organization_id, user_id}`) and/or `organization_ids`
+     (a provider id means all its coaches). Feed items carry `audience`
+     (`custom`, the providers and the coaches a coach rung reaches).
 7. **Leaving a provider** (Q6). Entries stay in every view of the member,
    labelled `former: true`. The provider loses access to all of the
    member's entries from the end date in three places:
@@ -127,10 +131,10 @@ organizations in their personal session, and coaches read through
   RLS predicate as the journal feed. Provider-specific facts (bookings,
   WOD, messages) are read in each provider's tenant context, so no context
   reaches into another's tables and authorization stays per provider.
-- Audiences are stored per provider, not per coach. A provider's coaches
-  share a reply queue and their coaching relationships change. Storing
-  exclusions keeps «all my active coaches» the default as providers come
-  and go.
+- Audiences are stored per coach: a member may trust one coach of a gym
+  and not another. Storing exclusions keeps «all my active coaches» the
+  default as providers and coaches come and go. A provider's own coaches
+  still always read what was recorded there.
 - One pure policy module with a SQL twin, tested as an exhaustive matrix,
   keeps the coach path, the member's feed and row security from drifting
   apart.
@@ -140,8 +144,9 @@ organizations in their personal session, and coaches read through
   history.
 - **Every provider sees everything shared** (Q5 option B): it leaks a
   private coach's programme to the gym.
-- **Per-coach audiences**: deferred. Coach-level granularity can be added
-  later with a `coach_user_id` column, without changing the policy's shape.
+- **Per-provider audiences**: shipped first, replaced by per-coach on
+  2026-10-21 (migration `20261125100000_journal_audience_per_coach`
+  expands each provider row into one row per coach it had).
 - **Postgres full-text search** for Ροή: trigram `ILIKE` handles Greek and
   partial words without a language configuration.
 
@@ -191,3 +196,9 @@ organizations in their personal session, and coaches read through
     wherever they are. The web sends the browser's zone with a date range.
   - `Organizations.put_provider_kind/2` is owner-only. An admin's save that
     includes it is refused as a whole.
+- Per coach (migration `20261125100000_journal_audience_per_coach`):
+  `coach_user_id` joins the primary keys of `journal_entry_audiences` and
+  `journal_coach_audience_exclusions`; `milos_my_provider_coaches()` lists
+  the coaches of the caller's active providers for the chooser. The web
+  chooser (`lib/coach-audience.ts`, `CoachChips`) groups coaches by
+  provider and hides the home provider's coaches, who always read.

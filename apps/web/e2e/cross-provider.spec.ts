@@ -83,9 +83,29 @@ async function common(page: Page) {
     route.fulfill(
       json({
         organization_ids: ["org-box", "org-coach"],
+        coaches: [
+          { organization_id: "org-box", user_id: "u-eleni" },
+          { organization_id: "org-box", user_id: "u-petros" },
+          { organization_id: "org-coach", user_id: "u-nikos" },
+        ],
         providers: [
-          { organization_id: "org-box", name: "Box Kypseli", kind: "gym", included: true },
-          { organization_id: "org-coach", name: "Nikos P.", kind: "coach", included: true },
+          {
+            organization_id: "org-box",
+            name: "Box Kypseli",
+            kind: "gym",
+            included: true,
+            coaches: [
+              { user_id: "u-eleni", name: "Eleni", included: true },
+              { user_id: "u-petros", name: "Petros", included: true },
+            ],
+          },
+          {
+            organization_id: "org-coach",
+            name: "Nikos P.",
+            kind: "coach",
+            included: true,
+            coaches: [{ user_id: "u-nikos", name: "Nikos", included: true }],
+          },
         ],
       }),
     ),
@@ -184,12 +204,20 @@ test.describe("One journal across providers", () => {
               id: "n-1",
               occurred_at: new Date().toISOString(),
               occurred_tz: "UTC",
-              organization_id: "org-box",
+              organization_id: null,
               journal_visibility: "private",
-              choosable_visibilities: ["private", "coach_can_view", "coach_reply_requested"],
-              source: source("org-box", "Box Kypseli"),
-              audience: null,
-              entry: { id: "n-1", topic: "thought", body: "Shoulder is tight", journal_visibility: "private", organization_id: "org-box" },
+              choosable_visibilities: ["private", "coach_can_view"],
+              source: { kind: "freeform", organization_id: null, name: null, former: false },
+              audience: {
+                custom: false,
+                organization_ids: ["org-box", "org-coach"],
+                coaches: [
+                  { organization_id: "org-box", user_id: "u-eleni" },
+                  { organization_id: "org-box", user_id: "u-petros" },
+                  { organization_id: "org-coach", user_id: "u-nikos" },
+                ],
+              },
+              entry: { id: "n-1", topic: "thought", body: "Shoulder is tight", journal_visibility: "private", organization_id: null },
             },
           ],
           next_cursor: null,
@@ -201,7 +229,20 @@ test.describe("One journal across providers", () => {
     );
     const audience = page.waitForRequest((request) => request.url().endsWith("/me/journal/entries/note/n-1/audience") && request.method() === "PUT");
     await page.route("**/api/me/journal/entries/note/n-1/audience", (route) =>
-      route.fulfill(json({ kind: "note", id: "n-1", audience: { custom: true, organization_ids: ["org-coach"] } })),
+      route.fulfill(
+        json({
+          kind: "note",
+          id: "n-1",
+          audience: {
+            custom: true,
+            organization_ids: ["org-box", "org-coach"],
+            coaches: [
+              { organization_id: "org-box", user_id: "u-petros" },
+              { organization_id: "org-coach", user_id: "u-nikos" },
+            ],
+          },
+        }),
+      ),
     );
 
     await page.goto("/journal");
@@ -210,10 +251,16 @@ test.describe("One journal across providers", () => {
     await picker.getByRole("radio", { name: /Coach can view/ }).check();
     const chooser = picker.getByRole("group", { name: "Who do you mean by «My coaches»?" });
     await expect(chooser).toBeVisible();
-    await chooser.getByRole("button", { name: /Box Kypseli/ }).click();
+    // Per coach: leave Eleni at the box out, Petros there still sees it.
+    await chooser.getByRole("button", { name: /Eleni/ }).click();
     await chooser.getByRole("checkbox", { name: "Use this for my coaches from now on" }).uncheck();
     await picker.getByRole("button", { name: "Save" }).click();
-    expect(bodyOf(await audience)).toEqual({ organization_ids: ["org-coach"] });
+    expect(bodyOf(await audience)).toEqual({
+      coaches: [
+        { organization_id: "org-box", user_id: "u-petros" },
+        { organization_id: "org-coach", user_id: "u-nikos" },
+      ],
+    });
   });
 
   test("Ρυθμίσεις exports the whole journal", async ({ page }) => {

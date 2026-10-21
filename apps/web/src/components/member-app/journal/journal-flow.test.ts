@@ -59,9 +59,9 @@ describe("withVisibility", () => {
 
 describe("withAudience (ADR-162)", () => {
   it("sets one entry's coach audience and leaves the rest", () => {
-    const pages = [page([item({ id: "a" }), item({ id: "b", audience: { custom: false, organization_ids: ["gym"] } })])];
-    const next = withAudience(pages, { kind: "note", id: "a" }, { custom: true, organization_ids: ["coach"] });
-    expect(next[0].items[0].audience).toEqual({ custom: true, organization_ids: ["coach"] });
-    expect(next[0].items[1].audience).toEqual({ custom: false, organization_ids: ["gym"] });
+    const pages = [page([item({ id: "a" }), item({ id: "b", audience: { custom: false, organization_ids: ["gym"], coaches: [] } })])];
+    const next = withAudience(pages, { kind: "note", id: "a" }, { custom: true, organization_ids: ["coach"], coaches: [{ organization_id: "coach", user_id: "nikos" }] });
+    expect(next[0].items[0].audience).toEqual({ custom: true, organization_ids: ["coach"], coaches: [{ organization_id: "coach", user_id: "nikos" }] });
+    expect(next[0].items[1].audience).toEqual({ custom: false, organization_ids: ["gym"], coaches: [] });
   });
 });

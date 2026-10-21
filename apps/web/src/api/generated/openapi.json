@@ -17696,8 +17696,31 @@
       },
       "CoachAudience": {
         "properties": {
+          "coaches": {
+            "description": "The coaches «Οι coach μου» means by default.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "user_id"
+              ],
+              "title": "CoachRef",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "organization_ids": {
-            "description": "Providers «Οι coach μου» means by default.",
+            "description": "Providers with at least one coach «Οι coach μου» means by default.",
             "items": {
               "format": "uuid",
               "type": "string"
@@ -17707,6 +17730,34 @@
           "providers": {
             "items": {
               "properties": {
+                "coaches": {
+                  "items": {
+                    "properties": {
+                      "avatar_url": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "included": {
+                        "type": "boolean"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "user_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "user_id",
+                      "name",
+                      "included"
+                    ],
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
                 "included": {
                   "type": "boolean"
                 },
@@ -17729,7 +17780,8 @@
                 "organization_id",
                 "name",
                 "kind",
-                "included"
+                "included",
+                "coaches"
               ],
               "type": "object"
             },
@@ -17738,6 +17790,7 @@
         },
         "required": [
           "organization_ids",
+          "coaches",
           "providers"
         ],
         "title": "CoachAudience",
@@ -17745,7 +17798,30 @@
       },
       "CoachAudienceRequest": {
         "additionalProperties": false,
+        "description": "The coaches «Οι coach μου» means; a provider id means all its coaches.",
         "properties": {
+          "coaches": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "user_id"
+              ],
+              "title": "CoachRef",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "organization_ids": {
             "items": {
               "format": "uuid",
@@ -17754,9 +17830,6 @@
             "type": "array"
           }
         },
-        "required": [
-          "organization_ids"
-        ],
         "title": "CoachAudienceRequest",
         "type": "object"
       },
@@ -17882,6 +17955,25 @@
           "provider_kind"
         ],
         "title": "CoachPractice",
+        "type": "object"
+      },
+      "CoachRef": {
+        "additionalProperties": false,
+        "properties": {
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "user_id"
+        ],
+        "title": "CoachRef",
         "type": "object"
       },
       "CoachingRelationship": {
@@ -30141,9 +30233,31 @@
         "type": "object"
       },
       "EntryAudience": {
-        "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+        "description": "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
         "nullable": true,
         "properties": {
+          "coaches": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "user_id"
+              ],
+              "title": "CoachRef",
+              "type": "object"
+            },
+            "type": "array"
+          },
           "custom": {
             "type": "boolean"
           },
@@ -30157,16 +30271,40 @@
         },
         "required": [
           "custom",
-          "organization_ids"
+          "organization_ids",
+          "coaches"
         ],
         "title": "EntryAudience",
         "type": "object"
       },
       "EntryAudienceRequest": {
         "additionalProperties": false,
+        "description": "Who this entry is shared with: coaches, and providers meaning all their coaches. Both null resets to the default.",
         "properties": {
+          "coaches": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "user_id"
+              ],
+              "title": "CoachRef",
+              "type": "object"
+            },
+            "nullable": true,
+            "type": "array"
+          },
           "organization_ids": {
-            "description": "Providers this entry is shared with; null resets to the default.",
             "items": {
               "format": "uuid",
               "type": "string"
@@ -30175,18 +30313,37 @@
             "type": "array"
           }
         },
-        "required": [
-          "organization_ids"
-        ],
         "title": "EntryAudienceRequest",
         "type": "object"
       },
       "EntryAudienceResponse": {
         "properties": {
           "audience": {
-            "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+            "description": "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
             "nullable": true,
             "properties": {
+              "coaches": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "user_id"
+                  ],
+                  "title": "CoachRef",
+                  "type": "object"
+                },
+                "type": "array"
+              },
               "custom": {
                 "type": "boolean"
               },
@@ -30200,7 +30357,8 @@
             },
             "required": [
               "custom",
-              "organization_ids"
+              "organization_ids",
+              "coaches"
             ],
             "title": "EntryAudience",
             "type": "object"
@@ -35640,9 +35798,31 @@
       "JournalFeedItem": {
         "properties": {
           "audience": {
-            "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+            "description": "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
             "nullable": true,
             "properties": {
+              "coaches": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "user_id"
+                  ],
+                  "title": "CoachRef",
+                  "type": "object"
+                },
+                "type": "array"
+              },
               "custom": {
                 "type": "boolean"
               },
@@ -35656,7 +35836,8 @@
             },
             "required": [
               "custom",
-              "organization_ids"
+              "organization_ids",
+              "coaches"
             ],
             "title": "EntryAudience",
             "type": "object"
@@ -36225,10 +36406,34 @@
         "additionalProperties": false,
         "properties": {
           "audience": {
-            "description": "ADR-162: providers to share with besides the entry's own; null resets to the default.",
+            "description": "ADR-162: providers (all their coaches) to share with besides the entry's own; null resets to the default.",
             "items": {
               "format": "uuid",
               "type": "string"
+            },
+            "nullable": true,
+            "type": "array"
+          },
+          "audience_coaches": {
+            "description": "ADR-162: individual coaches to share with, with or instead of `audience`.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "user_id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "organization_id",
+                "user_id"
+              ],
+              "title": "CoachRef",
+              "type": "object"
             },
             "nullable": true,
             "type": "array"
@@ -36261,9 +36466,31 @@
       "JournalVisibilityResponse": {
         "properties": {
           "audience": {
-            "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+            "description": "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
             "nullable": true,
             "properties": {
+              "coaches": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "user_id"
+                  ],
+                  "title": "CoachRef",
+                  "type": "object"
+                },
+                "type": "array"
+              },
               "custom": {
                 "type": "boolean"
               },
@@ -36277,7 +36504,8 @@
             },
             "required": [
               "custom",
-              "organization_ids"
+              "organization_ids",
+              "coaches"
             ],
             "title": "EntryAudience",
             "type": "object"
@@ -92745,8 +92973,31 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "coaches": {
+                      "description": "The coaches «Οι coach μου» means by default.",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "user_id"
+                        ],
+                        "title": "CoachRef",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "organization_ids": {
-                      "description": "Providers «Οι coach μου» means by default.",
+                      "description": "Providers with at least one coach «Οι coach μου» means by default.",
                       "items": {
                         "format": "uuid",
                         "type": "string"
@@ -92756,6 +93007,34 @@
                     "providers": {
                       "items": {
                         "properties": {
+                          "coaches": {
+                            "items": {
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "included": {
+                                  "type": "boolean"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "user_id",
+                                "name",
+                                "included"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
                           "included": {
                             "type": "boolean"
                           },
@@ -92778,7 +93057,8 @@
                           "organization_id",
                           "name",
                           "kind",
-                          "included"
+                          "included",
+                          "coaches"
                         ],
                         "type": "object"
                       },
@@ -92787,6 +93067,7 @@
                   },
                   "required": [
                     "organization_ids",
+                    "coaches",
                     "providers"
                   ],
                   "title": "CoachAudience",
@@ -92816,7 +93097,30 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
+                "description": "The coaches «Οι coach μου» means; a provider id means all its coaches.",
                 "properties": {
+                  "coaches": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "user_id"
+                      ],
+                      "title": "CoachRef",
+                      "type": "object"
+                    },
+                    "type": "array"
+                  },
                   "organization_ids": {
                     "items": {
                       "format": "uuid",
@@ -92825,9 +93129,6 @@
                     "type": "array"
                   }
                 },
-                "required": [
-                  "organization_ids"
-                ],
                 "title": "CoachAudienceRequest",
                 "type": "object"
               }
@@ -92841,8 +93142,31 @@
               "application/json": {
                 "schema": {
                   "properties": {
+                    "coaches": {
+                      "description": "The coaches «Οι coach μου» means by default.",
+                      "items": {
+                        "additionalProperties": false,
+                        "properties": {
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "user_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "user_id"
+                        ],
+                        "title": "CoachRef",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
                     "organization_ids": {
-                      "description": "Providers «Οι coach μου» means by default.",
+                      "description": "Providers with at least one coach «Οι coach μου» means by default.",
                       "items": {
                         "format": "uuid",
                         "type": "string"
@@ -92852,6 +93176,34 @@
                     "providers": {
                       "items": {
                         "properties": {
+                          "coaches": {
+                            "items": {
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "included": {
+                                  "type": "boolean"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "user_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "user_id",
+                                "name",
+                                "included"
+                              ],
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
                           "included": {
                             "type": "boolean"
                           },
@@ -92874,7 +93226,8 @@
                           "organization_id",
                           "name",
                           "kind",
-                          "included"
+                          "included",
+                          "coaches"
                         ],
                         "type": "object"
                       },
@@ -92883,6 +93236,7 @@
                   },
                   "required": [
                     "organization_ids",
+                    "coaches",
                     "providers"
                   ],
                   "title": "CoachAudience",
@@ -92949,9 +93303,32 @@
             "application/json": {
               "schema": {
                 "additionalProperties": false,
+                "description": "Who this entry is shared with: coaches, and providers meaning all their coaches. Both null resets to the default.",
                 "properties": {
+                  "coaches": {
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "user_id"
+                      ],
+                      "title": "CoachRef",
+                      "type": "object"
+                    },
+                    "nullable": true,
+                    "type": "array"
+                  },
                   "organization_ids": {
-                    "description": "Providers this entry is shared with; null resets to the default.",
                     "items": {
                       "format": "uuid",
                       "type": "string"
@@ -92960,9 +93337,6 @@
                     "type": "array"
                   }
                 },
-                "required": [
-                  "organization_ids"
-                ],
                 "title": "EntryAudienceRequest",
                 "type": "object"
               }
@@ -92977,9 +93351,31 @@
                 "schema": {
                   "properties": {
                     "audience": {
-                      "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+                      "description": "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
                       "nullable": true,
                       "properties": {
+                        "coaches": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "organization_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "organization_id",
+                              "user_id"
+                            ],
+                            "title": "CoachRef",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "custom": {
                           "type": "boolean"
                         },
@@ -92993,7 +93389,8 @@
                       },
                       "required": [
                         "custom",
-                        "organization_ids"
+                        "organization_ids",
+                        "coaches"
                       ],
                       "title": "EntryAudience",
                       "type": "object"
@@ -93044,7 +93441,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Share one entry with specific providers (or reset it)",
+        "summary": "Share one entry with specific coaches (or reset it)",
         "tags": [
           "Journal"
         ]
@@ -93094,10 +93491,34 @@
                 "additionalProperties": false,
                 "properties": {
                   "audience": {
-                    "description": "ADR-162: providers to share with besides the entry's own; null resets to the default.",
+                    "description": "ADR-162: providers (all their coaches) to share with besides the entry's own; null resets to the default.",
                     "items": {
                       "format": "uuid",
                       "type": "string"
+                    },
+                    "nullable": true,
+                    "type": "array"
+                  },
+                  "audience_coaches": {
+                    "description": "ADR-162: individual coaches to share with, with or instead of `audience`.",
+                    "items": {
+                      "additionalProperties": false,
+                      "properties": {
+                        "organization_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "user_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "organization_id",
+                        "user_id"
+                      ],
+                      "title": "CoachRef",
+                      "type": "object"
                     },
                     "nullable": true,
                     "type": "array"
@@ -93138,9 +93559,31 @@
                 "schema": {
                   "properties": {
                     "audience": {
-                      "description": "Providers a coach rung on this entry reaches; `custom` when the entry has its own audience.",
+                      "description": "Coaches a coach rung on this entry reaches (and their providers); `custom` when the entry has its own audience.",
                       "nullable": true,
                       "properties": {
+                        "coaches": {
+                          "items": {
+                            "additionalProperties": false,
+                            "properties": {
+                              "organization_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "user_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "organization_id",
+                              "user_id"
+                            ],
+                            "title": "CoachRef",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
                         "custom": {
                           "type": "boolean"
                         },
@@ -93154,7 +93597,8 @@
                       },
                       "required": [
                         "custom",
-                        "organization_ids"
+                        "organization_ids",
+                        "coaches"
                       ],
                       "title": "EntryAudience",
                       "type": "object"

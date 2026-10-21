@@ -8065,13 +8065,14 @@
     "audience": {
       "title": "«Os meus treinadores» significa",
       "askTitle": "Quem são «Os meus treinadores»?",
-      "hint": "Cada prestador vê sempre o que fizeste com ele. Escolhe que treinadores veem este registo.",
+      "hint": "Escolha que treinadores veem esta entrada.",
       "makeDefault": "Usar isto para os meus treinadores a partir de agora",
       "only": "Só {names}",
       "settingTitle": "Os meus treinadores",
-      "settingDescription": "Os treinadores de que prestadores veem os registos que partilhas com «Os meus treinadores».",
-      "settingHint": "Quando partilhas um registo com os teus treinadores, os treinadores destes prestadores veem-no. Podes restringir cada registo.",
-      "ownAlways": "Um prestador vê sempre o que fizeste com ele (as aulas e programas dele)."
+      "settingDescription": "Que treinadores veem o que partilha com «Os meus treinadores».",
+      "settingHint": "Quando partilha uma entrada com os seus treinadores, estes treinadores veem-na. Pode limitar cada entrada separadamente.",
+      "ownAlways": "Os treinadores de um fornecedor veem sempre o que fez com eles (as suas aulas e programas).",
+      "homeAlways": "Os treinadores de {name} veem-na sempre. Escolha quem mais."
     },
     "export": {
       "title": "Exportar o meu diário",

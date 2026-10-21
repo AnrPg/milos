@@ -8065,13 +8065,14 @@
     "audience": {
       "title": "Meine Coaches heißt",
       "askTitle": "Wen meinst du mit „Meine Coaches“?",
-      "hint": "Jeder Anbieter sieht immer, was du bei ihm gemacht hast. Wähle, wessen Coaches diesen Eintrag sehen.",
+      "hint": "Wähle, welche Coaches diesen Eintrag sehen.",
       "makeDefault": "Ab jetzt für meine Coaches verwenden",
       "only": "Nur {names}",
       "settingTitle": "Meine Coaches",
-      "settingDescription": "Welche Anbieter-Coaches Einträge sehen, die du mit „Meine Coaches“ teilst.",
-      "settingHint": "Wenn du einen Eintrag mit deinen Coaches teilst, sehen ihn die Coaches dieser Anbieter. Du kannst das für jeden Eintrag einzeln einschränken.",
-      "ownAlways": "Ein Anbieter sieht immer, was du bei ihm gemacht hast (seine Kurse und Programme)."
+      "settingDescription": "Welche Coaches sehen, was du mit «Meine Coaches» teilst.",
+      "settingHint": "Wenn du einen Eintrag mit deinen Coaches teilst, sehen ihn diese Coaches. Jeden Eintrag kannst du einzeln eingrenzen.",
+      "ownAlways": "Die Coaches eines Anbieters sehen immer, was du bei ihm gemacht hast (seine Kurse und Programme).",
+      "homeAlways": "Die Coaches von {name} sehen ihn immer. Wähle, wer ihn noch sieht."
     },
     "export": {
       "title": "Mein Journal exportieren",

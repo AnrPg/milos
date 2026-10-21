@@ -8065,13 +8065,14 @@
     "audience": {
       "title": "Mijn coaches betekent",
       "askTitle": "Wie bedoel je met ‘Mijn coaches’?",
-      "hint": "Elke aanbieder ziet altijd wat je bij hen hebt gedaan. Kies wiens coaches dit item zien.",
+      "hint": "Kies welke coaches deze notitie zien.",
       "makeDefault": "Voortaan gebruiken voor mijn coaches",
       "only": "Alleen {names}",
       "settingTitle": "Mijn coaches",
-      "settingDescription": "De coaches van welke aanbieders items zien die je deelt met ‘Mijn coaches’.",
-      "settingHint": "Als je een item met je coaches deelt, zien de coaches van deze aanbieders het. Je kunt dit per item beperken.",
-      "ownAlways": "Een aanbieder ziet altijd wat je bij hen hebt gedaan (hun lessen en programma’s)."
+      "settingDescription": "Welke coaches zien wat je deelt met «Mijn coaches».",
+      "settingHint": "Als je een notitie met je coaches deelt, zien deze coaches hem. Je kunt elke notitie apart beperken.",
+      "ownAlways": "De coaches van een aanbieder zien altijd wat je bij hen deed (hun lessen en programma's).",
+      "homeAlways": "De coaches van {name} zien hem altijd. Kies wie nog meer."
     },
     "export": {
       "title": "Mijn logboek exporteren",

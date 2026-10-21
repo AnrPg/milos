@@ -8065,13 +8065,14 @@
     "audience": {
       "title": "«Mis entrenadores» significa",
       "askTitle": "¿A quién te refieres con «Mis entrenadores»?",
-      "hint": "Cada proveedor siempre ve lo que hiciste con él. Elige qué entrenadores ven esta entrada.",
+      "hint": "Elige qué entrenadores ven esta entrada.",
       "makeDefault": "Usar esto para mis entrenadores a partir de ahora",
       "only": "Solo {names}",
       "settingTitle": "Mis entrenadores",
-      "settingDescription": "Qué entrenadores de tus proveedores ven las entradas que compartes con «Mis entrenadores».",
-      "settingHint": "Cuando compartes una entrada con tus entrenadores, la ven los entrenadores de estos proveedores. Puedes limitarlo en cada entrada.",
-      "ownAlways": "Un proveedor siempre ve lo que hiciste con él (sus clases y programas)."
+      "settingDescription": "Qué entrenadores ven lo que compartes con «Mis entrenadores».",
+      "settingHint": "Cuando compartes una entrada con tus entrenadores, la ven estos entrenadores. Puedes limitar cada entrada por separado.",
+      "ownAlways": "Los entrenadores de un proveedor siempre ven lo que hiciste con ellos (sus clases y programas).",
+      "homeAlways": "Los entrenadores de {name} siempre la ven. Elige quién más."
     },
     "export": {
       "title": "Exportar mi diario",
