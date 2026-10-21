@@ -8646,6 +8646,60 @@
     "notFound": "Cette squad n'est pas disponible.",
     "backToClub": "Retour au club"
   },
+  "Depth": {
+    "noData": "Aucun entraînement sur cette période.",
+    "coverage": {
+      "title": "Couverture musculaire",
+      "atlas": "Atlas ›",
+      "most": "Le plus travaillé",
+      "least": "Le moins travaillé",
+      "noneMost": "Aucun exercice reconnu sur cette période.",
+      "noneLeast": "Tous les grands groupes musculaires ont une couverture moyenne ou élevée.",
+      "pushPull": "Poussée : Tirage",
+      "quadHam": "Quadriceps : Ischios",
+      "ratioMissing": "Encore quelques séries",
+      "note": "Une indication du volume d’entraînement, pas un objectif."
+    },
+    "qualities": {
+      "title": "Qualités physiques",
+      "most": "Le plus : {qualities}",
+      "felt": "« Ressenti » : {qualities}",
+      "row": "{quality} : {sets} séries",
+      "note": "La forme montre où est allé l’entraînement, pas une note.",
+      "short": {
+        "cardiorespiratory-endurance": "Cardio",
+        "stamina": "Endurance",
+        "strength": "Force",
+        "flexibility": "Souplesse",
+        "power": "Puissance",
+        "speed": "Vitesse",
+        "coordination": "Coordination",
+        "agility": "Agilité",
+        "balance": "Équilibre",
+        "accuracy": "Précision"
+      }
+    },
+    "load": {
+      "title": "Charge d’entraînement",
+      "ratio": "Cette semaine : {ratio}× ta semaine habituelle",
+      "insufficient": "La comparaison apparaît après 3 semaines d’entraînements avec RPE et durée.",
+      "weeks": "Charge par semaine · 8 sem.",
+      "weekOf": "Semaine du {date} : {load}",
+      "unrated": "{count, plural, one {# entraînement des 4 dernières semaines n’a pas de RPE ou de durée et ne compte pas.} other {# entraînements des 4 dernières semaines n’ont pas de RPE ou de durée et ne comptent pas.}}",
+      "note": "Charge = RPE × minutes. Une indication par rapport à ta semaine habituelle, pas un avis médical.",
+      "band": {
+        "below": "Plus légère",
+        "steady": "Proche de l’habitude",
+        "above": "Au-dessus de l’habitude",
+        "well_above": "Nettement au-dessus de l’habitude"
+      }
+    },
+    "coach": {
+      "title": "Couverture, qualités, charge",
+      "range": "Période",
+      "sharedOnly": "Uniquement à partir des entrées que le client partage avec les coachs de la box."
+    }
+  },
   "Scaling": {
     "loading": "Chargement…",
     "settings": {

@@ -8646,6 +8646,60 @@
     "notFound": "Deze squad is niet beschikbaar.",
     "backToClub": "Terug naar de club"
   },
+  "Depth": {
+    "noData": "Geen trainingen in deze periode.",
+    "coverage": {
+      "title": "Spierdekking",
+      "atlas": "Atlas ›",
+      "most": "Meeste werk",
+      "least": "Minste werk",
+      "noneMost": "Geen herkende oefening in deze periode.",
+      "noneLeast": "Alle grote spiergroepen hebben gemiddelde of hoge dekking.",
+      "pushPull": "Duwen : Trekken",
+      "quadHam": "Quadriceps : Hamstrings",
+      "ratioMissing": "Nog een paar sets nodig",
+      "note": "Een indicatie van trainingsvolume, geen doel."
+    },
+    "qualities": {
+      "title": "Fitnesskwaliteiten",
+      "most": "Meeste: {qualities}",
+      "felt": "‘Gevoeld’: {qualities}",
+      "row": "{quality}: {sets} sets",
+      "note": "De vorm toont waar de training heen ging, geen cijfer.",
+      "short": {
+        "cardiorespiratory-endurance": "Cardio",
+        "stamina": "Uithouding",
+        "strength": "Kracht",
+        "flexibility": "Lenigheid",
+        "power": "Explosiviteit",
+        "speed": "Snelheid",
+        "coordination": "Coördinatie",
+        "agility": "Wendbaarheid",
+        "balance": "Balans",
+        "accuracy": "Precisie"
+      }
+    },
+    "load": {
+      "title": "Trainingsbelasting",
+      "ratio": "Deze week: {ratio}× je gebruikelijke",
+      "insufficient": "De vergelijking verschijnt na 3 weken trainingen met RPE en duur.",
+      "weeks": "Belasting per week · 8 wk",
+      "weekOf": "Week van {date}: {load}",
+      "unrated": "{count, plural, one {# training van de laatste 4 weken heeft geen RPE of duur en telt niet.} other {# trainingen van de laatste 4 weken hebben geen RPE of duur en tellen niet.}}",
+      "note": "Belasting = RPE × minuten. Een indicatie ten opzichte van je gebruikelijke week, geen medisch advies.",
+      "band": {
+        "below": "Lichter",
+        "steady": "Dicht bij gebruikelijk",
+        "above": "Boven gebruikelijk",
+        "well_above": "Ruim boven gebruikelijk"
+      }
+    },
+    "coach": {
+      "title": "Dekking, kwaliteiten, belasting",
+      "range": "Periode",
+      "sharedOnly": "Alleen uit items die de klant met de coaches van de box deelt."
+    }
+  },
   "Scaling": {
     "loading": "Laden…",
     "settings": {
