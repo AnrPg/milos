@@ -16,6 +16,7 @@ import { changeComments, type FinishComments } from "@/lib/journal-comments";
 import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { semanticLabel } from "@/i18n/presentation";
+import { FeltStep } from "@/components/wod-goals/FeltStep";
 import { buildSegmentStepDefinitions } from "./progress";
 
 type SectionScore = {
@@ -941,6 +942,7 @@ export function FinishWizard({
   pendingCommentIds = [],
   clockAdjustments,
   freeText = false,
+  feltExecutionId = null,
   isSaving,
   feedback,
   onConfirm,
@@ -953,6 +955,8 @@ export function FinishWizard({
   pendingCommentIds?: string[];
   clockAdjustments?: ClockAdjustmentSummary[];
   freeText?: boolean;
+  /** Offers «Τι ένιωσες;» (WOD goals feedback) on this execution before the confirm step. */
+  feltExecutionId?: string | null;
   isSaving: boolean;
   feedback: string | null;
   onConfirm: (editedScores: SectionScore[], finish: FinishComments) => void;
@@ -960,7 +964,9 @@ export function FinishWizard({
   onCancel?: () => void;
 }) {
   const i18n = useUiTranslations();
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | "felt" | 3>(1);
+  const afterComments = feltExecutionId ? "felt" : 3;
+  const finishFelt = React.useCallback(() => setStep(3), []);
   const [confirmedScores, setConfirmedScores] = useState<SectionScore[]>(scores);
   const [confirmedMods, setConfirmedMods] = useState<ExerciseModification[]>(() =>
     changeComments(comments).map((comment) => comment.change!),
@@ -974,7 +980,7 @@ export function FinishWizard({
 
   function handleModsNext(mods: ExerciseModification[]) {
     setConfirmedMods(mods);
-    setStep(3);
+    setStep(afterComments);
   }
 
   function handleSave() {
@@ -1003,8 +1009,8 @@ export function FinishWizard({
           text={text}
           onTextChange={setText}
           onBack={() => setStep(1)}
-          onNext={() => setStep(3)}
-          onSkip={() => setStep(3)}
+          onNext={() => setStep(afterComments)}
+          onSkip={() => setStep(afterComments)}
         />
       );
     }
@@ -1019,9 +1025,13 @@ export function FinishWizard({
         onTextChange={setText}
         onBack={() => setStep(1)}
         onNext={handleModsNext}
-        onSkip={() => setStep(3)}
+        onSkip={() => setStep(afterComments)}
       />
     );
+  }
+
+  if (step === "felt" && feltExecutionId) {
+    return <FeltStep entryKind="execution" entryId={feltExecutionId} onBack={() => setStep(2)} onDone={finishFelt} />;
   }
 
   return (
@@ -1033,7 +1043,7 @@ export function FinishWizard({
       clockAdjustments={clockAdjustments}
       isSaving={isSaving}
       feedback={feedback}
-      onBack={() => setStep(2)}
+      onBack={() => setStep(afterComments === "felt" ? "felt" : 2)}
       onSave={handleSave}
     />
   );

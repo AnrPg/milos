@@ -28,6 +28,7 @@ import {
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { WorkoutContentBlock } from "@/components/workouts/WorkoutContent";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -205,6 +206,7 @@ export function BoxToday() {
               freeTextBody={selected.workout.free_text_body}
               freeTextDocument={selected.workout.free_text_document}
             />
+            <WodGoalsStrip workoutId={selected.workout.id} />
 
             {token ? (
               <MyInjuryWarningsPanel

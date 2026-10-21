@@ -41,6 +41,9 @@ vi.mock("@/components/wellbeing/InjuryWarnings", () => ({
   },
 }));
 
+// The goals strip reads through React Query; its own tests cover it.
+vi.mock("@/components/wod-goals/WodGoalsStrip", () => ({ WodGoalsStrip: () => null }));
+
 vi.mock("@/api/executions", async (importOriginal) => ({
   ...(await importOriginal<typeof import("@/api/executions")>()),
   updateExecutionProgress: (...args: unknown[]) => updateExecutionProgress(...args),

@@ -23,6 +23,7 @@ import {
   waitlistPositionLabel,
 } from "@/components/schedule/member-booking";
 import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { downloadIcsEvent } from "@/lib/ics";
@@ -358,6 +359,7 @@ export function ClassSheet({
                 {t("wodNotPosted")}
               </p>
             )}
+            {slot.workout ? <WodGoalsStrip workoutId={slot.workout.id} className="mt-3" /> : null}
           </section>
 
           {slot.workout && ownBooking ? (
