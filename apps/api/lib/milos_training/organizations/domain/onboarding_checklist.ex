@@ -11,11 +11,26 @@ defmodule MilosTraining.Organizations.Domain.OnboardingChecklist do
   """
 
   @settings_key "onboarding"
-  @steps ~w(settings classes packages workout invite tour)
+  # ADR-170: an independent coach sets up a practice, not a gym: their public
+  # page, bookable sessions, session packages, the «Team» club, an open
+  # bootcamp, then clients.
+  @steps_by_audience %{
+    "gym" => ~w(settings classes packages workout invite tour),
+    "coach" => ~w(profile sessions packages team bootcamp invite tour)
+  }
+  @steps @steps_by_audience |> Map.values() |> List.flatten() |> Enum.uniq()
   @actions ~w(complete skip reopen dismiss restore tour_completed)
 
   def settings_key, do: @settings_key
+
+  @doc "Every step any audience knows, for stored state and the API enum."
   def steps, do: @steps
+  def steps(audience), do: Map.get(@steps_by_audience, audience, @steps_by_audience["gym"])
+  def audiences, do: Map.keys(@steps_by_audience)
+
+  @doc "The checklist audience of an organization kind (`gym` | `coach`)."
+  def audience(kind) when is_map_key(@steps_by_audience, kind), do: kind
+  def audience(_kind), do: "gym"
 
   def default_state,
     do: %{"completed" => [], "skipped" => [], "dismissed_at" => nil, "tour_completed_at" => nil}
@@ -42,9 +57,12 @@ defmodule MilosTraining.Organizations.Domain.OnboardingChecklist do
   Builds the checklist view. `signals` maps step ids to booleans that say the
   step is already satisfied by real data, e.g. `%{"packages" => true}`.
   """
-  def build(state, signals) when is_map(state) and is_map(signals) do
+  def build(state, signals, audience \\ "gym") when is_map(state) and is_map(signals) do
+    audience = audience(audience)
+    audience_steps = steps(audience)
+
     steps =
-      Enum.map(@steps, fn step ->
+      Enum.map(audience_steps, fn step ->
         auto = step_signal(step, state, signals)
         completed = auto or step in state["completed"]
         skipped = not completed and step in state["skipped"]
@@ -55,17 +73,20 @@ defmodule MilosTraining.Organizations.Domain.OnboardingChecklist do
     resolved = Enum.count(steps, &(&1["done"] or &1["skipped"]))
 
     %{
+      "audience" => audience,
       "steps" => steps,
       "completed_count" => Enum.count(steps, & &1["done"]),
-      "total" => length(@steps),
-      "finished" => resolved == length(@steps),
+      "total" => length(audience_steps),
+      "finished" => resolved == length(audience_steps),
       "dismissed" => not is_nil(state["dismissed_at"]),
       "tour_completed" => not is_nil(state["tour_completed_at"])
     }
   end
 
   @doc "Applies an admin action. Returns `{:ok, new_state}` or an error."
-  def apply_action(state, %{} = params, %DateTime{} = now) do
+  def apply_action(state, params, now, audience \\ "gym")
+
+  def apply_action(state, %{} = params, %DateTime{} = now, audience) do
     action = value(params, :action)
     step = value(params, :step)
 
@@ -73,7 +94,7 @@ defmodule MilosTraining.Organizations.Domain.OnboardingChecklist do
       action not in @actions ->
         {:error, :invalid_onboarding_action}
 
-      action in ~w(complete skip reopen) and step not in @steps ->
+      action in ~w(complete skip reopen) and step not in steps(audience(audience)) ->
         {:error, :invalid_onboarding_action}
 
       true ->
@@ -81,7 +102,7 @@ defmodule MilosTraining.Organizations.Domain.OnboardingChecklist do
     end
   end
 
-  def apply_action(_state, _params, _now), do: {:error, :invalid_onboarding_action}
+  def apply_action(_state, _params, _now, _audience), do: {:error, :invalid_onboarding_action}
 
   defp do_apply("complete", step, state, _now),
     do: state |> add("completed", step) |> remove("skipped", step)

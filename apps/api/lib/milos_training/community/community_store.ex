@@ -20,6 +20,8 @@ defmodule MilosTraining.Community.CommunityStore do
   @impl true
   def ensure_gym_club(context, channels), do: tenant_call(context, :ensure_gym_club, [channels])
   @impl true
+  def name_gym_club(context, name), do: tenant_call(context, :name_gym_club, [name])
+  @impl true
   def list_clubs(context, organization_ids),
     do: tenant_call(context, :list_clubs, [organization_ids])
 

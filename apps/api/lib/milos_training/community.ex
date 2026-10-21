@@ -42,6 +42,7 @@ defmodule MilosTraining.Community do
 
   # Clubs and channels.
   defdelegate provision_gym_club(context), to: ProvisionGymClub, as: :call
+  defdelegate provision_gym_club(context, name), to: ProvisionGymClub, as: :call
   defdelegate list_clubs(context, organization_ids), to: CommunityStore
   defdelegate get_club(context, id), to: CommunityStore
   defdelegate get_channel(context, id), to: CommunityStore

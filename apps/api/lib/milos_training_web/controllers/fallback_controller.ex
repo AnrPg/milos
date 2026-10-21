@@ -2164,6 +2164,18 @@ defmodule MilosTrainingWeb.FallbackController do
     add_on_base_ended: {:unprocessable_entity, "The add-on's base membership has ended"},
     last_owner: {:conflict, "A gym needs at least one owner"},
     owner_required: {:forbidden, "Only gym owners can create gyms"},
+    # ADR-170: platform plans and the solo-coach tier.
+    vendor_required: {:forbidden, "Only the platform team can do this"},
+    coach_practice_exists: {:conflict, "You already run a practice as an independent coach"},
+    plan_limit_reached:
+      {:conflict, "Your plan has no free staff seat; ask us about a bigger plan"},
+    unknown_plan: {:unprocessable_entity, "Choose one of the platform plans"},
+    invalid_plan_audience: {:unprocessable_entity, "Audience must be gym or coach"},
+    invalid_subscription_status:
+      {:unprocessable_entity, "Choose trialing, active, past_due, cancelled or comped"},
+    trial_end_required: {:unprocessable_entity, "A trial needs an end date in the future"},
+    invalid_price: {:unprocessable_entity, "A price is a whole number of cents, zero or more"},
+    invalid_name: {:unprocessable_entity, "A name has 2 to 120 characters"},
     machine_retired: {:unprocessable_entity, "This machine is retired"},
     # ADR-144: trials.
     trials_disabled: {:unprocessable_entity, "This box doesn't offer trials right now"},
