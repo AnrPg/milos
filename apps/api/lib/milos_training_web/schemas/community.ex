@@ -19,7 +19,8 @@ defmodule MilosTrainingWeb.Schemas.Community do
         id: @uuid,
         kind: %Schema{
           type: :string,
-          enum: ~w(announcements wod challenges class_slot season custom member_group general)
+          enum:
+            ~w(announcements wod challenges class_slot season custom member_group general pt_squad)
         },
         name: %Schema{type: :string, nullable: true, description: "Null for built-in channels"},
         description: %Schema{type: :string, nullable: true},

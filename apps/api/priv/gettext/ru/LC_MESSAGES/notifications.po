@@ -552,3 +552,9 @@ msgstr "Вы и %{nickname} хотите тренироваться вместе
 
 msgid "Training partner message"
 msgstr "Сообщение от партнёра по тренировкам"
+
+msgid "Squad invitation"
+msgstr "Приглашение в сквад"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} пригласил(а) тебя в сквад «%{group}»."

@@ -2230,6 +2230,11 @@ defmodule MilosTrainingWeb.FallbackController do
     invalid_target: {:unprocessable_entity, "That can't be reported"},
     invalid_action: {:unprocessable_entity, "That action doesn't apply here"},
     package_not_found: {:unprocessable_entity, "Choose an active package of this box"},
+    # ADR-168: PT squads.
+    too_many_squads: {:unprocessable_entity, "You already run the most squads you can"},
+    squad_full: {:unprocessable_entity, "This squad is full"},
+    squad_archived: {:conflict, "This squad is archived"},
+    coach_archives_instead: {:unprocessable_entity, "Archive the squad instead of leaving it"},
     # ADR-153: club events.
     event_cancelled: {:conflict, "This event was cancelled"},
     event_started: {:conflict, "This event has already started"},

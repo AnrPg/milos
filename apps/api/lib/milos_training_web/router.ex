@@ -442,6 +442,17 @@ defmodule MilosTrainingWeb.Router do
     delete("/groups/:id/members/:user_id", CommunityGroupController, :remove_member)
     post("/groups/:id/archive", CommunityGroupController, :archive)
     post("/groups/:id/reopen", CommunityGroupController, :reopen)
+    # ADR-168: PT squads.
+    get("/squads", PtSquadController, :index)
+    post("/squads", PtSquadController, :create)
+    get("/squads/:id", PtSquadController, :show)
+    patch("/squads/:id", PtSquadController, :update)
+    post("/squads/:id/invites", PtSquadController, :invite)
+    put("/squads/:id/invite", PtSquadController, :answer)
+    delete("/squads/:id/membership", PtSquadController, :leave)
+    delete("/squads/:id/members/:user_id", PtSquadController, :remove_member)
+    post("/squads/:id/archive", PtSquadController, :archive)
+    post("/squads/:id/reopen", PtSquadController, :reopen)
   end
 
   # ADR-118: standalone training log (class / offline workouts).
