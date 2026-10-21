@@ -3,64 +3,6 @@ defmodule MilosTraining.Identity.RegistrationPolicy do
 
   @roles [:member, :athlete, :admin]
   @self_register_roles [:member, :athlete]
-  @transliterations %{
-    "α" => "a",
-    "β" => "v",
-    "γ" => "g",
-    "δ" => "d",
-    "ε" => "e",
-    "ζ" => "z",
-    "η" => "i",
-    "θ" => "th",
-    "ι" => "i",
-    "κ" => "k",
-    "λ" => "l",
-    "μ" => "m",
-    "ν" => "n",
-    "ξ" => "x",
-    "ο" => "o",
-    "π" => "p",
-    "ρ" => "r",
-    "σ" => "s",
-    "ς" => "s",
-    "τ" => "t",
-    "υ" => "y",
-    "φ" => "f",
-    "χ" => "ch",
-    "ψ" => "ps",
-    "ω" => "o",
-    "а" => "a",
-    "б" => "b",
-    "в" => "v",
-    "г" => "g",
-    "д" => "d",
-    "е" => "e",
-    "ё" => "e",
-    "ж" => "zh",
-    "з" => "z",
-    "и" => "i",
-    "й" => "i",
-    "к" => "k",
-    "л" => "l",
-    "м" => "m",
-    "н" => "n",
-    "о" => "o",
-    "п" => "p",
-    "р" => "r",
-    "с" => "s",
-    "т" => "t",
-    "у" => "u",
-    "ф" => "f",
-    "х" => "h",
-    "ц" => "ts",
-    "ч" => "ch",
-    "ш" => "sh",
-    "щ" => "sht",
-    "ъ" => "a",
-    "ь" => "",
-    "ю" => "yu",
-    "я" => "ya"
-  }
 
   def roles, do: @roles
   def self_register_roles, do: @self_register_roles
@@ -88,9 +30,5 @@ defmodule MilosTraining.Identity.RegistrationPolicy do
 
   def valid_password?(_password), do: false
 
-  defp transliterate(value) do
-    value
-    |> String.graphemes()
-    |> Enum.map_join(&Map.get(@transliterations, &1, &1))
-  end
+  defp transliterate(value), do: MilosTraining.Transliteration.latin(value)
 end
