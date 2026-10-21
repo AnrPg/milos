@@ -541,3 +541,9 @@ msgstr ""
 
 msgid "Download it within seven days from Settings."
 msgstr ""
+
+msgid "Squad invitation"
+msgstr ""
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr ""

@@ -527,7 +527,7 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
 
   @impl true
   def list_channel_memberships(_context, channel_id) do
-    sources = ["requested" | ChannelMembership.member_sources()]
+    sources = ["requested", "pending_invite" | ChannelMembership.member_sources()]
 
     ChannelMembership
     |> where([m], m.channel_id == ^channel_id and m.source in ^sources)
@@ -569,6 +569,113 @@ defmodule MilosTraining.Infrastructure.Community.EctoCommunityStore do
     )
     |> Repo.all()
     |> Enum.map(&normalize_channel/1)
+  end
+
+  # PT squads (ADR-168) -------------------------------------------------------
+
+  @impl true
+  def list_squads(_context, club_id, filter) do
+    member_sources = ChannelMembership.member_sources()
+
+    Channel
+    |> where([ch], ch.club_id == ^club_id and ch.kind == "pt_squad")
+    |> then(fn query ->
+      if Map.get(filter, :archived, false),
+        do: where(query, [ch], not is_nil(ch.archived_at)),
+        else: where(query, [ch], is_nil(ch.archived_at))
+    end)
+    |> then(fn query ->
+      case filter do
+        %{coach_id: coach_id} -> where(query, [ch], ch.created_by_id == ^coach_id)
+        _all -> query
+      end
+    end)
+    |> then(fn query ->
+      case filter do
+        %{ids: ids} -> where(query, [ch], ch.id in ^ids)
+        _all -> query
+      end
+    end)
+    |> order_by([ch], asc: fragment("lower(?)", ch.name), asc: ch.inserted_at)
+    |> select([ch], %{
+      channel: ch,
+      member_count:
+        fragment(
+          "(SELECT count(*) FROM community_channel_memberships m WHERE m.channel_id = ? AND m.source = ANY(?) AND m.user_id <> ?)",
+          ch.id,
+          ^member_sources,
+          ch.created_by_id
+        ),
+      invite_count:
+        fragment(
+          "(SELECT count(*) FROM community_channel_memberships m WHERE m.channel_id = ? AND m.source = 'pending_invite')",
+          ch.id
+        )
+    })
+    |> Repo.all()
+    |> Enum.map(fn row ->
+      row.channel
+      |> normalize_channel()
+      |> Map.merge(%{member_count: row.member_count, invite_count: row.invite_count})
+    end)
+  end
+
+  @impl true
+  def squad_memberships_of(_context, user_id) do
+    ChannelMembership
+    |> join(:inner, [m], ch in Channel, on: ch.id == m.channel_id)
+    |> where([m, ch], m.user_id == ^user_id and ch.kind == "pt_squad" and is_nil(ch.archived_at))
+    |> where([m], m.source != "dismissed")
+    |> select([m, ch], %{
+      channel_id: m.channel_id,
+      club_id: ch.club_id,
+      coach_id: ch.created_by_id,
+      source: m.source,
+      role: m.role,
+      since: m.updated_at
+    })
+    |> Repo.all()
+  end
+
+  @impl true
+  def update_squad(_context, id, attrs) do
+    with %Channel{kind: "pt_squad"} = channel <- Repo.get(Channel, id) || {:error, :not_found},
+         {:ok, channel} <- channel |> Channel.squad_changeset(attrs) |> Repo.update() do
+      {:ok, normalize_channel(channel)}
+    else
+      %Channel{} -> {:error, :not_found}
+      error -> error
+    end
+  end
+
+  @impl true
+  def set_squad_archived(_context, id, archived_at) do
+    with %Channel{kind: "pt_squad"} = channel <- Repo.get(Channel, id) || {:error, :not_found},
+         {:ok, channel} <-
+           channel |> Channel.lifecycle_changeset(%{archived_at: archived_at}) |> Repo.update() do
+      {:ok, normalize_channel(channel)}
+    else
+      %Channel{} -> {:error, :not_found}
+      error -> error
+    end
+  end
+
+  @impl true
+  def dismiss_from_coach_squads(_context, coach_id, user_id) do
+    squad_ids =
+      Channel
+      |> where([ch], ch.kind == "pt_squad" and ch.created_by_id == ^coach_id)
+      |> select([ch], ch.id)
+
+    {count, _rows} =
+      ChannelMembership
+      |> where([m], m.user_id == ^user_id and m.channel_id in subquery(squad_ids))
+      |> where([m], m.source != "dismissed")
+      |> Repo.update_all(
+        set: [source: "dismissed", role: "member", updated_at: DateTime.utc_now()]
+      )
+
+    count
   end
 
   # Reports (ADR-143) --------------------------------------------------------

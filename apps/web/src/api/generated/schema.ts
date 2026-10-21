@@ -6789,6 +6789,144 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/community/squads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Squads you coach or are in, invitations waiting for you, and clients to invite */
+        get: operations["MilosTrainingWeb.PtSquadController.index"];
+        put?: never;
+        /** Coaches: start a squad, optionally inviting some of your clients */
+        post: operations["MilosTrainingWeb.PtSquadController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A squad with its people (its coach also sees open invitations) */
+        get: operations["MilosTrainingWeb.PtSquadController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Coach: rename or describe the squad */
+        patch: operations["MilosTrainingWeb.PtSquadController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Coach (or the gym's managers): archive the squad */
+        post: operations["MilosTrainingWeb.PtSquadController.archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}/invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Accept or decline an invitation to a squad */
+        put: operations["MilosTrainingWeb.PtSquadController.answer"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}/invites": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Coach: invite some of your active clients */
+        post: operations["MilosTrainingWeb.PtSquadController.invite"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}/members/{user_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Coach: remove a member, or withdraw an invitation */
+        delete: operations["MilosTrainingWeb.PtSquadController.remove_member"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}/membership": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Leave a squad */
+        delete: operations["MilosTrainingWeb.PtSquadController.leave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/community/squads/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Coach: bring back an archived squad */
+        post: operations["MilosTrainingWeb.PtSquadController.reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/community/wod-today": {
         parameters: {
             query?: never;
@@ -14488,7 +14626,7 @@ export interface components {
             /** @description Its posts reach your feed */
             joined: boolean;
             /** @enum {string} */
-            kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
+            kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general" | "pt_squad";
             /** @enum {string} */
             membership: "everyone" | "opt_in" | "invite";
             /** @description Null for built-in channels */
@@ -14534,7 +14672,7 @@ export interface components {
                 /** @description Its posts reach your feed */
                 joined: boolean;
                 /** @enum {string} */
-                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
+                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general" | "pt_squad";
                 /** @enum {string} */
                 membership: "everyone" | "opt_in" | "invite";
                 /** @description Null for built-in channels */
@@ -14606,7 +14744,7 @@ export interface components {
                     /** @description Its posts reach your feed */
                     joined: boolean;
                     /** @enum {string} */
-                    kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
+                    kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general" | "pt_squad";
                     /** @enum {string} */
                     membership: "everyone" | "opt_in" | "invite";
                     /** @description Null for built-in channels */
@@ -20791,6 +20929,296 @@ export interface components {
                 /** Format: date */
                 week_start: string;
             }[];
+        };
+        /** PtSquad */
+        PtSquad: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            can_manage: boolean;
+            /** Format: uuid */
+            club_id: string;
+            /** CommunityAuthor */
+            coach: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+            invite_count: number;
+            /** @description Members besides the coach */
+            member_count: number;
+            members?: {
+                /** CommunityAuthor */
+                person: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                /** Format: date-time */
+                since: string;
+                /** @enum {string} */
+                status: "member" | "invited";
+            }[];
+            name: string;
+            /** @enum {string} */
+            role: "coach" | "member" | "invited";
+        };
+        /** PtSquadAnswerRequest */
+        PtSquadAnswerRequest: {
+            accept: boolean;
+        };
+        /** PtSquadCreateRequest */
+        PtSquadCreateRequest: {
+            client_ids?: string[];
+            description?: string | null;
+            name: string;
+        };
+        /** PtSquadInviteRequest */
+        PtSquadInviteRequest: {
+            user_ids: string[];
+        };
+        /** PtSquadLimits */
+        PtSquadLimits: {
+            max_live_squads: number;
+            max_members: number;
+        };
+        /** PtSquadMember */
+        PtSquadMember: {
+            /** CommunityAuthor */
+            person: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            };
+            /** Format: date-time */
+            since: string;
+            /** @enum {string} */
+            status: "member" | "invited";
+        };
+        /** PtSquadOutcome */
+        PtSquadOutcome: {
+            /** @enum {string} */
+            outcome: "declined" | "left" | "archived";
+            /** Format: uuid */
+            squad_id: string;
+        };
+        /** PtSquadResponse */
+        PtSquadResponse: {
+            /** PtSquad */
+            squad: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /** CommunityAuthor */
+                coach: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                invite_count: number;
+                /** @description Members besides the coach */
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "invited";
+                }[];
+                name: string;
+                /** @enum {string} */
+                role: "coach" | "member" | "invited";
+            };
+        };
+        /** PtSquadUpdateRequest */
+        PtSquadUpdateRequest: {
+            description?: string | null;
+            name?: string;
+        };
+        /** PtSquadsOverview */
+        PtSquadsOverview: {
+            archived: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /** CommunityAuthor */
+                coach: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                invite_count: number;
+                /** @description Members besides the coach */
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "invited";
+                }[];
+                name: string;
+                /** @enum {string} */
+                role: "coach" | "member" | "invited";
+            }[];
+            /** @description Whether you coach here */
+            can_create: boolean;
+            clients: {
+                avatar_url?: string | null;
+                /** Format: uuid */
+                id: string;
+                nickname?: string | null;
+            }[];
+            coached: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /** CommunityAuthor */
+                coach: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                invite_count: number;
+                /** @description Members besides the coach */
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "invited";
+                }[];
+                name: string;
+                /** @enum {string} */
+                role: "coach" | "member" | "invited";
+            }[];
+            invites: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /** CommunityAuthor */
+                coach: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                invite_count: number;
+                /** @description Members besides the coach */
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "invited";
+                }[];
+                name: string;
+                /** @enum {string} */
+                role: "coach" | "member" | "invited";
+            }[];
+            joined: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                can_manage: boolean;
+                /** Format: uuid */
+                club_id: string;
+                /** CommunityAuthor */
+                coach: {
+                    avatar_url?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    nickname?: string | null;
+                };
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                invite_count: number;
+                /** @description Members besides the coach */
+                member_count: number;
+                members?: {
+                    /** CommunityAuthor */
+                    person: {
+                        avatar_url?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        nickname?: string | null;
+                    };
+                    /** Format: date-time */
+                    since: string;
+                    /** @enum {string} */
+                    status: "member" | "invited";
+                }[];
+                name: string;
+                /** @enum {string} */
+                role: "coach" | "member" | "invited";
+            }[];
+            /** PtSquadLimits */
+            limits: {
+                max_live_squads: number;
+                max_members: number;
+            };
+            /** Format: uuid */
+            organization_id: string;
         };
         /** PublicBox */
         PublicBox: {
@@ -31245,7 +31673,7 @@ export interface operations {
                                 /** @description Its posts reach your feed */
                                 joined: boolean;
                                 /** @enum {string} */
-                                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general";
+                                kind: "announcements" | "wod" | "challenges" | "class_slot" | "season" | "custom" | "member_group" | "general" | "pt_squad";
                                 /** @enum {string} */
                                 membership: "everyone" | "opt_in" | "invite";
                                 /** @description Null for built-in channels */
@@ -60023,6 +60451,702 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Squads */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        archived: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        }[];
+                        /** @description Whether you coach here */
+                        can_create: boolean;
+                        clients: {
+                            avatar_url?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            nickname?: string | null;
+                        }[];
+                        coached: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        }[];
+                        invites: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        }[];
+                        joined: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        }[];
+                        /** PtSquadLimits */
+                        limits: {
+                            max_live_squads: number;
+                            max_members: number;
+                        };
+                        /** Format: uuid */
+                        organization_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    client_ids?: string[];
+                    description?: string | null;
+                    name: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Squad */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Squad */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    description?: string | null;
+                    name?: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Squad */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        outcome: "declined" | "left" | "archived";
+                        /** Format: uuid */
+                        squad_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.answer": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    accept: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Squad or outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        };
+                    } | {
+                        /** @enum {string} */
+                        outcome: "declined" | "left" | "archived";
+                        /** Format: uuid */
+                        squad_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.invite": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    user_ids: string[];
+                };
+            };
+        };
+        responses: {
+            /** @description Squad */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.remove_member": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Squad */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.leave": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Outcome */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @enum {string} */
+                        outcome: "declined" | "left" | "archived";
+                        /** Format: uuid */
+                        squad_id: string;
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.PtSquadController.reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Squad */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** PtSquad */
+                        squad: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            can_manage: boolean;
+                            /** Format: uuid */
+                            club_id: string;
+                            /** CommunityAuthor */
+                            coach: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @description Invitations nobody answered yet (the coach's view; 0 for others) */
+                            invite_count: number;
+                            /** @description Members besides the coach */
+                            member_count: number;
+                            members?: {
+                                /** CommunityAuthor */
+                                person: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                };
+                                /** Format: date-time */
+                                since: string;
+                                /** @enum {string} */
+                                status: "member" | "invited";
+                            }[];
+                            name: string;
+                            /** @enum {string} */
+                            role: "coach" | "member" | "invited";
                         };
                     };
                 };

@@ -543,3 +543,9 @@ msgstr "تصدير يومياتك جاهز"
 
 msgid "Download it within seven days from Settings."
 msgstr "نزّله خلال سبعة أيام من الإعدادات."
+
+msgid "Squad invitation"
+msgstr "دعوة إلى فريق"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "دعاك %{nickname} إلى الفريق «%{group}»."

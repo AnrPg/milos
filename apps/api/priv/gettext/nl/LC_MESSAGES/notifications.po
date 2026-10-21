@@ -543,3 +543,9 @@ msgstr "Je dagboekexport staat klaar"
 
 msgid "Download it within seven days from Settings."
 msgstr "Download hem binnen zeven dagen via Instellingen."
+
+msgid "Squad invitation"
+msgstr "Uitnodiging voor een squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} heeft je uitgenodigd voor de squad «%{group}»."

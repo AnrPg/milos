@@ -543,3 +543,9 @@ msgstr "Dein Journal-Export ist fertig"
 
 msgid "Download it within seven days from Settings."
 msgstr "Lade ihn innerhalb von sieben Tagen in den Einstellungen herunter."
+
+msgid "Squad invitation"
+msgstr "Einladung in eine Squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} hat dich in die Squad «%{group}» eingeladen."
