@@ -341,6 +341,13 @@ defmodule MilosTraining.Organizations do
   def update_join_link(context, params),
     do: MilosTraining.Organizations.Commands.UpdateJoinLink.call(context, params)
 
+  @doc "ADR-163: the gym's workout-authoring defaults (any staff member may read them)."
+  def get_workout_settings(context),
+    do: MilosTraining.Organizations.Queries.GetWorkoutSettings.call(context)
+
+  def update_workout_settings(context, params),
+    do: MilosTraining.Organizations.Commands.UpdateWorkoutSettings.call(context, params)
+
   def get_onboarding_state(context),
     do: MilosTraining.Organizations.Queries.GetOnboardingState.call(context)
 
