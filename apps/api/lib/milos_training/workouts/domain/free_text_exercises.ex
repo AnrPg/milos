@@ -55,7 +55,9 @@ defmodule MilosTraining.Workouts.Domain.FreeTextExercises do
         entries ->
           entries
           |> Enum.reverse()
-          |> Enum.map(&%{name: &1.label, exercise_ref: &1.id, category: &1.category, weight: weight})
+          |> Enum.map(
+            &%{name: &1.label, exercise_ref: &1.id, category: &1.category, weight: weight}
+          )
       end
     end
   end
@@ -102,7 +104,7 @@ defmodule MilosTraining.Workouts.Domain.FreeTextExercises do
         String.ends_with?(last, "ss") ->
           last
 
-        String.ends_with?(last, "s") and byte_size(last) > 3 ->
+        String.ends_with?(last, "s") and byte_size(last) > 2 ->
           String.slice(last, 0..-2//1)
 
         true ->

@@ -15,6 +15,7 @@ defmodule MilosTrainingWeb.RouteCapabilities do
     W.AdminWorkoutController => [:manage_workouts],
     W.AdminWorkoutDslController => [:manage_workouts],
     W.AdminWorkoutFolderController => [:manage_workouts],
+    W.AdminWorkoutGoalsController => [:manage_workouts],
     W.AdminChallengeController => [:manage_challenges],
     W.AdminAssignedWorkoutController => [:manage_coaching],
     W.AdminContentController => [:manage_content],

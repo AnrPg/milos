@@ -13,8 +13,7 @@ defmodule MilosTraining.Journal.GoalFeedbackStore do
     do: RepoContext.run(context, fn -> adapter().feedback_entry(entry_kind, entry_id) end)
 
   def get_feedback(context, entry_kind, entry_id, user_id),
-    do:
-      RepoContext.run(context, fn -> adapter().get_feedback(entry_kind, entry_id, user_id) end)
+    do: RepoContext.run(context, fn -> adapter().get_feedback(entry_kind, entry_id, user_id) end)
 
   def put_feedback(context, attrs),
     do: RepoContext.run(context, fn -> adapter().put_feedback(attrs) end)

@@ -244,6 +244,7 @@ config :milos_training, :journal_store, MilosTraining.Infrastructure.Journal.Ect
 config :milos_training,
        :goal_feedback_store,
        MilosTraining.Infrastructure.Journal.EctoGoalFeedbackStore
+
 config :milos_training, :body_store, MilosTraining.Infrastructure.Body.EctoBodyStore
 config :milos_training, :buddy_store, MilosTraining.Infrastructure.Buddies.EctoBuddyStore
 
