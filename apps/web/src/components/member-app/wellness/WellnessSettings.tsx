@@ -152,7 +152,7 @@ export function WellnessCustomizeSheet({
 
   const exporter = useMutation({
     mutationFn: async (section: WellnessSection) => exportWellness(tokens!.access_token, [section]),
-    onSuccess: (data, section) => download(`milos-${section}.json`, data),
+    onSuccess: (data, section) => download(`palee-${section}.json`, data),
   });
 
   const eraser = useMutation({

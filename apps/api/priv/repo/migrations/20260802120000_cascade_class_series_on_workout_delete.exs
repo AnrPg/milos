@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CascadeClassSeriesOnWorkoutDelete do
+defmodule Palee.Repo.Migrations.CascadeClassSeriesOnWorkoutDelete do
   use Ecto.Migration
 
   def up do

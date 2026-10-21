@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnforceFeedbackTenantBoundaries do
+defmodule Palee.Repo.Migrations.EnforceFeedbackTenantBoundaries do
   use Ecto.Migration
 
   @tables ~w(review_questionnaires reviews review_answers)
@@ -10,15 +10,15 @@ defmodule MilosTraining.Repo.Migrations.EnforceFeedbackTenantBoundaries do
       execute("""
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """)
 
       execute("DROP POLICY IF EXISTS #{table}_tenant_policy ON #{table}")
 
       execute("""
       CREATE POLICY #{table}_tenant_policy ON #{table}
-      USING (organization_id = COALESCE(NULLIF(current_setting('app.organization_id', true), '')::uuid, milos_legacy_organization_id()))
-      WITH CHECK (organization_id = COALESCE(NULLIF(current_setting('app.organization_id', true), '')::uuid, milos_legacy_organization_id()))
+      USING (organization_id = COALESCE(NULLIF(current_setting('app.organization_id', true), '')::uuid, palee_legacy_organization_id()))
+      WITH CHECK (organization_id = COALESCE(NULLIF(current_setting('app.organization_id', true), '')::uuid, palee_legacy_organization_id()))
       """)
 
       execute("ALTER TABLE #{table} ENABLE ROW LEVEL SECURITY")

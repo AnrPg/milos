@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddLibraryVisibilityToMasterWorkouts do
+defmodule Palee.Repo.Migrations.AddLibraryVisibilityToMasterWorkouts do
   use Ecto.Migration
 
   # ADR-125 (owner decision): workouts copied for a member's personalized

@@ -1,5 +1,6 @@
 "use client";
 
+import { PaleeMark } from "@/components/branding/PaleeMark";
 import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
@@ -157,7 +158,7 @@ export function TopNav() {
     journalSections: bodySettingsQuery.data?.settings?.journal_sections ?? null,
   });
 
-  const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("milosTraining5b1a1c1");
+  const brandName = tenantBrandName(memberships, selectedOrganizationSlug) ?? i18n("brandName");
   const brandLogoUrl = tenantBrandLogoUrl(memberships, selectedOrganizationSlug);
   const hasTenantMembership = memberships.length > 0;
   const showTenantShell = hasTenantMembership;
@@ -233,7 +234,9 @@ export function TopNav() {
               unoptimized
               width={28}
             />
-          ) : null}
+          ) : (
+            <PaleeMark className="h-6 w-6 shrink-0" />
+          )}
           <span className="min-w-0">{brandName}</span>
         </Link>
 
@@ -278,7 +281,7 @@ export function TopNav() {
                 {unreadCount > 0 ? (
                   <span
                     className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
-                    style={{ background: "var(--primary)", color: "var(--bg)" }}
+                    style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
@@ -305,7 +308,7 @@ export function TopNav() {
               ) : (
                 <span
                   className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
                   {initials}
                 </span>
@@ -330,7 +333,7 @@ export function TopNav() {
 
             {menuOpen ? (
               <div
-                className="absolute end-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[0_16px_60px_rgba(0,0,0,0.6)]"
+                className="absolute end-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[var(--shadow-lg)]"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
               >
                 <div className="border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
@@ -356,7 +359,7 @@ export function TopNav() {
                   >
                     {t("notifications")}
                     {unreadNotifications > 0 ? (
-                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                      <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
                         {unreadNotifications > 99 ? "99+" : unreadNotifications}
                       </span>
                     ) : null}
@@ -442,7 +445,7 @@ export function TopNav() {
                         <span className="flex items-center justify-between gap-2">
                           {t("billing")}
                           {outstandingCents > 0 ? (
-                            <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "#fff" }}>
+                            <span className="rounded-full px-1.5 text-[10px] font-bold" style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
                               !
                             </span>
                           ) : null}

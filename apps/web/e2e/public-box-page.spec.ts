@@ -91,14 +91,14 @@ function todayAt(hour: number) {
 }
 
 async function asGuest(page: Page) {
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ error: "unauthorized" }, 401)));
 }
 
 async function signedIn(page: Page, { member = false } = {}) {
   const follows: unknown[] = [];
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: token(), refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));

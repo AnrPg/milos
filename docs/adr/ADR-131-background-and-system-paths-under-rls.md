@@ -51,14 +51,14 @@ but in everything around them, plus a test-harness blind spot:
 2. **Legitimate cross-tenant or cross-user operations go through narrow
    `SECURITY DEFINER` functions** that answer one question or perform one
    operation and nothing else (additive migrations, `SET search_path`,
-   `EXECUTE` left to `PUBLIC` like the existing `milos_*` helpers):
-   * `milos_active_organization_ids()` - ids of active organizations, for cron
+   `EXECUTE` left to `PUBLIC` like the existing `palee_*` helpers):
+   * `palee_active_organization_ids()` - ids of active organizations, for cron
      fanout; each job then enters one organization at a time;
-   * `milos_refresh_materialized_view(text)` - refreshes one of an allow-list
+   * `palee_refresh_materialized_view(text)` - refreshes one of an allow-list
      of three views as their owner;
-   * `milos_public_theme_slug(text)` - the theme slug of an active gym, for
+   * `palee_public_theme_slug(text)` - the theme slug of an active gym, for
      the unauthenticated theme endpoint;
-   * `milos_propagate_notification_nickname(text, text)` - rewrites snapshotted
+   * `palee_propagate_notification_nickname(text, text)` - rewrites snapshotted
      nicknames only for a real rename (new nickname held by an account, old
      one by none).
    One additive policy, `organization_settings_scoped_self_read_policy`,
@@ -77,8 +77,8 @@ but in everything around them, plus a test-harness blind spot:
   the policies stay as strict as they are, and every fix is visible at the
   call site.
 * Definer functions are the established pattern for the few reads that must
-  cross the boundary (`milos_organization_user_ids`,
-  `milos_organization_member_roles`). Each new one exposes no row data beyond
+  cross the boundary (`palee_organization_user_ids`,
+  `palee_organization_member_roles`). Each new one exposes no row data beyond
   its single answer (ids of active organizations, a theme slug) or performs a
   fixed, idempotent operation.
 * Clearing the session per request turns a whole class of silent production
@@ -95,9 +95,9 @@ but in everything around them, plus a test-harness blind spot:
   makes the runtime able to bypass every policy. Rejected.
 * **Loosening policies** (e.g. letting any session read `organizations`):
   rejected by the brief and unnecessary.
-* **Converting all ~380 DataCase tests to `MILOS_TEST_ENFORCE_RLS`**: out of
+* **Converting all ~380 DataCase tests to `PALEE_TEST_ENFORCE_RLS`**: out of
   scope; most failures are fixture setup. New background tests are enforced
-  instead, and the opt-in `MILOS_TEST_DETECT_UNSCOPED=1` diagnostic reports
+  instead, and the opt-in `PALEE_TEST_DETECT_UNSCOPED=1` diagnostic reports
   unscoped queries issued by requests.
 
 ## Consequences
@@ -125,13 +125,13 @@ Bugs found and fixed (production symptom -> fix):
 | Path | Symptom under the runtime role | Fix |
 |---|---|---|
 | `ProcessWorkoutCompletionJob` / `CompleteWorkout.process_completion/1` (executions and training-log entries) | Job crashed on the `user_achievements` insert after reading no settings/executions/challenges: no stats, streaks, badges or challenge progress, ever | Projection runs in `%{organization_id, user_id}` of the completion |
-| Per-tenant cron jobs (9 workers) | `list_organizations/0` returned nothing: every job was a no-op | `milos_active_organization_ids()` + `list_active_organizations_for_system/0`, each org read in its own scope |
-| `refresh_leaderboard`, coaching and finance aggregate refreshes | "must be owner of materialized view": leaderboard and dashboards never refreshed | `milos_refresh_materialized_view/1` |
+| Per-tenant cron jobs (9 workers) | `list_organizations/0` returned nothing: every job was a no-op | `palee_active_organization_ids()` + `list_active_organizations_for_system/0`, each org read in its own scope |
+| `refresh_leaderboard`, coaching and finance aggregate refreshes | "must be owner of materialized view": leaderboard and dashboards never refreshed | `palee_refresh_materialized_view/1` |
 | `GetLandingPage` (member landing) | Stats, badges, challenges, leaderboard, recent executions all empty | Payload built in the tenant context |
 | Leaderboard opt-in | Web called a route that did not exist (`/api/org/:slug/landing/leaderboard-opt-in`); the unscoped route raised an RLS violation (500) | Org-scoped route, service runs in tenant scope |
 | Challenge leaderboard / opt-in / opt-out | Unscoped routes: every challenge 404 | Org-scoped routes and services |
 | `GetAdminChallenge` (admin challenge detail) | 404; and participants were every account on the platform | Tenant scope; participants are the gym's active members |
-| `GET /api/theme` | Always the default theme | `milos_public_theme_slug/1` by `X-Organization-Slug` |
+| `GET /api/theme` | Always the default theme | `palee_public_theme_slug/1` by `X-Organization-Slug` |
 | `GetAdminSettings` / settings save without gamification changes | Gamification settings shown as defaults | Read in tenant scope |
 | `GetAdminAnalyticsSummary` | Whole dashboard empty (its test passed because `nil >= 1` is true) | Built in tenant scope; assertion fixed |
 | `ListFinanceMembers` | Listed every non-admin account on the platform (nickname, id) to any gym's finance desk | Only the gym's active members |
@@ -139,7 +139,7 @@ Bugs found and fixed (production symptom -> fix):
 | `delete_booking_pending_notifications` | Staff "new booking" notices never removed (wrong session, and rows carried no organization) | Staff resolved server-side, deleted in each recipient's scope; booking notices now carry `organization_id` |
 | `Workouts.list_workout_change_targets` in publish/delete | Assigned athletes never told about workout changes/deletion | Scoped variant |
 | `GetAdminUserMessages` unread count | Always 0 | Inside the tenant scope |
-| `PropagateNicknameJob` notification rewrite | Matched nothing | `milos_propagate_notification_nickname/2` |
+| `PropagateNicknameJob` notification rewrite | Matched nothing | `palee_propagate_notification_nickname/2` |
 | `AdminMemberSearchDocuments.build_all/0` | Documents without gyms or finance data: indexed admin search matched nobody | Built per active organization |
 | `CorporateInvoicing` sender settings | Brand name / locale ignored | Scoped settings read (+ self-read policy for jobs) |
 
@@ -150,7 +150,7 @@ recording, `NotificationEventJob`, `DispatchMessageJob`, `BookingTimeoutJob`,
 internals, finance/scheduling calls made by the cron jobs, chat/execution/class
 timer channels, `RealtimeEventHandler`, `RecordNotificationDelivered`.
 
-Diagnostics: with `MILOS_TEST_DETECT_UNSCOPED=1` the test suite reports every
+Diagnostics: with `PALEE_TEST_DETECT_UNSCOPED=1` the test suite reports every
 Ecto query a request issues against a forced-RLS table with no organization
 (or no scope at all). After these fixes the only reports are deliberate
 carve-outs (invitation redemption, slug-alias lookup, provisioning) and

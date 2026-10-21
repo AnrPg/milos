@@ -3,9 +3,9 @@
 Date: 2026-10-17
 Branch: milestone PRs into `redesign/social-centered` (Phase 1 merged to `main` with PR #7; the
 redesign ships as `v2.0.0`).
-Source of truth: `docs/product/2026-10-15-milos-product-vision-and-ia.md` (the brief, §9 v2 row) and
-`docs/product/mockups/milos-ia-mockup.html` (screens 03–06, 09, 19–22, 29, 30, 34). The Greek write-up
-`docs/product/Ο χάρτης του Milos.md` (2026-10-17) agrees with both and is used for copy.
+Source of truth: `docs/product/2026-10-15-palee-product-vision-and-ia.md` (the brief, §9 v2 row) and
+`docs/product/mockups/palee-ia-mockup.html` (screens 03–06, 09, 19–22, 29, 30, 34). The Greek write-up
+`docs/product/Ο χάρτης του Palee.md` (2026-10-17) agrees with both and is used for copy.
 Phase 1 plan: `docs/plans/redesign-phase-1-member-app.md` (what exists).
 Handoff for the next agent: `docs/handoff/2026-10-19-redesign-handoff.md` (state after P2-M1).
 
@@ -405,7 +405,7 @@ Built in P2-M6 (Γύρω μου), with the gym-side setting in the owner's billi
 13. **Audience picker:** one «Ποιος το βλέπει» row under the text opens a sheet: channels grouped by
     club, then Ακόλουθοι and Δημόσια, each saying who sees it. It starts on the audience of your
     last post. The first public post shows a one-time note «Δημόσια: το βλέπει οποιοσδήποτε, και
-    εκτός Milos».
+    εκτός Palee».
 14. **Link preview:** the published cover with name and «discipline · neighbourhood»; gyms
     without a cover get a generated card (logo, name, disciplines, neighbourhood, brand colour).
 
@@ -429,7 +429,7 @@ Apostolos picked every recommended option and every extra on 2026-10-19.
    Κοινοποίηση.
 5. **Profile post in the feed:** the audience («Ακόλουθοι» or «Δημόσια») takes the top line that a
    club post uses for «Club › #channel».
-6. **Booking sharing («Φίλοι»):** off until you turn it on. Milos offers it once, after your first
+6. **Booking sharing («Φίλοι»):** off until you turn it on. Palee offers it once, after your first
    follower; you can change it any time in Κοινοποίηση. When on, the people who follow you see
    which classes you booked, so «Φίλοι» in Πρόγραμμα shows classes where people you follow are going.
 
@@ -648,7 +648,7 @@ built and can still be changed (ADR-160).
 1. **Buddy page (Q1):** up to two buddies, each with what they receive; the same page lists the
    people you support.
 2. **Who (Q2):** club mates, people you follow, your coach, or an invite link to someone not on
-   Milos (7 days); nothing starts until they accept.
+   Palee (7 days); nothing starts until they accept.
 3. **Sending (Q3):** the Λιγούρα toggle plus a quick «Χρειάζομαι στήριξη» on Ευεξία and the + menu,
    an optional line, 5-second undo; no craving details are sent.
 4. **Buddy side (Q4):** push and card with quick replies, then an account-level buddy chat; the

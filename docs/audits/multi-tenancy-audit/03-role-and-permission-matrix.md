@@ -7,16 +7,16 @@
 > tenant-scoped `owner`/`admin` roles in §3 below are a separate, unrenamed
 > concept.
 
-Date: 2026-08-05. Built from direct code inspection of `apps/api/lib/milos_training/organizations/`,
-`apps/api/lib/milos_training/identity/`, `apps/api/lib/milos_training_web/router.ex`,
-`apps/api/lib/milos_training_web/plugs/`.
+Date: 2026-08-05. Built from direct code inspection of `apps/api/lib/palee/organizations/`,
+`apps/api/lib/palee/identity/`, `apps/api/lib/palee_web/router.ex`,
+`apps/api/lib/palee_web/plugs/`.
 
 ## 1. SaaS-owner authority (`platform_owners`)
 
 | Field | Value |
 |---|---|
 | Storage | `platform_owners` table, keyed by `user_id`, `status ∈ {active, revoked}` |
-| Who may assign | `mix milos.platform.grant_owner NICKNAME` — CLI/Mix task only, no HTTP endpoint. Confirmed sole caller of `grant_platform_owner/1` in the entire codebase. |
+| Who may assign | `mix palee.platform.grant_owner NICKNAME` — CLI/Mix task only, no HTTP endpoint. Confirmed sole caller of `grant_platform_owner/1` in the entire codebase. |
 | Who may revoke | **No code path exists.** No `revoke_platform_owner` function in `ports/organization_store.ex`, `organization_store.ex`, or the Ecto adapter. Once granted, only direct DB manipulation can revoke it (F-09). |
 | Scope | Installation-wide; independent of any organization membership |
 | How checked | `RequirePlatformOwner` plug → `ResolvePlatformContext` → `OrganizationStore.get_platform_owner(user_id)` → `Repo.get_by(PlatformOwner, user_id:, status: :active)` |
@@ -36,7 +36,7 @@ tenant context (F-02):
 | `:admin` | `application/get_calendar_feed.ex` (unauthenticated-adjacent ICS feed reveal), `application/get_schedule_calendar.ex:75` (fallback path when no TenantContext), `application/get_leaderboard_snippet.ex:7`, `infrastructure/identity/ecto_user_store.ex` (queries/guards, including a global "don't demote the last admin" invariant), `infrastructure/workouts/ecto_workout_store.ex:1910` |
 | `:admin` used to *exclude* accounts from listings | `application/admin_search_users.ex`, `application/admin_member_search_documents.ex`, `application/list_finance_members.ex` |
 
-`MilosTrainingWeb.Plugs.RequireRole` (the plug that would check this global role
+`PaleeWeb.Plugs.RequireRole` (the plug that would check this global role
 at the HTTP layer) is **dead code** — never wired into any router pipeline. The
 risk is not from that plug; it is from application-service-layer code reading
 `actor.role`/`user.role` directly instead of the membership role from

@@ -9,8 +9,8 @@ outbox age, auth anomalies, cache state, upload rejections and Oban failures.
 TD-031 stayed open because nothing turned these signals into dashboards or
 alerts. The application also had no metrics exporter: no OpenTelemetry metrics
 SDK, no Prometheus library and no OTLP metrics pipeline. A re-audit found that
-three of the claimed signals (`[:milos, :outbox, :age]`,
-`[:milos, :auth, :anomaly]`, `[:milos, :cache, :state]`) were subscribed to by
+three of the claimed signals (`[:palee, :outbox, :age]`,
+`[:palee, :auth, :anomaly]`, `[:palee, :cache, :state]`) were subscribed to by
 the log reporter but never emitted anywhere.
 
 The owner's constraints: self-hosted, free/open-source only, Docker Compose,
@@ -27,7 +27,7 @@ no new hex dependencies, and the default deployment must not change.
 3. Export application signals as Prometheus metrics from an in-app exporter
    built only on dependencies already in the project: `telemetry`,
    `telemetry_metrics`, `telemetry_poller`, `bandit` and `plug`.
-   `MilosTraining.Infrastructure.Observability.PrometheusExporter` aggregates
+   `Palee.Infrastructure.Observability.PrometheusExporter` aggregates
    `Telemetry.Metrics` definitions into ETS with atomic counters and renders
    text format 0.0.4.
 4. Serve the exporter on a separate internal Bandit listener (`METRICS_PORT`,
@@ -78,15 +78,15 @@ no new hex dependencies, and the default deployment must not change.
   entry.
 
 ## Consequences
-- Metric names in `MilosTrainingWeb.Telemetry.prometheus_metrics/0` are now a
+- Metric names in `PaleeWeb.Telemetry.prometheus_metrics/0` are now a
   contract with `ops/observability/prometheus/rules`, its tests and the
   Grafana dashboard. Renames must update all three.
 - When Oban runs, the API runs one grouped `oban_jobs` query every 30s. When
   the metrics listener is enabled, it also runs a readiness probe every 30s
   (the same checks as `/api/health`).
 - HTTP 5xx and latency alerts depend on `OTEL_EXPORTER_OTLP_ENDPOINT` being
-  set. `MilosTracesNotArriving` flags the misconfiguration. Per-route latency
-  is also available in-app (`milos_http_request_duration_seconds`) without
+  set. `PaleeTracesNotArriving` flags the misconfiguration. Per-route latency
+  is also available in-app (`palee_http_request_duration_seconds`) without
   tracing.
 - If `ALERTMANAGER_WEBHOOK_URL` is empty, alerts are visible but not
   delivered. The container warns and `AlertmanagerNotificationsFailing`

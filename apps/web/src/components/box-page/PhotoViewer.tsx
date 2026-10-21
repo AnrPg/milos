@@ -43,7 +43,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
       aria-modal="true"
       aria-label={t("photosTitle")}
       className="fixed inset-0 z-[70] flex flex-col"
-      style={{ background: "rgba(0,0,0,0.94)", color: "#fff" }}
+      style={{ background: "var(--scrim-strong)", color: "var(--on-media)" }}
       onTouchStart={(event) => {
         touch.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
       }}
@@ -60,7 +60,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
         <span className="px-2 text-sm font-semibold" aria-live="polite">
           {t("photoCounter", { current: index + 1, total: photos.length })}
         </span>
-        <button type="button" onClick={onClose} aria-label={t("close")} className={button} style={{ background: "rgba(255,255,255,0.12)" }}>
+        <button type="button" onClick={onClose} aria-label={t("close")} className={button} style={{ background: "var(--media-control-inverse)" }}>
           <Icon name="x" />
         </button>
       </header>
@@ -75,7 +75,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
               onClick={() => go(-1)}
               aria-label={t("previousPhoto")}
               className={`${button} absolute start-3 top-1/2 hidden -translate-y-1/2 sm:grid rtl:rotate-180`}
-              style={{ background: "rgba(255,255,255,0.12)" }}
+              style={{ background: "var(--media-control-inverse)" }}
             >
               <Icon name="chevron-left" />
             </button>
@@ -84,7 +84,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
               onClick={() => go(1)}
               aria-label={t("nextPhoto")}
               className={`${button} absolute end-3 top-1/2 hidden -translate-y-1/2 sm:grid rtl:rotate-180`}
-              style={{ background: "rgba(255,255,255,0.12)" }}
+              style={{ background: "var(--media-control-inverse)" }}
             >
               <Icon name="chevron-right" />
             </button>
@@ -102,7 +102,7 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
                 aria-label={t("photoAlt", { current: position + 1 })}
                 aria-current={position === index ? "true" : undefined}
                 className="block h-14 w-14 overflow-hidden rounded-lg"
-                style={{ outline: position === index ? "2px solid #fff" : "none", opacity: position === index ? 1 : 0.55 }}
+                style={{ outline: position === index ? "2px solid var(--on-media)" : "none", opacity: position === index ? 1 : 0.55 }}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- thumbnail */}
                 <img src={item.url} alt="" className="h-full w-full object-cover" />

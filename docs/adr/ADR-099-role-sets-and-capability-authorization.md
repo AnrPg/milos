@@ -72,7 +72,7 @@ Implemented in `0f8f700`, `25ab625`, `6102095` and `a37ab33`.
   roles, capabilities and coach scope. `AccessPolicyTest` asserts the
   report.
 - Routes: the `RequireRouteCapability` plug reads the capabilities of each
-  controller action from `MilosTrainingWeb.RouteCapabilities` (any one
+  controller action from `PaleeWeb.RouteCapabilities` (any one
   suffices). `RouteCapabilitiesTest` fails when a route under
   `/api/org/:slug/admin` or `/staff` has no capability or names an unknown
   one.

@@ -90,7 +90,7 @@ export function ClassTimerDisplay({ slotId }: { slotId: string }) {
             aria-label={timer.connected ? i18n("classTimerLive") : i18n("classTimerReconnecting")}
             title={timer.connected ? i18n("classTimerLive") : i18n("classTimerReconnecting")}
             className="h-3 w-3 rounded-full"
-            style={{ background: timer.connected ? "var(--success)" : "var(--warning)" }}
+            style={{ background: timer.connected ? "var(--spark)" : "var(--warning)", boxShadow: "0 0 0 1px var(--border-strong)" }}
           />
           <button type="button" onClick={toggleSound} className="min-h-11 rounded-xl px-3 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}>
             {cueMode === "off" ? i18n("classTimerSoundOff") : i18n("classTimerSoundOn")}

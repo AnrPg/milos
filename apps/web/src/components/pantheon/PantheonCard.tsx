@@ -197,7 +197,7 @@ function PRHistoryTooltip({
             border: "1px solid var(--border)",
             borderRadius: "1rem",
             padding: "12px 16px",
-            boxShadow: "0 16px 48px rgba(0,0,0,0.5)",
+            boxShadow: "var(--shadow-md)",
           }}
         >
           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] mb-2" style={{ color: "var(--dim)" }}>
@@ -213,7 +213,7 @@ function PRHistoryTooltip({
                   className="flex items-center justify-between gap-3 rounded-lg px-2.5 py-1"
                   style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
                 >
-                  <span className="text-xs font-bold tabular-nums" style={{ color: "var(--primary)" }}>
+                  <span className="text-xs font-bold tabular-nums" style={{ color: "var(--heat)" }}>
                     {formatScore(Number(entry.score), pr.unit)}
                   </span>
                   <span className="text-[10px]" style={{ color: "var(--dim)" }}>
@@ -288,12 +288,12 @@ function CompactCard({
         <div>
           <p className="text-sm font-semibold truncate pe-8" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
-            <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>{scoreStr}</span>
+            <span className="text-2xl font-bold tabular-nums" style={{ color: "var(--heat)" }}>{scoreStr}</span>
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
           </div>
           <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{dateStr}</p>
           {(details || latestComment) && (
-            <div className="mt-2 border-s-2 ps-2" style={{ borderColor: "var(--primary)" }}>
+            <div className="mt-2 border-s-2 ps-2" style={{ borderColor: "var(--heat)" }}>
               {details && <p className="truncate text-[11px]" style={{ color: "var(--text-soft)" }}>{details}</p>}
               {latestComment && <p className="mt-0.5 truncate text-[11px]" style={{ color: "var(--muted)" }}>{latestComment}</p>}
             </div>
@@ -364,14 +364,14 @@ function FullCard({
         <div className="min-w-0 pe-28">
           <p className="font-semibold truncate" style={{ color: "var(--text)" }}>{pr.name}</p>
           <div className="mt-1.5 flex items-baseline gap-1.5">
-            <span className="text-3xl font-bold tabular-nums" style={{ color: "var(--primary)" }}>{scoreStr}</span>
+            <span className="text-3xl font-bold tabular-nums" style={{ color: "var(--heat)" }}>{scoreStr}</span>
             <span className="text-xs font-semibold uppercase tracking-[0.16em]" style={{ color: "var(--dim)" }}>{unitLabel}</span>
           </div>
           <p className="mt-1.5 text-xs" style={{ color: "var(--dim)" }}>
             {pr.higher_is_better ? i18n("higherIsBetter7aab104") : i18n("lowerIsBettercf052ba")} · {dateStr}
           </p>
           {(details || latestComment) && (
-            <div className="mt-3 border-s-2 ps-2" style={{ borderColor: "var(--primary)" }}>
+            <div className="mt-3 border-s-2 ps-2" style={{ borderColor: "var(--heat)" }}>
               {details && <p className="text-xs" style={{ color: "var(--text-soft)" }}>{details}</p>}
               {latestComment && <p className="mt-1 line-clamp-2 text-xs leading-5" style={{ color: "var(--muted)" }}>{latestComment}</p>}
             </div>

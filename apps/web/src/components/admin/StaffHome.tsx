@@ -178,7 +178,7 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
               { key: "messages", value: stats.data.coaching_messages_this_week, label: i18n("rhStatCoachingMessages") },
               { key: "awaiting", value: stats.data.awaiting_reply, label: i18n("rhStatAwaitingReply") },
             ].map((stat) => (
-              <div key={stat.key} className="flex flex-col-reverse rounded-xl px-3 py-2" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+              <div key={stat.key} className="flex flex-col-reverse rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
                 <dt className="text-xs" style={{ color: "var(--dim)" }}>{stat.label}</dt>
                 <dd className="text-lg font-semibold tabular-nums" style={{ color: "var(--text)" }}>{stat.value}</dd>
               </div>
@@ -206,7 +206,7 @@ export function MyClientsSection({ membership }: { membership: Membership }) {
           </button>
         ) : null}
         {taking ? (
-          <div className="space-y-2 rounded-[1.2rem] p-3" style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}>
+          <div className="space-y-2 rounded-[1.2rem] p-3" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
             <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("rhTakeAthleteHelp")}</p>
             <input
               aria-label={i18n("rhSearchAthletes")}

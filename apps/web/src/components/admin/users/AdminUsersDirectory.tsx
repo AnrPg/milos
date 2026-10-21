@@ -297,7 +297,7 @@ function Avatar({ user }: { user: AdminUserDirectoryEntry }) {
 }
 
 function RoleBadge({ role }: { role: AdminUserDirectoryEntry["role"] }) {
-  const color = role === "admin" ? "var(--primary)" : role === "athlete" ? "var(--success, #16a34a)" : "var(--muted)";
+  const color = role === "admin" ? "var(--primary)" : role === "athlete" ? "var(--success)" : "var(--muted)";
   return (
     <span className="inline-flex items-center gap-1 font-semibold uppercase tracking-[0.12em]" style={{ color }}>
       <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full" style={{ background: color }} />
@@ -309,7 +309,7 @@ function RoleBadge({ role }: { role: AdminUserDirectoryEntry["role"] }) {
 function FinanceBadge({ status }: { status: string }) {
   const good = ["active", "paid", "current"].includes(status);
   const bad = ["overdue", "expired", "suspended", "cancelled", "canceled", "frozen"].includes(status);
-  const color = good ? "var(--success, #16a34a)" : bad ? "var(--danger, #dc2626)" : "var(--warning, #d97706)";
+  const color = good ? "var(--success)" : bad ? "var(--danger)" : "var(--warning)";
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-xs font-semibold" style={{ background: `color-mix(in srgb, ${color} 14%, transparent)`, color }}>
       <SemanticLabel value={status} />

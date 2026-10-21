@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddChatMessageNotificationType do
+defmodule Palee.Repo.Migrations.AddChatMessageNotificationType do
   use Ecto.Migration
 
   @types_with_chat_message [

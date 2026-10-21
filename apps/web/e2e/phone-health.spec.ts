@@ -2,7 +2,7 @@ import { expect, test, type Page, type Request } from "@playwright/test";
 
 // Phase 3 M10 (ADR-172): Apple Health and Health Connect inside the store
 // apps. The native shell is simulated with the bridge Capacitor injects plus
-// a MilosHealth plugin header whose calls answer from a fake; the API is
+// a PaleeHealth plugin header whose calls answer from a fake; the API is
 // stubbed and every route not listed answers {}.
 
 const json = (body: unknown, status = 200) => ({ status, contentType: "application/json", body: JSON.stringify(body) });
@@ -42,7 +42,7 @@ function connectedRow(provider: string, lastSync: string | null, prefs = ALL_ON)
 
 async function devicesPage(page: Page, rows: () => Row[]) {
   const { user, token } = persona();
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: token, refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
@@ -74,7 +74,7 @@ async function devicesPage(page: Page, rows: () => Row[]) {
   );
 }
 
-// Capacitor's iOS/Android shell, with the MilosHealth header and a fake
+// Capacitor's iOS/Android shell, with the PaleeHealth header and a fake
 // behind `nativePromise`. Every call lands in window.__healthCalls.
 function nativeBridge(platform: "ios" | "android", availability: Record<string, unknown> = { available: true }) {
   return `
@@ -85,9 +85,9 @@ const iso = (minutes) => new Date(now - minutes * 60000).toISOString().replace(/
 window.Capacitor = {
   isNativePlatform: () => true,
   getPlatform: () => "${platform}",
-  isPluginAvailable: (name) => name === "MilosHealth",
+  isPluginAvailable: (name) => name === "PaleeHealth",
   Plugins: {},
-  PluginHeaders: [{ name: "MilosHealth", methods: [
+  PluginHeaders: [{ name: "PaleeHealth", methods: [
     { name: "availability", rtype: "promise" },
     { name: "requestAuthorization", rtype: "promise" },
     { name: "read", rtype: "promise" },

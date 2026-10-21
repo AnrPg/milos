@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowScopedOrganizationSettingsSelfRead do
+defmodule Palee.Repo.Migrations.AllowScopedOrganizationSettingsSelfRead do
   use Ecto.Migration
 
   # TD-092 / ADR-131: mirrors organizations_scoped_self_read_policy for the

@@ -70,6 +70,6 @@ contracts.
 
 Validation performed:
 
-- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/milos_phase3_drilldown_build mix test test/milos_training/finance/domain/member_drill_down_test.exs test/milos_training/coaching/domain/athlete_drill_down_test.exs test/milos_training/admin_drill_down_alignment_test.exs test/milos_training_web/controllers/phase8_finance_controller_test.exs test/milos_training_web/controllers/admin_coaching_controller_test.exs test/milos_training_web/controllers/api_spec_controller_test.exs`
+- `DB_PORT=5434 MIX_BUILD_PATH=/tmp/palee_phase3_drilldown_build mix test test/palee/finance/domain/member_drill_down_test.exs test/palee/coaching/domain/athlete_drill_down_test.exs test/palee/admin_drill_down_alignment_test.exs test/palee_web/controllers/phase8_finance_controller_test.exs test/palee_web/controllers/admin_coaching_controller_test.exs test/palee_web/controllers/api_spec_controller_test.exs`
 
 No new backend follow-up work was deferred by this alignment slice.

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPreferredLocaleToUsers do
+defmodule Palee.Repo.Migrations.AddPreferredLocaleToUsers do
   use Ecto.Migration
 
   def change do

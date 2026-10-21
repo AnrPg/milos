@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddUniqueReviewTargetPerUser do
+defmodule Palee.Repo.Migrations.AddUniqueReviewTargetPerUser do
   use Ecto.Migration
 
   def up do

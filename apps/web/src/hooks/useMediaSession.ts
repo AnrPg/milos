@@ -27,7 +27,7 @@ export function useMediaSession({ title, subtitle, running, onPlay, onPause }: M
     if (typeof navigator === "undefined" || !("mediaSession" in navigator)) return;
     const session = navigator.mediaSession;
     try {
-      session.metadata = new MediaMetadata({ title, artist: subtitle, album: "Milos" });
+      session.metadata = new MediaMetadata({ title, artist: subtitle, album: "Palee" });
       session.playbackState = running ? "playing" : "paused";
     } catch {
       // MediaMetadata is missing in some embedded browsers.

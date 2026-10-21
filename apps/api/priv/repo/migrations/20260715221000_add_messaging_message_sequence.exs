@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddMessagingMessageSequence do
+defmodule Palee.Repo.Migrations.AddMessagingMessageSequence do
   use Ecto.Migration
 
   def change do

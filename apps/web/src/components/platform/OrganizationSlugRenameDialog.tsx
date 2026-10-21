@@ -95,7 +95,7 @@ export function OrganizationSlugRenameDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
       <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -110,14 +110,14 @@ export function OrganizationSlugRenameDialog({
         <p className="mt-4 text-sm leading-6 text-[var(--text-soft)]">{formatSlugCopy(copy.intro, { slug: currentSlug })}</p>
 
         {result ? (
-          <p className="mt-5 border-l-4 border-[var(--accent)] bg-[var(--surface-muted)] px-4 py-3 text-sm font-semibold text-[var(--text)]" role="status">
+          <p className="mt-5 border-l-4 border-[var(--accent)] bg-[var(--panel-muted)] px-4 py-3 text-sm font-semibold text-[var(--text)]" role="status">
             {formatSlugCopy(copy.done, { path: result.canonical_path })}
           </p>
         ) : null}
 
         {impactQuery.isLoading ? <p className="mt-5 text-sm text-[var(--text-soft)]">{copy.loading}</p> : null}
         {impactQuery.isError ? (
-          <p className="mt-5 border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{copy.loadError}</p>
+          <p className="mt-5 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.loadError}</p>
         ) : null}
 
         {impact && !result ? (
@@ -167,26 +167,26 @@ export function OrganizationSlugRenameDialog({
             </section>
 
             {impact.purge_open ? (
-              <p className="border-l-4 border-red-700 bg-red-50 px-4 py-3 text-sm font-semibold text-red-900">{copy.purgeBlocked}</p>
+              <p className="border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.purgeBlocked}</p>
             ) : null}
 
-            <section className="border border-red-300 bg-red-50 p-4 text-red-950">
+            <section className="border border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] p-4 text-[var(--text)]">
               <label className="block text-sm font-medium">
                 <span className="mb-1.5 block">{formatSlugCopy(copy.confirmationLabel, { slug: currentSlug })}</span>
                 <input
                   value={confirmation}
                   onChange={(event) => setConfirmation(event.target.value)}
-                  className="w-full border border-red-300 bg-white px-3 py-2.5 text-[var(--text)] outline-none focus:border-red-700"
+                  className="w-full border border-[var(--danger)] bg-[var(--panel)] px-3 py-2.5 text-[var(--text)] outline-none focus:border-[var(--danger)]"
                   autoComplete="off"
                   spellCheck={false}
                 />
               </label>
-              {actionError ? <p className="mt-3 text-sm font-semibold text-red-900" role="alert">{actionError}</p> : null}
+              {actionError ? <p className="mt-3 text-sm font-semibold text-[var(--danger)]" role="alert">{actionError}</p> : null}
               <div className="mt-3 flex flex-wrap gap-3">
-                <button type="submit" disabled={!canSubmit} className="bg-red-800 px-4 py-2 text-sm font-semibold text-white disabled:opacity-50">
+                <button type="submit" disabled={!canSubmit} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
                   {submitting ? copy.confirming : copy.confirm}
                 </button>
-                <button type="button" onClick={onClose} className="border border-red-900 px-4 py-2 text-sm font-semibold">
+                <button type="button" onClick={onClose} className="border border-[var(--danger)] px-4 py-2 text-sm font-semibold">
                   {copy.cancel}
                 </button>
               </div>

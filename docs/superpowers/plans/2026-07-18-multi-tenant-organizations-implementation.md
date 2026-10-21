@@ -3,7 +3,7 @@
 **Date:** 2026-07-18
 
 **Status:** In progress
-**Goal:** Convert Milos Training into a single-origin, shared-schema multi-tenant
+**Goal:** Convert Palee into a single-origin, shared-schema multi-tenant
 product with membership-scoped roles, one-time invitations, path-resolved tenant
 context, global personal resources, and defense-in-depth isolation.
 

@@ -1,5 +1,0 @@
-defmodule MilosTraining.Workouts.Queries.GetAdminWorkout do
-  alias MilosTraining.Workouts.WorkoutStore
-
-  def by_id(context, id), do: WorkoutStore.get_workout_for_admin(context, id)
-end

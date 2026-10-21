@@ -28,12 +28,12 @@ export function LibraryTransferDialog({
   const [selected, setSelected] = useState(initialFolderId ?? "");
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.65)" }} onClick={onCancel} role="presentation">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={onCancel} role="presentation">
       <form
         role="dialog"
         aria-modal="true"
         aria-label={title}
-        className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[0_30px_90px_rgba(0,0,0,.35)]"
+        className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[var(--shadow-lg)]"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         onClick={(event) => event.stopPropagation()}
         onSubmit={(event) => {

@@ -205,7 +205,7 @@ function InlineDateEditor({
       <AnchoredOverlay
         anchorRef={anchorRef}
         width={272}
-        className="rounded-[1.2rem] p-3 shadow-[0_20px_60px_rgba(0,0,0,0.45)]"
+        className="rounded-[1.2rem] p-3 shadow-[var(--shadow-lg)]"
         style={{ background: "var(--panel)", border: "1px solid var(--border-strong)", color: "var(--text)" }}
       >
         <div className="flex items-center justify-between">

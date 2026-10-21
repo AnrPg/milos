@@ -63,7 +63,6 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
   const photos = [...(page.profile.cover ? [page.profile.cover] : []), ...page.profile.photos];
   const place = page.locations.find((location) => location.neighbourhood || location.city);
   const line = place?.neighbourhood ?? place?.city ?? null;
-  const brand = page.box.primary_color ?? "var(--primary)";
   const firstHours = page.locations.find((location) => (location.opening_hours ?? []).length > 0);
   const apple = useSyncExternalStore(subscribeNever, readApple, serverApple);
   const pinned = page.locations.find((location) => location.latitude != null && location.longitude != null);
@@ -109,7 +108,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
       <header className="relative">
         <div
           className="relative h-52 w-full overflow-hidden sm:h-64 lg:h-96"
-          style={{ background: `linear-gradient(135deg, ${brand}, color-mix(in srgb, ${brand} 35%, var(--bg)))` }}
+          style={{ background: "linear-gradient(135deg, var(--deep), var(--primary))" }}
         >
           {page.profile.cover ? (
             <button type="button" onClick={() => setViewer(0)} aria-label={t("openPhotos")} className="block h-full w-full">
@@ -118,16 +117,16 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
             </button>
           ) : null}
           <div className="absolute inset-x-0 top-0 mx-auto flex max-w-[75rem] justify-between p-3 pt-[max(0.75rem,env(safe-area-inset-top))] lg:px-6 lg:pt-6">
-            <button type="button" onClick={back} aria-label={t("back")} className={`${roundButtonClass} rtl:rotate-180`} style={{ background: "rgba(0,0,0,0.45)", color: "#fff" }}>
+            <button type="button" onClick={back} aria-label={t("back")} className={`${roundButtonClass} rtl:rotate-180`} style={{ background: "var(--media-control)", color: "var(--on-media)" }}>
               <Icon name="chevron-left" />
             </button>
             <span className="flex gap-2">
               {photos.length > 1 ? (
-                <button type="button" onClick={() => setViewer(0)} aria-label={t("openPhotos")} className={roundButtonClass} style={{ background: "rgba(0,0,0,0.45)", color: "#fff" }}>
+                <button type="button" onClick={() => setViewer(0)} aria-label={t("openPhotos")} className={roundButtonClass} style={{ background: "var(--media-control)", color: "var(--on-media)" }}>
                   <Icon name="images" />
                 </button>
               ) : null}
-              <button type="button" onClick={() => void share()} aria-label={t("share")} className={roundButtonClass} style={{ background: "rgba(0,0,0,0.45)", color: "#fff" }}>
+              <button type="button" onClick={() => void share()} aria-label={t("share")} className={roundButtonClass} style={{ background: "var(--media-control)", color: "var(--on-media)" }}>
                 <Icon name={copied ? "check" : "share"} />
               </button>
             </span>
@@ -262,7 +261,7 @@ function Logo({ page, size = 80, className = "" }: { page: PublicBoxPage; size?:
     <span
       aria-hidden="true"
       className={`relative grid shrink-0 place-items-center rounded-full font-extrabold ${className}`}
-      style={{ ...style, background: page.box.primary_color ?? "var(--primary)", color: "var(--bg)", fontSize: size / 2.6 }}
+      style={{ ...style, background: "var(--primary)", color: "var(--primary-contrast)", fontSize: size / 2.6 }}
     >
       {initials}
     </span>
@@ -301,7 +300,7 @@ function Actions({
           <Link
             href={`/login?next=${encodeURIComponent(`/b/${page.box.slug}`)}`}
             className="flex min-h-11 w-full items-center justify-center rounded-2xl text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {tSocial("follow")}
           </Link>

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddFinanceDocumentMode do
+defmodule Palee.Repo.Migrations.AddFinanceDocumentMode do
   use Ecto.Migration
 
   def change do

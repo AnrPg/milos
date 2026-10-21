@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateTrainingQuotes do
+defmodule Palee.Repo.Migrations.CreateTrainingQuotes do
   use Ecto.Migration
 
   def change do

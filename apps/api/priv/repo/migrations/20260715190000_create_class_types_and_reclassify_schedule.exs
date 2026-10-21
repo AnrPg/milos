@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateClassTypesAndReclassifySchedule do
+defmodule Palee.Repo.Migrations.CreateClassTypesAndReclassifySchedule do
   use Ecto.Migration
 
   def change do

@@ -81,7 +81,7 @@ export function CoachAssignmentPanel({ userId }: { userId: string }) {
             <li
               key={item.id}
               className="flex flex-wrap items-center justify-between gap-3 rounded-[1.2rem] px-4 py-3"
-              style={{ background: "var(--bg-soft)", border: "1px solid var(--border)" }}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
             >
               <span className="min-w-0">
                 <span className="block truncate font-semibold" style={{ color: "var(--text)" }}>

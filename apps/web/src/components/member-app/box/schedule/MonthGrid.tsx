@@ -94,7 +94,7 @@ export function MonthGrid({
                 className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-sm font-bold"
                 style={{
                   background: selected ? "var(--primary)" : "transparent",
-                  color: selected ? "var(--bg)" : inMonth ? "var(--text-soft)" : "var(--dim)",
+                  color: selected ? "var(--primary-contrast)" : inMonth ? "var(--text-soft)" : "var(--dim)",
                   opacity: inMonth ? 1 : 0.45,
                   boxShadow: !selected && day === today ? "inset 0 0 0 1px var(--border)" : undefined,
                 }}

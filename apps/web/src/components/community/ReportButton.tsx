@@ -28,8 +28,8 @@ export function ReportButton({
         className,
       ].join(" ")}
       style={{
-        color: tone === "overlay" ? "#fff" : "var(--dim)",
-        outlineColor: tone === "overlay" ? "#fff" : "var(--primary)",
+        color: tone === "overlay" ? "var(--on-media)" : "var(--dim)",
+        outlineColor: tone === "overlay" ? "var(--on-media)" : "var(--primary)",
       }}
       data-testid="report-button"
     >

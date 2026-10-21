@@ -494,7 +494,7 @@ function ExecutionRow({
   );
 }
 
-/** "Κοινοποίηση στο Milos" of one finished workout, kept from the old landing. */
+/** "Κοινοποίηση στο Palee" of one finished workout, kept from the old landing. */
 function ShareExecution({ token, executionId, onClose }: { token: string; executionId: string; onClose: () => void }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
+defmodule Palee.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
   use Ecto.Migration
 
   # ADR-129 / TD-077: Pantheon PRs stay user-owned (ADR-055), but become
@@ -12,7 +12,7 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
   # Both are additional permissive SELECT policies: writes stay owner-only
   # under the existing `*_owner_policy` policies.
   #
-  # `milos_acting_user_coaches/1` is the single seam deciding "is the session
+  # `palee_acting_user_coaches/1` is the single seam deciding "is the session
   # user a coach of org X". Under today's single-role memberships that is
   # `om.role = 'coach'`. Once memberships carry a role set, only that one
   # predicate line changes (to `'coach' = ANY (om.roles)`); coach_scope and
@@ -77,7 +77,7 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
     end)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_coaches(org_id uuid)
+    CREATE OR REPLACE FUNCTION palee_acting_user_coaches(org_id uuid)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -100,7 +100,7 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
     # this check needs SECURITY DEFINER. It answers one boolean about one PR
     # and only for the gym the session is currently scoped to.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_pr_visible_to_acting_coach(pr_user_id uuid, pr_org_id uuid)
+    CREATE OR REPLACE FUNCTION palee_pr_visible_to_acting_coach(pr_user_id uuid, pr_org_id uuid)
     RETURNS boolean
     LANGUAGE sql
     STABLE
@@ -109,7 +109,7 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
     AS $$
       SELECT pr_org_id IS NOT NULL
         AND pr_org_id = NULLIF(current_setting('app.organization_id', true), '')::uuid
-        AND public.milos_acting_user_coaches(pr_org_id)
+        AND public.palee_acting_user_coaches(pr_org_id)
         AND EXISTS (
           SELECT 1
           FROM public.organization_memberships target
@@ -129,7 +129,7 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
     execute("""
     CREATE POLICY user_pr_records_coach_read_policy ON user_pr_records
     FOR SELECT
-    USING (milos_pr_visible_to_acting_coach(user_id, organization_id))
+    USING (palee_pr_visible_to_acting_coach(user_id, organization_id))
     """)
 
     execute("""
@@ -165,8 +165,8 @@ defmodule MilosTraining.Repo.Migrations.AddPrCoachVisibilityAndSharingGrants do
     execute("DROP POLICY IF EXISTS user_pr_history_shared_read_policy ON user_pr_history")
     execute("DROP POLICY IF EXISTS user_pr_records_grantee_read_policy ON user_pr_records")
     execute("DROP POLICY IF EXISTS user_pr_records_coach_read_policy ON user_pr_records")
-    execute("DROP FUNCTION IF EXISTS milos_pr_visible_to_acting_coach(uuid, uuid)")
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_coaches(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_pr_visible_to_acting_coach(uuid, uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_coaches(uuid)")
     drop table(:user_pr_share_grants)
     drop table(:user_pr_sharing_preferences)
   end

@@ -12,7 +12,7 @@ const domains = {
     "An athlete rescheduled their workout.", "Message from %{nickname}",
     "%{nickname} sent you a message.", "New coach note", "Your coach added a new note.",
     "Challenge completed", "You completed a challenge.", "New message in your workout thread",
-    "New message", "You received a new message.", "Milos Training", "You have a new notification.",
+    "New message", "You received a new message.", "Palee", "You have a new notification.",
     "invoice", "New invoice", "Invoice %{invoice_number} has been issued for your account.",
     "Payment reminder", "You have an outstanding balance of %{amount} due."
   ],
@@ -22,8 +22,8 @@ const domains = {
     "Outlook: use Add calendar → Subscribe from web and paste the HTTPS .ics URL.",
     "Downloading the .ics file imports a one-off snapshot and will not stay synchronized.",
     "Class: %{name}", "Assigned workout", "Workout: %{title}",
-    "Assigned workout in Milos Training.", "Scheduled %{name} class in Milos Training.",
-    "Pending", "Approved", "Scheduled", "Milos Training class booking status: %{status}."
+    "Assigned workout in Palee.", "Scheduled %{name} class in Palee.",
+    "Pending", "Approved", "Scheduled", "Palee class booking status: %{status}."
   ],
   sharing: [
     "New PR — %{name}: %{score} %{unit} (achieved on %{date})",

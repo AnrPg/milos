@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ScopeAssignmentUniquenessToNotes do
+defmodule Palee.Repo.Migrations.ScopeAssignmentUniquenessToNotes do
   use Ecto.Migration
 
   def change do

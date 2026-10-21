@@ -75,7 +75,7 @@ Timeout-job insertion now happens inside the booking write transaction, so a
 `pending` booking cannot be committed without its matching timeout job
 reference.
 
-Schedule reads are assembled through `MilosTraining.Application.GetScheduleCalendar`
+Schedule reads are assembled through `Palee.Application.GetScheduleCalendar`
 so the controller does not orchestrate cross-context data directly. That
 service enriches scheduling records with published workout previews from the
 Workouts context and member nicknames from Identity.

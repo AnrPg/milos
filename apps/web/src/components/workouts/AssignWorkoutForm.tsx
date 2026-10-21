@@ -259,7 +259,7 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
                     className="flex w-full items-center justify-between rounded-[1.2rem] px-4 py-3 text-start transition-colors"
                     style={
                       selected
-                        ? { background: "var(--primary)", color: "var(--bg)" }
+                        ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                         : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
                     }
                     onClick={() => {

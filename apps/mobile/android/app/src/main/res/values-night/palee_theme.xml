@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Generated from apps/web/src/lib/theme.ts by `npm run theme:native`; do not edit. -->
+<resources>
+    <color name="palee_background">#FF17181C</color>
+    <color name="palee_panel">#FF1D1F24</color>
+    <color name="palee_text">#FFF4F5F7</color>
+    <color name="palee_muted">#FFA2A8B3</color>
+    <color name="palee_border">#FF2C2F37</color>
+    <color name="palee_primary">#FF5B7CFF</color>
+    <color name="palee_primary_contrast">#FF0E0F12</color>
+    <color name="palee_spark">#FFE4FF6E</color>
+    <color name="palee_spark_contrast">#FF17181C</color>
+</resources>

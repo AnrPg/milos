@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- ADR-173: the widget picker's names and descriptions (the widgets' own
+     words come from the web app, in the person's language). -->
+<resources>
+    <string name="palee_widget_water_name">Water</string>
+    <string name="palee_widget_water_description">Today\'s water and +1 glass</string>
+    <string name="palee_widget_today_name">Today</string>
+    <string name="palee_widget_today_description">Today\'s WOD, programme and classes</string>
+    <string name="palee_widget_checkin_name">Check-in</string>
+    <string name="palee_widget_checkin_description">Your next class and your check-in code</string>
+    <string name="palee_widget_loading">Palee</string>
+</resources>

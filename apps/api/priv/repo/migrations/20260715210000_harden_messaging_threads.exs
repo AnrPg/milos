@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.HardenMessagingThreads do
+defmodule Palee.Repo.Migrations.HardenMessagingThreads do
   use Ecto.Migration
 
   def change do

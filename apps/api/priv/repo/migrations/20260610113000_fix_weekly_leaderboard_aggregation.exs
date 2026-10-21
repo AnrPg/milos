@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.FixWeeklyLeaderboardAggregation do
+defmodule Palee.Repo.Migrations.FixWeeklyLeaderboardAggregation do
   use Ecto.Migration
 
   def up do

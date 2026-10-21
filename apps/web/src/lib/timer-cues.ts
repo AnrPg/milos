@@ -21,7 +21,7 @@ export type CueSnapshot = {
 
 export const CUE_MODES: CueMode[] = ["sound", "vibrate", "off"];
 const COUNTDOWN_TICKS = new Set([1, 2, 3]);
-const STORAGE_KEY = "milos-timer-cue-mode";
+const STORAGE_KEY = "palee-timer-cue-mode";
 
 /**
  * Decides which cue (if any) a timer transition should play. Pure so the

@@ -16,11 +16,11 @@
 		504EC3121FED79650016851F /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 504EC3101FED79650016851F /* LaunchScreen.storyboard */; };
 		50B271D11FEDC1A000F3C39B /* public in Resources */ = {isa = PBXBuildFile; fileRef = 50B271D01FEDC1A000F3C39B /* public */; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
-		A172000000000000000000A2 /* MilosHealthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A172000000000000000000A1 /* MilosHealthPlugin.swift */; };
-		A172000000000000000000B2 /* MilosBridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A172000000000000000000B1 /* MilosBridgeViewController.swift */; };
-		A1730000000000000000000B /* MilosWidgetsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000A /* MilosWidgetsPlugin.swift */; };
-		A1730000000000000000000D /* MilosGeofencePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000C /* MilosGeofencePlugin.swift */; };
-		A1730000000000000000000F /* MilosNfcPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000E /* MilosNfcPlugin.swift */; };
+		A172000000000000000000A2 /* PaleeHealthPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A172000000000000000000A1 /* PaleeHealthPlugin.swift */; };
+		A172000000000000000000B2 /* PaleeBridgeViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = A172000000000000000000B1 /* PaleeBridgeViewController.swift */; };
+		A1730000000000000000000B /* PaleeWidgetsPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000A /* PaleeWidgetsPlugin.swift */; };
+		A1730000000000000000000D /* PaleeGeofencePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000C /* PaleeGeofencePlugin.swift */; };
+		A1730000000000000000000F /* PaleeNfcPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1730000000000000000000E /* PaleeNfcPlugin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -34,11 +34,11 @@
 		504EC3131FED79650016851F /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		50B271D01FEDC1A000F3C39B /* public */ = {isa = PBXFileReference; lastKnownFileType = folder; path = public; sourceTree = "<group>"; };
 		9582B6822FE993A50072D4E8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		A172000000000000000000A1 /* MilosHealthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosHealthPlugin.swift; sourceTree = "<group>"; };
-		A172000000000000000000B1 /* MilosBridgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosBridgeViewController.swift; sourceTree = "<group>"; };
-		A1730000000000000000000A /* MilosWidgetsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosWidgetsPlugin.swift; sourceTree = "<group>"; };
-		A1730000000000000000000C /* MilosGeofencePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosGeofencePlugin.swift; sourceTree = "<group>"; };
-		A1730000000000000000000E /* MilosNfcPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MilosNfcPlugin.swift; sourceTree = "<group>"; };
+		A172000000000000000000A1 /* PaleeHealthPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeHealthPlugin.swift; sourceTree = "<group>"; };
+		A172000000000000000000B1 /* PaleeBridgeViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeBridgeViewController.swift; sourceTree = "<group>"; };
+		A1730000000000000000000A /* PaleeWidgetsPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeWidgetsPlugin.swift; sourceTree = "<group>"; };
+		A1730000000000000000000C /* PaleeGeofencePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeGeofencePlugin.swift; sourceTree = "<group>"; };
+		A1730000000000000000000E /* PaleeNfcPlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PaleeNfcPlugin.swift; sourceTree = "<group>"; };
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
@@ -77,11 +77,11 @@
 				9582B6822FE993A50072D4E8 /* SceneDelegate.swift */,
 				50379B222058CBB4000EE86E /* capacitor.config.json */,
 				504EC3071FED79650016851F /* AppDelegate.swift */,
-				A172000000000000000000B1 /* MilosBridgeViewController.swift */,
-				A172000000000000000000A1 /* MilosHealthPlugin.swift */,
-				A1730000000000000000000A /* MilosWidgetsPlugin.swift */,
-				A1730000000000000000000C /* MilosGeofencePlugin.swift */,
-				A1730000000000000000000E /* MilosNfcPlugin.swift */,
+				A172000000000000000000B1 /* PaleeBridgeViewController.swift */,
+				A172000000000000000000A1 /* PaleeHealthPlugin.swift */,
+				A1730000000000000000000A /* PaleeWidgetsPlugin.swift */,
+				A1730000000000000000000C /* PaleeGeofencePlugin.swift */,
+				A1730000000000000000000E /* PaleeNfcPlugin.swift */,
 				504EC30B1FED79650016851F /* Main.storyboard */,
 				504EC30E1FED79650016851F /* Assets.xcassets */,
 				504EC3101FED79650016851F /* LaunchScreen.storyboard */,
@@ -175,11 +175,11 @@
 			files = (
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
-				A172000000000000000000A2 /* MilosHealthPlugin.swift in Sources */,
-				A172000000000000000000B2 /* MilosBridgeViewController.swift in Sources */,
-				A1730000000000000000000B /* MilosWidgetsPlugin.swift in Sources */,
-				A1730000000000000000000D /* MilosGeofencePlugin.swift in Sources */,
-				A1730000000000000000000F /* MilosNfcPlugin.swift in Sources */,
+				A172000000000000000000A2 /* PaleeHealthPlugin.swift in Sources */,
+				A172000000000000000000B2 /* PaleeBridgeViewController.swift in Sources */,
+				A1730000000000000000000B /* PaleeWidgetsPlugin.swift in Sources */,
+				A1730000000000000000000D /* PaleeGeofencePlugin.swift in Sources */,
+				A1730000000000000000000F /* PaleeNfcPlugin.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

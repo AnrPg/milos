@@ -28,6 +28,6 @@ describe("onboarding copy", () => {
   });
 
   it("builds namespaced storage keys", () => {
-    expect(checklistLaterKey("acme")).toBe("milos:onboarding-later:acme");
+    expect(checklistLaterKey("acme")).toBe("palee:onboarding-later:acme");
   });
 });

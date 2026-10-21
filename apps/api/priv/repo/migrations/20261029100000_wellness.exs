@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.Wellness do
+defmodule Palee.Repo.Migrations.Wellness do
   @moduledoc """
   ADR-159: Ημερολόγιο › Ευεξία (vision §7.7, mockups 21–22).
 
@@ -171,7 +171,7 @@ defmodule MilosTraining.Repo.Migrations.Wellness do
         FOR SELECT
         USING (
           deleted_at IS NULL
-          AND milos_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility)
+          AND palee_entry_visible_to_acting_coach(user_id, organization_id, journal_visibility)
         )
         """,
         "DROP POLICY IF EXISTS #{table}_coach_read_policy ON #{table}"

@@ -69,7 +69,7 @@ const source = (id: string | null, name: string | null, kind: "organization" | "
 
 async function common(page: Page) {
   const { user, token } = persona();
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: token, refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(user)));
@@ -153,7 +153,7 @@ test.describe("One journal across providers", () => {
     await sheet.getByRole("button", { name: /Nikos P\./ }).click();
     await expect(sheet).toBeHidden();
     expect(selected).toBe("org-coach");
-    expect(await page.evaluate(() => window.localStorage.getItem("milos:selected-organization-slug"))).toBe("nikos");
+    expect(await page.evaluate(() => window.localStorage.getItem("palee:selected-organization-slug"))).toBe("nikos");
   });
 
   test("Ροή labels each entry's source, filters by it and remembers the filter", async ({ page }) => {

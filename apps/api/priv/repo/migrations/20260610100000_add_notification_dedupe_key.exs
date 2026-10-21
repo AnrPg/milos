@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddNotificationDedupeKey do
+defmodule Palee.Repo.Migrations.AddNotificationDedupeKey do
   use Ecto.Migration
 
   def up do

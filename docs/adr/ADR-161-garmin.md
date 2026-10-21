@@ -47,7 +47,7 @@ privacy rules: imports are the member's, private until they choose.
    none becomes a journal entry of the new kind `device_activity`.
 6. **Privacy (Q3 A).** Imports are `private`; a class match takes that gym's
    provenance so the member can widen it like any entry, and coaches read
-   only through `milos_entry_visible_to_acting_coach`.
+   only through `palee_entry_visible_to_acting_coach`.
 7. **Health data (Q4 A).** Sleep goes to Ευεξία rows (`source: garmin`) and a
    manual entry or correction always wins; weight becomes a body snapshot
    with `source: garmin`; resting HR lands in `daily_stats`. Without the

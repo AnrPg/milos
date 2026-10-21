@@ -33,13 +33,13 @@ route:
 
 inhibit_rules:
   # A critical alert silences its own warning tier (same signal and queue),
-  # e.g. MilosOutboxBacklogCritical hides MilosOutboxBacklogAging.
+  # e.g. PaleeOutboxBacklogCritical hides PaleeOutboxBacklogAging.
   - source_matchers: ['severity="critical"', 'signal=~".+"']
     target_matchers: ['severity="warning"']
     equal: [signal, queue]
   # When the API cannot be scraped, its readiness gauges are stale.
-  - source_matchers: ['alertname="MilosApiMetricsDown"']
-    target_matchers: ['alertname="MilosReadinessDependencyDown"']
+  - source_matchers: ['alertname="PaleeApiMetricsDown"']
+    target_matchers: ['alertname="PaleeReadinessDependencyDown"']
 
 receivers:
   - name: default

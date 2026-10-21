@@ -4,7 +4,7 @@ import type { PublicBoxPage } from "@/api/social";
 import { apiOriginForProxy } from "@/lib/organization-slug-alias";
 
 /** The product name on link previews of gyms without a page. */
-export const BRAND_NAME = "Milos";
+export const BRAND_NAME = "Palee";
 
 /**
  * Server-side read of a published box page (ADR-142) for `/b/[slug]`, its

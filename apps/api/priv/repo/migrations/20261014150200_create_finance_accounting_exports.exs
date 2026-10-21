@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinanceAccountingExports do
+defmodule Palee.Repo.Migrations.CreateFinanceAccountingExports do
   use Ecto.Migration
 
   # ADR-126 / TD-022: audit record of every accounting export run - who asked,
@@ -49,7 +49,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceAccountingExports do
     execute("""
     CREATE TRIGGER finance_accounting_exports_apply_tenant_context
     BEFORE INSERT OR UPDATE ON finance_accounting_exports
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

@@ -32,6 +32,11 @@ WORKDIR /app
 
 ENV HOME=/app
 
-COPY --from=build /app/_build/prod/rel/milos_training ./
+COPY --from=build /app/_build/prod/rel/palee ./
 
-CMD ["./bin/milos_training", "start"]
+# The deployed manifests still start `bin/milos_training` and run
+# `MilosTraining.Release.migrate()` (TD-109). Keep that entry point until the
+# infrastructure rename lands, then drop this link and LegacyReleaseEntrypoint.
+RUN ln -s palee bin/milos_training
+
+CMD ["./bin/palee", "start"]

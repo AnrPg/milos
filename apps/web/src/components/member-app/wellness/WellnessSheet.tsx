@@ -22,7 +22,7 @@ export function WellnessSheet({
   return (
     <div
       className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0, 0, 0, 0.45)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={onClose}
     >
       <div
@@ -95,7 +95,7 @@ export function Pills<T extends string | number>({
             className="min-h-10 rounded-full px-3.5 text-sm font-semibold"
             style={{
               background: on ? "var(--primary)" : "var(--panel-raised)",
-              color: on ? "var(--bg)" : "var(--text)",
+              color: on ? "var(--primary-contrast)" : "var(--text)",
               border: "1px solid var(--border)",
             }}
           >
@@ -124,7 +124,7 @@ export function PrimaryButton({
       disabled={disabled}
       onClick={onClick}
       className="min-h-12 w-full rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-      style={{ background: "var(--primary)", color: "var(--bg)" }}
+      style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
     >
       {children}
     </button>

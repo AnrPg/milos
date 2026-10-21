@@ -109,7 +109,7 @@ function SquadView({ club, clubs, squad }: { club: CommunityClub; clubs: Communi
               className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
               style={{
                 background: tab === id ? "var(--primary)" : "var(--panel)",
-                color: tab === id ? "var(--bg)" : "var(--text)",
+                color: tab === id ? "var(--primary-contrast)" : "var(--text)",
                 border: "1px solid var(--border)",
               }}
             >

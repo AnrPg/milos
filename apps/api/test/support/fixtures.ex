@@ -1,5 +1,5 @@
-defmodule MilosTraining.TestFixtures do
-  alias MilosTraining.{Identity, Organizations, Scheduling, Workouts}
+defmodule Palee.TestFixtures do
+  alias Palee.{Identity, Organizations, Scheduling, Workouts}
 
   def user_fixture(attrs \\ %{}) do
     unique = System.unique_integer([:positive])
@@ -86,7 +86,7 @@ defmodule MilosTraining.TestFixtures do
       |> Map.merge(attrs)
       |> Map.delete(:tenant_context)
 
-    {:ok, slot} = MilosTraining.Scheduling.create_slot(context, params)
+    {:ok, slot} = Palee.Scheduling.create_slot(context, params)
     slot
   end
 
@@ -107,7 +107,7 @@ defmodule MilosTraining.TestFixtures do
   # workout lands in the organization the test actually set up, instead of
   # always defaulting to the legacy org.
   defp ambient_tenant_context do
-    case MilosTraining.Infrastructure.Tenancy.RepoContext.current_setting("app.organization_id") do
+    case Palee.Infrastructure.Tenancy.RepoContext.current_setting("app.organization_id") do
       nil -> nil
       organization_id -> system_tenant_context(organization_id, :workout_fixture_ambient)
     end

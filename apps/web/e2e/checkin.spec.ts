@@ -40,7 +40,7 @@ const membership = (role: string, capabilities: Record<string, unknown>) => ({
 async function common(page: Page, as: "member" | "admin") {
   const persona = as === "member" ? personaFor("member", "member") : personaFor("admin", "owner");
   const memberships = as === "member" ? [membership("member", {})] : [membership("owner", { manage_settings: true })];
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ access_token: persona.token, refresh_token: "refresh" })));
   await page.route("**/api/auth/me", (route) => route.fulfill(json(persona.user)));
@@ -301,10 +301,10 @@ test.describe("QR check-in", () => {
     async function desk(page: Page, scanAnswer: (body: Record<string, unknown>) => unknown) {
       await common(page, "admin");
       await page.addInitScript(() => {
-        const target = window as unknown as { __milosScannerSource: unknown; __milosEmit: (text: string) => void };
-        target.__milosScannerSource = {
+        const target = window as unknown as { __paleeScannerSource: unknown; __paleeEmit: (text: string) => void };
+        target.__paleeScannerSource = {
           start: (_video: HTMLVideoElement, onCode: (text: string) => void) => {
-            target.__milosEmit = onCode;
+            target.__paleeEmit = onCode;
             return Promise.resolve(() => undefined);
           },
         };
@@ -335,7 +335,7 @@ test.describe("QR check-in", () => {
       return calls;
     }
 
-    const emit = (page: Page, text: string) => page.evaluate((value) => (window as unknown as { __milosEmit: (text: string) => void }).__milosEmit(value), text);
+    const emit = (page: Page, text: string) => page.evaluate((value) => (window as unknown as { __paleeEmit: (text: string) => void }).__paleeEmit(value), text);
 
     test("a scan with a problem waits for staff; override, then revoke the code", async ({ page }) => {
       const calls = await desk(page, () => deskResult());

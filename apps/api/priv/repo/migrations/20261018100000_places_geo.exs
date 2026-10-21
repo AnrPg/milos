@@ -1,10 +1,10 @@
-defmodule MilosTraining.Repo.Migrations.PlacesGeo do
+defmodule Palee.Repo.Migrations.PlacesGeo do
   use Ecto.Migration
 
   # ADR-141: PostGIS, and where a gym location is. Coordinates are stored as
   # plain numbers so every reader (Ecto schemas, tenant export) decodes them
   # without a geometry type; distance search goes through
-  # `milos_geo_point/2`, an immutable function that a GiST expression index
+  # `palee_geo_point/2`, an immutable function that a GiST expression index
   # covers.
 
   def up do
@@ -16,7 +16,7 @@ defmodule MilosTraining.Repo.Migrations.PlacesGeo do
     # expressions with search_path = pg_catalog, pg_temp, where a string body
     # cannot find `geography`. It stays inlinable (no SET clause).
     execute("""
-    CREATE FUNCTION milos_geo_point(latitude double precision, longitude double precision)
+    CREATE FUNCTION palee_geo_point(latitude double precision, longitude double precision)
     RETURNS geography
     LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
     BEGIN ATOMIC
@@ -43,7 +43,7 @@ defmodule MilosTraining.Repo.Migrations.PlacesGeo do
 
     execute("""
     CREATE INDEX facility_locations_point_index ON facility_locations
-    USING gist (milos_geo_point(latitude, longitude))
+    USING gist (palee_geo_point(latitude, longitude))
     WHERE latitude IS NOT NULL AND archived_at IS NULL
     """)
   end
@@ -62,6 +62,6 @@ defmodule MilosTraining.Repo.Migrations.PlacesGeo do
       remove :accessibility
     end
 
-    execute("DROP FUNCTION IF EXISTS milos_geo_point(double precision, double precision)")
+    execute("DROP FUNCTION IF EXISTS palee_geo_point(double precision, double precision)")
   end
 end

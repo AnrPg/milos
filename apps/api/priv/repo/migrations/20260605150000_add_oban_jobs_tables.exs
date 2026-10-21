@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddObanJobsTables do
+defmodule Palee.Repo.Migrations.AddObanJobsTables do
   use Ecto.Migration
 
   def up, do: Oban.Migrations.up()

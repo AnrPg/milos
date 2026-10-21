@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateTrainingLogEntries do
+defmodule Palee.Repo.Migrations.CreateTrainingLogEntries do
   use Ecto.Migration
 
   # ADR-118 / TD-033: standalone training-log entries for class or offline

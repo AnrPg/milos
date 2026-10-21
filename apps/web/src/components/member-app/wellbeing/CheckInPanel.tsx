@@ -111,7 +111,7 @@ export function CheckInPanel({ skipQuestions = [] }: { skipQuestions?: string[] 
             type="submit"
             disabled={answers.length === 0 || submitMutation.isPending}
             className="min-h-11 w-full rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {submitMutation.isPending ? t("saving") : t("save")}
           </button>

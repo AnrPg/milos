@@ -11,7 +11,7 @@ const LINES = [
 ] as const;
 
 /**
- * Help lines, as information (board 15 q5 A): Milos is not a medical or
+ * Help lines, as information (board 15 q5 A): Palee is not a medical or
  * crisis service, so this page only lists who can help and how to reach
  * them. No advice, no assessment.
  */

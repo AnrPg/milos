@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPhaseBSchedulingRules do
+defmodule Palee.Repo.Migrations.AddPhaseBSchedulingRules do
   use Ecto.Migration
 
   # ADR-097: credit weighting, events, booking windows, cancellation cutoffs,

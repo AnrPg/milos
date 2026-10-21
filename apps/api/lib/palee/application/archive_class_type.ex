@@ -1,0 +1,13 @@
+defmodule Palee.Application.ArchiveClassType do
+  alias Palee.Scheduling
+
+  def call(context, id, replacement_id),
+    do: Scheduling.archive_class_type(context, id, blank_to_nil(replacement_id))
+
+  def call(id, replacement_id),
+    do: Scheduling.archive_class_type(id, blank_to_nil(replacement_id))
+
+  defp blank_to_nil(nil), do: nil
+  defp blank_to_nil(""), do: nil
+  defp blank_to_nil(value), do: value
+end

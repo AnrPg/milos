@@ -37,7 +37,7 @@ test role still saw rows. TD-094 tracked both.
    `Application.CreateOwnedOrganization` (owner) hand it to Organizations.
    `OwnerOrganizationController.create` goes through the application service.
 3. **Every Workouts read takes a tenant context.** The context-free read
-   arities are removed from `MilosTraining.Workouts`, from the
+   arities are removed from `Palee.Workouts`, from the
    `Workouts.WorkoutStore` facade and from the `Workouts.Queries.*` modules.
    Reads that had no scoped form gain one:
    `list_workout_change_targets/2`, `get_assignment/2`, `exercise_exists?/2`,

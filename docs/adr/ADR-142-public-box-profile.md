@@ -42,7 +42,7 @@ work, and visitors must be able to filter gyms by the same words everywhere
    bucket) returns the box, the published snapshot, open locations and the
    follower count. A slug or any retired alias resolves only for an active gym
    with a published page, through the SECURITY DEFINER functions
-   `milos_public_box_by_slug` and `milos_public_boxes`; the read then runs in
+   `palee_public_box_by_slug` and `palee_public_boxes`; the read then runs in
    that gym's scope and projects only public fields.
 8. **Sign-in for the rest (board 4 D2).** The schedule (a window of up to 31
    days, no bookings or member data) and the box's public posts are at
@@ -53,7 +53,7 @@ work, and visitors must be able to filter gyms by the same words everywhere
    make it `active` (RLS: insert as requested, target-only update); boxes and,
    from P2-M4, open clubs are followed at once. Requests and acceptances are
    notifications (`follow_requested`, `follow_accepted`). Counts are public
-   numbers through `milos_follow_counts` and `milos_following_count`.
+   numbers through `palee_follow_counts` and `palee_following_count`.
 10. **Audiences.** A club post is `club_channel` or, for staff only, `public`:
     it then also shows on the box page and to the box's followers (RLS read
     policies on posts, reactions and comments). A member's own voice lives in
@@ -69,7 +69,7 @@ work, and visitors must be able to filter gyms by the same words everywhere
     they accept their first follower and changeable in Κοινοποίηση &
     ορατότητα. The member schedule adds `friends_going` to each class: people
     the viewer actively follows who share and hold a place (pending or
-    approved). Only the owner reads the settings row; `milos_booking_sharers()`
+    approved). Only the owner reads the settings row; `palee_booking_sharers()`
     (SECURITY DEFINER, bound to `app.user_id`) tells a follower who among the
     people they follow shares, and nothing more.
 
@@ -99,4 +99,4 @@ when they change gyms.
 - Migration `20261020100000` adds the public lookups, follows, profile posts
   and their policies, the public read policies on club posts and `coach_ids`.
 - Migration `20261020110000` adds `community_social_settings` and
-  `milos_booking_sharers()`.
+  `palee_booking_sharers()`.

@@ -22,7 +22,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- milos:app-links begin -->
+            <!-- palee:app-links begin -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -44,7 +44,7 @@
                 <data android:host="milos.4kq.net" />
                 <data android:pathPrefix="/c/" />
             </intent-filter>
-            <!-- milos:app-links end -->
+            <!-- palee:app-links end -->
         </activity>
 
         <!-- ADR-172: Health Connect's privacy link (rationale up to Android 13). -->
@@ -70,29 +70,29 @@
         </activity-alias>
 
         <!-- ADR-173: the home-screen widgets («+1 νερό», Σήμερα, Check-in). -->
-        <receiver android:name=".WaterWidgetProvider" android:exported="false" android:label="@string/milos_widget_water_name">
+        <receiver android:name=".WaterWidgetProvider" android:exported="false" android:label="@string/palee_widget_water_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="app.milos.member.widget.ADD_WATER" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/milos_widget_water" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/palee_widget_water" />
         </receiver>
-        <receiver android:name=".TodayWidgetProvider" android:exported="false" android:label="@string/milos_widget_today_name">
+        <receiver android:name=".TodayWidgetProvider" android:exported="false" android:label="@string/palee_widget_today_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/milos_widget_today" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/palee_widget_today" />
         </receiver>
-        <receiver android:name=".CheckInWidgetProvider" android:exported="false" android:label="@string/milos_widget_checkin_name">
+        <receiver android:name=".CheckInWidgetProvider" android:exported="false" android:label="@string/palee_widget_checkin_name">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider" android:resource="@xml/milos_widget_checkin" />
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/palee_widget_checkin" />
         </receiver>
 
         <!-- ADR-173: the arrival reminder's region events, and putting regions back after a reboot or update. -->
-        <receiver android:name=".MilosGeofenceReceiver" android:exported="false" />
-        <receiver android:name=".MilosGeofenceBootReceiver" android:exported="false">
+        <receiver android:name=".PaleeGeofenceReceiver" android:exported="false" />
+        <receiver android:name=".PaleeGeofenceBootReceiver" android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />

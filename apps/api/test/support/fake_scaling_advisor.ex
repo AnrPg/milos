@@ -1,4 +1,4 @@
-defmodule MilosTraining.FakeScalingAdvisor do
+defmodule Palee.FakeScalingAdvisor do
   @moduledoc """
   Test stand-in behind the `ScalingAdvisor` port (ADR-174). Deterministic:
   every flagged movement gets a substitution, plus the first scale level.
@@ -7,7 +7,7 @@ defmodule MilosTraining.FakeScalingAdvisor do
   `invalid` as an unusable answer, `quiet` as «nothing to change».
   """
 
-  @behaviour MilosTraining.Scaling.Ports.ScalingAdvisor
+  @behaviour Palee.Scaling.Ports.ScalingAdvisor
 
   @impl true
   def suggest(input, options) do

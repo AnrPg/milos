@@ -1,6 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- ADR-173: the widgets' card, in the app's dark surface. -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
-    <solid android:color="#FF14171C" />
-    <corners android:radius="20dp" />
-</shape>

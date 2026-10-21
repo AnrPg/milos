@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
+defmodule Palee.Repo.Migrations.BuddyMessagesAndWellnessAccess do
   @moduledoc """
   ADR-160 follow-up: the buddy conversation, the coach's wellness-summary
   read log and the coach's Sunday summary push.
@@ -100,8 +100,8 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
     remove_notification_types(@notification_types)
 
     for function <- [
-          "milos_wellness_summary_members(integer)",
-          "milos_wellness_summary_coaches(uuid)"
+          "palee_wellness_summary_members(integer)",
+          "palee_wellness_summary_coaches(uuid)"
         ] do
       execute("DROP FUNCTION IF EXISTS #{function}")
     end
@@ -120,7 +120,7 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
     party_policy("support_replies")
 
     drop table(:buddy_messages)
-    execute("DROP FUNCTION IF EXISTS milos_buddy_messages_guard()")
+    execute("DROP FUNCTION IF EXISTS palee_buddy_messages_guard()")
   end
 
   defp party_policy(table) do
@@ -173,7 +173,7 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
 
     # A message's content, author and pair never change; only read_at.
     execute("""
-    CREATE FUNCTION milos_buddy_messages_guard()
+    CREATE FUNCTION palee_buddy_messages_guard()
     RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -194,7 +194,7 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
     execute("""
     CREATE TRIGGER buddy_messages_guard
     BEFORE UPDATE ON buddy_messages
-    FOR EACH ROW EXECUTE FUNCTION milos_buddy_messages_guard()
+    FOR EACH ROW EXECUTE FUNCTION palee_buddy_messages_guard()
     """)
 
     execute("ALTER TABLE buddy_messages ENABLE ROW LEVEL SECURITY")
@@ -205,7 +205,7 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
     execute("""
     CREATE TRIGGER wellness_access_log_apply_tenant_context
     BEFORE INSERT OR UPDATE ON wellness_access_log
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""
@@ -228,7 +228,7 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
     # Members whose coaches get the weekly wellness summary, with the zone
     # their week is counted in. Ids and zones only.
     execute("""
-    CREATE FUNCTION milos_wellness_summary_members(lim integer)
+    CREATE FUNCTION palee_wellness_summary_members(lim integer)
     RETURNS TABLE (user_id uuid, tz text)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -244,7 +244,7 @@ defmodule MilosTraining.Repo.Migrations.BuddyMessagesAndWellnessAccess do
     # The coaches of one such member: an active coaching relationship in a
     # gym where the member is active. Answers nothing without the toggle.
     execute("""
-    CREATE FUNCTION milos_wellness_summary_coaches(member uuid)
+    CREATE FUNCTION palee_wellness_summary_coaches(member uuid)
     RETURNS TABLE (organization_id uuid, coach_user_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$

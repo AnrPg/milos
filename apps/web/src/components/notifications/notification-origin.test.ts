@@ -1,10 +1,11 @@
 import { describe, expect, it } from "vitest";
 
 import { notificationOrigin } from "@/components/notifications/notification-origin";
+import { paletteColor } from "@/lib/provider-sources";
 
 const ORGANIZATIONS = [
-  { id: "org-a", name: "Atlas Gym", brandColor: "#ff8800" },
-  { id: "org-b", name: "Boreas Strength", brandColor: null },
+  { id: "org-a", name: "Atlas Gym" },
+  { id: "org-b", name: "Boreas Strength" },
 ];
 
 describe("notificationOrigin", () => {
@@ -15,14 +16,7 @@ describe("notificationOrigin", () => {
   it("names the originating organization when it differs from the active one", () => {
     expect(notificationOrigin("org-a", "org-b", ORGANIZATIONS, "Another gym")).toEqual({
       name: "Atlas Gym",
-      color: "#ff8800",
-    });
-  });
-
-  it("falls back to no colour when the organization has no brand colour", () => {
-    expect(notificationOrigin("org-b", "org-a", ORGANIZATIONS, "Another gym")).toEqual({
-      name: "Boreas Strength",
-      color: null,
+      color: paletteColor("org-a"),
     });
   });
 
@@ -40,11 +34,5 @@ describe("notificationOrigin", () => {
 
   it("stays quiet when no organization is active, rather than flagging everything", () => {
     expect(notificationOrigin("org-a", null, ORGANIZATIONS, "Another gym")).toBeNull();
-  });
-
-  it("treats a blank brand colour as no colour", () => {
-    expect(
-      notificationOrigin("org-c", "org-a", [{ id: "org-c", name: "Ceres", brandColor: "   " }], "x"),
-    ).toEqual({ name: "Ceres", color: null });
   });
 });

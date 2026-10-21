@@ -1,4 +1,5 @@
 import type { EntrySource, FormerProvider, MyProviders, Provider } from "@/api/providers";
+import { SERIES_TOKENS, tokenVar } from "@/lib/theme";
 
 /**
  * Where an entry came from (ADR-162, board 17 Q3): a provider (gym or
@@ -13,12 +14,12 @@ export function sourceToken(source: Pick<EntrySource, "kind" | "organization_id"
   return source.kind === "device" ? "device" : "freeform";
 }
 
-// Distinct hues on the app's dark and light panels; a provider without a
-// brand colour gets one by its id, so it keeps it across screens.
-const PALETTE = ["#D9743D", "#5B8DEF", "#78BFA6", "#C77DDB", "#E0B04A", "#E86F8A", "#4FB3C8", "#9AA35A"];
-export const FREEFORM_COLOR = "#8C9AA6";
-export const DEVICE_COLOR = "#3D8AB0";
-export const FORMER_COLOR = "#8A8A8A";
+// The theme's data-series colours: each provider gets one by its id, so it
+// keeps it across screens (gym brand colours do not tint the app).
+const PALETTE = SERIES_TOKENS.map(tokenVar);
+export const FREEFORM_COLOR = tokenVar("seriesNeutral");
+export const DEVICE_COLOR = tokenVar("series6");
+export const FORMER_COLOR = tokenVar("dim");
 
 function hash(text: string) {
   let value = 0;
@@ -30,10 +31,9 @@ export function paletteColor(id: string) {
   return PALETTE[hash(id) % PALETTE.length];
 }
 
-/** A provider's brand colour when it is a usable hex, else its palette colour. */
-export function providerColor(provider: { organization_id: string; primary_color?: string | null }) {
-  const brand = provider.primary_color?.trim();
-  return brand && /^#[0-9a-f]{6}$/i.test(brand) ? brand : paletteColor(provider.organization_id);
+/** A provider's series colour (stable by id; Palee wears one theme for every gym). */
+export function providerColor(provider: { organization_id: string }) {
+  return paletteColor(provider.organization_id);
 }
 
 export type SourceDirectory = {

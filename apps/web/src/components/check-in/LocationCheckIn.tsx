@@ -63,7 +63,7 @@ export function LocationCheckIn({ token, locationId }: { token: string; location
           <Link
             href={adminHref(`/admin/check-in/door/${locationId}`, slug)}
             className="flex min-h-11 items-center rounded-2xl px-4 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("openDoorScreen")}
           </Link>

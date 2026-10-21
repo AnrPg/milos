@@ -57,7 +57,7 @@ export function BookingSharingOffer() {
           disabled={busy}
           onClick={() => void set(true)}
           className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("bookingSharingYes")}
         </button>
@@ -71,7 +71,7 @@ export function BookingSharingOffer() {
           {t("bookingSharingNo")}
         </button>
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </section>
   );
 }
@@ -97,7 +97,7 @@ export function BookingSharingSetting() {
       >
         {enabled ? t("bookingSharingTurnOff") : t("bookingSharingTurnOn")}
       </button>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
     </div>
   );
 }

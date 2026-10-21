@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPropagateNotificationNicknameFunction do
+defmodule Palee.Repo.Migrations.AddPropagateNotificationNicknameFunction do
   use Ecto.Migration
 
   # TD-092 / ADR-131: after a nickname change, PropagateNicknameJob rewrites the
@@ -13,7 +13,7 @@ defmodule MilosTraining.Repo.Migrations.AddPropagateNotificationNicknameFunction
   # live account's messages.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_propagate_notification_nickname(old_nickname text, new_nickname text)
+    CREATE OR REPLACE FUNCTION palee_propagate_notification_nickname(old_nickname text, new_nickname text)
     RETURNS integer
     LANGUAGE plpgsql
     VOLATILE
@@ -48,11 +48,11 @@ defmodule MilosTraining.Repo.Migrations.AddPropagateNotificationNicknameFunction
     $$
     """)
 
-    # EXECUTE stays with PUBLIC (the default), like the other milos_*
+    # EXECUTE stays with PUBLIC (the default), like the other palee_*
     # SECURITY DEFINER helpers.
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_propagate_notification_nickname(text, text)")
+    execute("DROP FUNCTION IF EXISTS palee_propagate_notification_nickname(text, text)")
   end
 end

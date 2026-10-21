@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BodySnapshots do
+defmodule Palee.Repo.Migrations.BodySnapshots do
   @moduledoc """
   ADR-158 (P2-M10, Σώμα): body measurement snapshots, their private photos,
   health consents, body settings and the audit of coach reads.
@@ -26,8 +26,8 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
     with the gym, like `journal_coach_reads`.
 
   A coach of a gym reads a member's shared snapshots only while the member
-  is active there (`milos_body_visible_to_acting_coach`), and their photos
-  only on `coach_full` with an active consent (`milos_body_photos_consented`).
+  is active there (`palee_body_visible_to_acting_coach`), and their photos
+  only on `coach_full` with an active consent (`palee_body_photos_consented`).
   Both are narrow SECURITY DEFINER functions answering one boolean.
 
   Body photos attach to their snapshot (`attached_type = 'body_snapshot'`),
@@ -240,9 +240,9 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
     drop table(:body_snapshots)
 
     for function <- [
-          "milos_body_visible_to_acting_coach(uuid)",
-          "milos_body_photos_consented(uuid)",
-          "milos_body_reminders_due(timestamp, integer)"
+          "palee_body_visible_to_acting_coach(uuid)",
+          "palee_body_photos_consented(uuid)",
+          "palee_body_reminders_due(timestamp, integer)"
         ] do
       execute("DROP FUNCTION IF EXISTS #{function}")
     end
@@ -253,13 +253,13 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
     # active? One boolean about one member; the memberships it reads are
     # invisible to the coach's session.
     execute("""
-    CREATE FUNCTION milos_body_visible_to_acting_coach(member_id uuid)
+    CREATE FUNCTION palee_body_visible_to_acting_coach(member_id uuid)
     RETURNS boolean
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
       SELECT NULLIF(current_setting('app.organization_id', true), '') IS NOT NULL
         AND member_id IS DISTINCT FROM NULLIF(current_setting('app.user_id', true), '')::uuid
-        AND public.milos_acting_user_coaches(
+        AND public.palee_acting_user_coaches(
           NULLIF(current_setting('app.organization_id', true), '')::uuid
         )
         AND EXISTS (
@@ -274,7 +274,7 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
 
     # Whether the member's body-photo consent is active right now.
     execute("""
-    CREATE FUNCTION milos_body_photos_consented(member_id uuid)
+    CREATE FUNCTION palee_body_photos_consented(member_id uuid)
     RETURNS boolean
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -289,7 +289,7 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
     # their last snapshot, their last reminder and the moment they turned the
     # reminder on. Answers ids only; the job works in each person's session.
     execute("""
-    CREATE FUNCTION milos_body_reminders_due(p_now timestamp, p_lim integer)
+    CREATE FUNCTION palee_body_reminders_due(p_now timestamp, p_lim integer)
     RETURNS SETOF uuid
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -322,7 +322,7 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
     FOR SELECT
     USING (
       visibility IN ('coach_numbers', 'coach_full')
-      AND milos_body_visible_to_acting_coach(user_id)
+      AND palee_body_visible_to_acting_coach(user_id)
     )
     """)
 
@@ -336,8 +336,8 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
         SELECT 1 FROM body_snapshots s
         WHERE s.id = snapshot_id AND s.visibility = 'coach_full'
       )
-      AND milos_body_photos_consented(user_id)
-      AND milos_body_visible_to_acting_coach(user_id)
+      AND palee_body_photos_consented(user_id)
+      AND palee_body_visible_to_acting_coach(user_id)
     )
     """)
 
@@ -345,13 +345,13 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
     execute("""
     CREATE POLICY body_settings_coach_read_policy ON body_settings
     FOR SELECT
-    USING (milos_body_visible_to_acting_coach(user_id))
+    USING (palee_body_visible_to_acting_coach(user_id))
     """)
 
     execute("""
     CREATE TRIGGER body_access_log_apply_tenant_context
     BEFORE INSERT OR UPDATE ON body_access_log
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""
@@ -385,7 +385,7 @@ defmodule MilosTraining.Repo.Migrations.BodySnapshots do
         else: ""
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_dangling_post_media(cutoff timestamp, max_rows integer)
+    CREATE OR REPLACE FUNCTION palee_dangling_post_media(cutoff timestamp, max_rows integer)
     RETURNS TABLE (user_id uuid, media_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$

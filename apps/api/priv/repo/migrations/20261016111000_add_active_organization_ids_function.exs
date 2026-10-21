@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddActiveOrganizationIdsFunction do
+defmodule Palee.Repo.Migrations.AddActiveOrganizationIdsFunction do
   use Ecto.Migration
 
   # TD-092 / ADR-131: every per-tenant cron job (payment and package-expiry
@@ -16,7 +16,7 @@ defmodule MilosTraining.Repo.Migrations.AddActiveOrganizationIdsFunction do
   # (and the scoped self-read policies) apply.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_active_organization_ids()
+    CREATE OR REPLACE FUNCTION palee_active_organization_ids()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -30,12 +30,12 @@ defmodule MilosTraining.Repo.Migrations.AddActiveOrganizationIdsFunction do
     $$
     """)
 
-    # EXECUTE stays with PUBLIC (the default), like the other milos_*
+    # EXECUTE stays with PUBLIC (the default), like the other palee_*
     # SECURITY DEFINER helpers: runtime roles are provisioned outside
     # migrations under deployment-specific names.
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_active_organization_ids()")
+    execute("DROP FUNCTION IF EXISTS palee_active_organization_ids()")
   end
 end

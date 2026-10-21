@@ -10,7 +10,7 @@ collision between two distinct authorization concepts that both used the word
 "owner":
 
 1. **`platform_owners`** — an installation-wide authority, independent of any
-   organization, granted only via `mix milos.platform.grant_owner` (see
+   organization, granted only via `mix palee.platform.grant_owner` (see
    ADR-087, ADR-088). This is the SaaS operator's own account.
 2. **`organization_memberships.role == :owner`** — the highest tenant-scoped
    role within a single organization (a gym owner or freelance coach —
@@ -41,15 +41,15 @@ represented as a distinct identifier:
   `organization_provisioning_events.platform_owner_user_id` → `vendor_user_id`
   (migration `20260806160000_rename_platform_owner_to_vendor.exs`, fully
   reversible).
-- Schema `MilosTraining.Organizations.PlatformOwner` →
-  `MilosTraining.Organizations.Vendor`.
+- Schema `Palee.Organizations.PlatformOwner` →
+  `Palee.Organizations.Vendor`.
 - Store functions `grant_platform_owner/1`, `get_platform_owner/1` →
   `grant_vendor/1`, `get_vendor/1` (context, port, and Ecto adapter).
-- Plug `MilosTrainingWeb.Plugs.RequirePlatformOwner` →
-  `MilosTrainingWeb.Plugs.RequireVendor`; router pipeline `:platform_owner` →
+- Plug `PaleeWeb.Plugs.RequirePlatformOwner` →
+  `PaleeWeb.Plugs.RequireVendor`; router pipeline `:platform_owner` →
   `:vendor`.
 - Error code `"platform_owner_required"` → `"vendor_required"`.
-- Mix task `mix milos.platform.grant_owner` → `mix milos.platform.grant_vendor`.
+- Mix task `mix palee.platform.grant_owner` → `mix palee.platform.grant_vendor`.
 - `PlatformContext` struct field `:platform_owner` → `:vendor`.
 - Public API field `platform_owner` on `GET /api/auth/me` → `vendor` (OpenAPI
   contract regenerated, frontend consumers updated).
@@ -89,8 +89,8 @@ collision to rename (~30 files total vs. ~48 for the tenant role), and
 - Any external tooling, scripts, or dashboards querying the `platform_owners`
   table or the `platform_owner` field on `/api/auth/me` must be updated to the
   new names before this migrates to production.
-- `mix milos.platform.grant_owner` no longer exists; use
-  `mix milos.platform.grant_vendor`.
+- `mix palee.platform.grant_owner` no longer exists; use
+  `mix palee.platform.grant_vendor`.
 - Future audits, ADRs, and code should use "vendor" for the SaaS-level party
   and reserve "owner"/"admin" exclusively for tenant-scoped roles.
 

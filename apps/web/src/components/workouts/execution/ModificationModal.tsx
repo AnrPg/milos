@@ -145,7 +145,7 @@ export function ModificationModal({
   return (
     <div
       className="fixed inset-0 z-50 flex items-end justify-center"
-      style={{ background: "rgba(0,0,0,0.5)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={onClose}
     >
       <div
@@ -279,7 +279,7 @@ export function ModificationModal({
             type="button"
             onClick={handleSave}
             className="w-full rounded-2xl py-3.5 text-base font-semibold"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast, #fff)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {i18n("saveChanges179359b")}
           </button>

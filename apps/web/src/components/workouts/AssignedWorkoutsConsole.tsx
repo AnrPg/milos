@@ -61,7 +61,7 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
   if (scores.length === 0) return null;
   return (
     <div
-      className="pointer-events-none absolute bottom-full start-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+      className="pointer-events-none absolute bottom-full start-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[var(--shadow-md)]"
       style={{
         background: "var(--panel)",
         border: "1px solid var(--border-strong)",
@@ -1168,7 +1168,7 @@ export function AssignedWorkoutsConsole({
                           <span
                             key={(assignment.id) + "-" + (athlete.id)}
                             className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                            style={{ background: "var(--primary)", color: "var(--bg)" }}
+                            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                           >
                             {athlete.nickname}
                           </span>
@@ -1284,7 +1284,7 @@ export function AssignedWorkoutsConsole({
                                 className="flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-start text-sm transition-colors"
                                 style={
                                   selected
-                                    ? { background: "var(--primary)", color: "var(--bg)" }
+                                    ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                                     : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
                                 }
                                 onClick={() =>

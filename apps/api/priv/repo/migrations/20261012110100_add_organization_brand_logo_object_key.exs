@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddOrganizationBrandLogoObjectKey do
+defmodule Palee.Repo.Migrations.AddOrganizationBrandLogoObjectKey do
   use Ecto.Migration
 
   # ADR-121: first-class tenant logo upload.
@@ -32,7 +32,7 @@ defmodule MilosTraining.Repo.Migrations.AddOrganizationBrandLogoObjectKey do
         'organization_logo_removed'
       )
       AND organization_provisioning_events.vendor_user_id = #{@acting_user}
-      AND milos_acting_user_administers(organization_provisioning_events.organization_id)
+      AND palee_acting_user_administers(organization_provisioning_events.organization_id)
     )
     """)
   end

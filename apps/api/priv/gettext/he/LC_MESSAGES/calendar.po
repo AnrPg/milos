@@ -25,11 +25,11 @@ msgstr "אימון שהוקצה"
 msgid "Workout: %{title}"
 msgstr "אימון: %{title}"
 
-msgid "Assigned workout in TrainingJournal."
-msgstr "אימון מוקצה ב-TrainingJournal."
+msgid "Assigned workout in Palee."
+msgstr "אימון מוקצה ב-Palee."
 
-msgid "Scheduled %{name} class in TrainingJournal."
-msgstr "שיעור %{name} מתוזמן באימון מילוס."
+msgid "Scheduled %{name} class in Palee."
+msgstr "שיעור %{name} מתוזמן ב-Palee."
 
 msgid "Pending"
 msgstr "תָלוּי וְעוֹמֵד"
@@ -40,8 +40,8 @@ msgstr "מְאוּשָׁר"
 msgid "Scheduled"
 msgstr "מתוזמן"
 
-msgid "TrainingJournal class booking status: %{status}."
-msgstr "סטטוס הזמנת שיעורי הדרכה במילוס: %{status}."
+msgid "Palee class booking status: %{status}."
+msgstr "סטטוס הזמנת שיעורי הדרכה ב-Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "אימון ניסיון ב-%{box}: %{name}"

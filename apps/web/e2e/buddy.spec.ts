@@ -114,7 +114,7 @@ function wellnessOverview() {
 async function common(page: Page, options: { role?: "member" | "coach"; buddies?: () => unknown; authenticated?: boolean } = {}) {
   const role = options.role ?? "member";
   const { user, token } = persona(role);
-  await page.context().addCookies([{ name: "milos_locale", value: "en", url: "http://127.0.0.1" }]);
+  await page.context().addCookies([{ name: "palee_locale", value: "en", url: "http://127.0.0.1" }]);
   await page.route("**/api/**", (route) => route.fulfill(json({})));
   if (options.authenticated === false) {
     await page.route("**/api/auth/refresh", (route) => route.fulfill(json({ error: "unauthorized" }, 401)));

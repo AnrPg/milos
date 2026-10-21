@@ -1,8 +1,8 @@
 {
-  "name": "milos-mobile",
+  "name": "palee-mobile",
   "version": "0.1.0",
   "private": true,
-  "description": "Milos store apps (iOS and Android): a Capacitor shell around the deployed web app (ADR-171).",
+  "description": "Palee store apps (iOS and Android): a Capacitor shell around the deployed web app (ADR-171).",
   "scripts": {
     "configure": "node scripts/configure.mjs",
     "sync": "node scripts/configure.mjs && cap sync",

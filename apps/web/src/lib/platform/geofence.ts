@@ -1,7 +1,7 @@
 "use client";
 
 // ADR-173: the arrival reminder inside the store apps, through the app's own
-// `MilosGeofence` plugin (Core Location on iOS, Play Services geofencing on
+// `PaleeGeofence` plugin (Core Location on iOS, Play Services geofencing on
 // Android). The member turns it on in Box › Check-in; the app then hands the
 // phone the regions from GET /api/me/check-in/geofences, each with its
 // check-in windows and the reminder's words. The phone alone decides when
@@ -26,7 +26,7 @@ export type NativeGeofenceRegion = {
   windows: NativeGeofenceWindow[];
 };
 
-export type MilosGeofencePlugin = {
+export type PaleeGeofencePlugin = {
   checkPermissions(): Promise<GeofencePermissions>;
   requestPermissions(): Promise<GeofencePermissions>;
   setRegions(options: { regions: NativeGeofenceRegion[] }): Promise<{ monitored: number }>;
@@ -36,17 +36,17 @@ export type MilosGeofencePlugin = {
 /** How a window reads in the reminder: the box, the class and its time. */
 export type ReminderWords = (window: { box: string; className: string; time: string }) => { title: string; body: string };
 
-const PREFERENCE_KEY = "milos-geofence-reminder";
+const PREFERENCE_KEY = "palee-geofence-reminder";
 
 export function geofenceSupported() {
   return hasCapability("geofence");
 }
 
-let pluginPromise: Promise<MilosGeofencePlugin> | null = null;
+let pluginPromise: Promise<PaleeGeofencePlugin> | null = null;
 
-export function geofencePlugin(): Promise<MilosGeofencePlugin> {
+export function geofencePlugin(): Promise<PaleeGeofencePlugin> {
   pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => {
-    const native = registerPlugin<MilosGeofencePlugin>("MilosGeofence");
+    const native = registerPlugin<PaleeGeofencePlugin>("PaleeGeofence");
     return {
       checkPermissions: () => native.checkPermissions(),
       requestPermissions: () => native.requestPermissions(),
@@ -103,7 +103,7 @@ export async function syncGeofences(
   accessToken: string,
   words: ReminderWords,
   formatTime: (iso: string) => string,
-  options: { plugin?: MilosGeofencePlugin; origin?: string; fetch?: (token: string) => Promise<Geofences> } = {},
+  options: { plugin?: PaleeGeofencePlugin; origin?: string; fetch?: (token: string) => Promise<Geofences> } = {},
 ): Promise<number> {
   const plugin = options.plugin ?? (await geofencePlugin());
   if (!reminderEnabled()) {
@@ -117,7 +117,7 @@ export async function syncGeofences(
 }
 
 /** Sign-out: the phone stops watching. */
-export async function forgetGeofences(plugin?: MilosGeofencePlugin) {
+export async function forgetGeofences(plugin?: PaleeGeofencePlugin) {
   if (!geofenceSupported() && !plugin) return;
   // The next person on this phone chooses for themselves.
   setReminderEnabled(false);

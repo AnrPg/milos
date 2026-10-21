@@ -2,11 +2,11 @@ import { apiRequest } from "@/api/client";
 import type { operations } from "@/api/generated/schema";
 
 type ListResponse =
-  operations["MilosTrainingWeb.TrainingLogController.index"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.TrainingLogController.index"]["responses"][200]["content"]["application/json"];
 type SourcesResponse =
-  operations["MilosTrainingWeb.TrainingLogController.sources"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.TrainingLogController.sources"]["responses"][200]["content"]["application/json"];
 type EntryResponse =
-  operations["MilosTrainingWeb.TrainingLogController.show"]["responses"][200]["content"]["application/json"];
+  operations["PaleeWeb.TrainingLogController.show"]["responses"][200]["content"]["application/json"];
 
 export type TrainingLogEntry = ListResponse["entries"][number];
 export type TrainingLogSources = SourcesResponse;
@@ -16,9 +16,9 @@ export type TrainingLogLibrarySource = SourcesResponse["library_workouts"][numbe
 export type TrainingLogScoreableSection = TrainingLogClassSource["scoreable_sections"][number];
 export type TrainingLogSourceType = TrainingLogEntry["source_type"];
 export type CreateTrainingLogRequest =
-  operations["MilosTrainingWeb.TrainingLogController.create"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.TrainingLogController.create"]["requestBody"]["content"]["application/json"];
 export type UpdateTrainingLogRequest =
-  operations["MilosTrainingWeb.TrainingLogController.update"]["requestBody"]["content"]["application/json"];
+  operations["PaleeWeb.TrainingLogController.update"]["requestBody"]["content"]["application/json"];
 export type PerformedExercise = NonNullable<CreateTrainingLogRequest["performed_exercises"]>[number];
 
 const BASE = "/me/training-log";

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddBookingOperationIds do
+defmodule Palee.Repo.Migrations.AddBookingOperationIds do
   @moduledoc """
   ADR-120: client operation identities for offline-replayable booking commands.
 

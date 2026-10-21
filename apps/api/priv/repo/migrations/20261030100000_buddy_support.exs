@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BuddySupport do
+defmodule Palee.Repo.Migrations.BuddySupport do
   @moduledoc """
   ADR-160 (P2-M12, Buddy για στήριξη): one or two trusted people who get only
   what the member explicitly sends with «Χρειάζομαι στήριξη», and the
@@ -222,14 +222,14 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     drop table(:buddy_links)
 
     for function <- [
-          "milos_buddy_relation(uuid)",
-          "milos_buddy_candidates(text, integer)",
-          "milos_buddy_invite_preview(bytea, timestamp)",
-          "milos_buddy_claim_invite(bytea, timestamp)",
-          "milos_buddy_linked(uuid)",
-          "milos_buddy_quiet_hours(uuid)",
-          "milos_buddy_shared_phone(uuid)",
-          "milos_buddy_summary_requesters(integer)"
+          "palee_buddy_relation(uuid)",
+          "palee_buddy_candidates(text, integer)",
+          "palee_buddy_invite_preview(bytea, timestamp)",
+          "palee_buddy_claim_invite(bytea, timestamp)",
+          "palee_buddy_linked(uuid)",
+          "palee_buddy_quiet_hours(uuid)",
+          "palee_buddy_shared_phone(uuid)",
+          "palee_buddy_summary_requesters(integer)"
         ] do
       execute("DROP FUNCTION IF EXISTS #{function}")
     end
@@ -241,7 +241,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     # `follow` (either follows the other); NULL otherwise. One answer about
     # one pair; the rows it reads are invisible to the session.
     execute("""
-    CREATE FUNCTION milos_buddy_relation(other uuid)
+    CREATE FUNCTION palee_buddy_relation(other uuid)
     RETURNS text
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -281,7 +281,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     # open club in common who did not hide themselves from members. Ids and
     # the relation only.
     execute("""
-    CREATE FUNCTION milos_buddy_candidates(term text, lim integer)
+    CREATE FUNCTION palee_buddy_candidates(term text, lim integer)
     RETURNS TABLE (user_id uuid, relation text)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -337,7 +337,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     # The landing page of an off-platform invite: who invited and whether
     # the link still works. Nothing else about the inviter or the link.
     execute("""
-    CREATE FUNCTION milos_buddy_invite_preview(token_hash bytea, p_now timestamp)
+    CREATE FUNCTION palee_buddy_invite_preview(token_hash bytea, p_now timestamp)
     RETURNS TABLE (link_id uuid, inviter_id uuid, status text, expires_at timestamp)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -358,7 +358,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     # the link starts (they accepted by claiming it). Only an unexpired,
     # unclaimed link, never one's own, never a second open link of the pair.
     execute("""
-    CREATE FUNCTION milos_buddy_claim_invite(token_hash bytea, p_now timestamp)
+    CREATE FUNCTION palee_buddy_claim_invite(token_hash bytea, p_now timestamp)
     RETURNS uuid
     LANGUAGE plpgsql VOLATILE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -399,7 +399,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
 
     # Whether the session user and `other` are buddies right now, either way.
     execute("""
-    CREATE FUNCTION milos_buddy_linked(other uuid)
+    CREATE FUNCTION palee_buddy_linked(other uuid)
     RETURNS boolean
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -417,20 +417,20 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     # A buddy's quiet hours, for the person they support (nothing else of
     # their settings).
     execute("""
-    CREATE FUNCTION milos_buddy_quiet_hours(buddy uuid)
+    CREATE FUNCTION palee_buddy_quiet_hours(buddy uuid)
     RETURNS TABLE (quiet_from time, quiet_to time, tz text)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
       SELECT s.quiet_from, s.quiet_to, s.tz
       FROM buddy_settings s
-      WHERE s.user_id = buddy AND milos_buddy_linked(buddy)
+      WHERE s.user_id = buddy AND palee_buddy_linked(buddy)
     $$
     """)
 
     # The phone of someone the session user supports, only when they chose
     # to share it with their buddies.
     execute("""
-    CREATE FUNCTION milos_buddy_shared_phone(requester uuid)
+    CREATE FUNCTION palee_buddy_shared_phone(requester uuid)
     RETURNS text
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -449,7 +449,7 @@ defmodule MilosTraining.Repo.Migrations.BuddySupport do
     # with the zone their week is counted in. Ids only; the job works in
     # each person's session.
     execute("""
-    CREATE FUNCTION milos_buddy_summary_requesters(lim integer)
+    CREATE FUNCTION palee_buddy_summary_requesters(lim integer)
     RETURNS TABLE (user_id uuid, tz text)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$

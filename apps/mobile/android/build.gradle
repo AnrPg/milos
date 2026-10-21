@@ -9,7 +9,7 @@ buildscript {
     dependencies {
         classpath 'com.android.tools.build:gradle:8.13.0'
         classpath 'com.google.gms:google-services:4.4.4'
-        // ADR-172: Kotlin for the MilosHealth plugin (Health Connect is a Kotlin API).
+        // ADR-172: Kotlin for the PaleeHealth plugin (Health Connect is a Kotlin API).
         classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:2.1.21'
 
         // NOTE: Do not place your application dependencies here; they belong

@@ -16,11 +16,11 @@ type; the owner then chose to build notes and check-ins in Phase 1
 (2026-10-16).
 
 ## Decision
-1. **One ladder.** `MilosTraining.Journal.Domain.Visibility` defines the
+1. **One ladder.** `Palee.Journal.Domain.Visibility` defines the
    ordered enum `private < coach_can_view < coach_reply_requested < rated <
    posted`. A rung *reaches the coach* when it is `coach_can_view` or above.
    The same text values are stored everywhere, guarded by a check constraint
-   and by the SQL function `milos_journal_visibility_reaches_coach(text)`.
+   and by the SQL function `palee_journal_visibility_reaches_coach(text)`.
 2. **Stored per entry, as `journal_visibility`.** Reviews and injuries
    already own an unrelated `visibility` column (the audience of a rating or
    report), so the ladder column has its own name on every table:
@@ -49,7 +49,7 @@ type; the owner then chose to build notes and check-ins in Phase 1
    rung from its owner's `coach_visibility`, copies an opt-out into
    `journal_visibility_defaults`, and drops `user_pr_sharing_preferences`.
    The coach read policy of ADR-129 keeps its shape (provenance gym, active
-   membership, `milos_acting_user_coaches`) but now asks the record's own
+   membership, `palee_acting_user_coaches`) but now asks the record's own
    rung instead of the owner's switch.
 5. **Backfill.** Executions and training-log entries done in a gym get
    `coach_can_view` (coaches already see them), personal ones `private`;

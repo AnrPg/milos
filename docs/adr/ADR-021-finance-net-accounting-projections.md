@@ -92,10 +92,10 @@ submission until the membership-backed conversion fields are present.
 
 Verification completed:
 
-- `MIX_BUILD_PATH=/tmp/milos-api-build-dev DB_PORT=5434 mix ecto.migrate`
-- `MIX_BUILD_PATH=/tmp/milos-api-build-test DB_PORT=5434 mix test test/milos_training/finance/finance_test.exs test/milos_training/application/admin_search_users_test.exs`
-- `MIX_BUILD_PATH=/tmp/milos-api-build-dev mix compile --warnings-as-errors`
-- `MIX_BUILD_PATH=/tmp/milos-api-build-test DB_PORT=5434 mix test`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-dev DB_PORT=5434 mix ecto.migrate`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-test DB_PORT=5434 mix test test/palee/finance/finance_test.exs test/palee/application/admin_search_users_test.exs`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-dev mix compile --warnings-as-errors`
+- `MIX_BUILD_PATH=/tmp/palee-api-build-test DB_PORT=5434 mix test`
 - `npx eslint src/components/admin-finance.tsx`
 - `npx tsc --noEmit`
 - `npm run build`

@@ -15,7 +15,7 @@ give the funnel its steps.
 ## Decision
 1. **A Referrals context owns invites.** `referral_codes` holds one personal
    code per member per box: eight Crockford base32 characters, unique across
-   Milos, revocable («Νέος σύνδεσμος»). `referral_attributions` holds one row per
+   Palee, revocable («Νέος σύνδεσμος»). `referral_attributions` holds one row per
    friend per box: who invited them, the channel (link · qr · event · guest_pass
    · staff), the programme at the time, the window, the funnel stamps
    (`event_at`, `trial_at`, `joined_at`, `paid_at`) and the outcome (open ·
@@ -66,7 +66,7 @@ give the funnel its steps.
    link without a reward, and their invites are void with
    `referrer_not_eligible`. At the cap an invite is `capped`.
 7. **Public invite page.** `GET /api/public/referrals/:code` (rate limited)
-   resolves a code through the SECURITY DEFINER function `milos_referral_invite`.
+   resolves a code through the SECURITY DEFINER function `palee_referral_invite`.
    It returns only the box (when active) and whether the inviter is an active
    member. A revoked code, a former member or a closed box find nothing.
    `POST /api/referrals/claim` records the invite after sign-up or sign-in. The

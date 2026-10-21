@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateWorkoutSections do
+defmodule Palee.Repo.Migrations.CreateWorkoutSections do
   use Ecto.Migration
 
   def change do

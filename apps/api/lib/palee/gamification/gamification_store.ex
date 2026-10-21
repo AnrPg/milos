@@ -1,0 +1,119 @@
+defmodule Palee.Gamification.GamificationStore do
+  @behaviour Palee.Gamification.Ports.GamificationStore
+
+  alias Palee.Infrastructure.Tenancy.RepoContext
+
+  defp adapter do
+    Application.fetch_env!(:palee, :gamification_store)
+  end
+
+  def with_tenant_context(context, fun) when is_function(fun, 0),
+    do: RepoContext.run(context, fun)
+
+  @impl true
+  def get_user_stats(user_id), do: adapter().get_user_stats(user_id)
+
+  @impl true
+  def lock_user_stats(user_id), do: adapter().lock_user_stats(user_id)
+
+  @impl true
+  def get_settings, do: adapter().get_settings()
+
+  @impl true
+  def update_settings(params), do: adapter().update_settings(params)
+
+  @impl true
+  def upsert_user_stats(params), do: adapter().upsert_user_stats(params)
+
+  @impl true
+  def increment_advancement(user_id, occurred_at),
+    do: adapter().increment_advancement(user_id, occurred_at)
+
+  @impl true
+  def create_achievement(params), do: adapter().create_achievement(params)
+
+  @impl true
+  def list_user_achievements(user_id), do: adapter().list_user_achievements(user_id)
+
+  @impl true
+  def count_achievements_by_prefix(user_id, prefix),
+    do: adapter().count_achievements_by_prefix(user_id, prefix)
+
+  @impl true
+  def create_challenge(params), do: adapter().create_challenge(params)
+
+  @impl true
+  def create_challenge_with_limit(params, max_active),
+    do: adapter().create_challenge_with_limit(params, max_active)
+
+  @impl true
+  def get_challenge(id), do: adapter().get_challenge(id)
+
+  @impl true
+  def update_challenge(id, params), do: adapter().update_challenge(id, params)
+
+  @impl true
+  def delete_challenge(id), do: adapter().delete_challenge(id)
+
+  @impl true
+  def list_challenges, do: adapter().list_challenges()
+
+  @impl true
+  def list_active_challenges(date), do: adapter().list_active_challenges(date)
+
+  @impl true
+  def get_user_challenge_progress(user_id, challenge_id),
+    do: adapter().get_user_challenge_progress(user_id, challenge_id)
+
+  @impl true
+  def lock_challenge(challenge_id), do: adapter().lock_challenge(challenge_id)
+
+  @impl true
+  def list_challenge_progress(challenge_id), do: adapter().list_challenge_progress(challenge_id)
+
+  @impl true
+  def upsert_user_challenge_progress(params), do: adapter().upsert_user_challenge_progress(params)
+
+  @impl true
+  def set_leaderboard_opt_in(user_id, opted_in),
+    do: adapter().set_leaderboard_opt_in(user_id, opted_in)
+
+  @impl true
+  def leaderboard_opted_in?(user_id), do: adapter().leaderboard_opted_in?(user_id)
+
+  @impl true
+  def leaderboard_opted_in_user_ids(user_ids),
+    do: adapter().leaderboard_opted_in_user_ids(user_ids)
+
+  @impl true
+  def get_leaderboard(period, limit), do: adapter().get_leaderboard(period, limit)
+
+  @impl true
+  def refresh_leaderboard, do: adapter().refresh_leaderboard()
+
+  @impl true
+  def transaction(fun), do: adapter().transaction(fun)
+
+  @impl true
+  def get_user_preferences(user_id), do: adapter().get_user_preferences(user_id)
+
+  @impl true
+  def upsert_user_preferences(user_id, params),
+    do: adapter().upsert_user_preferences(user_id, params)
+
+  @impl true
+  def opt_in_challenge_leaderboard(user_id, challenge_id),
+    do: adapter().opt_in_challenge_leaderboard(user_id, challenge_id)
+
+  @impl true
+  def opt_out_challenge_leaderboard(user_id, challenge_id),
+    do: adapter().opt_out_challenge_leaderboard(user_id, challenge_id)
+
+  @impl true
+  def challenge_leaderboard_opted_in?(user_id, challenge_id),
+    do: adapter().challenge_leaderboard_opted_in?(user_id, challenge_id)
+
+  @impl true
+  def list_challenge_leaderboard_participants(challenge_id),
+    do: adapter().list_challenge_leaderboard_participants(challenge_id)
+end

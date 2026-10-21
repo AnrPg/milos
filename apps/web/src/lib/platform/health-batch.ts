@@ -1,4 +1,4 @@
-// ADR-172: turns what the MilosHealth plugin read from the phone into the
+// ADR-172: turns what the PaleeHealth plugin read from the phone into the
 // API's ingest batches. Pure, so both platforms share one tested shaping:
 //
 //   - instants get the wearer's offset back (`2026-10-20T07:30:00+03:00`), so

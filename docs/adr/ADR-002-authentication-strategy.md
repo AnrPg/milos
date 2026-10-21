@@ -38,8 +38,8 @@ Phase 1 follows the design doc over the implementation plan where they
 conflict: controllers delegate to application services instead of calling
 context functions directly.
 
-The backend namespace and OTP app were corrected to `MilosTraining` and
-`:milos_training` before implementing auth so the project no longer carries
+The backend namespace and OTP app were corrected to `Palee` and
+`:palee` before implementing auth so the project no longer carries
 the temporary `GymApp` identity.
 
 Oban startup is disabled in test so sandboxed database tests can run without

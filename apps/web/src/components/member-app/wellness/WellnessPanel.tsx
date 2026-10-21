@@ -427,7 +427,7 @@ function WaterTile({
   return (
     <Tile
       label={t("item.water")}
-      color="var(--info, #4aa3df)"
+      color="var(--info)"
       value={t("water.glasses", { filled, goal })}
       detail={
         <span className="flex flex-wrap gap-1" aria-label={t("water.dropsLabel")}>
@@ -440,7 +440,7 @@ function WaterTile({
                 aria-label={t("water.remove")}
                 onClick={() => onRemove(entry.id)}
                 className="h-3.5 w-3.5 rounded-full"
-                style={{ background: "var(--info, #4aa3df)" }}
+                style={{ background: "var(--info)" }}
               />
             ) : (
               <span key={`empty-${index}`} className="h-3.5 w-3.5 rounded-full" style={{ border: "1px solid var(--border)" }} />
@@ -454,7 +454,7 @@ function WaterTile({
           onClick={onAdd}
           disabled={pending}
           className="min-h-11 rounded-2xl text-base font-extrabold disabled:opacity-60"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("water.add")}
         </button>
@@ -475,7 +475,7 @@ function SleepTile({ day, onOpen }: { day: WellnessDay; onOpen: () => void }) {
   return (
     <Tile
       label={t("item.sleep")}
-      color="#a78bda"
+      color="var(--series-4)"
       value={duration ? t("sleep.duration", duration) : t("sleep.empty")}
       detail={details.join(" · ") || t("sleep.tap")}
       onOpen={onOpen}
@@ -498,7 +498,7 @@ function MealsTile({
   const { named, other } = mealsBySlot(meals, slots);
   return (
     <div className="flex flex-col gap-3 rounded-2xl p-4" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
-      <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--success, #3fb27f)" }}>
+      <span className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--success)" }}>
         {t("item.meals")}
       </span>
       <ul className="flex flex-wrap gap-2">
@@ -554,9 +554,9 @@ function SlotChip({
 }) {
   const border =
     fit === "in_plan"
-      ? "var(--success, #3fb27f)"
+      ? "var(--success)"
       : fit === "off_plan"
-        ? "var(--warning, #e0a43a)"
+        ? "var(--warning)"
         : fit === "logged"
           ? "var(--primary)"
           : "var(--border)";
@@ -635,7 +635,7 @@ function MoodTile({ mood }: { mood: WellnessDay["mood"] | null }) {
   return (
     <Tile
       label={t("item.mood")}
-      color="var(--warning, #e0a43a)"
+      color="var(--warning)"
       value={parts.length ? parts.join(" · ") : t("mood.empty")}
       detail={<a href="#check-in" style={{ color: "var(--primary)" }}>{t("mood.open")}</a>}
     />
@@ -659,7 +659,7 @@ function CravingTile({
     <div className="flex flex-col gap-3 rounded-2xl p-4" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
       <button type="button" onClick={onNew} className="flex items-center justify-between gap-3 text-start" data-testid="craving-open">
         <span>
-          <span className="block text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "#d9825b" }}>{t("item.cravings")}</span>
+          <span className="block text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--series-5)" }}>{t("item.cravings")}</span>
           <span className="block text-base font-extrabold" style={{ color: "var(--text)" }}>{t("craving.tileTitle")}</span>
           <span className="block text-xs" style={{ color: "var(--dim)" }}>
             {cravings.length ? t("craving.count", { count: cravings.length }) : t("craving.tileHint")}
@@ -683,7 +683,7 @@ const DOT_STYLE: Record<Dot, { background: string; border: string }> = {
   full: { background: "var(--primary)", border: "var(--primary)" },
   half: { background: "color-mix(in srgb, var(--primary) 40%, transparent)", border: "var(--primary)" },
   empty: { background: "transparent", border: "var(--border)" },
-  warm: { background: "#d9825b", border: "#d9825b" },
+  warm: { background: "var(--series-5)", border: "var(--series-5)" },
 };
 
 /** The week grid (board 14, Q7 A): a dot per day and row; swipe or step back through weeks. */

@@ -8,7 +8,7 @@ programmed workout for an athlete with an injury the gym knows about. The same p
 - injury warnings for a movement (ADR-124 `InjuryRiskPolicy`);
 - the gym's scale levels (ADR-128);
 - workout modifications as patches (ADR-050);
-- AI usage metering (ADR-152, the `[:milos, :ai, :generation]` event recorded by `RecordAiUsage`).
+- AI usage metering (ADR-152, the `[:palee, :ai, :generation]` event recorded by `RecordAiUsage`).
 
 There was no per-gym provider key. The ethics checklist says an AI suggestion must never reach an athlete without a
 coach's approval.
@@ -119,7 +119,7 @@ Made without a board, at the owner's instruction (least clutter, robustness):
 
 ## Implementation Notes
 - API files:
-  - `apps/api/lib/milos_training/scaling/` holds the domain, ports, store and schema;
+  - `apps/api/lib/palee/scaling/` holds the domain, ports, store and schema;
   - `application/scaling_suggestions.ex`, `application/gym_ai_settings.ex`;
   - `infrastructure/scaling/ecto_scaling_store.ex`, `infrastructure/ai/anthropic_scaling_advisor.ex`;
   - the workers `ScalingSuggestionScanJob` (cron `27 * * * *`) and `GenerateScalingSuggestionJob` (unique per pair).

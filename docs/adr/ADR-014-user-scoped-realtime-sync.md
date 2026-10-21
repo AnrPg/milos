@@ -74,9 +74,9 @@ The new topic is additive. Existing schedule, notification, and execution
 subscriptions do not change their semantics.
 
 ## Implementation Notes
-- Added `MilosTraining.Application.BroadcastUserSync` as the internal
+- Added `Palee.Application.BroadcastUserSync` as the internal
   application-level emitter for user-scoped invalidation events.
-- Added `MilosTrainingWeb.SyncChannel` and registered `sync:*` on the socket.
+- Added `PaleeWeb.SyncChannel` and registered `sync:*` on the socket.
   Join authorization is strict: only the authenticated user may subscribe to
   `sync:{their_id}`.
 - Extended `InvalidateLandingPages` so cache invalidation and browser refresh
@@ -109,5 +109,5 @@ subscriptions do not change their semantics.
 Application services publish realtime intents through an application-owned
 port. The Phoenix Endpoint adapter lives in Interface/Infrastructure and is
 configured at runtime. Application and bounded-context code must not compile
-against `MilosTrainingWeb.*`; architecture checks enforce this dependency
+against `PaleeWeb.*`; architecture checks enforce this dependency
 direction in CI.

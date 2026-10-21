@@ -27,22 +27,22 @@ This plan is split into sections to stay within file limits:
 | Action | Path |
 |---|---|
 | Create | `priv/repo/migrations/20260607000000_extend_workout_model_for_canvas_ux.exs` |
-| Modify | `lib/milos_training/workouts/master_workout.ex` |
-| Modify | `lib/milos_training/workouts/workout_exercise.ex` |
-| Modify | `lib/milos_training/workouts/exercise_variation.ex` |
-| Modify | `lib/milos_training/workouts/domain/timer_config.ex` |
-| Modify | `lib/milos_training/workouts/domain/workout_materializer.ex` |
-| Modify | `lib/milos_training/workouts/ports/workout_store.ex` |
-| Modify | `lib/milos_training/workouts.ex` |
-| Modify | `lib/milos_training/infrastructure/workouts/ecto_workout_store.ex` |
-| Create | `lib/milos_training/workouts/commands/create_draft_workout.ex` |
-| Create | `lib/milos_training/workouts/commands/update_draft_workout.ex` |
-| Create | `lib/milos_training/workouts/commands/publish_workout.ex` |
-| Create | `lib/milos_training/application/publish_workout.ex` |
-| Modify | `lib/milos_training_web/router.ex` |
-| Modify | `lib/milos_training_web/controllers/admin_workout_controller.ex` |
-| Modify | `test/milos_training_web/controllers/workout_controller_test.exs` |
-| Create | `test/milos_training_web/controllers/admin_workout_controller_test.exs` |
+| Modify | `lib/palee/workouts/master_workout.ex` |
+| Modify | `lib/palee/workouts/workout_exercise.ex` |
+| Modify | `lib/palee/workouts/exercise_variation.ex` |
+| Modify | `lib/palee/workouts/domain/timer_config.ex` |
+| Modify | `lib/palee/workouts/domain/workout_materializer.ex` |
+| Modify | `lib/palee/workouts/ports/workout_store.ex` |
+| Modify | `lib/palee/workouts.ex` |
+| Modify | `lib/palee/infrastructure/workouts/ecto_workout_store.ex` |
+| Create | `lib/palee/workouts/commands/create_draft_workout.ex` |
+| Create | `lib/palee/workouts/commands/update_draft_workout.ex` |
+| Create | `lib/palee/workouts/commands/publish_workout.ex` |
+| Create | `lib/palee/application/publish_workout.ex` |
+| Modify | `lib/palee_web/router.ex` |
+| Modify | `lib/palee_web/controllers/admin_workout_controller.ex` |
+| Modify | `test/palee_web/controllers/workout_controller_test.exs` |
+| Create | `test/palee_web/controllers/admin_workout_controller_test.exs` |
 
 ### Frontend — `apps/web/src/`
 

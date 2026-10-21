@@ -1,4 +1,4 @@
-// ADR-172: the MilosHealth plugin can't be compiled here, so these checks keep
+// ADR-172: the PaleeHealth plugin can't be compiled here, so these checks keep
 // its wiring honest: the same methods and kinds on iOS, Android and the web
 // wrapper, and every native file actually reachable by the app build.
 import assert from "node:assert/strict";
@@ -7,8 +7,8 @@ import { test } from "node:test";
 
 const read = (path) => readFileSync(new URL(path, import.meta.url), "utf8");
 
-const swift = read("../ios/App/App/MilosHealthPlugin.swift");
-const kotlin = read("../android/app/src/main/java/app/milos/member/MilosHealthPlugin.kt");
+const swift = read("../ios/App/App/PaleeHealthPlugin.swift");
+const kotlin = read("../android/app/src/main/java/app/milos/member/PaleeHealthPlugin.kt");
 const web = read("../../web/src/lib/platform/health.ts");
 
 const KINDS = ["activities", "sleep", "weight", "resting_hr", "steps"];
@@ -21,9 +21,9 @@ test("iOS and Android expose the methods the web wrapper calls", () => {
     assert.match(web, new RegExp(`\\b${method}\\(`), `web ${method}`);
   }
   assert.match(kotlin, /@PluginMethod\s+fun openInstaller\(/);
-  assert.match(swift, /jsName = "MilosHealth"/);
-  assert.match(kotlin, /@CapacitorPlugin\(name = "MilosHealth"/);
-  assert.match(web, /registerPlugin<[^>]*>\("MilosHealth"\)|registerPlugin\("MilosHealth"/);
+  assert.match(swift, /jsName = "PaleeHealth"/);
+  assert.match(kotlin, /@CapacitorPlugin\(name = "PaleeHealth"/);
+  assert.match(web, /registerPlugin<[^>]*>\("PaleeHealth"\)|registerPlugin\("PaleeHealth"/);
 });
 
 test("every kind is known on both platforms", () => {
@@ -35,18 +35,18 @@ test("every kind is known on both platforms", () => {
 
 test("the iOS plugin is compiled and registered", () => {
   const project = read("../ios/App/App.xcodeproj/project.pbxproj");
-  for (const file of ["MilosHealthPlugin.swift", "MilosBridgeViewController.swift"]) {
+  for (const file of ["PaleeHealthPlugin.swift", "PaleeBridgeViewController.swift"]) {
     assert.match(project, new RegExp(`/\\* ${file} in Sources \\*/,`), `${file} in the Sources phase`);
     assert.match(project, new RegExp(`isa = PBXFileReference;[^}]*path = ${file};`), `${file} file reference`);
   }
-  assert.match(read("../ios/App/App/Base.lproj/Main.storyboard"), /customClass="MilosBridgeViewController" customModule="App"/);
-  assert.match(read("../ios/App/App/MilosBridgeViewController.swift"), /registerPluginInstance\(MilosHealthPlugin\(\)\)/);
+  assert.match(read("../ios/App/App/Base.lproj/Main.storyboard"), /customClass="PaleeBridgeViewController" customModule="App"/);
+  assert.match(read("../ios/App/App/PaleeBridgeViewController.swift"), /registerPluginInstance\(PaleeHealthPlugin\(\)\)/);
   assert.match(read("../ios/App/App/Info.plist"), /<key>NSHealthShareUsageDescription<\/key>/);
   assert.match(read("../ios/App/App/App.entitlements"), /<key>com\.apple\.developer\.healthkit<\/key>\s*<true\/>/);
 });
 
 test("the Android plugin is registered with its read permissions", () => {
-  assert.match(read("../android/app/src/main/java/app/milos/member/MainActivity.java"), /registerPlugin\(MilosHealthPlugin\.class\)/);
+  assert.match(read("../android/app/src/main/java/app/milos/member/MainActivity.java"), /registerPlugin\(PaleeHealthPlugin\.class\)/);
   const manifest = read("../android/app/src/main/AndroidManifest.xml");
   for (const permission of ["EXERCISE", "HEART_RATE", "DISTANCE", "SLEEP", "WEIGHT", "RESTING_HEART_RATE", "STEPS"]) {
     assert.ok(manifest.includes(`android.permission.health.READ_${permission}"`), permission);

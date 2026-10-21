@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateNotifications do
+defmodule Palee.Repo.Migrations.CreateNotifications do
   use Ecto.Migration
 
   def change do

@@ -84,8 +84,8 @@ Refresh or enqueue reindex after:
 ## Implementation Notes
 
 Add:
-- `MilosTraining.Infrastructure.Search.MemberIndexer`.
-- `MilosTraining.Workers.IndexUserJob`.
+- `Palee.Infrastructure.Search.MemberIndexer`.
+- `Palee.Workers.IndexUserJob`.
 - Public application service for admin search.
 - Admin controller endpoint.
 - Tests proving filter translation and role/user-type scoping.

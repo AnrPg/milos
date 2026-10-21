@@ -461,7 +461,7 @@ function MemberHero({
         className="text-sm font-semibold uppercase tracking-[0.28em]"
         style={{ color: "var(--primary)" }}
       >
-        Milos Training
+        Palee
       </p>
 
       {/* Personalized welcome */}
@@ -2429,7 +2429,7 @@ Accordion content:
 
 - [ ] **Step 3: Verify messaging context supports `class_booking`**
 
-Check `apps/api/lib/milos_training/messaging.ex` and the messaging channel for `class_booking` contextType. If not supported, note it as a prerequisite (backend must add it before this frontend step can be tested end-to-end).
+Check `apps/api/lib/palee/messaging.ex` and the messaging channel for `class_booking` contextType. If not supported, note it as a prerequisite (backend must add it before this frontend step can be tested end-to-end).
 
 - [ ] **Step 4: Commit**
 

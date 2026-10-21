@@ -1,4 +1,4 @@
-defmodule MilosTrainingWeb.ConnCase do
+defmodule PaleeWeb.ConnCase do
   @moduledoc """
   This module defines the test case to be used by
   tests that require setting up a connection.
@@ -11,7 +11,7 @@ defmodule MilosTrainingWeb.ConnCase do
   we enable the SQL sandbox, so changes done to the database
   are reverted at the end of every test. If you are using
   PostgreSQL, you can even run database tests asynchronously
-  by setting `use MilosTrainingWeb.ConnCase, async: true`, although
+  by setting `use PaleeWeb.ConnCase, async: true`, although
   this option is not recommended for other databases.
   """
 
@@ -19,29 +19,29 @@ defmodule MilosTrainingWeb.ConnCase do
 
   using do
     quote do
-      use MilosTrainingWeb, :verified_routes
+      use PaleeWeb, :verified_routes
 
       # TD-046: every request is dispatched as the RLS-enforcing runtime role
-      # (see MilosTrainingWeb.RLSEnforcedEndpoint). Set after the verified
+      # (see PaleeWeb.RLSEnforcedEndpoint). Set after the verified
       # routes `use`, which assigns its own @endpoint.
-      @endpoint MilosTrainingWeb.RLSEnforcedEndpoint
+      @endpoint PaleeWeb.RLSEnforcedEndpoint
 
       # Import conveniences for testing with connections
       import Plug.Conn
       import Phoenix.ConnTest
-      import MilosTrainingWeb.ConnCase
-      import MilosTraining.DataCase, only: [bypass_rls: 1]
+      import PaleeWeb.ConnCase
+      import Palee.DataCase, only: [bypass_rls: 1]
     end
   end
 
   setup tags do
-    MilosTraining.DataCase.setup_sandbox(tags)
-    MilosTrainingWeb.RLSEnforcedEndpoint.put_enforced(Map.get(tags, :rls_enforced, true))
+    Palee.DataCase.setup_sandbox(tags)
+    PaleeWeb.RLSEnforcedEndpoint.put_enforced(Map.get(tags, :rls_enforced, true))
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 
   def put_bearer_token(conn, user) do
-    alias MilosTraining.Infrastructure.Auth.Guardian
+    alias Palee.Infrastructure.Auth.Guardian
 
     {:ok, token, _claims} =
       Guardian.encode_and_sign(user, %{"sv" => user.security_version || 1}, token_type: "access")

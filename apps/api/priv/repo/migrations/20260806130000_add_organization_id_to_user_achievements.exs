@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddOrganizationIdToUserAchievements do
+defmodule Palee.Repo.Migrations.AddOrganizationIdToUserAchievements do
   use Ecto.Migration
 
   def up do

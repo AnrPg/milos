@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.Partners do
+defmodule Palee.Repo.Migrations.Partners do
   @moduledoc """
   ADR-169 (P3-M7, Partners): training partners inside a club.
 
@@ -18,7 +18,7 @@ defmodule MilosTraining.Repo.Migrations.Partners do
 
   Personal (owner-only):
 
-  - `community_user_blocks`: whom a person blocked. `milos_blocked_user_ids`
+  - `community_user_blocks`: whom a person blocked. `palee_blocked_user_ids`
     (SECURITY DEFINER) answers, for the session user only, whom they
     blocked or were blocked by.
 
@@ -225,7 +225,7 @@ defmodule MilosTraining.Repo.Migrations.Partners do
       execute("""
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """)
 
       execute("""
@@ -267,7 +267,7 @@ defmodule MilosTraining.Repo.Migrations.Partners do
     # Whom the session user blocked or was blocked by: ids only, and only for
     # the session user, so nobody can ask about anyone else's blocks.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_blocked_user_ids()
+    CREATE OR REPLACE FUNCTION palee_blocked_user_ids()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -310,7 +310,7 @@ defmodule MilosTraining.Repo.Migrations.Partners do
       remove :partners_enabled
     end
 
-    execute("DROP FUNCTION IF EXISTS milos_blocked_user_ids()")
+    execute("DROP FUNCTION IF EXISTS palee_blocked_user_ids()")
     drop table(:community_user_blocks)
     drop table(:partner_messages)
     drop table(:partner_matches)

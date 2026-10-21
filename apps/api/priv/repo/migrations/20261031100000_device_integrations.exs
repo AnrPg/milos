@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
+defmodule Palee.Repo.Migrations.DeviceIntegrations do
   @moduledoc """
   ADR-161 (P2-M13, Garmin; ADR-149): connected health devices.
 
@@ -26,7 +26,7 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
   All four are the person's own (personal-session RLS, like Σώμα). A coach of
   a gym reads a device activity only while its rung reaches them: its own
   rung for a class-tied activity, the rung of the entry it merged into
-  otherwise (`milos_journal_entry_rung`).
+  otherwise (`palee_journal_entry_rung`).
 
   The push endpoint, the OAuth return and the token sweep run without a
   session; narrow SECURITY DEFINER lookups answer ids only. The match lookup
@@ -96,7 +96,7 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
 
     create unique_index(:device_connections, [:user_id, :provider])
 
-    # A provider account links to one Milos account at a time.
+    # A provider account links to one Palee account at a time.
     create unique_index(:device_connections, [:provider, :provider_user_id],
              where: "provider_user_id IS NOT NULL AND status <> 'revoked'",
              name: :device_connections_provider_user_index
@@ -237,10 +237,10 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
     remove_notification_types(@notification_types)
 
     for function <- [
-          "milos_device_connection_by_oauth_state(text)",
-          "milos_device_connections_for_provider_users(text, text[])",
-          "milos_device_connections_due_refresh(timestamp, integer)",
-          "milos_device_match_candidates(timestamp, timestamp)"
+          "palee_device_connection_by_oauth_state(text)",
+          "palee_device_connections_for_provider_users(text, text[])",
+          "palee_device_connections_due_refresh(timestamp, integer)",
+          "palee_device_match_candidates(timestamp, timestamp)"
         ] do
       execute("DROP FUNCTION IF EXISTS #{function}")
     end
@@ -254,7 +254,7 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
   defp functions do
     # The OAuth return: which pending connection started this sign-in.
     execute("""
-    CREATE FUNCTION milos_device_connection_by_oauth_state(p_state_hash text)
+    CREATE FUNCTION palee_device_connection_by_oauth_state(p_state_hash text)
     RETURNS TABLE (id uuid, user_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -265,7 +265,7 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
 
     # The push endpoint: which connections the provider's user ids belong to.
     execute("""
-    CREATE FUNCTION milos_device_connections_for_provider_users(p_provider text, p_user_ids text[])
+    CREATE FUNCTION palee_device_connections_for_provider_users(p_provider text, p_user_ids text[])
     RETURNS TABLE (id uuid, user_id uuid, provider_user_id text, status text)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -278,7 +278,7 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
 
     # The token sweep: active or failing connections whose access token ends soon.
     execute("""
-    CREATE FUNCTION milos_device_connections_due_refresh(p_before timestamp, p_lim integer)
+    CREATE FUNCTION palee_device_connections_due_refresh(p_before timestamp, p_lim integer)
     RETURNS TABLE (id uuid, user_id uuid)
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -296,7 +296,7 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
     # logged workouts, finished in-app executions and approved or attended
     # classes not logged yet, in every gym, between two instants.
     execute("""
-    CREATE FUNCTION milos_device_match_candidates(p_from timestamp, p_to timestamp)
+    CREATE FUNCTION palee_device_match_candidates(p_from timestamp, p_to timestamp)
     RETURNS TABLE (
       kind text, id uuid, organization_id uuid, title text,
       starts_at timestamp, ends_at timestamp
@@ -368,11 +368,11 @@ defmodule MilosTraining.Repo.Migrations.DeviceIntegrations do
     FOR SELECT
     USING (
       state <> 'pending'
-      AND milos_entry_visible_to_acting_coach(
+      AND palee_entry_visible_to_acting_coach(
         user_id,
         organization_id,
         CASE WHEN merged_id IS NULL THEN journal_visibility
-             ELSE milos_journal_entry_rung(merged_kind, merged_id) END
+             ELSE palee_journal_entry_rung(merged_kind, merged_id) END
       )
     )
     """)

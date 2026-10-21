@@ -15,28 +15,28 @@
 ## File Map
 
 ### Files to delete
-- `apps/api/lib/milos_training/workouts/assignment_message.ex`
-- `apps/api/lib/milos_training/coaching/admin_athlete_note.ex`
-- `apps/api/lib/milos_training/coaching/note_store.ex`
-- `apps/api/lib/milos_training/coaching/ports/note_store.ex`
-- `apps/api/lib/milos_training/coaching/commands/write_note.ex`
-- `apps/api/lib/milos_training/coaching/queries/list_notes_for_athlete.ex`
-- `apps/api/lib/milos_training/infrastructure/coaching/ecto_note_store.ex`
-- `apps/api/lib/milos_training/application/post_assignment_message.ex`
-- `apps/api/lib/milos_training/application/list_assignment_messages.ex`
-- `apps/api/lib/milos_training/application/write_admin_athlete_note.ex`
-- `apps/api/lib/milos_training/application/send_athlete_message.ex`
+- `apps/api/lib/palee/workouts/assignment_message.ex`
+- `apps/api/lib/palee/coaching/admin_athlete_note.ex`
+- `apps/api/lib/palee/coaching/note_store.ex`
+- `apps/api/lib/palee/coaching/ports/note_store.ex`
+- `apps/api/lib/palee/coaching/commands/write_note.ex`
+- `apps/api/lib/palee/coaching/queries/list_notes_for_athlete.ex`
+- `apps/api/lib/palee/infrastructure/coaching/ecto_note_store.ex`
+- `apps/api/lib/palee/application/post_assignment_message.ex`
+- `apps/api/lib/palee/application/list_assignment_messages.ex`
+- `apps/api/lib/palee/application/write_admin_athlete_note.ex`
+- `apps/api/lib/palee/application/send_athlete_message.ex`
 
 ### Files to modify
-- `apps/api/lib/milos_training/coaching.ex` — remove `write_note`, `list_notes_for_athlete`
-- `apps/api/lib/milos_training_web/controllers/admin_coaching_controller.ex` — remove `create_note` action + OpenAPI spec
-- `apps/api/lib/milos_training_web/controllers/my_workout_controller.ex` — remove `send_message`, `list_messages`, `post_message` actions
-- `apps/api/lib/milos_training_web/controllers/schedule_controller.ex` — remove `send_slot_message` action
-- `apps/api/lib/milos_training_web/router.ex` — remove legacy routes
-- `apps/api/lib/milos_training/workouts.ex` — remove `create_assignment_message`, `list_assignment_messages`
-- `apps/api/lib/milos_training/application/get_coaching_athlete_drill_down.ex` — use Messaging
-- `apps/api/lib/milos_training/coaching/domain/athlete_drill_down.ex` — update to work with messages
-- `apps/api/test/milos_training_web/controllers/admin_coaching_controller_test.exs` — update note test
+- `apps/api/lib/palee/coaching.ex` — remove `write_note`, `list_notes_for_athlete`
+- `apps/api/lib/palee_web/controllers/admin_coaching_controller.ex` — remove `create_note` action + OpenAPI spec
+- `apps/api/lib/palee_web/controllers/my_workout_controller.ex` — remove `send_message`, `list_messages`, `post_message` actions
+- `apps/api/lib/palee_web/controllers/schedule_controller.ex` — remove `send_slot_message` action
+- `apps/api/lib/palee_web/router.ex` — remove legacy routes
+- `apps/api/lib/palee/workouts.ex` — remove `create_assignment_message`, `list_assignment_messages`
+- `apps/api/lib/palee/application/get_coaching_athlete_drill_down.ex` — use Messaging
+- `apps/api/lib/palee/coaching/domain/athlete_drill_down.ex` — update to work with messages
+- `apps/api/test/palee_web/controllers/admin_coaching_controller_test.exs` — update note test
 
 ### New migrations (drop legacy tables)
 - `apps/api/priv/repo/migrations/20260614000004_drop_assignment_messages.exs`
@@ -54,7 +54,7 @@
 
 ```elixir
 # apps/api/priv/repo/migrations/20260614000004_drop_assignment_messages.exs
-defmodule MilosTraining.Repo.Migrations.DropAssignmentMessages do
+defmodule Palee.Repo.Migrations.DropAssignmentMessages do
   use Ecto.Migration
 
   def up do
@@ -77,7 +77,7 @@ end
 
 ```elixir
 # apps/api/priv/repo/migrations/20260614000005_drop_admin_athlete_notes.exs
-defmodule MilosTraining.Repo.Migrations.DropAdminAthleteNotes do
+defmodule Palee.Repo.Migrations.DropAdminAthleteNotes do
   use Ecto.Migration
 
   def up do
@@ -111,17 +111,17 @@ Expected: both migrations run without error.
 - [ ] **Step 1: Delete files**
 
 ```bash
-rm apps/api/lib/milos_training/workouts/assignment_message.ex
-rm apps/api/lib/milos_training/coaching/admin_athlete_note.ex
-rm apps/api/lib/milos_training/coaching/note_store.ex
-rm apps/api/lib/milos_training/coaching/ports/note_store.ex
-rm apps/api/lib/milos_training/coaching/commands/write_note.ex
-rm apps/api/lib/milos_training/coaching/queries/list_notes_for_athlete.ex
-rm apps/api/lib/milos_training/infrastructure/coaching/ecto_note_store.ex
-rm apps/api/lib/milos_training/application/post_assignment_message.ex
-rm apps/api/lib/milos_training/application/list_assignment_messages.ex
-rm apps/api/lib/milos_training/application/write_admin_athlete_note.ex
-rm apps/api/lib/milos_training/application/send_athlete_message.ex
+rm apps/api/lib/palee/workouts/assignment_message.ex
+rm apps/api/lib/palee/coaching/admin_athlete_note.ex
+rm apps/api/lib/palee/coaching/note_store.ex
+rm apps/api/lib/palee/coaching/ports/note_store.ex
+rm apps/api/lib/palee/coaching/commands/write_note.ex
+rm apps/api/lib/palee/coaching/queries/list_notes_for_athlete.ex
+rm apps/api/lib/palee/infrastructure/coaching/ecto_note_store.ex
+rm apps/api/lib/palee/application/post_assignment_message.ex
+rm apps/api/lib/palee/application/list_assignment_messages.ex
+rm apps/api/lib/palee/application/write_admin_athlete_note.ex
+rm apps/api/lib/palee/application/send_athlete_message.ex
 ```
 
 - [ ] **Step 2: Try compiling — expect failures (modules that used these files)**
@@ -137,17 +137,17 @@ Expected: compile errors referencing `AdminAthleteNote`, `AssignmentMessage`, `W
 ## Task 3: Update Coaching context facade
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/coaching.ex`
+- Modify: `apps/api/lib/palee/coaching.ex`
 
 - [ ] **Step 1: Remove note-related delegations**
 
 Replace the entire `coaching.ex` with:
 
 ```elixir
-# apps/api/lib/milos_training/coaching.ex
-defmodule MilosTraining.Coaching do
-  alias MilosTraining.Coaching.Commands.RefreshAggregates
-  alias MilosTraining.Coaching.Queries.GetAggregates
+# apps/api/lib/palee/coaching.ex
+defmodule Palee.Coaching do
+  alias Palee.Coaching.Commands.RefreshAggregates
+  alias Palee.Coaching.Queries.GetAggregates
 
   defdelegate get_aggregates(), to: GetAggregates, as: :call
   defdelegate refresh_aggregates(), to: RefreshAggregates, as: :call
@@ -159,7 +159,7 @@ end
 ## Task 4: Update AdminCoachingController — remove create_note
 
 **Files:**
-- Modify: `apps/api/lib/milos_training_web/controllers/admin_coaching_controller.ex`
+- Modify: `apps/api/lib/palee_web/controllers/admin_coaching_controller.ex`
 
 - [ ] **Step 1: Remove create_note action and its OpenAPI spec**
 
@@ -169,7 +169,7 @@ The controller should only retain the `drill_down` action after this change.
 
 - [ ] **Step 2: Remove legacy admin coaching routes from router**
 
-In `apps/api/lib/milos_training_web/router.ex`, find and remove:
+In `apps/api/lib/palee_web/router.ex`, find and remove:
 
 ```elixir
 post("/athletes/:id/notes", AdminCoachingController, :create_note)
@@ -180,8 +180,8 @@ post("/athletes/:id/notes", AdminCoachingController, :create_note)
 ## Task 5: Remove legacy message routes and actions from MyWorkoutController
 
 **Files:**
-- Modify: `apps/api/lib/milos_training_web/controllers/my_workout_controller.ex`
-- Modify: `apps/api/lib/milos_training_web/router.ex`
+- Modify: `apps/api/lib/palee_web/controllers/my_workout_controller.ex`
+- Modify: `apps/api/lib/palee_web/router.ex`
 
 - [ ] **Step 1: Remove from MyWorkoutController**
 
@@ -209,8 +209,8 @@ post("/assigned-workouts/:id/messages", MyWorkoutController, :post_message)
 ## Task 6: Remove send_slot_message from ScheduleController
 
 **Files:**
-- Modify: `apps/api/lib/milos_training_web/controllers/schedule_controller.ex`
-- Modify: `apps/api/lib/milos_training_web/router.ex`
+- Modify: `apps/api/lib/palee_web/controllers/schedule_controller.ex`
+- Modify: `apps/api/lib/palee_web/router.ex`
 
 - [ ] **Step 1: Remove action**
 
@@ -229,13 +229,13 @@ post("/schedule/slots/:id/message", ScheduleController, :send_slot_message)
 ## Task 7: Remove assignment message functions from Workouts context
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/workouts.ex`
+- Modify: `apps/api/lib/palee/workouts.ex`
 
 - [ ] **Step 1: Find and remove note/message functions**
 
 ```bash
 grep -n "assignment_message\|create_assignment_message\|list_assignment_messages" \
-  apps/api/lib/milos_training/workouts.ex
+  apps/api/lib/palee/workouts.ex
 ```
 
 Remove the functions `create_assignment_message/1` and `list_assignment_messages/2` (and related delegations). Keep all workout assignment functions unrelated to messaging.
@@ -245,22 +245,22 @@ Remove the functions `create_assignment_message/1` and `list_assignment_messages
 ## Task 8: Update coaching drill-down to read from Messaging
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/application/get_coaching_athlete_drill_down.ex`
-- Modify: `apps/api/lib/milos_training/coaching/domain/athlete_drill_down.ex`
+- Modify: `apps/api/lib/palee/application/get_coaching_athlete_drill_down.ex`
+- Modify: `apps/api/lib/palee/coaching/domain/athlete_drill_down.ex`
 
 - [ ] **Step 1: Update GetCoachingAthleteDrillDown**
 
 Replace the file content:
 
 ```elixir
-# apps/api/lib/milos_training/application/get_coaching_athlete_drill_down.ex
-defmodule MilosTraining.Application.GetCoachingAthleteDrillDown do
-  alias MilosTraining.Application.ListWorkoutExecutions
-  alias MilosTraining.Coaching
-  alias MilosTraining.Coaching.Domain.AthleteDrillDown
-  alias MilosTraining.Identity
-  alias MilosTraining.Messaging
-  alias MilosTraining.Workouts
+# apps/api/lib/palee/application/get_coaching_athlete_drill_down.ex
+defmodule Palee.Application.GetCoachingAthleteDrillDown do
+  alias Palee.Application.ListWorkoutExecutions
+  alias Palee.Coaching
+  alias Palee.Coaching.Domain.AthleteDrillDown
+  alias Palee.Identity
+  alias Palee.Messaging
+  alias Palee.Workouts
 
   def call(athlete_id, params \\ %{}) do
     with %{role: :athlete} = athlete <- Identity.find_by_id(athlete_id),
@@ -328,7 +328,7 @@ end
 
 - [ ] **Step 2: Update AthleteDrillDown.normalize_admin_note to accept Message maps**
 
-In `apps/api/lib/milos_training/coaching/domain/athlete_drill_down.ex`, find `normalize_admin_note/1` and update it to work with the new message map shape (which has `sender_id` instead of `admin_id`):
+In `apps/api/lib/palee/coaching/domain/athlete_drill_down.ex`, find `normalize_admin_note/1` and update it to work with the new message map shape (which has `sender_id` instead of `admin_id`):
 
 ```elixir
 # Old:
@@ -358,7 +358,7 @@ end
 ## Task 9: Update coaching controller test
 
 **Files:**
-- Modify: `apps/api/test/milos_training_web/controllers/admin_coaching_controller_test.exs`
+- Modify: `apps/api/test/palee_web/controllers/admin_coaching_controller_test.exs`
 
 - [ ] **Step 1: Replace the "write note" test with a messaging-based test**
 

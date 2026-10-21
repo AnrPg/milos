@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
+defmodule Palee.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
   use Ecto.Migration
 
   # ADR-142 (P2-M2): the public box page, follows and post audiences.
@@ -59,11 +59,11 @@ defmodule MilosTraining.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
     end
 
     for table <- Enum.reverse(@profile_tables), do: drop(table(table))
-    execute("DROP FUNCTION IF EXISTS milos_follow_counts(text, uuid[])")
-    execute("DROP FUNCTION IF EXISTS milos_following_count(uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_follow_counts(text, uuid[])")
+    execute("DROP FUNCTION IF EXISTS palee_following_count(uuid)")
     drop table(:community_follows)
-    execute("DROP FUNCTION IF EXISTS milos_public_boxes(uuid[])")
-    execute("DROP FUNCTION IF EXISTS milos_public_box_by_slug(text)")
+    execute("DROP FUNCTION IF EXISTS palee_public_boxes(uuid[])")
+    execute("DROP FUNCTION IF EXISTS palee_public_box_by_slug(text)")
 
     alter table(:organization_public_profiles) do
       remove :coach_ids
@@ -74,7 +74,7 @@ defmodule MilosTraining.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
     # A slug, a current slug or any alias it ever had, resolves only for an
     # active gym that has published its page.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_public_box_by_slug(box_slug text)
+    CREATE OR REPLACE FUNCTION palee_public_box_by_slug(box_slug text)
     RETURNS TABLE (organization_id uuid, slug text)
     LANGUAGE sql
     STABLE
@@ -95,7 +95,7 @@ defmodule MilosTraining.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_public_boxes(org_ids uuid[])
+    CREATE OR REPLACE FUNCTION palee_public_boxes(org_ids uuid[])
     RETURNS TABLE (organization_id uuid, slug text, name text, logo_url text, primary_color text)
     LANGUAGE sql
     STABLE
@@ -180,7 +180,7 @@ defmodule MilosTraining.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
 
     # Followers of each target, active only; what anyone may see on a profile.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_follow_counts(kind text, ids uuid[])
+    CREATE OR REPLACE FUNCTION palee_follow_counts(kind text, ids uuid[])
     RETURNS TABLE (target_id uuid, followers bigint)
     LANGUAGE sql
     STABLE
@@ -195,7 +195,7 @@ defmodule MilosTraining.Repo.Migrations.PublicBoxesFollowsAndProfilePosts do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_following_count(account uuid)
+    CREATE OR REPLACE FUNCTION palee_following_count(account uuid)
     RETURNS bigint
     LANGUAGE sql
     STABLE

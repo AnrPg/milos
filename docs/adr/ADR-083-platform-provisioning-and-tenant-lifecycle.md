@@ -42,7 +42,7 @@ backups until a future approved deletion workflow is implemented.
 ## Implementation Notes
 T7 adds platform-owner resolution, transactional provisioning events, lifecycle and
 settings commands, OpenAPI-described HTTP endpoints, and the authenticated
-`/platform/organizations` operations page. `mix milos.platform.grant_owner NICKNAME`
+`/platform/organizations` operations page. `mix palee.platform.grant_owner NICKNAME`
 is idempotent. The operational runbook documents runtime-role bootstrap, backup,
 tenant export, restore drills, archiving, and deletion review. Automated invitation
 delivery remains deferred under TD-034.

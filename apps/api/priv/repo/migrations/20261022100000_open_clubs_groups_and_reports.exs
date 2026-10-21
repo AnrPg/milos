@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
+defmodule Palee.Repo.Migrations.OpenClubsGroupsAndReports do
   use Ecto.Migration
 
   # ADR-143 (P2-M4): open clubs, member groups and moderation.
@@ -211,7 +211,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
 
     # Open clubs read through the person's own club membership (any gym).
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_club_ids()
+    CREATE OR REPLACE FUNCTION palee_acting_user_club_ids()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -241,13 +241,13 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
     execute("""
     CREATE POLICY community_channels_open_read_policy ON community_channels
     FOR SELECT
-    USING (club_id IN (SELECT milos_acting_user_club_ids()))
+    USING (club_id IN (SELECT palee_acting_user_club_ids()))
     """)
 
     execute("""
     CREATE POLICY community_posts_open_read_policy ON community_posts
     FOR SELECT
-    USING (club_id IN (SELECT milos_acting_user_club_ids()))
+    USING (club_id IN (SELECT palee_acting_user_club_ids()))
     """)
 
     for table <- ~w(community_post_reactions community_post_comments) do
@@ -256,7 +256,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
       FOR SELECT
       USING (post_id IN (
         SELECT p.id FROM public.community_posts p
-        WHERE p.club_id IN (SELECT milos_acting_user_club_ids())
+        WHERE p.club_id IN (SELECT palee_acting_user_club_ids())
       ))
       """)
     end
@@ -280,7 +280,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
 
     # How many people an open club has, for anyone deciding to join it.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_open_club_member_counts(club_ids uuid[])
+    CREATE OR REPLACE FUNCTION palee_open_club_member_counts(club_ids uuid[])
     RETURNS TABLE (club_id uuid, member_count bigint)
     LANGUAGE sql
     STABLE
@@ -300,7 +300,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
     execute("""
     CREATE POLICY community_club_memberships_open_read_policy ON community_club_memberships
     FOR SELECT
-    USING (club_id IN (SELECT milos_acting_user_club_ids()))
+    USING (club_id IN (SELECT palee_acting_user_club_ids()))
     """)
 
     # Board 7 Q1: a member can keep themselves out of every club's «Μέλη».
@@ -309,7 +309,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
     end
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_hidden_member_ids(user_ids uuid[])
+    CREATE OR REPLACE FUNCTION palee_hidden_member_ids(user_ids uuid[])
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -326,7 +326,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
 
   def down do
     replace_notification_types(@before_types)
-    execute("DROP FUNCTION IF EXISTS milos_hidden_member_ids(uuid[])")
+    execute("DROP FUNCTION IF EXISTS palee_hidden_member_ids(uuid[])")
 
     alter table(:community_social_settings) do
       remove :hide_from_members
@@ -343,8 +343,8 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
           ~w(community_post_reactions community_post_comments community_posts community_channels community_clubs),
         do: execute("DROP POLICY IF EXISTS #{table}_open_read_policy ON #{table}")
 
-    execute("DROP FUNCTION IF EXISTS milos_open_club_member_counts(uuid[])")
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_club_ids()")
+    execute("DROP FUNCTION IF EXISTS palee_open_club_member_counts(uuid[])")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_club_ids()")
 
     execute("DROP POLICY IF EXISTS community_reports_own_read_policy ON community_reports")
     drop table(:community_reports)
@@ -437,7 +437,7 @@ defmodule MilosTraining.Repo.Migrations.OpenClubsGroupsAndReports do
     execute("""
     CREATE TRIGGER #{table}_apply_tenant_context
     BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

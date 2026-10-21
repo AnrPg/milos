@@ -21,7 +21,7 @@ context:
 
 - `organization_id` (FK `organizations`, `ON DELETE CASCADE`, `NOT NULL`),
   forced RLS with the sibling `organization_id = app.organization_id` policy,
-  and the `milos_apply_tenant_context()` insert/update trigger.
+  and the `palee_apply_tenant_context()` insert/update trigger.
 - Uniqueness is per organization: `(organization_id, slug)` and
   `(organization_id, sort_order) WHERE is_active`.
 - `exercise_variations.scale_level_id` becomes a composite FK
@@ -85,7 +85,7 @@ materializing correctly.
   still resolves, and per-organization labels/order for shared slugs are lost.
 - `scale_levels` is declared in `Workouts.Domain.TenantDataPolicy` (purged
   after `exercise_variations`) and listed as a ready tenant table in
-  `mix milos.tenancy.audit`. It was removed from the clean-slate purge's
+  `mix palee.tenancy.audit`. It was removed from the clean-slate purge's
   preserved tables (ADR-094): it is tenant data now, and `TRUNCATE
   organizations CASCADE` would empty it anyway.
 - `GetWorkoutExecution` now materializes the workout it already read in the

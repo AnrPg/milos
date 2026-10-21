@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowWorkoutAssignmentPerSeriesOccurrence do
+defmodule Palee.Repo.Migrations.AllowWorkoutAssignmentPerSeriesOccurrence do
   use Ecto.Migration
 
   def change do

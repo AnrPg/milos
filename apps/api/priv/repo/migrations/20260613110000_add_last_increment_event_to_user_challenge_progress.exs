@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddLastIncrementEventToUserChallengeProgress do
+defmodule Palee.Repo.Migrations.AddLastIncrementEventToUserChallengeProgress do
   use Ecto.Migration
 
   def change do

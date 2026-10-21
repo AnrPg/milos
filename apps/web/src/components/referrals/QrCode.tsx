@@ -2,13 +2,14 @@
 
 import type { QRCodeToStringOptions } from "qrcode";
 import { useEffect, useState } from "react";
+import { APP_THEMES, DEFAULT_THEME_SLUG } from "@/lib/theme";
 
 // Medium error correction: readable from a cracked screen, still a small code.
 const QR_OPTIONS: QRCodeToStringOptions = {
   type: "svg",
   errorCorrectionLevel: "medium",
   margin: 1,
-  color: { dark: "#000000", light: "#ffffff" },
+  color: { dark: APP_THEMES[DEFAULT_THEME_SLUG].tokens.onPaper, light: APP_THEMES[DEFAULT_THEME_SLUG].tokens.paper },
 };
 
 /**

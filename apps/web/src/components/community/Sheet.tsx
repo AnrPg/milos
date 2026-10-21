@@ -28,7 +28,7 @@ export function Sheet({
   return createPortal(
     <div
       className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
-      style={{ background: "rgba(0,0,0,0.55)" }}
+      style={{ background: "var(--scrim)" }}
       onClick={onClose}
       role="presentation"
     >
@@ -87,7 +87,7 @@ export function SheetButton({
       className="min-h-11 flex-1 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
       style={{
         background: primary ? "var(--primary)" : "var(--panel-raised)",
-        color: primary ? "var(--bg)" : "var(--text)",
+        color: primary ? "var(--primary-contrast)" : "var(--text)",
         border: primary ? "none" : "1px solid var(--border)",
       }}
     >
@@ -129,6 +129,6 @@ export function ChoicePill({
 
 export function ErrorLine({ message }: { message: string | null }) {
   return message ? (
-    <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{message}</p>
+    <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{message}</p>
   ) : null;
 }

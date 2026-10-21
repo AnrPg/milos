@@ -47,7 +47,7 @@ import {
 } from "@/lib/body";
 
 const VISIBILITIES: BodyVisibility[] = ["private", "coach_numbers", "coach_full"];
-const ASKED_KEY = "milos:body:weight-display-asked";
+const ASKED_KEY = "palee:body:weight-display-asked";
 
 function readAsked() {
   try {
@@ -300,7 +300,7 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
                     onClick={() => openSlot(pose)}
                     aria-label={filled ? t("retakePose", { pose: label }) : t("addPose", { pose: label })}
                     className="relative block aspect-[3/4] w-full overflow-hidden rounded-xl"
-                    style={{ background: "linear-gradient(160deg, #3b332c, #1e1915)", border: "1px dashed rgba(255,255,255,0.35)" }}
+                    style={{ background: "linear-gradient(160deg, var(--deep), var(--media))", border: "1px dashed var(--media-control-border)" }}
                     data-testid={["pose-slot", pose].join("-")}
                     data-phase={item?.phase ?? (current ? "saved" : "empty")}
                   >
@@ -310,7 +310,7 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
                     ) : current ? (
                       <BodyPhotoView photo={current} blur={prefs.blur_photos} label={label} size="thumb" className="h-full w-full" />
                     ) : null}
-                    <span className="absolute inset-x-1 bottom-1 truncate text-start text-[11px] font-bold text-white">
+                    <span className="absolute inset-x-1 bottom-1 truncate text-start text-[11px] font-bold text-[var(--on-media)]">
                       {item?.phase === "uploading"
                         ? t("uploading")
                         : item?.phase === "failed"
@@ -328,8 +328,8 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
                         else if (current) setRemoved((ids) => [...ids, current.id]);
                       }}
                       aria-label={t("removePose", { pose: label })}
-                      className="absolute end-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-white"
-                      style={{ background: "rgba(0,0,0,0.55)" }}
+                      className="absolute end-1 top-1 inline-flex h-7 w-7 items-center justify-center rounded-full text-sm font-bold text-[var(--on-media)]"
+                      style={{ background: "var(--media-control)" }}
                     >
                       <span aria-hidden="true">×</span>
                     </button>

@@ -55,7 +55,7 @@ export function WellnessStrip() {
             onClick={() => add.mutate()}
             disabled={add.isPending}
             className="min-h-10 rounded-2xl px-4 text-sm font-extrabold disabled:opacity-60"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("water.add")}
           </button>

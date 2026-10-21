@@ -833,7 +833,7 @@ export function WorkoutAdminConsole() {
                       }}
                     >
                       <span aria-hidden>📂</span>
-                      <span aria-hidden className="absolute bottom-1 end-0.5 grid h-3.5 w-3.5 place-items-center rounded-full text-[10px] font-black leading-none" style={{ background: "var(--success)", color: "var(--bg)" }}>+</span>
+                      <span aria-hidden className="absolute bottom-1 end-0.5 grid h-3.5 w-3.5 place-items-center rounded-full text-[10px] font-black leading-none" style={{ background: "var(--success)", color: "var(--success-contrast)" }}>+</span>
                     </button>
                   </HoverHint>
                 </div>
@@ -897,9 +897,9 @@ export function WorkoutAdminConsole() {
       </div>
 
       {folderModalOpen ? (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.65)" }} onClick={() => setFolderModalOpen(false)} role="presentation">
+        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={() => setFolderModalOpen(false)} role="presentation">
           <form
-            className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[0_30px_90px_rgba(0,0,0,.35)]"
+            className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[var(--shadow-lg)]"
             style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
             onClick={(event) => event.stopPropagation()}
             onSubmit={(event) => {
@@ -984,7 +984,7 @@ export function WorkoutAdminConsole() {
           <>
             <div
               className="fixed inset-0 z-40"
-              style={{ background: "rgba(0,0,0,0.45)" }}
+              style={{ background: "var(--scrim)" }}
               onClick={() => setPreviewWorkoutId(null)}
             />
             <aside
@@ -993,7 +993,7 @@ export function WorkoutAdminConsole() {
                 width: "min(480px, 90vw)",
                 background: "var(--panel)",
                 borderInlineStart: "1px solid var(--border)",
-                boxShadow: "-8px 0 32px rgba(0,0,0,0.18)",
+                boxShadow: "var(--shadow-md)",
               }}
             >
               <div className="flex shrink-0 items-start justify-between gap-4 border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.EnableSchedulingRls do
+defmodule Palee.Repo.Migrations.EnableSchedulingRls do
   use Ecto.Migration
 
   @tables ~w(

@@ -101,12 +101,12 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "rgba(0,0,0,.65)" }} onClick={onClose} role="presentation">
+    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
       <form
         role="dialog"
         aria-modal="true"
         aria-labelledby="member-class-placement-title"
-        className="w-full max-w-lg rounded-[1.5rem] p-5 shadow-[0_30px_90px_rgba(0,0,0,.35)]"
+        className="w-full max-w-lg rounded-[1.5rem] p-5 shadow-[var(--shadow-lg)]"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
         onClick={(event) => event.stopPropagation()}
         onSubmit={(event) => {

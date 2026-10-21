@@ -67,13 +67,13 @@ export function AvatarEditorModal({ file, pending, uploadError, onCancel, onSave
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/75 p-4" role="dialog" aria-modal="true" aria-labelledby="avatar-editor-title">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-labelledby="avatar-editor-title">
       <div className="flex min-h-full items-center justify-center py-2">
         <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-[2rem] p-6 shadow-2xl" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
           <h2 id="avatar-editor-title" className="text-xl font-bold" style={{ color: "var(--text)" }}>{tProfile("avatarEditorTitle")}</h2>
           <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{tProfile("avatarEditorDescription")}</p>
 
-          <div className="mx-auto mt-5 aspect-square w-full max-w-72 overflow-hidden rounded-full sm:max-w-80" style={{ border: "3px solid var(--primary)", background: "var(--bg-soft)" }}>
+          <div className="mx-auto mt-5 aspect-square w-full max-w-72 overflow-hidden rounded-full sm:max-w-80" style={{ border: "3px solid var(--primary)", background: "var(--panel-muted)" }}>
             <canvas ref={canvasRef} width={512} height={512} className="h-full w-full" aria-label={tProfile("avatarPreviewLabel")} />
           </div>
 

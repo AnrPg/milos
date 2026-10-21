@@ -39,9 +39,9 @@ sync as the system grows. Branding-facing metadata should stay easy to rename
 because the human-approved placeholder name may change later.
 
 ## Implementation Notes
-Phase 0 implementation uses the confirmed brand name `Milos Training` in
+Phase 0 implementation uses the confirmed brand name `Palee` in
 branding-facing files where appropriate, while keeping the Phoenix OTP app
-name as `milos_training` to stay aligned with the approved design doc and later
+name as `palee` to stay aligned with the approved design doc and later
 phases.
 
 The repository already had a `.git` directory on `main`, so Phase 0 reused

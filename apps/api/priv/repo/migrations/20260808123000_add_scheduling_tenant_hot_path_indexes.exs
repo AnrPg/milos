@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddSchedulingTenantHotPathIndexes do
+defmodule Palee.Repo.Migrations.AddSchedulingTenantHotPathIndexes do
   use Ecto.Migration
 
   def change do

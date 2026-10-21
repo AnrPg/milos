@@ -53,8 +53,8 @@
 ### PropagateNicknameJob design
 
 ```elixir
-# apps/api/lib/milos_training/workers/propagate_nickname_job.ex
-defmodule MilosTraining.Workers.PropagateNicknameJob do
+# apps/api/lib/palee/workers/propagate_nickname_job.ex
+defmodule Palee.Workers.PropagateNicknameJob do
   use Oban.Worker, queue: :default, max_attempts: 3
 
   @impl Oban.Worker
@@ -104,7 +104,7 @@ end
 ### Elixir patterns
 - All writes go through Ecto changesets. Hashing done in store (`maybe_put_password_hash`), not in changeset.
 - `to_account/1` converts `User` schema → `Account` struct (done in `EctoUserStore`)
-- `PasswordVerifier.verify/2` uses Argon2 — from `MilosTraining.Application.PasswordVerifier`
+- `PasswordVerifier.verify/2` uses Argon2 — from `Palee.Application.PasswordVerifier`
 - Application services (`UpdateProfile`, etc.) take the current user `Account` struct as first arg (Guardian loads this fresh on every request — includes `password_hash`)
 - Port callbacks in `identity/ports/user_store.ex` → dispatcher `identity/user_store.ex` → context `identity.ex`
 - `RegistrationPolicy.normalize_nickname/1` = `String.trim/1 |> String.downcase/1`
@@ -112,10 +112,10 @@ end
 ### MinIO pattern (from `minio_storage.ex`)
 ```elixir
 defp ex_aws_config do
-  endpoint = Application.get_env(:milos_training, :minio_endpoint, "http://localhost:9000")
-  access_key = Application.get_env(:milos_training, :minio_access_key, "minioadmin")
-  secret_key = Application.get_env(:milos_training, :minio_secret_key, "minioadmin")
-  bucket = Application.get_env(:milos_training, :minio_bucket, "milos-invoices")
+  endpoint = Application.get_env(:palee, :minio_endpoint, "http://localhost:9000")
+  access_key = Application.get_env(:palee, :minio_access_key, "minioadmin")
+  secret_key = Application.get_env(:palee, :minio_secret_key, "minioadmin")
+  bucket = Application.get_env(:palee, :minio_bucket, "milos-invoices")
   uri = URI.parse(endpoint)
   config = ExAws.Config.new(:s3, access_key_id: access_key, secret_access_key: secret_key,
     scheme: "#{uri.scheme}://", host: uri.host, port: uri.port, region: "us-east-1")
@@ -127,7 +127,7 @@ Avatar public URL: `#{minio_public_endpoint}/milos-avatars/avatars/#{user_id}`
 Avatar key: `"avatars/#{user_id}"` — fixed key (overwritten on re-upload, no cleanup needed).
 
 ### OpenAPI pattern
-Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `mix milos.export_openapi`.
+Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `mix palee.export_openapi`.
 
 ### Frontend patterns
 - `CurrentUser` type derived from `paths["/api/auth/me"]["get"]["responses"]["200"]["content"]["application/json"]` in `api/auth.ts`
@@ -144,19 +144,19 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
 - [x] **`apps/api/priv/repo/migrations/20260615010000_add_avatar_url_to_users.exs`**  
   Add `avatar_url :string` column to `users` table
 
-- [x] **`apps/api/lib/milos_training/application/update_profile.ex`**  
+- [x] **`apps/api/lib/palee/application/update_profile.ex`**  
   App service: verify current password if changing password, call `Identity.update_profile`, enqueue `PropagateNicknameJob` if nickname changed
 
-- [x] **`apps/api/lib/milos_training/application/update_avatar.ex`**  
+- [x] **`apps/api/lib/palee/application/update_avatar.ex`**  
   App service: calls `Identity.update_avatar(user.id, avatar_url)`
 
-- [x] **`apps/api/lib/milos_training/application/search_users.ex`**  
+- [x] **`apps/api/lib/palee/application/search_users.ex`**  
   App service: calls `Identity.search_users(query)`, returns list of `%{id, nickname, role}`
 
-- [x] **`apps/api/lib/milos_training/workers/propagate_nickname_job.ex`**  
+- [x] **`apps/api/lib/palee/workers/propagate_nickname_job.ex`**  
   Oban worker: refresh leaderboard MV + Meilisearch re-sync + notification payload update
 
-- [x] **`apps/api/lib/milos_training_web/controllers/me_controller.ex`**  
+- [x] **`apps/api/lib/palee_web/controllers/me_controller.ex`**  
   3 actions: `update_profile` (PATCH /api/me/profile), `avatar_upload_url` (POST /api/me/avatar/upload-url), `search_users` (GET /api/me/search/users)
 
 ### Backend — Modified Files
@@ -165,38 +165,38 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
   Add: `minio_avatar_bucket: System.get_env("MINIO_AVATAR_BUCKET", "milos-avatars")`  
   Add: `minio_public_endpoint: System.get_env("MINIO_PUBLIC_ENDPOINT")` (optional, falls back to minio_endpoint)
 
-- [x] **`apps/api/lib/milos_training/identity/user.ex`**  
+- [x] **`apps/api/lib/palee/identity/user.ex`**  
   Add field: `avatar_url :string`  
   Add changeset: `profile_changeset/2` — casts `[:nickname, :password, :avatar_url]`, applies normalize_nickname, validates nickname (3–30, format `/^[a-zA-Z0-9_]+$/`, unique), validates password (min 8), all conditionally if field present  
   Add changeset: `avatar_changeset/2` — casts `[:avatar_url]`
 
-- [x] **`apps/api/lib/milos_training/identity/account.ex`**  
+- [x] **`apps/api/lib/palee/identity/account.ex`**  
   Add `avatar_url` to `@enforce_keys` (NO — keep it optional) and `defstruct`
 
-- [x] **`apps/api/lib/milos_training/infrastructure/identity/ecto_user_store.ex`**  
+- [x] **`apps/api/lib/palee/infrastructure/identity/ecto_user_store.ex`**  
   Update `to_account/1`: add `avatar_url: user.avatar_url`  
   Add `update_profile/2`: fetch User, apply `profile_changeset`, call `maybe_put_password_hash`, `Repo.update`, return `{:ok, account}`  
   Add `update_avatar/2`: fetch User, apply `avatar_changeset`, `Repo.update`, return `{:ok, account}`  
   Add `search_users/1`: ILIKE on nickname, all roles, order by nickname, limit 20
 
-- [x] **`apps/api/lib/milos_training/identity/ports/user_store.ex`**  
+- [x] **`apps/api/lib/palee/identity/ports/user_store.ex`**  
   Add callbacks: `update_profile/2`, `update_avatar/2`, `search_users/1`
 
-- [x] **`apps/api/lib/milos_training/identity/user_store.ex`**  
+- [x] **`apps/api/lib/palee/identity/user_store.ex`**  
   Add `@impl true` delegations for `update_profile/2`, `update_avatar/2`, `search_users/1`
 
-- [x] **`apps/api/lib/milos_training/identity.ex`**  
+- [x] **`apps/api/lib/palee/identity.ex`**  
   Add: `defdelegate update_profile(user_id, params), to: UserStore`  
   Add: `defdelegate update_avatar(user_id, avatar_url), to: UserStore`  
   Add: `defdelegate search_users(query), to: FindUser, as: :search_all`  
   (Or keep `search_users` as a direct UserStore delegation if no FindUser query module needed)
 
-- [x] **`apps/api/lib/milos_training/infrastructure/storage/minio_storage.ex`**  
+- [x] **`apps/api/lib/palee/infrastructure/storage/minio_storage.ex`**  
   Add `presigned_avatar_upload_url/1(user_id)`: generates PUT presigned URL + public URL  
   Add `avatar_ex_aws_config/0`: same as `ex_aws_config/0` but uses `minio_avatar_bucket`  
   Add `avatar_public_url/1(key)`: `#{minio_public_endpoint || minio_endpoint}/#{avatar_bucket}/#{key}`
 
-- [x] **`apps/api/lib/milos_training/notifications/domain/push_message_builder.ex`**  
+- [x] **`apps/api/lib/palee/notifications/domain/push_message_builder.ex`**  
   Add explicit clause BEFORE catch-all:
   ```elixir
   def build("chat_message", payload) do
@@ -209,24 +209,24 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
   end
   ```
 
-- [x] **`apps/api/lib/milos_training/notifications/ports/notification_store.ex`**  
+- [x] **`apps/api/lib/palee/notifications/ports/notification_store.ex`**  
   Add callback: `propagate_nickname_change(String.t(), String.t()) :: :ok`
 
-- [x] **`apps/api/lib/milos_training/notifications/notification_store.ex`**  
+- [x] **`apps/api/lib/palee/notifications/notification_store.ex`**  
   Add `@impl true` delegation: `def propagate_nickname_change(old, new), do: adapter().propagate_nickname_change(old, new)`
 
-- [x] **`apps/api/lib/milos_training/notifications.ex`**  
+- [x] **`apps/api/lib/palee/notifications.ex`**  
   Add: `def propagate_nickname_change(old_nickname, new_nickname), do: NotificationStore.propagate_nickname_change(old_nickname, new_nickname)`
 
-- [x] **`apps/api/lib/milos_training/infrastructure/notifications/ecto_notification_store.ex`**  
+- [x] **`apps/api/lib/palee/infrastructure/notifications/ecto_notification_store.ex`**  
   Implement `propagate_nickname_change/2` with two `Repo.query!` calls using `jsonb_set` + `to_jsonb($1::text)`
 
-- [x] **`apps/api/lib/milos_training_web/controllers/messaging_controller.ex`**  
+- [x] **`apps/api/lib/palee_web/controllers/messaging_controller.ex`**  
   In the thread list action: collect all participant `user_id`s → call `Identity.list_by_ids/1` → build `%{user_id => account}` lookup map  
   Update `serialize_participant/1` to `serialize_participant/2` with the lookup map, adding `nickname` field  
   Update OpenAPI schema: add `nickname: %Schema{type: :string, nullable: true}` to participant schema
 
-- [x] **`apps/api/lib/milos_training_web/controllers/fallback_controller.ex`**  
+- [x] **`apps/api/lib/palee_web/controllers/fallback_controller.ex`**  
   Add before the catch-all:
   ```elixir
   def call(conn, {:error, :invalid_current_password}) do
@@ -234,11 +234,11 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
   end
   ```
 
-- [x] **`apps/api/lib/milos_training_web/controllers/auth_controller.ex`**  
+- [x] **`apps/api/lib/palee_web/controllers/auth_controller.ex`**  
   Add `avatar_url: user.avatar_url` to `me` action response  
   Update `operation(:me)` OpenAPI schema: add `avatar_url` property (type string, nullable true)
 
-- [x] **`apps/api/lib/milos_training_web/router.ex`**  
+- [x] **`apps/api/lib/palee_web/router.ex`**  
   In the `/api/me` scope (authenticated), add:
   ```elixir
   patch("/profile", MeController, :update_profile)
@@ -355,6 +355,6 @@ Controllers use `OpenApiSpex.ControllerSpecs` with `operation/2`. Export with `m
 
 - `apps/web/src/api/generated/schema.ts` — generated, do not hand-edit
 - `apps/web/src/api/generated/openapi.json` — generated, do not hand-edit
-- `apps/api/lib/milos_training/messaging/participant.ex` — no schema change, nickname loaded at controller layer
-- `apps/api/lib/milos_training/infrastructure/messaging/ecto_thread_store.ex` — no change, nickname batch-loaded in controller
-- `apps/api/lib/milos_training/gamification/commands/refresh_leaderboard.ex` — existing, reused unchanged
+- `apps/api/lib/palee/messaging/participant.ex` — no schema change, nickname loaded at controller layer
+- `apps/api/lib/palee/infrastructure/messaging/ecto_thread_store.ex` — no change, nickname batch-loaded in controller
+- `apps/api/lib/palee/gamification/commands/refresh_leaderboard.ex` — existing, reused unchanged

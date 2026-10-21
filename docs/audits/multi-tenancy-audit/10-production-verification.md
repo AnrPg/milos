@@ -3,7 +3,7 @@
 This is a follow-up to the main audit (files `00`–`09`), performed after the
 user provided access details for the live production deployment: Kubernetes
 namespace `tenant-m4` on the Gata cluster, GitOps source at
-`/home/rodochrousbisbiki/MyApps/deployed-milos/gitops`, live app at
+`/home/rodochrousbisbiki/MyApps/deployed-palee/gitops`, live app at
 `https://milos.4kq.net/`.
 
 **Scope and method:** Read-only only. No `kubectl apply`/`delete`/`patch`, no
@@ -35,19 +35,19 @@ retried or worked around.
   RLS policy correctness would not be caught by CI — but it is no longer
   grounds to suspect production itself lacks RLS enforcement.
 - **F-04 (RLS legacy-org COALESCE fallback) confirmed live in production**:
-  40 policies reference `milos_legacy_organization_id`. However, the function
+  40 policies reference `palee_legacy_organization_id`. However, the function
   currently resolves to `NULL` in production because it looks up the legacy
   organization by a hardcoded slug (`legacy-milos-training`) and production's
-  sole organization has since had its slug changed to `milos-training`. This
+  sole organization has since had its slug changed to `palee`. This
   makes the fallback **accidentally inert right now** (fails closed to zero
   rows instead of silently exposing/misattributing to that org) — but it is
   fragile, unintentional, and will silently reactivate if any organization is
   ever created or renamed back to that exact slug (including via a routine,
-  documented-as-safe re-run of `mix milos.organizations.ensure_legacy`). This
+  documented-as-safe re-run of `mix palee.organizations.ensure_legacy`). This
   must still be remediated per F-04's original recommendation (remove the
   fallback entirely) rather than relied upon.
 - **Production is currently single-tenant**: exactly one organization
-  (`milos-training`, status `active`), 5 total `users` rows, 3
+  (`palee`, status `active`), 5 total `users` rows, 3
   `organization_memberships`, 1 active `platform_owners` row. This is
   evidently a pre-commercial-launch or early-access deployment, consistent
   with the codebase's own runbook guidance not to provision a second
@@ -78,40 +78,40 @@ retried or worked around.
 
 ```elixir
 # Role privilege check
-Ecto.Adapters.SQL.query!(MilosTraining.Repo,
+Ecto.Adapters.SQL.query!(Palee.Repo,
   "SELECT current_user, (SELECT rolsuper FROM pg_roles WHERE rolname = current_user), (SELECT rolbypassrls FROM pg_roles WHERE rolname = current_user)", [])
 # => [["app", false, false]]
 
 # Legacy-org fallback policy count
-Ecto.Adapters.SQL.query!(MilosTraining.Repo,
+Ecto.Adapters.SQL.query!(Palee.Repo,
   "SELECT count(*) FROM pg_policy p WHERE pg_get_expr(p.polqual, p.polrelid) ILIKE $1 OR pg_get_expr(p.polwithcheck, p.polrelid) ILIKE $1",
-  ["%milos_legacy_organization_id%"])
+  ["%palee_legacy_organization_id%"])
 # => [[40]]
 
 # Legacy-org fallback function live resolution
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT milos_legacy_organization_id()", [])
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT palee_legacy_organization_id()", [])
 # => [[nil]]
 
 # Tenant/user/org counts
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT slug, status FROM organizations", [])
-# => [["milos-training", "active"]]
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM users", [])           # => [[5]]
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM organization_memberships", []) # => [[3]]
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM platform_owners WHERE status = $1", ["active"]) # => [[1]]
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT slug, status FROM organizations", [])
+# => [["palee", "active"]]
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT count(*) FROM users", [])           # => [[5]]
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT count(*) FROM organization_memberships", []) # => [[3]]
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT count(*) FROM platform_owners WHERE status = $1", ["active"]) # => [[1]]
 
 # Materialized view exposure size
-Ecto.Adapters.SQL.query!(MilosTraining.Repo,
+Ecto.Adapters.SQL.query!(Palee.Repo,
   "SELECT (SELECT count(DISTINCT organization_id) FROM finance_invoices), (SELECT count(*) FROM organizations), (SELECT count(*) FROM finance_aggregates), (SELECT count(*) FROM weekly_leaderboard)", [])
 # => [[0, 1, 7, 0]]
 
 # Unmapped-row check (F-04 blast-radius so far)
-Ecto.Adapters.SQL.query!(MilosTraining.Repo,
+Ecto.Adapters.SQL.query!(Palee.Repo,
   "SELECT (SELECT count(*) FROM finance_invoices WHERE organization_id IS NULL), (SELECT count(*) FROM memberships WHERE organization_id IS NULL), (SELECT count(*) FROM master_workouts WHERE organization_id IS NULL), (SELECT count(*) FROM bookings WHERE organization_id IS NULL), (SELECT count(*) FROM messaging_threads WHERE organization_id IS NULL)", [])
 # => [[0, 0, 0, 0, 0]]
 
 # Feature-usage sanity checks
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM messaging_threads", []) # => [[0]]
-Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM finance_settings", [])  # => [[0]]
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT count(*) FROM messaging_threads", []) # => [[0]]
+Ecto.Adapters.SQL.query!(Palee.Repo, "SELECT count(*) FROM finance_settings", [])  # => [[0]]
 ```
 
 ## GitOps/Kubernetes configuration review (read-only)
@@ -119,7 +119,7 @@ Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM finance_setti
 - Namespace `tenant-m4`, reconciled by Flux from
   `src.4kq.net/client-milos-method/gitops` `main` branch every minute.
 - `milos-api.yaml`: 2-replica Deployment, `migrate` initContainer runs
-  `MilosTraining.Release.migrate()` before the `api` container starts;
+  `Palee.Release.migrate()` before the `api` container starts;
   **both use the same `milos-db-app` DATABASE_URL** — no separate elevated
   migration role exists at the Kubernetes-manifest level, matching what the
   live role query confirmed (both are the same non-superuser `app` role).
@@ -127,15 +127,15 @@ Ecto.Adapters.SQL.query!(MilosTraining.Repo, "SELECT count(*) FROM finance_setti
   instances, no custom `managed.roles` override, so CNPG's default
   non-superuser `app` role convention applies — consistent with the absence
   of a `milos-db-superuser` secret.
-- `milos-secrets.yaml`: SOPS-encrypted with `age`, per the repo's documented
+- `palee-secrets.yaml`: SOPS-encrypted with `age`, per the repo's documented
   convention; not decrypted as part of this audit.
 - Pod inventory at time of check: `milos-api` (2/2 running, 15h age),
   `milos-web` (2/2, 15h — recent rollout), `milos-db-{1,2,3}` (18–19d age),
-  `milos-redis`, `milos-meilisearch`, `milos-minio` — all healthy.
+  `palee-redis`, `palee-meilisearch`, `palee-minio` — all healthy.
 
 ## What was explicitly not done
 
-- No decryption of `milos-secrets.yaml` or any live Kubernetes `Secret`
+- No decryption of `palee-secrets.yaml` or any live Kubernetes `Secret`
   value.
 - No write, update, patch, or delete operation against any cluster resource.
 - No mutation of any database row.

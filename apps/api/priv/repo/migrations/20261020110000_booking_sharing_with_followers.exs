@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BookingSharingWithFollowers do
+defmodule Palee.Repo.Migrations.BookingSharingWithFollowers do
   use Ecto.Migration
 
   # ADR-142 decision 12 (P2-M2, board 5 Q6): the «Φίλοι» chip in Πρόγραμμα
@@ -33,7 +33,7 @@ defmodule MilosTraining.Repo.Migrations.BookingSharingWithFollowers do
     # The people the session's account actively follows who share their
     # bookings with followers. Nothing else about anyone's settings leaks.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_booking_sharers()
+    CREATE OR REPLACE FUNCTION palee_booking_sharers()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -52,7 +52,7 @@ defmodule MilosTraining.Repo.Migrations.BookingSharingWithFollowers do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_booking_sharers()")
+    execute("DROP FUNCTION IF EXISTS palee_booking_sharers()")
     drop table(:community_social_settings)
   end
 end

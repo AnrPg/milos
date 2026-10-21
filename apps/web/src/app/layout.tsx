@@ -19,14 +19,15 @@ import { ReferralClaimBridge } from "@/components/referrals/ReferralClaimBridge"
 import { NativeAppBridge } from "@/components/platform/NativeAppBridge";
 import { PhoneHealthSyncBridge } from "@/components/platform/PhoneHealthSyncBridge";
 import { WidgetsGeofenceBridge } from "@/components/platform/WidgetsGeofenceBridge";
-import { APP_THEMES, cssVariablesForTheme, DEFAULT_THEME_SLUG, THEME_STORAGE_KEY } from "@/lib/theme";
+import { APP_THEMES, DEFAULT_THEME_SLUG, THEME_SLUGS, THEME_STORAGE_KEY, themeStylesheet } from "@/lib/theme";
 import { isAppLocale, localeDirection } from "@/i18n/locales";
+import "@fontsource-variable/commissioner";
 import "./globals.css";
 
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
   return {
-    title: i18n("milosTraining5b1a1c1"),
+    title: i18n("brandName"),
     description: i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a"),
     manifest: "/manifest.webmanifest",
     icons: {
@@ -42,15 +43,19 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // The browser and status bar colour; ThemeProvider keeps it in step with
+  // the member's light or dark choice.
+  themeColor: APP_THEMES[DEFAULT_THEME_SLUG].tokens.bg,
 };
 
-const initialThemeVariablesBySlug = Object.fromEntries(
-  Object.values(APP_THEMES).map((theme) => [theme.slug, cssVariablesForTheme(theme)]),
-);
+// Every theme variable, generated from src/lib/theme.ts (the only place
+// colours are defined); the bootstrap script picks the stored theme before
+// first paint.
+const themeCss = themeStylesheet();
 
 const themeBootstrapScript = `
 (() => {
-  const variablesByTheme = ${JSON.stringify(initialThemeVariablesBySlug)};
+  const slugs = ${JSON.stringify(THEME_SLUGS)};
   const storageKey = ${JSON.stringify(THEME_STORAGE_KEY)};
   const defaultSlug = ${JSON.stringify(DEFAULT_THEME_SLUG)};
   let slug = defaultSlug;
@@ -61,13 +66,8 @@ const themeBootstrapScript = `
     slug = defaultSlug;
   }
 
-  const variables = variablesByTheme[slug] || variablesByTheme[defaultSlug];
   const root = document.documentElement;
-  root.dataset.theme = variablesByTheme[slug] ? slug : defaultSlug;
-
-  for (const [name, value] of Object.entries(variables)) {
-    root.style.setProperty(name, value);
-  }
+  root.dataset.theme = slugs.includes(slug) ? slug : defaultSlug;
 
   // ADR-171: mark the store apps before first paint (safe-area padding).
   try {
@@ -97,13 +97,14 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <style id="palee-theme" dangerouslySetInnerHTML={{ __html: themeCss }} />
         <script
           nonce={nonce}
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
         />
       </head>
-      <body className="min-h-full flex flex-col" style={{ background: "var(--bg)" }}>
+      <body className="min-h-full flex flex-col">
         <NextIntlClientProvider locale={locale} messages={messages}>
           <QueryProvider>
             <ThemeProvider>

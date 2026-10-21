@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateGamificationSettings do
+defmodule Palee.Repo.Migrations.CreateGamificationSettings do
   use Ecto.Migration
 
   def up do

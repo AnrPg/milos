@@ -85,7 +85,7 @@ Implemented on 2026-06-10 with two additive migrations:
   maps, and per-segment cycle counters alongside the existing progress fields
 
 Execution scoring is handled by a new pure domain module,
-`MilosTraining.Execution.Domain.ProgressSnapshotter`, which derives:
+`Palee.Execution.Domain.ProgressSnapshotter`, which derives:
 
 - in-progress semantic snapshots for scoreable sections
 - fallback final scores when the athlete completes a workout without entering a

@@ -11,11 +11,11 @@ jobs:
       postgres:
         image: postgis/postgis:18-3.6-alpine
         env:
-          POSTGRES_DB: milos_training_test
+          POSTGRES_DB: palee_test
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         options: >-
-          --health-cmd "pg_isready -U postgres -d milos_training_test"
+          --health-cmd "pg_isready -U postgres -d palee_test"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -31,7 +31,7 @@ jobs:
         working-directory: apps/api
         env:
           DB_HOST: localhost
-          DB_NAME: milos_training_test
+          DB_NAME: palee_test
           DB_PASSWORD: postgres
           DB_USER: postgres
       - run: mix hex.audit
@@ -40,7 +40,7 @@ jobs:
         working-directory: apps/api
         env:
           DB_HOST: localhost
-          DB_NAME: milos_training_test
+          DB_NAME: palee_test
           DB_PASSWORD: postgres
           DB_USER: postgres
       - name: Verify latest migration is reversible
@@ -48,7 +48,7 @@ jobs:
         working-directory: apps/api
         env:
           DB_HOST: localhost
-          DB_NAME: milos_training_test
+          DB_NAME: palee_test
           DB_PASSWORD: postgres
           DB_USER: postgres
 
@@ -98,11 +98,11 @@ jobs:
       postgres:
         image: postgis/postgis:18-3.6-alpine
         env:
-          POSTGRES_DB: milos_training_backup_drill
+          POSTGRES_DB: palee_backup_drill
           POSTGRES_PASSWORD: postgres
           POSTGRES_USER: postgres
         options: >-
-          --health-cmd "pg_isready -U postgres -d milos_training_backup_drill"
+          --health-cmd "pg_isready -U postgres -d palee_backup_drill"
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
@@ -112,25 +112,25 @@ jobs:
         run: sh -n ops/postgres/backup/run-backup.sh && sh -n ops/postgres/backup/restore-drill.sh
       - name: Run base-backup and restore drill
         run: |
-          mkdir -p /tmp/milos-ci-backups /tmp/milos-ci-wal
+          mkdir -p /tmp/palee-ci-backups /tmp/palee-ci-wal
           docker run --rm --network host \
             -e PGHOST=127.0.0.1 \
-            -e PGDATABASE=milos_training_backup_drill \
+            -e PGDATABASE=palee_backup_drill \
             -e PGUSER=postgres \
             -e PGPASSWORD=postgres \
             -e BACKUP_ROOT=/backups/postgres \
             -e WAL_ARCHIVE=/wal-archive \
             -v "$PWD/ops/postgres/backup:/backup:ro" \
-            -v "/tmp/milos-ci-backups:/backups/postgres" \
-            -v "/tmp/milos-ci-wal:/wal-archive" \
+            -v "/tmp/palee-ci-backups:/backups/postgres" \
+            -v "/tmp/palee-ci-wal:/wal-archive" \
             postgis/postgis:18-3.6-alpine /backup/run-backup.sh
-          touch /tmp/milos-ci-wal/000000010000000000000001
+          touch /tmp/palee-ci-wal/000000010000000000000001
           docker run --rm \
             -e BACKUP_ROOT=/backups/postgres \
             -e WAL_ARCHIVE=/wal-archive \
             -v "$PWD/ops/postgres/backup:/backup:ro" \
-            -v "/tmp/milos-ci-backups:/backups/postgres:ro" \
-            -v "/tmp/milos-ci-wal:/wal-archive:ro" \
+            -v "/tmp/palee-ci-backups:/backups/postgres:ro" \
+            -v "/tmp/palee-ci-wal:/wal-archive:ro" \
             postgis/postgis:18-3.6-alpine /backup/restore-drill.sh
 
   image-build:

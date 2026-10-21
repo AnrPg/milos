@@ -65,7 +65,7 @@ export function BuddyPage() {
             type="button"
             onClick={() => setAdding(true)}
             className="flex min-h-11 items-center justify-center gap-2 rounded-2xl px-4 text-sm font-bold"
-            style={{ background: mine.length === 0 ? "var(--primary)" : "var(--panel-raised)", color: mine.length === 0 ? "var(--bg)" : "var(--text)", border: "1px solid var(--border)" }}
+            style={{ background: mine.length === 0 ? "var(--primary)" : "var(--panel-raised)", color: mine.length === 0 ? "var(--primary-contrast)" : "var(--text)", border: "1px solid var(--border)" }}
           >
             {t("add")}
           </button>

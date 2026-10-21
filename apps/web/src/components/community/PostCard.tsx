@@ -112,7 +112,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
       </header>
 
       {post.hidden ? (
-        <p className="text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("hiddenNotice")}</p>
+        <p className="text-xs font-semibold" style={{ color: "var(--warning)" }}>{t("hiddenNotice")}</p>
       ) : null}
       {post.media_status === "processing" ? (
         <p role="status" className="flex flex-wrap items-center gap-2 text-xs" style={{ color: "var(--text-soft)" }}>
@@ -122,7 +122,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
           {tMedia("processingHint")}
         </p>
       ) : post.media_status === "failed" ? (
-        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger, #dc2626)" }}>{tMedia("failed")}</p>
+        <p role="alert" className="text-xs font-semibold" style={{ color: "var(--danger)" }}>{tMedia("failed")}</p>
       ) : null}
       {media.length > 0 ? <PostMediaView media={media} author={author} onOpen={setViewing} /> : null}
       {post.body ? (
@@ -146,9 +146,10 @@ export function PostCard({ post }: { post: CommunityPost }) {
           onClick={() => void run(() => setKudos(token!, post, !post.kudos_by_me))}
           className="min-h-11 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
           style={{
-            background: post.kudos_by_me ? "var(--primary)" : "var(--panel-raised)",
-            color: post.kudos_by_me ? "var(--bg)" : "var(--text)",
-            border: "1px solid var(--border)",
+            // Kudos are emotion: Heat (BRAND.md).
+            background: post.kudos_by_me ? "var(--heat)" : "var(--panel-raised)",
+            color: post.kudos_by_me ? "var(--heat-contrast)" : "var(--text)",
+            border: `1px solid ${post.kudos_by_me ? "var(--heat)" : "var(--border)"}`,
           }}
         >
           {t("kudos", { count: post.kudos_count })}
@@ -185,7 +186,7 @@ export function PostCard({ post }: { post: CommunityPost }) {
         ) : null}
         {post.can_report ? <ReportButton label={t("report")} onClick={() => setReporting(true)} className="-me-2" /> : null}
       </div>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
       {showComments ? <Comments post={post} /> : null}
       {viewing !== null ? (
         <MediaViewer
@@ -339,7 +340,7 @@ export function Attachment({ type, snapshot }: { type: string; snapshot: Snapsho
 
   return (
     <div className="rounded-2xl p-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
-      <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>
+      <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: type === "pr" ? "var(--heat)" : "var(--dim)" }}>
         {type === "pr" ? t("attachmentPr") : t("attachmentWorkout")}
       </p>
       <p className="font-bold" style={{ color: "var(--text)" }}>{title}</p>
@@ -392,7 +393,7 @@ function Comments({ post }: { post: CommunityPost }) {
             <p className="min-w-0 grow">
               <b>{comment.author.nickname ?? "?"}</b> <span className="whitespace-pre-wrap">{comment.body}</span>
               {comment.hidden ? (
-                <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning, #b45309)" }}>{t("commentHidden")}</span>
+                <span className="ml-2 text-xs font-semibold" style={{ color: "var(--warning)" }}>{t("commentHidden")}</span>
               ) : null}
               {comment.can_moderate ? (
                 <button
@@ -442,12 +443,12 @@ function Comments({ post }: { post: CommunityPost }) {
           type="submit"
           disabled={!draft.trim()}
           className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("send")}
         </button>
       </form>
-      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+      {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
       {reporting ? (
         <ReportSheet target="comment" targetId={reporting} onClose={() => setReporting(null)} onReported={() => void refresh()} />
       ) : null}

@@ -17,7 +17,7 @@ ANR's standing Phase 3 rule: no boards; pick the most robust, practical,
 future-proof, modular option with the least clutter, and record it.
 
 ## Decision
-1. **A Partners bounded context** (`MilosTraining.Partners`) owns four
+1. **A Partners bounded context** (`Palee.Partners`) owns four
    tables, all tenant data of the club's gym (`organization_id` = the club's
    gym, the gym's tenant policy, purged with the gym):
    - `partner_profiles` (club, user, `active`, `level
@@ -71,7 +71,7 @@ future-proof, modular option with the least clutter, and record it.
    everywhere it matters: it ends every active Partners match between the
    two (`end_reason blocked`), ends any buddy link (`Buddies.end_for_block`,
    already reserved by ADR-160) and keeps both out of each other's decks.
-   `milos_blocked_user_ids()` (SECURITY DEFINER) answers, for the session
+   `palee_blocked_user_ids()` (SECURITY DEFINER) answers, for the session
    user only, whom they blocked or were blocked by. Unblocking lives in
    Ρυθμίσεις › Κοινοποίηση & ορατότητα › Αποκλεισμένα. Future features
    (direct messages, comments) can consult the same list.

@@ -38,8 +38,8 @@ describe("tenantBrandName", () => {
       tenantBrandName(
         [
           {
-            organization: { name: "Milos Training", slug: "milos" },
-            settings: { brand_name: "Milos Training" },
+            organization: { name: "Kypseli Box", slug: "palee" },
+            settings: { brand_name: "Palee" },
           },
           {
             organization: { name: "TestAccount LLC", slug: "test-account" },
@@ -70,7 +70,7 @@ describe("tenantBrandName", () => {
 describe("tenantBrandLogoUrl", () => {
   const memberships = [
     {
-      organization: { name: "Milos Training", slug: "milos" },
+      organization: { name: "Kypseli Box", slug: "palee" },
       settings: { brand_logo_url: "https://media.test/organizations/a/branding/logo/a.png" },
     },
     {
@@ -80,7 +80,7 @@ describe("tenantBrandLogoUrl", () => {
   ];
 
   it("uses the selected organization's logo", () => {
-    expect(tenantBrandLogoUrl(memberships, "milos")).toBe(
+    expect(tenantBrandLogoUrl(memberships, "palee")).toBe(
       "https://media.test/organizations/a/branding/logo/a.png",
     );
   });

@@ -29,7 +29,7 @@ edited. Reopening reconstructs `draft_data` but leaves the canonical workout
 status and materialized sections published. Autosave updates only `draft_data`;
 republishing atomically replaces the materialized section tree.
 
-Role changes run through `MilosTraining.Application.UpdateUserRole`. The
+Role changes run through `Palee.Application.UpdateUserRole`. The
 service asks the currently owned contexts to reconcile active role-specific
 state before changing Identity:
 
@@ -102,7 +102,7 @@ cannot commit a state with zero admins.
 ## Implementation Notes
 Implemented without destructive schema changes:
 
-- The Service Worker now uses `milos-workout-runtime-v2-user-{user_id}` cache
+- The Service Worker now uses `palee-workout-runtime-v2-user-{user_id}` cache
   namespaces, ignores authenticated workout requests until a session user is
   established, and clears legacy/all user caches whenever the active identity
   changes.

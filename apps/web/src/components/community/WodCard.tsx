@@ -44,9 +44,20 @@ export function WodCard({ club, showOrigin = true }: { club: CommunityClub; show
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("wodNoWorkout")}</p>
       ) : (
         <div className="flex flex-col gap-3">
-          <div>
-            <h2 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{data.workout.title}</h2>
-            <p className="text-sm" style={{ color: "var(--dim)" }}>
+          {/* The screen's hero (BRAND.md): the WOD on the deep surface, tagged in
+              Spark, with a Dojo edge so Spark and Graphite never stand alone. */}
+          <div
+            className="rounded-2xl p-4"
+            style={{ background: "var(--deep)", color: "var(--deep-contrast)", borderInlineStart: "4px solid var(--primary)" }}
+          >
+            <span
+              className="inline-block rounded-full px-2 py-0.5 text-[11px] font-extrabold uppercase tracking-[0.14em]"
+              style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
+            >
+              #{channelName({ kind: "wod" }, t)}
+            </span>
+            <h2 className="mt-2 text-xl font-extrabold">{data.workout.title}</h2>
+            <p className="text-sm" style={{ opacity: 0.75 }}>
               {[...data.classes.map((entry) => time(entry.scheduled_at)), t("wodScoreCount", { count: data.leaderboard.length })].join(" · ")}
             </p>
           </div>

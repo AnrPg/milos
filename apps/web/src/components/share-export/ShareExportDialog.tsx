@@ -170,7 +170,7 @@ export function ShareExportDialog({
   return (
     <div
       className="fixed inset-0 z-[80] flex items-end justify-center p-3 sm:items-center sm:p-6"
-      style={{ background: "rgba(8, 12, 24, 0.72)", backdropFilter: "blur(8px)" }}
+      style={{ background: "var(--scrim)", backdropFilter: "blur(8px)" }}
       onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
       role="presentation"
     >
@@ -179,7 +179,7 @@ export function ShareExportDialog({
         aria-labelledby={titleId}
         aria-modal="true"
         className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-[1.5rem] p-5 outline-none sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", boxShadow: "0 30px 90px rgba(0,0,0,0.35)" }}
+        style={{ background: "var(--panel)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}
         role="dialog"
         tabIndex={-1}
       >

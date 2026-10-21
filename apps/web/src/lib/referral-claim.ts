@@ -9,7 +9,7 @@ import type { ReferralChannel, ReferralClaim } from "@/api/referrals";
  * The invite belongs to whoever's link the friend used (Q4), so the link
  * used last is claimed last and owns it.
  */
-export const PENDING_REFERRAL_KEY = "milos:pending-referrals";
+export const PENDING_REFERRAL_KEY = "palee:pending-referrals";
 export const PENDING_REFERRAL_DAYS = 30;
 const MAX_PENDING = 5;
 

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinancePaymentReversals do
+defmodule Palee.Repo.Migrations.CreateFinancePaymentReversals do
   use Ecto.Migration
 
   def change do

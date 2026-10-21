@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AiSettingsVoiceLogging do
+defmodule Palee.Repo.Migrations.AiSettingsVoiceLogging do
   @moduledoc """
   ADR-175 (P3-M13): voice logging gets its own switch in the gym's AI
   settings, off by default. Nothing else is stored: the audio lives in memory

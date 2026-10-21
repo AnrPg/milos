@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateUserInsights do
+defmodule Palee.Repo.Migrations.CreateUserInsights do
   @moduledoc """
   ADR-166 (P3-M4, Πρόοδος › Insights): one row per person and insight rule,
   written by the nightly job (and on read when the rows are older than a
@@ -69,7 +69,7 @@ defmodule MilosTraining.Repo.Migrations.CreateUserInsights do
     # People with anything an insight reads since `p_since`: a training
     # session, a wellness entry or a craving. Keyset on the id; ids only.
     execute("""
-    CREATE FUNCTION milos_insight_candidates(p_since timestamp, p_after uuid, p_lim integer)
+    CREATE FUNCTION palee_insight_candidates(p_since timestamp, p_after uuid, p_lim integer)
     RETURNS SETOF uuid
     LANGUAGE sql STABLE SECURITY DEFINER SET search_path = public, pg_temp
     AS $$
@@ -96,7 +96,7 @@ defmodule MilosTraining.Repo.Migrations.CreateUserInsights do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_insight_candidates(timestamp, uuid, integer)")
+    execute("DROP FUNCTION IF EXISTS palee_insight_candidates(timestamp, uuid, integer)")
     drop table(:user_insights)
   end
 end

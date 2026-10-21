@@ -1,5 +1,5 @@
-const WORKOUT_CACHE_PREFIX = "milos-workout-runtime-v2-user-";
-const LEGACY_WORKOUT_CACHE = "milos-workout-runtime-v1";
+const WORKOUT_CACHE_PREFIX = "palee-workout-runtime-v2-user-";
+const LEGACY_WORKOUT_CACHE = "palee-workout-runtime-v1";
 const AUTHENTICATED_CACHE_TTL_MS = 15 * 60 * 1000;
 let activeUserId = null;
 
@@ -23,7 +23,7 @@ async function clearWorkoutCaches() {
 
 async function cacheableResponse(response) {
   const headers = new Headers(response.headers);
-  headers.set("x-milos-cached-at", String(Date.now()));
+  headers.set("x-palee-cached-at", String(Date.now()));
   const body = await response.clone().blob();
 
   return new Response(body, {
@@ -34,7 +34,7 @@ async function cacheableResponse(response) {
 }
 
 function freshCachedResponse(response) {
-  const cachedAt = Number(response?.headers.get("x-milos-cached-at") ?? 0);
+  const cachedAt = Number(response?.headers.get("x-palee-cached-at") ?? 0);
   return cachedAt > 0 && Date.now() - cachedAt <= AUTHENTICATED_CACHE_TTL_MS;
 }
 

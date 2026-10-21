@@ -248,12 +248,12 @@ git commit -m "fix: side panels start below TopNav so Close button is always acc
 **Root cause:** `normalize_assigned_workout/1` in `ecto_workout_store.ex` calls `normalize_base_exercise/1` which omits `variations`. Fix: use `normalize_exercise/1` instead. Add `variations` to frontend TypeScript type.
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex`
+- Modify: `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex`
 - Modify: `apps/web/src/api/assigned-workouts.ts`
 
 - [ ] **Step 1: Write backend test**
 
-In `apps/api/test/milos_training/application/get_assigned_workout_week_test.exs` (create if absent):
+In `apps/api/test/palee/application/get_assigned_workout_week_test.exs` (create if absent):
 
 ```elixir
 test "assigned workout exercises include variations", %{admin: admin, athlete: athlete} do
@@ -274,14 +274,14 @@ end
 - [ ] **Step 2: Run test to confirm it fails**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/get_assigned_workout_week_test.exs 2>&1 | tail -20
+cd apps/api && mix test test/palee/application/get_assigned_workout_week_test.exs 2>&1 | tail -20
 ```
 
 Expected: test fails (variations is nil or empty).
 
 - [ ] **Step 3: Fix backend — use normalize_exercise in assigned workout**
 
-In `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex`, find `normalize_assigned_workout`:
+In `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex`, find `normalize_assigned_workout`:
 
 ```elixir
 defp normalize_assigned_workout(%MasterWorkout{} = workout) do
@@ -312,7 +312,7 @@ end
 - [ ] **Step 4: Run test to confirm it passes**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/get_assigned_workout_week_test.exs 2>&1 | tail -10
+cd apps/api && mix test test/palee/application/get_assigned_workout_week_test.exs 2>&1 | tail -10
 ```
 
 Expected: 1 test, 0 failures.
@@ -377,8 +377,8 @@ cd apps/web && npx tsc --noEmit 2>&1 | head -20
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex \
-        apps/api/test/milos_training/application/get_assigned_workout_week_test.exs \
+git add apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex \
+        apps/api/test/palee/application/get_assigned_workout_week_test.exs \
         apps/web/src/api/assigned-workouts.ts
 git commit -m "fix: include exercise variations in assigned workout preview (item 1)"
 ```
@@ -390,23 +390,23 @@ git commit -m "fix: include exercise variations in assigned workout preview (ite
 ### Task 4: Athlete drag-and-drop + reschedule endpoint (Item 10)
 
 **Files:**
-- Create: `apps/api/lib/milos_training/application/reschedule_assigned_workout.ex`
-- Modify: `apps/api/lib/milos_training_web/controllers/my_workout_controller.ex`
-- Modify: `apps/api/lib/milos_training_web/router.ex`
-- Modify: `apps/api/lib/milos_training/notifications.ex`
+- Create: `apps/api/lib/palee/application/reschedule_assigned_workout.ex`
+- Modify: `apps/api/lib/palee_web/controllers/my_workout_controller.ex`
+- Modify: `apps/api/lib/palee_web/router.ex`
+- Modify: `apps/api/lib/palee/notifications.ex`
 - Modify: `apps/web/src/api/assigned-workouts.ts`
 - Modify: `apps/web/src/components/workouts/AssignedWorkoutsConsole.tsx`
 - Modify: `apps/web/src/components/workouts/AssignedWorkoutPanel.tsx`
 
 - [ ] **Step 1: Write backend test for reschedule**
 
-Create `apps/api/test/milos_training/application/reschedule_assigned_workout_test.exs`:
+Create `apps/api/test/palee/application/reschedule_assigned_workout_test.exs`:
 
 ```elixir
-defmodule MilosTraining.Application.RescheduleAssignedWorkoutTest do
-  use MilosTraining.DataCase
+defmodule Palee.Application.RescheduleAssignedWorkoutTest do
+  use Palee.DataCase
 
-  alias MilosTraining.Application.RescheduleAssignedWorkout
+  alias Palee.Application.RescheduleAssignedWorkout
 
   test "athlete can reschedule their own assignment to a future date" do
     athlete = insert(:user, role: :athlete)
@@ -454,20 +454,20 @@ end
 - [ ] **Step 2: Run test to confirm it fails**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/reschedule_assigned_workout_test.exs 2>&1 | tail -10
+cd apps/api && mix test test/palee/application/reschedule_assigned_workout_test.exs 2>&1 | tail -10
 ```
 
 Expected: compilation error (module not found).
 
 - [ ] **Step 3: Create RescheduleAssignedWorkout application service**
 
-Create `apps/api/lib/milos_training/application/reschedule_assigned_workout.ex`:
+Create `apps/api/lib/palee/application/reschedule_assigned_workout.ex`:
 
 ```elixir
-defmodule MilosTraining.Application.RescheduleAssignedWorkout do
+defmodule Palee.Application.RescheduleAssignedWorkout do
   require Logger
 
-  alias MilosTraining.{Notifications, Workouts}
+  alias Palee.{Notifications, Workouts}
 
   def call(assignment_id, athlete_id, new_date_str) do
     with {:ok, new_date} <- parse_date(new_date_str),
@@ -506,7 +506,7 @@ defmodule MilosTraining.Application.RescheduleAssignedWorkout do
   end
 
   defp notify_admins_workout_moved(assignment, athlete_id, new_date) do
-    case MilosTraining.Identity.get_user(athlete_id) do
+    case Palee.Identity.get_user(athlete_id) do
       nil ->
         :ok
 
@@ -528,21 +528,21 @@ end
 
 - [ ] **Step 4: Add `get_assigned_workout` and `update_assignment_date` to Workouts context**
 
-In `apps/api/lib/milos_training/workouts.ex`, add delegations (and implement in the port/store):
+In `apps/api/lib/palee/workouts.ex`, add delegations (and implement in the port/store):
 
 ```elixir
 defdelegate get_assigned_workout(id), to: WorkoutStore
 defdelegate update_assignment_date(id, date), to: WorkoutStore
 ```
 
-In `apps/api/lib/milos_training/workouts/ports/workout_store.ex`, add specs:
+In `apps/api/lib/palee/workouts/ports/workout_store.ex`, add specs:
 
 ```elixir
 @callback get_assigned_workout(String.t()) :: map() | nil
 @callback update_assignment_date(String.t(), Date.t()) :: {:ok, map()} | {:error, term()}
 ```
 
-In `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex`, implement:
+In `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex`, implement:
 
 ```elixir
 @impl true
@@ -579,7 +579,7 @@ end
 
 - [ ] **Step 5: Add `workout_moved` notification support**
 
-In `apps/api/lib/milos_training/notifications.ex`, add after the existing `process_event` clauses:
+In `apps/api/lib/palee/notifications.ex`, add after the existing `process_event` clauses:
 
 ```elixir
 def process_event("workout_moved", payload), do: enqueue_workout_moved(payload)
@@ -590,7 +590,7 @@ Add the delivery function:
 ```elixir
 def enqueue_workout_moved(%{athlete_nickname: nick, workout_title: title, from_date: from,
                             to_date: to, assignment_id: _aid, url: url} = payload) do
-  admins = MilosTraining.Identity.list_admins()
+  admins = Palee.Identity.list_admins()
 
   Enum.each(admins, fn admin ->
     body = "#{nick} moved \"#{title}\" from #{from} to #{to}."
@@ -604,16 +604,16 @@ end
 
 - [ ] **Step 6: Add reschedule route and controller action**
 
-In `apps/api/lib/milos_training_web/router.ex`, inside the authenticated athlete scope, add:
+In `apps/api/lib/palee_web/router.ex`, inside the authenticated athlete scope, add:
 
 ```elixir
 patch "/my-workouts/assignments/:id/reschedule", MyWorkoutController, :reschedule
 ```
 
-In `apps/api/lib/milos_training_web/controllers/my_workout_controller.ex`, add at the top:
+In `apps/api/lib/palee_web/controllers/my_workout_controller.ex`, add at the top:
 
 ```elixir
-alias MilosTraining.Application.RescheduleAssignedWorkout
+alias Palee.Application.RescheduleAssignedWorkout
 ```
 
 Add the action:
@@ -659,7 +659,7 @@ end
 - [ ] **Step 7: Run backend tests**
 
 ```bash
-cd apps/api && mix test test/milos_training/application/reschedule_assigned_workout_test.exs 2>&1 | tail -10
+cd apps/api && mix test test/palee/application/reschedule_assigned_workout_test.exs 2>&1 | tail -10
 ```
 
 Expected: 3 tests, 0 failures.
@@ -954,13 +954,13 @@ cd apps/web && npx tsc --noEmit 2>&1 | head -20
 - [ ] **Step 13: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/reschedule_assigned_workout.ex \
-        apps/api/lib/milos_training_web/controllers/my_workout_controller.ex \
-        apps/api/lib/milos_training_web/router.ex \
-        apps/api/lib/milos_training/notifications.ex \
-        apps/api/lib/milos_training/workouts.ex \
-        apps/api/lib/milos_training/workouts/ports/workout_store.ex \
-        apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex \
+git add apps/api/lib/palee/application/reschedule_assigned_workout.ex \
+        apps/api/lib/palee_web/controllers/my_workout_controller.ex \
+        apps/api/lib/palee_web/router.ex \
+        apps/api/lib/palee/notifications.ex \
+        apps/api/lib/palee/workouts.ex \
+        apps/api/lib/palee/workouts/ports/workout_store.ex \
+        apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex \
         apps/web/src/api/assigned-workouts.ts \
         apps/web/src/components/workouts/AssignedWorkoutsConsole.tsx \
         apps/web/src/components/workouts/AssignedWorkoutPanel.tsx \
@@ -975,9 +975,9 @@ git commit -m "feat: enable DnD and reschedule for athletes + workout_moved noti
 ### Task 5: Notification URLs with deep-link panel params (Item 9)
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/application/publish_workout.ex`
-- Modify: `apps/api/lib/milos_training/application/delete_workout.ex`
-- Modify: `apps/api/lib/milos_training/application/reject_assigned_workout.ex`
+- Modify: `apps/api/lib/palee/application/publish_workout.ex`
+- Modify: `apps/api/lib/palee/application/delete_workout.ex`
+- Modify: `apps/api/lib/palee/application/reject_assigned_workout.ex`
 - Modify: `apps/web/src/app/schedule/page.tsx`
 - Modify: `apps/web/src/components/schedule/ScheduleConsole.tsx`
 - Modify: `apps/web/src/app/my-workouts/page.tsx`
@@ -985,7 +985,7 @@ git commit -m "feat: enable DnD and reschedule for athletes + workout_moved noti
 
 - [ ] **Step 1: Add assignment ID to workout_changed assignment notifications URL**
 
-In `apps/api/lib/milos_training/application/publish_workout.ex`, in `notify_assignment_targets`:
+In `apps/api/lib/palee/application/publish_workout.ex`, in `notify_assignment_targets`:
 
 ```elixir
 payload = %{
@@ -1013,7 +1013,7 @@ payload = %{
 
 - [ ] **Step 2: Add IDs to workout_deleted notifications URL**
 
-In `apps/api/lib/milos_training/application/delete_workout.ex`:
+In `apps/api/lib/palee/application/delete_workout.ex`:
 
 In `notify_assignment_targets`:
 ```elixir
@@ -1136,8 +1136,8 @@ cd apps/web && npx tsc --noEmit 2>&1 | head -20
 - [ ] **Step 8: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/publish_workout.ex \
-        apps/api/lib/milos_training/application/delete_workout.ex \
+git add apps/api/lib/palee/application/publish_workout.ex \
+        apps/api/lib/palee/application/delete_workout.ex \
         apps/web/src/app/schedule/page.tsx \
         apps/web/src/components/schedule/ScheduleConsole.tsx \
         apps/web/src/app/my-workouts/page.tsx \
@@ -1150,13 +1150,13 @@ git commit -m "feat: notification deep-links open the relevant panel on navigati
 ### Task 6: Differentiated workout_changed vs workout_deleted notifications (Item 12)
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/application/publish_workout.ex`
-- Modify: `apps/api/lib/milos_training/application/delete_workout.ex`
+- Modify: `apps/api/lib/palee/application/publish_workout.ex`
+- Modify: `apps/api/lib/palee/application/delete_workout.ex`
 - Modify: `apps/web/src/components/notifications/NotificationBell.tsx`
 
 - [ ] **Step 1: Add change_type to workout_changed payload**
 
-In `apps/api/lib/milos_training/application/publish_workout.ex`:
+In `apps/api/lib/palee/application/publish_workout.ex`:
 
 In `notify_assignment_targets`, add `change_type: "sections_updated"` to the payload:
 
@@ -1188,7 +1188,7 @@ payload = %{
 
 - [ ] **Step 2: Improve workout_deleted message clarity**
 
-In `apps/api/lib/milos_training/application/delete_workout.ex`:
+In `apps/api/lib/palee/application/delete_workout.ex`:
 
 In `notify_assignment_targets`:
 ```elixir
@@ -1225,8 +1225,8 @@ if (notification.type === "workout_changed") {
 - [ ] **Step 4: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/publish_workout.ex \
-        apps/api/lib/milos_training/application/delete_workout.ex \
+git add apps/api/lib/palee/application/publish_workout.ex \
+        apps/api/lib/palee/application/delete_workout.ex \
         apps/web/src/components/notifications/NotificationBell.tsx
 git commit -m "feat: differentiate workout_changed vs workout_deleted notification content (item 12)"
 ```
@@ -1254,7 +1254,7 @@ async function storeTokenForSW(token: string) {
 
 function openSwDb(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
-    const req = indexedDB.open("milos-sw", 1);
+    const req = indexedDB.open("palee-sw", 1);
     req.onupgradeneeded = () => req.result.createObjectStore("config", { keyPath: "key" });
     req.onsuccess = () => resolve(req.result);
     req.onerror = () => reject(req.error);
@@ -1277,7 +1277,7 @@ self.addEventListener("push", (event) => {
 
   event.waitUntil(
     (async () => {
-      await self.registration.showNotification(data.title ?? "Milos Training", {
+      await self.registration.showNotification(data.title ?? "Palee", {
         body: data.body ?? "",
         icon: "/globe.svg",
         badge: "/globe.svg",
@@ -1299,7 +1299,7 @@ self.addEventListener("push", (event) => {
 
 async function readTokenFromDb() {
   return new Promise((resolve) => {
-    const req = indexedDB.open("milos-sw", 1);
+    const req = indexedDB.open("palee-sw", 1);
     req.onupgradeneeded = () => req.result.createObjectStore("config", { keyPath: "key" });
     req.onsuccess = () => {
       const tx = req.result.transaction("config", "readonly");
@@ -1314,11 +1314,11 @@ async function readTokenFromDb() {
 
 - [ ] **Step 3: Ensure notification_id is in the push payload from backend**
 
-In `apps/api/lib/milos_training/notifications.ex`, find the push delivery function (likely `deliver_push_notification` or similar). Add `notification_id` to the push payload map sent to the push service.
+In `apps/api/lib/palee/notifications.ex`, find the push delivery function (likely `deliver_push_notification` or similar). Add `notification_id` to the push payload map sent to the push service.
 
 Grep for the function:
 ```bash
-grep -n "deliver_push\|push_payload\|web_push\|Pigeon\|WebPush" apps/api/lib/milos_training/notifications.ex | head -10
+grep -n "deliver_push\|push_payload\|web_push\|Pigeon\|WebPush" apps/api/lib/palee/notifications.ex | head -10
 ```
 
 Add `notification_id: notification.id` to whatever map is sent as the push body.
@@ -1328,7 +1328,7 @@ Add `notification_id: notification.id` to whatever map is sent as the push body.
 ```bash
 git add apps/web/public/sw-push-notifications.js \
         apps/web/src/hooks/usePushNotifications.ts \
-        apps/api/lib/milos_training/notifications.ex
+        apps/api/lib/palee/notifications.ex
 git commit -m "feat: auto-mark notification as read when delivered via browser push (item 15)"
 ```
 
@@ -1341,22 +1341,22 @@ git commit -m "feat: auto-mark notification as read when delivered via browser p
 **Root cause:** When admin reopens a published workout, `reopenWorkout` creates a new draft with a new ID. The original published record stays published. If admin publishes the new draft, both records exist. The new draft's publish changes its own status to `published`, but the original record also remains. We clean up by deleting any draft records that were created as a reopen of this workout.
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/application/publish_workout.ex`
-- Modify: `apps/api/lib/milos_training/workouts.ex`
-- Modify: `apps/api/lib/milos_training/workouts/ports/workout_store.ex`
-- Modify: `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex`
+- Modify: `apps/api/lib/palee/application/publish_workout.ex`
+- Modify: `apps/api/lib/palee/workouts.ex`
+- Modify: `apps/api/lib/palee/workouts/ports/workout_store.ex`
+- Modify: `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex`
 
 - [ ] **Step 1: Check reopen_workout to understand draft lineage**
 
 ```bash
-cat apps/api/lib/milos_training/application/reopen_workout.ex
+cat apps/api/lib/palee/application/reopen_workout.ex
 ```
 
 Identify the field that links a draft back to its source (e.g. `reopened_from_id` or similar). If no such field exists, we track by `inserted_by` + `status = 'draft'` — clean all OTHER drafts for the same admin after publish.
 
 - [ ] **Step 2: Add cleanup to publish_workout.ex**
 
-In `apps/api/lib/milos_training/application/publish_workout.ex`, after the `with` block succeeds:
+In `apps/api/lib/palee/application/publish_workout.ex`, after the `with` block succeeds:
 
 ```elixir
 with {:ok, workout} <- Workouts.publish_workout(id, params),
@@ -1369,19 +1369,19 @@ end
 
 - [ ] **Step 3: Add delete_superseded_drafts to Workouts context**
 
-In `apps/api/lib/milos_training/workouts.ex`:
+In `apps/api/lib/palee/workouts.ex`:
 
 ```elixir
 defdelegate delete_superseded_drafts(published_id, admin_id), to: WorkoutStore
 ```
 
-In `apps/api/lib/milos_training/workouts/ports/workout_store.ex`:
+In `apps/api/lib/palee/workouts/ports/workout_store.ex`:
 
 ```elixir
 @callback delete_superseded_drafts(String.t(), String.t()) :: :ok
 ```
 
-In `apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex`:
+In `apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex`:
 
 ```elixir
 @impl true
@@ -1403,10 +1403,10 @@ cd apps/api && mix test 2>&1 | tail -5
 - [ ] **Step 5: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/application/publish_workout.ex \
-        apps/api/lib/milos_training/workouts.ex \
-        apps/api/lib/milos_training/workouts/ports/workout_store.ex \
-        apps/api/lib/milos_training/infrastructure/workouts/ecto_workout_store.ex
+git add apps/api/lib/palee/application/publish_workout.ex \
+        apps/api/lib/palee/workouts.ex \
+        apps/api/lib/palee/workouts/ports/workout_store.ex \
+        apps/api/lib/palee/infrastructure/workouts/ecto_workout_store.ex
 git commit -m "fix: hard-delete orphan drafts when a workout is published (item 14)"
 ```
 

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddGoalFeedbackEntryScope do
+defmodule Palee.Repo.Migrations.AddGoalFeedbackEntryScope do
   @moduledoc """
   ADR-163 coach totals: which workout and which scheduled class a journal
   entry belongs to, and whether it was voided, so the goal-feedback summary
@@ -10,7 +10,7 @@ defmodule MilosTraining.Repo.Migrations.AddGoalFeedbackEntryScope do
   when it was started from a class booking (`source = 'class_booking'`, the
   booking in `source_reference_id`).
 
-  SECURITY DEFINER for the same reason as `milos_goal_feedback_entry`:
+  SECURITY DEFINER for the same reason as `palee_goal_feedback_entry`:
   executions, logs and bookings sit under other scopes than the coach's
   session. It answers about one entry and adds no table, so no new policy.
   The body names its arguments `$1`/`$2`: `bookings` has a `kind` column,
@@ -21,7 +21,7 @@ defmodule MilosTraining.Repo.Migrations.AddGoalFeedbackEntryScope do
 
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_goal_feedback_entry_scope(kind text, entry uuid)
+    CREATE OR REPLACE FUNCTION palee_goal_feedback_entry_scope(kind text, entry uuid)
     RETURNS TABLE (master_workout_id uuid, scheduled_class_id uuid, voided boolean)
     LANGUAGE sql
     STABLE
@@ -44,6 +44,6 @@ defmodule MilosTraining.Repo.Migrations.AddGoalFeedbackEntryScope do
   end
 
   def down do
-    execute("DROP FUNCTION IF EXISTS milos_goal_feedback_entry_scope(text, uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_goal_feedback_entry_scope(text, uuid)")
   end
 end

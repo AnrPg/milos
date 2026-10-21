@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddFreeTextWorkoutAuthoring do
+defmodule Palee.Repo.Migrations.AddFreeTextWorkoutAuthoring do
   use Ecto.Migration
 
   def change do

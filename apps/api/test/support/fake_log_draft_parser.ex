@@ -1,4 +1,4 @@
-defmodule MilosTraining.FakeLogDraftParser do
+defmodule Palee.FakeLogDraftParser do
   @moduledoc """
   Test stand-in behind the `LogDraftParser` port (ADR-175). Deterministic:
   answers a fixed draft for any transcript. Tells the calling process what
@@ -7,7 +7,7 @@ defmodule MilosTraining.FakeLogDraftParser do
   unusable answer.
   """
 
-  @behaviour MilosTraining.VoiceLog.Ports.LogDraftParser
+  @behaviour Palee.VoiceLog.Ports.LogDraftParser
 
   @impl true
   def parse(input, options) do

@@ -25,11 +25,11 @@ msgstr "التمرين المخصص"
 msgid "Workout: %{title}"
 msgstr "التمرين: %{title}"
 
-msgid "Assigned workout in TrainingJournal."
-msgstr "التمرين المخصص في تدريب ميلوس."
+msgid "Assigned workout in Palee."
+msgstr "التمرين المخصص في Palee."
 
-msgid "Scheduled %{name} class in TrainingJournal."
-msgstr "تمت جدولة فصل %{name} في تدريب ميلوس."
+msgid "Scheduled %{name} class in Palee."
+msgstr "تمت جدولة فصل %{name} في Palee."
 
 msgid "Pending"
 msgstr "قيد الانتظار"
@@ -40,8 +40,8 @@ msgstr "موافقة"
 msgid "Scheduled"
 msgstr "المقرر"
 
-msgid "TrainingJournal class booking status: %{status}."
-msgstr "حالة حجز فصل تدريب ميلوس: %{status}."
+msgid "Palee class booking status: %{status}."
+msgstr "حالة حجز فصل Palee: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "حصة تجريبية في %{box}: %{name}"

@@ -3,10 +3,13 @@ import type { CapacitorConfig } from "@capacitor/cli";
 // ADR-171: the store apps are a native shell around the deployed web app
 // (same code, same deploy). The web view loads `server.url` for the chosen
 // environment; `www/` only holds the page shown when it cannot be reached.
-// MILOS_APP_ENV (production | staging | development) and MILOS_APP_URL pick
+// PALEE_APP_ENV (production | staging | development) and PALEE_APP_URL pick
 // the URL at `cap sync` time.
 // eslint-disable-next-line @typescript-eslint/no-require-imports
 const { resolveEnvironment } = require("./config/resolve.cjs");
+
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const theme = require("./palee-theme.json"); // generated from the web theme (npm run theme:native)
 
 const environment = resolveEnvironment();
 
@@ -16,7 +19,7 @@ const config: CapacitorConfig = {
   webDir: "www",
   // Lets the server tell the app apart in logs; the web detects the app
   // through the native bridge, never through this string.
-  appendUserAgent: "MilosApp",
+  appendUserAgent: "PaleeApp",
   server: {
     url: environment.url,
     cleartext: environment.cleartext,
@@ -38,7 +41,7 @@ const config: CapacitorConfig = {
     SplashScreen: {
       launchAutoHide: true,
       launchShowDuration: 600,
-      backgroundColor: "#0b0d10",
+      backgroundColor: theme.light.background,
       showSpinner: false,
     },
     PushNotifications: {

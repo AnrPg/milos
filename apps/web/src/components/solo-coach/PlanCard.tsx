@@ -10,8 +10,8 @@ import { formatCents, shownMonthlyPrice, usageShare, usageTone, type UsageTone }
 
 const TONE_COLOR: Record<UsageTone, string> = {
   ok: "var(--primary)",
-  warn: "var(--warning, #d97706)",
-  full: "var(--danger, #dc2626)",
+  warn: "var(--warning)",
+  full: "var(--danger)",
 };
 
 export function useAdminPlan(token: string | undefined) {
@@ -26,7 +26,7 @@ export function useAdminPlan(token: string | undefined) {
 }
 
 /**
- * The organization's Milos plan (ADR-170), for owners and admins: name,
+ * The organization's Palee plan (ADR-170), for owners and admins: name,
  * status, seats used against the limits and the price once it is confirmed.
  */
 export function PlanCard({ token }: { token: string }) {
@@ -98,8 +98,8 @@ export function PlanNotice({ token }: { token: string }) {
       role="status"
       className="rounded-2xl px-4 py-3 text-sm"
       style={{
-        background: "color-mix(in srgb, var(--warning, #d97706) 12%, transparent)",
-        border: "1px solid color-mix(in srgb, var(--warning, #d97706) 35%, transparent)",
+        background: "color-mix(in srgb, var(--warning) 12%, transparent)",
+        border: "1px solid color-mix(in srgb, var(--warning) 35%, transparent)",
         color: "var(--text)",
       }}
     >

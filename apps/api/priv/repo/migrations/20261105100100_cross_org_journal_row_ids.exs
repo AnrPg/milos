@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CrossOrgJournalRowIds do
+defmodule Palee.Repo.Migrations.CrossOrgJournalRowIds do
   @moduledoc """
   ADR-162 / ADR-117: the tenant data export and purge address rows by `id`,
   so the member's per-provider rows get one beside their natural keys.

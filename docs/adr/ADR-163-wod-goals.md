@@ -52,9 +52,9 @@ already the key of the injury-risk policy, ADR-124). Neither has a muscle tree.
    per `(entry_kind, entry_id, user_id)` with `entry_kind` `execution|training_log`,
    `felt_muscles`, `felt_qualities`. It is the member's own data and follows its entry
    like a journal comment (ADR-140): owner-only writes, and only on an entry the
-   writer owns (`milos_journal_entry_owner`); coaches read it only while the entry's
-   rung reaches them (`milos_entry_visible_to_acting_coach`, and the ADR-162 shared
-   read). A SECURITY DEFINER `milos_goal_feedback_entry(kind, id)` returns an entry's
+   writer owns (`palee_journal_entry_owner`); coaches read it only while the entry's
+   rung reaches them (`palee_entry_visible_to_acting_coach`, and the ADR-162 shared
+   read). A SECURITY DEFINER `palee_goal_feedback_entry(kind, id)` returns an entry's
    owner, gym, workout and voided flag for the use case.
 6. **Static taxonomy endpoint** `GET /api/anatomy/taxonomy` (authenticated): version,
    nodes in tree order (`id, kind, parent_id, name, ta2_ids`), qualities and roles,
@@ -154,7 +154,7 @@ The owner took every recommended extra on board 18 (plan §5a). Backend:
   from it and executions timed from one of its bookings, whichever workout version they
   followed; its goals are those of the class's workout. Migration
   `20261111100000_add_goal_feedback_entry_scope.exs` adds the SECURITY DEFINER
-  `milos_goal_feedback_entry_scope(kind, id)` (workout, class, voided of one entry); its body
+  `palee_goal_feedback_entry_scope(kind, id)` (workout, class, voided of one entry); its body
   uses `$1/$2` because `bookings.kind` would shadow the `kind` argument.
 - **Member switch.** `felt_prompt_without_goals` (default true) on `body_settings`, next to
   `journal_sections`, in `GET/PUT /api/me/body/settings` (migration

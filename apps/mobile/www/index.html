@@ -3,17 +3,18 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-    <title>Milos</title>
+    <title>Palee</title>
     <!-- ADR-171: the app loads the deployed web app (server.url). This page is only
          reached if that setting is missing; it forwards to the configured URL. -->
     <script src="app-config.js"></script>
+    <link rel="stylesheet" href="palee-theme.css" />
     <style>
-      html, body { margin: 0; height: 100%; background: #0b0d10; }
+      html, body { margin: 0; height: 100%; background: var(--background); }
     </style>
   </head>
   <body>
     <script>
-      if (window.MILOS_APP_URL) window.location.replace(window.MILOS_APP_URL);
+      if (window.PALEE_APP_URL) window.location.replace(window.PALEE_APP_URL);
     </script>
   </body>
 </html>

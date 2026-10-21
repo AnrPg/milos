@@ -206,8 +206,8 @@ export function runElapsedMs(run: Pick<FreeTextRun, "startedAt" | "carriedMs">, 
   return run.carriedMs + (run.startedAt === null ? 0 : Math.max(0, now - run.startedAt));
 }
 
-const RUN_KEY = "milos:free-text-timer:";
-const LAST_PRESET_KEY = "milos:free-text-timer:last-preset";
+const RUN_KEY = "palee:free-text-timer:";
+const LAST_PRESET_KEY = "palee:free-text-timer:last-preset";
 
 /** Persisted per execution so a reload resumes the same clock. */
 export function readFreeTextRun(executionId: string): FreeTextRun | null {
@@ -263,7 +263,7 @@ export type FreeTextKpi = {
   paused_at?: number | null;
 };
 
-const KPI_KEY = "milos:free-text-kpi:";
+const KPI_KEY = "palee:free-text-kpi:";
 
 export function emptyFreeTextKpi(): FreeTextKpi {
   return { pauses: 0, paused_ms: 0, finish_wizard_opens: 0, skips: 0, paused_at: null };

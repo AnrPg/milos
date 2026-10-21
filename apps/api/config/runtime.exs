@@ -1,9 +1,9 @@
 import Config
 
-config :milos_training, :app_env, config_env()
+config :palee, :app_env, config_env()
 
 if System.get_env("PHX_SERVER") do
-  config :milos_training, MilosTrainingWeb.Endpoint, server: true
+  config :palee, PaleeWeb.Endpoint, server: true
 end
 
 # Outbound Gemini calls honour HTTPS_PROXY (corporate egress, or a sandbox
@@ -27,10 +27,9 @@ gemini_req_options =
 # Free-text workout analysis assistant. Without a key the analyze endpoint
 # answers 503 and the editor keeps working as a plain text editor.
 # ADR-141: point at a self-hosted Photon in production.
-config :milos_training, :photon,
-  base_url: System.get_env("PHOTON_BASE_URL", "https://photon.komoot.io")
+config :palee, :photon, base_url: System.get_env("PHOTON_BASE_URL", "https://photon.komoot.io")
 
-config :milos_training, :gemini,
+config :palee, :gemini,
   req_options: gemini_req_options,
   api_key: System.get_env("GEMINI_API_KEY"),
   model: System.get_env("GEMINI_MODEL", "gemini-3.8-flash"),
@@ -46,7 +45,7 @@ config :milos_training, :gemini,
 
 # ADR-174: AI scaling suggestions call the Claude API with each gym's own key
 # (set in the gym's AI settings); only the default model is configured here.
-config :milos_training, :anthropic,
+config :palee, :anthropic,
   req_options: gemini_req_options,
   scaling_model: System.get_env("ANTHROPIC_SCALING_MODEL", "claude-sonnet-5-5"),
   # ADR-175: voice logging turns the transcript into a draft entry.
@@ -79,7 +78,7 @@ minio_secret_key =
   System.get_env("MINIO_SECRET_KEY") ||
     if(config_env() == :prod, do: raise("MINIO_SECRET_KEY is required"), else: "minioadmin")
 
-config :milos_training,
+config :palee,
   minio_endpoint: minio_endpoint,
   minio_public_endpoint: minio_public_endpoint,
   minio_access_key: minio_access_key,
@@ -102,7 +101,7 @@ meili_api_key =
       else: "dev-meili-master-key"
     )
 
-config :milos_training, :meilisearch,
+config :palee, :meilisearch,
   url: meili_url,
   api_key: meili_api_key,
   admin_member_index: System.get_env("MEILI_ADMIN_MEMBER_INDEX", "admin_members")
@@ -119,7 +118,7 @@ end
 # ADR-155: Wallet cards. Each platform works only with all of its values set;
 # otherwise adding a card answers wallet_not_configured and the rest of
 # check-in works. PEM values may be the PEM text or a path to a PEM file.
-config :milos_training, :wallet,
+config :palee, :wallet,
   apple: [
     pass_type_identifier: present_env.("WALLET_APPLE_PASS_TYPE_ID"),
     team_identifier: present_env.("WALLET_APPLE_TEAM_ID"),
@@ -143,7 +142,7 @@ config :milos_training, :wallet,
 # account JSON (the text or a path); APNs (iOS) needs the team id, the key id
 # and the .p8 key (text or path). APNS_TOPIC is the iOS bundle id. Without
 # them that provider is off: nothing is registered or sent.
-config :milos_training, :native_push,
+config :palee, :native_push,
   fcm: [service_account: present_env.("FCM_SERVICE_ACCOUNT_JSON")],
   apns: [
     team_id: present_env.("APNS_TEAM_ID"),
@@ -156,7 +155,7 @@ config :milos_training, :native_push,
 # secret the devices row shows «Σύντομα» and connecting answers
 # garmin_not_configured. GARMIN_PUSH_TOKEN, when set, must also appear as
 # ?token=… in the push URLs registered at Garmin.
-config :milos_training, :garmin,
+config :palee, :garmin,
   client_id: present_env.("GARMIN_CLIENT_ID"),
   client_secret: present_env.("GARMIN_CLIENT_SECRET"),
   redirect_uri: present_env.("GARMIN_REDIRECT_URI"),
@@ -171,7 +170,7 @@ case present_env.("DATA_ENCRYPTION_KEY") do
   encoded ->
     case Base.decode64(encoded) do
       {:ok, key} when byte_size(key) == 32 ->
-        config :milos_training, :data_encryption_key, key
+        config :palee, :data_encryption_key, key
 
       _invalid ->
         raise "DATA_ENCRYPTION_KEY must be 32 bytes, base64-encoded"
@@ -182,7 +181,7 @@ otel_traces_endpoint = present_env.("OTEL_EXPORTER_OTLP_TRACES_ENDPOINT")
 otel_base_endpoint = present_env.("OTEL_EXPORTER_OTLP_ENDPOINT")
 otel_endpoint = otel_traces_endpoint || otel_base_endpoint
 
-otel_service_name = present_env.("OTEL_SERVICE_NAME") || "milos-training-api"
+otel_service_name = present_env.("OTEL_SERVICE_NAME") || "palee-api"
 
 if otel_endpoint do
   config :opentelemetry,
@@ -191,7 +190,7 @@ if otel_endpoint do
     resource: [
       service: [
         name: otel_service_name,
-        namespace: present_env.("OTEL_SERVICE_NAMESPACE") || "milos-training"
+        namespace: present_env.("OTEL_SERVICE_NAMESPACE") || "palee"
       ],
       deployment: [environment: Atom.to_string(config_env())]
     ]
@@ -235,13 +234,13 @@ if metrics_port do
     |> String.to_charlist()
     |> :inet.parse_address()
 
-  config :milos_training, :prometheus_metrics,
+  config :palee, :prometheus_metrics,
     enabled: true,
     port: String.to_integer(metrics_port),
     ip: metrics_ip,
     token: metrics_token
 else
-  config :milos_training, :prometheus_metrics, enabled: false
+  config :palee, :prometheus_metrics, enabled: false
 end
 
 if config_env() == :prod do
@@ -252,8 +251,7 @@ if config_env() == :prod do
       Generate a strong secret and set it before starting the server.
       """
 
-  config :milos_training, MilosTraining.Infrastructure.Auth.Guardian,
-    secret_key: guardian_secret_key
+  config :palee, Palee.Infrastructure.Auth.Guardian, secret_key: guardian_secret_key
 
   database_url =
     System.get_env("DATABASE_URL") ||
@@ -264,12 +262,12 @@ if config_env() == :prod do
 
   maybe_ipv6 = if System.get_env("ECTO_IPV6") in ~w(true 1), do: [:inet6], else: []
 
-  config :milos_training, MilosTraining.Repo,
+  config :palee, Palee.Repo,
     url: database_url,
     pool_size: String.to_integer(System.get_env("POOL_SIZE") || "10"),
     socket_options: maybe_ipv6
 
-  config :milos_training,
+  config :palee,
     migration_database_url: System.get_env("MIGRATION_DATABASE_URL") || database_url
 
   redis_url =
@@ -279,7 +277,7 @@ if config_env() == :prod do
       For example: redis://HOST:6379
       """
 
-  config :milos_training, :redis_url, redis_url
+  config :palee, :redis_url, redis_url
 
   secret_key_base =
     System.get_env("SECRET_KEY_BASE") ||
@@ -291,11 +289,11 @@ if config_env() == :prod do
   host = System.get_env("PHX_HOST") || "example.com"
   port = String.to_integer(System.get_env("PORT") || "4000")
 
-  config :milos_training, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
-  config :milos_training, :public_base_url, "https://#{host}"
+  config :palee, :dns_cluster_query, System.get_env("DNS_CLUSTER_QUERY")
+  config :palee, :public_base_url, "https://#{host}"
 
-  config :milos_training, :mail_from,
-    name: System.get_env("MAIL_FROM_NAME") || "TrainingJournal",
+  config :palee, :mail_from,
+    name: System.get_env("MAIL_FROM_NAME") || "Palee",
     address: System.get_env("MAIL_FROM_ADDRESS") || "no-reply@#{host}"
 
   # Optional on purpose: absent SMTP_RELAY must not crash boot over a
@@ -305,7 +303,7 @@ if config_env() == :prod do
   # than crashing (see SendOwnerInvitationEmail.safe_deliver/1) - so this
   # stays a degraded feature, not an outage, until these are set.
   if smtp_relay = System.get_env("SMTP_RELAY") do
-    config :milos_training, MilosTraining.Mailer,
+    config :palee, Palee.Mailer,
       adapter: Swoosh.Adapters.SMTP,
       relay: smtp_relay,
       port: String.to_integer(System.get_env("SMTP_PORT") || "587"),
@@ -316,7 +314,7 @@ if config_env() == :prod do
       ssl: System.get_env("SMTP_SSL") in ~w(true 1)
   end
 
-  config :milos_training, MilosTrainingWeb.Endpoint,
+  config :palee, PaleeWeb.Endpoint,
     url: [host: host, port: 443, scheme: "https"],
     http: [
       ip: {0, 0, 0, 0, 0, 0, 0, 0},

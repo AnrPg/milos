@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.ReferralDiscountRenewals do
+defmodule Palee.Repo.Migrations.ReferralDiscountRenewals do
   use Ecto.Migration
 
   # ADR-156 (board 11 Q6 extra): «Δόθηκε» on a discount reward takes it off

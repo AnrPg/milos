@@ -4,7 +4,7 @@
 
 **Goal:** Create the `Messaging` bounded context foundation — three DB tables, three Ecto schemas, ThreadPolicy domain module, and two port behaviours.
 
-**Architecture:** New `Messaging` context under `lib/milos_training/messaging/`. Hexagonal: domain schemas have no external deps; ports are behaviours only. Infrastructure adapters come in Plan 2.
+**Architecture:** New `Messaging` context under `lib/palee/messaging/`. Hexagonal: domain schemas have no external deps; ports are behaviours only. Infrastructure adapters come in Plan 2.
 
 **Tech Stack:** Elixir/Phoenix 1.7, Ecto, PostgreSQL 16, ExUnit + DataCase
 
@@ -19,17 +19,17 @@
 - `apps/api/priv/repo/migrations/20260614000001_create_messaging_threads.exs`
 - `apps/api/priv/repo/migrations/20260614000002_create_messaging_participants.exs`
 - `apps/api/priv/repo/migrations/20260614000003_create_messaging_messages.exs`
-- `apps/api/lib/milos_training/messaging/thread.ex`
-- `apps/api/lib/milos_training/messaging/message.ex`
-- `apps/api/lib/milos_training/messaging/participant.ex`
-- `apps/api/lib/milos_training/messaging/domain/thread_policy.ex`
-- `apps/api/lib/milos_training/messaging/ports/thread_store.ex`
-- `apps/api/lib/milos_training/messaging/ports/message_store.ex`
-- `apps/api/lib/milos_training/messaging.ex`
-- `apps/api/test/milos_training/messaging/thread_test.exs`
-- `apps/api/test/milos_training/messaging/message_test.exs`
-- `apps/api/test/milos_training/messaging/participant_test.exs`
-- `apps/api/test/milos_training/messaging/domain/thread_policy_test.exs`
+- `apps/api/lib/palee/messaging/thread.ex`
+- `apps/api/lib/palee/messaging/message.ex`
+- `apps/api/lib/palee/messaging/participant.ex`
+- `apps/api/lib/palee/messaging/domain/thread_policy.ex`
+- `apps/api/lib/palee/messaging/ports/thread_store.ex`
+- `apps/api/lib/palee/messaging/ports/message_store.ex`
+- `apps/api/lib/palee/messaging.ex`
+- `apps/api/test/palee/messaging/thread_test.exs`
+- `apps/api/test/palee/messaging/message_test.exs`
+- `apps/api/test/palee/messaging/participant_test.exs`
+- `apps/api/test/palee/messaging/domain/thread_policy_test.exs`
 
 ---
 
@@ -42,7 +42,7 @@
 
 ```elixir
 # apps/api/priv/repo/migrations/20260614000001_create_messaging_threads.exs
-defmodule MilosTraining.Repo.Migrations.CreateMessagingThreads do
+defmodule Palee.Repo.Migrations.CreateMessagingThreads do
   use Ecto.Migration
 
   def change do
@@ -85,7 +85,7 @@ Expected: `== Running 20260614000001 CreateMessagingThreads.change/0 forward`
 
 ```elixir
 # apps/api/priv/repo/migrations/20260614000002_create_messaging_participants.exs
-defmodule MilosTraining.Repo.Migrations.CreateMessagingParticipants do
+defmodule Palee.Repo.Migrations.CreateMessagingParticipants do
   use Ecto.Migration
 
   def change do
@@ -127,7 +127,7 @@ Expected: `== Running 20260614000002 CreateMessagingParticipants.change/0 forwar
 
 ```elixir
 # apps/api/priv/repo/migrations/20260614000003_create_messaging_messages.exs
-defmodule MilosTraining.Repo.Migrations.CreateMessagingMessages do
+defmodule Palee.Repo.Migrations.CreateMessagingMessages do
   use Ecto.Migration
 
   def change do
@@ -161,17 +161,17 @@ Expected: `== Running 20260614000003 CreateMessagingMessages.change/0 forward`
 ## Task 4: Thread schema with tests
 
 **Files:**
-- Create: `apps/api/lib/milos_training/messaging/thread.ex`
-- Create: `apps/api/test/milos_training/messaging/thread_test.exs`
+- Create: `apps/api/lib/palee/messaging/thread.ex`
+- Create: `apps/api/test/palee/messaging/thread_test.exs`
 
 - [ ] **Step 1: Write failing test**
 
 ```elixir
-# apps/api/test/milos_training/messaging/thread_test.exs
-defmodule MilosTraining.Messaging.ThreadTest do
-  use MilosTraining.DataCase, async: true
+# apps/api/test/palee/messaging/thread_test.exs
+defmodule Palee.Messaging.ThreadTest do
+  use Palee.DataCase, async: true
 
-  alias MilosTraining.Messaging.Thread
+  alias Palee.Messaging.Thread
 
   describe "changeset/2" do
     test "valid direct thread requires only context_type and created_by_id" do
@@ -232,7 +232,7 @@ end
 - [ ] **Step 2: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/thread_test.exs 2>&1 | head -20
+cd apps/api && mix test test/palee/messaging/thread_test.exs 2>&1 | head -20
 ```
 
 Expected: `** (CompileError)` — module does not exist yet.
@@ -240,8 +240,8 @@ Expected: `** (CompileError)` — module does not exist yet.
 - [ ] **Step 3: Implement Thread schema**
 
 ```elixir
-# apps/api/lib/milos_training/messaging/thread.ex
-defmodule MilosTraining.Messaging.Thread do
+# apps/api/lib/palee/messaging/thread.ex
+defmodule Palee.Messaging.Thread do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -255,8 +255,8 @@ defmodule MilosTraining.Messaging.Thread do
     field :context_id, :binary_id
     field :created_by_id, :binary_id
 
-    has_many :participants, MilosTraining.Messaging.Participant, foreign_key: :thread_id
-    has_many :messages, MilosTraining.Messaging.Message, foreign_key: :thread_id
+    has_many :participants, Palee.Messaging.Participant, foreign_key: :thread_id
+    has_many :messages, Palee.Messaging.Message, foreign_key: :thread_id
 
     timestamps(updated_at: false)
   end
@@ -281,7 +281,7 @@ end
 - [ ] **Step 4: Run test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/thread_test.exs
+cd apps/api && mix test test/palee/messaging/thread_test.exs
 ```
 
 Expected: `4 tests, 0 failures`
@@ -289,7 +289,7 @@ Expected: `4 tests, 0 failures`
 - [ ] **Step 5: Format and lint**
 
 ```bash
-cd apps/api && mix format lib/milos_training/messaging/thread.ex && mix credo --strict lib/milos_training/messaging/thread.ex
+cd apps/api && mix format lib/palee/messaging/thread.ex && mix credo --strict lib/palee/messaging/thread.ex
 ```
 
 - [ ] **Step 6: Commit**
@@ -298,8 +298,8 @@ cd apps/api && mix format lib/milos_training/messaging/thread.ex && mix credo --
 git add apps/api/priv/repo/migrations/20260614000001_create_messaging_threads.exs \
         apps/api/priv/repo/migrations/20260614000002_create_messaging_participants.exs \
         apps/api/priv/repo/migrations/20260614000003_create_messaging_messages.exs \
-        apps/api/lib/milos_training/messaging/thread.ex \
-        apps/api/test/milos_training/messaging/thread_test.exs
+        apps/api/lib/palee/messaging/thread.ex \
+        apps/api/test/palee/messaging/thread_test.exs
 git commit -m "feat(messaging): DB migrations + Thread schema"
 ```
 
@@ -308,17 +308,17 @@ git commit -m "feat(messaging): DB migrations + Thread schema"
 ## Task 5: Message schema with tests
 
 **Files:**
-- Create: `apps/api/lib/milos_training/messaging/message.ex`
-- Create: `apps/api/test/milos_training/messaging/message_test.exs`
+- Create: `apps/api/lib/palee/messaging/message.ex`
+- Create: `apps/api/test/palee/messaging/message_test.exs`
 
 - [ ] **Step 1: Write failing test**
 
 ```elixir
-# apps/api/test/milos_training/messaging/message_test.exs
-defmodule MilosTraining.Messaging.MessageTest do
-  use MilosTraining.DataCase, async: true
+# apps/api/test/palee/messaging/message_test.exs
+defmodule Palee.Messaging.MessageTest do
+  use Palee.DataCase, async: true
 
-  alias MilosTraining.Messaging.Message
+  alias Palee.Messaging.Message
 
   describe "changeset/2" do
     test "valid text message" do
@@ -380,14 +380,14 @@ end
 - [ ] **Step 2: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/message_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee/messaging/message_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 3: Implement Message schema**
 
 ```elixir
-# apps/api/lib/milos_training/messaging/message.ex
-defmodule MilosTraining.Messaging.Message do
+# apps/api/lib/palee/messaging/message.ex
+defmodule Palee.Messaging.Message do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -419,7 +419,7 @@ end
 - [ ] **Step 4: Run test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/message_test.exs
+cd apps/api && mix test test/palee/messaging/message_test.exs
 ```
 
 Expected: `5 tests, 0 failures`
@@ -429,17 +429,17 @@ Expected: `5 tests, 0 failures`
 ## Task 6: Participant schema with tests
 
 **Files:**
-- Create: `apps/api/lib/milos_training/messaging/participant.ex`
-- Create: `apps/api/test/milos_training/messaging/participant_test.exs`
+- Create: `apps/api/lib/palee/messaging/participant.ex`
+- Create: `apps/api/test/palee/messaging/participant_test.exs`
 
 - [ ] **Step 1: Write failing test**
 
 ```elixir
-# apps/api/test/milos_training/messaging/participant_test.exs
-defmodule MilosTraining.Messaging.ParticipantTest do
-  use MilosTraining.DataCase, async: true
+# apps/api/test/palee/messaging/participant_test.exs
+defmodule Palee.Messaging.ParticipantTest do
+  use Palee.DataCase, async: true
 
-  alias MilosTraining.Messaging.Participant
+  alias Palee.Messaging.Participant
 
   describe "changeset/2" do
     test "valid participant" do
@@ -482,14 +482,14 @@ end
 - [ ] **Step 2: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/participant_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee/messaging/participant_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 3: Implement Participant schema**
 
 ```elixir
-# apps/api/lib/milos_training/messaging/participant.ex
-defmodule MilosTraining.Messaging.Participant do
+# apps/api/lib/palee/messaging/participant.ex
+defmodule Palee.Messaging.Participant do
   use Ecto.Schema
   import Ecto.Changeset
 
@@ -528,7 +528,7 @@ end
 - [ ] **Step 4: Run test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/participant_test.exs
+cd apps/api && mix test test/palee/messaging/participant_test.exs
 ```
 
 Expected: `4 tests, 0 failures`
@@ -536,10 +536,10 @@ Expected: `4 tests, 0 failures`
 - [ ] **Step 5: Commit schemas**
 
 ```bash
-git add apps/api/lib/milos_training/messaging/message.ex \
-        apps/api/lib/milos_training/messaging/participant.ex \
-        apps/api/test/milos_training/messaging/message_test.exs \
-        apps/api/test/milos_training/messaging/participant_test.exs
+git add apps/api/lib/palee/messaging/message.ex \
+        apps/api/lib/palee/messaging/participant.ex \
+        apps/api/test/palee/messaging/message_test.exs \
+        apps/api/test/palee/messaging/participant_test.exs
 git commit -m "feat(messaging): Message and Participant schemas"
 ```
 
@@ -548,17 +548,17 @@ git commit -m "feat(messaging): Message and Participant schemas"
 ## Task 7: ThreadPolicy domain module
 
 **Files:**
-- Create: `apps/api/lib/milos_training/messaging/domain/thread_policy.ex`
-- Create: `apps/api/test/milos_training/messaging/domain/thread_policy_test.exs`
+- Create: `apps/api/lib/palee/messaging/domain/thread_policy.ex`
+- Create: `apps/api/test/palee/messaging/domain/thread_policy_test.exs`
 
 - [ ] **Step 1: Write failing test**
 
 ```elixir
-# apps/api/test/milos_training/messaging/domain/thread_policy_test.exs
-defmodule MilosTraining.Messaging.Domain.ThreadPolicyTest do
+# apps/api/test/palee/messaging/domain/thread_policy_test.exs
+defmodule Palee.Messaging.Domain.ThreadPolicyTest do
   use ExUnit.Case, async: true
 
-  alias MilosTraining.Messaging.Domain.ThreadPolicy
+  alias Palee.Messaging.Domain.ThreadPolicy
 
   describe "canonical_pair/2" do
     test "always returns sorted pair" do
@@ -594,14 +594,14 @@ end
 - [ ] **Step 2: Run test — expect compile error**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/domain/thread_policy_test.exs 2>&1 | head -10
+cd apps/api && mix test test/palee/messaging/domain/thread_policy_test.exs 2>&1 | head -10
 ```
 
 - [ ] **Step 3: Implement ThreadPolicy**
 
 ```elixir
-# apps/api/lib/milos_training/messaging/domain/thread_policy.ex
-defmodule MilosTraining.Messaging.Domain.ThreadPolicy do
+# apps/api/lib/palee/messaging/domain/thread_policy.ex
+defmodule Palee.Messaging.Domain.ThreadPolicy do
   @doc "Sort two user IDs for canonical direct-thread deduplication."
   def canonical_pair(user_a_id, user_b_id), do: Enum.sort([user_a_id, user_b_id])
 
@@ -615,7 +615,7 @@ end
 - [ ] **Step 4: Run test — expect pass**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/domain/thread_policy_test.exs
+cd apps/api && mix test test/palee/messaging/domain/thread_policy_test.exs
 ```
 
 Expected: `3 tests, 0 failures`
@@ -625,15 +625,15 @@ Expected: `3 tests, 0 failures`
 ## Task 8: Port behaviours + Messaging facade
 
 **Files:**
-- Create: `apps/api/lib/milos_training/messaging/ports/thread_store.ex`
-- Create: `apps/api/lib/milos_training/messaging/ports/message_store.ex`
-- Create: `apps/api/lib/milos_training/messaging.ex`
+- Create: `apps/api/lib/palee/messaging/ports/thread_store.ex`
+- Create: `apps/api/lib/palee/messaging/ports/message_store.ex`
+- Create: `apps/api/lib/palee/messaging.ex`
 
 - [ ] **Step 1: Write ThreadStore port**
 
 ```elixir
-# apps/api/lib/milos_training/messaging/ports/thread_store.ex
-defmodule MilosTraining.Messaging.Ports.ThreadStore do
+# apps/api/lib/palee/messaging/ports/thread_store.ex
+defmodule Palee.Messaging.Ports.ThreadStore do
   @callback get_or_create_direct(String.t(), String.t()) ::
               {:ok, map()} | {:error, term()}
 
@@ -652,8 +652,8 @@ end
 - [ ] **Step 2: Write MessageStore port**
 
 ```elixir
-# apps/api/lib/milos_training/messaging/ports/message_store.ex
-defmodule MilosTraining.Messaging.Ports.MessageStore do
+# apps/api/lib/palee/messaging/ports/message_store.ex
+defmodule Palee.Messaging.Ports.MessageStore do
   @callback persist(map()) :: {:ok, map()} | {:error, term()}
 
   @callback list_page(String.t(), map()) :: [map()]
@@ -667,23 +667,23 @@ end
 - [ ] **Step 3: Write Messaging facade**
 
 ```elixir
-# apps/api/lib/milos_training/messaging.ex
-defmodule MilosTraining.Messaging do
-  alias MilosTraining.Messaging.Ports.{ThreadStore, MessageStore}
+# apps/api/lib/palee/messaging.ex
+defmodule Palee.Messaging do
+  alias Palee.Messaging.Ports.{ThreadStore, MessageStore}
 
   defp thread_store do
     Application.get_env(
-      :milos_training,
+      :palee,
       :messaging_thread_store,
-      MilosTraining.Infrastructure.Messaging.EctoThreadStore
+      Palee.Infrastructure.Messaging.EctoThreadStore
     )
   end
 
   defp message_store do
     Application.get_env(
-      :milos_training,
+      :palee,
       :messaging_message_store,
-      MilosTraining.Infrastructure.Messaging.EctoMessageStore
+      Palee.Infrastructure.Messaging.EctoMessageStore
     )
   end
 
@@ -725,7 +725,7 @@ Expected: no errors on new files.
 - [ ] **Step 5: Run all new tests**
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/
+cd apps/api && mix test test/palee/messaging/
 ```
 
 Expected: all pass.
@@ -733,8 +733,8 @@ Expected: all pass.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/messaging/ \
-        apps/api/test/milos_training/messaging/
+git add apps/api/lib/palee/messaging/ \
+        apps/api/test/palee/messaging/
 git commit -m "feat(messaging): ports, ThreadPolicy, Messaging facade"
 ```
 
@@ -743,7 +743,7 @@ git commit -m "feat(messaging): ports, ThreadPolicy, Messaging facade"
 ## Completion check
 
 ```bash
-cd apps/api && mix test test/milos_training/messaging/ && mix compile --warnings-as-errors 2>&1 | tail -5
+cd apps/api && mix test test/palee/messaging/ && mix compile --warnings-as-errors 2>&1 | tail -5
 ```
 
 Expected: all tests pass, no compile warnings.

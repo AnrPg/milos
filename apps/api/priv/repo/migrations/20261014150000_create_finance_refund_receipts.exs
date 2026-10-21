@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
+defmodule Palee.Repo.Migrations.CreateFinanceRefundReceipts do
   use Ecto.Migration
 
   # ADR-126 / TD-022: immutable refund receipts attached to the append-only
@@ -7,7 +7,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
   # no gaps. Additive only: no existing column is touched.
   #
   # Both tables mirror the sibling finance tables (ADR-091): `organization_id`
-  # stamped by `milos_apply_tenant_context()`, a bare-equality tenant policy,
+  # stamped by `palee_apply_tenant_context()`, a bare-equality tenant policy,
   # and ENABLE + FORCE row level security.
   @tables ~w(finance_document_counters finance_refund_receipts)
 
@@ -104,7 +104,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
     # ON DELETE SET NULL may clear (and the tenant trigger's no-op re-stamp of
     # organization_id) are allowed to change.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_finance_refund_receipts_immutable()
+    CREATE OR REPLACE FUNCTION palee_finance_refund_receipts_immutable()
     RETURNS trigger
     LANGUAGE plpgsql
     AS $$
@@ -141,7 +141,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
     execute("""
     CREATE TRIGGER finance_refund_receipts_immutable
     BEFORE UPDATE ON finance_refund_receipts
-    FOR EACH ROW EXECUTE FUNCTION milos_finance_refund_receipts_immutable()
+    FOR EACH ROW EXECUTE FUNCTION palee_finance_refund_receipts_immutable()
     """)
 
     Enum.each(@tables, &enforce_tenant_boundary/1)
@@ -151,7 +151,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
     Enum.each(@tables, &drop_tenant_boundary/1)
 
     execute("DROP TRIGGER IF EXISTS finance_refund_receipts_immutable ON finance_refund_receipts")
-    execute("DROP FUNCTION IF EXISTS milos_finance_refund_receipts_immutable()")
+    execute("DROP FUNCTION IF EXISTS palee_finance_refund_receipts_immutable()")
 
     drop table(:finance_refund_receipts)
     drop table(:finance_document_counters)
@@ -161,7 +161,7 @@ defmodule MilosTraining.Repo.Migrations.CreateFinanceRefundReceipts do
     execute("""
     CREATE TRIGGER #{table}_apply_tenant_context
     BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

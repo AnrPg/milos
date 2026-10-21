@@ -22,8 +22,8 @@ token counts (`promptTokenCount`, `cachedContentTokenCount`,
 1. **Measure at the source, per billed call.** Each Gemini adapter reads
    `usageMetadata` from every HTTP 200 response (including answers that later
    prove unusable, which are billed too) and emits one
-   `[:milos, :ai, :generation]` telemetry event through
-   `MilosTraining.AiUsage.report_generation/3`. Tokens are normalized by
+   `[:palee, :ai, :generation]` telemetry event through
+   `Palee.AiUsage.report_generation/3`. Tokens are normalized by
    `TokenUsage` so each is billed once: input (prompt + tool-use prompt −
    cached), cached input, output, thinking (billed at the output rate).
 2. **Operations group calls.** A user action (one analysis, one icon
@@ -41,7 +41,7 @@ token counts (`promptTokenCount`, `cachedContentTokenCount`,
 5. **Report.** `AiUsage.operation_usage/2` lists one operation's calls and
    totals; `AiUsage.usage_summary/2` aggregates a period per feature and model
    (operations, calls, tokens, cost, mean cost per operation).
-6. **Measure repeatably.** `mix milos.ai.measure_free_text` runs the real
+6. **Measure repeatably.** `mix palee.ai.measure_free_text` runs the real
    analysis N times per sample workout (`bench/free_text_workouts.txt` by
    default) and prints every run plus mean, sample sd and standard error of the
    mean for cost, tokens, calls and wall time; `--out` writes every run and

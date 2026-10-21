@@ -53,7 +53,7 @@ add three things:
      `visitor_scanned`.
 3. **The door scan is one pure decision.** `POST /api/check-in/scan` with
    `location_id` + `code` resolves the box through a narrow SECURITY DEFINER
-   lookup, `milos_door_location`, which returns only what the door itself
+   lookup, `palee_door_location`, which returns only what the door itself
    shows. It then gathers facts and asks `ResolveScan.decide/4`, in this
    order:
    1. A booking at this location whose class starts within the owner's
@@ -250,7 +250,7 @@ add three things:
 - The sound and green flash on a successful scan are web-only.
 
 ## Implementation Notes
-- Config: `config :milos_training, :wallet`, read by
+- Config: `config :palee, :wallet`, read by
   `Infrastructure.Wallet.Credentials`; PEM values are either the text or a
   file path. The env names are:
   - Apple: `WALLET_APPLE_PASS_TYPE_ID`, `WALLET_APPLE_TEAM_ID`,

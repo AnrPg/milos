@@ -234,7 +234,7 @@ export function PackagePanel({
           <p className="rounded-2xl px-4 py-3 text-sm" style={{ background: "color-mix(in srgb, var(--primary) 8%, transparent)", color: "var(--text-soft)" }}>
             {t("pkgEditSnapshotNotice")}
           </p>
-          <div className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--bg-soft)" }}>
+          <div className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel-muted)" }}>
             <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("pkgStep_type")}: {t(typeLabelKey(draft.packageType))}</span>
             <span className="text-xs" style={{ color: "var(--dim)" }}>{t("pkgTypeChangeHint")}</span>
           </div>
@@ -313,7 +313,7 @@ export function PackagePanel({
         </div>
       )}
       {showReconciliation ? (
-        <div className="fixed inset-0 z-[90] grid place-items-center bg-black/70 p-4" role="dialog" aria-modal="true" aria-labelledby="package-retirement-title">
+        <div className="fixed inset-0 z-[90] grid place-items-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-labelledby="package-retirement-title">
           <div className="w-full max-w-lg rounded-[1.75rem] p-6 shadow-2xl" style={{ background: "var(--bg)", border: "1px solid var(--border-strong)" }}>
             <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--warning)" }}>{i18n("requiredReconciliationd3a0ead")}</p>
             <h3 id="package-retirement-title" className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("moveCurrentSubscribersBeforeRetiringThisPackage8116b72")}</h3>
@@ -346,7 +346,7 @@ export function PackagePanel({
               <button
                 type="button"
                 className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-40"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 disabled={retireMutation.isPending || affectedRoles.some((role) => !replacements[role])}
                 onClick={() => retireMutation.mutate()}
               >

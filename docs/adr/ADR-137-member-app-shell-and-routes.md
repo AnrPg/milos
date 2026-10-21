@@ -96,7 +96,7 @@ lost from today's features.
   statistics stay behind `view_advanced_analytics`, and `/journal/pantheon`
   lights the Πρόοδος segment. Ροή merges finished executions and training-log
   entries per day (`journal-flow.ts`; ADR-118 keeps them disjoint) and keeps
-  "Share in Milos" from the old landing. The landing's "Log workout" pill
+  "Share in Palee" from the old landing. The landing's "Log workout" pill
   (`workout-cta.ts`) is replaced by Box's today card.
 - `MembershipEntitlement.tsx` was extracted from the billing page so Box and
   Πληρωμές share one entitlement card; `TrainingLogDialog` and

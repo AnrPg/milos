@@ -16,7 +16,7 @@ export const SUPPORTED_LOCALES = [
 export type AppLocale = (typeof SUPPORTED_LOCALES)[number];
 
 export const DEFAULT_LOCALE: AppLocale = "en";
-export const LOCALE_COOKIE = "milos_locale";
+export const LOCALE_COOKIE = "palee_locale";
 export const RTL_LOCALES = new Set<AppLocale>(["ar", "he"]);
 
 export const LOCALE_NAMES: Record<AppLocale, string> = {

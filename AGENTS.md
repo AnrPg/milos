@@ -43,7 +43,7 @@ Section §2 of the design doc (`2026-06-05-gym-app-design.md`) defines **non-neg
 
 ```
 Interface     →  Phoenix Controllers, Channels, Plugs
-Application   →  Use Cases / Application Services (MilosTraining.Application.*)
+Application   →  Use Cases / Application Services (Palee.Application.*)
 Domain        →  Pure Elixir business logic (no Ecto, no HTTP, no Redis)
 Infrastructure →  Ecto Repos, MeilisearchClient, PushDispatcher, RedisCache
 ```
@@ -59,18 +59,18 @@ Contexts: `Identity` · `Scheduling` · `Workouts` · `Execution` · `Gamificati
 - No context may call another context's internal modules or schemas.
 - Cross-context communication: Phoenix PubSub events OR context public API functions only.
 - An Application Service orchestrates cross-context operations (never a controller).
-- `mix milos.architecture` is the mandatory compile-dependency boundary gate.
+- `mix palee.architecture` is the mandatory compile-dependency boundary gate.
 
 ### Rule 3 — Light CQRS Within Each Context
 
 ```
-MilosTraining.<Context>.Commands.*   →  writes only (Ecto changesets)
-MilosTraining.<Context>.Queries.*    →  reads only (never mutate state)
+Palee.<Context>.Commands.*   →  writes only (Ecto changesets)
+Palee.<Context>.Queries.*    →  reads only (never mutate state)
 ```
 
 ### Rule 4 — Application Services for Cross-Context Operations
 
-`MilosTraining.Application.*` — one public `call/N` function, uses `with` for error propagation, no DB queries, no business logic (that lives in Domain).
+`Palee.Application.*` — one public `call/N` function, uses `with` for error propagation, no DB queries, no business logic (that lives in Domain).
 
 ### Rule 5 — Contract-First API
 
@@ -271,7 +271,7 @@ Append to `docs/technical_debt.md`:
   by default). Replaced values are freed only lazily, so re-putting a large
   term over and over aborts the VM with `literal_alloc: Cannot allocate …`.
   That is how OpenApiSpex's default cache crashed full test runs: it re-put
-  the ~23 MB spec once per controller action. `MilosTrainingWeb.OpenApiSpecCache`
+  the ~23 MB spec once per controller action. `PaleeWeb.OpenApiSpecCache`
   stores it once (a test checks this). Do not switch back to the default
   adapter, and never re-put large or frequently changing values into
   `:persistent_term`.
@@ -279,7 +279,7 @@ Append to `docs/technical_debt.md`:
   `ELIXIR_ERL_OPTIONS="+MIscs 4096"` in the shell. `mix.exs`, `config/*.exs`
   and aliases cannot set emulator flags, because the VM has already booted
   when Mix reads them. Treat needing the flag as a bug to fix.
-- `mix milos.export_openapi` (run by `npm run generate:api`) writes JSON with
+- `mix palee.export_openapi` (run by `npm run generate:api`) writes JSON with
   object keys sorted recursively. That keeps generated-client diffs limited
   to real contract changes.
 
@@ -288,11 +288,11 @@ Append to `docs/technical_debt.md`:
 ## Project Structure
 
 ```
-milos/
+palee/
 ├── AGENTS.md                          ← you are here
 ├── apps/
-│   ├── api/                           # Phoenix backend (MilosTraining)
-│   │   └── lib/milos_training/
+│   ├── api/                           # Phoenix backend (Palee)
+│   │   └── lib/palee/
 │   │       ├── identity/              # Bounded context
 │   │       ├── scheduling/            # Bounded context
 │   │       ├── workouts/              # Bounded context
@@ -331,7 +331,7 @@ milos/
 1. **Scale level labels:** `Beginner / Intermediate / Advanced` vs `Scaled / Rx / Rx+`
    — Confirm with the human before writing the `exercise_variations` migration.
 
-2. **App name / branding:** Milos Training — affects `mix.exs`, `package.json`, `manifest.json`.
+2. **App name / branding:** Palee — affects `mix.exs`, `package.json`, `manifest.json`.
    — Confirmed on 2026-06-05 for Phase 0 implementation.
 
 ---

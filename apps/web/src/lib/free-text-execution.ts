@@ -12,7 +12,7 @@ export type FreeTextExecutionWorkout = {
   timer_preset?: FreeTextTimerPreset | null;
 };
 
-const STORAGE_KEY = "milos:free-text-execution";
+const STORAGE_KEY = "palee:free-text-execution";
 
 export function storeFreeTextExecutionWorkout(workout: {
   id: string;

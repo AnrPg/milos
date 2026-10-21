@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateFinanceEntitlementUsageEntries do
+defmodule Palee.Repo.Migrations.CreateFinanceEntitlementUsageEntries do
   use Ecto.Migration
 
   def change do

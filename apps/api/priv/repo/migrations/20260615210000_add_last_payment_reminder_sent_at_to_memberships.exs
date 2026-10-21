@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddLastPaymentReminderSentAtToMemberships do
+defmodule Palee.Repo.Migrations.AddLastPaymentReminderSentAtToMemberships do
   use Ecto.Migration
 
   def change do

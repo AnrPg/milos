@@ -1,4 +1,4 @@
-defmodule MilosTraining.FakeSpeechTranscriber do
+defmodule Palee.FakeSpeechTranscriber do
   @moduledoc """
   Test stand-in behind the `SpeechTranscriber` port (ADR-175). Tells the
   calling process what it got (`{:speech_transcriber_called, clip,
@@ -8,10 +8,10 @@ defmodule MilosTraining.FakeSpeechTranscriber do
   adapter, so the daily cap can be exercised.
   """
 
-  @behaviour MilosTraining.VoiceLog.Ports.SpeechTranscriber
+  @behaviour Palee.VoiceLog.Ports.SpeechTranscriber
 
-  alias MilosTraining.AiUsage
-  alias MilosTraining.AiUsage.Domain.TokenUsage
+  alias Palee.AiUsage
+  alias Palee.AiUsage.Domain.TokenUsage
 
   @default "Έκανα 5 σετ των 5 back squat με 100 κιλά και 20 λεπτά κωπηλατική."
 

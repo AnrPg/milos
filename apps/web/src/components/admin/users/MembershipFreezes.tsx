@@ -161,7 +161,7 @@ export function MembershipFreezes({
         const state = freezeState(freeze, today);
         const cancellable = state === "upcoming" || state === "active";
         return (
-          <div className="rounded-xl p-3" key={freeze.id} style={{ background: "var(--bg-soft)" }}>
+          <div className="rounded-xl p-3" key={freeze.id} style={{ background: "var(--panel-muted)" }}>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <strong style={{ color: state === "cancelled" ? "var(--muted)" : "var(--text)" }}>
@@ -190,7 +190,7 @@ export function MembershipFreezes({
                     style={fieldStyle}
                     value={cancelReason}
                   />
-                  <button className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" disabled={cancel.isPending} onClick={() => cancel.mutate(freeze)} style={{ background: "var(--danger)", color: "white" }} type="button">
+                  <button className="rounded-full px-3 py-2 text-xs font-semibold disabled:opacity-50" disabled={cancel.isPending} onClick={() => cancel.mutate(freeze)} style={{ background: "var(--danger)", color: "var(--danger-contrast)" }} type="button">
                     {i18n("admFreezeCancel")}
                   </button>
                   <button className="rounded-full px-3 py-2 text-xs font-semibold" onClick={() => setCancelTarget(null)} style={{ background: "var(--border)", color: "var(--text-soft)" }} type="button">

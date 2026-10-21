@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateAssignmentMessages do
+defmodule Palee.Repo.Migrations.CreateAssignmentMessages do
   use Ecto.Migration
 
   def change do

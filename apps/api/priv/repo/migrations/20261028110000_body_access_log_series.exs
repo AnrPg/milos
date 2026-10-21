@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.BodyAccessLogSeries do
+defmodule Palee.Repo.Migrations.BodyAccessLogSeries do
   @moduledoc "ADR-158: a coach reading a client's metric series is logged too."
   use Ecto.Migration
 

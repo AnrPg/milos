@@ -1,0 +1,48 @@
+defmodule Palee.Application.UpdateAvatarTest do
+  use Palee.DataCase, async: false
+
+  alias Palee.Application.UpdateAvatar
+  alias Palee.Identity
+
+  setup do
+    original_avatar_storage = Application.fetch_env!(:palee, :avatar_storage)
+
+    Application.put_env(:palee, :avatar_storage, __MODULE__.AvatarStorage)
+
+    on_exit(fn ->
+      Application.put_env(:palee, :avatar_storage, original_avatar_storage)
+    end)
+  end
+
+  test "persists the public URL returned by avatar storage" do
+    {:ok, user} =
+      Identity.register(%{
+        nickname: "avatar_member",
+        password: "S3cur3P@ss!42",
+        role: :member,
+        email: "u#{System.unique_integer([:positive])}@placeholder.invalid"
+      })
+
+    avatar_key = "avatars/#{user.id}/avatar.jpg"
+
+    assert {:ok, updated_user} = UpdateAvatar.call(user.id, avatar_key)
+    assert updated_user.avatar_url == "https://s3-milos.4kq.net/milos-avatars/#{avatar_key}"
+    assert Identity.find_by_id(user.id).avatar_url == updated_user.avatar_url
+  end
+
+  defmodule AvatarStorage do
+    @behaviour Palee.Application.Ports.AvatarStorage
+
+    @impl true
+    def create_upload(_user_id, _content_type, _byte_size), do: {:error, :not_used}
+
+    @impl true
+    def validate_uploaded(user_id, "avatars/" <> _rest = key) do
+      if String.starts_with?(key, "avatars/#{user_id}/") do
+        {:ok, "https://s3-milos.4kq.net/milos-avatars/#{key}"}
+      else
+        {:error, :invalid_avatar_upload}
+      end
+    end
+  end
+end

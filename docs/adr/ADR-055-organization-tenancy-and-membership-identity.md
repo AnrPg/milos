@@ -4,12 +4,12 @@ Status: Accepted
 Amended: 2026-07-19
 
 ## Context
-Milos Training must serve independently operated gyms and coaching companies from one installation. The original model stores one global role on each user and assumes one gym owner, which cannot express isolated client administration, tenant-specific profiles, or one person participating in multiple organizations.
+Palee must serve independently operated gyms and coaching companies from one installation. The original model stores one global role on each user and assumes one gym owner, which cannot express isolated client administration, tenant-specific profiles, or one person participating in multiple organizations.
 
 ## Decision
-Introduce `MilosTraining.Organizations` as a bounded context owning organizations, organization memberships, organization domains, organization settings, and registration invitations. `Identity` continues to own global authentication principals and credentials. Roles that authorize tenant behavior move to organization memberships; platform-operator authority remains separate from tenant roles.
+Introduce `Palee.Organizations` as a bounded context owning organizations, organization memberships, organization domains, organization settings, and registration invitations. `Identity` continues to own global authentication principals and credentials. Roles that authorize tenant behavior move to organization memberships; platform-operator authority remains separate from tenant roles.
 
-Every tenant-owned record carries an `organization_id`. Cross-context registration and membership activation are orchestrated by `MilosTraining.Application.*` services using public context APIs and plain values.
+Every tenant-owned record carries an `organization_id`. Cross-context registration and membership activation are orchestrated by `Palee.Application.*` services using public context APIs and plain values.
 
 Global personal resources are explicitly classified rather than forced into a
 synthetic organization. Independent users may create an Identity account without an
@@ -31,7 +31,7 @@ require owner access, an accepted coaching relationship with its documented base
 or an explicit personal grant.
 
 ## Implementation Notes
-The T0-T3 foundation landed on 2026-08-03. `MilosTraining.Organizations` now owns a
+The T0-T3 foundation landed on 2026-08-03. `Palee.Organizations` now owns a
 store port, Ecto adapter, commands, queries, public API, membership-scoped
 authorization, and a transport-neutral `TenantContext`. Personal registration still
 creates no synthetic membership; invited identities retain a transitional global

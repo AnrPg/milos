@@ -82,7 +82,7 @@ export function NfcTagRow({ token, locationId }: { token: string; locationId: st
               disabled={write.isPending}
               onClick={() => write.mutate(link)}
               className="flex min-h-11 items-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {t("nfcWrite")}
             </button>

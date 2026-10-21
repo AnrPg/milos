@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddReferralRewardEventUniqueness do
+defmodule Palee.Repo.Migrations.AddReferralRewardEventUniqueness do
   use Ecto.Migration
 
   def up do

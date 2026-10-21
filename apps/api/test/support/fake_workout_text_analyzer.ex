@@ -1,6 +1,6 @@
-defmodule MilosTraining.Test.FakeWorkoutTextAnalyzer do
+defmodule Palee.Test.FakeWorkoutTextAnalyzer do
   @moduledoc false
-  @behaviour MilosTraining.Workouts.Ports.WorkoutTextAnalyzer
+  @behaviour Palee.Workouts.Ports.WorkoutTextAnalyzer
 
   # Tests steer the fake per process; Task.async callers inherit `$callers`.
   @impl true

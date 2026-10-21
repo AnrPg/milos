@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddProgressStateToWorkoutExecutions do
+defmodule Palee.Repo.Migrations.AddProgressStateToWorkoutExecutions do
   use Ecto.Migration
 
   def change do

@@ -60,7 +60,7 @@ export function BoxMessagePanel({ userId }: { userId: string }) {
             style={
               topic === item
                 ? { background: "var(--primary)", color: "var(--primary-contrast)" }
-                : { background: "var(--bg-soft)", color: "var(--text-soft)", border: "1px solid var(--border)" }
+                : { background: "var(--panel-muted)", color: "var(--text-soft)", border: "1px solid var(--border)" }
             }
           >
             {i18n(TOPIC_KEYS[item])}

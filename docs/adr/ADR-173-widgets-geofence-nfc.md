@@ -9,8 +9,8 @@ check-in) driven by a small signed widget token API; a geofenced check-in
 reminder per location (ADR-141 point) that ends in the same `ResolveScan`
 path; NFC door tags in the check-in settings. It builds on the Capacitor
 shell and the platform capability layer (ADR-171), where `widgets`,
-`geofence` and `nfc` light up when the `MilosWidgets`, `MilosGeofence` and
-`MilosNfc` plugins are present, and on the QR check-in of ADR-155.
+`geofence` and `nfc` light up when the `PaleeWidgets`, `PaleeGeofence` and
+`PaleeNfc` plugins are present, and on the QR check-in of ADR-155.
 
 ## Decision
 1. **Widget token.** New personal table `widget_tokens` (id, user,
@@ -56,27 +56,27 @@ shell and the platform capability layer (ADR-171), where `widgets`,
    and notifies no one. Migration `20261123100000_widgets_geofence_and_nfc`
    extends both check-in method constraints.
 6. **Native plugins** (minimal, in the app target, registered next to
-   `MilosHealth`: `MainActivity.registerPlugin`,
-   `MilosBridgeViewController.registerPluginInstance`):
-   - `MilosWidgets` `setSession({token, baseUrl, labels, paths})` / `clear()`.
+   `PaleeHealth`: `MainActivity.registerPlugin`,
+   `PaleeBridgeViewController.registerPluginInstance`):
+   - `PaleeWidgets` `setSession({token, baseUrl, labels, paths})` / `clear()`.
      Android: three `AppWidgetProvider`s (Water with a «+1» broadcast,
      Today, Check-in), `HttpURLConnection` off the main thread, last
-     snapshot cached, 30-minute refresh, 401 → «Άνοιξε το Milos». iOS: the
+     snapshot cached, 30-minute refresh, 401 → «Άνοιξε το Palee». iOS: the
      plugin writes the App Group `group.app.milos.member` and reloads
      timelines; the WidgetKit extension sources live in
-     `apps/mobile/ios/App/MilosWidgets/` (iOS 17, `AddWaterIntent` for the
+     `apps/mobile/ios/App/PaleeWidgets/` (iOS 17, `AddWaterIntent` for the
      interactive «+1»).
-   - `MilosGeofence` `checkPermissions` / `requestPermissions` /
+   - `PaleeGeofence` `checkPermissions` / `requestPermissions` /
      `setRegions({regions})` / `clear()`. Android: Play Services
      geofencing (`play-services-location` 21.3.0, `INITIAL_TRIGGER_ENTER`),
      a receiver that shows one reminder per open window, a boot/update
-     receiver that re-registers. iOS: `MilosGeofenceMonitor`
+     receiver that re-registers. iOS: `PaleeGeofenceMonitor`
      (`CLLocationManager`, started in `AppDelegate` so background relaunches
      reach it, `requestState` for "already inside"), local notifications;
      a tap posts `.capacitorOpenURL`, so the web app's existing
      `appUrlOpen` route handles it (Android opens the same URL as an App
      Link intent).
-   - `MilosNfc` `isAvailable()` / `write({url})`. Android reader mode with
+   - `PaleeNfc` `isAvailable()` / `write({url})`. Android reader mode with
      `Ndef` / `NdefFormatable` (60 s); iOS `NFCNDEFReaderSession` writing a
      URI record. Reading needs no code: iOS opens universal links from NDEF
      tags; Android gets an `NDEF_DISCOVERED` filter for `https://<host>/c/`
@@ -90,8 +90,8 @@ shell and the platform capability layer (ADR-171), where `widgets`,
    regions and turns the reminder off for the next person.
 8. **iOS scene fix.** `SceneDelegate` built its window with a plain
    `CAPBridgeViewController()`, bypassing `Main.storyboard`, so no app
-   plugin (MilosHealth either) was registered on iOS. It now uses
-   `MilosBridgeViewController()`.
+   plugin (PaleeHealth either) was registered on iOS. It now uses
+   `PaleeBridgeViewController()`.
 
 ## Decisions
 Product and UX choices made without a board (owner's standing instruction:
@@ -170,9 +170,9 @@ booking windows gives a useful reminder without any server-side location.
 2. Play Console: complete the **background location** declaration (video of
    the reminder) and the data-safety answers (location used on device only).
 3. Store listings: mention widgets, the arrival reminder and NFC.
-4. Xcode, once: File › New › Target › Widget Extension `MilosWidgets`
+4. Xcode, once: File › New › Target › Widget Extension `PaleeWidgets`
    (bundle id `app.milos.member.widgets`, iOS 17, no configuration intent),
-   replace the generated files with `apps/mobile/ios/App/MilosWidgets/`,
+   replace the generated files with `apps/mobile/ios/App/PaleeWidgets/`,
    set its entitlements file, add the App Groups capability to both targets.
 5. Buy NTAG213/215 stickers for the doors.
 

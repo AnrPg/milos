@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
+defmodule Palee.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
   @moduledoc """
   ADR-163: WOD goals.
 
@@ -59,7 +59,7 @@ defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
     execute("""
     CREATE TRIGGER workout_goals_apply_tenant_context
     BEFORE INSERT OR UPDATE ON workout_goals
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""
@@ -96,10 +96,10 @@ defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
 
     # The entry a feedback row is about: its owner, gym, workout and whether
     # it was voided. SECURITY DEFINER for the same reason as
-    # milos_journal_entry_owner: executions and logs sit under other scopes
+    # palee_journal_entry_owner: executions and logs sit under other scopes
     # than the member's feedback routes. It answers about one entry.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_goal_feedback_entry(kind text, entry uuid)
+    CREATE OR REPLACE FUNCTION palee_goal_feedback_entry(kind text, entry uuid)
     RETURNS TABLE (user_id uuid, organization_id uuid, master_workout_id uuid, voided boolean)
     LANGUAGE sql
     STABLE
@@ -121,7 +121,7 @@ defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
     USING (user_id = NULLIF(current_setting('app.user_id', true), '')::uuid)
     WITH CHECK (
       user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
-      AND user_id = (SELECT owner.user_id FROM milos_journal_entry_owner(entry_kind, entry_id) owner)
+      AND user_id = (SELECT owner.user_id FROM palee_journal_entry_owner(entry_kind, entry_id) owner)
     )
     """)
 
@@ -129,8 +129,8 @@ defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
     CREATE POLICY goal_feedback_coach_read_policy ON goal_feedback
     FOR SELECT
     USING (
-      milos_entry_visible_to_acting_coach(
-        user_id, organization_id, milos_journal_entry_rung(entry_kind, entry_id)
+      palee_entry_visible_to_acting_coach(
+        user_id, organization_id, palee_journal_entry_rung(entry_kind, entry_id)
       )
     )
     """)
@@ -139,9 +139,9 @@ defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
     CREATE POLICY goal_feedback_coach_shared_read_policy ON goal_feedback
     FOR SELECT
     USING (
-      milos_entry_shared_with_acting_coach(
+      palee_entry_shared_with_acting_coach(
         entry_kind, entry_id, user_id, organization_id,
-        milos_journal_entry_rung(entry_kind, entry_id)
+        palee_journal_entry_rung(entry_kind, entry_id)
       )
     )
     """)
@@ -152,7 +152,7 @@ defmodule MilosTraining.Repo.Migrations.CreateWorkoutGoalsAndGoalFeedback do
 
   def down do
     drop table(:goal_feedback)
-    execute("DROP FUNCTION IF EXISTS milos_goal_feedback_entry(text, uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_goal_feedback_entry(text, uuid)")
     drop table(:workout_goals)
   end
 end

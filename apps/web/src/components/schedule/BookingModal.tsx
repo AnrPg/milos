@@ -33,9 +33,9 @@ export function BookingModal({
   const common = useTranslations("Common");
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "rgba(0,0,0,0.7)" }}>
+    <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "var(--scrim)" }}>
       <div
-        className="w-full max-w-md rounded-[2rem] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.7)]"
+        className="w-full max-w-md rounded-[2rem] p-6 shadow-[var(--shadow-lg)]"
         style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
       >
         <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("confirm")}</p>

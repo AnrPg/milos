@@ -1,6 +1,6 @@
-defmodule MilosTraining.FakeWalletUpdater do
+defmodule Palee.FakeWalletUpdater do
   @moduledoc "Records Wallet updates (ADR-155) as messages to the processes that subscribed."
-  @behaviour MilosTraining.Wallet.Ports.PassUpdater
+  @behaviour Palee.Wallet.Ports.PassUpdater
 
   def subscribe, do: :persistent_term.put({__MODULE__, :listener}, self())
   def unsubscribe, do: :persistent_term.erase({__MODULE__, :listener})
@@ -20,9 +20,9 @@ defmodule MilosTraining.FakeWalletUpdater do
   end
 end
 
-defmodule MilosTraining.FakeWalletImageSource do
+defmodule Palee.FakeWalletImageSource do
   @moduledoc false
-  @behaviour MilosTraining.Wallet.Ports.ImageSource
+  @behaviour Palee.Wallet.Ports.ImageSource
 
   @impl true
   def fetch(_url), do: {:error, :not_fetched_in_tests}

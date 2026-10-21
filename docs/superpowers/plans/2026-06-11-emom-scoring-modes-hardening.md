@@ -14,12 +14,12 @@
 
 | File | Action | Responsibility |
 |------|--------|----------------|
-| `apps/api/lib/milos_training/workouts/domain/timer_config.ex` | Modify | Validate `scoring_mode`, `amrap_scoring_style`, `max_windows` |
-| `apps/api/lib/milos_training/execution/domain/timer_sequence_builder.ex` | Modify | Use `max_windows` for "to_failure" mode; full interval per round |
-| `apps/api/lib/milos_training/execution/domain/progress_snapshotter.ex` | Modify | Dedicated EMOM snapshot logic per scoring mode |
-| `apps/api/test/milos_training/workouts/domain/timer_config_test.exs` | Modify | Tests for new field validation |
-| `apps/api/test/milos_training/execution/domain/timer_sequence_builder_test.exs` | Create | Tests for EMOM segment generation per mode |
-| `apps/api/test/milos_training/execution/domain/progress_snapshotter_test.exs` | Modify | EMOM snapshot tests for all 4 modes |
+| `apps/api/lib/palee/workouts/domain/timer_config.ex` | Modify | Validate `scoring_mode`, `amrap_scoring_style`, `max_windows` |
+| `apps/api/lib/palee/execution/domain/timer_sequence_builder.ex` | Modify | Use `max_windows` for "to_failure" mode; full interval per round |
+| `apps/api/lib/palee/execution/domain/progress_snapshotter.ex` | Modify | Dedicated EMOM snapshot logic per scoring mode |
+| `apps/api/test/palee/workouts/domain/timer_config_test.exs` | Modify | Tests for new field validation |
+| `apps/api/test/palee/execution/domain/timer_sequence_builder_test.exs` | Create | Tests for EMOM segment generation per mode |
+| `apps/api/test/palee/execution/domain/progress_snapshotter_test.exs` | Modify | EMOM snapshot tests for all 4 modes |
 | `apps/web/src/types/workout.ts` | Modify | `EmomScoringMode` type, new `ScoreType` values, `DraftSection` fields |
 | `apps/web/src/stores/workout-creation.ts` | Modify | Parse/serialize `emomScoringMode`, `emomAmrapScoringStyle` |
 | `apps/web/src/components/workouts/creation/SectionConfig.tsx` | Modify | Scoring mode picker UI for EMOM formats |
@@ -30,8 +30,8 @@
 ## Task 1: Backend — TimerConfig validation for new fields
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/workouts/domain/timer_config.ex`
-- Modify: `apps/api/test/milos_training/workouts/domain/timer_config_test.exs`
+- Modify: `apps/api/lib/palee/workouts/domain/timer_config.ex`
+- Modify: `apps/api/test/palee/workouts/domain/timer_config_test.exs`
 
 ### Context
 
@@ -43,7 +43,7 @@ Currently EMOM/complex_emom timer configs have no `scoring_mode`, `amrap_scoring
 
 - [ ] **Step 1: Write the failing tests**
 
-Add to `apps/api/test/milos_training/workouts/domain/timer_config_test.exs`:
+Add to `apps/api/test/palee/workouts/domain/timer_config_test.exs`:
 
 ```elixir
 describe "emom scoring_mode" do
@@ -125,7 +125,7 @@ end
 - [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-cd apps/api && mix test test/milos_training/workouts/domain/timer_config_test.exs
+cd apps/api && mix test test/palee/workouts/domain/timer_config_test.exs
 ```
 
 Expected: failures about `scoring_mode` not being preserved, `amrap_scoring_style` not validated.
@@ -135,7 +135,7 @@ Expected: failures about `scoring_mode` not being preserved, `amrap_scoring_styl
 Replace the full `timer_config.ex` with:
 
 ```elixir
-defmodule MilosTraining.Workouts.Domain.TimerConfig do
+defmodule Palee.Workouts.Domain.TimerConfig do
   @moduledoc """
   Pure validation and normalization for workout section timer configuration.
   """
@@ -267,7 +267,7 @@ end
 - [ ] **Step 4: Run tests**
 
 ```bash
-cd apps/api && mix test test/milos_training/workouts/domain/timer_config_test.exs
+cd apps/api && mix test test/palee/workouts/domain/timer_config_test.exs
 ```
 
 Expected: all tests pass.
@@ -275,7 +275,7 @@ Expected: all tests pass.
 - [ ] **Step 5: Format and lint**
 
 ```bash
-cd apps/api && mix format lib/milos_training/workouts/domain/timer_config.ex && mix credo --strict lib/milos_training/workouts/domain/timer_config.ex
+cd apps/api && mix format lib/palee/workouts/domain/timer_config.ex && mix credo --strict lib/palee/workouts/domain/timer_config.ex
 ```
 
 Expected: no warnings or errors.
@@ -283,8 +283,8 @@ Expected: no warnings or errors.
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/workouts/domain/timer_config.ex \
-        apps/api/test/milos_training/workouts/domain/timer_config_test.exs
+git add apps/api/lib/palee/workouts/domain/timer_config.ex \
+        apps/api/test/palee/workouts/domain/timer_config_test.exs
 git commit -m "feat(timer): add scoring_mode, amrap_scoring_style, max_windows to EMOM timer config"
 ```
 
@@ -293,8 +293,8 @@ git commit -m "feat(timer): add scoring_mode, amrap_scoring_style, max_windows t
 ## Task 2: Backend — TimerSequenceBuilder for "to_failure" mode
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/execution/domain/timer_sequence_builder.ex`
-- Create: `apps/api/test/milos_training/execution/domain/timer_sequence_builder_test.exs`
+- Modify: `apps/api/lib/palee/execution/domain/timer_sequence_builder.ex`
+- Create: `apps/api/test/palee/execution/domain/timer_sequence_builder_test.exs`
 
 ### Context
 
@@ -304,13 +304,13 @@ The key change: when `scoring_mode = "to_failure"`, pass `effective_duration = 0
 
 - [ ] **Step 1: Write the failing tests**
 
-Create `apps/api/test/milos_training/execution/domain/timer_sequence_builder_test.exs`:
+Create `apps/api/test/palee/execution/domain/timer_sequence_builder_test.exs`:
 
 ```elixir
-defmodule MilosTraining.Execution.Domain.TimerSequenceBuilderTest do
+defmodule Palee.Execution.Domain.TimerSequenceBuilderTest do
   use ExUnit.Case, async: true
 
-  alias MilosTraining.Execution.Domain.TimerSequenceBuilder
+  alias Palee.Execution.Domain.TimerSequenceBuilder
 
   defp section(timer_config, exercises \\ []) do
     %{
@@ -423,14 +423,14 @@ end
 - [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-cd apps/api && mix test test/milos_training/execution/domain/timer_sequence_builder_test.exs
+cd apps/api && mix test test/palee/execution/domain/timer_sequence_builder_test.exs
 ```
 
 Expected: failures — `to_failure` tests fail because `max_windows` is ignored.
 
 - [ ] **Step 3: Implement the change**
 
-In `apps/api/lib/milos_training/execution/domain/timer_sequence_builder.ex`, replace `build_emom_segments/2`:
+In `apps/api/lib/palee/execution/domain/timer_sequence_builder.ex`, replace `build_emom_segments/2`:
 
 ```elixir
 defp build_emom_segments(section, exercises) do
@@ -475,7 +475,7 @@ end
 - [ ] **Step 4: Run tests**
 
 ```bash
-cd apps/api && mix test test/milos_training/execution/domain/timer_sequence_builder_test.exs
+cd apps/api && mix test test/palee/execution/domain/timer_sequence_builder_test.exs
 ```
 
 Expected: all tests pass.
@@ -483,14 +483,14 @@ Expected: all tests pass.
 - [ ] **Step 5: Format and lint**
 
 ```bash
-cd apps/api && mix format lib/milos_training/execution/domain/timer_sequence_builder.ex && mix credo --strict lib/milos_training/execution/domain/timer_sequence_builder.ex
+cd apps/api && mix format lib/palee/execution/domain/timer_sequence_builder.ex && mix credo --strict lib/palee/execution/domain/timer_sequence_builder.ex
 ```
 
 - [ ] **Step 6: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/execution/domain/timer_sequence_builder.ex \
-        apps/api/test/milos_training/execution/domain/timer_sequence_builder_test.exs
+git add apps/api/lib/palee/execution/domain/timer_sequence_builder.ex \
+        apps/api/test/palee/execution/domain/timer_sequence_builder_test.exs
 git commit -m "feat(timer): handle to_failure mode with max_windows in EMOM segment builder"
 ```
 
@@ -499,8 +499,8 @@ git commit -m "feat(timer): handle to_failure mode with max_windows in EMOM segm
 ## Task 3: Backend — ProgressSnapshotter EMOM scoring mode dispatch
 
 **Files:**
-- Modify: `apps/api/lib/milos_training/execution/domain/progress_snapshotter.ex`
-- Modify: `apps/api/test/milos_training/execution/domain/progress_snapshotter_test.exs`
+- Modify: `apps/api/lib/palee/execution/domain/progress_snapshotter.ex`
+- Modify: `apps/api/test/palee/execution/domain/progress_snapshotter_test.exs`
 
 ### Context
 
@@ -517,7 +517,7 @@ For Complex EMOM AMRAP with `amrap_scoring_style: "lowest_window"`, the final sc
 
 - [ ] **Step 1: Write the failing tests**
 
-Add to `apps/api/test/milos_training/execution/domain/progress_snapshotter_test.exs`:
+Add to `apps/api/test/palee/execution/domain/progress_snapshotter_test.exs`:
 
 ```elixir
 # Helper: build an EMOM segment for testing
@@ -702,14 +702,14 @@ end
 - [ ] **Step 2: Run tests to confirm they fail**
 
 ```bash
-cd apps/api && mix test test/milos_training/execution/domain/progress_snapshotter_test.exs
+cd apps/api && mix test test/palee/execution/domain/progress_snapshotter_test.exs
 ```
 
 Expected: all new tests fail.
 
 - [ ] **Step 3: Implement the changes**
 
-In `apps/api/lib/milos_training/execution/domain/progress_snapshotter.ex`, make the following changes:
+In `apps/api/lib/palee/execution/domain/progress_snapshotter.ex`, make the following changes:
 
 **3a. Add EMOM cases in `snapshot_for_section` for `:progress`**
 
@@ -883,7 +883,7 @@ end
 - [ ] **Step 4: Run tests**
 
 ```bash
-cd apps/api && mix test test/milos_training/execution/domain/progress_snapshotter_test.exs
+cd apps/api && mix test test/palee/execution/domain/progress_snapshotter_test.exs
 ```
 
 Expected: all tests pass.
@@ -899,14 +899,14 @@ Expected: all existing tests still pass.
 - [ ] **Step 6: Format and lint**
 
 ```bash
-cd apps/api && mix format lib/milos_training/execution/domain/progress_snapshotter.ex && mix credo --strict lib/milos_training/execution/domain/progress_snapshotter.ex
+cd apps/api && mix format lib/palee/execution/domain/progress_snapshotter.ex && mix credo --strict lib/palee/execution/domain/progress_snapshotter.ex
 ```
 
 - [ ] **Step 7: Commit**
 
 ```bash
-git add apps/api/lib/milos_training/execution/domain/progress_snapshotter.ex \
-        apps/api/test/milos_training/execution/domain/progress_snapshotter_test.exs
+git add apps/api/lib/palee/execution/domain/progress_snapshotter.ex \
+        apps/api/test/palee/execution/domain/progress_snapshotter_test.exs
 git commit -m "feat(scoring): implement EMOM scoring mode dispatch in ProgressSnapshotter"
 ```
 

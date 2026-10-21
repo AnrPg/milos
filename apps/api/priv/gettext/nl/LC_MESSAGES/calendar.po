@@ -25,11 +25,11 @@ msgstr "Toegewezen training"
 msgid "Workout: %{title}"
 msgstr "Training: %{title}"
 
-msgid "Assigned workout in TrainingJournal."
-msgstr "Toegewezen training in TrainingJournal."
+msgid "Assigned workout in Palee."
+msgstr "Toegewezen training in Palee."
 
-msgid "Scheduled %{name} class in TrainingJournal."
-msgstr "Geplande %{name} les in TrainingJournal."
+msgid "Scheduled %{name} class in Palee."
+msgstr "Geplande %{name} les in Palee."
 
 msgid "Pending"
 msgstr "In behandeling"
@@ -40,8 +40,8 @@ msgstr "Goedgekeurd"
 msgid "Scheduled"
 msgstr "Gepland"
 
-msgid "TrainingJournal class booking status: %{status}."
-msgstr "Boekingsstatus TrainingJournal-les: %{status}."
+msgid "Palee class booking status: %{status}."
+msgstr "Boekingsstatus Palee-les: %{status}."
 
 msgid "Trial at %{box}: %{name}"
 msgstr "Proefles bij %{box}: %{name}"

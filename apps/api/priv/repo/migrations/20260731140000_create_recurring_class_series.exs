@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateRecurringClassSeries do
+defmodule Palee.Repo.Migrations.CreateRecurringClassSeries do
   use Ecto.Migration
 
   def change do

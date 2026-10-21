@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateCommunity do
+defmodule Palee.Repo.Migrations.CreateCommunity do
   use Ecto.Migration
 
   # ADR-138: the Community context. Clubs (a gym's own club first), their
@@ -278,7 +278,7 @@ defmodule MilosTraining.Repo.Migrations.CreateCommunity do
       """
       CREATE TRIGGER #{table}_apply_tenant_context
       BEFORE INSERT OR UPDATE ON #{table}
-      FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+      FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
       """,
       "DROP TRIGGER IF EXISTS #{table}_apply_tenant_context ON #{table}"
     )
@@ -296,7 +296,7 @@ defmodule MilosTraining.Repo.Migrations.CreateCommunity do
       """
       CREATE POLICY #{table}_member_read_policy ON #{table}
       FOR SELECT
-      USING (milos_acting_user_belongs_to(organization_id))
+      USING (palee_acting_user_belongs_to(organization_id))
       """,
       "DROP POLICY IF EXISTS #{table}_member_read_policy ON #{table}"
     )

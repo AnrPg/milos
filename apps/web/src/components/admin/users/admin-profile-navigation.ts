@@ -1,6 +1,6 @@
 import { SECTION_TAB } from "@/components/admin/users/member-profile-tabs";
 
-export const ADMIN_PROFILE_SECTION_REQUEST = "milos:admin-profile-section-request";
+export const ADMIN_PROFILE_SECTION_REQUEST = "palee:admin-profile-section-request";
 
 export type AdminProfileSectionRequest = CustomEvent<{ section: string }>;
 

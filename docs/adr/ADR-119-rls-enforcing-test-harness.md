@@ -12,10 +12,10 @@ organization commands ship broken (TD-046). `RLSCase` could prove a single
 policy on a raw connection, but it could not run application code.
 
 ## Decision
-1. Every `MilosTrainingWeb.ConnCase` test dispatches requests through
-   `MilosTrainingWeb.RLSEnforcedEndpoint`. That test-only endpoint runs each
+1. Every `PaleeWeb.ConnCase` test dispatches requests through
+   `PaleeWeb.RLSEnforcedEndpoint`. That test-only endpoint runs each
    request inside the sandbox transaction as the non-superuser
-   `milos_test_runtime` role (`SET LOCAL ROLE`) and then restores the role.
+   `palee_test_runtime` role (`SET LOCAL ROLE`) and then restores the role.
    Fixtures and assertions outside the request keep the superuser role, so
    existing tests did not need rewriting, while the controller → application →
    store path runs exactly as it does in production.
@@ -23,7 +23,7 @@ policy on a raw connection, but it could not run application code.
    the debt item that explains why.
 3. Application- and store-level tests can enforce RLS for the whole test with
    `@moduletag :rls_enforced`, using `bypass_rls/1` only for fixture setup.
-   `MILOS_TEST_ENFORCE_RLS=1` applies this to every DataCase test, as a probe
+   `PALEE_TEST_ENFORCE_RLS=1` applies this to every DataCase test, as a probe
    for migrating further tests.
 
 ## Rationale
@@ -59,7 +59,7 @@ change:
   could not write notifications.** `organization_memberships` RLS shows a
   member only their own row, and `notifications` is owner-only, including on
   INSERT. Fixes:
-  - a narrow `SECURITY DEFINER` function, `milos_organization_user_ids/2`,
+  - a narrow `SECURITY DEFINER` function, `palee_organization_user_ids/2`,
     returns an organization's active (optionally role-filtered) user ids, and
     only to sessions inside that organization;
   - staff and co-member lookups use it within a tenant scope;

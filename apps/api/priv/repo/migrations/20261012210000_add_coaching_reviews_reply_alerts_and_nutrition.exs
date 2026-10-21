@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddCoachingReviewsReplyAlertsAndNutrition do
+defmodule Palee.Repo.Migrations.AddCoachingReviewsReplyAlertsAndNutrition do
   use Ecto.Migration
 
   # ADR-098: form reviews, overdue coach replies and nutrition plans.
@@ -143,7 +143,7 @@ defmodule MilosTraining.Repo.Migrations.AddCoachingReviewsReplyAlertsAndNutritio
     execute("""
     CREATE TRIGGER #{table}_apply_tenant_context
     BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

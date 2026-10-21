@@ -13,7 +13,7 @@ global role is not `admin`. This was TD-044.
 
 ## Decision
 Every application-level admin fanout resolves recipients through
-`MilosTraining.Application.TenantStaffRecipients.user_ids/1`. It takes an
+`Palee.Application.TenantStaffRecipients.user_ids/1`. It takes an
 ordered list of ownership sources — the caller's tenant context first, then
 the entity the operation produced — and returns the active
 owner/admin/coach memberships of the first organization found
@@ -49,7 +49,7 @@ single place and makes regressions greppable.
 - The injury API response gains an optional, nullable `organization_id` so
   member-side flows can route provenance-bearing injuries to the right tenant.
 - A regression test fails if `list_by_role(:admin)` reappears under
-  `lib/milos_training/application/`.
+  `lib/palee/application/`.
 
 ## Implementation Notes
 - `CreateWorkoutWithSections` had no callers and was removed rather than

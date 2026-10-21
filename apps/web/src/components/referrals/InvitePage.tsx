@@ -87,7 +87,7 @@ export function InvitePage({
             <span
               aria-hidden="true"
               className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl text-lg font-extrabold"
-              style={{ background: box.primary_color ?? "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {box.name.slice(0, 2).toUpperCase()}
             </span>

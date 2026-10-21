@@ -158,7 +158,7 @@ export function DoorKiosk({ locationId }: { locationId: string }) {
       ref={rootRef}
       className="relative flex min-h-dvh flex-col overflow-hidden"
       data-testid="door-kiosk"
-      style={{ background: welcome ? "color-mix(in srgb, var(--success, #22c55e) 22%, var(--bg))" : "var(--bg)", color: "var(--text)", transition: "background 300ms" }}
+      style={{ background: welcome ? "color-mix(in srgb, var(--success) 22%, var(--bg))" : "var(--bg)", color: "var(--text)", transition: "background 300ms" }}
     >
       {welcome ? <div key={welcome.id} aria-hidden="true" className="checkin-flash pointer-events-none absolute inset-0" /> : null}
 
@@ -175,11 +175,11 @@ export function DoorKiosk({ locationId }: { locationId: string }) {
         </div>
         <div className="flex shrink-0 items-center gap-2">
           {soundOn ? (
-            <span className="rounded-full px-3 py-1.5 text-xs font-bold" style={{ color: "var(--success, #22c55e)", border: "1px solid currentColor" }}>
+            <span className="rounded-full px-3 py-1.5 text-xs font-bold" style={{ color: "var(--success)", border: "1px solid currentColor" }}>
               {t("soundOn")}
             </span>
           ) : (
-            <button type="button" onClick={enableSound} className="min-h-11 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <button type="button" onClick={enableSound} className="min-h-11 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {t("enableSound")}
             </button>
           )}
@@ -224,7 +224,7 @@ export function DoorKiosk({ locationId }: { locationId: string }) {
         <section className="flex max-w-xl flex-col gap-[3vmin] text-center landscape:text-start">
           <div aria-live="polite" className="min-h-[4.5rem]">
             {welcome ? (
-              <p className="font-black" style={{ fontSize: "clamp(1.8rem, 6vmin, 4.5rem)", color: "var(--success, #22c55e)" }} data-testid="door-welcome">
+              <p className="font-black" style={{ fontSize: "clamp(1.8rem, 6vmin, 4.5rem)", color: "var(--success)" }} data-testid="door-welcome">
                 {welcome.name ? t("welcome", { name: welcome.name }) : t("welcomeAnon")}
               </p>
             ) : (
@@ -245,7 +245,7 @@ export function DoorKiosk({ locationId }: { locationId: string }) {
           ) : null}
 
           {offline ? (
-            <p role="status" className="rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning, #f59e0b) 16%, transparent)", color: "var(--text)" }} data-testid="door-offline">
+            <p role="status" className="rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--warning) 16%, transparent)", color: "var(--text)" }} data-testid="door-offline">
               {frame.current ? t("doorOffline", { minutes: minutesLeft }) : t("doorOfflineOut")}
             </p>
           ) : null}

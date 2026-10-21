@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CommunityEvents do
+defmodule Palee.Repo.Migrations.CommunityEvents do
   use Ecto.Migration
 
   # ADR-153 (P2-M5): events per club.
@@ -205,7 +205,7 @@ defmodule MilosTraining.Repo.Migrations.CommunityEvents do
 
     # The events a person has a row on, at any box (guests, open events).
     execute("""
-    CREATE OR REPLACE FUNCTION milos_acting_user_event_ids()
+    CREATE OR REPLACE FUNCTION palee_acting_user_event_ids()
     RETURNS SETOF uuid
     LANGUAGE sql
     STABLE
@@ -222,13 +222,13 @@ defmodule MilosTraining.Repo.Migrations.CommunityEvents do
     execute("""
     CREATE POLICY community_events_member_read_policy ON community_events
     FOR SELECT
-    USING (milos_acting_user_belongs_to(organization_id))
+    USING (palee_acting_user_belongs_to(organization_id))
     """)
 
     execute("""
     CREATE POLICY community_events_open_club_read_policy ON community_events
     FOR SELECT
-    USING (club_id IN (SELECT milos_acting_user_club_ids()))
+    USING (club_id IN (SELECT palee_acting_user_club_ids()))
     """)
 
     execute("""
@@ -240,7 +240,7 @@ defmodule MilosTraining.Repo.Migrations.CommunityEvents do
     execute("""
     CREATE POLICY community_events_attendee_read_policy ON community_events
     FOR SELECT
-    USING (id IN (SELECT milos_acting_user_event_ids()))
+    USING (id IN (SELECT palee_acting_user_event_ids()))
     """)
 
     execute("""
@@ -277,7 +277,7 @@ defmodule MilosTraining.Repo.Migrations.CommunityEvents do
 
     drop table(:community_event_attendees)
     drop table(:community_events)
-    execute("DROP FUNCTION IF EXISTS milos_acting_user_event_ids()")
+    execute("DROP FUNCTION IF EXISTS palee_acting_user_event_ids()")
   end
 
   defp replace_attachment_check(types) do
@@ -311,7 +311,7 @@ defmodule MilosTraining.Repo.Migrations.CommunityEvents do
     execute("""
     CREATE TRIGGER #{table}_apply_tenant_context
     BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

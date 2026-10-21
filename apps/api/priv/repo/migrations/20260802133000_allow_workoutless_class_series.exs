@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AllowWorkoutlessClassSeries do
+defmodule Palee.Repo.Migrations.AllowWorkoutlessClassSeries do
   use Ecto.Migration
 
   def up do

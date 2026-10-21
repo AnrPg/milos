@@ -287,7 +287,7 @@ describe("PlatformOrganizationsPage", () => {
 
     fireEvent.click(openLink);
 
-    expect(window.localStorage.getItem("milos:selected-organization-slug")).toBe("north-harbor");
+    expect(window.localStorage.getItem("palee:selected-organization-slug")).toBe("north-harbor");
   });
 
   it("permanently deletes an organization only after explicit confirmation", async () => {

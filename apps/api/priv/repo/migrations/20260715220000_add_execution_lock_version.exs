@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddExecutionLockVersion do
+defmodule Palee.Repo.Migrations.AddExecutionLockVersion do
   use Ecto.Migration
 
   def change do

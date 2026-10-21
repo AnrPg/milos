@@ -149,7 +149,7 @@ It translates socket payloads into:
 - `window` `CustomEvent`s for non-query screens that already have imperative load
   functions
 
-The browser event name is `milos:user-sync` and is normalized by
+The browser event name is `palee:user-sync` and is normalized by
 `apps/web/src/lib/user-sync.ts`.
 
 ## Notes On Message-Like Features

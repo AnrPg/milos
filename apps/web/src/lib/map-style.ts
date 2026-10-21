@@ -1,7 +1,8 @@
-// Street maps (Πρόγραμμα location picker, later Γύρω μου). The style is a
+// Street maps (Πρόγραμμα location picker, Γύρω μου). The style is a
 // MapLibre style URL; OpenFreeMap needs no key. Self-hosters point
-// NEXT_PUBLIC_MAP_STYLE_URL at their own tiles.
-const DEFAULT_MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/liberty";
+// NEXT_PUBLIC_MAP_STYLE_URL at their own tiles. Positron is the calm base:
+// lib/map-theme.ts repaints its colours from the theme.
+const DEFAULT_MAP_STYLE_URL = "https://tiles.openfreemap.org/styles/positron";
 
 type MapEnv = Record<string, string | undefined>;
 

@@ -92,7 +92,7 @@ export function NextCoachSession() {
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               >
                 {t("box.join")}
               </a>

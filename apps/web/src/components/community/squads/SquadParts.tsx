@@ -354,7 +354,7 @@ export function SmallAction({
       className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
       style={{
         background: primary ? "var(--primary)" : "var(--panel-raised)",
-        color: primary ? "var(--bg)" : "var(--text)",
+        color: primary ? "var(--primary-contrast)" : "var(--text)",
         border: primary ? "none" : "1px solid var(--border)",
       }}
     >

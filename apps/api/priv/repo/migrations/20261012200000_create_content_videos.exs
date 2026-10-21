@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateContentVideos do
+defmodule Palee.Repo.Migrations.CreateContentVideos do
   use Ecto.Migration
 
   # ADR-098: on-demand video items, linked from an external host.
@@ -27,7 +27,7 @@ defmodule MilosTraining.Repo.Migrations.CreateContentVideos do
     execute("""
     CREATE TRIGGER content_videos_apply_tenant_context
     BEFORE INSERT OR UPDATE ON content_videos
-    FOR EACH ROW EXECUTE FUNCTION milos_apply_tenant_context()
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
     """)
 
     execute("""

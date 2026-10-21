@@ -66,7 +66,7 @@ function ClubRow({ club }: { club: CommunityClub }) {
       <span
         aria-hidden="true"
         className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-extrabold"
-        style={{ background: club.primary_color ?? "var(--panel-raised)", color: club.primary_color ? "#fff" : "var(--text)" }}
+        style={{ background: "var(--panel-raised)", color: "var(--text)" }}
       >
         {clubInitials(club.name)}
       </span>
@@ -75,7 +75,7 @@ function ClubRow({ club }: { club: CommunityClub }) {
           {club.name}
         </Link>
         <label htmlFor={selectId} className="text-xs" style={{ color: "var(--dim)" }}>{t("notifyLabel")}</label>
-        {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger, #dc2626)" }}>{error}</p> : null}
+        {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
       </div>
       <select
         id={selectId}

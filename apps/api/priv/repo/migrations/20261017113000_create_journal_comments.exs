@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CreateJournalComments do
+defmodule Palee.Repo.Migrations.CreateJournalComments do
   @moduledoc """
   ADR-140 §1: one Σχόλιο store for text a member writes on their own entry,
   wherever it is written (execution NoteModal, FinishWizard, Καταγραφή, PR,
@@ -73,7 +73,7 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalComments do
     # DEFINER so the policy can ask about an entry the session may not read
     # directly; it answers one text about one entry.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_journal_entry_rung(kind text, entry uuid)
+    CREATE OR REPLACE FUNCTION palee_journal_entry_rung(kind text, entry uuid)
     RETURNS text
     LANGUAGE sql
     STABLE
@@ -93,7 +93,7 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalComments do
     # because executions, logs and PRs sit under different tenant scopes than
     # the user-scoped comment routes.
     execute("""
-    CREATE OR REPLACE FUNCTION milos_journal_entry_owner(kind text, entry uuid)
+    CREATE OR REPLACE FUNCTION palee_journal_entry_owner(kind text, entry uuid)
     RETURNS TABLE (user_id uuid, organization_id uuid)
     LANGUAGE sql
     STABLE
@@ -116,7 +116,7 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalComments do
     USING (user_id = NULLIF(current_setting('app.user_id', true), '')::uuid)
     WITH CHECK (
       user_id = NULLIF(current_setting('app.user_id', true), '')::uuid
-      AND user_id = (SELECT owner.user_id FROM milos_journal_entry_owner(entry_kind, entry_id) owner)
+      AND user_id = (SELECT owner.user_id FROM palee_journal_entry_owner(entry_kind, entry_id) owner)
     )
     """)
 
@@ -125,8 +125,8 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalComments do
     FOR SELECT
     USING (
       deleted_at IS NULL
-      AND milos_entry_visible_to_acting_coach(
-        user_id, organization_id, milos_journal_entry_rung(entry_kind, entry_id)
+      AND palee_entry_visible_to_acting_coach(
+        user_id, organization_id, palee_journal_entry_rung(entry_kind, entry_id)
       )
     )
     """)
@@ -197,8 +197,8 @@ defmodule MilosTraining.Repo.Migrations.CreateJournalComments do
 
     recreate_coaching_aggregates("cardinality(execution.exercise_notes) > 0")
 
-    execute("DROP FUNCTION IF EXISTS milos_journal_entry_rung(text, uuid) CASCADE")
-    execute("DROP FUNCTION IF EXISTS milos_journal_entry_owner(text, uuid) CASCADE")
+    execute("DROP FUNCTION IF EXISTS palee_journal_entry_rung(text, uuid) CASCADE")
+    execute("DROP FUNCTION IF EXISTS palee_journal_entry_owner(text, uuid) CASCADE")
     drop table(:journal_comments)
   end
 

@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.CoachNoteSubjects do
+defmodule Palee.Repo.Migrations.CoachNoteSubjects do
   @moduledoc """
   ADR-140 §5: a coach note may be about one thing of the client's (an
   execution, a training log, a PR, an injury, a form review or an assigned
@@ -30,7 +30,7 @@ defmodule MilosTraining.Repo.Migrations.CoachNoteSubjects do
            )
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_coach_note_subject_belongs(
+    CREATE OR REPLACE FUNCTION palee_coach_note_subject_belongs(
       kind text, subject uuid, client uuid, organization uuid
     )
     RETURNS boolean
@@ -68,12 +68,12 @@ defmodule MilosTraining.Repo.Migrations.CoachNoteSubjects do
     """)
 
     execute("""
-    CREATE OR REPLACE FUNCTION milos_coaching_notes_check_subject()
+    CREATE OR REPLACE FUNCTION palee_coaching_notes_check_subject()
     RETURNS trigger
     LANGUAGE plpgsql
     AS $$
     BEGIN
-      IF NEW.subject_id IS NOT NULL AND NOT milos_coach_note_subject_belongs(
+      IF NEW.subject_id IS NOT NULL AND NOT palee_coach_note_subject_belongs(
         NEW.subject_kind, NEW.subject_id, NEW.client_user_id, NEW.organization_id
       ) THEN
         RAISE EXCEPTION 'coach note subject is not the client''s'
@@ -87,14 +87,14 @@ defmodule MilosTraining.Repo.Migrations.CoachNoteSubjects do
     execute("""
     CREATE TRIGGER coaching_notes_check_subject
     BEFORE INSERT OR UPDATE OF subject_kind, subject_id, client_user_id ON coaching_notes
-    FOR EACH ROW EXECUTE FUNCTION milos_coaching_notes_check_subject()
+    FOR EACH ROW EXECUTE FUNCTION palee_coaching_notes_check_subject()
     """)
   end
 
   def down do
     execute("DROP TRIGGER IF EXISTS coaching_notes_check_subject ON coaching_notes")
-    execute("DROP FUNCTION IF EXISTS milos_coaching_notes_check_subject()")
-    execute("DROP FUNCTION IF EXISTS milos_coach_note_subject_belongs(text, uuid, uuid, uuid)")
+    execute("DROP FUNCTION IF EXISTS palee_coaching_notes_check_subject()")
+    execute("DROP FUNCTION IF EXISTS palee_coach_note_subject_belongs(text, uuid, uuid, uuid)")
 
     alter table(:coaching_notes) do
       remove :subject_kind

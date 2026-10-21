@@ -1,18 +1,18 @@
-defmodule MilosTraining.TenantPurgeFixtures do
+defmodule Palee.TenantPurgeFixtures do
   @moduledoc """
   Seeds a tenant with data across bounded contexts - including the RESTRICT
   chains (scheduled class -> workout) that blocked the old permanent delete -
   plus stored objects, for ADR-117 purge tests.
   """
 
-  import MilosTraining.TestFixtures
+  import Palee.TestFixtures
 
-  alias MilosTraining.Application.{TenantDataContexts, TenantObjectStorage}
-  alias MilosTraining.{Finance, Organizations, Repo}
-  alias MilosTraining.Gamification.{GamificationSetting, UserAchievement}
-  alias MilosTraining.Notifications.Notification
-  alias MilosTraining.Pantheon.PRRecord
-  alias MilosTraining.TestSupport.MemoryObjectStore
+  alias Palee.Application.{TenantDataContexts, TenantObjectStorage}
+  alias Palee.{Finance, Organizations, Repo}
+  alias Palee.Gamification.{GamificationSetting, UserAchievement}
+  alias Palee.Notifications.Notification
+  alias Palee.Pantheon.PRRecord
+  alias Palee.TestSupport.MemoryObjectStore
 
   def seed_tenant(name, opts \\ []) do
     owner = admin_fixture()
@@ -60,8 +60,7 @@ defmodule MilosTraining.TenantPurgeFixtures do
       GamificationSetting.changeset(%GamificationSetting{}, %{
         organization_id: organization.id,
         weekly_workout_target: 3,
-        leaderboard_enabled: true,
-        theme_slug: "ember"
+        leaderboard_enabled: true
       })
     )
 

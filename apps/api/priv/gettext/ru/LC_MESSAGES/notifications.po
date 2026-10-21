@@ -88,8 +88,8 @@ msgstr "Новое сообщение"
 msgid "You received a new message."
 msgstr "Вы получили новое сообщение."
 
-msgid "TrainingJournal"
-msgstr "Милош Тренинг"
+msgid "Palee"
+msgstr "Palee"
 
 msgid "You have a new notification."
 msgstr "У вас есть новое уведомление."

@@ -50,7 +50,7 @@ export function CommitmentOverridePrompt({
           className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
           disabled={pending || reason.trim().length < 3}
           onClick={() => onConfirm(reason.trim())}
-          style={{ background: "var(--danger)", color: "white" }}
+          style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
           type="button"
         >
           {i18n("admCommitmentEndAnyway")}

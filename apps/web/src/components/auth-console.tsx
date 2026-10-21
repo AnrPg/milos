@@ -4,6 +4,7 @@
 
 
 
+import { PaleeMark } from "@/components/branding/PaleeMark";
 import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useEffect, useRef, useState } from "react";
@@ -209,7 +210,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                 className="rounded-full px-5 py-2 transition-colors"
                 style={
                   mode === "register"
-                    ? { background: "var(--primary)", color: "var(--bg)" }
+                    ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                     : { background: "transparent", color: "var(--dim)" }
                 }
                 onClick={() => setMode("register")}
@@ -221,7 +222,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                 className="rounded-full px-5 py-2 transition-colors"
                 style={
                   mode === "login"
-                    ? { background: "var(--primary)", color: "var(--bg)" }
+                    ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                     : { background: "transparent", color: "var(--dim)" }
                 }
                 onClick={() => setMode("login")}
@@ -233,8 +234,9 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
           </div>
 
           <div className="mb-6 text-center">
+            <PaleeMark className="mx-auto mb-3 h-12 w-12" />
             <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-              {i18n("milosTraining5b1a1c1")}
+              {i18n("brandName")}
             </p>
             <h1 className="mt-2 text-2xl font-bold tracking-tight" style={{ color: "var(--text)" }}>
               {mode === "register" ? i18n("createYourAccount4046b58") : i18n("signInada2e9e")}
@@ -284,7 +286,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                       <span className="text-xs" style={{ color: "var(--dim)" }}>{i18n("checking820d600")}</span>
                     )}
                     {nicknameStatus === "available" && (
-                      <span className="text-xs font-semibold" style={{ color: "var(--success, #4ade80)" }}>{i18n("availableaeed20b")}</span>
+                      <span className="text-xs font-semibold" style={{ color: "var(--success)" }}>{i18n("availableaeed20b")}</span>
                     )}
                     {nicknameStatus === "taken" && (
                       <span className="text-xs font-semibold" style={{ color: "var(--primary-strong)" }}>{i18n("alreadyTakena92fd32")}</span>
@@ -294,7 +296,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                     className="mt-2 w-full rounded-2xl px-4 py-3 outline-none"
                     style={{
                       background: "var(--bg)",
-                      border: `1px solid ${nicknameInvalid ? "var(--danger)" : nicknameStatus === "available" ? "var(--success, #4ade80)" : nicknameStatus === "taken" ? "var(--primary-strong)" : "var(--border)"}`,
+                      border: `1px solid ${nicknameInvalid ? "var(--danger)" : nicknameStatus === "available" ? "var(--success)" : nicknameStatus === "taken" ? "var(--primary-strong)" : "var(--border)"}`,
                       color: "var(--text)",
                     }}
                     value={registerForm.nickname}
@@ -428,7 +430,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   disabled={
                     busyAction === "register" ||
                     (invitationToken.trim().length > 0 && invitation === null)
@@ -499,7 +501,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   disabled={busyAction === "login"}
                   onClick={() => {
                     if (!validateCredentials(loginForm.nickname, loginForm.password)) return;

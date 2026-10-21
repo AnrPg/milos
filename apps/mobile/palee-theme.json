@@ -1,0 +1,9 @@
+{
+  "_comment": "Generated from apps/web/src/lib/theme.ts by `npm run theme:native`; do not edit.",
+  "light": {
+    "background": "#F4F5F7"
+  },
+  "dark": {
+    "background": "#17181C"
+  }
+}

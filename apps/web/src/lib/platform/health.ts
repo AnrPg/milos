@@ -1,7 +1,7 @@
 "use client";
 
 // ADR-172: the phone's health store inside the store apps, through the app's
-// own `MilosHealth` plugin (Swift HealthKit on iOS, Kotlin Health Connect on
+// own `PaleeHealth` plugin (Swift HealthKit on iOS, Kotlin Health Connect on
 // Android, one interface). In a browser nothing here runs and nothing is
 // downloaded: @capacitor/core is imported lazily, only inside the app.
 import { ingestPhoneHealth, type PhoneHealthProvider, type PhoneHealthRow } from "@/api/phone-health";
@@ -14,7 +14,7 @@ export type HealthAvailability = { available: boolean; reason?: "unsupported" | 
 /** `granted` is null on iOS: HealthKit never tells an app what it may read. */
 export type HealthAuthorization = { asked: HealthKind[]; granted: HealthKind[] | null };
 
-export type MilosHealthPlugin = {
+export type PaleeHealthPlugin = {
   availability(): Promise<HealthAvailability>;
   requestAuthorization(options: { kinds: HealthKind[] }): Promise<HealthAuthorization>;
   read(options: { kinds: HealthKind[]; from: string; to: string }): Promise<RawHealthRead>;
@@ -30,14 +30,14 @@ export function phoneHealthProvider(platform: NativePlatform | null = nativePlat
   return hasCapability(platform === "ios" ? "healthKit" : "healthConnect") ? PROVIDERS[platform] : null;
 }
 
-let pluginPromise: Promise<MilosHealthPlugin> | null = null;
+let pluginPromise: Promise<PaleeHealthPlugin> | null = null;
 
 /**
  * Capacitor's plugin proxy answers every property, `then` included, so a
  * promise must never resolve to it (it would wait forever on a `then` call
  * the plugin does not have). It travels wrapped in a plain object instead.
  */
-export function plainHealthPlugin(native: MilosHealthPlugin): MilosHealthPlugin {
+export function plainHealthPlugin(native: PaleeHealthPlugin): PaleeHealthPlugin {
   return {
     availability: () => native.availability(),
     requestAuthorization: (options) => native.requestAuthorization(options),
@@ -46,8 +46,8 @@ export function plainHealthPlugin(native: MilosHealthPlugin): MilosHealthPlugin 
   };
 }
 
-export function healthPlugin(): Promise<MilosHealthPlugin> {
-  pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => plainHealthPlugin(registerPlugin<MilosHealthPlugin>("MilosHealth")));
+export function healthPlugin(): Promise<PaleeHealthPlugin> {
+  pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => plainHealthPlugin(registerPlugin<PaleeHealthPlugin>("PaleeHealth")));
   return pluginPromise;
 }
 
@@ -94,7 +94,7 @@ let inflight: Promise<SyncResult> | null = null;
  * Reads the window from the phone and sends it in batches. One sync at a
  * time on this install, whoever asks (the app opening, «Συγχρονισμός τώρα»).
  */
-export function syncPhoneHealth(token: string, row: PhoneHealthRow, plugin?: MilosHealthPlugin, now: Date = new Date()): Promise<SyncResult> {
+export function syncPhoneHealth(token: string, row: PhoneHealthRow, plugin?: PaleeHealthPlugin, now: Date = new Date()): Promise<SyncResult> {
   inflight ??= (async () => {
     const health = plugin ?? (await healthPlugin());
     const kinds = enabledKinds(row.connection?.sync_prefs ?? row.sync_prefs);

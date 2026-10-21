@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.NormalizeAssignedWorkoutNotes do
+defmodule Palee.Repo.Migrations.NormalizeAssignedWorkoutNotes do
   use Ecto.Migration
 
   def up do

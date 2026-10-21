@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPlatformProvisioning do
+defmodule Palee.Repo.Migrations.AddPlatformProvisioning do
   use Ecto.Migration
 
   def change do

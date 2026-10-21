@@ -10,7 +10,7 @@ data must be modeled as first-class domain facts rather than UI-only fields.
 
 ## Architectural Direction
 
-Add a dedicated `MilosTraining.Finance` bounded context.
+Add a dedicated `Palee.Finance` bounded context.
 
 The context owns:
 - Membership package definitions.

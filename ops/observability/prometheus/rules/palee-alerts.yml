@@ -1,0 +1,247 @@
+# Alert thresholds for TD-031 / ADR-116. Rationale for each number lives in
+# ops/observability/README.md ("Alert thresholds"). Metric names come from
+# PaleeWeb.Telemetry.prometheus_metrics/0 (palee_*) and from the
+# collector's spanmetrics connector (traces_span_metrics_*).
+#
+# Severity contract: `critical` = users are affected now, act immediately;
+# `warning` = degraded or trending bad, act within working hours;
+# `info` = configuration drift worth a look.
+groups:
+  - name: palee-availability
+    rules:
+      - alert: PaleeApiMetricsDown
+        expr: up{job="palee-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API metrics endpoint unreachable"
+          description: "Prometheus cannot scrape api:9568 for 2m. The API is down, METRICS_PORT is not set, or METRICS_TOKEN differs between the api and prometheus services."
+
+      - alert: PaleeReadinessDependencyDown
+        expr: palee_readiness_check_up == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Readiness dependency {{ $labels.dependency }} is failing"
+          description: "The API's readiness probe has reported {{ $labels.dependency }} as unavailable for 2m. /api/health returns 503 and Compose marks the API unhealthy."
+
+      - alert: PaleeReadinessFailuresRecurring
+        expr: sum by (failed) (increase(palee_readiness_failures_total[10m])) > 5
+        labels:
+          severity: warning
+        annotations:
+          summary: "Readiness flapping ({{ $labels.failed }})"
+          description: "{{ $value | humanize }} readiness evaluations failed in 10m for {{ $labels.failed }}. Compose health checks hit /api/health every 10s, so more than 5 failures means roughly a minute of cumulative degradation."
+
+      - alert: PaleeOtelCollectorDown
+        expr: up{job=~"otel-collector.*"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "OpenTelemetry Collector target {{ $labels.job }} down"
+          description: "Trace-derived HTTP metrics and their alerts are blind while the collector is unreachable."
+
+      - alert: PaleeTracesNotArriving
+        expr: absent_over_time(traces_span_metrics_calls_total{service_name="palee-api"}[12h]) and on() (up{job="palee-api"} == 1)
+        labels:
+          severity: info
+        annotations:
+          summary: "No API traces for 12h while the API is up"
+          description: "OTEL_EXPORTER_OTLP_ENDPOINT is probably unset on the api service, so HTTP 5xx/latency alerts cannot fire."
+
+  - name: palee-http
+    rules:
+      - record: palee:http_server_requests:rate5m
+        expr: sum(rate(traces_span_metrics_calls_total{service_name="palee-api",span_kind="SPAN_KIND_SERVER"}[5m]))
+
+      - record: palee:http_server_5xx:rate5m
+        expr: sum(rate(traces_span_metrics_calls_total{service_name="palee-api",span_kind="SPAN_KIND_SERVER",http_response_status_code=~"5.."}[5m])) or vector(0)
+
+      - record: palee:http_server_latency_p95_ms:5m
+        expr: histogram_quantile(0.95, sum by (le) (rate(traces_span_metrics_duration_milliseconds_bucket{service_name="palee-api",span_kind="SPAN_KIND_SERVER"}[5m])))
+
+      - alert: PaleeHttp5xxRateCritical
+        expr: (palee:http_server_5xx:rate5m / palee:http_server_requests:rate5m) > 0.05 and palee:http_server_requests:rate5m > 0.1
+        for: 5m
+        labels:
+          severity: critical
+          signal: http_5xx
+        annotations:
+          summary: "API 5xx ratio above 5%"
+          description: "{{ $value | humanizePercentage }} of API requests failed with 5xx over the last 5m (traffic floor 0.1 req/s)."
+
+      - alert: PaleeHttp5xxRateElevated
+        expr: (palee:http_server_5xx:rate5m / palee:http_server_requests:rate5m) > 0.02 and palee:http_server_requests:rate5m > 0.1
+        for: 15m
+        labels:
+          severity: warning
+          signal: http_5xx
+        annotations:
+          summary: "API 5xx ratio above 2%"
+          description: "{{ $value | humanizePercentage }} of API requests failed with 5xx, sustained for 15m."
+
+      - alert: PaleeHttpLatencyP95Critical
+        expr: palee:http_server_latency_p95_ms:5m > 2500 and palee:http_server_requests:rate5m > 0.1
+        for: 10m
+        labels:
+          severity: critical
+          signal: http_latency
+        annotations:
+          summary: "API p95 latency above 2.5s"
+          description: "p95 server latency is {{ $value | printf \"%.0f\" }}ms (traces, 5m window)."
+
+      - alert: PaleeHttpLatencyP95High
+        expr: palee:http_server_latency_p95_ms:5m > 1000 and palee:http_server_requests:rate5m > 0.1
+        for: 15m
+        labels:
+          severity: warning
+          signal: http_latency
+        annotations:
+          summary: "API p95 latency above 1s"
+          description: "p95 server latency is {{ $value | printf \"%.0f\" }}ms (traces, 5m window)."
+
+  - name: palee-outbox
+    rules:
+      - alert: PaleeOutboxBacklogCritical
+        expr: max by (queue) (palee_outbox_oldest_due_seconds) > 900
+        for: 5m
+        labels:
+          severity: critical
+          signal: outbox_age
+        annotations:
+          summary: "Outbox queue {{ $labels.queue }} stalled for 15m+"
+          description: "The oldest due {{ $labels.queue }} job has waited {{ $value | humanizeDuration }}. Notifications, analytics, search indexing or cache invalidation are not being delivered."
+
+      - alert: PaleeOutboxBacklogAging
+        expr: max by (queue) (palee_outbox_oldest_due_seconds) > 300
+        for: 5m
+        labels:
+          severity: warning
+          signal: outbox_age
+        annotations:
+          summary: "Outbox queue {{ $labels.queue }} lagging"
+          description: "The oldest due {{ $labels.queue }} job has waited {{ $value | humanizeDuration }} (healthy queues drain in seconds)."
+
+      - alert: PaleeOutboxRetryBacklog
+        expr: sum by (queue) (palee_outbox_retryable_jobs) > 20
+        for: 15m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $value }} outbox jobs waiting to retry in {{ $labels.queue }}"
+          description: "A downstream dependency is failing repeatedly; inspect the oban_jobs errors column."
+
+  - name: palee-jobs
+    rules:
+      - alert: PaleeObanJobsDiscarded
+        expr: sum by (queue, worker) (increase(palee_oban_job_failures_total{state="discard"}[15m])) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.worker }} discarded jobs"
+          description: "{{ $value | humanize }} {{ $labels.worker }} job(s) on {{ $labels.queue }} exhausted their attempts in 15m. Their side effects will not happen without manual action."
+
+      - alert: PaleeObanFailureRateHigh
+        expr: |
+          (
+            sum by (queue) (rate(palee_oban_job_failures_total[15m]))
+            /
+            (sum by (queue) (rate(palee_oban_job_failures_total[15m])) + sum by (queue) (rate(palee_oban_job_completions_total[15m])))
+          ) > 0.2
+          and sum by (queue) (increase(palee_oban_job_failures_total[15m])) >= 5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Oban failure ratio above 20% on {{ $labels.queue }}"
+          description: "{{ $value | humanizePercentage }} of {{ $labels.queue }} executions are failing."
+
+  - name: palee-security
+    rules:
+      - alert: PaleeCredentialFailuresSpike
+        expr: sum(increase(palee_auth_anomalies_total{reason="invalid_credentials"}[10m])) > 50
+        labels:
+          severity: warning
+        annotations:
+          summary: "Login failures spiking"
+          description: "{{ $value | humanize }} failed logins in 10m; possible credential stuffing."
+
+      - alert: PaleeRefreshTokenRejectionsSpike
+        expr: sum(increase(palee_auth_anomalies_total{reason="invalid_refresh_token"}[10m])) > 20
+        labels:
+          severity: warning
+        annotations:
+          summary: "Refresh token rejections spiking"
+          description: "{{ $value | humanize }} refresh tokens rejected in 10m; possible token replay or a broken client release."
+
+      - alert: PaleeCredentialEndpointRateLimited
+        expr: sum(increase(palee_auth_anomalies_total{reason="rate_limited"}[10m])) > 10
+        labels:
+          severity: warning
+        annotations:
+          summary: "Credential endpoints are being rate limited"
+          description: "{{ $value | humanize }} login/registration/invitation requests hit the rate limit in 10m."
+
+  - name: palee-cache
+    rules:
+      - alert: PaleeCacheInvalidationFailing
+        expr: sum by (cache) (increase(palee_cache_operations_total{operation="invalidate",result=~"error|unavailable"}[10m])) > 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.cache }} cache invalidations failing"
+          description: "Invalidations could not reach Redis. Users may see stale landing data for up to the 60s TTL, and Redis is likely degraded."
+
+      - alert: PaleeCacheReadsBypassed
+        expr: |
+          (
+            sum by (cache) (rate(palee_cache_operations_total{operation="read",result=~"error|unavailable"}[10m]))
+            / sum by (cache) (rate(palee_cache_operations_total{operation="read"}[10m]))
+          ) > 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "{{ $labels.cache }} cache unavailable for most reads"
+          description: "{{ $value | humanizePercentage }} of cache reads bypassed Redis; every request is falling through to PostgreSQL."
+
+  - name: palee-uploads
+    rules:
+      - alert: PaleeUploadRejectionsSpike
+        expr: sum(increase(palee_upload_rejections_total[15m])) > 20
+        labels:
+          severity: warning
+        annotations:
+          summary: "Upload rejections spiking"
+          description: "{{ $value | humanize }} uploads rejected in 15m; check the reason breakdown on the dashboard."
+
+      - alert: PaleeUploadVerificationFailing
+        expr: sum(increase(palee_upload_rejections_total{reason=~"document_upload_unverified|document_upload_missing"}[15m])) > 3
+        labels:
+          severity: warning
+        annotations:
+          summary: "Uploads failing storage verification"
+          description: "{{ $value | humanize }} uploads in 15m were missing or unverifiable in object storage; check MinIO health, bucket policy and MINIO_PUBLIC_ENDPOINT/CORS."
+
+  - name: palee-monitoring-meta
+    rules:
+      - alert: AlertmanagerNotificationsFailing
+        expr: sum by (integration) (rate(alertmanager_notifications_failed_total[10m])) > 0
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Alertmanager cannot deliver {{ $labels.integration }} notifications"
+          description: "Check ALERTMANAGER_WEBHOOK_URL (or SMTP settings). Alerts are still visible in Grafana and the Alertmanager UI."
+
+      - alert: PrometheusRuleEvaluationFailing
+        expr: sum(increase(prometheus_rule_evaluation_failures_total[10m])) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Prometheus rule evaluations are failing"
+          description: "Some alert rules cannot be evaluated; alerts may be silently missing."

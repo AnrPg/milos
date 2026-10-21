@@ -7,14 +7,14 @@ Scope: `apps/api` (Elixir/Phoenix, hexagonal, bounded contexts), `apps/web` (Nex
 
 ```
 Interface     →  Phoenix Controllers, Channels, Plugs, Router pipelines
-Application   →  MilosTraining.Application.* (cross-context orchestration)
+Application   →  Palee.Application.* (cross-context orchestration)
 Domain        →  Pure Elixir business logic (no Ecto, no HTTP, no Redis)
 Infrastructure →  Ecto Repos/adapters, MeilisearchClient, Redix, MinIO (ExAws), Oban workers
 ```
 
 Bounded contexts: `Identity`, `Organizations`, `Scheduling`, `Workouts`, `Execution`,
 `Gamification`, `Coaching`, `Notifications`, `Finance`, `Analytics`, `Feedback`,
-`Wellbeing`, `Messaging`, `Pantheon`. `mix milos.architecture` enforces the
+`Wellbeing`, `Messaging`, `Pantheon`. `mix palee.architecture` enforces the
 compile-time boundary rule (verified green during this audit — see
 `08-test-gap-plan.md` / commands run).
 
@@ -42,10 +42,10 @@ erDiagram
   to transition a membership to `suspended`/`revoked`** — see Finding F-08.
 - **Platform owner (`platform_owners`)** — separate installation-wide authority,
   keyed by `user_id`, `status ∈ {active, revoked}`. Grant path is exclusively the
-  `mix milos.platform.grant_owner` Mix task (no HTTP endpoint). **No revoke code
+  `mix palee.platform.grant_owner` Mix task (no HTTP endpoint). **No revoke code
   path exists** (status enum implies one but none is implemented) — Finding F-09.
 - **TenantContext** (`organizations/tenant_context.ex`) — transport-neutral struct
-  built by `MilosTraining.Application.ResolveTenantContext` from
+  built by `Palee.Application.ResolveTenantContext` from
   `Organizations.Domain.TenantAuthorization.build/4`, which validates organization
   `status == :active`, membership↔org/user match, and membership `status ==
   :active`. This is the single correct choke point for tenant authorization.
@@ -122,7 +122,7 @@ key, Meilisearch filter, and MinIO object prefix is supposed to carry
 
 ## 6. Row-Level Security enforcement state (verified against the running dev DB)
 
-`mix milos.tenancy.audit` was executed against a locally migrated copy of the
+`mix palee.tenancy.audit` was executed against a locally migrated copy of the
 schema (dev/test infra started for this audit only — see `08-test-gap-plan.md`
 for exact commands run). All 44 tables in the module's `@ready_tenant_tables` /
 `@ready_personal_tables` lists report `unmapped=0 rls=true force=true`, and the
@@ -134,10 +134,10 @@ However, the audit script has blind spots, verified by direct migration review:
 - Every "enforce"-stage RLS policy across finance, memberships, promotions,
   referrals, messaging, gamification, analytics, feedback/reviews, and
   attendance tables uses `organization_id = COALESCE(NULLIF(current_setting(
-  'app.organization_id', true), ''), milos_legacy_organization_id())` — i.e. RLS
+  'app.organization_id', true), ''), palee_legacy_organization_id())` — i.e. RLS
   itself silently scopes any session that never sets `app.organization_id` to
   the **legacy organization**, rather than denying all rows. `mix
-  milos.tenancy.audit`'s `rls_forced` check is `true` for these tables
+  palee.tenancy.audit`'s `rls_forced` check is `true` for these tables
   regardless of this fallback — the script cannot detect it. Finding F-05
   (Critical).
 - Materialized views (`finance_aggregates`, `coaching_aggregates`,

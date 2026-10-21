@@ -1,24 +1,24 @@
 ---
-name: "Thumoa"
-tagline: "Thumo up."
+name: "Palee"
+tagline: "See you palee."
 specVersion: "0.3.0"
 version: 1
 language: en
 ---
 
-# Thumoa
+# Palee
 
 Upstream identity for the member app, the gym/owner console and the marketing
 site. Status: **draft v1**, proposed in the product discussion of Oct 2026 and
 awaiting the founder's approval. Product context lives in
-[`../product/2026-10-15-milos-product-vision-and-ia.md`](../product/2026-10-15-milos-product-vision-and-ia.md).
+[`../product/2026-10-15-palee-product-vision-and-ia.md`](../product/2026-10-15-palee-product-vision-and-ia.md).
 The visual board is [`brand-board-frost.html`](brand-board-frost.html) (locked); earlier explorations live alongside it.
 
 ## Strategy
 
 ### Overview
 
-Thumoa is the social home for people who love to use their bodies, organized
+Palee is the social home for people who love to use their bodies, organized
 around the clubs where they actually move: gyms, CrossFit boxes, dance studios,
 dojos, climbing walls, run crews.
 
@@ -32,14 +32,18 @@ For the member it is three things in one stable app: my people (the club feed),
 my club (book, train, pay, ask the coach) and me (a private journal of body and
 mind).
 
-The name comes from the ancient Greek *thumos* (θυμός): the spirited part of the
-soul. It is the drive, the heart, the stubborn courage that gets you back on the
-floor tomorrow. Thumoa is a softened, international form of it.
+The name is the Greek *πάλι* ("again"), spelled the way it sounds. Coming back
+tomorrow is the real PR, and the app exists to bring you back. Πάλη is also
+wrestling, the struggle itself. To an English ear it sounds like "pal" and
+"pally", the friend you train with. Off the couch, back again, with your pals.
+
+Palee sits in a family of plain Greek words spelled phonetically, one per app of
+the studio: Mazee (μαζί) and Kefi (κέφι).
 
 Before: a booking app you tolerate, a tracker you forget, a feed full of
 strangers. After: the place where your club's people actually live.
 
-Long-term ambition: every movement club in Europe runs on Thumoa, and every
+Long-term ambition: every movement club in Europe runs on Palee, and every
 member feels it is theirs.
 
 ### Audience
@@ -79,7 +83,7 @@ Structural differentials:
 - Private by default: the journal belongs to the member, across clubs
 - Works for any movement discipline, not only lifting
 
-Territory: belonging through movement. Thumoa owns the feeling of walking into
+Territory: belonging through movement. Palee owns the feeling of walking into
 your club and being known.
 
 ### Personality
@@ -125,10 +129,10 @@ Core promise:
 - Your progress is yours, and private unless you share it.
 - Owners grow on their own terms.
 
-Base message: Thumoa turns movement clubs into living communities. Members
+Base message: Palee turns movement clubs into living communities. Members
 belong, owners grow, and nobody is judged for where they start.
 
-Synthesizing phrase: Thumoa exists so that nobody moves alone.
+Synthesizing phrase: Palee exists so that nobody moves alone.
 
 ### Guardrails
 
@@ -162,29 +166,29 @@ Essence: Nobody moves alone.
 
 ### Tagline & Slogans
 
-Primary: **"Thumo up."** Greek: **«Ψηλά το κεφάλι.»**
+Primary: **"See you palee."** Greek: **«Τα λέμε πάλι.»**
 
-"Thumo up" carries the name and two meanings: "stand up, get moving" and
-"thumbs up, be positive". The Greek line means "keep your chin up", and the
-mark's head is literally up. The Greek market does not get a literal
-translation, because in modern Greek θυμός means anger.
+"See you palee" carries the name and the promise: the club expects you back, and
+someone will be there when you come. It reads as "see you again" to Greek ears
+and as "see you, pal" to English ones. The Greek line is the everyday goodbye
+after class.
 
-Tagline system (decided Oct 2026):
+Tagline system (decided Oct 2026, with the rename to Palee):
 
 | Role | English | Greek |
 |---|---|---|
-| Primary tagline | Thumo up. | Ψηλά το κεφάλι. |
-| In-app verb | thumo (the kudos): "3 thumos", "she thumo'd your PR" | thumo |
+| Primary tagline | See you palee. | Τα λέμε πάλι. |
+| In-app cheer | palee! (the kudos, "again!"): "3 palees", "Maria said palee! to your PR" | πάλι! |
 | Campaign template | Raise one for… ("Raise one for the 7am crew.", "Raise one for Maria's comeback.") | stays English |
-| Onboarding / name explainer | Bring your thumos. + *thumos (θυμός): the ancient Greek word for the spirit that gets you moving.* | Βάλε ψυχή. |
-| Owners / B2B | Every club has a spirit. Now it has a home. | Κάθε ομάδα έχει ψυχή. Τώρα έχει και σπίτι. |
-| Merch / social | Get your thumos on. | none |
+| Onboarding / name explainer | Coming back is the real PR. + *palee (πάλι): Greek for "again".* | Πάλι αύριο. |
+| Owners / B2B | Members who come back, again and again. | Μέλη που έρχονται πάλι και πάλι. |
+| Merch / social | Same time, palee. | Ίδια ώρα, πάλι. |
 
 Rules:
-- Put "thumo" on the kudos button and let members adopt the verb. Never force it into body copy.
+- Put "palee!" on the kudos button and let members adopt it. Never force it into body copy.
 - "Raise one" is always a toast to a person or a crew. Never show alcohol with it.
-- Never use "thumos" alone in Greek-language copy, because Greek readers hear "anger". Use «ψυχή».
-- Retired: "The spirit that moves you." (not ownable), "Spirit is a team sport." (cliché).
+- Write the name in Latin letters, «Palee», in Greek copy too; use «πάλι» only as the everyday word.
+- Retired: the previous name and its tagline (hard to say, with the wrong meaning in modern Greek), "The spirit that moves you." (not ownable), "Spirit is a team sport." (cliché).
 
 Slogans by context:
 - App store: "Your club, your people, your progress."
@@ -199,7 +203,7 @@ Slogans by context:
 - The club is the social unit.
 - Small groups over follower counts.
 
-**Spirit (thumos)**
+**Coming back (palee)**
 - Drive comes from people, not punishment.
 - Coming back is the real PR.
 
@@ -256,7 +260,7 @@ Voice by channel (same identity, different energy):
 | Errors | Plain | Own it, say what to do next |
 
 Taglines by channel: see the tagline system under Tagline & Slogans. App store and
-social lead with "Thumo up."; owner sales pages use the B2B line; campaigns use
+social lead with "See you palee."; owner sales pages use the B2B line; campaigns use
 "Raise one for…".
 
 | We Say | We Never Say |
@@ -281,9 +285,9 @@ Energy comes from three saturated colours; luxury comes only from the finish
 - **Dojo** `#2F5BFF` (mandatory). The primary: actions, navigation, the mark's
   head. Glow tone on dark: `#5B7CFF`.
 - **Spark** (Sun Lime) `#E4FF6E`. What is alive right now: LIVE, new, challenges,
-  thumo counts. Always with Graphite text, or on Graphite. Chosen to sit clearly
+  palee counts. Always with Graphite text, or on Graphite. Chosen to sit clearly
   away from Nike Volt.
-- **Heat** `#E0203F`. Emotion: thumo (kudos), PR, Comeback, the wordmark's dot,
+- **Heat** `#E0203F`. Emotion: palee! (kudos), PR, Comeback, the wordmark's dot,
   support moments. Glow tone on dark: `#FF4D6A`.
 - **Plum** `#2A0F2E` (optional). Marketing, merch and the member card only;
   never in the app UI.
@@ -296,6 +300,11 @@ Usage rules:
 - Never a surface of only Dojo and white (reads as the national flag).
 - Dark mode is "Graphite Night": Graphite page, `#22242A` cards, Frost text,
   glow tones.
+- In the app the palette is the only theme, for gyms and members alike:
+  `frost` (light, the default) and `graphite` (Graphite Night), both in
+  `apps/web/src/lib/theme.ts`, the single source of every colour. Members may
+  switch to dark; gyms do not pick a theme. [THEME.md](THEME.md) lists which
+  token dresses each UI element and its parts.
 
 Retired (draft v1): Pomegranate, Chalk, Breath, Sun.
 
@@ -320,22 +329,24 @@ was measured.
 
 ### Logo & Marks
 
-- **Mark ("the dancer", U3):** a dot (head) above an asymmetric "u" (arms, one
-  raised higher). It reads as the letters "u" and "o" of the name, as a person
-  moving, and as a cupped heart.
-- **Wordmark:** lowercase "thumoa" with a dot above the "u", echoing the mark's
-  head.
+- **Mark ("arms up"):** a round head between two arms raised in one thick
+  curved stroke: a person cheering, the moment a PR lands and the box shouts
+  «πάλι!». It also reads as an open hand and as a smile.
+- **Wordmark:** lowercase "palee" followed by a round full stop in the mark's
+  head colour, so the name and the mark share one shape.
 - **The marker test:** the mark must be drawable by a child with one marker in
   under five seconds. No gradients, no outlines, no inner detail.
-- **Locked colourway:** mark head Dojo `#2F5BFF`, body Graphite `#17181C`, no
-  eye. Wordmark letters Graphite with the dot above the "u" in Heat `#E0203F`
-  (the heart dot). Lockup: mark left of the wordmark.
-- Reversed (on Graphite): head Dojo glow `#5B7CFF`, body Frost.
+- **Locked colourway:** on Frost, arms Graphite `#17181C` and head Dojo
+  `#2F5BFF`; wordmark Graphite with the full stop in Dojo. Lockup: mark left of
+  the wordmark.
+- Reversed (on Graphite): arms Dojo glow `#5B7CFF`, head Spark `#E4FF6E`.
+  On Dojo: arms white, head Spark. This is the app icon.
 - Single-colour versions (Graphite, Frost or Dojo) for stamps, embroidery and
-  small sizes. Never gradient, never rotated so that the raised arm points
+  small sizes. Never gradient, never rotated or flipped so that the arms point
   downward, never Spark with Heat.
-- Explored and parked: an "eye" in the head and a coloured letter in the
-  wordmark (see the Frost board labs).
+- Explored and parked: the earlier "dancer" mark (U3), an "eye" in the head
+  and a coloured letter in the wordmark (see the Frost board labs). Source
+  files: [`logo/`](logo/).
 
 ### Photography & Illustration
 
@@ -356,7 +367,7 @@ Illustration: marker-style single-colour line drawings in the mark's language
 Design keywords: Warm ground. One heartbeat colour. Round thick strokes. People
 in motion. Generous space. Hand-made touches.
 
-Direction statement: Thumoa should feel like the moment after class when
+Direction statement: Palee should feel like the moment after class when
 everyone is still in the room: warm, a bit out of breath, proud, together.
 
 Visual territory: **chalk on the studio floor.** A warm off-white ground. One
@@ -373,12 +384,14 @@ Features are named plainly in sentence case: "journal", "clubs", "check-in",
 
 ### Trademark status
 
-Preliminary web search (2026-10-15), **not a legal clearance**: no registered mark or
-live product named "Thumoa" was found. Nearby marks: THUMA (furniture, Class 20,
-US/CA), THUM (pharmaceuticals, US), THAUMA (food, ES), and the "Thumo" food-delivery
-app (Eswatini). None is in software or fitness services. Before launch, run a
-professional clearance in EUIPO/TMview, WIPO Global Brand Database, USPTO and the Greek
-registry for Classes 9, 41, 42 and 44, and file in the EU and Greece first.
+Preliminary screen (2026-10-21), **not a legal clearance**: no registered mark,
+app or company named "Palee" was found. Nearby: US mark PAL (PAL App Limited,
+class 9, software for meeting people for activities) and PALLY (India, class 9).
+palee.app, palee.club and palee.fit were unregistered on 2026-10-21; palee.com
+is taken. Before launch, run a professional clearance in EUIPO/TMview, WIPO
+Global Brand Database, USPTO and the Greek registry for Classes 9, 41, 42 and
+44, have a lawyer assess PAL before any US launch, and file in the EU and Greece
+first.
 
 ### Claims
 

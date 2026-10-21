@@ -92,7 +92,7 @@ export function AuthGuard({ children, roles, roleRedirects }: AuthGuardProps) {
   ) {
     return (
       <main className="flex min-h-screen items-center justify-center bg-[var(--bg)] px-6">
-        <p className="text-sm font-medium uppercase tracking-[0.24em] text-black/45">
+        <p className="text-sm font-medium uppercase tracking-[0.24em] text-[var(--dim)]">
           {i18n("restoringSession5a59aa5")}
         </p>
       </main>

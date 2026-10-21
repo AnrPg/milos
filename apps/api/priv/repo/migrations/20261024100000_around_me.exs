@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AroundMe do
+defmodule Palee.Repo.Migrations.AroundMe do
   use Ecto.Migration
 
   # ADR-154 (P2-M6): Γύρω μου, nearby discovery.
@@ -155,19 +155,19 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     replace_notification_types(@before_types)
 
     for function <- [
-          "milos_around_alert_candidates",
-          "milos_around_pins",
-          "milos_around_counts",
-          "milos_around_posts",
-          "milos_around_clubs",
-          "milos_around_boxes",
-          "milos_around_events",
-          "milos_around_match_posts",
-          "milos_around_match_clubs",
-          "milos_around_match_boxes",
-          "milos_around_match_events",
-          "milos_around_host_places",
-          "milos_around_tags_match"
+          "palee_around_alert_candidates",
+          "palee_around_pins",
+          "palee_around_counts",
+          "palee_around_posts",
+          "palee_around_clubs",
+          "palee_around_boxes",
+          "palee_around_events",
+          "palee_around_match_posts",
+          "palee_around_match_clubs",
+          "palee_around_match_boxes",
+          "palee_around_match_events",
+          "palee_around_host_places",
+          "palee_around_tags_match"
         ] do
       execute("DROP FUNCTION IF EXISTS #{function} CASCADE")
     end
@@ -226,7 +226,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
 
     execute("""
     CREATE INDEX places_neighbourhoods_point_index ON places_neighbourhoods
-    USING gist (milos_geo_point(latitude, longitude))
+    USING gist (palee_geo_point(latitude, longitude))
     """)
 
     # Reference data: anyone reads it, nobody writes it outside migrations.
@@ -367,7 +367,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     # Events with a place of their own (not one of the box's locations).
     execute("""
     CREATE INDEX community_events_open_point_index ON community_events
-    USING gist (milos_geo_point(latitude, longitude))
+    USING gist (palee_geo_point(latitude, longitude))
     WHERE open_to_non_members AND cancelled_at IS NULL AND latitude IS NOT NULL
     """)
 
@@ -393,7 +393,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     # matches no tag filter. Within a list any tag matches, except amenities,
     # which must all be there.
     execute("""
-    CREATE FUNCTION milos_around_tags_match(
+    CREATE FUNCTION palee_around_tags_match(
       p_snapshot jsonb, p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[]
     )
     RETURNS boolean
@@ -408,7 +408,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
 
     # Each active gym's nearest pinned location inside the search area.
     execute("""
-    CREATE FUNCTION milos_around_host_places(p_origin geography, p_radius_m double precision, p_bbox geography)
+    CREATE FUNCTION palee_around_host_places(p_origin geography, p_radius_m double precision, p_bbox geography)
     RETURNS TABLE (
       organization_id uuid, location_id uuid, latitude double precision,
       longitude double precision, neighbourhood text, city text, distance_m double precision
@@ -417,12 +417,12 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     AS $$
       SELECT DISTINCT ON (l.organization_id)
              l.organization_id, l.id, l.latitude, l.longitude, l.neighbourhood::text, l.city::text,
-             ST_Distance(milos_geo_point(l.latitude, l.longitude), p_origin)
+             ST_Distance(palee_geo_point(l.latitude, l.longitude), p_origin)
       FROM public.facility_locations l
       JOIN public.organizations o ON o.id = l.organization_id AND o.status = 'active'
       WHERE l.latitude IS NOT NULL AND l.archived_at IS NULL
-        AND milos_geo_point(l.latitude, l.longitude) && p_bbox
-        AND ST_DWithin(milos_geo_point(l.latitude, l.longitude), p_origin, p_radius_m)
+        AND palee_geo_point(l.latitude, l.longitude) && p_bbox
+        AND ST_DWithin(palee_geo_point(l.latitude, l.longitude), p_origin, p_radius_m)
       ORDER BY l.organization_id, 7, l.id
     $$
     """)
@@ -430,7 +430,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     # Upcoming events open to everyone, at their own place, at one of the
     # box's locations, or (no place given) at the box's nearest location.
     execute("""
-    CREATE FUNCTION milos_around_match_events(
+    CREATE FUNCTION palee_around_match_events(
       p_origin geography, p_radius_m double precision, p_bbox geography, p_now_at timestamptz,
       p_win_from timestamptz[], p_win_to timestamptz[], p_max_price_cents integer,
       p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
@@ -446,26 +446,26 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
              e.starts_at, e.inserted_at, e.title::text
       FROM (
         SELECT pe.id, pe.latitude, pe.longitude,
-               ST_Distance(milos_geo_point(pe.latitude, pe.longitude), p_origin) AS distance_m
+               ST_Distance(palee_geo_point(pe.latitude, pe.longitude), p_origin) AS distance_m
         FROM public.community_events pe
         WHERE pe.open_to_non_members AND pe.cancelled_at IS NULL AND pe.latitude IS NOT NULL
-          AND milos_geo_point(pe.latitude, pe.longitude) && p_bbox
-          AND ST_DWithin(milos_geo_point(pe.latitude, pe.longitude), p_origin, p_radius_m)
+          AND palee_geo_point(pe.latitude, pe.longitude) && p_bbox
+          AND ST_DWithin(palee_geo_point(pe.latitude, pe.longitude), p_origin, p_radius_m)
           AND pe.starts_at >= p_now_at
         UNION ALL
         SELECT le.id, l.latitude, l.longitude,
-               ST_Distance(milos_geo_point(l.latitude, l.longitude), p_origin)
+               ST_Distance(palee_geo_point(l.latitude, l.longitude), p_origin)
         FROM public.facility_locations l
         JOIN public.community_events le
           ON le.location_id = l.id AND le.organization_id = l.organization_id
         WHERE l.latitude IS NOT NULL AND l.archived_at IS NULL
-          AND milos_geo_point(l.latitude, l.longitude) && p_bbox
-          AND ST_DWithin(milos_geo_point(l.latitude, l.longitude), p_origin, p_radius_m)
+          AND palee_geo_point(l.latitude, l.longitude) && p_bbox
+          AND ST_DWithin(palee_geo_point(l.latitude, l.longitude), p_origin, p_radius_m)
           AND le.open_to_non_members AND le.cancelled_at IS NULL AND le.location_id IS NOT NULL
           AND le.latitude IS NULL AND le.starts_at >= p_now_at
         UNION ALL
         SELECT he.id, h.latitude, h.longitude, h.distance_m
-        FROM public.milos_around_host_places(p_origin, p_radius_m, p_bbox) h
+        FROM public.palee_around_host_places(p_origin, p_radius_m, p_bbox) h
         JOIN public.community_events he ON he.organization_id = h.organization_id
         WHERE he.open_to_non_members AND he.cancelled_at IS NULL
           AND he.latitude IS NULL AND he.location_id IS NULL AND he.starts_at >= p_now_at
@@ -479,13 +479,13 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
                WHERE e.starts_at >= w.f AND e.starts_at < w.t))
         AND (p_max_price_cents IS NULL OR e.price_cents <= p_max_price_cents)
         AND (p_created_after IS NULL OR e.inserted_at > p_created_after)
-        AND milos_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
+        AND palee_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
     $$
     """)
 
     # Gyms with a published page, at their nearest location.
     execute("""
-    CREATE FUNCTION milos_around_match_boxes(
+    CREATE FUNCTION palee_around_match_boxes(
       p_origin geography, p_radius_m double precision, p_bbox geography,
       p_trial_only boolean, p_exclude_ids uuid[],
       p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
@@ -503,7 +503,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
              h.neighbourhood, h.city, COALESCE(t.enabled, false), pr.published_snapshot,
              pr.published_at, o.slug::text, COALESCE(NULLIF(btrim(s.brand_name), ''), o.name)::text,
              s.brand_logo_url::text, s.brand_primary_color::text
-      FROM public.milos_around_host_places(p_origin, p_radius_m, p_bbox) h
+      FROM public.palee_around_host_places(p_origin, p_radius_m, p_bbox) h
       JOIN public.organizations o ON o.id = h.organization_id
       JOIN public.organization_public_profiles pr
         ON pr.organization_id = h.organization_id AND pr.published_at IS NOT NULL
@@ -512,14 +512,14 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       WHERE (NOT p_trial_only OR COALESCE(t.enabled, false))
         AND (p_exclude_ids IS NULL OR NOT (h.organization_id = ANY (p_exclude_ids)))
         AND (p_created_after IS NULL OR pr.published_at > p_created_after)
-        AND milos_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
+        AND palee_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
     $$
     """)
 
     # Open clubs anyone signed in can join (at once or on request), at
     # their box's nearest location.
     execute("""
-    CREATE FUNCTION milos_around_match_clubs(
+    CREATE FUNCTION palee_around_match_clubs(
       p_origin geography, p_radius_m double precision, p_bbox geography,
       p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
       p_created_after timestamptz
@@ -532,14 +532,14 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     AS $$
       SELECT c.id, c.organization_id, h.latitude, h.longitude, h.distance_m, c.inserted_at,
              c.name::text
-      FROM public.milos_around_host_places(p_origin, p_radius_m, p_bbox) h
+      FROM public.palee_around_host_places(p_origin, p_radius_m, p_bbox) h
       JOIN public.community_clubs c
         ON c.organization_id = h.organization_id AND c.kind = 'open' AND c.archived_at IS NULL
       LEFT JOIN public.organization_public_profiles pr
         ON pr.organization_id = h.organization_id AND pr.published_at IS NOT NULL
       WHERE c.join_policy IN ('open', 'approval')
         AND (p_created_after IS NULL OR c.inserted_at > p_created_after)
-        AND milos_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
+        AND palee_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
     $$
     """)
 
@@ -548,7 +548,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     # neighbourhood's centroid, never more precise). A person's post carries
     # no tags, so any tag filter leaves it out.
     execute("""
-    CREATE FUNCTION milos_around_match_posts(
+    CREATE FUNCTION palee_around_match_posts(
       p_origin geography, p_radius_m double precision, p_bbox geography, p_since timestamptz,
       p_viewer_id uuid, p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
       p_created_after timestamptz
@@ -562,7 +562,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     AS $$
       SELECT p.id, 'club'::text, p.organization_id, p.author_id, h.latitude, h.longitude,
              h.distance_m, p.inserted_at, COALESCE(NULLIF(btrim(s.brand_name), ''), o.name)::text
-      FROM public.milos_around_host_places(p_origin, p_radius_m, p_bbox) h
+      FROM public.palee_around_host_places(p_origin, p_radius_m, p_bbox) h
       JOIN public.organizations o ON o.id = h.organization_id
       JOIN public.organization_public_profiles pr
         ON pr.organization_id = h.organization_id AND pr.published_at IS NOT NULL
@@ -572,13 +572,13 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
        AND p.deleted_at IS NULL AND p.hidden_at IS NULL
       WHERE p.inserted_at >= p_since
         AND (p_created_after IS NULL OR p.inserted_at > p_created_after)
-        AND milos_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
+        AND palee_around_tags_match(pr.published_snapshot, p_disciplines, p_audiences, p_languages, p_amenities)
         AND (p_viewer_id IS NULL OR NOT EXISTS (
                SELECT 1 FROM public.community_reports r
                WHERE r.target_type = 'post' AND r.target_id = p.id AND r.reporter_id = p_viewer_id))
       UNION ALL
       SELECT pp.id, 'profile'::text, NULL::uuid, pp.user_id, n.latitude, n.longitude,
-             ST_Distance(milos_geo_point(n.latitude, n.longitude), p_origin), pp.inserted_at,
+             ST_Distance(palee_geo_point(n.latitude, n.longitude), p_origin), pp.inserted_at,
              u.nickname::text
       FROM public.places_neighbourhoods n
       JOIN public.user_home_areas a ON a.neighbourhood_id = n.id AND a.position = 0
@@ -586,8 +586,8 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       JOIN public.users u ON u.id = a.user_id
       JOIN public.community_profile_posts pp
         ON pp.user_id = a.user_id AND pp.audience = 'public' AND pp.deleted_at IS NULL
-      WHERE milos_geo_point(n.latitude, n.longitude) && p_bbox
-        AND ST_DWithin(milos_geo_point(n.latitude, n.longitude), p_origin, p_radius_m)
+      WHERE palee_geo_point(n.latitude, n.longitude) && p_bbox
+        AND ST_DWithin(palee_geo_point(n.latitude, n.longitude), p_origin, p_radius_m)
         AND pp.inserted_at >= p_since
         AND (p_created_after IS NULL OR pp.inserted_at > p_created_after)
         AND p_disciplines IS NULL AND p_audiences IS NULL AND p_languages IS NULL AND p_amenities IS NULL
@@ -600,7 +600,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
 
     # Each search: the page after the cursor, plus how many match in all.
     execute("""
-    CREATE FUNCTION milos_around_events(
+    CREATE FUNCTION palee_around_events(
       p_origin geography, p_radius_m double precision, p_bbox geography, p_now_at timestamptz,
       p_win_from timestamptz[], p_win_to timestamptz[], p_max_price_cents integer,
       p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
@@ -615,7 +615,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       SELECT m.id, m.organization_id, m.latitude, m.longitude, m.distance_m, m.starts_at, m.total
       FROM (
         SELECT x.*, count(*) OVER () AS total
-        FROM milos_around_match_events(p_origin, p_radius_m, p_bbox, p_now_at, p_win_from, p_win_to,
+        FROM palee_around_match_events(p_origin, p_radius_m, p_bbox, p_now_at, p_win_from, p_win_to,
                p_max_price_cents, p_disciplines, p_audiences, p_languages, p_amenities, p_created_after) x
       ) m
       WHERE p_after_id IS NULL OR (m.starts_at, m.id) > (p_after_starts_at, p_after_id)
@@ -626,7 +626,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
 
     # Gyms taking trials first, then nearest.
     execute("""
-    CREATE FUNCTION milos_around_boxes(
+    CREATE FUNCTION palee_around_boxes(
       p_origin geography, p_radius_m double precision, p_bbox geography,
       p_trial_only boolean, p_exclude_ids uuid[],
       p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
@@ -647,7 +647,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       FROM (
         SELECT x.*, CASE WHEN x.takes_trials THEN 0 ELSE 1 END AS rank,
                count(*) OVER () AS total
-        FROM milos_around_match_boxes(p_origin, p_radius_m, p_bbox, p_trial_only, p_exclude_ids,
+        FROM palee_around_match_boxes(p_origin, p_radius_m, p_bbox, p_trial_only, p_exclude_ids,
                p_disciplines, p_audiences, p_languages, p_amenities, p_created_after) x
       ) m
       WHERE p_after_id IS NULL
@@ -658,7 +658,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     """)
 
     execute("""
-    CREATE FUNCTION milos_around_clubs(
+    CREATE FUNCTION palee_around_clubs(
       p_origin geography, p_radius_m double precision, p_bbox geography,
       p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
       p_created_after timestamptz, p_after_distance double precision, p_after_id uuid, p_lim integer
@@ -672,7 +672,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       SELECT m.id, m.organization_id, m.latitude, m.longitude, m.distance_m, m.total
       FROM (
         SELECT x.*, count(*) OVER () AS total
-        FROM milos_around_match_clubs(p_origin, p_radius_m, p_bbox, p_disciplines, p_audiences,
+        FROM palee_around_match_clubs(p_origin, p_radius_m, p_bbox, p_disciplines, p_audiences,
                p_languages, p_amenities, p_created_after) x
       ) m
       WHERE p_after_id IS NULL OR (m.distance_m, m.id) > (p_after_distance, p_after_id)
@@ -683,7 +683,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
 
     # Newest first.
     execute("""
-    CREATE FUNCTION milos_around_posts(
+    CREATE FUNCTION palee_around_posts(
       p_origin geography, p_radius_m double precision, p_bbox geography, p_since timestamptz,
       p_viewer_id uuid, p_disciplines text[], p_audiences text[], p_languages text[], p_amenities text[],
       p_created_after timestamptz, p_before_at timestamptz, p_before_id uuid, p_lim integer
@@ -699,7 +699,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
              m.distance_m, m.created_at, m.total
       FROM (
         SELECT x.*, count(*) OVER () AS total
-        FROM milos_around_match_posts(p_origin, p_radius_m, p_bbox, p_since, p_viewer_id, p_disciplines,
+        FROM palee_around_match_posts(p_origin, p_radius_m, p_bbox, p_since, p_viewer_id, p_disciplines,
                p_audiences, p_languages, p_amenities, p_created_after) x
       ) m
       WHERE p_before_id IS NULL OR (m.created_at, m.id) < (p_before_at, p_before_id)
@@ -711,7 +711,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     # How many match per kind within each radius, in one pass over the
     # largest radius (the «θέλεις πιο μακριά;» counts, and the alert counts).
     execute("""
-    CREATE FUNCTION milos_around_counts(
+    CREATE FUNCTION palee_around_counts(
       p_origin geography, p_radii double precision[], p_max_radius_m double precision,
       p_bbox geography, p_kinds text[], p_now_at timestamptz,
       p_win_from timestamptz[], p_win_to timestamptz[], p_max_price_cents integer,
@@ -725,22 +725,22 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       SELECT x.kind, r.radius_m, count(*) FILTER (WHERE x.distance_m <= r.radius_m)
       FROM (
         SELECT 'events'::text AS kind, e.distance_m
-        FROM milos_around_match_events(p_origin, p_max_radius_m, p_bbox, p_now_at, p_win_from, p_win_to,
+        FROM palee_around_match_events(p_origin, p_max_radius_m, p_bbox, p_now_at, p_win_from, p_win_to,
                p_max_price_cents, p_disciplines, p_audiences, p_languages, p_amenities, p_created_after) e
         WHERE 'events' = ANY (p_kinds)
         UNION ALL
         SELECT 'boxes', b.distance_m
-        FROM milos_around_match_boxes(p_origin, p_max_radius_m, p_bbox, p_trial_only, p_exclude_ids,
+        FROM palee_around_match_boxes(p_origin, p_max_radius_m, p_bbox, p_trial_only, p_exclude_ids,
                p_disciplines, p_audiences, p_languages, p_amenities, p_created_after) b
         WHERE 'boxes' = ANY (p_kinds)
         UNION ALL
         SELECT 'clubs', c.distance_m
-        FROM milos_around_match_clubs(p_origin, p_max_radius_m, p_bbox, p_disciplines, p_audiences,
+        FROM palee_around_match_clubs(p_origin, p_max_radius_m, p_bbox, p_disciplines, p_audiences,
                p_languages, p_amenities, p_created_after) c
         WHERE 'clubs' = ANY (p_kinds)
         UNION ALL
         SELECT 'posts', p.distance_m
-        FROM milos_around_match_posts(p_origin, p_max_radius_m, p_bbox, p_since, p_viewer_id,
+        FROM palee_around_match_posts(p_origin, p_max_radius_m, p_bbox, p_since, p_viewer_id,
                p_disciplines, p_audiences, p_languages, p_amenities, p_created_after) p
         WHERE 'posts' = ANY (p_kinds)
       ) x
@@ -751,7 +751,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
 
     # Map pins («Ψάξε εδώ»): every kind in one capped list, nearest first.
     execute("""
-    CREATE FUNCTION milos_around_pins(
+    CREATE FUNCTION palee_around_pins(
       p_origin geography, p_radius_m double precision, p_bbox geography, p_kinds text[],
       p_now_at timestamptz, p_win_from timestamptz[], p_win_to timestamptz[],
       p_max_price_cents integer, p_trial_only boolean, p_exclude_ids uuid[], p_since timestamptz,
@@ -768,23 +768,23 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
       FROM (
         SELECT 'events'::text AS kind, e.id, e.latitude, e.longitude, e.title,
                NULL::text AS slug, e.distance_m
-        FROM milos_around_match_events(p_origin, p_radius_m, p_bbox, p_now_at, p_win_from, p_win_to,
+        FROM palee_around_match_events(p_origin, p_radius_m, p_bbox, p_now_at, p_win_from, p_win_to,
                p_max_price_cents, p_disciplines, p_audiences, p_languages, p_amenities, NULL) e
         WHERE 'events' = ANY (p_kinds)
         UNION ALL
         SELECT 'boxes', b.organization_id, b.latitude, b.longitude, b.title, b.slug,
                b.distance_m
-        FROM milos_around_match_boxes(p_origin, p_radius_m, p_bbox, p_trial_only, p_exclude_ids,
+        FROM palee_around_match_boxes(p_origin, p_radius_m, p_bbox, p_trial_only, p_exclude_ids,
                p_disciplines, p_audiences, p_languages, p_amenities, NULL) b
         WHERE 'boxes' = ANY (p_kinds)
         UNION ALL
         SELECT 'clubs', c.id, c.latitude, c.longitude, c.title, NULL, c.distance_m
-        FROM milos_around_match_clubs(p_origin, p_radius_m, p_bbox, p_disciplines, p_audiences,
+        FROM palee_around_match_clubs(p_origin, p_radius_m, p_bbox, p_disciplines, p_audiences,
                p_languages, p_amenities, NULL) c
         WHERE 'clubs' = ANY (p_kinds)
         UNION ALL
         SELECT 'posts', p.id, p.latitude, p.longitude, p.title, NULL, p.distance_m
-        FROM milos_around_match_posts(p_origin, p_radius_m, p_bbox, p_since, p_viewer_id,
+        FROM palee_around_match_posts(p_origin, p_radius_m, p_bbox, p_since, p_viewer_id,
                p_disciplines, p_audiences, p_languages, p_amenities, NULL) p
         WHERE 'posts' = ANY (p_kinds)
       ) x
@@ -796,7 +796,7 @@ defmodule MilosTraining.Repo.Migrations.AroundMe do
     # The daily alert sweep reaches every person's alerting filters; it
     # learns only which ones are due, then works in each person's session.
     execute("""
-    CREATE FUNCTION milos_around_alert_candidates(p_today date, p_lim integer)
+    CREATE FUNCTION palee_around_alert_candidates(p_today date, p_lim integer)
     RETURNS TABLE (id uuid, user_id uuid)
     #{definer}
     AS $$

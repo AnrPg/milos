@@ -1,0 +1,3 @@
+/* Generated from apps/web/src/lib/theme.ts by `npm run theme:native`; do not edit. */
+:root { color-scheme: light dark; --background: #F4F5F7; --panel: #FFFFFF; --text: #17181C; --muted: #5E6470; --border: #DFE2E8; --primary: #2F5BFF; --primary-contrast: #FFFFFF; --spark: #E4FF6E; --spark-contrast: #17181C; }
+@media (prefers-color-scheme: dark) { :root { --background: #17181C; --panel: #1D1F24; --text: #F4F5F7; --muted: #A2A8B3; --border: #2C2F37; --primary: #5B7CFF; --primary-contrast: #0E0F12; --spark: #E4FF6E; --spark-contrast: #17181C; } }

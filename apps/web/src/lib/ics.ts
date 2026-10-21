@@ -21,7 +21,7 @@ function toDateCompact(yyyyMmDd: string): string {
 }
 
 export function downloadIcsEvent(event: IcsEvent): void {
-  const uid = `trainingjournal-${Date.now()}@trainingjournal`;
+  const uid = `palee-${Date.now()}@palee`;
   const dtstamp = toUtcCompact(new Date().toISOString());
 
   const dtstart = event.datetime
@@ -35,7 +35,7 @@ export function downloadIcsEvent(event: IcsEvent): void {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//TrainingJournal//EN",
+    "PRODID:-//Palee//EN",
     "BEGIN:VEVENT",
     `UID:${uid}`,
     `DTSTAMP:${dtstamp}`,

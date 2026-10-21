@@ -1,6 +1,6 @@
 /**
  * The ten general physical skills used by WOD goals and the qualities radar
- * (ADR-163), mirroring `MilosTraining.Anatomy.Domain.FitnessQualities`.
+ * (ADR-163), mirroring `Palee.Anatomy.Domain.FitnessQualities`.
  * Labels: `Anatomy.quality.<id>`.
  */
 export const FITNESS_QUALITIES = [

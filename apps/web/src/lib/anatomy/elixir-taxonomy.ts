@@ -2,7 +2,7 @@ import type { TaxonomyTree } from "./taxonomy";
 
 /**
  * Reads the `@tree` and `@version` literals of the API's
- * `MilosTraining.Anatomy.Domain.MuscleTaxonomy` module. The tree is a nested
+ * `Palee.Anatomy.Domain.MuscleTaxonomy` module. The tree is a nested
  * literal of strings, lists and tuples, so swapping tuple braces for list
  * brackets turns it into JSON. Used by the test that keeps `taxonomy.ts` in
  * step with the API (the source of truth).

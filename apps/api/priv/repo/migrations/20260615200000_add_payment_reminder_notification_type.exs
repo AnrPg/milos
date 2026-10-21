@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddPaymentReminderNotificationType do
+defmodule Palee.Repo.Migrations.AddPaymentReminderNotificationType do
   use Ecto.Migration
 
   @types_with_reminder [

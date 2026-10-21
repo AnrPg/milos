@@ -37,10 +37,10 @@ Phase 1's community context (ADR-138) had one club per gym and staff-made channe
 7. **Personal routes for posting anywhere.** Posts, kudos, comments and moderation
    for any club the member reaches go through `/api/me/community/*`; writes run in the
    scope of the gym that runs the club (`ClubScope.write_context`). Open-club reads
-   for non-members use SECURITY DEFINER helpers (`milos_open_club_member_counts`).
+   for non-members use SECURITY DEFINER helpers (`palee_open_club_member_counts`).
 8. **«Μέλη».** `/api/me/clubs/:id/members` lists everyone but the reader, coaches
    first, with a search. `community_social_settings.hide_from_members` lets a person
-   stay off the list (`milos_hidden_member_ids`).
+   stay off the list (`palee_hidden_member_ids`).
 9. **Capabilities.** `moderate_community` (owner, admin, coach) and
    `manage_community` (owner, admin); see rights-per-account-type.
 10. **Realtime.** Group changes broadcast `channels_changed` on

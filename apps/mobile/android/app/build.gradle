@@ -44,10 +44,10 @@ dependencies {
     implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
     implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
     implementation project(':capacitor-android')
-    // ADR-172: Health Connect and coroutines for the MilosHealth plugin.
+    // ADR-172: Health Connect and coroutines for the PaleeHealth plugin.
     implementation "androidx.health.connect:connect-client:$healthConnectVersion"
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutinesVersion"
-    // ADR-173: geofencing for the arrival reminder (MilosGeofence).
+    // ADR-173: geofencing for the arrival reminder (PaleeGeofence).
     implementation "com.google.android.gms:play-services-location:$playServicesLocationVersion"
     // ADR-173: NotificationCompat and ContextCompat for the reminder.
     implementation "androidx.core:core:$androidxCoreVersion"

@@ -50,7 +50,7 @@ the journal-section switches; Pantheon keeps a PR history with dates.
    Owner-only RLS (ENABLE + FORCE), listed in `@ready_personal_tables`, no
    coach policy, deleted with the account.
 4. **Nightly job** `NightlyInsightsJob` (02:40, `analytics` queue): the definer
-   function `milos_insight_candidates(since, after, limit)` answers the ids
+   function `palee_insight_candidates(since, after, limit)` answers the ids
    of people with any session, wellness entry or craving in the window
    (keyset, ids only); each is computed in their own session; one failure is
    logged and never stops the run.

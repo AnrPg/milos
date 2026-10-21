@@ -6,6 +6,7 @@ import * as maplibregl from "maplibre-gl";
 import { useEffect, useRef } from "react";
 
 import { mapStyleUrl } from "@/lib/map-style";
+import { followMapTheme } from "@/lib/map-theme";
 
 export type MapPlace = { id: string; name: string; latitude: number; longitude: number; selected: boolean };
 export type MapBounds = { west: number; south: number; east: number; north: number };
@@ -53,6 +54,7 @@ export default function PlacesMap({
       // No WebGL2 (old devices, some test browsers): the page works without the map.
       return;
     }
+    const stopTheme = followMapTheme(instance);
     const report = () => {
       const bounds = instance.getBounds();
       callbacks.current.onBoundsChange({
@@ -66,6 +68,7 @@ export default function PlacesMap({
     instance.on("load", report);
     map.current = instance;
     return () => {
+      stopTheme();
       instance.remove();
       map.current = null;
     };
@@ -78,14 +81,14 @@ export default function PlacesMap({
     markers.current = places.map((place) => {
       const element = document.createElement("button");
       element.type = "button";
-      element.className = "milos-map-pin";
+      element.className = "palee-map-pin";
       element.dataset.selected = String(place.selected);
       element.setAttribute("aria-label", place.name);
       const label = document.createElement("span");
-      label.className = "milos-map-pin__label";
+      label.className = "palee-map-pin__label";
       label.textContent = place.name;
       const dot = document.createElement("span");
-      dot.className = "milos-map-pin__dot";
+      dot.className = "palee-map-pin__dot";
       element.append(label, dot);
       element.addEventListener("click", () => callbacks.current.onSelect(place.id));
       return new maplibregl.Marker({ element, anchor: "bottom" })

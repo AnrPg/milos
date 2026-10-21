@@ -44,7 +44,7 @@ Implemented in `0f8f700`, `25ab625` and `a37ab33`.
   finance access can be widened per gym (ADR-099 notes).
 - Migration `20261013130000_create_housekeeping` adds
   `housekeeping_areas` (with a task checklist) and `housekeeping_entries`
-  with RLS; facade `MilosTraining.Housekeeping`.
+  with RLS; facade `Palee.Housekeeping`.
 - Web: `/admin/cleaning` (`CleaningLog.tsx`): start an entry, tick tasks,
   finish; areas and history for those who review. A janitor's home is the
   log.

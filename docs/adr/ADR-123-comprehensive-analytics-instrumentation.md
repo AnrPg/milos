@@ -65,7 +65,7 @@ Constraints:
    It always returns `:ok`. `RecordAnalyticsEvent` now records inside the named
    tenant's `RepoContext` session whenever `organization_id` is known, so
    user-only sessions (executions) and job sessions (push) still satisfy the
-   forced RLS policy. Failures emit `[:milos, :analytics, :record_failed]`
+   forced RLS policy. Failures emit `[:palee, :analytics, :record_failed]`
    telemetry.
 4. **Server-derived execution facts.**
    - Completion facts and the abandon point are pure functions in
@@ -88,7 +88,7 @@ Constraints:
    `src/lib/execution-analytics.ts` (`createExecutionAnalytics`) is the client
    API for the timer branch.
 6. **Delivery facts without context coupling.** The Notifications context
-   emits `[:milos, :notification, :delivered]` telemetry when it creates a new
+   emits `[:palee, :notification, :delivered]` telemetry when it creates a new
    in-app notification. `Application.RecordNotificationDelivered`, attached at
    start, records the event in the delivering process. The push dispatch job
    calls `Application.RecordPushDeliveryOutcome`.
@@ -205,7 +205,7 @@ and `SendMessage` pipe their results through it unchanged.
 
 | Event | Boundary | Metadata | Dedupe |
 |---|---|---|---|
-| `notification_in_app_delivered` | `RecordNotificationDelivered`, a telemetry handler attached in `MilosTraining.Application.start/2` | type | per notification |
+| `notification_in_app_delivered` | `RecordNotificationDelivered`, a telemetry handler attached in `Palee.Application.start/2` | type | per notification |
 | `notification_push_outcome` | `RecordPushDeliveryOutcome`, called from `PushDispatchJob` after every dispatcher result. It also writes a `push_dispatch_attempts` row: status, reason class in `error`, SHA-256 of the endpoint. This row feeds the existing summary's `push_dispatch.by_status`. | outcome (sent / expired / failed), reason_class (subscription_expired, not_configured, rate_limited, payload_too_large, client_error, server_error, timeout, unknown), notification_type, attempt, final_attempt | - |
 
 The Phase 8 events are unchanged and are now registered: `payment_recorded`,

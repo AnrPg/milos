@@ -1,4 +1,4 @@
-defmodule MilosTraining.Repo.Migrations.AddCompletedToursToUsers do
+defmodule Palee.Repo.Migrations.AddCompletedToursToUsers do
   use Ecto.Migration
 
   # Additive: which product tours (admin, member, athlete) an account has

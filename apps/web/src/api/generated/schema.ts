@@ -12,7 +12,7 @@ export interface paths {
             cookie?: never;
         };
         /** The muscle taxonomy and fitness qualities used by WOD goals */
-        get: operations["MilosTrainingWeb.AnatomyController.taxonomy"];
+        get: operations["PaleeWeb.AnatomyController.taxonomy"];
         put?: never;
         post?: never;
         delete?: never;
@@ -31,7 +31,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Map pins inside a viewport («Ψάξε εδώ»), same filter, capped */
-        post: operations["MilosTrainingWeb.AroundController.pins"];
+        post: operations["PaleeWeb.AroundController.pins"];
         delete?: never;
         options?: never;
         head?: never;
@@ -51,7 +51,7 @@ export interface paths {
          * Γύρω μου: each kind's nearest or soonest cards, totals and wider counts
          * @description Events (soonest first), boxes with a published page (trial-takers first, then nearest), open clubs (nearest) and, when asked for, public posts (newest). Remembers the filter as your last-used Γύρω μου filter unless `remember` is false.
          */
-        post: operations["MilosTrainingWeb.AroundController.search"];
+        post: operations["PaleeWeb.AroundController.search"];
         delete?: never;
         options?: never;
         head?: never;
@@ -68,7 +68,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** One Γύρω μου kind, cursor-paged («Δες όλα») */
-        post: operations["MilosTrainingWeb.AroundController.kind"];
+        post: operations["PaleeWeb.AroundController.kind"];
         delete?: never;
         options?: never;
         head?: never;
@@ -85,7 +85,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Inspect a one-time organization invitation */
-        post: operations["MilosTrainingWeb.OrganizationAccessController.inspect"];
+        post: operations["PaleeWeb.OrganizationAccessController.inspect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -100,7 +100,7 @@ export interface paths {
             cookie?: never;
         };
         /** Public: describe the organization behind a join link */
-        get: operations["MilosTrainingWeb.OrganizationAccessController.inspect_join_link"];
+        get: operations["PaleeWeb.OrganizationAccessController.inspect_join_link"];
         put?: never;
         post?: never;
         delete?: never;
@@ -119,7 +119,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Log in a user */
-        post: operations["MilosTrainingWeb.AuthController.login"];
+        post: operations["PaleeWeb.AuthController.login"];
         delete?: never;
         options?: never;
         head?: never;
@@ -136,7 +136,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Sign out the current browser session */
-        post: operations["MilosTrainingWeb.AuthController.logout"];
+        post: operations["PaleeWeb.AuthController.logout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -151,7 +151,7 @@ export interface paths {
             cookie?: never;
         };
         /** Return the authenticated user */
-        get: operations["MilosTrainingWeb.AuthController.me"];
+        get: operations["PaleeWeb.AuthController.me"];
         put?: never;
         post?: never;
         delete?: never;
@@ -168,7 +168,7 @@ export interface paths {
             cookie?: never;
         };
         /** Check whether a nickname is available for registration */
-        get: operations["MilosTrainingWeb.AuthController.nickname_available"];
+        get: operations["PaleeWeb.AuthController.nickname_available"];
         put?: never;
         post?: never;
         delete?: never;
@@ -187,7 +187,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Refresh an access token */
-        post: operations["MilosTrainingWeb.AuthController.refresh"];
+        post: operations["PaleeWeb.AuthController.refresh"];
         delete?: never;
         options?: never;
         head?: never;
@@ -204,7 +204,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Register a new user */
-        post: operations["MilosTrainingWeb.AuthController.register"];
+        post: operations["PaleeWeb.AuthController.register"];
         delete?: never;
         options?: never;
         head?: never;
@@ -221,7 +221,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Register through an owner or admin organization invitation */
-        post: operations["MilosTrainingWeb.AuthController.register_admin"];
+        post: operations["PaleeWeb.AuthController.register_admin"];
         delete?: never;
         options?: never;
         head?: never;
@@ -238,7 +238,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Register through an organization invitation */
-        post: operations["MilosTrainingWeb.AuthController.register_member"];
+        post: operations["PaleeWeb.AuthController.register_member"];
         delete?: never;
         options?: never;
         head?: never;
@@ -255,7 +255,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Invalidate every session for the authenticated user */
-        post: operations["MilosTrainingWeb.AuthController.sign_out_all"];
+        post: operations["PaleeWeb.AuthController.sign_out_all"];
         delete?: never;
         options?: never;
         head?: never;
@@ -270,7 +270,7 @@ export interface paths {
             cookie?: never;
         };
         /** Disciplines by group, audiences, amenities and services */
-        get: operations["MilosTrainingWeb.BoxVocabularyController.show"];
+        get: operations["PaleeWeb.BoxVocabularyController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -287,10 +287,10 @@ export interface paths {
             cookie?: never;
         };
         /** Your conversation with a box and a page of its messages, newest first */
-        get: operations["MilosTrainingWeb.BoxConversationController.show"];
+        get: operations["PaleeWeb.BoxConversationController.show"];
         put?: never;
         /** Start (or return) your conversation with a box */
-        post: operations["MilosTrainingWeb.BoxConversationController.open"];
+        post: operations["PaleeWeb.BoxConversationController.open"];
         delete?: never;
         options?: never;
         head?: never;
@@ -307,7 +307,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Write to the box */
-        post: operations["MilosTrainingWeb.BoxConversationController.send_message"];
+        post: operations["PaleeWeb.BoxConversationController.send_message"];
         delete?: never;
         options?: never;
         head?: never;
@@ -324,7 +324,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark the conversation read up to a message */
-        post: operations["MilosTrainingWeb.BoxConversationController.mark_read"];
+        post: operations["PaleeWeb.BoxConversationController.mark_read"];
         delete?: never;
         options?: never;
         head?: never;
@@ -339,7 +339,7 @@ export interface paths {
             cookie?: never;
         };
         /** A published box's upcoming events open to everyone (its page's Events tab) */
-        get: operations["MilosTrainingWeb.CommunityEventController.box_events"];
+        get: operations["PaleeWeb.CommunityEventController.box_events"];
         put?: never;
         post?: never;
         delete?: never;
@@ -356,7 +356,7 @@ export interface paths {
             cookie?: never;
         };
         /** Posts a published box made public, newest first (signed in) */
-        get: operations["MilosTrainingWeb.PublicBoxController.posts"];
+        get: operations["PaleeWeb.PublicBoxController.posts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -373,7 +373,7 @@ export interface paths {
             cookie?: never;
         };
         /** A published box's classes in a window (read-only; signed in) */
-        get: operations["MilosTrainingWeb.PublicBoxController.schedule"];
+        get: operations["PaleeWeb.PublicBoxController.schedule"];
         put?: never;
         post?: never;
         delete?: never;
@@ -392,7 +392,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Ask for (or book) a trial in a class of a published box */
-        post: operations["MilosTrainingWeb.TrialController.create"];
+        post: operations["PaleeWeb.TrialController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -407,7 +407,7 @@ export interface paths {
             cookie?: never;
         };
         /** Preview of a buddy invite link (public) */
-        get: operations["MilosTrainingWeb.BuddyInviteController.show"];
+        get: operations["PaleeWeb.BuddyInviteController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -424,7 +424,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get signed calendar export links for the current user */
-        get: operations["MilosTrainingWeb.CalendarFeedController.links"];
+        get: operations["PaleeWeb.CalendarFeedController.links"];
         put?: never;
         post?: never;
         delete?: never;
@@ -443,7 +443,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Regenerate calendar export links and revoke previous feed URLs */
-        post: operations["MilosTrainingWeb.CalendarFeedController.regenerate_links"];
+        post: operations["PaleeWeb.CalendarFeedController.regenerate_links"];
         delete?: never;
         options?: never;
         head?: never;
@@ -458,7 +458,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch a signed user calendar feed */
-        get: operations["MilosTrainingWeb.CalendarFeedController.feed"];
+        get: operations["PaleeWeb.CalendarFeedController.feed"];
         put?: never;
         post?: never;
         delete?: never;
@@ -477,7 +477,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Scan the door: check in to a booking or open gym, or see what the box offers */
-        post: operations["MilosTrainingWeb.ScanCheckInController.scan"];
+        post: operations["PaleeWeb.ScanCheckInController.scan"];
         delete?: never;
         options?: never;
         head?: never;
@@ -495,7 +495,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Undo a scan's check-in within its minute */
-        delete: operations["MilosTrainingWeb.ScanCheckInController.undo"];
+        delete: operations["PaleeWeb.ScanCheckInController.undo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -511,7 +511,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Open your practice as an independent coach (one per account) */
-        post: operations["MilosTrainingWeb.CoachPracticeController.create"];
+        post: operations["PaleeWeb.CoachPracticeController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -526,10 +526,10 @@ export interface paths {
             cookie?: never;
         };
         /** List my workout executions */
-        get: operations["MilosTrainingWeb.ExecutionController.index"];
+        get: operations["PaleeWeb.ExecutionController.index"];
         put?: never;
         /** Start a workout execution */
-        post: operations["MilosTrainingWeb.ExecutionController.create"];
+        post: operations["PaleeWeb.ExecutionController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -544,7 +544,7 @@ export interface paths {
             cookie?: never;
         };
         /** My completed workouts, each with its dated entries (ADR-098) */
-        get: operations["MilosTrainingWeb.ExecutionController.vault"];
+        get: operations["PaleeWeb.ExecutionController.vault"];
         put?: never;
         post?: never;
         delete?: never;
@@ -561,7 +561,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get an execution by id */
-        get: operations["MilosTrainingWeb.ExecutionController.show"];
+        get: operations["PaleeWeb.ExecutionController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -584,7 +584,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Complete a workout execution */
-        patch: operations["MilosTrainingWeb.ExecutionController.complete"];
+        patch: operations["PaleeWeb.ExecutionController.complete"];
         trace?: never;
     };
     "/api/executions/{id}/interactions": {
@@ -600,7 +600,7 @@ export interface paths {
          * Report client-only execution interaction events (analytics, ADR-123)
          * @description Batched, idempotent ingestion of execution interaction signals the server cannot observe (pause sheet, manual skip, round taps, adjusts, ready screen, finish wizard, cast mode). Each event dedupes on its client_event_id; retries are accepted and counted as duplicates. Any invalid event rejects the batch.
          */
-        post: operations["MilosTrainingWeb.ExecutionController.record_interactions"];
+        post: operations["PaleeWeb.ExecutionController.record_interactions"];
         delete?: never;
         options?: never;
         head?: never;
@@ -621,7 +621,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Persist execution progress */
-        patch: operations["MilosTrainingWeb.ExecutionController.update_progress"];
+        patch: operations["PaleeWeb.ExecutionController.update_progress"];
         trace?: never;
     };
     "/api/gamification/preferences": {
@@ -632,9 +632,9 @@ export interface paths {
             cookie?: never;
         };
         /** Get my gamification preferences */
-        get: operations["MilosTrainingWeb.GamificationPreferencesController.show"];
+        get: operations["PaleeWeb.GamificationPreferencesController.show"];
         /** Update my gamification preferences */
-        put: operations["MilosTrainingWeb.GamificationPreferencesController.update"];
+        put: operations["PaleeWeb.GamificationPreferencesController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -653,7 +653,7 @@ export interface paths {
          * Read API health
          * @description Returns the API health status for local and container checks.
          */
-        get: operations["MilosTrainingWeb.HealthController.index"];
+        get: operations["PaleeWeb.HealthController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -670,7 +670,7 @@ export interface paths {
             cookie?: never;
         };
         /** Garmin's OAuth return; redirects to the devices page */
-        get: operations["MilosTrainingWeb.GarminIntegrationController.callback"];
+        get: operations["PaleeWeb.GarminIntegrationController.callback"];
         put?: never;
         post?: never;
         delete?: never;
@@ -688,8 +688,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Garmin tells Milos a person removed the app at Garmin */
-        post: operations["MilosTrainingWeb.GarminIntegrationController.deregistration"];
+        /** Garmin tells Palee a person removed the app at Garmin */
+        post: operations["PaleeWeb.GarminIntegrationController.deregistration"];
         delete?: never;
         options?: never;
         head?: never;
@@ -706,7 +706,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Garmin's push endpoint (summaries or callback URLs); verified, idempotent */
-        post: operations["MilosTrainingWeb.GarminIntegrationController.push"];
+        post: operations["PaleeWeb.GarminIntegrationController.push"];
         delete?: never;
         options?: never;
         head?: never;
@@ -723,7 +723,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Write or edit several comments at once (all or none) */
-        post: operations["MilosTrainingWeb.JournalCommentController.batch"];
+        post: operations["PaleeWeb.JournalCommentController.batch"];
         delete?: never;
         options?: never;
         head?: never;
@@ -739,10 +739,10 @@ export interface paths {
         };
         get?: never;
         /** Write or edit a comment on one of your entries */
-        put: operations["MilosTrainingWeb.JournalCommentController.save"];
+        put: operations["PaleeWeb.JournalCommentController.save"];
         post?: never;
         /** Delete one of your comments */
-        delete: operations["MilosTrainingWeb.JournalCommentController.delete"];
+        delete: operations["PaleeWeb.JournalCommentController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -756,9 +756,9 @@ export interface paths {
             cookie?: never;
         };
         /** Your «Η περιοχή μου» */
-        get: operations["MilosTrainingWeb.PlacesController.area"];
+        get: operations["PaleeWeb.PlacesController.area"];
         /** Set «Η περιοχή μου» (up to 5 neighbourhoods; the first is the main one) */
-        put: operations["MilosTrainingWeb.PlacesController.update_area"];
+        put: operations["PaleeWeb.PlacesController.update_area"];
         post?: never;
         delete?: never;
         options?: never;
@@ -774,7 +774,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your muscle coverage across every provider, for the anatomy atlas */
-        get: operations["MilosTrainingWeb.AnatomyAtlasController.show"];
+        get: operations["PaleeWeb.AnatomyAtlasController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -797,7 +797,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Finalize or clear the current user's avatar */
-        patch: operations["MilosTrainingWeb.MeController.update_avatar"];
+        patch: operations["PaleeWeb.MeController.update_avatar"];
         trace?: never;
     };
     "/api/me/avatar/upload-url": {
@@ -810,7 +810,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a constrained presigned avatar upload */
-        post: operations["MilosTrainingWeb.MeController.avatar_upload_url"];
+        post: operations["PaleeWeb.MeController.avatar_upload_url"];
         delete?: never;
         options?: never;
         head?: never;
@@ -825,10 +825,10 @@ export interface paths {
             cookie?: never;
         };
         /** People you blocked */
-        get: operations["MilosTrainingWeb.PartnersController.blocks"];
+        get: operations["PaleeWeb.PartnersController.blocks"];
         put?: never;
         /** Block a person: Partners matches and buddy links between you end; they are not told */
-        post: operations["MilosTrainingWeb.PartnersController.block"];
+        post: operations["PaleeWeb.PartnersController.block"];
         delete?: never;
         options?: never;
         head?: never;
@@ -846,7 +846,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Unblock a person (ended matches and links stay ended) */
-        delete: operations["MilosTrainingWeb.PartnersController.unblock"];
+        delete: operations["PaleeWeb.PartnersController.unblock"];
         options?: never;
         head?: never;
         patch?: never;
@@ -860,7 +860,7 @@ export interface paths {
             cookie?: never;
         };
         /** Which coaches looked at the snapshots you shared, and when */
-        get: operations["MilosTrainingWeb.MyBodyController.access_log"];
+        get: operations["PaleeWeb.MyBodyController.access_log"];
         put?: never;
         post?: never;
         delete?: never;
@@ -877,7 +877,7 @@ export interface paths {
             cookie?: never;
         };
         /** Two snapshots side by side, with the change of each metric */
-        get: operations["MilosTrainingWeb.MyBodyController.compare"];
+        get: operations["PaleeWeb.MyBodyController.compare"];
         put?: never;
         post?: never;
         delete?: never;
@@ -894,7 +894,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your health consents */
-        get: operations["MilosTrainingWeb.MyBodyController.consents"];
+        get: operations["PaleeWeb.MyBodyController.consents"];
         put?: never;
         post?: never;
         delete?: never;
@@ -912,10 +912,10 @@ export interface paths {
         };
         get?: never;
         /** Give a health consent */
-        put: operations["MilosTrainingWeb.MyBodyController.grant_consent"];
+        put: operations["PaleeWeb.MyBodyController.grant_consent"];
         post?: never;
         /** Withdraw a health consent (coaches stop seeing your photos at once) */
-        delete: operations["MilosTrainingWeb.MyBodyController.withdraw_consent"];
+        delete: operations["PaleeWeb.MyBodyController.withdraw_consent"];
         options?: never;
         head?: never;
         patch?: never;
@@ -932,7 +932,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete all your body photos (files included) */
-        delete: operations["MilosTrainingWeb.MyBodyController.delete_photos"];
+        delete: operations["PaleeWeb.MyBodyController.delete_photos"];
         options?: never;
         head?: never;
         patch?: never;
@@ -946,7 +946,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your latest photo of each pose, for the camera's outline */
-        get: operations["MilosTrainingWeb.MyBodyController.latest_photos"];
+        get: operations["PaleeWeb.MyBodyController.latest_photos"];
         put?: never;
         post?: never;
         delete?: never;
@@ -965,7 +965,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reserve an upload for a body photo (needs your body-photo consent) */
-        post: operations["MilosTrainingWeb.MyBodyController.upload"];
+        post: operations["PaleeWeb.MyBodyController.upload"];
         delete?: never;
         options?: never;
         head?: never;
@@ -980,7 +980,7 @@ export interface paths {
             cookie?: never;
         };
         /** One metric over time, smoothed, with a trend word (as your display allows) */
-        get: operations["MilosTrainingWeb.MyBodyController.series"];
+        get: operations["PaleeWeb.MyBodyController.series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -997,9 +997,9 @@ export interface paths {
             cookie?: never;
         };
         /** Your body settings and the metric catalog in your units */
-        get: operations["MilosTrainingWeb.MyBodyController.settings"];
+        get: operations["PaleeWeb.MyBodyController.settings"];
         /** Change your body settings (units, weight display, sections, reminder) */
-        put: operations["MilosTrainingWeb.MyBodyController.update_settings"];
+        put: operations["PaleeWeb.MyBodyController.update_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1017,7 +1017,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Share a before/after of one pose as a post (explicit confirmation; photos copied) */
-        post: operations["MilosTrainingWeb.MyBodyController.share"];
+        post: operations["PaleeWeb.MyBodyController.share"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1032,10 +1032,10 @@ export interface paths {
             cookie?: never;
         };
         /** Your body snapshots, newest first */
-        get: operations["MilosTrainingWeb.MyBodyController.index"];
+        get: operations["PaleeWeb.MyBodyController.index"];
         put?: never;
         /** Save a snapshot: metrics in your units and/or photos (private by default) */
-        post: operations["MilosTrainingWeb.MyBodyController.create"];
+        post: operations["PaleeWeb.MyBodyController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1050,15 +1050,15 @@ export interface paths {
             cookie?: never;
         };
         /** One of your snapshots */
-        get: operations["MilosTrainingWeb.MyBodyController.show"];
+        get: operations["PaleeWeb.MyBodyController.show"];
         put?: never;
         post?: never;
         /** Delete a snapshot and its photos */
-        delete: operations["MilosTrainingWeb.MyBodyController.delete"];
+        delete: operations["PaleeWeb.MyBodyController.delete"];
         options?: never;
         head?: never;
         /** Edit a snapshot (metrics merge; null removes one) */
-        patch: operations["MilosTrainingWeb.MyBodyController.update"];
+        patch: operations["PaleeWeb.MyBodyController.update"];
         trace?: never;
     };
     "/api/me/body/snapshots/{id}/photos": {
@@ -1071,7 +1071,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Add an uploaded photo to a snapshot */
-        post: operations["MilosTrainingWeb.MyBodyController.add_photo"];
+        post: operations["PaleeWeb.MyBodyController.add_photo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1089,7 +1089,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Remove a photo from a snapshot (the file is deleted) */
-        delete: operations["MilosTrainingWeb.MyBodyController.remove_photo"];
+        delete: operations["PaleeWeb.MyBodyController.remove_photo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1103,7 +1103,7 @@ export interface paths {
             cookie?: never;
         };
         /** The boxes you talk to without being a member, latest first */
-        get: operations["MilosTrainingWeb.BoxConversationController.index"];
+        get: operations["PaleeWeb.BoxConversationController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1120,10 +1120,10 @@ export interface paths {
             cookie?: never;
         };
         /** Your buddies, the people you support, invitations waiting for you, your settings */
-        get: operations["MilosTrainingWeb.MyBuddiesController.index"];
+        get: operations["PaleeWeb.MyBuddiesController.index"];
         put?: never;
         /** Invite someone you know here (they must accept; expires after 7 days) */
-        post: operations["MilosTrainingWeb.MyBuddiesController.invite"];
+        post: operations["PaleeWeb.MyBuddiesController.invite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1138,7 +1138,7 @@ export interface paths {
             cookie?: never;
         };
         /** People you can invite: your coaches and follows; with q, people of a club in common */
-        get: operations["MilosTrainingWeb.MyBuddiesController.candidates"];
+        get: operations["PaleeWeb.MyBuddiesController.candidates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1156,8 +1156,8 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** An invite link for someone not on Milos yet (shown once; expires after 7 days) */
-        post: operations["MilosTrainingWeb.MyBuddiesController.create_invite_link"];
+        /** An invite link for someone not on Palee yet (shown once; expires after 7 days) */
+        post: operations["PaleeWeb.MyBuddiesController.create_invite_link"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1172,9 +1172,9 @@ export interface paths {
             cookie?: never;
         };
         /** Your quiet hours and whether buddies may see your phone */
-        get: operations["MilosTrainingWeb.MyBuddiesController.settings"];
+        get: operations["PaleeWeb.MyBuddiesController.settings"];
         /** Change your quiet hours, zone or phone sharing (off by default) */
-        put: operations["MilosTrainingWeb.MyBuddiesController.update_settings"];
+        put: operations["PaleeWeb.MyBuddiesController.update_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1196,7 +1196,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** What your buddy receives: only what you send, or also the weekly counts summary */
-        patch: operations["MilosTrainingWeb.MyBuddiesController.update"];
+        patch: operations["PaleeWeb.MyBuddiesController.update"];
         trace?: never;
     };
     "/api/me/buddies/{id}/accept": {
@@ -1209,7 +1209,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Accept an invitation to support someone */
-        post: operations["MilosTrainingWeb.MyBuddiesController.accept"];
+        post: operations["PaleeWeb.MyBuddiesController.accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1226,7 +1226,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Decline an invitation (the other person is not notified) */
-        post: operations["MilosTrainingWeb.MyBuddiesController.decline"];
+        post: operations["PaleeWeb.MyBuddiesController.decline"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1243,7 +1243,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Stop, from either side, at any time (no push; the other sees it on their page) */
-        post: operations["MilosTrainingWeb.MyBuddiesController.leave"];
+        post: operations["PaleeWeb.MyBuddiesController.leave"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1258,10 +1258,10 @@ export interface paths {
             cookie?: never;
         };
         /** The link's conversation, newest first (cursor paging) */
-        get: operations["MilosTrainingWeb.BuddyMessagesController.index"];
+        get: operations["PaleeWeb.BuddyMessagesController.index"];
         put?: never;
         /** Write to your buddy (the link must be active) */
-        post: operations["MilosTrainingWeb.BuddyMessagesController.create"];
+        post: operations["PaleeWeb.BuddyMessagesController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1278,7 +1278,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark the other person's messages read */
-        post: operations["MilosTrainingWeb.BuddyMessagesController.read"];
+        post: operations["PaleeWeb.BuddyMessagesController.read"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1295,7 +1295,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Claim an invite link: you become that person's buddy */
-        post: operations["MilosTrainingWeb.MyBuddiesController.claim"];
+        post: operations["PaleeWeb.MyBuddiesController.claim"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1310,7 +1310,7 @@ export interface paths {
             cookie?: never;
         };
         /** Where the store app reminds the member to check in: locations with a booking soon (ADR-173) */
-        get: operations["MilosTrainingWeb.ScanCheckInController.geofences"];
+        get: operations["PaleeWeb.ScanCheckInController.geofences"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1327,7 +1327,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your clubs across every gym you belong to, with their channels */
-        get: operations["MilosTrainingWeb.CommunityController.my_clubs"];
+        get: operations["PaleeWeb.CommunityController.my_clubs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1344,7 +1344,7 @@ export interface paths {
             cookie?: never;
         };
         /** Partners in a club as it applies to you: offered?, your profile, the options */
-        get: operations["MilosTrainingWeb.PartnersController.club"];
+        get: operations["PaleeWeb.PartnersController.club"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1361,7 +1361,7 @@ export interface paths {
             cookie?: never;
         };
         /** The next people of the club who opted in, best fit first */
-        get: operations["MilosTrainingWeb.PartnersController.deck"];
+        get: operations["PaleeWeb.PartnersController.deck"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1379,7 +1379,7 @@ export interface paths {
         };
         get?: never;
         /** Opt in or change your Partners profile in a club (a member of the club only) */
-        put: operations["MilosTrainingWeb.PartnersController.put_profile"];
+        put: operations["PaleeWeb.PartnersController.put_profile"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1397,7 +1397,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Like or pass; a like answered by a like makes a match */
-        post: operations["MilosTrainingWeb.PartnersController.swipe"];
+        post: operations["PaleeWeb.PartnersController.swipe"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1415,7 +1415,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Take back a swipe that made no match */
-        delete: operations["MilosTrainingWeb.PartnersController.undo"];
+        delete: operations["PaleeWeb.PartnersController.undo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1429,7 +1429,7 @@ export interface paths {
             cookie?: never;
         };
         /** A club's members (not you), coaches first */
-        get: operations["MilosTrainingWeb.OpenClubController.members"];
+        get: operations["PaleeWeb.OpenClubController.members"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1446,10 +1446,10 @@ export interface paths {
             cookie?: never;
         };
         /** A club's events: upcoming (cancelled ones flagged) or past */
-        get: operations["MilosTrainingWeb.CommunityEventController.club_events"];
+        get: operations["PaleeWeb.CommunityEventController.club_events"];
         put?: never;
         /** Create an event in a club (staff and coaches); weekly with repeat_until */
-        post: operations["MilosTrainingWeb.CommunityEventController.create"];
+        post: operations["PaleeWeb.CommunityEventController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1467,7 +1467,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your comment (or one you moderate) */
-        delete: operations["MilosTrainingWeb.ClubPostController.delete_comment"];
+        delete: operations["PaleeWeb.ClubPostController.delete_comment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1482,7 +1482,7 @@ export interface paths {
         };
         get?: never;
         /** Hide or show a comment you moderate */
-        put: operations["MilosTrainingWeb.ClubPostController.hide_comment"];
+        put: operations["PaleeWeb.ClubPostController.hide_comment"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1498,7 +1498,7 @@ export interface paths {
             cookie?: never;
         };
         /** «Βρες»: open clubs to join and your gyms' groups you are not in */
-        get: operations["MilosTrainingWeb.OpenClubController.discover"];
+        get: operations["PaleeWeb.OpenClubController.discover"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1515,7 +1515,7 @@ export interface paths {
             cookie?: never;
         };
         /** Upcoming events across every club you can see */
-        get: operations["MilosTrainingWeb.CommunityEventController.clubs_events"];
+        get: operations["PaleeWeb.CommunityEventController.clubs_events"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1534,7 +1534,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Post in a channel of a club you reach */
-        post: operations["MilosTrainingWeb.ClubPostController.create"];
+        post: operations["PaleeWeb.ClubPostController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1552,7 +1552,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your post (staff and group admins: any post they moderate) */
-        delete: operations["MilosTrainingWeb.ClubPostController.delete"];
+        delete: operations["PaleeWeb.ClubPostController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1566,10 +1566,10 @@ export interface paths {
             cookie?: never;
         };
         /** A post's comments, oldest first */
-        get: operations["MilosTrainingWeb.ClubPostController.comments"];
+        get: operations["PaleeWeb.ClubPostController.comments"];
         put?: never;
         /** Comment on a post */
-        post: operations["MilosTrainingWeb.ClubPostController.comment"];
+        post: operations["PaleeWeb.ClubPostController.comment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1585,7 +1585,7 @@ export interface paths {
         };
         get?: never;
         /** Hide or show a post you moderate */
-        put: operations["MilosTrainingWeb.ClubPostController.hide"];
+        put: operations["PaleeWeb.ClubPostController.hide"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1602,7 +1602,7 @@ export interface paths {
         };
         get?: never;
         /** Give or take back kudos */
-        put: operations["MilosTrainingWeb.ClubPostController.kudos"];
+        put: operations["PaleeWeb.ClubPostController.kudos"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1619,7 +1619,7 @@ export interface paths {
         };
         get?: never;
         /** Pin or unpin a post you moderate */
-        put: operations["MilosTrainingWeb.ClubPostController.pin"];
+        put: operations["PaleeWeb.ClubPostController.pin"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1637,7 +1637,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Report a post, a comment or a group; it disappears for you and staff look at it */
-        post: operations["MilosTrainingWeb.OpenClubController.report"];
+        post: operations["PaleeWeb.OpenClubController.report"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1652,7 +1652,7 @@ export interface paths {
             cookie?: never;
         };
         /** My Wallet cards, calendar feed and health integrations */
-        get: operations["MilosTrainingWeb.WalletController.devices"];
+        get: operations["PaleeWeb.WalletController.devices"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1669,7 +1669,7 @@ export interface paths {
             cookie?: never;
         };
         /** Πρόοδος: the member's own daily stats from a device (resting heart rate) */
-        get: operations["MilosTrainingWeb.DevicesController.daily_stats"];
+        get: operations["PaleeWeb.DevicesController.daily_stats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1688,7 +1688,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Answer «Ήταν αυτό το …;»: merge into one candidate or keep as its own entry */
-        post: operations["MilosTrainingWeb.DevicesController.confirm"];
+        post: operations["PaleeWeb.DevicesController.confirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1703,7 +1703,7 @@ export interface paths {
             cookie?: never;
         };
         /** Wallet cards, calendar feed and health integrations, with Garmin's status */
-        get: operations["MilosTrainingWeb.DevicesController.index"];
+        get: operations["PaleeWeb.DevicesController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1720,7 +1720,7 @@ export interface paths {
             cookie?: never;
         };
         /** Everything connected devices brought in, as JSON (workouts, daily stats, import log) */
-        get: operations["MilosTrainingWeb.PhoneHealthController.export"];
+        get: operations["PaleeWeb.PhoneHealthController.export"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1740,11 +1740,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Disconnect Garmin, keeping or deleting what it brought in */
-        delete: operations["MilosTrainingWeb.DevicesController.disconnect"];
+        delete: operations["PaleeWeb.DevicesController.disconnect"];
         options?: never;
         head?: never;
         /** Change what Garmin syncs */
-        patch: operations["MilosTrainingWeb.DevicesController.update"];
+        patch: operations["PaleeWeb.DevicesController.update"];
         trace?: never;
     };
     "/api/me/devices/garmin/connect": {
@@ -1757,7 +1757,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Start connecting Garmin: choose what syncs and how far back, get Garmin's sign-in */
-        post: operations["MilosTrainingWeb.DevicesController.connect"];
+        post: operations["PaleeWeb.DevicesController.connect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1772,7 +1772,7 @@ export interface paths {
             cookie?: never;
         };
         /** Garmin workouts that could be one of two classes or workouts */
-        get: operations["MilosTrainingWeb.DevicesController.pending"];
+        get: operations["PaleeWeb.DevicesController.pending"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1791,7 +1791,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «Συγχρονισμός τώρα»: Garmin resends the last two days (at most every 5 minutes) */
-        post: operations["MilosTrainingWeb.DevicesController.sync"];
+        post: operations["PaleeWeb.DevicesController.sync"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1809,11 +1809,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Disconnect the phone's health data, keeping or deleting what it brought in */
-        delete: operations["MilosTrainingWeb.PhoneHealthController.disconnect"];
+        delete: operations["PaleeWeb.PhoneHealthController.disconnect"];
         options?: never;
         head?: never;
         /** Change what the phone brings in */
-        patch: operations["MilosTrainingWeb.PhoneHealthController.update"];
+        patch: operations["PaleeWeb.PhoneHealthController.update"];
         trace?: never;
     };
     "/api/me/devices/phone/{provider}/connect": {
@@ -1826,7 +1826,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Connect Apple Health or Health Connect after the phone granted read access */
-        post: operations["MilosTrainingWeb.PhoneHealthController.connect"];
+        post: operations["PaleeWeb.PhoneHealthController.connect"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1843,7 +1843,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** A batch the app read from the phone: workouts, nights, weigh-ins, daily numbers */
-        post: operations["MilosTrainingWeb.PhoneHealthController.ingest"];
+        post: operations["PaleeWeb.PhoneHealthController.ingest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1858,7 +1858,7 @@ export interface paths {
             cookie?: never;
         };
         /** The journal's device card: new imports since last seen, and what needs an answer */
-        get: operations["MilosTrainingWeb.DevicesController.summary"];
+        get: operations["PaleeWeb.DevicesController.summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1877,7 +1877,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** The device card was seen: it hides until something new arrives */
-        post: operations["MilosTrainingWeb.DevicesController.seen"];
+        post: operations["PaleeWeb.DevicesController.seen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1892,7 +1892,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your upcoming events at any box: going or on the waitlist */
-        get: operations["MilosTrainingWeb.CommunityEventController.mine"];
+        get: operations["PaleeWeb.CommunityEventController.mine"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1909,14 +1909,14 @@ export interface paths {
             cookie?: never;
         };
         /** An event; with ?invite= it also says who invited you and if a place is left */
-        get: operations["MilosTrainingWeb.CommunityEventController.show"];
+        get: operations["PaleeWeb.CommunityEventController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Edit an event (staff and coaches): this one or this and following */
-        patch: operations["MilosTrainingWeb.CommunityEventController.update"];
+        patch: operations["PaleeWeb.CommunityEventController.update"];
         trace?: never;
     };
     "/api/me/events/{id}/cancel": {
@@ -1929,7 +1929,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel an event (staff and coaches): this one or this and following */
-        post: operations["MilosTrainingWeb.CommunityEventController.cancel"];
+        post: operations["PaleeWeb.CommunityEventController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1946,7 +1946,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Your guest pass link for an event you are going to */
-        post: operations["MilosTrainingWeb.CommunityEventController.invite"];
+        post: operations["PaleeWeb.CommunityEventController.invite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1962,7 +1962,7 @@ export interface paths {
         };
         get?: never;
         /** «Θα έρθω» (a place, or the waitlist when full) or «Δεν θα έρθω» */
-        put: operations["MilosTrainingWeb.CommunityEventController.rsvp"];
+        put: operations["PaleeWeb.CommunityEventController.rsvp"];
         post?: never;
         delete?: never;
         options?: never;
@@ -1978,7 +1978,7 @@ export interface paths {
             cookie?: never;
         };
         /** Posts from your clubs, newest first */
-        get: operations["MilosTrainingWeb.CommunityPostController.feed"];
+        get: operations["PaleeWeb.CommunityPostController.feed"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1995,10 +1995,10 @@ export interface paths {
             cookie?: never;
         };
         /** Your last-used and saved filters of one list surface */
-        get: operations["MilosTrainingWeb.SavedFilterController.show"];
+        get: operations["PaleeWeb.SavedFilterController.show"];
         put?: never;
         /** Save a named filter combination (same name replaces) */
-        post: operations["MilosTrainingWeb.SavedFilterController.save"];
+        post: operations["PaleeWeb.SavedFilterController.save"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2014,7 +2014,7 @@ export interface paths {
         };
         get?: never;
         /** Remember the filter you just used on a surface */
-        put: operations["MilosTrainingWeb.SavedFilterController.remember"];
+        put: operations["PaleeWeb.SavedFilterController.remember"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2033,7 +2033,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete a saved filter */
-        delete: operations["MilosTrainingWeb.SavedFilterController.delete"];
+        delete: operations["PaleeWeb.SavedFilterController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2051,7 +2051,7 @@ export interface paths {
          * Turn a saved Γύρω μου filter's daily alert on or off (ADR-154)
          * @description At most one notification a day, only when something new matches. Turning it on counts only what appears from now on. Only the `around_me` surface has alerts.
          */
-        put: operations["MilosTrainingWeb.SavedFilterController.alert"];
+        put: operations["PaleeWeb.SavedFilterController.alert"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2067,7 +2067,7 @@ export interface paths {
             cookie?: never;
         };
         /** People waiting for you to accept them */
-        get: operations["MilosTrainingWeb.FollowController.requests"];
+        get: operations["PaleeWeb.FollowController.requests"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2087,7 +2087,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Decline a follow request, or remove a follower */
-        delete: operations["MilosTrainingWeb.FollowController.remove"];
+        delete: operations["PaleeWeb.FollowController.remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2103,7 +2103,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Accept a follow request */
-        post: operations["MilosTrainingWeb.FollowController.accept"];
+        post: operations["PaleeWeb.FollowController.accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2118,7 +2118,7 @@ export interface paths {
             cookie?: never;
         };
         /** People who follow you */
-        get: operations["MilosTrainingWeb.FollowController.followers"];
+        get: operations["PaleeWeb.FollowController.followers"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2138,7 +2138,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Decline a follow request, or remove a follower */
-        delete: operations["MilosTrainingWeb.FollowController.remove (2)"];
+        delete: operations["PaleeWeb.FollowController.remove (2)"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2152,7 +2152,7 @@ export interface paths {
             cookie?: never;
         };
         /** People (type user) or boxes (type organization) you follow */
-        get: operations["MilosTrainingWeb.FollowController.following"];
+        get: operations["PaleeWeb.FollowController.following"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2171,7 +2171,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Follow a person (a request they accept) or a published box (at once) */
-        post: operations["MilosTrainingWeb.FollowController.create"];
+        post: operations["PaleeWeb.FollowController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2186,11 +2186,11 @@ export interface paths {
             cookie?: never;
         };
         /** Whether you follow a person or box */
-        get: operations["MilosTrainingWeb.FollowController.show"];
+        get: operations["PaleeWeb.FollowController.show"];
         put?: never;
         post?: never;
         /** Unfollow, or withdraw a request */
-        delete: operations["MilosTrainingWeb.FollowController.delete"];
+        delete: operations["PaleeWeb.FollowController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2204,7 +2204,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your training log across every provider (workouts or booked classes) */
-        get: operations["MilosTrainingWeb.AccountTrainingController.history"];
+        get: operations["PaleeWeb.AccountTrainingController.history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2221,7 +2221,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your insights (indicators, never medical advice) */
-        get: operations["MilosTrainingWeb.InsightsController.show"];
+        get: operations["PaleeWeb.InsightsController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2240,7 +2240,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Show every dismissed insight again */
-        post: operations["MilosTrainingWeb.InsightsController.restore"];
+        post: operations["PaleeWeb.InsightsController.restore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2257,7 +2257,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Hide one insight until its finding changes */
-        post: operations["MilosTrainingWeb.InsightsController.dismiss"];
+        post: operations["PaleeWeb.InsightsController.dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2272,7 +2272,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your journal across every provider: every entry kind, newest first */
-        get: operations["MilosTrainingWeb.JournalController.index"];
+        get: operations["PaleeWeb.JournalController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2289,9 +2289,9 @@ export interface paths {
             cookie?: never;
         };
         /** Who «Οι coach μου» means across your providers */
-        get: operations["MilosTrainingWeb.JournalController.coach_audience"];
+        get: operations["PaleeWeb.JournalController.coach_audience"];
         /** Choose which providers' coaches «Οι coach μου» means */
-        put: operations["MilosTrainingWeb.JournalController.put_coach_audience"];
+        put: operations["PaleeWeb.JournalController.put_coach_audience"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2308,7 +2308,7 @@ export interface paths {
         };
         get?: never;
         /** Share one entry with specific coaches (or reset it) */
-        put: operations["MilosTrainingWeb.JournalController.entry_audience"];
+        put: operations["PaleeWeb.JournalController.entry_audience"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2325,7 +2325,7 @@ export interface paths {
         };
         get?: never;
         /** Move one of your entries on the visibility ladder */
-        put: operations["MilosTrainingWeb.JournalController.set_visibility"];
+        put: operations["PaleeWeb.JournalController.set_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2343,7 +2343,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Export your whole journal across providers (JSON and training CSV) */
-        post: operations["MilosTrainingWeb.JournalController.export"];
+        post: operations["PaleeWeb.JournalController.export"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2358,7 +2358,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your journal exports, with short-lived download links */
-        get: operations["MilosTrainingWeb.JournalController.exports"];
+        get: operations["PaleeWeb.JournalController.exports"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2377,7 +2377,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Write a Σημείωση */
-        post: operations["MilosTrainingWeb.JournalController.create_note"];
+        post: operations["PaleeWeb.JournalController.create_note"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2395,11 +2395,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete one of your notes */
-        delete: operations["MilosTrainingWeb.JournalController.delete_note"];
+        delete: operations["PaleeWeb.JournalController.delete_note"];
         options?: never;
         head?: never;
         /** Edit one of your notes */
-        patch: operations["MilosTrainingWeb.JournalController.update_note"];
+        patch: operations["PaleeWeb.JournalController.update_note"];
         trace?: never;
     };
     "/api/me/media/capabilities": {
@@ -2410,7 +2410,7 @@ export interface paths {
             cookie?: never;
         };
         /** What the compose may offer: photo and video limits on this server */
-        get: operations["MilosTrainingWeb.MyMediaController.capabilities"];
+        get: operations["PaleeWeb.MyMediaController.capabilities"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2429,7 +2429,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reserve an upload for a post photo or video and get a presigned PUT for it */
-        post: operations["MilosTrainingWeb.MyMediaController.upload"];
+        post: operations["PaleeWeb.MyMediaController.upload"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2444,15 +2444,15 @@ export interface paths {
             cookie?: never;
         };
         /** One of your uploads, while it processes and after */
-        get: operations["MilosTrainingWeb.MyMediaController.show"];
+        get: operations["PaleeWeb.MyMediaController.show"];
         put?: never;
         post?: never;
         /** Remove an upload you took out of the compose (not one in a post) */
-        delete: operations["MilosTrainingWeb.MyMediaController.delete"];
+        delete: operations["PaleeWeb.MyMediaController.delete"];
         options?: never;
         head?: never;
         /** Set or clear an upload's alternative text (its post follows) */
-        patch: operations["MilosTrainingWeb.MyMediaController.update"];
+        patch: operations["PaleeWeb.MyMediaController.update"];
         trace?: never;
     };
     "/api/me/media/{id}/alt-text-suggestion": {
@@ -2465,7 +2465,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Suggest alternative text for a ready photo (shown to you only, never saved) */
-        post: operations["MilosTrainingWeb.MyMediaController.suggest_alt_text"];
+        post: operations["PaleeWeb.MyMediaController.suggest_alt_text"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2482,7 +2482,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** The upload finished: verify its type and size and start processing it */
-        post: operations["MilosTrainingWeb.MyMediaController.complete"];
+        post: operations["PaleeWeb.MyMediaController.complete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2497,7 +2497,7 @@ export interface paths {
             cookie?: never;
         };
         /** An open club: what it is, how many are in it and where you stand */
-        get: operations["MilosTrainingWeb.OpenClubController.show"];
+        get: operations["PaleeWeb.OpenClubController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2516,9 +2516,9 @@ export interface paths {
         get?: never;
         put?: never;
         /** Join an open club (or ask, when it asks for approval) */
-        post: operations["MilosTrainingWeb.OpenClubController.join"];
+        post: operations["PaleeWeb.OpenClubController.join"];
         /** Leave an open club */
-        delete: operations["MilosTrainingWeb.OpenClubController.leave"];
+        delete: operations["PaleeWeb.OpenClubController.leave"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2533,7 +2533,7 @@ export interface paths {
         };
         get?: never;
         /** How much you hear from an open club */
-        put: operations["MilosTrainingWeb.OpenClubController.set_notify_level"];
+        put: operations["PaleeWeb.OpenClubController.set_notify_level"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2549,7 +2549,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your Partners matches, latest conversation first */
-        get: operations["MilosTrainingWeb.PartnersController.matches"];
+        get: operations["PaleeWeb.PartnersController.matches"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2569,7 +2569,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** End a match quietly; its conversation stays readable */
-        delete: operations["MilosTrainingWeb.PartnersController.end_match"];
+        delete: operations["PaleeWeb.PartnersController.end_match"];
         options?: never;
         head?: never;
         patch?: never;
@@ -2583,10 +2583,10 @@ export interface paths {
             cookie?: never;
         };
         /** A page of the match's conversation, newest first */
-        get: operations["MilosTrainingWeb.PartnersController.messages"];
+        get: operations["PaleeWeb.PartnersController.messages"];
         put?: never;
         /** Write in an active match's conversation */
-        post: operations["MilosTrainingWeb.PartnersController.post_message"];
+        post: operations["PaleeWeb.PartnersController.post_message"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2603,7 +2603,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark the conversation read */
-        post: operations["MilosTrainingWeb.PartnersController.mark_read"];
+        post: operations["PaleeWeb.PartnersController.mark_read"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2620,7 +2620,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Suggest a class in the conversation («Κλείστε μαζί») */
-        post: operations["MilosTrainingWeb.PartnersController.plan"];
+        post: operations["PaleeWeb.PartnersController.plan"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2635,7 +2635,7 @@ export interface paths {
             cookie?: never;
         };
         /** «Κλείστε μαζί»: the gym's next classes that suit you both */
-        get: operations["MilosTrainingWeb.PartnersController.sessions"];
+        get: operations["PaleeWeb.PartnersController.sessions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2652,9 +2652,9 @@ export interface paths {
             cookie?: never;
         };
         /** Ρυθμίσεις › Partners: whether others in your clubs see you */
-        get: operations["MilosTrainingWeb.PartnersController.settings"];
+        get: operations["PaleeWeb.PartnersController.settings"];
         /** Pause or resume every Partners profile at once */
-        put: operations["MilosTrainingWeb.PartnersController.put_settings"];
+        put: operations["PaleeWeb.PartnersController.put_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2673,7 +2673,7 @@ export interface paths {
          * Locations the user can book, nearest first
          * @description Distance is from lat/lng when given (the device position), otherwise from the user's home location.
          */
-        get: operations["MilosTrainingWeb.MyPlacesController.index"];
+        get: operations["PaleeWeb.MyPlacesController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2690,7 +2690,7 @@ export interface paths {
             cookie?: never;
         };
         /** Preview the card one of your journal entries or PRs makes in a post */
-        get: operations["MilosTrainingWeb.PostAttachmentController.show"];
+        get: operations["PaleeWeb.PostAttachmentController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2713,7 +2713,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update current user profile and language preference */
-        patch: operations["MilosTrainingWeb.MeController.update_profile"];
+        patch: operations["PaleeWeb.MeController.update_profile"];
         trace?: never;
     };
     "/api/me/progress": {
@@ -2724,7 +2724,7 @@ export interface paths {
             cookie?: never;
         };
         /** Πρόοδος across every provider */
-        get: operations["MilosTrainingWeb.AccountTrainingController.progress"];
+        get: operations["PaleeWeb.AccountTrainingController.progress"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2741,7 +2741,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your muscle coverage, qualities radar and training load across every provider */
-        get: operations["MilosTrainingWeb.TrainingDepthController.show"];
+        get: operations["PaleeWeb.TrainingDepthController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2758,7 +2758,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your providers (gyms and independent coaches), active and former */
-        get: operations["MilosTrainingWeb.MyProvidersController.index"];
+        get: operations["PaleeWeb.MyProvidersController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2776,7 +2776,7 @@ export interface paths {
         };
         get?: never;
         /** Remember the provider Box opens on */
-        put: operations["MilosTrainingWeb.MyProvidersController.select"];
+        put: operations["PaleeWeb.MyProvidersController.select"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2792,7 +2792,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search visible users by nickname */
-        get: operations["MilosTrainingWeb.MeController.search_users (2)"];
+        get: operations["PaleeWeb.MeController.search_users (2)"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2809,7 +2809,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your counts for Εγώ: posts, followers, following, waiting requests */
-        get: operations["MilosTrainingWeb.FollowController.summary"];
+        get: operations["PaleeWeb.FollowController.summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2827,7 +2827,7 @@ export interface paths {
         };
         get?: never;
         /** Show your public posts in Γύρω μου at your neighbourhood, or stop (ADR-154) */
-        put: operations["MilosTrainingWeb.FollowController.around_visibility"];
+        put: operations["PaleeWeb.FollowController.around_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2844,7 +2844,7 @@ export interface paths {
         };
         get?: never;
         /** Show followers the classes you book, or stop (board 5 Q6) */
-        put: operations["MilosTrainingWeb.FollowController.booking_sharing"];
+        put: operations["PaleeWeb.FollowController.booking_sharing"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2861,7 +2861,7 @@ export interface paths {
         };
         get?: never;
         /** Keep yourself out of your clubs' «Μέλη» lists, or show again (board 7 Q1) */
-        put: operations["MilosTrainingWeb.FollowController.member_visibility"];
+        put: operations["PaleeWeb.FollowController.member_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2877,10 +2877,10 @@ export interface paths {
             cookie?: never;
         };
         /** Your recent support requests, or the ones you received */
-        get: operations["MilosTrainingWeb.SupportRequestController.index"];
+        get: operations["PaleeWeb.SupportRequestController.index"];
         put?: never;
         /** Ask your active buddies for support (optional message; nothing else is shared) */
-        post: operations["MilosTrainingWeb.SupportRequestController.create"];
+        post: operations["PaleeWeb.SupportRequestController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2895,7 +2895,7 @@ export interface paths {
             cookie?: never;
         };
         /** One support request: who received it, who replied, quiet hours, the no-reply card */
-        get: operations["MilosTrainingWeb.SupportRequestController.show"];
+        get: operations["PaleeWeb.SupportRequestController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2914,7 +2914,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Answer as a buddy: here, walk, call (with the sender's phone if shared) or text */
-        post: operations["MilosTrainingWeb.SupportRequestController.reply"];
+        post: operations["PaleeWeb.SupportRequestController.reply"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2931,7 +2931,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Take a request back within 5 seconds (nobody is told) */
-        post: operations["MilosTrainingWeb.SupportRequestController.undo"];
+        post: operations["PaleeWeb.SupportRequestController.undo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2946,7 +2946,7 @@ export interface paths {
             cookie?: never;
         };
         /** Today across every provider, in time order, each with its source */
-        get: operations["MilosTrainingWeb.MyProvidersController.today"];
+        get: operations["PaleeWeb.MyProvidersController.today"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2965,7 +2965,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record that the current account finished a product tour */
-        post: operations["MilosTrainingWeb.MeController.complete_tour"];
+        post: operations["PaleeWeb.MeController.complete_tour"];
         delete?: never;
         options?: never;
         head?: never;
@@ -2980,7 +2980,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your trials at every box: upcoming, and recent ones with something to show */
-        get: operations["MilosTrainingWeb.TrialController.index"];
+        get: operations["PaleeWeb.TrialController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -2997,7 +2997,7 @@ export interface paths {
             cookie?: never;
         };
         /** One of your trials */
-        get: operations["MilosTrainingWeb.TrialController.show"];
+        get: operations["PaleeWeb.TrialController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3016,7 +3016,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel your trial (frees the seat, or withdraws the ask) */
-        post: operations["MilosTrainingWeb.TrialController.cancel"];
+        post: operations["PaleeWeb.TrialController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3033,7 +3033,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** After the trial: «Θέλω να γραφτώ» opens a chat with the box, «Όχι τώρα» hides the card */
-        post: operations["MilosTrainingWeb.TrialController.follow_up"];
+        post: operations["PaleeWeb.TrialController.follow_up"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3048,7 +3048,7 @@ export interface paths {
             cookie?: never;
         };
         /** The Vault across every provider: one trend per workout, every attempt labelled */
-        get: operations["MilosTrainingWeb.AccountTrainingController.vault"];
+        get: operations["PaleeWeb.AccountTrainingController.vault"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3068,7 +3068,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke one of my Wallet cards: it stops scanning at once */
-        delete: operations["MilosTrainingWeb.WalletController.revoke"];
+        delete: operations["PaleeWeb.WalletController.revoke"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3082,11 +3082,11 @@ export interface paths {
             cookie?: never;
         };
         /** The member's wellness days (Σήμερα card, week strip) from..to, local dates */
-        get: operations["MilosTrainingWeb.WellnessController.show"];
+        get: operations["PaleeWeb.WellnessController.show"];
         put?: never;
         post?: never;
         /** Delete every entry of a section (wellness, cravings); irreversible */
-        delete: operations["MilosTrainingWeb.WellnessController.erase"];
+        delete: operations["PaleeWeb.WellnessController.erase"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3100,9 +3100,9 @@ export interface paths {
             cookie?: never;
         };
         /** Whether your coaches get a weekly wellness summary, and cravings in it */
-        get: operations["MilosTrainingWeb.WellnessSummarySharingController.show"];
+        get: operations["PaleeWeb.WellnessSummarySharingController.show"];
         /** Turn the coach's weekly wellness summary, or cravings in it, on or off */
-        put: operations["MilosTrainingWeb.WellnessSummarySharingController.update"];
+        put: operations["PaleeWeb.WellnessSummarySharingController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3118,7 +3118,7 @@ export interface paths {
             cookie?: never;
         };
         /** Which coaches read your weekly wellness summary, newest first */
-        get: operations["MilosTrainingWeb.WellnessSummarySharingController.access_log"];
+        get: operations["PaleeWeb.WellnessSummarySharingController.access_log"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3137,7 +3137,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Log a Λιγούρα */
-        post: operations["MilosTrainingWeb.WellnessController.create_craving"];
+        post: operations["PaleeWeb.WellnessController.create_craving"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3155,11 +3155,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Remove one of your Λιγούρες */
-        delete: operations["MilosTrainingWeb.WellnessController.delete_craving"];
+        delete: operations["PaleeWeb.WellnessController.delete_craving"];
         options?: never;
         head?: never;
         /** Update a Λιγούρα (e.g. how it went) */
-        patch: operations["MilosTrainingWeb.WellnessController.update_craving"];
+        patch: operations["PaleeWeb.WellnessController.update_craving"];
         trace?: never;
     };
     "/api/me/wellness/entries": {
@@ -3172,7 +3172,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Log water, sleep or a meal */
-        post: operations["MilosTrainingWeb.WellnessController.create_entry"];
+        post: operations["PaleeWeb.WellnessController.create_entry"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3190,11 +3190,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Remove one of your wellness entries (undo a glass, a meal, a night) */
-        delete: operations["MilosTrainingWeb.WellnessController.delete_entry"];
+        delete: operations["PaleeWeb.WellnessController.delete_entry"];
         options?: never;
         head?: never;
         /** Correct one of your wellness entries */
-        patch: operations["MilosTrainingWeb.WellnessController.update_entry"];
+        patch: operations["PaleeWeb.WellnessController.update_entry"];
         trace?: never;
     };
     "/api/me/wellness/export": {
@@ -3205,7 +3205,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your wellness and/or cravings as JSON, meal photos as signed links */
-        get: operations["MilosTrainingWeb.WellnessController.export"];
+        get: operations["PaleeWeb.WellnessController.export"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3224,7 +3224,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reserve an upload for a meal photo (needs your health-data consent) */
-        post: operations["MilosTrainingWeb.WellnessController.upload_meal_photo"];
+        post: operations["PaleeWeb.WellnessController.upload_meal_photo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3239,9 +3239,9 @@ export interface paths {
             cookie?: never;
         };
         /** Your wellness targets and hidden items */
-        get: operations["MilosTrainingWeb.WellnessController.preferences"];
+        get: operations["PaleeWeb.WellnessController.preferences"];
         /** Set your water goal, glass size, sleep goal or hidden items */
-        put: operations["MilosTrainingWeb.WellnessController.update_preferences"];
+        put: operations["PaleeWeb.WellnessController.update_preferences"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3259,7 +3259,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Issue this app install's widget token (replacing its previous one) */
-        post: operations["MilosTrainingWeb.WidgetController.create_token"];
+        post: operations["PaleeWeb.WidgetController.create_token"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3277,7 +3277,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke a widget token (sign-out on that install) */
-        delete: operations["MilosTrainingWeb.WidgetController.delete_token"];
+        delete: operations["PaleeWeb.WidgetController.delete_token"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3291,7 +3291,7 @@ export interface paths {
             cookie?: never;
         };
         /** List active organization memberships for the authenticated account */
-        get: operations["MilosTrainingWeb.OrganizationAccessController.memberships"];
+        get: operations["PaleeWeb.OrganizationAccessController.memberships"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3310,7 +3310,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Join an organization through its public join link */
-        post: operations["MilosTrainingWeb.OrganizationAccessController.join"];
+        post: operations["PaleeWeb.OrganizationAccessController.join"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3327,7 +3327,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Redeem an invitation for the authenticated account */
-        post: operations["MilosTrainingWeb.OrganizationAccessController.redeem"];
+        post: operations["PaleeWeb.OrganizationAccessController.redeem"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3342,7 +3342,7 @@ export interface paths {
             cookie?: never;
         };
         /** List notifications for the current user */
-        get: operations["MilosTrainingWeb.NotificationController.index"];
+        get: operations["PaleeWeb.NotificationController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3364,7 +3364,7 @@ export interface paths {
          * Register a store app install's push token for the current user
          * @description ADR-171: FCM tokens come from the Android app, APNs tokens from the iOS app. Answers 503 native_push_not_configured while the provider has no credentials.
          */
-        post: operations["MilosTrainingWeb.NotificationController.create_native_push_token"];
+        post: operations["PaleeWeb.NotificationController.create_native_push_token"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3384,7 +3384,7 @@ export interface paths {
          * Stop push to a store app install of the current user
          * @description ADR-171: the token travels in the body so it never lands in URLs or logs.
          */
-        post: operations["MilosTrainingWeb.NotificationController.delete_native_push_token"];
+        post: operations["PaleeWeb.NotificationController.delete_native_push_token"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3399,7 +3399,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get Web Push configuration for the current user */
-        get: operations["MilosTrainingWeb.NotificationController.push_config"];
+        get: operations["PaleeWeb.NotificationController.push_config"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3418,9 +3418,9 @@ export interface paths {
         get?: never;
         put?: never;
         /** Save or update a push subscription for the current user */
-        post: operations["MilosTrainingWeb.NotificationController.create_push_subscription"];
+        post: operations["PaleeWeb.NotificationController.create_push_subscription"];
         /** Delete a push subscription for the current user */
-        delete: operations["MilosTrainingWeb.NotificationController.delete_push_subscription"];
+        delete: operations["PaleeWeb.NotificationController.delete_push_subscription"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3436,7 +3436,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Inspect whether a push subscription endpoint is persisted for the current user */
-        post: operations["MilosTrainingWeb.NotificationController.push_subscription_status"];
+        post: operations["PaleeWeb.NotificationController.push_subscription_status"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3453,7 +3453,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark all notifications as read for the current user */
-        post: operations["MilosTrainingWeb.NotificationController.mark_all_read"];
+        post: operations["PaleeWeb.NotificationController.mark_all_read"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3470,7 +3470,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record a notification click and mark it read for the current user */
-        post: operations["MilosTrainingWeb.NotificationController.mark_clicked"];
+        post: operations["PaleeWeb.NotificationController.mark_clicked"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3487,7 +3487,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark a single notification as read for the current user */
-        post: operations["MilosTrainingWeb.NotificationController.mark_read"];
+        post: operations["PaleeWeb.NotificationController.mark_read"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3502,9 +3502,9 @@ export interface paths {
             cookie?: never;
         };
         /** The gym's AI settings and this month's usage */
-        get: operations["MilosTrainingWeb.AdminAiSettingsController.show"];
+        get: operations["PaleeWeb.AdminAiSettingsController.show"];
         /** Update the gym's AI settings */
-        put: operations["MilosTrainingWeb.AdminAiSettingsController.update"];
+        put: operations["PaleeWeb.AdminAiSettingsController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3520,7 +3520,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch Phase 8 analytics summary from persisted facts and aggregates */
-        get: operations["MilosTrainingWeb.AdminAnalyticsController.summary"];
+        get: operations["PaleeWeb.AdminAnalyticsController.summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3542,7 +3542,7 @@ export interface paths {
          * Assign a published workout to one or more athletes or members
          * @description ADR-125: `athlete_ids` holds assignee user ids - active athletes or members of the organization (the field name is kept for compatibility). Members require a package with the personal_programming channel and execute_assigned_workouts capability (403 `member_programming_not_entitled`). `source_slot_id` makes the assignment one member's version of a class they booked (exactly one member; 422 `class_variant_requires_single_member` / `slot_not_booked_by_member`).
          */
-        post: operations["MilosTrainingWeb.AdminAssignedWorkoutController.create"];
+        post: operations["PaleeWeb.AdminAssignedWorkoutController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3560,11 +3560,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete an assigned workout */
-        delete: operations["MilosTrainingWeb.AdminAssignedWorkoutController.delete"];
+        delete: operations["PaleeWeb.AdminAssignedWorkoutController.delete"];
         options?: never;
         head?: never;
         /** Update an assigned workout */
-        patch: operations["MilosTrainingWeb.AdminAssignedWorkoutController.update"];
+        patch: operations["PaleeWeb.AdminAssignedWorkoutController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/athletes": {
@@ -3575,7 +3575,7 @@ export interface paths {
             cookie?: never;
         };
         /** List assignable users (athletes; optionally members, ADR-125) */
-        get: operations["MilosTrainingWeb.AdminUserController.index_athletes"];
+        get: operations["PaleeWeb.AdminUserController.index_athletes"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3592,7 +3592,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch an athlete coaching drill-down */
-        get: operations["MilosTrainingWeb.AdminCoachingController.drill_down"];
+        get: operations["PaleeWeb.AdminCoachingController.drill_down"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3618,7 +3618,7 @@ export interface paths {
          * Approve a booking
          * @description Booking resolution is never replayed blindly (ADR-120): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
-        patch: operations["MilosTrainingWeb.AdminScheduleController.approve_booking"];
+        patch: operations["PaleeWeb.AdminScheduleController.approve_booking"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/bookings/{id}/reject": {
@@ -3638,7 +3638,7 @@ export interface paths {
          * Reject a booking
          * @description Booking resolution is never replayed blindly (ADR-120): a booking that is no longer pending returns 409 `booking_not_pending` unless it was resolved by this same `client_operation_id`, which returns the booking with 200.
          */
-        patch: operations["MilosTrainingWeb.AdminScheduleController.reject_booking"];
+        patch: operations["PaleeWeb.AdminScheduleController.reject_booking"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/branding": {
@@ -3649,7 +3649,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch the organization's branding */
-        get: operations["MilosTrainingWeb.AdminBrandingController.show"];
+        get: operations["PaleeWeb.AdminBrandingController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3667,10 +3667,10 @@ export interface paths {
         };
         get?: never;
         /** Verify an uploaded logo and make it the organization's logo */
-        put: operations["MilosTrainingWeb.AdminBrandingController.finalize_logo"];
+        put: operations["PaleeWeb.AdminBrandingController.finalize_logo"];
         post?: never;
         /** Remove the organization's logo */
-        delete: operations["MilosTrainingWeb.AdminBrandingController.remove_logo"];
+        delete: operations["PaleeWeb.AdminBrandingController.remove_logo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3686,7 +3686,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a constrained presigned upload for a new organization logo */
-        post: operations["MilosTrainingWeb.AdminBrandingController.logo_upload_url"];
+        post: operations["PaleeWeb.AdminBrandingController.logo_upload_url"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3701,10 +3701,10 @@ export interface paths {
             cookie?: never;
         };
         /** List seasonal challenges with progress summaries */
-        get: operations["MilosTrainingWeb.AdminChallengeController.index"];
+        get: operations["PaleeWeb.AdminChallengeController.index"];
         put?: never;
         /** Create a seasonal challenge */
-        post: operations["MilosTrainingWeb.AdminChallengeController.create"];
+        post: operations["PaleeWeb.AdminChallengeController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3719,15 +3719,15 @@ export interface paths {
             cookie?: never;
         };
         /** Get a seasonal challenge with participant progress */
-        get: operations["MilosTrainingWeb.AdminChallengeController.show"];
+        get: operations["PaleeWeb.AdminChallengeController.show"];
         put?: never;
         post?: never;
         /** Delete a seasonal challenge */
-        delete: operations["MilosTrainingWeb.AdminChallengeController.delete"];
+        delete: operations["PaleeWeb.AdminChallengeController.delete"];
         options?: never;
         head?: never;
         /** Update a seasonal challenge */
-        patch: operations["MilosTrainingWeb.AdminChallengeController.update"];
+        patch: operations["PaleeWeb.AdminChallengeController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/check-in/door/{location_id}": {
@@ -3738,7 +3738,7 @@ export interface paths {
             cookie?: never;
         };
         /** The door display of a location: its code, the next codes, the next class */
-        get: operations["MilosTrainingWeb.AdminCheckInController.door"];
+        get: operations["PaleeWeb.AdminCheckInController.door"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3755,9 +3755,9 @@ export interface paths {
             cookie?: never;
         };
         /** The NFC door tag of a location: the link to write and whether it is on */
-        get: operations["MilosTrainingWeb.AdminCheckInController.nfc_tag"];
+        get: operations["PaleeWeb.AdminCheckInController.nfc_tag"];
         /** Turn the NFC door tag of a location on or off */
-        put: operations["MilosTrainingWeb.AdminCheckInController.update_nfc_tag"];
+        put: operations["PaleeWeb.AdminCheckInController.update_nfc_tag"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3775,7 +3775,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «Νέος κωδικός ετικέτας»: every written tag stops working */
-        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_nfc_tag"];
+        post: operations["PaleeWeb.AdminCheckInController.rotate_nfc_tag"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3790,9 +3790,9 @@ export interface paths {
             cookie?: never;
         };
         /** The printed poster of a location: its static QR and whether it is on */
-        get: operations["MilosTrainingWeb.AdminCheckInController.poster"];
+        get: operations["PaleeWeb.AdminCheckInController.poster"];
         /** Turn the printed poster of a location on or off */
-        put: operations["MilosTrainingWeb.AdminCheckInController.update_poster"];
+        put: operations["PaleeWeb.AdminCheckInController.update_poster"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3810,7 +3810,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «Νέος κωδικός αφίσας»: every printed copy stops working */
-        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_poster"];
+        post: operations["PaleeWeb.AdminCheckInController.rotate_poster"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3827,7 +3827,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «Νέος κωδικός πόρτας»: every code shown so far stops working */
-        post: operations["MilosTrainingWeb.AdminCheckInController.rotate_door"];
+        post: operations["PaleeWeb.AdminCheckInController.rotate_door"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3844,7 +3844,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Check a member in from the desk (booking in the window, else open gym) */
-        post: operations["MilosTrainingWeb.AdminCheckInController.check_in_member"];
+        post: operations["PaleeWeb.AdminCheckInController.check_in_member"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3862,7 +3862,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke a member's static personal code; their Wallet cards stop scanning */
-        delete: operations["MilosTrainingWeb.AdminCheckInController.revoke_member_code"];
+        delete: operations["PaleeWeb.AdminCheckInController.revoke_member_code"];
         options?: never;
         head?: never;
         patch?: never;
@@ -3878,7 +3878,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Scan a member's personal QR or Wallet card at the desk */
-        post: operations["MilosTrainingWeb.AdminCheckInController.scan_member"];
+        post: operations["PaleeWeb.AdminCheckInController.scan_member"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3893,9 +3893,9 @@ export interface paths {
             cookie?: never;
         };
         /** The box's check-in rules */
-        get: operations["MilosTrainingWeb.AdminCheckInController.settings"];
+        get: operations["PaleeWeb.AdminCheckInController.settings"];
         /** Change the box's check-in rules */
-        put: operations["MilosTrainingWeb.AdminCheckInController.update_settings"];
+        put: operations["PaleeWeb.AdminCheckInController.update_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -3911,7 +3911,7 @@ export interface paths {
             cookie?: never;
         };
         /** People who scanned the door and are not members («Επισκέπτης»), newest first */
-        get: operations["MilosTrainingWeb.AdminCheckInController.visitors"];
+        get: operations["PaleeWeb.AdminCheckInController.visitors"];
         put?: never;
         post?: never;
         delete?: never;
@@ -3928,10 +3928,10 @@ export interface paths {
             cookie?: never;
         };
         /** List open-gym check-ins of a day or a member */
-        get: operations["MilosTrainingWeb.AdminFacilityController.index_check_ins"];
+        get: operations["PaleeWeb.AdminFacilityController.index_check_ins"];
         put?: never;
         /** Check a member in to open gym from the desk */
-        post: operations["MilosTrainingWeb.AdminFacilityController.create_check_in"];
+        post: operations["PaleeWeb.AdminFacilityController.create_check_in"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3946,10 +3946,10 @@ export interface paths {
             cookie?: never;
         };
         /** List active and archived class types */
-        get: operations["MilosTrainingWeb.AdminClassTypeController.index"];
+        get: operations["PaleeWeb.AdminClassTypeController.index"];
         put?: never;
         /** Create a class type */
-        post: operations["MilosTrainingWeb.AdminClassTypeController.create"];
+        post: operations["PaleeWeb.AdminClassTypeController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -3967,11 +3967,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Archive a class type and map future classes when necessary */
-        delete: operations["MilosTrainingWeb.AdminClassTypeController.delete"];
+        delete: operations["PaleeWeb.AdminClassTypeController.delete"];
         options?: never;
         head?: never;
         /** Rename or reorder an active class type */
-        patch: operations["MilosTrainingWeb.AdminClassTypeController.update"];
+        patch: operations["PaleeWeb.AdminClassTypeController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/community/clubs": {
@@ -3982,10 +3982,10 @@ export interface paths {
             cookie?: never;
         };
         /** The gym's open clubs */
-        get: operations["MilosTrainingWeb.AdminCommunityController.clubs"];
+        get: operations["PaleeWeb.AdminCommunityController.clubs"];
         put?: never;
         /** Start an open club */
-        post: operations["MilosTrainingWeb.AdminCommunityController.create_club"];
+        post: operations["PaleeWeb.AdminCommunityController.create_club"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4000,14 +4000,14 @@ export interface paths {
             cookie?: never;
         };
         /** An open club with its members and requests */
-        get: operations["MilosTrainingWeb.AdminCommunityController.club"];
+        get: operations["PaleeWeb.AdminCommunityController.club"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Edit an open club */
-        patch: operations["MilosTrainingWeb.AdminCommunityController.update_club"];
+        patch: operations["PaleeWeb.AdminCommunityController.update_club"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/community/clubs/{id}/archive": {
@@ -4020,7 +4020,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Archive an open club */
-        post: operations["MilosTrainingWeb.AdminCommunityController.archive_club"];
+        post: operations["PaleeWeb.AdminCommunityController.archive_club"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4038,7 +4038,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Remove someone from an open club */
-        delete: operations["MilosTrainingWeb.AdminCommunityController.remove_club_member"];
+        delete: operations["PaleeWeb.AdminCommunityController.remove_club_member"];
         options?: never;
         head?: never;
         patch?: never;
@@ -4053,7 +4053,7 @@ export interface paths {
         };
         get?: never;
         /** Let someone into an open club, or turn them down */
-        put: operations["MilosTrainingWeb.AdminCommunityController.answer_club_request"];
+        put: operations["PaleeWeb.AdminCommunityController.answer_club_request"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4069,10 +4069,10 @@ export interface paths {
             cookie?: never;
         };
         /** The box's upcoming (default) or past events, with their numbers */
-        get: operations["MilosTrainingWeb.AdminCommunityEventController.index"];
+        get: operations["PaleeWeb.AdminCommunityEventController.index"];
         put?: never;
         /** Create an event in one of the box's clubs; weekly with repeat_until */
-        post: operations["MilosTrainingWeb.AdminCommunityEventController.create"];
+        post: operations["PaleeWeb.AdminCommunityEventController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4087,14 +4087,14 @@ export interface paths {
             cookie?: never;
         };
         /** An event with its attendees, numbers and trial offer */
-        get: operations["MilosTrainingWeb.AdminCommunityEventController.show"];
+        get: operations["PaleeWeb.AdminCommunityEventController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Edit an event: this one or this and following */
-        patch: operations["MilosTrainingWeb.AdminCommunityEventController.update"];
+        patch: operations["PaleeWeb.AdminCommunityEventController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/community/events/{id}/attendees/{user_id}": {
@@ -4108,7 +4108,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Free someone's place; the first on the waitlist moves up */
-        delete: operations["MilosTrainingWeb.AdminCommunityEventController.remove"];
+        delete: operations["PaleeWeb.AdminCommunityEventController.remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -4123,7 +4123,7 @@ export interface paths {
         };
         get?: never;
         /** «Ήρθε» for someone holding a place, or undo it */
-        put: operations["MilosTrainingWeb.AdminCommunityEventController.check_in"];
+        put: operations["PaleeWeb.AdminCommunityEventController.check_in"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4140,7 +4140,7 @@ export interface paths {
         };
         get?: never;
         /** «Πλήρωσε»: record a payment at the box (a Finance receipt when possible) */
-        put: operations["MilosTrainingWeb.AdminCommunityEventController.mark_paid"];
+        put: operations["PaleeWeb.AdminCommunityEventController.mark_paid"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4158,7 +4158,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel an event: this one or this and following; people going hear why */
-        post: operations["MilosTrainingWeb.AdminCommunityEventController.cancel"];
+        post: operations["PaleeWeb.AdminCommunityEventController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4175,7 +4175,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «Μήνυμα σε όλους»: a notification to everyone going */
-        post: operations["MilosTrainingWeb.AdminCommunityEventController.message"];
+        post: operations["PaleeWeb.AdminCommunityEventController.message"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4192,7 +4192,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Send the one trial offer to people who came and are not members */
-        post: operations["MilosTrainingWeb.AdminCommunityEventController.trial_offer"];
+        post: operations["PaleeWeb.AdminCommunityEventController.trial_offer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4207,7 +4207,7 @@ export interface paths {
             cookie?: never;
         };
         /** Proposed, live and archived groups, and the gym's group rule */
-        get: operations["MilosTrainingWeb.AdminCommunityController.groups"];
+        get: operations["PaleeWeb.AdminCommunityController.groups"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4225,7 +4225,7 @@ export interface paths {
         };
         get?: never;
         /** Approve or decline a proposed group */
-        put: operations["MilosTrainingWeb.AdminCommunityController.decide_group"];
+        put: operations["PaleeWeb.AdminCommunityController.decide_group"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4243,7 +4243,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Bring an archived group back */
-        post: operations["MilosTrainingWeb.AdminCommunityController.reopen_group"];
+        post: operations["PaleeWeb.AdminCommunityController.reopen_group"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4258,7 +4258,7 @@ export interface paths {
             cookie?: never;
         };
         /** Open reports, one row per reported item */
-        get: operations["MilosTrainingWeb.AdminCommunityController.reports"];
+        get: operations["PaleeWeb.AdminCommunityController.reports"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4277,7 +4277,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Act on a reported item; every open report on it closes */
-        post: operations["MilosTrainingWeb.AdminCommunityController.act_on_report"];
+        post: operations["PaleeWeb.AdminCommunityController.act_on_report"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4293,7 +4293,7 @@ export interface paths {
         };
         get?: never;
         /** Whether members may start groups, and whether staff approve them first */
-        put: operations["MilosTrainingWeb.AdminCommunityController.update_settings"];
+        put: operations["PaleeWeb.AdminCommunityController.update_settings"];
         post?: never;
         delete?: never;
         options?: never;
@@ -4309,13 +4309,13 @@ export interface paths {
             cookie?: never;
         };
         /** Accounting export run history */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.exports"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.exports"];
         put?: never;
         /**
          * Export payments, allocations, reversals, credits and refund receipts
          * @description Ranges up to 31 days are built immediately (201, status `completed`); longer ranges are queued for background processing (202, status `queued`). The ZIP holds one CSV and one JSON file per dataset plus a checksummed manifest (schema_version 1).
          */
-        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.request_export"];
+        post: operations["PaleeWeb.AdminFinanceAccountingController.request_export"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4330,7 +4330,7 @@ export interface paths {
             cookie?: never;
         };
         /** Short-lived signed download link for a completed accounting export */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.export_download"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.export_download"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4347,7 +4347,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search active finance records eligible for audited soft deletion */
-        get: operations["MilosTrainingWeb.AdminFinanceController.cleanup_records"];
+        get: operations["PaleeWeb.AdminFinanceController.cleanup_records"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4366,7 +4366,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Soft-delete a finance invoice, receipt, or payment after password re-entry */
-        post: operations["MilosTrainingWeb.AdminFinanceController.purge_record"];
+        post: operations["PaleeWeb.AdminFinanceController.purge_record"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4381,10 +4381,10 @@ export interface paths {
             cookie?: never;
         };
         /** Corporate clients */
-        get: operations["MilosTrainingWeb.PaymentModelsController.clients"];
+        get: operations["PaleeWeb.PaymentModelsController.clients"];
         put?: never;
         /** Create the corporate client of a corporate package */
-        post: operations["MilosTrainingWeb.PaymentModelsController.create_client"];
+        post: operations["PaleeWeb.PaymentModelsController.create_client"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4405,7 +4405,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Edit a corporate client, archive it or issue a new enrollment code */
-        patch: operations["MilosTrainingWeb.PaymentModelsController.update_client"];
+        patch: operations["PaleeWeb.PaymentModelsController.update_client"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/corporate-clients/{id}/invoices": {
@@ -4416,10 +4416,10 @@ export interface paths {
             cookie?: never;
         };
         /** Invoices issued to a corporate client */
-        get: operations["MilosTrainingWeb.PaymentModelsController.invoices"];
+        get: operations["PaleeWeb.PaymentModelsController.invoices"];
         put?: never;
         /** Invoice a corporate client for the period containing a date (today by default) */
-        post: operations["MilosTrainingWeb.PaymentModelsController.create_invoice"];
+        post: operations["PaleeWeb.PaymentModelsController.create_invoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4434,10 +4434,10 @@ export interface paths {
             cookie?: never;
         };
         /** Seats of a corporate client */
-        get: operations["MilosTrainingWeb.PaymentModelsController.seats"];
+        get: operations["PaleeWeb.PaymentModelsController.seats"];
         put?: never;
         /** Give a gym member a seat on the corporate plan */
-        post: operations["MilosTrainingWeb.PaymentModelsController.add_seat"];
+        post: operations["PaleeWeb.PaymentModelsController.add_seat"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4454,7 +4454,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** End an employee's seat today */
-        post: operations["MilosTrainingWeb.PaymentModelsController.end_seat"];
+        post: operations["PaleeWeb.PaymentModelsController.end_seat"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4469,7 +4469,7 @@ export interface paths {
             cookie?: never;
         };
         /** A corporate invoice with its payments, client and issuer, for the document */
-        get: operations["MilosTrainingWeb.PaymentModelsController.invoice"];
+        get: operations["PaleeWeb.PaymentModelsController.invoice"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4488,7 +4488,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record a (partial) payment against a corporate invoice */
-        post: operations["MilosTrainingWeb.PaymentModelsController.record_payment"];
+        post: operations["PaleeWeb.PaymentModelsController.record_payment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4505,7 +4505,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reverse a mistaken corporate payment */
-        post: operations["MilosTrainingWeb.PaymentModelsController.reverse_payment"];
+        post: operations["PaleeWeb.PaymentModelsController.reverse_payment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4522,7 +4522,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Email a corporate invoice (a reminder when overdue) to the billing contact */
-        post: operations["MilosTrainingWeb.PaymentModelsController.send_invoice"];
+        post: operations["PaleeWeb.PaymentModelsController.send_invoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4539,7 +4539,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Void a corporate invoice that has no payments */
-        post: operations["MilosTrainingWeb.PaymentModelsController.invoice_status"];
+        post: operations["PaleeWeb.PaymentModelsController.invoice_status"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4556,7 +4556,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Dry-run or apply the legacy entitlement-profile backfill */
-        post: operations["MilosTrainingWeb.AdminFinanceController.backfill_entitlements"];
+        post: operations["PaleeWeb.AdminFinanceController.backfill_entitlements"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4577,7 +4577,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update due_date and/or notes on a finance invoice */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.update_invoice"];
+        patch: operations["PaleeWeb.AdminFinanceController.update_invoice"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/download-url": {
@@ -4588,7 +4588,7 @@ export interface paths {
             cookie?: never;
         };
         /** Generate a presigned download URL for an invoice file */
-        get: operations["MilosTrainingWeb.AdminFinanceController.invoice_download_url"];
+        get: operations["PaleeWeb.AdminFinanceController.invoice_download_url"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4611,7 +4611,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Issue a draft finance invoice */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.issue_invoice"];
+        patch: operations["PaleeWeb.AdminFinanceController.issue_invoice"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/invoices/{id}/upload-complete": {
@@ -4624,7 +4624,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Validate and attach an uploaded invoice file */
-        post: operations["MilosTrainingWeb.AdminFinanceController.invoice_upload_complete"];
+        post: operations["PaleeWeb.AdminFinanceController.invoice_upload_complete"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4641,7 +4641,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Generate a presigned upload URL for an invoice file */
-        post: operations["MilosTrainingWeb.AdminFinanceController.invoice_upload_url"];
+        post: operations["PaleeWeb.AdminFinanceController.invoice_upload_url"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4662,7 +4662,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Void a finance invoice */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.void_invoice"];
+        patch: operations["PaleeWeb.AdminFinanceController.void_invoice"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/members": {
@@ -4673,7 +4673,7 @@ export interface paths {
             cookie?: never;
         };
         /** List all members with finance summary */
-        get: operations["MilosTrainingWeb.AdminFinanceController.members"];
+        get: operations["PaleeWeb.AdminFinanceController.members"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4690,14 +4690,14 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch a user's finance profile */
-        get: operations["MilosTrainingWeb.AdminFinanceController.member"];
+        get: operations["PaleeWeb.AdminFinanceController.member"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Create or update a user's membership profile */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.update_member"];
+        patch: operations["PaleeWeb.AdminFinanceController.update_member"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/members/{id}/credits": {
@@ -4710,7 +4710,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Grant manual credit to a user's membership */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_manual_credit"];
+        post: operations["PaleeWeb.AdminFinanceController.create_manual_credit"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4727,7 +4727,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reverse an applied credit ledger entry and restore member credit */
-        post: operations["MilosTrainingWeb.AdminFinanceController.reverse_credit_ledger_entry"];
+        post: operations["PaleeWeb.AdminFinanceController.reverse_credit_ledger_entry"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4744,7 +4744,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a manual finance invoice for a user's membership */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_invoice"];
+        post: operations["PaleeWeb.AdminFinanceController.create_invoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4761,7 +4761,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Generate a renewal invoice from a user's active membership package */
-        post: operations["MilosTrainingWeb.AdminFinanceController.generate_renewal_invoice"];
+        post: operations["PaleeWeb.AdminFinanceController.generate_renewal_invoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4778,7 +4778,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Apply available credit to a finance invoice */
-        post: operations["MilosTrainingWeb.AdminFinanceController.apply_credit_to_invoice"];
+        post: operations["PaleeWeb.AdminFinanceController.apply_credit_to_invoice"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4795,7 +4795,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Assign a package to a user's membership */
-        post: operations["MilosTrainingWeb.AdminFinanceController.assign_package"];
+        post: operations["PaleeWeb.AdminFinanceController.assign_package"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4812,7 +4812,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record a manual membership payment */
-        post: operations["MilosTrainingWeb.AdminFinanceController.record_payment"];
+        post: operations["PaleeWeb.AdminFinanceController.record_payment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4829,7 +4829,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Apply available credit to a membership payment */
-        post: operations["MilosTrainingWeb.AdminFinanceController.apply_credit_to_payment"];
+        post: operations["PaleeWeb.AdminFinanceController.apply_credit_to_payment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4846,7 +4846,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record an audited refund or reversal for a membership payment */
-        post: operations["MilosTrainingWeb.AdminFinanceController.reverse_payment"];
+        post: operations["PaleeWeb.AdminFinanceController.reverse_payment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4863,7 +4863,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record a promotion redemption for a user's membership */
-        post: operations["MilosTrainingWeb.AdminFinanceController.redeem_promotion"];
+        post: operations["PaleeWeb.AdminFinanceController.redeem_promotion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4880,7 +4880,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record received money and immediately issue its receipt */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_receipt"];
+        post: operations["PaleeWeb.AdminFinanceController.create_receipt"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4895,7 +4895,7 @@ export interface paths {
             cookie?: never;
         };
         /** Describe package types, presets, locks and catalog fields */
-        get: operations["MilosTrainingWeb.AdminFinanceController.package_catalog"];
+        get: operations["PaleeWeb.AdminFinanceController.package_catalog"];
         put?: never;
         post?: never;
         delete?: never;
@@ -4912,10 +4912,10 @@ export interface paths {
             cookie?: never;
         };
         /** List membership packages */
-        get: operations["MilosTrainingWeb.AdminFinanceController.packages"];
+        get: operations["PaleeWeb.AdminFinanceController.packages"];
         put?: never;
         /** Create a membership package */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_package"];
+        post: operations["PaleeWeb.AdminFinanceController.create_package"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4930,14 +4930,14 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch a membership package */
-        get: operations["MilosTrainingWeb.AdminFinanceController.package"];
+        get: operations["PaleeWeb.AdminFinanceController.package"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Update a membership package */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.update_package"];
+        patch: operations["PaleeWeb.AdminFinanceController.update_package"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/packages/{id}/retire": {
@@ -4954,7 +4954,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Retire a package and atomically reconcile its effective subscribers */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.retire_package"];
+        patch: operations["PaleeWeb.AdminFinanceController.retire_package"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/promotions": {
@@ -4965,10 +4965,10 @@ export interface paths {
             cookie?: never;
         };
         /** List promotion campaigns */
-        get: operations["MilosTrainingWeb.AdminFinanceController.promotions"];
+        get: operations["PaleeWeb.AdminFinanceController.promotions"];
         put?: never;
         /** Create a promotion campaign */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_promotion"];
+        post: operations["PaleeWeb.AdminFinanceController.create_promotion"];
         delete?: never;
         options?: never;
         head?: never;
@@ -4983,10 +4983,10 @@ export interface paths {
             cookie?: never;
         };
         /** List promotion codes for a campaign */
-        get: operations["MilosTrainingWeb.AdminFinanceController.promotion_codes"];
+        get: operations["PaleeWeb.AdminFinanceController.promotion_codes"];
         put?: never;
         /** Create a promotion code for a campaign */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_promotion_code"];
+        post: operations["PaleeWeb.AdminFinanceController.create_promotion_code"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5001,7 +5001,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch operational finance queues */
-        get: operations["MilosTrainingWeb.AdminFinanceController.operational_queues"];
+        get: operations["PaleeWeb.AdminFinanceController.operational_queues"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5018,13 +5018,13 @@ export interface paths {
             cookie?: never;
         };
         /** List payment-provider reconciliation records */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_records"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.reconciliation_records"];
         put?: never;
         /**
          * Record an external provider statement line
          * @description Idempotent on (organization, provider, external_reference): an identical replay returns the existing record with 200 and `idempotent_replay: true`; a replay with a different type, amount, currency or date returns 409 `reconciliation_reference_conflict`.
          */
-        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.record_reconciliation_line"];
+        post: operations["PaleeWeb.AdminFinanceAccountingController.record_reconciliation_line"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5039,7 +5039,7 @@ export interface paths {
             cookie?: never;
         };
         /** Ranked internal payments or reversals that could match a statement line */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_candidates"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.reconciliation_candidates"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5061,7 +5061,7 @@ export interface paths {
          * Match a statement line to an internal payment or reversal
          * @description The record becomes `matched`, or `mismatched` with the discrepancies found (amount, currency, date tolerance, settlement, type). An internal fact can be linked to one statement line only (409 `reconciliation_target_already_matched`).
          */
-        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.match_reconciliation"];
+        post: operations["PaleeWeb.AdminFinanceAccountingController.match_reconciliation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5078,7 +5078,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Clear a statement line's match */
-        post: operations["MilosTrainingWeb.AdminFinanceAccountingController.unmatch_reconciliation"];
+        post: operations["PaleeWeb.AdminFinanceAccountingController.unmatch_reconciliation"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5093,10 +5093,10 @@ export interface paths {
             cookie?: never;
         };
         /** List referral programs */
-        get: operations["MilosTrainingWeb.AdminFinanceController.referral_programs"];
+        get: operations["PaleeWeb.AdminFinanceController.referral_programs"];
         put?: never;
         /** Create a referral program */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_referral_program"];
+        post: operations["PaleeWeb.AdminFinanceController.create_referral_program"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5117,7 +5117,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update a referral program */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_program"];
+        patch: operations["PaleeWeb.AdminFinanceController.update_referral_program"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/referral-rewards": {
@@ -5128,7 +5128,7 @@ export interface paths {
             cookie?: never;
         };
         /** List referral rewards */
-        get: operations["MilosTrainingWeb.AdminFinanceController.referral_rewards"];
+        get: operations["PaleeWeb.AdminFinanceController.referral_rewards"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5151,7 +5151,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update referral reward status */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_reward_status"];
+        patch: operations["PaleeWeb.AdminFinanceController.update_referral_reward_status"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/referrals": {
@@ -5162,10 +5162,10 @@ export interface paths {
             cookie?: never;
         };
         /** List referral events */
-        get: operations["MilosTrainingWeb.AdminFinanceController.referrals"];
+        get: operations["PaleeWeb.AdminFinanceController.referrals"];
         put?: never;
         /** Create a referral event */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_referral"];
+        post: operations["PaleeWeb.AdminFinanceController.create_referral"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5182,7 +5182,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a referral reward for a referral event */
-        post: operations["MilosTrainingWeb.AdminFinanceController.create_referral_reward"];
+        post: operations["PaleeWeb.AdminFinanceController.create_referral_reward"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5203,7 +5203,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update referral event status */
-        patch: operations["MilosTrainingWeb.AdminFinanceController.update_referral_status"];
+        patch: operations["PaleeWeb.AdminFinanceController.update_referral_status"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/finance/refund-receipts": {
@@ -5214,7 +5214,7 @@ export interface paths {
             cookie?: never;
         };
         /** List the organization's refund receipts, newest number first */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.refund_receipts"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.refund_receipts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5231,7 +5231,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get one refund receipt with its immutable snapshot */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.refund_receipt"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5251,7 +5251,7 @@ export interface paths {
          * Printable HTML refund receipt
          * @description Deterministic, self-contained HTML (no scripts or external resources) rendered from the immutable snapshot. Print or save as PDF from the browser.
          */
-        get: operations["MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt_document"];
+        get: operations["PaleeWeb.AdminFinanceAccountingController.refund_receipt_document"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5268,10 +5268,10 @@ export interface paths {
             cookie?: never;
         };
         /** People sharing a membership */
-        get: operations["MilosTrainingWeb.PaymentModelsController.beneficiaries"];
+        get: operations["PaleeWeb.PaymentModelsController.beneficiaries"];
         put?: never;
         /** Add a gym member to a shared membership */
-        post: operations["MilosTrainingWeb.PaymentModelsController.add_beneficiary"];
+        post: operations["PaleeWeb.PaymentModelsController.add_beneficiary"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5288,7 +5288,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Remove a beneficiary from a shared membership */
-        post: operations["MilosTrainingWeb.PaymentModelsController.remove_beneficiary"];
+        post: operations["PaleeWeb.PaymentModelsController.remove_beneficiary"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5303,7 +5303,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch finance analytics summary */
-        get: operations["MilosTrainingWeb.AdminFinanceController.summary"];
+        get: operations["PaleeWeb.AdminFinanceController.summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5320,7 +5320,7 @@ export interface paths {
             cookie?: never;
         };
         /** Address suggestions for pinning a location (ADR-141) */
-        get: operations["MilosTrainingWeb.AdminFacilityController.search_addresses"];
+        get: operations["PaleeWeb.AdminFacilityController.search_addresses"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5337,7 +5337,7 @@ export interface paths {
             cookie?: never;
         };
         /** The pin and address behind a pasted Google Maps link (ADR-141) */
-        get: operations["MilosTrainingWeb.AdminFacilityController.resolve_map_link"];
+        get: operations["PaleeWeb.AdminFacilityController.resolve_map_link"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5354,7 +5354,7 @@ export interface paths {
             cookie?: never;
         };
         /** The address and neighbourhood at a map point (ADR-141) */
-        get: operations["MilosTrainingWeb.AdminFacilityController.reverse_geocode"];
+        get: operations["PaleeWeb.AdminFacilityController.reverse_geocode"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5371,10 +5371,10 @@ export interface paths {
             cookie?: never;
         };
         /** List locations, including archived ones */
-        get: operations["MilosTrainingWeb.AdminFacilityController.index_locations"];
+        get: operations["PaleeWeb.AdminFacilityController.index_locations"];
         put?: never;
         /** Create a location */
-        post: operations["MilosTrainingWeb.AdminFacilityController.create_location"];
+        post: operations["PaleeWeb.AdminFacilityController.create_location"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5395,7 +5395,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Rename a location or change its address */
-        patch: operations["MilosTrainingWeb.AdminFacilityController.update_location"];
+        patch: operations["PaleeWeb.AdminFacilityController.update_location"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/locations/{id}/archive": {
@@ -5408,7 +5408,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Archive a location; its past classes keep the reference */
-        post: operations["MilosTrainingWeb.AdminFacilityController.archive_location"];
+        post: operations["PaleeWeb.AdminFacilityController.archive_location"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5423,14 +5423,14 @@ export interface paths {
             cookie?: never;
         };
         /** Get the admin onboarding checklist */
-        get: operations["MilosTrainingWeb.AdminOnboardingController.show"];
+        get: operations["PaleeWeb.AdminOnboardingController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Complete, skip or reopen a step, dismiss the popup or record the finished tour */
-        patch: operations["MilosTrainingWeb.AdminOnboardingController.update"];
+        patch: operations["PaleeWeb.AdminOnboardingController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/organization/archive": {
@@ -5443,7 +5443,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Archive the gym; access closes for everyone (confirm with its slug) */
-        post: operations["MilosTrainingWeb.OwnerOrganizationController.archive"];
+        post: operations["PaleeWeb.OwnerOrganizationController.archive"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5460,7 +5460,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Hand ownership to an active member; the former owner stays as admin */
-        post: operations["MilosTrainingWeb.OwnerOrganizationController.transfer"];
+        post: operations["PaleeWeb.OwnerOrganizationController.transfer"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5475,7 +5475,7 @@ export interface paths {
             cookie?: never;
         };
         /** The organization's platform plan with seats used */
-        get: operations["MilosTrainingWeb.AdminPlanController.show"];
+        get: operations["PaleeWeb.AdminPlanController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5495,7 +5495,7 @@ export interface paths {
          * Active members whose PR dossier a coach may open (ADR-132)
          * @description Every coach of the gym reads members' PRs recorded here (ADR-129); coach client scope (ADR-100) does not narrow this list. Public identity only.
          */
-        get: operations["MilosTrainingWeb.AdminUserController.pr_members"];
+        get: operations["PaleeWeb.AdminUserController.pr_members"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5512,9 +5512,9 @@ export interface paths {
             cookie?: never;
         };
         /** The gym's public profile (Σχετικά of the public box page) */
-        get: operations["MilosTrainingWeb.AdminPublicProfileController.show"];
+        get: operations["PaleeWeb.AdminPublicProfileController.show"];
         /** Edit the draft of the gym's public profile; visitors see it after publishing */
-        put: operations["MilosTrainingWeb.AdminPublicProfileController.update"];
+        put: operations["PaleeWeb.AdminPublicProfileController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5532,7 +5532,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reserve a box photo and get a presigned upload for it */
-        post: operations["MilosTrainingWeb.AdminPublicProfileController.photo_upload"];
+        post: operations["PaleeWeb.AdminPublicProfileController.photo_upload"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5549,7 +5549,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Verify an uploaded box photo (type, size, no metadata) and mark it ready */
-        post: operations["MilosTrainingWeb.AdminPublicProfileController.complete_photo"];
+        post: operations["PaleeWeb.AdminPublicProfileController.complete_photo"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5566,7 +5566,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Publish the draft: visitors see it from now on */
-        post: operations["MilosTrainingWeb.AdminPublicProfileController.publish"];
+        post: operations["PaleeWeb.AdminPublicProfileController.publish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5583,7 +5583,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Suggest a tag missing from a list, for review */
-        post: operations["MilosTrainingWeb.AdminPublicProfileController.suggest"];
+        post: operations["PaleeWeb.AdminPublicProfileController.suggest"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5600,7 +5600,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Hide the public page; the draft is kept */
-        post: operations["MilosTrainingWeb.AdminPublicProfileController.unpublish"];
+        post: operations["PaleeWeb.AdminPublicProfileController.unpublish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5615,7 +5615,7 @@ export interface paths {
             cookie?: never;
         };
         /** The box's invites, newest first; filter review keeps those waiting for approval */
-        get: operations["MilosTrainingWeb.AdminReferralController.index"];
+        get: operations["PaleeWeb.AdminReferralController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5634,7 +5634,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Approve the referral: its reward is created, and a credit lands at once */
-        post: operations["MilosTrainingWeb.AdminReferralController.approve"];
+        post: operations["PaleeWeb.AdminReferralController.approve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5651,7 +5651,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Apply the friend's gift on their first sale (free days, a credit or a described gift) */
-        post: operations["MilosTrainingWeb.AdminReferralController.friend_gift"];
+        post: operations["PaleeWeb.AdminReferralController.friend_gift"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5668,7 +5668,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «Δόθηκε»: an approved reward that isn't a credit was handed over */
-        post: operations["MilosTrainingWeb.AdminReferralController.given"];
+        post: operations["PaleeWeb.AdminReferralController.given"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5684,7 +5684,7 @@ export interface paths {
         };
         get?: never;
         /** Give an invite that hasn't qualified yet to another member, with a note */
-        put: operations["MilosTrainingWeb.AdminReferralController.reassign"];
+        put: operations["PaleeWeb.AdminReferralController.reassign"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5702,7 +5702,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reject the referral; no reward is made */
-        post: operations["MilosTrainingWeb.AdminReferralController.reject"];
+        post: operations["PaleeWeb.AdminReferralController.reject"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5717,7 +5717,7 @@ export interface paths {
             cookie?: never;
         };
         /** List user reviews for admin moderation and analytics */
-        get: operations["MilosTrainingWeb.AdminReviewController.index"];
+        get: operations["PaleeWeb.AdminReviewController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5740,7 +5740,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update review moderation status */
-        patch: operations["MilosTrainingWeb.AdminReviewController.update_status"];
+        patch: operations["PaleeWeb.AdminReviewController.update_status"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/role-access": {
@@ -5751,7 +5751,7 @@ export interface paths {
             cookie?: never;
         };
         /** Capabilities this gym unlocked per role, and what can be unlocked */
-        get: operations["MilosTrainingWeb.RoleAccessController.show"];
+        get: operations["PaleeWeb.RoleAccessController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5769,7 +5769,7 @@ export interface paths {
         };
         get?: never;
         /** Set what a role may do beyond its defaults in this gym */
-        put: operations["MilosTrainingWeb.RoleAccessController.update"];
+        put: operations["PaleeWeb.RoleAccessController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5785,9 +5785,9 @@ export interface paths {
             cookie?: never;
         };
         /** List configured scale levels */
-        get: operations["MilosTrainingWeb.AdminScaleLevelController.index"];
+        get: operations["PaleeWeb.AdminScaleLevelController.index"];
         /** Replace configured scale levels */
-        put: operations["MilosTrainingWeb.AdminScaleLevelController.update"];
+        put: operations["PaleeWeb.AdminScaleLevelController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5805,7 +5805,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a scheduled class slot */
-        post: operations["MilosTrainingWeb.AdminScheduleController.create_slot"];
+        post: operations["PaleeWeb.AdminScheduleController.create_slot"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5822,7 +5822,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a recurring class series */
-        post: operations["MilosTrainingWeb.AdminScheduleController.create_series"];
+        post: operations["PaleeWeb.AdminScheduleController.create_series"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5840,11 +5840,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete a scheduled class slot */
-        delete: operations["MilosTrainingWeb.AdminScheduleController.delete_slot"];
+        delete: operations["PaleeWeb.AdminScheduleController.delete_slot"];
         options?: never;
         head?: never;
         /** Update a scheduled class slot */
-        patch: operations["MilosTrainingWeb.AdminScheduleController.update_slot"];
+        patch: operations["PaleeWeb.AdminScheduleController.update_slot"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/schedule/slots/{id}/goal-feedback-summary": {
@@ -5858,7 +5858,7 @@ export interface paths {
          * Coach totals of «τι ένιωσες» on a scheduled class
          * @description Entries logged from the class or timed from its bookings, whatever workout version they followed; same rules as the workout summary.
          */
-        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary"];
+        get: operations["PaleeWeb.AdminWorkoutGoalsController.class_feedback_summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5875,7 +5875,7 @@ export interface paths {
             cookie?: never;
         };
         /** Injury safety warnings for the members booked into a class slot */
-        get: operations["MilosTrainingWeb.AdminInjuryWarningController.slot"];
+        get: operations["PaleeWeb.AdminInjuryWarningController.slot"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5894,7 +5894,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Record attendance for a user in a class slot */
-        post: operations["MilosTrainingWeb.AdminScheduleController.record_attendance"];
+        post: operations["PaleeWeb.AdminScheduleController.record_attendance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5909,7 +5909,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search users with finance membership metadata */
-        get: operations["MilosTrainingWeb.AdminSearchController.index"];
+        get: operations["PaleeWeb.AdminSearchController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -5928,7 +5928,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Confirm a request: package, #season channel and programme */
-        post: operations["MilosTrainingWeb.AdminSeasonController.confirm"];
+        post: operations["PaleeWeb.AdminSeasonController.confirm"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5945,7 +5945,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Decline a request, with an optional reason the member sees */
-        post: operations["MilosTrainingWeb.AdminSeasonController.decline"];
+        post: operations["PaleeWeb.AdminSeasonController.decline"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5962,7 +5962,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Take a member out of the season (their programme from today on goes) */
-        post: operations["MilosTrainingWeb.AdminSeasonController.remove"];
+        post: operations["PaleeWeb.AdminSeasonController.remove"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5977,10 +5977,10 @@ export interface paths {
             cookie?: never;
         };
         /** The gym's seasons with their place counts */
-        get: operations["MilosTrainingWeb.AdminSeasonController.index"];
+        get: operations["PaleeWeb.AdminSeasonController.index"];
         put?: never;
         /** Create a season (a draft unless published straight away) */
-        post: operations["MilosTrainingWeb.AdminSeasonController.create"];
+        post: operations["PaleeWeb.AdminSeasonController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5995,7 +5995,7 @@ export interface paths {
             cookie?: never;
         };
         /** One season with every request and participant */
-        get: operations["MilosTrainingWeb.AdminSeasonController.show"];
+        get: operations["PaleeWeb.AdminSeasonController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6005,7 +6005,7 @@ export interface paths {
          * Change, publish or cancel a season
          * @description Start date, weeks and programme are locked once a participant is confirmed. Cancelling closes every request and place and archives the season's channel.
          */
-        patch: operations["MilosTrainingWeb.AdminSeasonController.update"];
+        patch: operations["PaleeWeb.AdminSeasonController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/settings": {
@@ -6016,14 +6016,14 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch global admin settings */
-        get: operations["MilosTrainingWeb.AdminSettingsController.show"];
+        get: operations["PaleeWeb.AdminSettingsController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Update global admin settings */
-        patch: operations["MilosTrainingWeb.AdminSettingsController.update"];
+        patch: operations["PaleeWeb.AdminSettingsController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/trial-policy": {
@@ -6034,9 +6034,9 @@ export interface paths {
             cookie?: never;
         };
         /** The box's trial rules and this week's trial count */
-        get: operations["MilosTrainingWeb.AdminTrialController.policy"];
+        get: operations["PaleeWeb.AdminTrialController.policy"];
         /** Change the box's trial rules */
-        put: operations["MilosTrainingWeb.AdminTrialController.update_policy"];
+        put: operations["PaleeWeb.AdminTrialController.update_policy"];
         post?: never;
         delete?: never;
         options?: never;
@@ -6052,7 +6052,7 @@ export interface paths {
             cookie?: never;
         };
         /** Trials in one stage of the funnel, with the count per stage and the last 30 days */
-        get: operations["MilosTrainingWeb.AdminTrialController.queue"];
+        get: operations["PaleeWeb.AdminTrialController.queue"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6071,7 +6071,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Accept a trial request: the seat is booked */
-        post: operations["MilosTrainingWeb.AdminTrialController.accept"];
+        post: operations["PaleeWeb.AdminTrialController.accept"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6088,7 +6088,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Ήρθε / Δεν ήρθε (recorded on the class roster) */
-        post: operations["MilosTrainingWeb.AdminTrialController.attendance"];
+        post: operations["PaleeWeb.AdminTrialController.attendance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6105,7 +6105,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Decline a trial request, with an optional reason the person sees */
-        post: operations["MilosTrainingWeb.AdminTrialController.decline"];
+        post: operations["PaleeWeb.AdminTrialController.decline"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6120,7 +6120,7 @@ export interface paths {
             cookie?: never;
         };
         /** List all users for the admin directory */
-        get: operations["MilosTrainingWeb.AdminUserController.index"];
+        get: operations["PaleeWeb.AdminUserController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6137,11 +6137,11 @@ export interface paths {
             cookie?: never;
         };
         /** Get the common role-aware admin user profile shell */
-        get: operations["MilosTrainingWeb.AdminUserController.show"];
+        get: operations["PaleeWeb.AdminUserController.show"];
         put?: never;
         post?: never;
         /** Delete a user's account */
-        delete: operations["MilosTrainingWeb.AdminUserController.delete"];
+        delete: operations["PaleeWeb.AdminUserController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -6157,7 +6157,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Extend one user's named package allowance for a specific period */
-        post: operations["MilosTrainingWeb.AdminUserController.grant_allowance"];
+        post: operations["PaleeWeb.AdminUserController.grant_allowance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6174,7 +6174,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Revoke a personal allowance extension with a compensating ledger entry */
-        post: operations["MilosTrainingWeb.AdminUserController.revoke_allowance"];
+        post: operations["PaleeWeb.AdminUserController.revoke_allowance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6191,7 +6191,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Book a member into a class, optionally moving them out of an existing booking */
-        post: operations["MilosTrainingWeb.AdminUserController.place_in_class"];
+        post: operations["PaleeWeb.AdminUserController.place_in_class"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6212,7 +6212,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Make a coach a head coach (all clients) or limit them to their own (ADR-100) */
-        patch: operations["MilosTrainingWeb.AdminUserController.update_coach_scope"];
+        patch: operations["PaleeWeb.AdminUserController.update_coach_scope"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/users/{id}/coaching-context": {
@@ -6223,7 +6223,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get role-aware coaching context for a user */
-        get: operations["MilosTrainingWeb.AdminUserController.coaching_context"];
+        get: operations["PaleeWeb.AdminUserController.coaching_context"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6240,7 +6240,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a user's finance dossier section */
-        get: operations["MilosTrainingWeb.AdminUserController.finance"];
+        get: operations["PaleeWeb.AdminUserController.finance"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6257,10 +6257,10 @@ export interface paths {
             cookie?: never;
         };
         /** List a member's package freezes (ADR-097) */
-        get: operations["MilosTrainingWeb.AdminUserController.freezes"];
+        get: operations["PaleeWeb.AdminUserController.freezes"];
         put?: never;
         /** Freeze a member's package for a date range; the package end moves out */
-        post: operations["MilosTrainingWeb.AdminUserController.create_freeze"];
+        post: operations["PaleeWeb.AdminUserController.create_freeze"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6277,7 +6277,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel a freeze; unused days are given back */
-        post: operations["MilosTrainingWeb.AdminUserController.cancel_freeze"];
+        post: operations["PaleeWeb.AdminUserController.cancel_freeze"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6292,7 +6292,7 @@ export interface paths {
             cookie?: never;
         };
         /** A user's training log (workouts or booked classes) with performance */
-        get: operations["MilosTrainingWeb.TrainingHistoryController.for_user"];
+        get: operations["PaleeWeb.TrainingHistoryController.for_user"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6310,7 +6310,7 @@ export interface paths {
         };
         get?: never;
         /** Set a member's home location (staff who manage memberships) */
-        put: operations["MilosTrainingWeb.HomeLocationController.update_member"];
+        put: operations["PaleeWeb.HomeLocationController.update_member"];
         post?: never;
         delete?: never;
         options?: never;
@@ -6326,7 +6326,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a user's health and injury incidents */
-        get: operations["MilosTrainingWeb.AdminUserController.incidents"];
+        get: operations["PaleeWeb.AdminUserController.incidents"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6343,7 +6343,7 @@ export interface paths {
             cookie?: never;
         };
         /** A client's membership status without amounts (coaches, front desk) */
-        get: operations["MilosTrainingWeb.AdminUserController.membership_status"];
+        get: operations["PaleeWeb.AdminUserController.membership_status"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6360,7 +6360,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a user's communication thread summary */
-        get: operations["MilosTrainingWeb.AdminUserController.messages"];
+        get: operations["PaleeWeb.AdminUserController.messages"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6382,7 +6382,7 @@ export interface paths {
          * Copy or save a workout and associate it with this user's assignment, class variant or booked class
          * @description Athletes receive a personal assignment. Members follow `mode` (ADR-125). Without folder_id, copies are filed automatically (ADR-136): athletes in their folder, class workouts in the class-day folder, member variations in the member's variations folder. Member assignment modes fail with 403 `member_programming_not_entitled` when the member's package lacks the personal_programming channel or execute_assigned_workouts capability.
          */
-        post: operations["MilosTrainingWeb.AdminUserController.program_workout"];
+        post: operations["PaleeWeb.AdminUserController.program_workout"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6397,7 +6397,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a user's personal records */
-        get: operations["MilosTrainingWeb.AdminUserController.prs"];
+        get: operations["PaleeWeb.AdminUserController.prs"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6420,7 +6420,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update a user's role */
-        patch: operations["MilosTrainingWeb.AdminUserController.update_role"];
+        patch: operations["PaleeWeb.AdminUserController.update_role"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/users/{id}/roles": {
@@ -6432,7 +6432,7 @@ export interface paths {
         };
         get?: never;
         /** Set every role a person holds in this gym (ADR-099) */
-        put: operations["MilosTrainingWeb.AdminUserController.update_roles"];
+        put: operations["PaleeWeb.AdminUserController.update_roles"];
         post?: never;
         delete?: never;
         options?: never;
@@ -6448,7 +6448,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a role-specific user schedule */
-        get: operations["MilosTrainingWeb.AdminUserController.schedule"];
+        get: operations["PaleeWeb.AdminUserController.schedule"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6465,7 +6465,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a user's executions, scores, assignments, and class participation */
-        get: operations["MilosTrainingWeb.AdminUserController.training_history"];
+        get: operations["PaleeWeb.AdminUserController.training_history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6482,10 +6482,10 @@ export interface paths {
             cookie?: never;
         };
         /** List on-demand videos, including drafts and archived ones */
-        get: operations["MilosTrainingWeb.AdminContentController.index"];
+        get: operations["PaleeWeb.AdminContentController.index"];
         put?: never;
         /** Add an on-demand video (draft until published) */
-        post: operations["MilosTrainingWeb.AdminContentController.create"];
+        post: operations["PaleeWeb.AdminContentController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6506,7 +6506,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Edit an on-demand video */
-        patch: operations["MilosTrainingWeb.AdminContentController.update"];
+        patch: operations["PaleeWeb.AdminContentController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/videos/{id}/archive": {
@@ -6519,7 +6519,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Archive an on-demand video; members no longer see it */
-        post: operations["MilosTrainingWeb.AdminContentController.archive"];
+        post: operations["PaleeWeb.AdminContentController.archive"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6536,7 +6536,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Publish or unpublish an on-demand video */
-        post: operations["MilosTrainingWeb.AdminContentController.publish"];
+        post: operations["PaleeWeb.AdminContentController.publish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6551,7 +6551,7 @@ export interface paths {
             cookie?: never;
         };
         /** List injury reports for admin review */
-        get: operations["MilosTrainingWeb.AdminWellbeingController.index"];
+        get: operations["PaleeWeb.AdminWellbeingController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6574,7 +6574,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Add an update to an injury (text and/or field changes) on its timeline */
-        patch: operations["MilosTrainingWeb.AdminWellbeingController.update"];
+        patch: operations["PaleeWeb.AdminWellbeingController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/heal": {
@@ -6591,7 +6591,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Mark an injury report healed */
-        patch: operations["MilosTrainingWeb.AdminWellbeingController.heal"];
+        patch: operations["PaleeWeb.AdminWellbeingController.heal"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/wellbeing/injuries/{id}/reopen": {
@@ -6604,7 +6604,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reopen a healed injury */
-        post: operations["MilosTrainingWeb.AdminWellbeingController.reopen"];
+        post: operations["PaleeWeb.AdminWellbeingController.reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6624,7 +6624,7 @@ export interface paths {
          * Injury safety warnings for athletes against a workout
          * @description Informational only (ADR-124). Only injuries with this organization's provenance are considered; members' personal self-reports are never visible to staff.
          */
-        post: operations["MilosTrainingWeb.AdminInjuryWarningController.evaluate"];
+        post: operations["PaleeWeb.AdminInjuryWarningController.evaluate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6644,7 +6644,7 @@ export interface paths {
          * Acknowledge injury safety warnings shown for athletes
          * @description Records an analytics acknowledgement for each warned athlete. Warnings are re-evaluated server-side and never block.
          */
-        post: operations["MilosTrainingWeb.AdminInjuryWarningController.acknowledge"];
+        post: operations["PaleeWeb.AdminInjuryWarningController.acknowledge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6661,7 +6661,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Report an injury on behalf of a user */
-        post: operations["MilosTrainingWeb.AdminWellbeingController.create"];
+        post: operations["PaleeWeb.AdminWellbeingController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6676,10 +6676,10 @@ export interface paths {
             cookie?: never;
         };
         /** List nested workout-library folders (system folders are created on demand) */
-        get: operations["MilosTrainingWeb.AdminWorkoutFolderController.index"];
+        get: operations["PaleeWeb.AdminWorkoutFolderController.index"];
         put?: never;
         /** Create a workout-library folder */
-        post: operations["MilosTrainingWeb.AdminWorkoutFolderController.create"];
+        post: operations["PaleeWeb.AdminWorkoutFolderController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6697,11 +6697,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete a folder and move its contents to its parent */
-        delete: operations["MilosTrainingWeb.AdminWorkoutFolderController.delete"];
+        delete: operations["PaleeWeb.AdminWorkoutFolderController.delete"];
         options?: never;
         head?: never;
         /** Rename or reparent a workout-library folder */
-        patch: operations["MilosTrainingWeb.AdminWorkoutFolderController.update"];
+        patch: operations["PaleeWeb.AdminWorkoutFolderController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/workouts": {
@@ -6712,10 +6712,10 @@ export interface paths {
             cookie?: never;
         };
         /** List master workouts */
-        get: operations["MilosTrainingWeb.AdminWorkoutController.index"];
+        get: operations["PaleeWeb.AdminWorkoutController.index"];
         put?: never;
         /** Create an empty workout draft, optionally inside a library folder */
-        post: operations["MilosTrainingWeb.AdminWorkoutController.create"];
+        post: operations["PaleeWeb.AdminWorkoutController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6730,7 +6730,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get the versioned coach manual, templates, and vocabulary */
-        get: operations["MilosTrainingWeb.AdminWorkoutDslController.manual"];
+        get: operations["PaleeWeb.AdminWorkoutDslController.manual"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6749,7 +6749,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Parse and canonically format Quick Text workout source */
-        post: operations["MilosTrainingWeb.AdminWorkoutDslController.parse"];
+        post: operations["PaleeWeb.AdminWorkoutDslController.parse"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6766,7 +6766,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Read a free-text workout into the canonical schema with actionable issues */
-        post: operations["MilosTrainingWeb.AdminWorkoutFreeTextController.analyze"];
+        post: operations["PaleeWeb.AdminWorkoutFreeTextController.analyze"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6783,7 +6783,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Preview the timer sequence a draft section will run */
-        post: operations["MilosTrainingWeb.AdminWorkoutTimerPreviewController.create"];
+        post: operations["PaleeWeb.AdminWorkoutTimerPreviewController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6798,11 +6798,11 @@ export interface paths {
             cookie?: never;
         };
         /** Get an admin workout draft or published workout */
-        get: operations["MilosTrainingWeb.AdminWorkoutController.show"];
+        get: operations["PaleeWeb.AdminWorkoutController.show"];
         put?: never;
         post?: never;
         /** Hard delete a workout and dependent records */
-        delete: operations["MilosTrainingWeb.AdminWorkoutController.delete"];
+        delete: operations["PaleeWeb.AdminWorkoutController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -6818,7 +6818,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Copy a workout into a library folder (published workouts stay published) */
-        post: operations["MilosTrainingWeb.AdminWorkoutController.copy"];
+        post: operations["PaleeWeb.AdminWorkoutController.copy"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6839,7 +6839,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Autosave a workout draft */
-        patch: operations["MilosTrainingWeb.AdminWorkoutController.update_draft"];
+        patch: operations["PaleeWeb.AdminWorkoutController.update_draft"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/workouts/{id}/dsl": {
@@ -6850,7 +6850,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get retained or canonically generated Quick Text source */
-        get: operations["MilosTrainingWeb.AdminWorkoutDslController.show_authoring"];
+        get: operations["PaleeWeb.AdminWorkoutDslController.show_authoring"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6869,7 +6869,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Parse, preflight, and publish an exact Quick Text source revision */
-        post: operations["MilosTrainingWeb.AdminWorkoutDslController.publish"];
+        post: operations["PaleeWeb.AdminWorkoutDslController.publish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6886,7 +6886,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Duplicate a workout as a new draft */
-        post: operations["MilosTrainingWeb.AdminWorkoutController.duplicate"];
+        post: operations["PaleeWeb.AdminWorkoutController.duplicate"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6904,7 +6904,7 @@ export interface paths {
          * Coach totals of «τι ένιωσες» on a workout
          * @description Counts only feedback on non-voided entries whose visibility reaches the caller as a coach; shown only from 3 entries.
          */
-        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary"];
+        get: operations["PaleeWeb.AdminWorkoutGoalsController.feedback_summary"];
         put?: never;
         post?: never;
         delete?: never;
@@ -6924,9 +6924,9 @@ export interface paths {
          * A workout's WOD goals and the live suggestion
          * @description Saved goals, or the suggestion from the workout's exercises (saved=false) when none are saved. Drafts included.
          */
-        get: operations["MilosTrainingWeb.AdminWorkoutGoalsController.show"];
+        get: operations["PaleeWeb.AdminWorkoutGoalsController.show"];
         /** Save a workout's WOD goals */
-        put: operations["MilosTrainingWeb.AdminWorkoutGoalsController.update"];
+        put: operations["PaleeWeb.AdminWorkoutGoalsController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -6948,7 +6948,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Set a workout's library icon, or reset it to automatic (rules + AI suggestion) */
-        patch: operations["MilosTrainingWeb.AdminWorkoutController.update_icon"];
+        patch: operations["PaleeWeb.AdminWorkoutController.update_icon"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/workouts/{id}/library": {
@@ -6965,7 +6965,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Move a workout in the nested library */
-        patch: operations["MilosTrainingWeb.AdminWorkoutController.update_library"];
+        patch: operations["PaleeWeb.AdminWorkoutController.update_library"];
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/workouts/{id}/publish": {
@@ -6978,7 +6978,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Publish a workout draft */
-        post: operations["MilosTrainingWeb.AdminWorkoutController.publish"];
+        post: operations["PaleeWeb.AdminWorkoutController.publish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -6995,7 +6995,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reopen a published workout for editing */
-        post: operations["MilosTrainingWeb.AdminWorkoutController.reopen"];
+        post: operations["PaleeWeb.AdminWorkoutController.reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7010,7 +7010,7 @@ export interface paths {
             cookie?: never;
         };
         /** Exercises that train an atlas node, with the gym's videos */
-        get: operations["MilosTrainingWeb.AnatomyAtlasController.exercises"];
+        get: operations["PaleeWeb.AnatomyAtlasController.exercises"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7032,7 +7032,7 @@ export interface paths {
          * Book a schedule slot
          * @description Optionally idempotent per `client_operation_id` (ADR-120): replaying the same id for the same slot returns the original booking with 200 and no new reservation, notification, or broadcast; reusing it for another slot returns 409 `idempotency_key_conflict`.
          */
-        post: operations["MilosTrainingWeb.ScheduleController.create_booking"];
+        post: operations["PaleeWeb.ScheduleController.create_booking"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7049,7 +7049,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Book a named guest into a class on a guest pass */
-        post: operations["MilosTrainingWeb.ScheduleController.create_guest_booking"];
+        post: operations["PaleeWeb.ScheduleController.create_guest_booking"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7066,7 +7066,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Join the waitlist of a full class */
-        post: operations["MilosTrainingWeb.ScheduleController.join_waitlist"];
+        post: operations["PaleeWeb.ScheduleController.join_waitlist"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7084,7 +7084,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Withdraw a pending or approved booking */
-        delete: operations["MilosTrainingWeb.ScheduleController.delete_booking"];
+        delete: operations["PaleeWeb.ScheduleController.delete_booking"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7100,7 +7100,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Check in to a class you booked (from 30 minutes before it starts until it ends) */
-        post: operations["MilosTrainingWeb.ScheduleController.check_in_class"];
+        post: operations["PaleeWeb.ScheduleController.check_in_class"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7117,7 +7117,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Check in to open gym */
-        post: operations["MilosTrainingWeb.ScheduleController.check_in"];
+        post: operations["PaleeWeb.ScheduleController.check_in"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7132,7 +7132,7 @@ export interface paths {
             cookie?: never;
         };
         /** Read the coach-run timer of a scheduled class */
-        get: operations["MilosTrainingWeb.ClassTimerController.show"];
+        get: operations["PaleeWeb.ClassTimerController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7151,7 +7151,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Run a class timer command (coaches and admins) */
-        post: operations["MilosTrainingWeb.ClassTimerController.command"];
+        post: operations["PaleeWeb.ClassTimerController.command"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7168,9 +7168,9 @@ export interface paths {
         get?: never;
         put?: never;
         /** Join an opt-in channel */
-        post: operations["MilosTrainingWeb.CommunityController.join_channel"];
+        post: operations["PaleeWeb.CommunityController.join_channel"];
         /** Leave an opt-in channel */
-        delete: operations["MilosTrainingWeb.CommunityController.leave_channel"];
+        delete: operations["PaleeWeb.CommunityController.leave_channel"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7185,7 +7185,7 @@ export interface paths {
         };
         get?: never;
         /** How much you hear from a club */
-        put: operations["MilosTrainingWeb.CommunityController.set_notify_level"];
+        put: operations["PaleeWeb.CommunityController.set_notify_level"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7204,7 +7204,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your comment (staff: any comment in their club) */
-        delete: operations["MilosTrainingWeb.CommunityPostController.delete_comment"];
+        delete: operations["PaleeWeb.CommunityPostController.delete_comment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7219,7 +7219,7 @@ export interface paths {
         };
         get?: never;
         /** Staff and group admins: hide or show a comment */
-        put: operations["MilosTrainingWeb.CommunityPostController.hide_comment"];
+        put: operations["PaleeWeb.CommunityPostController.hide_comment"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7235,10 +7235,10 @@ export interface paths {
             cookie?: never;
         };
         /** The club's live groups and whether you can start one */
-        get: operations["MilosTrainingWeb.CommunityGroupController.index"];
+        get: operations["PaleeWeb.CommunityGroupController.index"];
         put?: never;
         /** Start a group (it waits for staff when the gym asks for approval) */
-        post: operations["MilosTrainingWeb.CommunityGroupController.create"];
+        post: operations["PaleeWeb.CommunityGroupController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7253,14 +7253,14 @@ export interface paths {
             cookie?: never;
         };
         /** A group with its members (and requests, for its admins) */
-        get: operations["MilosTrainingWeb.CommunityGroupController.show"];
+        get: operations["PaleeWeb.CommunityGroupController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Admins: rename a group, describe it, or change how people join */
-        patch: operations["MilosTrainingWeb.CommunityGroupController.update"];
+        patch: operations["PaleeWeb.CommunityGroupController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/community/groups/{id}/admins/{user_id}": {
@@ -7272,7 +7272,7 @@ export interface paths {
         };
         get?: never;
         /** Admins: make a member an admin, or not */
-        put: operations["MilosTrainingWeb.CommunityGroupController.set_admin"];
+        put: operations["PaleeWeb.CommunityGroupController.set_admin"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7290,7 +7290,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Admins: archive the group */
-        post: operations["MilosTrainingWeb.CommunityGroupController.archive"];
+        post: operations["PaleeWeb.CommunityGroupController.archive"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7308,7 +7308,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Admins: remove someone from the group */
-        delete: operations["MilosTrainingWeb.CommunityGroupController.remove_member"];
+        delete: operations["PaleeWeb.CommunityGroupController.remove_member"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7324,9 +7324,9 @@ export interface paths {
         get?: never;
         put?: never;
         /** Join a group, or ask to when its admins let people in */
-        post: operations["MilosTrainingWeb.CommunityGroupController.join"];
+        post: operations["PaleeWeb.CommunityGroupController.join"];
         /** Leave a group (the last admin hands over first; the last member archives it) */
-        delete: operations["MilosTrainingWeb.CommunityGroupController.leave"];
+        delete: operations["PaleeWeb.CommunityGroupController.leave"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7342,7 +7342,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Bring back an archived group you started */
-        post: operations["MilosTrainingWeb.CommunityGroupController.reopen"];
+        post: operations["PaleeWeb.CommunityGroupController.reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7358,7 +7358,7 @@ export interface paths {
         };
         get?: never;
         /** Admins: let someone in, or turn the request down */
-        put: operations["MilosTrainingWeb.CommunityGroupController.answer_request"];
+        put: operations["PaleeWeb.CommunityGroupController.answer_request"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7376,7 +7376,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Post in a channel of your gym's club, optionally attaching a journal entry */
-        post: operations["MilosTrainingWeb.CommunityPostController.create"];
+        post: operations["PaleeWeb.CommunityPostController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7394,7 +7394,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your post (staff: any post in their club) */
-        delete: operations["MilosTrainingWeb.CommunityPostController.delete"];
+        delete: operations["PaleeWeb.CommunityPostController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7408,10 +7408,10 @@ export interface paths {
             cookie?: never;
         };
         /** A post's comments, oldest first */
-        get: operations["MilosTrainingWeb.CommunityPostController.comments"];
+        get: operations["PaleeWeb.CommunityPostController.comments"];
         put?: never;
         /** Comment on a post */
-        post: operations["MilosTrainingWeb.CommunityPostController.comment"];
+        post: operations["PaleeWeb.CommunityPostController.comment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7427,7 +7427,7 @@ export interface paths {
         };
         get?: never;
         /** Staff: hide or show a post */
-        put: operations["MilosTrainingWeb.CommunityPostController.hide"];
+        put: operations["PaleeWeb.CommunityPostController.hide"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7444,7 +7444,7 @@ export interface paths {
         };
         get?: never;
         /** Give or take back kudos */
-        put: operations["MilosTrainingWeb.CommunityPostController.kudos"];
+        put: operations["PaleeWeb.CommunityPostController.kudos"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7461,7 +7461,7 @@ export interface paths {
         };
         get?: never;
         /** Staff: pin or unpin an announcement */
-        put: operations["MilosTrainingWeb.CommunityPostController.pin"];
+        put: operations["PaleeWeb.CommunityPostController.pin"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7477,10 +7477,10 @@ export interface paths {
             cookie?: never;
         };
         /** Squads you coach or are in, invitations waiting for you, and clients to invite */
-        get: operations["MilosTrainingWeb.PtSquadController.index"];
+        get: operations["PaleeWeb.PtSquadController.index"];
         put?: never;
         /** Coaches: start a squad, optionally inviting some of your clients */
-        post: operations["MilosTrainingWeb.PtSquadController.create"];
+        post: operations["PaleeWeb.PtSquadController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7495,14 +7495,14 @@ export interface paths {
             cookie?: never;
         };
         /** A squad with its people (its coach also sees open invitations) */
-        get: operations["MilosTrainingWeb.PtSquadController.show"];
+        get: operations["PaleeWeb.PtSquadController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Coach: rename or describe the squad */
-        patch: operations["MilosTrainingWeb.PtSquadController.update"];
+        patch: operations["PaleeWeb.PtSquadController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/community/squads/{id}/archive": {
@@ -7515,7 +7515,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Coach (or the gym's managers): archive the squad */
-        post: operations["MilosTrainingWeb.PtSquadController.archive"];
+        post: operations["PaleeWeb.PtSquadController.archive"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7531,7 +7531,7 @@ export interface paths {
         };
         get?: never;
         /** Accept or decline an invitation to a squad */
-        put: operations["MilosTrainingWeb.PtSquadController.answer"];
+        put: operations["PaleeWeb.PtSquadController.answer"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7549,7 +7549,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Coach: invite some of your active clients */
-        post: operations["MilosTrainingWeb.PtSquadController.invite"];
+        post: operations["PaleeWeb.PtSquadController.invite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7567,7 +7567,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Coach: remove a member, or withdraw an invitation */
-        delete: operations["MilosTrainingWeb.PtSquadController.remove_member"];
+        delete: operations["PaleeWeb.PtSquadController.remove_member"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7584,7 +7584,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Leave a squad */
-        delete: operations["MilosTrainingWeb.PtSquadController.leave"];
+        delete: operations["PaleeWeb.PtSquadController.leave"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7600,7 +7600,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Coach: bring back an archived squad */
-        post: operations["MilosTrainingWeb.PtSquadController.reopen"];
+        post: operations["PaleeWeb.PtSquadController.reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7615,7 +7615,7 @@ export interface paths {
             cookie?: never;
         };
         /** The gym's #wod card for a day: its WOD, classes and leaderboard */
-        get: operations["MilosTrainingWeb.CommunityController.wod_today"];
+        get: operations["PaleeWeb.CommunityController.wod_today"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7632,10 +7632,10 @@ export interface paths {
             cookie?: never;
         };
         /** List pending invitations of the organization */
-        get: operations["MilosTrainingWeb.OrganizationAccessController.list_invitations"];
+        get: operations["PaleeWeb.OrganizationAccessController.list_invitations"];
         put?: never;
         /** Issue a one-time organization invitation */
-        post: operations["MilosTrainingWeb.OrganizationAccessController.issue"];
+        post: operations["PaleeWeb.OrganizationAccessController.issue"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7653,7 +7653,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Revoke an active organization invitation */
-        delete: operations["MilosTrainingWeb.OrganizationAccessController.revoke"];
+        delete: operations["PaleeWeb.OrganizationAccessController.revoke"];
         options?: never;
         head?: never;
         patch?: never;
@@ -7667,9 +7667,9 @@ export interface paths {
             cookie?: never;
         };
         /** Get the organization's public join link settings */
-        get: operations["MilosTrainingWeb.OrganizationAccessController.show_join_link"];
+        get: operations["PaleeWeb.OrganizationAccessController.show_join_link"];
         /** Enable, disable or change the role of the public join link */
-        put: operations["MilosTrainingWeb.OrganizationAccessController.update_join_link"];
+        put: operations["PaleeWeb.OrganizationAccessController.update_join_link"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7685,7 +7685,7 @@ export interface paths {
             cookie?: never;
         };
         /** Fetch the authenticated landing page payload */
-        get: operations["MilosTrainingWeb.LandingController.show"];
+        get: operations["PaleeWeb.LandingController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7704,7 +7704,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Update leaderboard opt-in preference */
-        post: operations["MilosTrainingWeb.LandingController.update_leaderboard_preference"];
+        post: operations["PaleeWeb.LandingController.update_leaderboard_preference"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7719,7 +7719,7 @@ export interface paths {
             cookie?: never;
         };
         /** List the gym's locations */
-        get: operations["MilosTrainingWeb.ScheduleController.locations"];
+        get: operations["PaleeWeb.ScheduleController.locations"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7736,10 +7736,10 @@ export interface paths {
             cookie?: never;
         };
         /** My appointments */
-        get: operations["MilosTrainingWeb.AppointmentsController.my_appointments"];
+        get: operations["PaleeWeb.AppointmentsController.my_appointments"];
         put?: never;
         /** Book an appointment slot */
-        post: operations["MilosTrainingWeb.AppointmentsController.book"];
+        post: operations["PaleeWeb.AppointmentsController.book"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7754,7 +7754,7 @@ export interface paths {
             cookie?: never;
         };
         /** Upcoming appointment slots I can book with my packages */
-        get: operations["MilosTrainingWeb.AppointmentsController.offered_slots"];
+        get: operations["PaleeWeb.AppointmentsController.offered_slots"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7773,7 +7773,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel an appointment; inside the cancellation cutoff the session is used */
-        post: operations["MilosTrainingWeb.AppointmentsController.cancel"];
+        post: operations["PaleeWeb.AppointmentsController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7788,7 +7788,7 @@ export interface paths {
             cookie?: never;
         };
         /** My personal check-in QR at this box (rotating every 30 s, or static per the box) */
-        get: operations["MilosTrainingWeb.MyCheckInController.code"];
+        get: operations["PaleeWeb.MyCheckInController.code"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7807,7 +7807,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reset my static personal code: the old one and its Wallet cards stop */
-        post: operations["MilosTrainingWeb.MyCheckInController.reset_code"];
+        post: operations["PaleeWeb.MyCheckInController.reset_code"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7822,10 +7822,10 @@ export interface paths {
             cookie?: never;
         };
         /** A company plan my account email qualifies for, if any */
-        get: operations["MilosTrainingWeb.PaymentModelsController.enrollment_offer"];
+        get: operations["PaleeWeb.PaymentModelsController.enrollment_offer"];
         put?: never;
         /** Join my company's corporate plan with its code, or by my email domain */
-        post: operations["MilosTrainingWeb.PaymentModelsController.enroll"];
+        post: operations["PaleeWeb.PaymentModelsController.enroll"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7840,7 +7840,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get the current user's effective package benefits and allowance usage */
-        get: operations["MilosTrainingWeb.MyFinanceController.entitlement"];
+        get: operations["PaleeWeb.MyFinanceController.entitlement"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7857,7 +7857,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get the current member's finance summary */
-        get: operations["MilosTrainingWeb.MyFinanceController.index"];
+        get: operations["PaleeWeb.MyFinanceController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7874,10 +7874,10 @@ export interface paths {
             cookie?: never;
         };
         /** My form reviews */
-        get: operations["MilosTrainingWeb.CoachingExtrasController.my_form_reviews"];
+        get: operations["PaleeWeb.CoachingExtrasController.my_form_reviews"];
         put?: never;
         /** Ask a coach for feedback on a video of my technique */
-        post: operations["MilosTrainingWeb.CoachingExtrasController.submit_form_review"];
+        post: operations["PaleeWeb.CoachingExtrasController.submit_form_review"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7894,7 +7894,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Withdraw an open form review; the review is given back */
-        post: operations["MilosTrainingWeb.CoachingExtrasController.withdraw_form_review"];
+        post: operations["PaleeWeb.CoachingExtrasController.withdraw_form_review"];
         delete?: never;
         options?: never;
         head?: never;
@@ -7912,9 +7912,9 @@ export interface paths {
          * The goals of an entry's workout and what the member felt
          * @description Only for the member's own entry. goals is null unless the coach made them visible; feedback is null until saved.
          */
-        get: operations["MilosTrainingWeb.GoalFeedbackController.show"];
+        get: operations["PaleeWeb.GoalFeedbackController.show"];
         /** Save what the member felt after one of their entries */
-        put: operations["MilosTrainingWeb.GoalFeedbackController.update"];
+        put: operations["PaleeWeb.GoalFeedbackController.update"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7930,7 +7930,7 @@ export interface paths {
             cookie?: never;
         };
         /** The signed-in user's training log (workouts or booked classes) with performance */
-        get: operations["MilosTrainingWeb.TrainingHistoryController.mine"];
+        get: operations["PaleeWeb.TrainingHistoryController.mine"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7948,7 +7948,7 @@ export interface paths {
         };
         get?: never;
         /** Set my home location in this gym */
-        put: operations["MilosTrainingWeb.HomeLocationController.update_mine"];
+        put: operations["PaleeWeb.HomeLocationController.update_mine"];
         post?: never;
         delete?: never;
         options?: never;
@@ -7964,7 +7964,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a presigned download URL for one of the current member's invoices */
-        get: operations["MilosTrainingWeb.MyFinanceController.invoice_download_url"];
+        get: operations["PaleeWeb.MyFinanceController.invoice_download_url"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7981,7 +7981,7 @@ export interface paths {
             cookie?: never;
         };
         /** My nutrition plan */
-        get: operations["MilosTrainingWeb.CoachingExtrasController.my_nutrition_plan"];
+        get: operations["PaleeWeb.CoachingExtrasController.my_nutrition_plan"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7998,7 +7998,7 @@ export interface paths {
             cookie?: never;
         };
         /** Advanced statistics of my training in this gym */
-        get: operations["MilosTrainingWeb.MyContentController.progress"];
+        get: operations["PaleeWeb.MyContentController.progress"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8015,7 +8015,7 @@ export interface paths {
             cookie?: never;
         };
         /** Your «Φέρε φίλο» at the box: link, programme, events to invite to and your invites */
-        get: operations["MilosTrainingWeb.ReferralController.mine"];
+        get: operations["PaleeWeb.ReferralController.mine"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8034,7 +8034,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** A new invite link at the box; the old one stops working */
-        post: operations["MilosTrainingWeb.ReferralController.rotate_code"];
+        post: operations["PaleeWeb.ReferralController.rotate_code"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8049,7 +8049,7 @@ export interface paths {
             cookie?: never;
         };
         /** List the current member's refund receipts */
-        get: operations["MilosTrainingWeb.MyFinanceController.refund_receipts"];
+        get: operations["PaleeWeb.MyFinanceController.refund_receipts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8066,7 +8066,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get one of the current member's refund receipts */
-        get: operations["MilosTrainingWeb.MyFinanceController.refund_receipt"];
+        get: operations["PaleeWeb.MyFinanceController.refund_receipt"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8083,7 +8083,7 @@ export interface paths {
             cookie?: never;
         };
         /** Printable HTML version of one of the current member's refund receipts */
-        get: operations["MilosTrainingWeb.MyFinanceController.refund_receipt_document"];
+        get: operations["PaleeWeb.MyFinanceController.refund_receipt_document"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8100,10 +8100,10 @@ export interface paths {
             cookie?: never;
         };
         /** List reviews submitted by the current user */
-        get: operations["MilosTrainingWeb.ReviewController.index"];
+        get: operations["PaleeWeb.ReviewController.index"];
         put?: never;
         /** Submit a review for a workout, exercise, gym parameter, or coaching target */
-        post: operations["MilosTrainingWeb.ReviewController.create"];
+        post: operations["PaleeWeb.ReviewController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8118,7 +8118,7 @@ export interface paths {
             cookie?: never;
         };
         /** Search visible users by nickname */
-        get: operations["MilosTrainingWeb.MeController.search_users"];
+        get: operations["PaleeWeb.MeController.search_users"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8135,7 +8135,7 @@ export interface paths {
             cookie?: never;
         };
         /** The gym's open seasons and the ones you hold a place in */
-        get: operations["MilosTrainingWeb.SeasonController.index"];
+        get: operations["PaleeWeb.SeasonController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8157,7 +8157,7 @@ export interface paths {
          * Withdraw your request or waitlist place
          * @description A confirmed place is settled with the box.
          */
-        post: operations["MilosTrainingWeb.SeasonController.cancel"];
+        post: operations["PaleeWeb.SeasonController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8174,7 +8174,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Ask for a place (the waitlist when the season is full); staff confirm */
-        post: operations["MilosTrainingWeb.SeasonController.request"];
+        post: operations["PaleeWeb.SeasonController.request"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8189,10 +8189,10 @@ export interface paths {
             cookie?: never;
         };
         /** List threads for the current user */
-        get: operations["MilosTrainingWeb.MessagingController.list_threads"];
+        get: operations["PaleeWeb.MessagingController.list_threads"];
         put?: never;
         /** Create or get an existing thread */
-        post: operations["MilosTrainingWeb.MessagingController.create_thread"];
+        post: operations["PaleeWeb.MessagingController.create_thread"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8207,7 +8207,7 @@ export interface paths {
             cookie?: never;
         };
         /** Count unread threads for the current user */
-        get: operations["MilosTrainingWeb.MessagingController.unread_count"];
+        get: operations["PaleeWeb.MessagingController.unread_count"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8224,7 +8224,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a single thread */
-        get: operations["MilosTrainingWeb.MessagingController.show_thread"];
+        get: operations["PaleeWeb.MessagingController.show_thread"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8241,10 +8241,10 @@ export interface paths {
             cookie?: never;
         };
         /** List messages in a thread */
-        get: operations["MilosTrainingWeb.MessagingController.list_messages"];
+        get: operations["PaleeWeb.MessagingController.list_messages"];
         put?: never;
         /** Send a message in a thread */
-        post: operations["MilosTrainingWeb.MessagingController.send_message"];
+        post: operations["PaleeWeb.MessagingController.send_message"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8261,7 +8261,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark a message as read in a thread */
-        post: operations["MilosTrainingWeb.MessagingController.mark_read"];
+        post: operations["PaleeWeb.MessagingController.mark_read"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8276,13 +8276,13 @@ export interface paths {
             cookie?: never;
         };
         /** List the current user's training log entries in this organization */
-        get: operations["MilosTrainingWeb.TrainingLogController.index"];
+        get: operations["PaleeWeb.TrainingLogController.index"];
         put?: never;
         /**
          * Log a class, assigned, library, or freeform workout
          * @description Idempotent per `idempotency_key`: a replay returns the original entry with 200, before source authorization is re-evaluated (ADR-120). Reusing a key for a different source returns 409 `idempotency_key_conflict`. Logging feeds the same durable completion projection as workout executions.
          */
-        post: operations["MilosTrainingWeb.TrainingLogController.create"];
+        post: operations["PaleeWeb.TrainingLogController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8297,14 +8297,14 @@ export interface paths {
             cookie?: never;
         };
         /** Get one of the current user's training log entries */
-        get: operations["MilosTrainingWeb.TrainingLogController.show"];
+        get: operations["PaleeWeb.TrainingLogController.show"];
         put?: never;
         post?: never;
         delete?: never;
         options?: never;
         head?: never;
         /** Edit the performed details of a training log entry */
-        patch: operations["MilosTrainingWeb.TrainingLogController.update"];
+        patch: operations["PaleeWeb.TrainingLogController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/me/training-log/entries/{id}/void": {
@@ -8317,7 +8317,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Void a training log entry (entries are never deleted) */
-        post: operations["MilosTrainingWeb.TrainingLogController.void"];
+        post: operations["PaleeWeb.TrainingLogController.void"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8332,7 +8332,7 @@ export interface paths {
             cookie?: never;
         };
         /** List classes, assignments, and library workouts that can be logged */
-        get: operations["MilosTrainingWeb.TrainingLogController.sources"];
+        get: operations["PaleeWeb.TrainingLogController.sources"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8349,7 +8349,7 @@ export interface paths {
             cookie?: never;
         };
         /** Whether the current user may log a workout by voice */
-        get: operations["MilosTrainingWeb.MyVoiceLogController.show"];
+        get: operations["PaleeWeb.MyVoiceLogController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8368,7 +8368,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Transcribe one recording into a draft training-log entry (nothing is saved) */
-        post: operations["MilosTrainingWeb.MyVoiceLogController.create"];
+        post: operations["PaleeWeb.MyVoiceLogController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8383,7 +8383,7 @@ export interface paths {
             cookie?: never;
         };
         /** On-demand videos included in my package */
-        get: operations["MilosTrainingWeb.MyContentController.videos"];
+        get: operations["PaleeWeb.MyContentController.videos"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8402,7 +8402,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Add my check-in card at this box to Apple or Google Wallet */
-        post: operations["MilosTrainingWeb.MyCheckInController.add_wallet_pass"];
+        post: operations["PaleeWeb.MyCheckInController.add_wallet_pass"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8420,7 +8420,7 @@ export interface paths {
          * The current user's injury safety warnings for a workout
          * @description Informational only (ADR-124): includes the user's own personal injuries; never blocks starting the workout.
          */
-        get: operations["MilosTrainingWeb.MyInjuryWarningController.show"];
+        get: operations["PaleeWeb.MyInjuryWarningController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8439,7 +8439,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Acknowledge the current user's injury safety warnings for a workout */
-        post: operations["MilosTrainingWeb.MyInjuryWarningController.acknowledge"];
+        post: operations["PaleeWeb.MyInjuryWarningController.acknowledge"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8454,7 +8454,7 @@ export interface paths {
             cookie?: never;
         };
         /** The current user's coach-approved adaptation of a workout */
-        get: operations["MilosTrainingWeb.MyScalingController.show"];
+        get: operations["PaleeWeb.MyScalingController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8474,7 +8474,7 @@ export interface paths {
          * List assigned workouts for the current athlete or member, or all assignments for staff
          * @description ADR-125: members receive personal assignments and class variants. Each assignment carries `assignment_kind` (`personal` | `class_variant`) and `source_slot_id` (the class a variant belongs to, or null).
          */
-        get: operations["MilosTrainingWeb.MyWorkoutController.index"];
+        get: operations["PaleeWeb.MyWorkoutController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8496,7 +8496,7 @@ export interface paths {
          * Assignee reports opening an assigned workout's detail (analytics, ADR-121)
          * @description Records workout_assignment_opened once per athlete, assignment and UTC day. Repeated calls the same day are accepted and ignored.
          */
-        post: operations["MilosTrainingWeb.MyWorkoutController.open"];
+        post: operations["PaleeWeb.MyWorkoutController.open"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8517,7 +8517,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Assignee (athlete or member, ADR-125) rejects an assigned workout */
-        patch: operations["MilosTrainingWeb.MyWorkoutController.reject"];
+        patch: operations["PaleeWeb.MyWorkoutController.reject"];
         trace?: never;
     };
     "/api/org/{organization_slug}/my-workouts/assignments/{id}/reschedule": {
@@ -8534,7 +8534,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Athlete reschedules an assigned workout to a new date */
-        patch: operations["MilosTrainingWeb.MyWorkoutController.reschedule"];
+        patch: operations["PaleeWeb.MyWorkoutController.reschedule"];
         trace?: never;
     };
     "/api/org/{organization_slug}/my-workouts/requests": {
@@ -8547,7 +8547,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Athlete requests a workout assignment for a specific date */
-        post: operations["MilosTrainingWeb.MyWorkoutController.request_assignment"];
+        post: operations["PaleeWeb.MyWorkoutController.request_assignment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8562,7 +8562,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get the schedule window */
-        get: operations["MilosTrainingWeb.ScheduleController.index"];
+        get: operations["PaleeWeb.ScheduleController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8579,10 +8579,10 @@ export interface paths {
             cookie?: never;
         };
         /** Appointment slots in a date range, with their bookings */
-        get: operations["MilosTrainingWeb.AppointmentsController.slots"];
+        get: operations["PaleeWeb.AppointmentsController.slots"];
         put?: never;
         /** Publish an appointment slot (for yourself or another coach) */
-        post: operations["MilosTrainingWeb.AppointmentsController.create_slot"];
+        post: operations["PaleeWeb.AppointmentsController.create_slot"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8599,7 +8599,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Book a client into a slot on their package */
-        post: operations["MilosTrainingWeb.AppointmentsController.book_for_client"];
+        post: operations["PaleeWeb.AppointmentsController.book_for_client"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8616,7 +8616,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel a slot; booked clients get their session back */
-        post: operations["MilosTrainingWeb.AppointmentsController.cancel_slot"];
+        post: operations["PaleeWeb.AppointmentsController.cancel_slot"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8633,7 +8633,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Mark an appointment attended or missed */
-        post: operations["MilosTrainingWeb.AppointmentsController.attendance"];
+        post: operations["PaleeWeb.AppointmentsController.attendance"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8650,7 +8650,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel an appointment; inside the cancellation cutoff the session is used */
-        post: operations["MilosTrainingWeb.AppointmentsController.cancel (2)"];
+        post: operations["PaleeWeb.AppointmentsController.cancel (2)"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8665,10 +8665,10 @@ export interface paths {
             cookie?: never;
         };
         /** Cleaning areas */
-        get: operations["MilosTrainingWeb.CleaningController.areas"];
+        get: operations["PaleeWeb.CleaningController.areas"];
         put?: never;
         /** Add a cleaning area */
-        post: operations["MilosTrainingWeb.CleaningController.create_area"];
+        post: operations["PaleeWeb.CleaningController.create_area"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8689,7 +8689,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Rename an area or change its tasks */
-        patch: operations["MilosTrainingWeb.CleaningController.update_area"];
+        patch: operations["PaleeWeb.CleaningController.update_area"];
         trace?: never;
     };
     "/api/org/{organization_slug}/staff/cleaning/areas/{id}/archive": {
@@ -8702,7 +8702,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Archive an area */
-        post: operations["MilosTrainingWeb.CleaningController.archive_area"];
+        post: operations["PaleeWeb.CleaningController.archive_area"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8717,10 +8717,10 @@ export interface paths {
             cookie?: never;
         };
         /** The cleaning log: everyone's for reviewers, your own otherwise */
-        get: operations["MilosTrainingWeb.CleaningController.entries"];
+        get: operations["PaleeWeb.CleaningController.entries"];
         put?: never;
         /** Start cleaning an area */
-        post: operations["MilosTrainingWeb.CleaningController.start"];
+        post: operations["PaleeWeb.CleaningController.start"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8737,7 +8737,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Finish cleaning: the tasks done and an optional note */
-        post: operations["MilosTrainingWeb.CleaningController.finish"];
+        post: operations["PaleeWeb.CleaningController.finish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8752,7 +8752,7 @@ export interface paths {
             cookie?: never;
         };
         /** A client's shared body snapshots (reads are logged for the client) */
-        get: operations["MilosTrainingWeb.ClientBodyController.index"];
+        get: operations["PaleeWeb.ClientBodyController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8769,7 +8769,7 @@ export interface paths {
             cookie?: never;
         };
         /** One metric of a client over a range, as the client's display allows (logged) */
-        get: operations["MilosTrainingWeb.ClientBodyController.series"];
+        get: operations["PaleeWeb.ClientBodyController.series"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8786,7 +8786,7 @@ export interface paths {
             cookie?: never;
         };
         /** One shared snapshot of a client (the read is logged for the client) */
-        get: operations["MilosTrainingWeb.ClientBodyController.show"];
+        get: operations["PaleeWeb.ClientBodyController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8803,10 +8803,10 @@ export interface paths {
             cookie?: never;
         };
         /** Private notes about a client that you may read (reads are logged) */
-        get: operations["MilosTrainingWeb.CoachNotesController.index"];
+        get: operations["PaleeWeb.CoachNotesController.index"];
         put?: never;
         /** Write a private note about one of your clients, optionally about one thing of theirs */
-        post: operations["MilosTrainingWeb.CoachNotesController.create"];
+        post: operations["PaleeWeb.CoachNotesController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8821,7 +8821,7 @@ export interface paths {
             cookie?: never;
         };
         /** A client's journal as their coach may read it (audited) */
-        get: operations["MilosTrainingWeb.JournalController.client_journal"];
+        get: operations["PaleeWeb.JournalController.client_journal"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8838,9 +8838,9 @@ export interface paths {
             cookie?: never;
         };
         /** A client's nutrition plan */
-        get: operations["MilosTrainingWeb.CoachingExtrasController.nutrition_plan"];
+        get: operations["PaleeWeb.CoachingExtrasController.nutrition_plan"];
         /** Write a client's nutrition plan; the client is notified */
-        put: operations["MilosTrainingWeb.CoachingExtrasController.save_nutrition_plan"];
+        put: operations["PaleeWeb.CoachingExtrasController.save_nutrition_plan"];
         post?: never;
         delete?: never;
         options?: never;
@@ -8856,7 +8856,7 @@ export interface paths {
             cookie?: never;
         };
         /** A client's muscle coverage, qualities radar and training load, from shared entries */
-        get: operations["MilosTrainingWeb.TrainingDepthController.client"];
+        get: operations["PaleeWeb.TrainingDepthController.client"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8873,7 +8873,7 @@ export interface paths {
             cookie?: never;
         };
         /** A client's weekly wellness summary (only when the client allowed it) */
-        get: operations["MilosTrainingWeb.ClientWellnessSummaryController.show"];
+        get: operations["PaleeWeb.ClientWellnessSummaryController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8890,7 +8890,7 @@ export interface paths {
             cookie?: never;
         };
         /** Who read your notes, and when */
-        get: operations["MilosTrainingWeb.CoachNotesController.reads"];
+        get: operations["PaleeWeb.CoachNotesController.reads"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8910,11 +8910,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your note */
-        delete: operations["MilosTrainingWeb.CoachNotesController.delete"];
+        delete: operations["PaleeWeb.CoachNotesController.delete"];
         options?: never;
         head?: never;
         /** Edit your note */
-        patch: operations["MilosTrainingWeb.CoachNotesController.update"];
+        patch: operations["PaleeWeb.CoachNotesController.update"];
         trace?: never;
     };
     "/api/org/{organization_slug}/staff/coaching-relationships": {
@@ -8925,10 +8925,10 @@ export interface paths {
             cookie?: never;
         };
         /** Coaching relationships: a coach's own, or all for owners, admins and head coaches */
-        get: operations["MilosTrainingWeb.CoachingRelationshipsController.index"];
+        get: operations["PaleeWeb.CoachingRelationshipsController.index"];
         put?: never;
         /** Assign a coach to a client (owners, admins) or take an athlete yourself (coaches) */
-        post: operations["MilosTrainingWeb.CoachingRelationshipsController.create"];
+        post: operations["PaleeWeb.CoachingRelationshipsController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8945,7 +8945,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** End a coaching relationship */
-        post: operations["MilosTrainingWeb.CoachingRelationshipsController.finish"];
+        post: operations["PaleeWeb.CoachingRelationshipsController.finish"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8960,7 +8960,7 @@ export interface paths {
             cookie?: never;
         };
         /** Form reviews, open ones by default */
-        get: operations["MilosTrainingWeb.CoachingExtrasController.form_review_queue"];
+        get: operations["PaleeWeb.CoachingExtrasController.form_review_queue"];
         put?: never;
         post?: never;
         delete?: never;
@@ -8979,7 +8979,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Answer a form review */
-        post: operations["MilosTrainingWeb.CoachingExtrasController.complete_form_review"];
+        post: operations["PaleeWeb.CoachingExtrasController.complete_form_review"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8994,10 +8994,10 @@ export interface paths {
             cookie?: never;
         };
         /** Machines and appliances, with state and service due */
-        get: operations["MilosTrainingWeb.InventoryController.machines"];
+        get: operations["PaleeWeb.InventoryController.machines"];
         put?: never;
         /** Add a machine or appliance */
-        post: operations["MilosTrainingWeb.InventoryController.create_machine"];
+        post: operations["PaleeWeb.InventoryController.create_machine"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9018,7 +9018,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Edit a machine's details */
-        patch: operations["MilosTrainingWeb.InventoryController.update_machine"];
+        patch: operations["PaleeWeb.InventoryController.update_machine"];
         trace?: never;
     };
     "/api/org/{organization_slug}/staff/inventory/machines/{id}/archive": {
@@ -9031,7 +9031,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Remove a machine from the list (its log is kept) */
-        post: operations["MilosTrainingWeb.InventoryController.archive_machine"];
+        post: operations["PaleeWeb.InventoryController.archive_machine"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9046,10 +9046,10 @@ export interface paths {
             cookie?: never;
         };
         /** A machine's log */
-        get: operations["MilosTrainingWeb.InventoryController.machine_events"];
+        get: operations["PaleeWeb.InventoryController.machine_events"];
         put?: never;
         /** Log a note, issue, outage, repair call, service or repair */
-        post: operations["MilosTrainingWeb.InventoryController.log_machine_event"];
+        post: operations["PaleeWeb.InventoryController.log_machine_event"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9064,7 +9064,7 @@ export interface paths {
             cookie?: never;
         };
         /** How fast consumables go, what they cost, and monthly inventory expenses */
-        get: operations["MilosTrainingWeb.InventoryController.report"];
+        get: operations["PaleeWeb.InventoryController.report"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9081,10 +9081,10 @@ export interface paths {
             cookie?: never;
         };
         /** Consumables with stock and how long it lasts */
-        get: operations["MilosTrainingWeb.InventoryController.supplies"];
+        get: operations["PaleeWeb.InventoryController.supplies"];
         put?: never;
         /** Add a consumable */
-        post: operations["MilosTrainingWeb.InventoryController.create_supply"];
+        post: operations["PaleeWeb.InventoryController.create_supply"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9105,7 +9105,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Edit a consumable (use movements to change the count) */
-        patch: operations["MilosTrainingWeb.InventoryController.update_supply"];
+        patch: operations["PaleeWeb.InventoryController.update_supply"];
         trace?: never;
     };
     "/api/org/{organization_slug}/staff/inventory/supplies/{id}/archive": {
@@ -9118,7 +9118,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Stop tracking a consumable (its history is kept) */
-        post: operations["MilosTrainingWeb.InventoryController.archive_supply"];
+        post: operations["PaleeWeb.InventoryController.archive_supply"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9133,10 +9133,10 @@ export interface paths {
             cookie?: never;
         };
         /** Every "running low" report on a consumable: who, when, note, resolved */
-        get: operations["MilosTrainingWeb.InventoryController.supply_reports"];
+        get: operations["PaleeWeb.InventoryController.supply_reports"];
         put?: never;
         /** Report a consumable running low or empty, with a note (anyone on the team) */
-        post: operations["MilosTrainingWeb.InventoryController.report_low"];
+        post: operations["PaleeWeb.InventoryController.report_low"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9151,10 +9151,10 @@ export interface paths {
             cookie?: never;
         };
         /** A consumable's restocks, uses and recounts */
-        get: operations["MilosTrainingWeb.InventoryController.movements"];
+        get: operations["PaleeWeb.InventoryController.movements"];
         put?: never;
         /** Restock, use or recount a consumable */
-        post: operations["MilosTrainingWeb.InventoryController.record_movement"];
+        post: operations["PaleeWeb.InventoryController.record_movement"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9170,7 +9170,7 @@ export interface paths {
         };
         get?: never;
         /** Let admins read your notes or not (owners always can) */
-        put: operations["MilosTrainingWeb.CoachNotesController.visibility"];
+        put: operations["PaleeWeb.CoachNotesController.visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -9186,7 +9186,7 @@ export interface paths {
             cookie?: never;
         };
         /** Owners, admins and coaches of this gym */
-        get: operations["MilosTrainingWeb.StaffController.index"];
+        get: operations["PaleeWeb.StaffController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9203,7 +9203,7 @@ export interface paths {
             cookie?: never;
         };
         /** Πελάτες μου stats for the signed-in coach (ADR-140 §7) */
-        get: operations["MilosTrainingWeb.CoachingExtrasController.my_client_stats"];
+        get: operations["PaleeWeb.CoachingExtrasController.my_client_stats"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9220,7 +9220,7 @@ export interface paths {
             cookie?: never;
         };
         /** Client messages waiting for a staff reply, overdue first */
-        get: operations["MilosTrainingWeb.CoachingExtrasController.reply_queue"];
+        get: operations["PaleeWeb.CoachingExtrasController.reply_queue"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9237,7 +9237,7 @@ export interface paths {
             cookie?: never;
         };
         /** AI scaling suggestions waiting for the coach (pending by default) */
-        get: operations["MilosTrainingWeb.StaffScalingController.index"];
+        get: operations["PaleeWeb.StaffScalingController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9256,7 +9256,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Approve a suggestion, optionally edited; it becomes the athlete's modifications */
-        post: operations["MilosTrainingWeb.StaffScalingController.approve"];
+        post: operations["PaleeWeb.StaffScalingController.approve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9273,7 +9273,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Dismiss a suggestion; nothing reaches the athlete */
-        post: operations["MilosTrainingWeb.StaffScalingController.dismiss"];
+        post: operations["PaleeWeb.StaffScalingController.dismiss"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9288,7 +9288,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get a master workout */
-        get: operations["MilosTrainingWeb.WorkoutController.show"];
+        get: operations["PaleeWeb.WorkoutController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9308,7 +9308,7 @@ export interface paths {
          * A published workout's WOD goals, when the coach made them visible
          * @description goals is null when none are saved or the coach keeps them hidden.
          */
-        get: operations["MilosTrainingWeb.WorkoutGoalsController.show"];
+        get: operations["PaleeWeb.WorkoutGoalsController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9325,7 +9325,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get materialized workout scale instances */
-        get: operations["MilosTrainingWeb.WorkoutController.scales"];
+        get: operations["PaleeWeb.WorkoutController.scales"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9342,7 +9342,7 @@ export interface paths {
             cookie?: never;
         };
         /** Resolve a retired organization slug to its current canonical slug */
-        get: operations["MilosTrainingWeb.OrganizationSlugAliasController.show"];
+        get: operations["PaleeWeb.OrganizationSlugAliasController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9361,7 +9361,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** An owner creates another gym and owns it */
-        post: operations["MilosTrainingWeb.OwnerOrganizationController.create"];
+        post: operations["PaleeWeb.OwnerOrganizationController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9376,7 +9376,7 @@ export interface paths {
             cookie?: never;
         };
         /** A person: name, avatar, counts and both follow relationships */
-        get: operations["MilosTrainingWeb.PeopleController.show"];
+        get: operations["PaleeWeb.PeopleController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9393,7 +9393,7 @@ export interface paths {
             cookie?: never;
         };
         /** A person's followers and public posts you may read */
-        get: operations["MilosTrainingWeb.PeopleController.posts"];
+        get: operations["PaleeWeb.PeopleController.posts"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9410,7 +9410,7 @@ export interface paths {
             cookie?: never;
         };
         /** Neighbourhoods and cities matching a name (case and accents ignored) */
-        get: operations["MilosTrainingWeb.PlacesController.neighbourhoods"];
+        get: operations["PaleeWeb.PlacesController.neighbourhoods"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9427,7 +9427,7 @@ export interface paths {
             cookie?: never;
         };
         /** Recent purge records (audit trail that survives purged organizations) */
-        get: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.index"];
+        get: operations["PaleeWeb.PlatformOrganizationPurgeController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9444,10 +9444,10 @@ export interface paths {
             cookie?: never;
         };
         /** List provisioned organizations */
-        get: operations["MilosTrainingWeb.PlatformOrganizationController.index"];
+        get: operations["PaleeWeb.PlatformOrganizationController.index"];
         put?: never;
         /** Provision an organization and one-time initial admin invitation */
-        post: operations["MilosTrainingWeb.PlatformOrganizationController.create"];
+        post: operations["PaleeWeb.PlatformOrganizationController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9465,7 +9465,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Permanently delete an organization */
-        delete: operations["MilosTrainingWeb.PlatformOrganizationController.delete"];
+        delete: operations["PaleeWeb.PlatformOrganizationController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9479,7 +9479,7 @@ export interface paths {
             cookie?: never;
         };
         /** List tenant memberships for platform access management */
-        get: operations["MilosTrainingWeb.PlatformOrganizationController.access"];
+        get: operations["PaleeWeb.PlatformOrganizationController.access"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9497,10 +9497,10 @@ export interface paths {
         };
         get?: never;
         /** Verify an uploaded logo and make it the organization's logo */
-        put: operations["MilosTrainingWeb.PlatformOrganizationBrandingController.finalize_logo"];
+        put: operations["PaleeWeb.PlatformOrganizationBrandingController.finalize_logo"];
         post?: never;
         /** Remove an organization's logo */
-        delete: operations["MilosTrainingWeb.PlatformOrganizationBrandingController.remove_logo"];
+        delete: operations["PaleeWeb.PlatformOrganizationBrandingController.remove_logo"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9516,7 +9516,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Create a constrained presigned upload for an organization logo */
-        post: operations["MilosTrainingWeb.PlatformOrganizationBrandingController.logo_upload_url"];
+        post: operations["PaleeWeb.PlatformOrganizationBrandingController.logo_upload_url"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9533,7 +9533,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Issue a tenant invitation from the platform console */
-        post: operations["MilosTrainingWeb.PlatformOrganizationController.invite"];
+        post: operations["PaleeWeb.PlatformOrganizationController.invite"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9550,7 +9550,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Email an already-issued invitation's setup link to its recipient */
-        post: operations["MilosTrainingWeb.PlatformOrganizationController.invitation_email"];
+        post: operations["PaleeWeb.PlatformOrganizationController.invitation_email"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9571,7 +9571,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Change organization lifecycle state */
-        patch: operations["MilosTrainingWeb.PlatformOrganizationController.lifecycle"];
+        patch: operations["PaleeWeb.PlatformOrganizationController.lifecycle"];
         trace?: never;
     };
     "/api/platform/organizations/{id}/memberships/{membership_id}/role": {
@@ -9588,7 +9588,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update a tenant membership role from the platform console */
-        patch: operations["MilosTrainingWeb.PlatformOrganizationController.membership_role"];
+        patch: operations["PaleeWeb.PlatformOrganizationController.membership_role"];
         trace?: never;
     };
     "/api/platform/organizations/{id}/name": {
@@ -9605,7 +9605,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Rename an organization's canonical display name */
-        patch: operations["MilosTrainingWeb.PlatformOrganizationController.rename"];
+        patch: operations["PaleeWeb.PlatformOrganizationController.rename"];
         trace?: never;
     };
     "/api/platform/organizations/{id}/plan": {
@@ -9617,7 +9617,7 @@ export interface paths {
         };
         get?: never;
         /** Put an organization on a plan with a status (vendors) */
-        put: operations["MilosTrainingWeb.PlatformPlanController.assign"];
+        put: operations["PaleeWeb.PlatformPlanController.assign"];
         post?: never;
         delete?: never;
         options?: never;
@@ -9633,10 +9633,10 @@ export interface paths {
             cookie?: never;
         };
         /** Latest purge status, retention review, and signed export link */
-        get: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.show"];
+        get: operations["PaleeWeb.PlatformOrganizationPurgeController.show"];
         put?: never;
         /** Request a reviewed tenant purge (suspends the organization and starts the export) */
-        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.create"];
+        post: operations["PaleeWeb.PlatformOrganizationPurgeController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9653,7 +9653,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Approve an exported purge by retyping the organization slug */
-        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.approve"];
+        post: operations["PaleeWeb.PlatformOrganizationPurgeController.approve"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9670,7 +9670,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Cancel a purge that has not been approved and delete its export */
-        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.cancel"];
+        post: operations["PaleeWeb.PlatformOrganizationPurgeController.cancel"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9687,7 +9687,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Re-enqueue the export or purge stage of an open purge after a failure */
-        post: operations["MilosTrainingWeb.PlatformOrganizationPurgeController.resume"];
+        post: operations["PaleeWeb.PlatformOrganizationPurgeController.resume"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9708,7 +9708,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Update organization branding, locale, timezone, and invitation lifetime */
-        patch: operations["MilosTrainingWeb.PlatformOrganizationController.settings"];
+        patch: operations["PaleeWeb.PlatformOrganizationController.settings"];
         trace?: never;
     };
     "/api/platform/organizations/{id}/slug": {
@@ -9728,7 +9728,7 @@ export interface paths {
          * Rename an organization's path slug, keeping the old slug as a redirecting alias
          * @description Requires the current slug retyped as `confirmation`. The previous slug keeps resolving for API requests (with an `x-organization-canonical-slug` response header) and the web redirects `/org/<old>/...` to the new slug. Retired slugs stay reserved for the organization and can be reclaimed by it.
          */
-        patch: operations["MilosTrainingWeb.PlatformOrganizationController.rename_slug"];
+        patch: operations["PaleeWeb.PlatformOrganizationController.rename_slug"];
         trace?: never;
     };
     "/api/platform/organizations/{id}/slug-impact": {
@@ -9739,7 +9739,7 @@ export interface paths {
             cookie?: never;
         };
         /** Summarize what renaming an organization's path slug affects (ADR-122) */
-        get: operations["MilosTrainingWeb.PlatformOrganizationController.slug_impact"];
+        get: operations["PaleeWeb.PlatformOrganizationController.slug_impact"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9756,10 +9756,10 @@ export interface paths {
             cookie?: never;
         };
         /** Every platform plan (vendors) */
-        get: operations["MilosTrainingWeb.PlatformPlanController.index"];
+        get: operations["PaleeWeb.PlatformPlanController.index"];
         put?: never;
         /** Add a platform plan (vendors) */
-        post: operations["MilosTrainingWeb.PlatformPlanController.create"];
+        post: operations["PaleeWeb.PlatformPlanController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9780,7 +9780,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Change a plan's name, limits, prices, trial or visibility (vendors) */
-        patch: operations["MilosTrainingWeb.PlatformPlanController.update"];
+        patch: operations["PaleeWeb.PlatformPlanController.update"];
         trace?: never;
     };
     "/api/platform/subscriptions": {
@@ -9791,7 +9791,7 @@ export interface paths {
             cookie?: never;
         };
         /** The plan every organization is on (vendors) */
-        get: operations["MilosTrainingWeb.PlatformPlanController.subscriptions"];
+        get: operations["PaleeWeb.PlatformPlanController.subscriptions"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9808,7 +9808,7 @@ export interface paths {
             cookie?: never;
         };
         /** Pending tag suggestions from every gym */
-        get: operations["MilosTrainingWeb.PlatformTagSuggestionController.index"];
+        get: operations["PaleeWeb.PlatformTagSuggestionController.index"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9831,7 +9831,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Mark a suggestion added to its list or declined */
-        patch: operations["MilosTrainingWeb.PlatformTagSuggestionController.resolve"];
+        patch: operations["PaleeWeb.PlatformTagSuggestionController.resolve"];
         trace?: never;
     };
     "/api/pr-sharing": {
@@ -9842,7 +9842,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get my PR sharing settings */
-        get: operations["MilosTrainingWeb.PRSharingController.show"];
+        get: operations["PaleeWeb.PRSharingController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9860,7 +9860,7 @@ export interface paths {
         };
         get?: never;
         /** Allow or stop gym coaches reading my PRs */
-        put: operations["MilosTrainingWeb.PRSharingController.update_coach_visibility"];
+        put: operations["PaleeWeb.PRSharingController.update_coach_visibility"];
         post?: never;
         delete?: never;
         options?: never;
@@ -9879,7 +9879,7 @@ export interface paths {
          * Find an account to share my PRs with by its exact nickname (ADR-132)
          * @description Exact, normalized nickname match only (no prefix or fuzzy search), so accounts cannot be enumerated. Returns the account id and nickname, nothing else; `grantee` is null for an unknown nickname or for yourself.
          */
-        get: operations["MilosTrainingWeb.PRSharingController.lookup_grantee"];
+        get: operations["PaleeWeb.PRSharingController.lookup_grantee"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9898,7 +9898,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Share all my PRs (read-only) with another account */
-        post: operations["MilosTrainingWeb.PRSharingController.create_grant"];
+        post: operations["PaleeWeb.PRSharingController.create_grant"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9916,7 +9916,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Stop sharing my PRs with an account */
-        delete: operations["MilosTrainingWeb.PRSharingController.revoke_grant"];
+        delete: operations["PaleeWeb.PRSharingController.revoke_grant"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9930,7 +9930,7 @@ export interface paths {
             cookie?: never;
         };
         /** PRs other accounts have shared with me */
-        get: operations["MilosTrainingWeb.PRSharingController.shared_with_me"];
+        get: operations["PaleeWeb.PRSharingController.shared_with_me"];
         put?: never;
         post?: never;
         delete?: never;
@@ -9950,7 +9950,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your comment, or any comment on your post */
-        delete: operations["MilosTrainingWeb.ProfilePostController.delete_comment"];
+        delete: operations["PaleeWeb.ProfilePostController.delete_comment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9966,7 +9966,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Post to your followers or to everyone, optionally attaching a journal entry */
-        post: operations["MilosTrainingWeb.ProfilePostController.create"];
+        post: operations["PaleeWeb.ProfilePostController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -9984,7 +9984,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete your post */
-        delete: operations["MilosTrainingWeb.ProfilePostController.delete"];
+        delete: operations["PaleeWeb.ProfilePostController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -9998,10 +9998,10 @@ export interface paths {
             cookie?: never;
         };
         /** A post's comments, oldest first */
-        get: operations["MilosTrainingWeb.ProfilePostController.comments"];
+        get: operations["PaleeWeb.ProfilePostController.comments"];
         put?: never;
         /** Comment on a post */
-        post: operations["MilosTrainingWeb.ProfilePostController.comment"];
+        post: operations["PaleeWeb.ProfilePostController.comment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10017,7 +10017,7 @@ export interface paths {
         };
         get?: never;
         /** Give or take back kudos */
-        put: operations["MilosTrainingWeb.ProfilePostController.kudos"];
+        put: operations["PaleeWeb.ProfilePostController.kudos"];
         post?: never;
         delete?: never;
         options?: never;
@@ -10033,10 +10033,10 @@ export interface paths {
             cookie?: never;
         };
         /** List my PRs */
-        get: operations["MilosTrainingWeb.PRController.index"];
+        get: operations["PaleeWeb.PRController.index"];
         put?: never;
         /** Create a PR record */
-        post: operations["MilosTrainingWeb.PRController.create"];
+        post: operations["PaleeWeb.PRController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10054,11 +10054,11 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete a PR record */
-        delete: operations["MilosTrainingWeb.PRController.delete"];
+        delete: operations["PaleeWeb.PRController.delete"];
         options?: never;
         head?: never;
         /** Update a PR record */
-        patch: operations["MilosTrainingWeb.PRController.update"];
+        patch: operations["PaleeWeb.PRController.update"];
         trace?: never;
     };
     "/api/prs/{id}/edit": {
@@ -10075,7 +10075,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Correct the current PR result without adding history */
-        patch: operations["MilosTrainingWeb.PRController.edit"];
+        patch: operations["PaleeWeb.PRController.edit"];
         trace?: never;
     };
     "/api/prs/{id}/history": {
@@ -10086,7 +10086,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get score history for a PR */
-        get: operations["MilosTrainingWeb.PRController.history"];
+        get: operations["PaleeWeb.PRController.history"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10105,7 +10105,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Get a shareable text for a PR */
-        post: operations["MilosTrainingWeb.PRController.share"];
+        post: operations["PaleeWeb.PRController.share"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10120,7 +10120,7 @@ export interface paths {
             cookie?: never;
         };
         /** A published box: who it is, its «Σχετικά» and its locations */
-        get: operations["MilosTrainingWeb.PublicBoxController.show"];
+        get: operations["PaleeWeb.PublicBoxController.show"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10137,7 +10137,7 @@ export interface paths {
             cookie?: never;
         };
         /** Active public platform plans (pricing, coach onboarding) */
-        get: operations["MilosTrainingWeb.PlatformPlanController.index_public"];
+        get: operations["PaleeWeb.PlatformPlanController.index_public"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10154,7 +10154,7 @@ export interface paths {
             cookie?: never;
         };
         /** What an invite link shows: the box, who invites and the friend's gift (no sign-in) */
-        get: operations["MilosTrainingWeb.ReferralController.invite"];
+        get: operations["PaleeWeb.ReferralController.invite"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10173,24 +10173,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Records that the signed-in person came through a member's invite (first invite wins) */
-        post: operations["MilosTrainingWeb.ReferralController.claim"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/theme": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Fetch active public UI theme */
-        get: operations["MilosTrainingWeb.ThemeController.show"];
-        put?: never;
-        post?: never;
+        post: operations["PaleeWeb.ReferralController.claim"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10205,7 +10188,7 @@ export interface paths {
             cookie?: never;
         };
         /** The Apple Wallet .pkpass behind a short-lived download link */
-        get: operations["MilosTrainingWeb.WalletController.download"];
+        get: operations["PaleeWeb.WalletController.download"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10222,10 +10205,10 @@ export interface paths {
             cookie?: never;
         };
         /** The current user's Πώς νιώθω timeline */
-        get: operations["MilosTrainingWeb.CheckInController.index"];
+        get: operations["PaleeWeb.CheckInController.index"];
         put?: never;
         /** Submit a Πώς νιώθω check-in (a new timestamped entry) */
-        post: operations["MilosTrainingWeb.CheckInController.create"];
+        post: operations["PaleeWeb.CheckInController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10243,7 +10226,7 @@ export interface paths {
         put?: never;
         post?: never;
         /** Delete one of the current user's check-ins */
-        delete: operations["MilosTrainingWeb.CheckInController.delete"];
+        delete: operations["PaleeWeb.CheckInController.delete"];
         options?: never;
         head?: never;
         patch?: never;
@@ -10257,10 +10240,10 @@ export interface paths {
             cookie?: never;
         };
         /** List the current user's injury history */
-        get: operations["MilosTrainingWeb.WellbeingController.index"];
+        get: operations["PaleeWeb.WellbeingController.index"];
         put?: never;
         /** Report an injury for the current user */
-        post: operations["MilosTrainingWeb.WellbeingController.create"];
+        post: operations["PaleeWeb.WellbeingController.create"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10281,7 +10264,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Add an update to an injury (text and/or field changes) on its timeline */
-        patch: operations["MilosTrainingWeb.WellbeingController.update"];
+        patch: operations["PaleeWeb.WellbeingController.update"];
         trace?: never;
     };
     "/api/wellbeing/injuries/{id}/heal": {
@@ -10298,7 +10281,7 @@ export interface paths {
         options?: never;
         head?: never;
         /** Mark one of the current user's injuries healed */
-        patch: operations["MilosTrainingWeb.WellbeingController.heal"];
+        patch: operations["PaleeWeb.WellbeingController.heal"];
         trace?: never;
     };
     "/api/wellbeing/injuries/{id}/reopen": {
@@ -10311,7 +10294,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** Reopen a healed injury */
-        post: operations["MilosTrainingWeb.WellbeingController.reopen"];
+        post: operations["PaleeWeb.WellbeingController.reopen"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10326,7 +10309,7 @@ export interface paths {
             cookie?: never;
         };
         /** What the widgets show now (widget token) */
-        get: operations["MilosTrainingWeb.WidgetController.snapshot"];
+        get: operations["PaleeWeb.WidgetController.snapshot"];
         put?: never;
         post?: never;
         delete?: never;
@@ -10345,7 +10328,7 @@ export interface paths {
         get?: never;
         put?: never;
         /** «+1 νερό» from the widget: one glass of the member's size (widget token) */
-        post: operations["MilosTrainingWeb.WidgetController.add_water"];
+        post: operations["PaleeWeb.WidgetController.add_water"];
         delete?: never;
         options?: never;
         head?: never;
@@ -10360,7 +10343,7 @@ export interface paths {
             cookie?: never;
         };
         /** Get timer sequence for a workout */
-        get: operations["MilosTrainingWeb.ExecutionController.timer_sequence"];
+        get: operations["PaleeWeb.ExecutionController.timer_sequence"];
         put?: never;
         post?: never;
         delete?: never;
@@ -29249,7 +29232,7 @@ export interface components {
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    "MilosTrainingWeb.AnatomyController.taxonomy": {
+    "PaleeWeb.AnatomyController.taxonomy": {
         parameters: {
             query?: never;
             header?: never;
@@ -29290,7 +29273,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AroundController.pins": {
+    "PaleeWeb.AroundController.pins": {
         parameters: {
             query?: never;
             header?: never;
@@ -29366,7 +29349,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AroundController.search": {
+    "PaleeWeb.AroundController.search": {
         parameters: {
             query?: never;
             header?: never;
@@ -29938,7 +29921,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AroundController.kind": {
+    "PaleeWeb.AroundController.kind": {
         parameters: {
             query?: never;
             header?: never;
@@ -30449,7 +30432,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.inspect": {
+    "PaleeWeb.OrganizationAccessController.inspect": {
         parameters: {
             query?: never;
             header?: never;
@@ -30489,7 +30472,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.inspect_join_link": {
+    "PaleeWeb.OrganizationAccessController.inspect_join_link": {
         parameters: {
             query?: never;
             header?: never;
@@ -30527,7 +30510,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.login": {
+    "PaleeWeb.AuthController.login": {
         parameters: {
             query?: never;
             header?: never;
@@ -30608,7 +30591,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.logout": {
+    "PaleeWeb.AuthController.logout": {
         parameters: {
             query?: never;
             header?: never;
@@ -30626,7 +30609,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.me": {
+    "PaleeWeb.AuthController.me": {
         parameters: {
             query?: never;
             header?: never;
@@ -30649,8 +30632,11 @@ export interface operations {
                         nickname: string;
                         /** @enum {string} */
                         preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
-                        /** @description The member's own theme; null follows the gym's */
-                        preferred_theme_slug?: string | null;
+                        /**
+                         * @description The member's own theme: graphite (dark) or frost (light); null is frost
+                         * @enum {string|null}
+                         */
+                        preferred_theme_slug?: "frost" | "graphite" | null;
                         role: string;
                         vendor: boolean;
                     };
@@ -30669,7 +30655,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.nickname_available": {
+    "PaleeWeb.AuthController.nickname_available": {
         parameters: {
             query: {
                 nickname: string;
@@ -30693,7 +30679,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.refresh": {
+    "PaleeWeb.AuthController.refresh": {
         parameters: {
             query?: never;
             header?: never;
@@ -30759,7 +30745,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.register": {
+    "PaleeWeb.AuthController.register": {
         parameters: {
             query?: never;
             header?: never;
@@ -30839,7 +30825,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.register_admin": {
+    "PaleeWeb.AuthController.register_admin": {
         parameters: {
             query?: never;
             header?: never;
@@ -30908,7 +30894,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.register_member": {
+    "PaleeWeb.AuthController.register_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -30949,7 +30935,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AuthController.sign_out_all": {
+    "PaleeWeb.AuthController.sign_out_all": {
         parameters: {
             query?: never;
             header?: never;
@@ -30967,7 +30953,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BoxVocabularyController.show": {
+    "PaleeWeb.BoxVocabularyController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -30995,7 +30981,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BoxConversationController.show": {
+    "PaleeWeb.BoxConversationController.show": {
         parameters: {
             query?: {
                 before_id?: string;
@@ -31079,7 +31065,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BoxConversationController.open": {
+    "PaleeWeb.BoxConversationController.open": {
         parameters: {
             query?: never;
             header?: never;
@@ -31169,7 +31155,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BoxConversationController.send_message": {
+    "PaleeWeb.BoxConversationController.send_message": {
         parameters: {
             query?: never;
             header?: never;
@@ -31225,7 +31211,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BoxConversationController.mark_read": {
+    "PaleeWeb.BoxConversationController.mark_read": {
         parameters: {
             query?: never;
             header?: never;
@@ -31264,7 +31250,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.box_events": {
+    "PaleeWeb.CommunityEventController.box_events": {
         parameters: {
             query?: never;
             header?: never;
@@ -31413,7 +31399,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PublicBoxController.posts": {
+    "PaleeWeb.PublicBoxController.posts": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -31652,7 +31638,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PublicBoxController.schedule": {
+    "PaleeWeb.PublicBoxController.schedule": {
         parameters: {
             query?: {
                 start_at?: string;
@@ -31744,7 +31730,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrialController.create": {
+    "PaleeWeb.TrialController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -31874,7 +31860,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BuddyInviteController.show": {
+    "PaleeWeb.BuddyInviteController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -31908,7 +31894,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CalendarFeedController.links": {
+    "PaleeWeb.CalendarFeedController.links": {
         parameters: {
             query?: never;
             header?: never;
@@ -31930,7 +31916,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CalendarFeedController.regenerate_links": {
+    "PaleeWeb.CalendarFeedController.regenerate_links": {
         parameters: {
             query?: never;
             header?: never;
@@ -31952,7 +31938,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CalendarFeedController.feed": {
+    "PaleeWeb.CalendarFeedController.feed": {
         parameters: {
             query: {
                 token: string;
@@ -31984,7 +31970,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScanCheckInController.scan": {
+    "PaleeWeb.ScanCheckInController.scan": {
         parameters: {
             query?: never;
             header?: never;
@@ -32179,7 +32165,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScanCheckInController.undo": {
+    "PaleeWeb.ScanCheckInController.undo": {
         parameters: {
             query?: never;
             header?: never;
@@ -32245,7 +32231,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachPracticeController.create": {
+    "PaleeWeb.CoachPracticeController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -32281,7 +32267,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.index": {
+    "PaleeWeb.ExecutionController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -32301,7 +32287,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.create": {
+    "PaleeWeb.ExecutionController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -32354,7 +32340,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.vault": {
+    "PaleeWeb.ExecutionController.vault": {
         parameters: {
             query?: never;
             header?: never;
@@ -32396,7 +32382,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.show": {
+    "PaleeWeb.ExecutionController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -32428,7 +32414,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.complete": {
+    "PaleeWeb.ExecutionController.complete": {
         parameters: {
             query?: never;
             header?: never;
@@ -32500,7 +32486,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.record_interactions": {
+    "PaleeWeb.ExecutionController.record_interactions": {
         parameters: {
             query?: never;
             header?: never;
@@ -32587,7 +32573,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.update_progress": {
+    "PaleeWeb.ExecutionController.update_progress": {
         parameters: {
             query?: never;
             header?: never;
@@ -32679,7 +32665,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GamificationPreferencesController.show": {
+    "PaleeWeb.GamificationPreferencesController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -32699,7 +32685,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GamificationPreferencesController.update": {
+    "PaleeWeb.GamificationPreferencesController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -32736,7 +32722,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.HealthController.index": {
+    "PaleeWeb.HealthController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -32799,7 +32785,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GarminIntegrationController.callback": {
+    "PaleeWeb.GarminIntegrationController.callback": {
         parameters: {
             query?: {
                 code?: string;
@@ -32823,7 +32809,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GarminIntegrationController.deregistration": {
+    "PaleeWeb.GarminIntegrationController.deregistration": {
         parameters: {
             query?: {
                 token?: string;
@@ -32866,7 +32852,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GarminIntegrationController.push": {
+    "PaleeWeb.GarminIntegrationController.push": {
         parameters: {
             query?: {
                 token?: string;
@@ -32920,7 +32906,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalCommentController.batch": {
+    "PaleeWeb.JournalCommentController.batch": {
         parameters: {
             query?: never;
             header?: never;
@@ -32951,7 +32937,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalCommentController.save": {
+    "PaleeWeb.JournalCommentController.save": {
         parameters: {
             query?: never;
             header?: never;
@@ -32998,7 +32984,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalCommentController.delete": {
+    "PaleeWeb.JournalCommentController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -33019,7 +33005,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlacesController.area": {
+    "PaleeWeb.PlacesController.area": {
         parameters: {
             query?: never;
             header?: never;
@@ -33052,7 +33038,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlacesController.update_area": {
+    "PaleeWeb.PlacesController.update_area": {
         parameters: {
             query?: never;
             header?: never;
@@ -33091,7 +33077,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AnatomyAtlasController.show": {
+    "PaleeWeb.AnatomyAtlasController.show": {
         parameters: {
             query?: {
                 range?: "1w" | "4w" | "12w";
@@ -33157,7 +33143,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MeController.update_avatar": {
+    "PaleeWeb.MeController.update_avatar": {
         parameters: {
             query?: never;
             header?: never;
@@ -33198,7 +33184,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MeController.avatar_upload_url": {
+    "PaleeWeb.MeController.avatar_upload_url": {
         parameters: {
             query?: never;
             header?: never;
@@ -33232,7 +33218,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.blocks": {
+    "PaleeWeb.PartnersController.blocks": {
         parameters: {
             query?: never;
             header?: never;
@@ -33264,7 +33250,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.block": {
+    "PaleeWeb.PartnersController.block": {
         parameters: {
             query?: never;
             header?: never;
@@ -33295,7 +33281,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.unblock": {
+    "PaleeWeb.PartnersController.unblock": {
         parameters: {
             query?: never;
             header?: never;
@@ -33321,7 +33307,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.access_log": {
+    "PaleeWeb.MyBodyController.access_log": {
         parameters: {
             query?: never;
             header?: never;
@@ -33362,7 +33348,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.compare": {
+    "PaleeWeb.MyBodyController.compare": {
         parameters: {
             query: {
                 from: string;
@@ -33526,7 +33512,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.consents": {
+    "PaleeWeb.MyBodyController.consents": {
         parameters: {
             query?: never;
             header?: never;
@@ -33556,7 +33542,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.grant_consent": {
+    "PaleeWeb.MyBodyController.grant_consent": {
         parameters: {
             query?: never;
             header?: never;
@@ -33588,7 +33574,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.withdraw_consent": {
+    "PaleeWeb.MyBodyController.withdraw_consent": {
         parameters: {
             query?: never;
             header?: never;
@@ -33620,7 +33606,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.delete_photos": {
+    "PaleeWeb.MyBodyController.delete_photos": {
         parameters: {
             query?: never;
             header?: never;
@@ -33644,7 +33630,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.latest_photos": {
+    "PaleeWeb.MyBodyController.latest_photos": {
         parameters: {
             query?: never;
             header?: never;
@@ -33686,7 +33672,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.upload": {
+    "PaleeWeb.MyBodyController.upload": {
         parameters: {
             query?: never;
             header?: never;
@@ -33726,7 +33712,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.series": {
+    "PaleeWeb.MyBodyController.series": {
         parameters: {
             query: {
                 metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
@@ -33776,7 +33762,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.settings": {
+    "PaleeWeb.MyBodyController.settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -33834,7 +33820,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.update_settings": {
+    "PaleeWeb.MyBodyController.update_settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -33916,7 +33902,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.share": {
+    "PaleeWeb.MyBodyController.share": {
         parameters: {
             query?: never;
             header?: never;
@@ -34165,7 +34151,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.index": {
+    "PaleeWeb.MyBodyController.index": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -34254,7 +34240,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.create": {
+    "PaleeWeb.MyBodyController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -34384,7 +34370,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.show": {
+    "PaleeWeb.MyBodyController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -34472,7 +34458,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.delete": {
+    "PaleeWeb.MyBodyController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -34494,7 +34480,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.update": {
+    "PaleeWeb.MyBodyController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -34611,7 +34597,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.add_photo": {
+    "PaleeWeb.MyBodyController.add_photo": {
         parameters: {
             query?: never;
             header?: never;
@@ -34668,7 +34654,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBodyController.remove_photo": {
+    "PaleeWeb.MyBodyController.remove_photo": {
         parameters: {
             query?: never;
             header?: never;
@@ -34691,7 +34677,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BoxConversationController.index": {
+    "PaleeWeb.BoxConversationController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -34741,7 +34727,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.index": {
+    "PaleeWeb.MyBuddiesController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -34859,7 +34845,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.invite": {
+    "PaleeWeb.MyBuddiesController.invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -34919,7 +34905,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.candidates": {
+    "PaleeWeb.MyBuddiesController.candidates": {
         parameters: {
             query?: {
                 q?: string;
@@ -34955,7 +34941,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.create_invite_link": {
+    "PaleeWeb.MyBuddiesController.create_invite_link": {
         parameters: {
             query?: never;
             header?: never;
@@ -35013,7 +34999,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.settings": {
+    "PaleeWeb.MyBuddiesController.settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -35045,7 +35031,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.update_settings": {
+    "PaleeWeb.MyBuddiesController.update_settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -35089,7 +35075,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.update": {
+    "PaleeWeb.MyBuddiesController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -35150,7 +35136,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.accept": {
+    "PaleeWeb.MyBuddiesController.accept": {
         parameters: {
             query?: never;
             header?: never;
@@ -35205,7 +35191,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.decline": {
+    "PaleeWeb.MyBuddiesController.decline": {
         parameters: {
             query?: never;
             header?: never;
@@ -35260,7 +35246,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.leave": {
+    "PaleeWeb.MyBuddiesController.leave": {
         parameters: {
             query?: never;
             header?: never;
@@ -35315,7 +35301,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BuddyMessagesController.index": {
+    "PaleeWeb.BuddyMessagesController.index": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -35363,7 +35349,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BuddyMessagesController.create": {
+    "PaleeWeb.BuddyMessagesController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -35412,7 +35398,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.BuddyMessagesController.read": {
+    "PaleeWeb.BuddyMessagesController.read": {
         parameters: {
             query?: never;
             header?: never;
@@ -35436,7 +35422,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyBuddiesController.claim": {
+    "PaleeWeb.MyBuddiesController.claim": {
         parameters: {
             query?: never;
             header?: never;
@@ -35491,7 +35477,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScanCheckInController.geofences": {
+    "PaleeWeb.ScanCheckInController.geofences": {
         parameters: {
             query?: never;
             header?: never;
@@ -35540,7 +35526,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityController.my_clubs": {
+    "PaleeWeb.CommunityController.my_clubs": {
         parameters: {
             query?: never;
             header?: never;
@@ -35619,7 +35605,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.club": {
+    "PaleeWeb.PartnersController.club": {
         parameters: {
             query?: never;
             header?: never;
@@ -35684,7 +35670,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.deck": {
+    "PaleeWeb.PartnersController.deck": {
         parameters: {
             query?: {
                 time?: "early" | "midday" | "afternoon" | "evening" | "weekend";
@@ -35736,7 +35722,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.put_profile": {
+    "PaleeWeb.PartnersController.put_profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -35798,7 +35784,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.swipe": {
+    "PaleeWeb.PartnersController.swipe": {
         parameters: {
             query?: never;
             header?: never;
@@ -35868,7 +35854,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.undo": {
+    "PaleeWeb.PartnersController.undo": {
         parameters: {
             query?: never;
             header?: never;
@@ -35895,7 +35881,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.members": {
+    "PaleeWeb.OpenClubController.members": {
         parameters: {
             query?: {
                 q?: string;
@@ -35931,7 +35917,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.club_events": {
+    "PaleeWeb.CommunityEventController.club_events": {
         parameters: {
             query?: {
                 scope?: "upcoming" | "past";
@@ -36081,7 +36067,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.create": {
+    "PaleeWeb.CommunityEventController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -36275,7 +36261,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.delete_comment": {
+    "PaleeWeb.ClubPostController.delete_comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -36297,7 +36283,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.hide_comment": {
+    "PaleeWeb.ClubPostController.hide_comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -36325,7 +36311,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.discover": {
+    "PaleeWeb.OpenClubController.discover": {
         parameters: {
             query?: {
                 q?: string;
@@ -36449,7 +36435,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.clubs_events": {
+    "PaleeWeb.CommunityEventController.clubs_events": {
         parameters: {
             query?: never;
             header?: never;
@@ -36595,7 +36581,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.create": {
+    "PaleeWeb.ClubPostController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -36842,7 +36828,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.delete": {
+    "PaleeWeb.ClubPostController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -36864,7 +36850,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.comments": {
+    "PaleeWeb.ClubPostController.comments": {
         parameters: {
             query?: never;
             header?: never;
@@ -36907,7 +36893,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.comment": {
+    "PaleeWeb.ClubPostController.comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -36957,7 +36943,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.hide": {
+    "PaleeWeb.ClubPostController.hide": {
         parameters: {
             query?: never;
             header?: never;
@@ -37192,7 +37178,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.kudos": {
+    "PaleeWeb.ClubPostController.kudos": {
         parameters: {
             query?: never;
             header?: never;
@@ -37427,7 +37413,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClubPostController.pin": {
+    "PaleeWeb.ClubPostController.pin": {
         parameters: {
             query?: never;
             header?: never;
@@ -37662,7 +37648,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.report": {
+    "PaleeWeb.OpenClubController.report": {
         parameters: {
             query?: never;
             header?: never;
@@ -37699,7 +37685,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WalletController.devices": {
+    "PaleeWeb.WalletController.devices": {
         parameters: {
             query?: never;
             header?: never;
@@ -37828,7 +37814,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.daily_stats": {
+    "PaleeWeb.DevicesController.daily_stats": {
         parameters: {
             query?: {
                 metric?: "resting_hr" | "steps";
@@ -37896,7 +37882,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.confirm": {
+    "PaleeWeb.DevicesController.confirm": {
         parameters: {
             query?: never;
             header?: never;
@@ -37995,7 +37981,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.index": {
+    "PaleeWeb.DevicesController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -38124,7 +38110,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PhoneHealthController.export": {
+    "PaleeWeb.PhoneHealthController.export": {
         parameters: {
             query?: never;
             header?: never;
@@ -38218,7 +38204,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.disconnect": {
+    "PaleeWeb.DevicesController.disconnect": {
         parameters: {
             query?: {
                 delete_data?: boolean;
@@ -38262,7 +38248,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.update": {
+    "PaleeWeb.DevicesController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -38379,7 +38365,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.connect": {
+    "PaleeWeb.DevicesController.connect": {
         parameters: {
             query?: never;
             header?: never;
@@ -38461,7 +38447,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.pending": {
+    "PaleeWeb.DevicesController.pending": {
         parameters: {
             query?: never;
             header?: never;
@@ -38536,7 +38522,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.sync": {
+    "PaleeWeb.DevicesController.sync": {
         parameters: {
             query?: never;
             header?: never;
@@ -38623,7 +38609,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PhoneHealthController.disconnect": {
+    "PaleeWeb.PhoneHealthController.disconnect": {
         parameters: {
             query?: {
                 delete_data?: boolean;
@@ -38669,7 +38655,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PhoneHealthController.update": {
+    "PaleeWeb.PhoneHealthController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -38779,7 +38765,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PhoneHealthController.connect": {
+    "PaleeWeb.PhoneHealthController.connect": {
         parameters: {
             query?: never;
             header?: never;
@@ -38890,7 +38876,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PhoneHealthController.ingest": {
+    "PaleeWeb.PhoneHealthController.ingest": {
         parameters: {
             query?: never;
             header?: never;
@@ -39016,7 +39002,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.summary": {
+    "PaleeWeb.DevicesController.summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -39056,7 +39042,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.DevicesController.seen": {
+    "PaleeWeb.DevicesController.seen": {
         parameters: {
             query?: never;
             header?: never;
@@ -39096,7 +39082,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.mine": {
+    "PaleeWeb.CommunityEventController.mine": {
         parameters: {
             query?: never;
             header?: never;
@@ -39242,7 +39228,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.show": {
+    "PaleeWeb.CommunityEventController.show": {
         parameters: {
             query?: {
                 /** @description The token of a guest pass link */
@@ -39394,7 +39380,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.update": {
+    "PaleeWeb.CommunityEventController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -39581,7 +39567,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.cancel": {
+    "PaleeWeb.CommunityEventController.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -39741,7 +39727,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.invite": {
+    "PaleeWeb.CommunityEventController.invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -39770,7 +39756,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityEventController.rsvp": {
+    "PaleeWeb.CommunityEventController.rsvp": {
         parameters: {
             query?: never;
             header?: never;
@@ -39928,7 +39914,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.feed": {
+    "PaleeWeb.CommunityPostController.feed": {
         parameters: {
             query?: {
                 club_id?: string;
@@ -40361,7 +40347,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SavedFilterController.show": {
+    "PaleeWeb.SavedFilterController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -40403,7 +40389,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SavedFilterController.save": {
+    "PaleeWeb.SavedFilterController.save": {
         parameters: {
             query?: never;
             header?: never;
@@ -40455,7 +40441,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SavedFilterController.remember": {
+    "PaleeWeb.SavedFilterController.remember": {
         parameters: {
             query?: never;
             header?: never;
@@ -40506,7 +40492,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SavedFilterController.delete": {
+    "PaleeWeb.SavedFilterController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -40549,7 +40535,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SavedFilterController.alert": {
+    "PaleeWeb.SavedFilterController.alert": {
         parameters: {
             query?: never;
             header?: never;
@@ -40598,7 +40584,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.requests": {
+    "PaleeWeb.FollowController.requests": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -40647,7 +40633,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.remove": {
+    "PaleeWeb.FollowController.remove": {
         parameters: {
             query?: never;
             header?: never;
@@ -40669,7 +40655,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.accept": {
+    "PaleeWeb.FollowController.accept": {
         parameters: {
             query?: never;
             header?: never;
@@ -40691,7 +40677,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.followers": {
+    "PaleeWeb.FollowController.followers": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -40742,7 +40728,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.remove (2)": {
+    "PaleeWeb.FollowController.remove (2)": {
         parameters: {
             query?: never;
             header?: never;
@@ -40764,7 +40750,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.following": {
+    "PaleeWeb.FollowController.following": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -40816,7 +40802,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.create": {
+    "PaleeWeb.FollowController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -40848,7 +40834,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.show": {
+    "PaleeWeb.FollowController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -40874,7 +40860,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.delete": {
+    "PaleeWeb.FollowController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -40900,7 +40886,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AccountTrainingController.history": {
+    "PaleeWeb.AccountTrainingController.history": {
         parameters: {
             query?: {
                 kind?: "workouts" | "classes";
@@ -40982,7 +40968,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InsightsController.show": {
+    "PaleeWeb.InsightsController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -41059,7 +41045,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InsightsController.restore": {
+    "PaleeWeb.InsightsController.restore": {
         parameters: {
             query?: never;
             header?: never;
@@ -41136,7 +41122,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InsightsController.dismiss": {
+    "PaleeWeb.InsightsController.dismiss": {
         parameters: {
             query?: never;
             header?: never;
@@ -41226,7 +41212,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.index": {
+    "PaleeWeb.JournalController.index": {
         parameters: {
             query?: {
                 /** @description `next_cursor` of the previous page */
@@ -41272,7 +41258,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.coach_audience": {
+    "PaleeWeb.JournalController.coach_audience": {
         parameters: {
             query?: never;
             header?: never;
@@ -41317,7 +41303,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.put_coach_audience": {
+    "PaleeWeb.JournalController.put_coach_audience": {
         parameters: {
             query?: never;
             header?: never;
@@ -41383,7 +41369,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.entry_audience": {
+    "PaleeWeb.JournalController.entry_audience": {
         parameters: {
             query?: never;
             header?: never;
@@ -41454,7 +41440,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.set_visibility": {
+    "PaleeWeb.JournalController.set_visibility": {
         parameters: {
             query?: never;
             header?: never;
@@ -41547,7 +41533,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.export": {
+    "PaleeWeb.JournalController.export": {
         parameters: {
             query?: never;
             header?: never;
@@ -41598,7 +41584,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.exports": {
+    "PaleeWeb.JournalController.exports": {
         parameters: {
             query?: never;
             header?: never;
@@ -41639,7 +41625,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.create_note": {
+    "PaleeWeb.JournalController.create_note": {
         parameters: {
             query?: never;
             header?: never;
@@ -41678,7 +41664,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.delete_note": {
+    "PaleeWeb.JournalController.delete_note": {
         parameters: {
             query?: never;
             header?: never;
@@ -41698,7 +41684,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.update_note": {
+    "PaleeWeb.JournalController.update_note": {
         parameters: {
             query?: never;
             header?: never;
@@ -41738,7 +41724,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.capabilities": {
+    "PaleeWeb.MyMediaController.capabilities": {
         parameters: {
             query?: never;
             header?: never;
@@ -41769,7 +41755,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.upload": {
+    "PaleeWeb.MyMediaController.upload": {
         parameters: {
             query?: never;
             header?: never;
@@ -41811,7 +41797,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.show": {
+    "PaleeWeb.MyMediaController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -41862,7 +41848,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.delete": {
+    "PaleeWeb.MyMediaController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -41884,7 +41870,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.update": {
+    "PaleeWeb.MyMediaController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -41941,7 +41927,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.suggest_alt_text": {
+    "PaleeWeb.MyMediaController.suggest_alt_text": {
         parameters: {
             query?: never;
             header?: never;
@@ -41973,7 +41959,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyMediaController.complete": {
+    "PaleeWeb.MyMediaController.complete": {
         parameters: {
             query?: never;
             header?: never;
@@ -42024,7 +42010,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.show": {
+    "PaleeWeb.OpenClubController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -42100,7 +42086,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.join": {
+    "PaleeWeb.OpenClubController.join": {
         parameters: {
             query?: never;
             header?: never;
@@ -42176,7 +42162,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.leave": {
+    "PaleeWeb.OpenClubController.leave": {
         parameters: {
             query?: never;
             header?: never;
@@ -42252,7 +42238,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OpenClubController.set_notify_level": {
+    "PaleeWeb.OpenClubController.set_notify_level": {
         parameters: {
             query?: never;
             header?: never;
@@ -42286,7 +42272,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.matches": {
+    "PaleeWeb.PartnersController.matches": {
         parameters: {
             query?: never;
             header?: never;
@@ -42339,7 +42325,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.end_match": {
+    "PaleeWeb.PartnersController.end_match": {
         parameters: {
             query?: never;
             header?: never;
@@ -42366,7 +42352,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.messages": {
+    "PaleeWeb.PartnersController.messages": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -42422,7 +42408,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.post_message": {
+    "PaleeWeb.PartnersController.post_message": {
         parameters: {
             query?: never;
             header?: never;
@@ -42479,7 +42465,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.mark_read": {
+    "PaleeWeb.PartnersController.mark_read": {
         parameters: {
             query?: never;
             header?: never;
@@ -42503,7 +42489,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.plan": {
+    "PaleeWeb.PartnersController.plan": {
         parameters: {
             query?: never;
             header?: never;
@@ -42562,7 +42548,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.sessions": {
+    "PaleeWeb.PartnersController.sessions": {
         parameters: {
             query?: never;
             header?: never;
@@ -42600,7 +42586,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.settings": {
+    "PaleeWeb.PartnersController.settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -42626,7 +42612,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PartnersController.put_settings": {
+    "PaleeWeb.PartnersController.put_settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -42658,7 +42644,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyPlacesController.index": {
+    "PaleeWeb.MyPlacesController.index": {
         parameters: {
             query?: {
                 lat?: number;
@@ -42701,7 +42687,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PostAttachmentController.show": {
+    "PaleeWeb.PostAttachmentController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -42731,7 +42717,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MeController.update_profile": {
+    "PaleeWeb.MeController.update_profile": {
         parameters: {
             query?: never;
             header?: never;
@@ -42749,10 +42735,10 @@ export interface operations {
                     /** @enum {string} */
                     preferred_locale?: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
                     /**
-                     * @description Your own theme; null follows your gym's
+                     * @description Your own theme: graphite (dark) or frost (light); null is frost
                      * @enum {string|null}
                      */
-                    preferred_theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset" | null;
+                    preferred_theme_slug?: "frost" | "graphite" | null;
                 };
             };
         };
@@ -42787,7 +42773,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AccountTrainingController.progress": {
+    "PaleeWeb.AccountTrainingController.progress": {
         parameters: {
             query?: {
                 range?: "4w" | "12w" | "6m" | "1y" | "all";
@@ -42892,7 +42878,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingDepthController.show": {
+    "PaleeWeb.TrainingDepthController.show": {
         parameters: {
             query?: {
                 range?: "4w" | "12w" | "6m" | "1y" | "all";
@@ -43018,7 +43004,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyProvidersController.index": {
+    "PaleeWeb.MyProvidersController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -43077,7 +43063,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyProvidersController.select": {
+    "PaleeWeb.MyProvidersController.select": {
         parameters: {
             query?: never;
             header?: never;
@@ -43152,7 +43138,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MeController.search_users (2)": {
+    "PaleeWeb.MeController.search_users (2)": {
         parameters: {
             query?: {
                 q?: string;
@@ -43181,7 +43167,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.summary": {
+    "PaleeWeb.FollowController.summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -43230,7 +43216,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.around_visibility": {
+    "PaleeWeb.FollowController.around_visibility": {
         parameters: {
             query?: never;
             header?: never;
@@ -43260,7 +43246,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.booking_sharing": {
+    "PaleeWeb.FollowController.booking_sharing": {
         parameters: {
             query?: never;
             header?: never;
@@ -43289,7 +43275,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.FollowController.member_visibility": {
+    "PaleeWeb.FollowController.member_visibility": {
         parameters: {
             query?: never;
             header?: never;
@@ -43317,7 +43303,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SupportRequestController.index": {
+    "PaleeWeb.SupportRequestController.index": {
         parameters: {
             query?: {
                 role?: "sent" | "received";
@@ -43422,7 +43408,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SupportRequestController.create": {
+    "PaleeWeb.SupportRequestController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -43535,7 +43521,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SupportRequestController.show": {
+    "PaleeWeb.SupportRequestController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -43644,7 +43630,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SupportRequestController.reply": {
+    "PaleeWeb.SupportRequestController.reply": {
         parameters: {
             query?: never;
             header?: never;
@@ -43701,7 +43687,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SupportRequestController.undo": {
+    "PaleeWeb.SupportRequestController.undo": {
         parameters: {
             query?: never;
             header?: never;
@@ -43810,7 +43796,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyProvidersController.today": {
+    "PaleeWeb.MyProvidersController.today": {
         parameters: {
             query?: {
                 date?: string;
@@ -43870,7 +43856,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MeController.complete_tour": {
+    "PaleeWeb.MeController.complete_tour": {
         parameters: {
             query?: never;
             header?: never;
@@ -43894,7 +43880,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrialController.index": {
+    "PaleeWeb.TrialController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -43984,7 +43970,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrialController.show": {
+    "PaleeWeb.TrialController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -44095,7 +44081,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrialController.cancel": {
+    "PaleeWeb.TrialController.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -44206,7 +44192,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrialController.follow_up": {
+    "PaleeWeb.TrialController.follow_up": {
         parameters: {
             query?: never;
             header?: never;
@@ -44371,7 +44357,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AccountTrainingController.vault": {
+    "PaleeWeb.AccountTrainingController.vault": {
         parameters: {
             query?: {
                 /** @description Comma-separated workout types */
@@ -44467,7 +44453,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WalletController.revoke": {
+    "PaleeWeb.WalletController.revoke": {
         parameters: {
             query?: never;
             header?: never;
@@ -44521,7 +44507,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.show": {
+    "PaleeWeb.WellnessController.show": {
         parameters: {
             query: {
                 from: string;
@@ -44713,7 +44699,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.erase": {
+    "PaleeWeb.WellnessController.erase": {
         parameters: {
             query: {
                 sections: string;
@@ -44739,7 +44725,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessSummarySharingController.show": {
+    "PaleeWeb.WellnessSummarySharingController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -44771,7 +44757,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessSummarySharingController.update": {
+    "PaleeWeb.WellnessSummarySharingController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -44810,7 +44796,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessSummarySharingController.access_log": {
+    "PaleeWeb.WellnessSummarySharingController.access_log": {
         parameters: {
             query?: never;
             header?: never;
@@ -44851,7 +44837,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.create_craving": {
+    "PaleeWeb.WellnessController.create_craving": {
         parameters: {
             query?: never;
             header?: never;
@@ -44920,7 +44906,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.delete_craving": {
+    "PaleeWeb.WellnessController.delete_craving": {
         parameters: {
             query?: never;
             header?: never;
@@ -44940,7 +44926,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.update_craving": {
+    "PaleeWeb.WellnessController.update_craving": {
         parameters: {
             query?: never;
             header?: never;
@@ -45011,7 +44997,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.create_entry": {
+    "PaleeWeb.WellnessController.create_entry": {
         parameters: {
             query?: never;
             header?: never;
@@ -45090,7 +45076,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.delete_entry": {
+    "PaleeWeb.WellnessController.delete_entry": {
         parameters: {
             query?: never;
             header?: never;
@@ -45110,7 +45096,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.update_entry": {
+    "PaleeWeb.WellnessController.update_entry": {
         parameters: {
             query?: never;
             header?: never;
@@ -45187,7 +45173,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.export": {
+    "PaleeWeb.WellnessController.export": {
         parameters: {
             query: {
                 sections: string;
@@ -45294,7 +45280,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.upload_meal_photo": {
+    "PaleeWeb.WellnessController.upload_meal_photo": {
         parameters: {
             query?: never;
             header?: never;
@@ -45334,7 +45320,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.preferences": {
+    "PaleeWeb.WellnessController.preferences": {
         parameters: {
             query?: never;
             header?: never;
@@ -45365,7 +45351,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellnessController.update_preferences": {
+    "PaleeWeb.WellnessController.update_preferences": {
         parameters: {
             query?: never;
             header?: never;
@@ -45409,7 +45395,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WidgetController.create_token": {
+    "PaleeWeb.WidgetController.create_token": {
         parameters: {
             query?: never;
             header?: never;
@@ -45458,7 +45444,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WidgetController.delete_token": {
+    "PaleeWeb.WidgetController.delete_token": {
         parameters: {
             query?: never;
             header?: never;
@@ -45489,7 +45475,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.memberships": {
+    "PaleeWeb.OrganizationAccessController.memberships": {
         parameters: {
             query?: never;
             header?: never;
@@ -45540,7 +45526,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.join": {
+    "PaleeWeb.OrganizationAccessController.join": {
         parameters: {
             query?: never;
             header?: never;
@@ -45633,7 +45619,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.redeem": {
+    "PaleeWeb.OrganizationAccessController.redeem": {
         parameters: {
             query?: never;
             header?: never;
@@ -45691,7 +45677,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.index": {
+    "PaleeWeb.NotificationController.index": {
         parameters: {
             query?: {
                 limit?: number;
@@ -45733,7 +45719,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.create_native_push_token": {
+    "PaleeWeb.NotificationController.create_native_push_token": {
         parameters: {
             query?: never;
             header?: never;
@@ -45806,7 +45792,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.delete_native_push_token": {
+    "PaleeWeb.NotificationController.delete_native_push_token": {
         parameters: {
             query?: never;
             header?: never;
@@ -45834,7 +45820,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.push_config": {
+    "PaleeWeb.NotificationController.push_config": {
         parameters: {
             query?: never;
             header?: never;
@@ -45859,7 +45845,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.create_push_subscription": {
+    "PaleeWeb.NotificationController.create_push_subscription": {
         parameters: {
             query?: never;
             header?: never;
@@ -45936,7 +45922,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.delete_push_subscription": {
+    "PaleeWeb.NotificationController.delete_push_subscription": {
         parameters: {
             query: {
                 /** @description Subscription endpoint */
@@ -45961,7 +45947,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.push_subscription_status": {
+    "PaleeWeb.NotificationController.push_subscription_status": {
         parameters: {
             query?: never;
             header?: never;
@@ -46006,7 +45992,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.mark_all_read": {
+    "PaleeWeb.NotificationController.mark_all_read": {
         parameters: {
             query?: never;
             header?: never;
@@ -46028,7 +46014,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.mark_clicked": {
+    "PaleeWeb.NotificationController.mark_clicked": {
         parameters: {
             query?: never;
             header?: never;
@@ -46063,7 +46049,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.NotificationController.mark_read": {
+    "PaleeWeb.NotificationController.mark_read": {
         parameters: {
             query?: never;
             header?: never;
@@ -46099,7 +46085,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminAiSettingsController.show": {
+    "PaleeWeb.AdminAiSettingsController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -46140,7 +46126,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminAiSettingsController.update": {
+    "PaleeWeb.AdminAiSettingsController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -46202,7 +46188,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminAnalyticsController.summary": {
+    "PaleeWeb.AdminAnalyticsController.summary": {
         parameters: {
             query?: {
                 days?: number;
@@ -46226,7 +46212,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminAssignedWorkoutController.create": {
+    "PaleeWeb.AdminAssignedWorkoutController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -46270,7 +46256,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminAssignedWorkoutController.delete": {
+    "PaleeWeb.AdminAssignedWorkoutController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -46292,7 +46278,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminAssignedWorkoutController.update": {
+    "PaleeWeb.AdminAssignedWorkoutController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -46327,7 +46313,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.index_athletes": {
+    "PaleeWeb.AdminUserController.index_athletes": {
         parameters: {
             query?: {
                 q?: string;
@@ -46358,7 +46344,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCoachingController.drill_down": {
+    "PaleeWeb.AdminCoachingController.drill_down": {
         parameters: {
             query?: never;
             header?: never;
@@ -46492,7 +46478,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.approve_booking": {
+    "PaleeWeb.AdminScheduleController.approve_booking": {
         parameters: {
             query?: never;
             header?: never;
@@ -46565,7 +46551,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.reject_booking": {
+    "PaleeWeb.AdminScheduleController.reject_booking": {
         parameters: {
             query?: never;
             header?: never;
@@ -46638,7 +46624,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminBrandingController.show": {
+    "PaleeWeb.AdminBrandingController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -46669,7 +46655,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminBrandingController.finalize_logo": {
+    "PaleeWeb.AdminBrandingController.finalize_logo": {
         parameters: {
             query?: never;
             header?: never;
@@ -46706,7 +46692,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminBrandingController.remove_logo": {
+    "PaleeWeb.AdminBrandingController.remove_logo": {
         parameters: {
             query?: never;
             header?: never;
@@ -46737,7 +46723,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminBrandingController.logo_upload_url": {
+    "PaleeWeb.AdminBrandingController.logo_upload_url": {
         parameters: {
             query?: never;
             header?: never;
@@ -46773,7 +46759,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminChallengeController.index": {
+    "PaleeWeb.AdminChallengeController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -46795,7 +46781,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminChallengeController.create": {
+    "PaleeWeb.AdminChallengeController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -46840,7 +46826,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminChallengeController.show": {
+    "PaleeWeb.AdminChallengeController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -46890,7 +46876,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminChallengeController.delete": {
+    "PaleeWeb.AdminChallengeController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -46923,7 +46909,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminChallengeController.update": {
+    "PaleeWeb.AdminChallengeController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -46981,7 +46967,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.door": {
+    "PaleeWeb.AdminCheckInController.door": {
         parameters: {
             query?: never;
             header?: never;
@@ -47061,7 +47047,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.nfc_tag": {
+    "PaleeWeb.AdminCheckInController.nfc_tag": {
         parameters: {
             query?: never;
             header?: never;
@@ -47107,7 +47093,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.update_nfc_tag": {
+    "PaleeWeb.AdminCheckInController.update_nfc_tag": {
         parameters: {
             query?: never;
             header?: never;
@@ -47159,7 +47145,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.rotate_nfc_tag": {
+    "PaleeWeb.AdminCheckInController.rotate_nfc_tag": {
         parameters: {
             query?: never;
             header?: never;
@@ -47205,7 +47191,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.poster": {
+    "PaleeWeb.AdminCheckInController.poster": {
         parameters: {
             query?: never;
             header?: never;
@@ -47251,7 +47237,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.update_poster": {
+    "PaleeWeb.AdminCheckInController.update_poster": {
         parameters: {
             query?: never;
             header?: never;
@@ -47303,7 +47289,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.rotate_poster": {
+    "PaleeWeb.AdminCheckInController.rotate_poster": {
         parameters: {
             query?: never;
             header?: never;
@@ -47349,7 +47335,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.rotate_door": {
+    "PaleeWeb.AdminCheckInController.rotate_door": {
         parameters: {
             query?: never;
             header?: never;
@@ -47429,7 +47415,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.check_in_member": {
+    "PaleeWeb.AdminCheckInController.check_in_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -47564,7 +47550,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.revoke_member_code": {
+    "PaleeWeb.AdminCheckInController.revoke_member_code": {
         parameters: {
             query?: never;
             header?: never;
@@ -47591,7 +47577,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.scan_member": {
+    "PaleeWeb.AdminCheckInController.scan_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -47711,7 +47697,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.settings": {
+    "PaleeWeb.AdminCheckInController.settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -47749,7 +47735,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.update_settings": {
+    "PaleeWeb.AdminCheckInController.update_settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -47817,7 +47803,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCheckInController.visitors": {
+    "PaleeWeb.AdminCheckInController.visitors": {
         parameters: {
             query?: {
                 date?: string;
@@ -47856,7 +47842,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.index_check_ins": {
+    "PaleeWeb.AdminFacilityController.index_check_ins": {
         parameters: {
             query?: {
                 date?: string;
@@ -47899,7 +47885,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.create_check_in": {
+    "PaleeWeb.AdminFacilityController.create_check_in": {
         parameters: {
             query?: never;
             header?: never;
@@ -47960,7 +47946,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminClassTypeController.index": {
+    "PaleeWeb.AdminClassTypeController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -48001,7 +47987,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminClassTypeController.create": {
+    "PaleeWeb.AdminClassTypeController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -48064,7 +48050,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminClassTypeController.delete": {
+    "PaleeWeb.AdminClassTypeController.delete": {
         parameters: {
             query?: {
                 replacement_class_type_id?: string;
@@ -48118,7 +48104,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminClassTypeController.update": {
+    "PaleeWeb.AdminClassTypeController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -48183,7 +48169,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.clubs": {
+    "PaleeWeb.AdminCommunityController.clubs": {
         parameters: {
             query?: never;
             header?: never;
@@ -48256,7 +48242,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.create_club": {
+    "PaleeWeb.AdminCommunityController.create_club": {
         parameters: {
             query?: never;
             header?: never;
@@ -48341,7 +48327,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.club": {
+    "PaleeWeb.AdminCommunityController.club": {
         parameters: {
             query?: never;
             header?: never;
@@ -48417,7 +48403,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.update_club": {
+    "PaleeWeb.AdminCommunityController.update_club": {
         parameters: {
             query?: never;
             header?: never;
@@ -48504,7 +48490,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.archive_club": {
+    "PaleeWeb.AdminCommunityController.archive_club": {
         parameters: {
             query?: never;
             header?: never;
@@ -48530,7 +48516,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.remove_club_member": {
+    "PaleeWeb.AdminCommunityController.remove_club_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -48607,7 +48593,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.answer_club_request": {
+    "PaleeWeb.AdminCommunityController.answer_club_request": {
         parameters: {
             query?: never;
             header?: never;
@@ -48690,7 +48676,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.index": {
+    "PaleeWeb.AdminCommunityEventController.index": {
         parameters: {
             query?: {
                 scope?: "upcoming" | "past";
@@ -48854,7 +48840,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.create": {
+    "PaleeWeb.AdminCommunityEventController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -49227,7 +49213,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.show": {
+    "PaleeWeb.AdminCommunityEventController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -49556,7 +49542,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.update": {
+    "PaleeWeb.AdminCommunityEventController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -49923,7 +49909,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.remove": {
+    "PaleeWeb.AdminCommunityEventController.remove": {
         parameters: {
             query?: never;
             header?: never;
@@ -50253,7 +50239,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.check_in": {
+    "PaleeWeb.AdminCommunityEventController.check_in": {
         parameters: {
             query?: never;
             header?: never;
@@ -50589,7 +50575,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.mark_paid": {
+    "PaleeWeb.AdminCommunityEventController.mark_paid": {
         parameters: {
             query?: never;
             header?: never;
@@ -50926,7 +50912,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.cancel": {
+    "PaleeWeb.AdminCommunityEventController.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -51266,7 +51252,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.message": {
+    "PaleeWeb.AdminCommunityEventController.message": {
         parameters: {
             query?: never;
             header?: never;
@@ -51297,7 +51283,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityEventController.trial_offer": {
+    "PaleeWeb.AdminCommunityEventController.trial_offer": {
         parameters: {
             query?: never;
             header?: never;
@@ -51322,7 +51308,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.groups": {
+    "PaleeWeb.AdminCommunityController.groups": {
         parameters: {
             query?: never;
             header?: never;
@@ -51431,7 +51417,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.decide_group": {
+    "PaleeWeb.AdminCommunityController.decide_group": {
         parameters: {
             query?: never;
             header?: never;
@@ -51487,7 +51473,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.reopen_group": {
+    "PaleeWeb.AdminCommunityController.reopen_group": {
         parameters: {
             query?: never;
             header?: never;
@@ -51536,7 +51522,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.reports": {
+    "PaleeWeb.AdminCommunityController.reports": {
         parameters: {
             query?: never;
             header?: never;
@@ -51608,7 +51594,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.act_on_report": {
+    "PaleeWeb.AdminCommunityController.act_on_report": {
         parameters: {
             query?: never;
             header?: never;
@@ -51645,7 +51631,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminCommunityController.update_settings": {
+    "PaleeWeb.AdminCommunityController.update_settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -51683,7 +51669,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.exports": {
+    "PaleeWeb.AdminFinanceAccountingController.exports": {
         parameters: {
             query?: {
                 limit?: number;
@@ -51745,7 +51731,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.request_export": {
+    "PaleeWeb.AdminFinanceAccountingController.request_export": {
         parameters: {
             query?: never;
             header?: never;
@@ -51883,7 +51869,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.export_download": {
+    "PaleeWeb.AdminFinanceAccountingController.export_download": {
         parameters: {
             query?: never;
             header?: never;
@@ -51929,7 +51915,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.cleanup_records": {
+    "PaleeWeb.AdminFinanceController.cleanup_records": {
         parameters: {
             query?: {
                 q?: string;
@@ -51954,7 +51940,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.purge_record": {
+    "PaleeWeb.AdminFinanceController.purge_record": {
         parameters: {
             query?: never;
             header?: never;
@@ -51988,7 +51974,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.clients": {
+    "PaleeWeb.PaymentModelsController.clients": {
         parameters: {
             query?: never;
             header?: never;
@@ -52031,7 +52017,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.create_client": {
+    "PaleeWeb.PaymentModelsController.create_client": {
         parameters: {
             query?: never;
             header?: never;
@@ -52098,7 +52084,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.update_client": {
+    "PaleeWeb.PaymentModelsController.update_client": {
         parameters: {
             query?: never;
             header?: never;
@@ -52157,7 +52143,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.invoices": {
+    "PaleeWeb.PaymentModelsController.invoices": {
         parameters: {
             query?: never;
             header?: never;
@@ -52224,7 +52210,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.create_invoice": {
+    "PaleeWeb.PaymentModelsController.create_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -52310,7 +52296,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.seats": {
+    "PaleeWeb.PaymentModelsController.seats": {
         parameters: {
             query?: never;
             header?: never;
@@ -52347,7 +52333,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.add_seat": {
+    "PaleeWeb.PaymentModelsController.add_seat": {
         parameters: {
             query?: never;
             header?: never;
@@ -52403,7 +52389,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.end_seat": {
+    "PaleeWeb.PaymentModelsController.end_seat": {
         parameters: {
             query?: never;
             header?: never;
@@ -52442,7 +52428,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.invoice": {
+    "PaleeWeb.PaymentModelsController.invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -52547,7 +52533,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.record_payment": {
+    "PaleeWeb.PaymentModelsController.record_payment": {
         parameters: {
             query?: never;
             header?: never;
@@ -52649,7 +52635,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.reverse_payment": {
+    "PaleeWeb.PaymentModelsController.reverse_payment": {
         parameters: {
             query?: never;
             header?: never;
@@ -52724,7 +52710,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.send_invoice": {
+    "PaleeWeb.PaymentModelsController.send_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -52803,7 +52789,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.invoice_status": {
+    "PaleeWeb.PaymentModelsController.invoice_status": {
         parameters: {
             query?: never;
             header?: never;
@@ -52889,7 +52875,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.backfill_entitlements": {
+    "PaleeWeb.AdminFinanceController.backfill_entitlements": {
         parameters: {
             query?: never;
             header?: never;
@@ -52923,7 +52909,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.update_invoice": {
+    "PaleeWeb.AdminFinanceController.update_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -52953,7 +52939,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.invoice_download_url": {
+    "PaleeWeb.AdminFinanceController.invoice_download_url": {
         parameters: {
             query?: never;
             header?: never;
@@ -52977,7 +52963,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.issue_invoice": {
+    "PaleeWeb.AdminFinanceController.issue_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -53007,7 +52993,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.invoice_upload_complete": {
+    "PaleeWeb.AdminFinanceController.invoice_upload_complete": {
         parameters: {
             query?: never;
             header?: never;
@@ -53040,7 +53026,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.invoice_upload_url": {
+    "PaleeWeb.AdminFinanceController.invoice_upload_url": {
         parameters: {
             query?: never;
             header?: never;
@@ -53073,7 +53059,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.void_invoice": {
+    "PaleeWeb.AdminFinanceController.void_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -53103,7 +53089,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.members": {
+    "PaleeWeb.AdminFinanceController.members": {
         parameters: {
             query?: never;
             header?: never;
@@ -53125,7 +53111,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.member": {
+    "PaleeWeb.AdminFinanceController.member": {
         parameters: {
             query?: never;
             header?: never;
@@ -53242,7 +53228,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.update_member": {
+    "PaleeWeb.AdminFinanceController.update_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -53272,7 +53258,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_manual_credit": {
+    "PaleeWeb.AdminFinanceController.create_manual_credit": {
         parameters: {
             query?: never;
             header?: never;
@@ -53308,7 +53294,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.reverse_credit_ledger_entry": {
+    "PaleeWeb.AdminFinanceController.reverse_credit_ledger_entry": {
         parameters: {
             query?: never;
             header?: never;
@@ -53345,7 +53331,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_invoice": {
+    "PaleeWeb.AdminFinanceController.create_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -53413,7 +53399,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.generate_renewal_invoice": {
+    "PaleeWeb.AdminFinanceController.generate_renewal_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -53443,7 +53429,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.apply_credit_to_invoice": {
+    "PaleeWeb.AdminFinanceController.apply_credit_to_invoice": {
         parameters: {
             query?: never;
             header?: never;
@@ -53480,7 +53466,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.assign_package": {
+    "PaleeWeb.AdminFinanceController.assign_package": {
         parameters: {
             query?: never;
             header?: never;
@@ -53510,7 +53496,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.record_payment": {
+    "PaleeWeb.AdminFinanceController.record_payment": {
         parameters: {
             query?: never;
             header?: never;
@@ -53540,7 +53526,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.apply_credit_to_payment": {
+    "PaleeWeb.AdminFinanceController.apply_credit_to_payment": {
         parameters: {
             query?: never;
             header?: never;
@@ -53577,7 +53563,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.reverse_payment": {
+    "PaleeWeb.AdminFinanceController.reverse_payment": {
         parameters: {
             query?: never;
             header?: never;
@@ -53614,7 +53600,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.redeem_promotion": {
+    "PaleeWeb.AdminFinanceController.redeem_promotion": {
         parameters: {
             query?: never;
             header?: never;
@@ -53644,7 +53630,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_receipt": {
+    "PaleeWeb.AdminFinanceController.create_receipt": {
         parameters: {
             query?: never;
             header?: never;
@@ -53684,7 +53670,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.package_catalog": {
+    "PaleeWeb.AdminFinanceController.package_catalog": {
         parameters: {
             query?: never;
             header?: never;
@@ -53706,7 +53692,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.packages": {
+    "PaleeWeb.AdminFinanceController.packages": {
         parameters: {
             query?: never;
             header?: never;
@@ -53728,7 +53714,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_package": {
+    "PaleeWeb.AdminFinanceController.create_package": {
         parameters: {
             query?: never;
             header?: never;
@@ -53869,7 +53855,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.package": {
+    "PaleeWeb.AdminFinanceController.package": {
         parameters: {
             query?: never;
             header?: never;
@@ -53893,7 +53879,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.update_package": {
+    "PaleeWeb.AdminFinanceController.update_package": {
         parameters: {
             query?: never;
             header?: never;
@@ -54036,7 +54022,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.retire_package": {
+    "PaleeWeb.AdminFinanceController.retire_package": {
         parameters: {
             query?: never;
             header?: never;
@@ -54071,7 +54057,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.promotions": {
+    "PaleeWeb.AdminFinanceController.promotions": {
         parameters: {
             query?: never;
             header?: never;
@@ -54093,7 +54079,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_promotion": {
+    "PaleeWeb.AdminFinanceController.create_promotion": {
         parameters: {
             query?: never;
             header?: never;
@@ -54130,7 +54116,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.promotion_codes": {
+    "PaleeWeb.AdminFinanceController.promotion_codes": {
         parameters: {
             query?: never;
             header?: never;
@@ -54154,7 +54140,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_promotion_code": {
+    "PaleeWeb.AdminFinanceController.create_promotion_code": {
         parameters: {
             query?: never;
             header?: never;
@@ -54192,7 +54178,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.operational_queues": {
+    "PaleeWeb.AdminFinanceController.operational_queues": {
         parameters: {
             query?: never;
             header?: never;
@@ -54214,7 +54200,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_records": {
+    "PaleeWeb.AdminFinanceAccountingController.reconciliation_records": {
         parameters: {
             query?: {
                 status?: "unmatched" | "matched" | "mismatched";
@@ -54276,7 +54262,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.record_reconciliation_line": {
+    "PaleeWeb.AdminFinanceAccountingController.record_reconciliation_line": {
         parameters: {
             query?: never;
             header?: never;
@@ -54420,7 +54406,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.reconciliation_candidates": {
+    "PaleeWeb.AdminFinanceAccountingController.reconciliation_candidates": {
         parameters: {
             query?: never;
             header?: never;
@@ -54511,7 +54497,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.match_reconciliation": {
+    "PaleeWeb.AdminFinanceAccountingController.match_reconciliation": {
         parameters: {
             query?: never;
             header?: never;
@@ -54610,7 +54596,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.unmatch_reconciliation": {
+    "PaleeWeb.AdminFinanceAccountingController.unmatch_reconciliation": {
         parameters: {
             query?: never;
             header?: never;
@@ -54687,7 +54673,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.referral_programs": {
+    "PaleeWeb.AdminFinanceController.referral_programs": {
         parameters: {
             query?: never;
             header?: never;
@@ -54709,7 +54695,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_referral_program": {
+    "PaleeWeb.AdminFinanceController.create_referral_program": {
         parameters: {
             query?: never;
             header?: never;
@@ -54757,7 +54743,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.update_referral_program": {
+    "PaleeWeb.AdminFinanceController.update_referral_program": {
         parameters: {
             query?: never;
             header?: never;
@@ -54807,7 +54793,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.referral_rewards": {
+    "PaleeWeb.AdminFinanceController.referral_rewards": {
         parameters: {
             query?: never;
             header?: never;
@@ -54829,7 +54815,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.update_referral_reward_status": {
+    "PaleeWeb.AdminFinanceController.update_referral_reward_status": {
         parameters: {
             query?: never;
             header?: never;
@@ -54859,7 +54845,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.referrals": {
+    "PaleeWeb.AdminFinanceController.referrals": {
         parameters: {
             query?: never;
             header?: never;
@@ -54881,7 +54867,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_referral": {
+    "PaleeWeb.AdminFinanceController.create_referral": {
         parameters: {
             query?: never;
             header?: never;
@@ -54921,7 +54907,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.create_referral_reward": {
+    "PaleeWeb.AdminFinanceController.create_referral_reward": {
         parameters: {
             query?: never;
             header?: never;
@@ -54956,7 +54942,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.update_referral_status": {
+    "PaleeWeb.AdminFinanceController.update_referral_status": {
         parameters: {
             query?: never;
             header?: never;
@@ -54986,7 +54972,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipts": {
+    "PaleeWeb.AdminFinanceAccountingController.refund_receipts": {
         parameters: {
             query?: {
                 q?: string;
@@ -55050,7 +55036,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt": {
+    "PaleeWeb.AdminFinanceAccountingController.refund_receipt": {
         parameters: {
             query?: never;
             header?: never;
@@ -55124,7 +55110,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceAccountingController.refund_receipt_document": {
+    "PaleeWeb.AdminFinanceAccountingController.refund_receipt_document": {
         parameters: {
             query?: {
                 locale?: string;
@@ -55157,7 +55143,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.beneficiaries": {
+    "PaleeWeb.PaymentModelsController.beneficiaries": {
         parameters: {
             query?: never;
             header?: never;
@@ -55194,7 +55180,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.add_beneficiary": {
+    "PaleeWeb.PaymentModelsController.add_beneficiary": {
         parameters: {
             query?: never;
             header?: never;
@@ -55251,7 +55237,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.remove_beneficiary": {
+    "PaleeWeb.PaymentModelsController.remove_beneficiary": {
         parameters: {
             query?: never;
             header?: never;
@@ -55290,7 +55276,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFinanceController.summary": {
+    "PaleeWeb.AdminFinanceController.summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -55312,7 +55298,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.search_addresses": {
+    "PaleeWeb.AdminFacilityController.search_addresses": {
         parameters: {
             query: {
                 q: string;
@@ -55358,7 +55344,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.resolve_map_link": {
+    "PaleeWeb.AdminFacilityController.resolve_map_link": {
         parameters: {
             query: {
                 url: string;
@@ -55403,7 +55389,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.reverse_geocode": {
+    "PaleeWeb.AdminFacilityController.reverse_geocode": {
         parameters: {
             query: {
                 latitude: number;
@@ -55449,7 +55435,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.index_locations": {
+    "PaleeWeb.AdminFacilityController.index_locations": {
         parameters: {
             query?: never;
             header?: never;
@@ -55496,7 +55482,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.create_location": {
+    "PaleeWeb.AdminFacilityController.create_location": {
         parameters: {
             query?: never;
             header?: never;
@@ -55574,7 +55560,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.update_location": {
+    "PaleeWeb.AdminFacilityController.update_location": {
         parameters: {
             query?: never;
             header?: never;
@@ -55665,7 +55651,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminFacilityController.archive_location": {
+    "PaleeWeb.AdminFacilityController.archive_location": {
         parameters: {
             query?: never;
             header?: never;
@@ -55726,7 +55712,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminOnboardingController.show": {
+    "PaleeWeb.AdminOnboardingController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -55761,7 +55747,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminOnboardingController.update": {
+    "PaleeWeb.AdminOnboardingController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -55805,7 +55791,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OwnerOrganizationController.archive": {
+    "PaleeWeb.OwnerOrganizationController.archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -55837,7 +55823,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OwnerOrganizationController.transfer": {
+    "PaleeWeb.OwnerOrganizationController.transfer": {
         parameters: {
             query?: never;
             header?: never;
@@ -55870,7 +55856,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPlanController.show": {
+    "PaleeWeb.AdminPlanController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -55934,7 +55920,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.pr_members": {
+    "PaleeWeb.AdminUserController.pr_members": {
         parameters: {
             query?: never;
             header?: never;
@@ -55969,7 +55955,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.show": {
+    "PaleeWeb.AdminPublicProfileController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -56078,7 +56064,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.update": {
+    "PaleeWeb.AdminPublicProfileController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -56224,7 +56210,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.photo_upload": {
+    "PaleeWeb.AdminPublicProfileController.photo_upload": {
         parameters: {
             query?: never;
             header?: never;
@@ -56264,7 +56250,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.complete_photo": {
+    "PaleeWeb.AdminPublicProfileController.complete_photo": {
         parameters: {
             query?: never;
             header?: never;
@@ -56315,7 +56301,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.publish": {
+    "PaleeWeb.AdminPublicProfileController.publish": {
         parameters: {
             query?: never;
             header?: never;
@@ -56449,7 +56435,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.suggest": {
+    "PaleeWeb.AdminPublicProfileController.suggest": {
         parameters: {
             query?: never;
             header?: never;
@@ -56499,7 +56485,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminPublicProfileController.unpublish": {
+    "PaleeWeb.AdminPublicProfileController.unpublish": {
         parameters: {
             query?: never;
             header?: never;
@@ -56608,7 +56594,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReferralController.index": {
+    "PaleeWeb.AdminReferralController.index": {
         parameters: {
             query?: {
                 filter?: "review";
@@ -56729,7 +56715,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReferralController.approve": {
+    "PaleeWeb.AdminReferralController.approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -56865,7 +56851,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReferralController.friend_gift": {
+    "PaleeWeb.AdminReferralController.friend_gift": {
         parameters: {
             query?: never;
             header?: never;
@@ -57001,7 +56987,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReferralController.given": {
+    "PaleeWeb.AdminReferralController.given": {
         parameters: {
             query?: never;
             header?: never;
@@ -57137,7 +57123,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReferralController.reassign": {
+    "PaleeWeb.AdminReferralController.reassign": {
         parameters: {
             query?: never;
             header?: never;
@@ -57281,7 +57267,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReferralController.reject": {
+    "PaleeWeb.AdminReferralController.reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -57423,7 +57409,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReviewController.index": {
+    "PaleeWeb.AdminReviewController.index": {
         parameters: {
             query?: {
                 target_type?: string;
@@ -57495,7 +57481,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminReviewController.update_status": {
+    "PaleeWeb.AdminReviewController.update_status": {
         parameters: {
             query?: never;
             header?: never;
@@ -57571,7 +57557,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.RoleAccessController.show": {
+    "PaleeWeb.RoleAccessController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -57598,7 +57584,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.RoleAccessController.update": {
+    "PaleeWeb.RoleAccessController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -57633,7 +57619,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScaleLevelController.index": {
+    "PaleeWeb.AdminScaleLevelController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -57684,7 +57670,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScaleLevelController.update": {
+    "PaleeWeb.AdminScaleLevelController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -57732,7 +57718,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.create_slot": {
+    "PaleeWeb.AdminScheduleController.create_slot": {
         parameters: {
             query?: never;
             header?: never;
@@ -57776,7 +57762,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.create_series": {
+    "PaleeWeb.AdminScheduleController.create_series": {
         parameters: {
             query?: never;
             header?: never;
@@ -57825,7 +57811,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.delete_slot": {
+    "PaleeWeb.AdminScheduleController.delete_slot": {
         parameters: {
             query?: never;
             header?: never;
@@ -57847,7 +57833,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.update_slot": {
+    "PaleeWeb.AdminScheduleController.update_slot": {
         parameters: {
             query?: never;
             header?: never;
@@ -57893,7 +57879,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutGoalsController.class_feedback_summary": {
+    "PaleeWeb.AdminWorkoutGoalsController.class_feedback_summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -57950,7 +57936,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminInjuryWarningController.slot": {
+    "PaleeWeb.AdminInjuryWarningController.slot": {
         parameters: {
             query?: never;
             header?: never;
@@ -58010,7 +57996,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminScheduleController.record_attendance": {
+    "PaleeWeb.AdminScheduleController.record_attendance": {
         parameters: {
             query?: never;
             header?: never;
@@ -58045,7 +58031,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSearchController.index": {
+    "PaleeWeb.AdminSearchController.index": {
         parameters: {
             query?: {
                 q?: string;
@@ -58075,7 +58061,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.confirm": {
+    "PaleeWeb.AdminSeasonController.confirm": {
         parameters: {
             query?: never;
             header?: never;
@@ -58185,7 +58171,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.decline": {
+    "PaleeWeb.AdminSeasonController.decline": {
         parameters: {
             query?: never;
             header?: never;
@@ -58301,7 +58287,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.remove": {
+    "PaleeWeb.AdminSeasonController.remove": {
         parameters: {
             query?: never;
             header?: never;
@@ -58411,7 +58397,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.index": {
+    "PaleeWeb.AdminSeasonController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -58482,7 +58468,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.create": {
+    "PaleeWeb.AdminSeasonController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -58618,7 +58604,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.show": {
+    "PaleeWeb.AdminSeasonController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -58728,7 +58714,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSeasonController.update": {
+    "PaleeWeb.AdminSeasonController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -58866,7 +58852,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSettingsController.show": {
+    "PaleeWeb.AdminSettingsController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -58905,8 +58891,6 @@ export interface operations {
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
                             streak_shield_reset_day?: number | null;
-                            /** @enum {string} */
-                            theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
@@ -58952,7 +58936,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminSettingsController.update": {
+    "PaleeWeb.AdminSettingsController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -58975,8 +58959,6 @@ export interface operations {
                     gamification?: {
                         leaderboard_enabled?: boolean;
                         streak_shield_reset_day?: number | null;
-                        /** @enum {string} */
-                        theme_slug?: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                         weekly_workout_target?: number;
                     };
                     notifications?: {
@@ -59035,8 +59017,6 @@ export interface operations {
                             inserted_at?: string | null;
                             leaderboard_enabled: boolean;
                             streak_shield_reset_day?: number | null;
-                            /** @enum {string} */
-                            theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                             /** Format: date-time */
                             updated_at?: string | null;
                             weekly_workout_target: number;
@@ -59082,7 +59062,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminTrialController.policy": {
+    "PaleeWeb.AdminTrialController.policy": {
         parameters: {
             query?: never;
             header?: never;
@@ -59120,7 +59100,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminTrialController.update_policy": {
+    "PaleeWeb.AdminTrialController.update_policy": {
         parameters: {
             query?: never;
             header?: never;
@@ -59185,7 +59165,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminTrialController.queue": {
+    "PaleeWeb.AdminTrialController.queue": {
         parameters: {
             query?: {
                 stage?: "requests" | "upcoming" | "visited" | "joined";
@@ -59284,7 +59264,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminTrialController.accept": {
+    "PaleeWeb.AdminTrialController.accept": {
         parameters: {
             query?: never;
             header?: never;
@@ -59384,7 +59364,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminTrialController.attendance": {
+    "PaleeWeb.AdminTrialController.attendance": {
         parameters: {
             query?: never;
             header?: never;
@@ -59491,7 +59471,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminTrialController.decline": {
+    "PaleeWeb.AdminTrialController.decline": {
         parameters: {
             query?: never;
             header?: never;
@@ -59597,7 +59577,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.index": {
+    "PaleeWeb.AdminUserController.index": {
         parameters: {
             query?: {
                 q?: string;
@@ -59624,7 +59604,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.show": {
+    "PaleeWeb.AdminUserController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -59659,7 +59639,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.delete": {
+    "PaleeWeb.AdminUserController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -59712,7 +59692,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.grant_allowance": {
+    "PaleeWeb.AdminUserController.grant_allowance": {
         parameters: {
             query?: never;
             header?: never;
@@ -59772,7 +59752,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.revoke_allowance": {
+    "PaleeWeb.AdminUserController.revoke_allowance": {
         parameters: {
             query?: never;
             header?: never;
@@ -59825,7 +59805,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.place_in_class": {
+    "PaleeWeb.AdminUserController.place_in_class": {
         parameters: {
             query?: never;
             header?: never;
@@ -59857,7 +59837,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.update_coach_scope": {
+    "PaleeWeb.AdminUserController.update_coach_scope": {
         parameters: {
             query?: never;
             header?: never;
@@ -59898,7 +59878,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.coaching_context": {
+    "PaleeWeb.AdminUserController.coaching_context": {
         parameters: {
             query?: never;
             header?: never;
@@ -59927,7 +59907,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.finance": {
+    "PaleeWeb.AdminUserController.finance": {
         parameters: {
             query?: never;
             header?: never;
@@ -59979,7 +59959,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.freezes": {
+    "PaleeWeb.AdminUserController.freezes": {
         parameters: {
             query?: never;
             header?: never;
@@ -60017,7 +59997,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.create_freeze": {
+    "PaleeWeb.AdminUserController.create_freeze": {
         parameters: {
             query?: never;
             header?: never;
@@ -60088,7 +60068,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.cancel_freeze": {
+    "PaleeWeb.AdminUserController.cancel_freeze": {
         parameters: {
             query?: never;
             header?: never;
@@ -60156,7 +60136,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingHistoryController.for_user": {
+    "PaleeWeb.TrainingHistoryController.for_user": {
         parameters: {
             query?: {
                 kind?: "workouts" | "classes";
@@ -60232,7 +60212,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.HomeLocationController.update_member": {
+    "PaleeWeb.HomeLocationController.update_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -60271,7 +60251,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.incidents": {
+    "PaleeWeb.AdminUserController.incidents": {
         parameters: {
             query?: never;
             header?: never;
@@ -60311,7 +60291,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.membership_status": {
+    "PaleeWeb.AdminUserController.membership_status": {
         parameters: {
             query?: never;
             header?: never;
@@ -60345,7 +60325,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.messages": {
+    "PaleeWeb.AdminUserController.messages": {
         parameters: {
             query?: never;
             header?: never;
@@ -60385,7 +60365,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.program_workout": {
+    "PaleeWeb.AdminUserController.program_workout": {
         parameters: {
             query?: never;
             header?: never;
@@ -60428,7 +60408,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.prs": {
+    "PaleeWeb.AdminUserController.prs": {
         parameters: {
             query?: never;
             header?: never;
@@ -60480,7 +60460,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.update_role": {
+    "PaleeWeb.AdminUserController.update_role": {
         parameters: {
             query?: never;
             header?: never;
@@ -60573,7 +60553,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.update_roles": {
+    "PaleeWeb.AdminUserController.update_roles": {
         parameters: {
             query?: never;
             header?: never;
@@ -60613,7 +60593,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.schedule": {
+    "PaleeWeb.AdminUserController.schedule": {
         parameters: {
             query: {
                 start_date: string;
@@ -60640,7 +60620,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminUserController.training_history": {
+    "PaleeWeb.AdminUserController.training_history": {
         parameters: {
             query?: never;
             header?: never;
@@ -60680,7 +60660,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminContentController.index": {
+    "PaleeWeb.AdminContentController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -60714,7 +60694,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminContentController.create": {
+    "PaleeWeb.AdminContentController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -60770,7 +60750,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminContentController.update": {
+    "PaleeWeb.AdminContentController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -60839,7 +60819,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminContentController.archive": {
+    "PaleeWeb.AdminContentController.archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -60887,7 +60867,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminContentController.publish": {
+    "PaleeWeb.AdminContentController.publish": {
         parameters: {
             query?: never;
             header?: never;
@@ -60941,7 +60921,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWellbeingController.index": {
+    "PaleeWeb.AdminWellbeingController.index": {
         parameters: {
             query?: {
                 status?: string;
@@ -61021,7 +61001,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWellbeingController.update": {
+    "PaleeWeb.AdminWellbeingController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -61109,7 +61089,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWellbeingController.heal": {
+    "PaleeWeb.AdminWellbeingController.heal": {
         parameters: {
             query?: never;
             header?: never;
@@ -61192,7 +61172,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWellbeingController.reopen": {
+    "PaleeWeb.AdminWellbeingController.reopen": {
         parameters: {
             query?: never;
             header?: never;
@@ -61268,7 +61248,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminInjuryWarningController.evaluate": {
+    "PaleeWeb.AdminInjuryWarningController.evaluate": {
         parameters: {
             query?: never;
             header?: never;
@@ -61336,7 +61316,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminInjuryWarningController.acknowledge": {
+    "PaleeWeb.AdminInjuryWarningController.acknowledge": {
         parameters: {
             query?: never;
             header?: never;
@@ -61370,7 +61350,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWellbeingController.create": {
+    "PaleeWeb.AdminWellbeingController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -61461,7 +61441,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutFolderController.index": {
+    "PaleeWeb.AdminWorkoutFolderController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -61497,7 +61477,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutFolderController.create": {
+    "PaleeWeb.AdminWorkoutFolderController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -61539,7 +61519,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutFolderController.delete": {
+    "PaleeWeb.AdminWorkoutFolderController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -61559,7 +61539,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutFolderController.update": {
+    "PaleeWeb.AdminWorkoutFolderController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -61603,7 +61583,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.index": {
+    "PaleeWeb.AdminWorkoutController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -61649,7 +61629,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.create": {
+    "PaleeWeb.AdminWorkoutController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -61680,7 +61660,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutDslController.manual": {
+    "PaleeWeb.AdminWorkoutDslController.manual": {
         parameters: {
             query?: never;
             header?: never;
@@ -61735,7 +61715,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutDslController.parse": {
+    "PaleeWeb.AdminWorkoutDslController.parse": {
         parameters: {
             query?: never;
             header?: never;
@@ -61848,7 +61828,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutFreeTextController.analyze": {
+    "PaleeWeb.AdminWorkoutFreeTextController.analyze": {
         parameters: {
             query?: never;
             header?: never;
@@ -61970,7 +61950,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutTimerPreviewController.create": {
+    "PaleeWeb.AdminWorkoutTimerPreviewController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -62052,7 +62032,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.show": {
+    "PaleeWeb.AdminWorkoutController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -62603,7 +62583,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.delete": {
+    "PaleeWeb.AdminWorkoutController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -62636,7 +62616,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.copy": {
+    "PaleeWeb.AdminWorkoutController.copy": {
         parameters: {
             query?: never;
             header?: never;
@@ -62669,7 +62649,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.update_draft": {
+    "PaleeWeb.AdminWorkoutController.update_draft": {
         parameters: {
             query?: never;
             header?: never;
@@ -63194,7 +63174,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutDslController.show_authoring": {
+    "PaleeWeb.AdminWorkoutDslController.show_authoring": {
         parameters: {
             query?: never;
             header?: never;
@@ -63258,7 +63238,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutDslController.publish": {
+    "PaleeWeb.AdminWorkoutDslController.publish": {
         parameters: {
             query?: never;
             header?: never;
@@ -63352,7 +63332,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.duplicate": {
+    "PaleeWeb.AdminWorkoutController.duplicate": {
         parameters: {
             query?: never;
             header?: never;
@@ -63389,7 +63369,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutGoalsController.feedback_summary": {
+    "PaleeWeb.AdminWorkoutGoalsController.feedback_summary": {
         parameters: {
             query?: never;
             header?: never;
@@ -63446,7 +63426,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutGoalsController.show": {
+    "PaleeWeb.AdminWorkoutGoalsController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -63523,7 +63503,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutGoalsController.update": {
+    "PaleeWeb.AdminWorkoutGoalsController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -63627,7 +63607,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.update_icon": {
+    "PaleeWeb.AdminWorkoutController.update_icon": {
         parameters: {
             query?: never;
             header?: never;
@@ -63662,7 +63642,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.update_library": {
+    "PaleeWeb.AdminWorkoutController.update_library": {
         parameters: {
             query?: never;
             header?: never;
@@ -63693,7 +63673,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.publish": {
+    "PaleeWeb.AdminWorkoutController.publish": {
         parameters: {
             query?: never;
             header?: never;
@@ -64745,7 +64725,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AdminWorkoutController.reopen": {
+    "PaleeWeb.AdminWorkoutController.reopen": {
         parameters: {
             query?: never;
             header?: never;
@@ -64793,7 +64773,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AnatomyAtlasController.exercises": {
+    "PaleeWeb.AnatomyAtlasController.exercises": {
         parameters: {
             query?: never;
             header?: never;
@@ -64844,7 +64824,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.create_booking": {
+    "PaleeWeb.ScheduleController.create_booking": {
         parameters: {
             query?: never;
             header?: never;
@@ -64926,7 +64906,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.create_guest_booking": {
+    "PaleeWeb.ScheduleController.create_guest_booking": {
         parameters: {
             query?: never;
             header?: never;
@@ -64976,7 +64956,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.join_waitlist": {
+    "PaleeWeb.ScheduleController.join_waitlist": {
         parameters: {
             query?: never;
             header?: never;
@@ -65025,7 +65005,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.delete_booking": {
+    "PaleeWeb.ScheduleController.delete_booking": {
         parameters: {
             query?: never;
             header?: never;
@@ -65065,7 +65045,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.check_in_class": {
+    "PaleeWeb.ScheduleController.check_in_class": {
         parameters: {
             query?: never;
             header?: never;
@@ -65104,7 +65084,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.check_in": {
+    "PaleeWeb.ScheduleController.check_in": {
         parameters: {
             query?: never;
             header?: never;
@@ -65161,7 +65141,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClassTimerController.show": {
+    "PaleeWeb.ClassTimerController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -65230,7 +65210,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClassTimerController.command": {
+    "PaleeWeb.ClassTimerController.command": {
         parameters: {
             query?: never;
             header?: never;
@@ -65349,7 +65329,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityController.join_channel": {
+    "PaleeWeb.CommunityController.join_channel": {
         parameters: {
             query?: never;
             header?: never;
@@ -65375,7 +65355,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityController.leave_channel": {
+    "PaleeWeb.CommunityController.leave_channel": {
         parameters: {
             query?: never;
             header?: never;
@@ -65401,7 +65381,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityController.set_notify_level": {
+    "PaleeWeb.CommunityController.set_notify_level": {
         parameters: {
             query?: never;
             header?: never;
@@ -65435,7 +65415,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.delete_comment": {
+    "PaleeWeb.CommunityPostController.delete_comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -65457,7 +65437,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.hide_comment": {
+    "PaleeWeb.CommunityPostController.hide_comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -65485,7 +65465,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.index": {
+    "PaleeWeb.CommunityGroupController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -65618,7 +65598,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.create": {
+    "PaleeWeb.CommunityGroupController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -65698,7 +65678,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.show": {
+    "PaleeWeb.CommunityGroupController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -65771,7 +65751,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.update": {
+    "PaleeWeb.CommunityGroupController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -65853,7 +65833,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.set_admin": {
+    "PaleeWeb.CommunityGroupController.set_admin": {
         parameters: {
             query?: never;
             header?: never;
@@ -65933,7 +65913,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.archive": {
+    "PaleeWeb.CommunityGroupController.archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -65960,7 +65940,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.remove_member": {
+    "PaleeWeb.CommunityGroupController.remove_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -66034,7 +66014,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.join": {
+    "PaleeWeb.CommunityGroupController.join": {
         parameters: {
             query?: never;
             header?: never;
@@ -66107,7 +66087,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.leave": {
+    "PaleeWeb.CommunityGroupController.leave": {
         parameters: {
             query?: never;
             header?: never;
@@ -66134,7 +66114,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.reopen": {
+    "PaleeWeb.CommunityGroupController.reopen": {
         parameters: {
             query?: never;
             header?: never;
@@ -66207,7 +66187,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityGroupController.answer_request": {
+    "PaleeWeb.CommunityGroupController.answer_request": {
         parameters: {
             query?: never;
             header?: never;
@@ -66287,7 +66267,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.create": {
+    "PaleeWeb.CommunityPostController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -66534,7 +66514,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.delete": {
+    "PaleeWeb.CommunityPostController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -66556,7 +66536,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.comments": {
+    "PaleeWeb.CommunityPostController.comments": {
         parameters: {
             query?: never;
             header?: never;
@@ -66599,7 +66579,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.comment": {
+    "PaleeWeb.CommunityPostController.comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -66649,7 +66629,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.hide": {
+    "PaleeWeb.CommunityPostController.hide": {
         parameters: {
             query?: never;
             header?: never;
@@ -66884,7 +66864,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.kudos": {
+    "PaleeWeb.CommunityPostController.kudos": {
         parameters: {
             query?: never;
             header?: never;
@@ -67119,7 +67099,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityPostController.pin": {
+    "PaleeWeb.CommunityPostController.pin": {
         parameters: {
             query?: never;
             header?: never;
@@ -67354,7 +67334,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.index": {
+    "PaleeWeb.PtSquadController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -67538,7 +67518,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.create": {
+    "PaleeWeb.PtSquadController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -67605,7 +67585,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.show": {
+    "PaleeWeb.PtSquadController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -67666,7 +67646,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.update": {
+    "PaleeWeb.PtSquadController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -67734,7 +67714,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.archive": {
+    "PaleeWeb.PtSquadController.archive": {
         parameters: {
             query?: never;
             header?: never;
@@ -67761,7 +67741,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.answer": {
+    "PaleeWeb.PtSquadController.answer": {
         parameters: {
             query?: never;
             header?: never;
@@ -67833,7 +67813,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.invite": {
+    "PaleeWeb.PtSquadController.invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -67900,7 +67880,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.remove_member": {
+    "PaleeWeb.PtSquadController.remove_member": {
         parameters: {
             query?: never;
             header?: never;
@@ -67962,7 +67942,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.leave": {
+    "PaleeWeb.PtSquadController.leave": {
         parameters: {
             query?: never;
             header?: never;
@@ -67989,7 +67969,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PtSquadController.reopen": {
+    "PaleeWeb.PtSquadController.reopen": {
         parameters: {
             query?: never;
             header?: never;
@@ -68050,7 +68030,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CommunityController.wod_today": {
+    "PaleeWeb.CommunityController.wod_today": {
         parameters: {
             query?: {
                 /** @description Local date; today in `timezone` when omitted */
@@ -68112,7 +68092,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.list_invitations": {
+    "PaleeWeb.OrganizationAccessController.list_invitations": {
         parameters: {
             query?: never;
             header?: never;
@@ -68143,7 +68123,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.issue": {
+    "PaleeWeb.OrganizationAccessController.issue": {
         parameters: {
             query?: never;
             header?: never;
@@ -68187,7 +68167,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.revoke": {
+    "PaleeWeb.OrganizationAccessController.revoke": {
         parameters: {
             query?: never;
             header?: never;
@@ -68208,7 +68188,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.show_join_link": {
+    "PaleeWeb.OrganizationAccessController.show_join_link": {
         parameters: {
             query?: never;
             header?: never;
@@ -68234,7 +68214,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationAccessController.update_join_link": {
+    "PaleeWeb.OrganizationAccessController.update_join_link": {
         parameters: {
             query?: never;
             header?: never;
@@ -68268,7 +68248,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.LandingController.show": {
+    "PaleeWeb.LandingController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -68299,8 +68279,6 @@ export interface operations {
                             settings: {
                                 leaderboard_enabled: boolean;
                                 streak_shield_reset_day?: number | null;
-                                /** @enum {string} */
-                                theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
                                 weekly_workout_target: number;
                             };
                         } & {
@@ -68324,7 +68302,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.LandingController.update_leaderboard_preference": {
+    "PaleeWeb.LandingController.update_leaderboard_preference": {
         parameters: {
             query?: never;
             header?: never;
@@ -68370,7 +68348,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.locations": {
+    "PaleeWeb.ScheduleController.locations": {
         parameters: {
             query?: never;
             header?: never;
@@ -68417,7 +68395,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.my_appointments": {
+    "PaleeWeb.AppointmentsController.my_appointments": {
         parameters: {
             query?: never;
             header?: never;
@@ -68457,7 +68435,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.book": {
+    "PaleeWeb.AppointmentsController.book": {
         parameters: {
             query?: never;
             header?: never;
@@ -68527,7 +68505,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.offered_slots": {
+    "PaleeWeb.AppointmentsController.offered_slots": {
         parameters: {
             query?: never;
             header?: never;
@@ -68592,7 +68570,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.cancel": {
+    "PaleeWeb.AppointmentsController.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -68646,7 +68624,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyCheckInController.code": {
+    "PaleeWeb.MyCheckInController.code": {
         parameters: {
             query?: never;
             header?: never;
@@ -68677,7 +68655,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyCheckInController.reset_code": {
+    "PaleeWeb.MyCheckInController.reset_code": {
         parameters: {
             query?: never;
             header?: never;
@@ -68719,7 +68697,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.enrollment_offer": {
+    "PaleeWeb.PaymentModelsController.enrollment_offer": {
         parameters: {
             query?: never;
             header?: never;
@@ -68743,7 +68721,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PaymentModelsController.enroll": {
+    "PaleeWeb.PaymentModelsController.enroll": {
         parameters: {
             query?: never;
             header?: never;
@@ -68807,7 +68785,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.entitlement": {
+    "PaleeWeb.MyFinanceController.entitlement": {
         parameters: {
             query?: never;
             header?: never;
@@ -68829,7 +68807,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.index": {
+    "PaleeWeb.MyFinanceController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -68851,7 +68829,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.my_form_reviews": {
+    "PaleeWeb.CoachingExtrasController.my_form_reviews": {
         parameters: {
             query?: never;
             header?: never;
@@ -68893,7 +68871,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.submit_form_review": {
+    "PaleeWeb.CoachingExtrasController.submit_form_review": {
         parameters: {
             query?: never;
             header?: never;
@@ -68968,7 +68946,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.withdraw_form_review": {
+    "PaleeWeb.CoachingExtrasController.withdraw_form_review": {
         parameters: {
             query?: never;
             header?: never;
@@ -69024,7 +69002,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GoalFeedbackController.show": {
+    "PaleeWeb.GoalFeedbackController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -69088,7 +69066,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.GoalFeedbackController.update": {
+    "PaleeWeb.GoalFeedbackController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -69171,7 +69149,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingHistoryController.mine": {
+    "PaleeWeb.TrainingHistoryController.mine": {
         parameters: {
             query?: {
                 kind?: "workouts" | "classes";
@@ -69245,7 +69223,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.HomeLocationController.update_mine": {
+    "PaleeWeb.HomeLocationController.update_mine": {
         parameters: {
             query?: never;
             header?: never;
@@ -69282,7 +69260,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.invoice_download_url": {
+    "PaleeWeb.MyFinanceController.invoice_download_url": {
         parameters: {
             query?: never;
             header?: never;
@@ -69324,7 +69302,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.my_nutrition_plan": {
+    "PaleeWeb.CoachingExtrasController.my_nutrition_plan": {
         parameters: {
             query?: never;
             header?: never;
@@ -69387,7 +69365,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyContentController.progress": {
+    "PaleeWeb.MyContentController.progress": {
         parameters: {
             query?: never;
             header?: never;
@@ -69471,7 +69449,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReferralController.mine": {
+    "PaleeWeb.ReferralController.mine": {
         parameters: {
             query?: never;
             header?: never;
@@ -69596,7 +69574,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReferralController.rotate_code": {
+    "PaleeWeb.ReferralController.rotate_code": {
         parameters: {
             query?: never;
             header?: never;
@@ -69619,7 +69597,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.refund_receipts": {
+    "PaleeWeb.MyFinanceController.refund_receipts": {
         parameters: {
             query?: never;
             header?: never;
@@ -69677,7 +69655,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.refund_receipt": {
+    "PaleeWeb.MyFinanceController.refund_receipt": {
         parameters: {
             query?: never;
             header?: never;
@@ -69751,7 +69729,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyFinanceController.refund_receipt_document": {
+    "PaleeWeb.MyFinanceController.refund_receipt_document": {
         parameters: {
             query?: {
                 locale?: string;
@@ -69784,7 +69762,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReviewController.index": {
+    "PaleeWeb.ReviewController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -69850,7 +69828,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReviewController.create": {
+    "PaleeWeb.ReviewController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -69937,7 +69915,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MeController.search_users": {
+    "PaleeWeb.MeController.search_users": {
         parameters: {
             query?: {
                 q?: string;
@@ -69966,7 +69944,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SeasonController.index": {
+    "PaleeWeb.SeasonController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -70023,7 +70001,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SeasonController.cancel": {
+    "PaleeWeb.SeasonController.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -70110,7 +70088,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.SeasonController.request": {
+    "PaleeWeb.SeasonController.request": {
         parameters: {
             query?: never;
             header?: never;
@@ -70197,7 +70175,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.list_threads": {
+    "PaleeWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
                 context_type?: "direct" | "assignment" | "class_slot" | "box";
@@ -70241,7 +70219,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.create_thread": {
+    "PaleeWeb.MessagingController.create_thread": {
         parameters: {
             query?: never;
             header?: never;
@@ -70299,7 +70277,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.unread_count": {
+    "PaleeWeb.MessagingController.unread_count": {
         parameters: {
             query?: never;
             header?: never;
@@ -70321,7 +70299,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.show_thread": {
+    "PaleeWeb.MessagingController.show_thread": {
         parameters: {
             query?: never;
             header?: never;
@@ -70383,7 +70361,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.list_messages": {
+    "PaleeWeb.MessagingController.list_messages": {
         parameters: {
             query?: {
                 limit?: number;
@@ -70435,7 +70413,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.send_message": {
+    "PaleeWeb.MessagingController.send_message": {
         parameters: {
             query?: never;
             header?: never;
@@ -70513,7 +70491,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MessagingController.mark_read": {
+    "PaleeWeb.MessagingController.mark_read": {
         parameters: {
             query?: never;
             header?: never;
@@ -70565,7 +70543,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingLogController.index": {
+    "PaleeWeb.TrainingLogController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -70587,7 +70565,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingLogController.create": {
+    "PaleeWeb.TrainingLogController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -70694,7 +70672,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingLogController.show": {
+    "PaleeWeb.TrainingLogController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -70728,7 +70706,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingLogController.update": {
+    "PaleeWeb.TrainingLogController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -70813,7 +70791,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingLogController.void": {
+    "PaleeWeb.TrainingLogController.void": {
         parameters: {
             query?: never;
             header?: never;
@@ -70863,7 +70841,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingLogController.sources": {
+    "PaleeWeb.TrainingLogController.sources": {
         parameters: {
             query?: never;
             header?: never;
@@ -70924,7 +70902,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyVoiceLogController.show": {
+    "PaleeWeb.MyVoiceLogController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -70953,7 +70931,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyVoiceLogController.create": {
+    "PaleeWeb.MyVoiceLogController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -71045,7 +71023,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyContentController.videos": {
+    "PaleeWeb.MyContentController.videos": {
         parameters: {
             query?: never;
             header?: never;
@@ -71090,7 +71068,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyCheckInController.add_wallet_pass": {
+    "PaleeWeb.MyCheckInController.add_wallet_pass": {
         parameters: {
             query?: never;
             header?: never;
@@ -71164,7 +71142,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyInjuryWarningController.show": {
+    "PaleeWeb.MyInjuryWarningController.show": {
         parameters: {
             query?: {
                 surface?: "assignment_detail" | "class_detail" | "pre_start";
@@ -71222,7 +71200,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyInjuryWarningController.acknowledge": {
+    "PaleeWeb.MyInjuryWarningController.acknowledge": {
         parameters: {
             query?: never;
             header?: never;
@@ -71259,7 +71237,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyScalingController.show": {
+    "PaleeWeb.MyScalingController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -71310,7 +71288,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyWorkoutController.index": {
+    "PaleeWeb.MyWorkoutController.index": {
         parameters: {
             query?: {
                 start_date?: string;
@@ -71340,7 +71318,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyWorkoutController.open": {
+    "PaleeWeb.MyWorkoutController.open": {
         parameters: {
             query?: never;
             header?: never;
@@ -71369,7 +71347,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyWorkoutController.reject": {
+    "PaleeWeb.MyWorkoutController.reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -71411,7 +71389,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyWorkoutController.reschedule": {
+    "PaleeWeb.MyWorkoutController.reschedule": {
         parameters: {
             query?: never;
             header?: never;
@@ -71469,7 +71447,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.MyWorkoutController.request_assignment": {
+    "PaleeWeb.MyWorkoutController.request_assignment": {
         parameters: {
             query?: never;
             header?: never;
@@ -71519,7 +71497,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ScheduleController.index": {
+    "PaleeWeb.ScheduleController.index": {
         parameters: {
             query?: {
                 /** @description Calendar window start date */
@@ -71616,7 +71594,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.slots": {
+    "PaleeWeb.AppointmentsController.slots": {
         parameters: {
             query?: {
                 from?: string;
@@ -71685,7 +71663,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.create_slot": {
+    "PaleeWeb.AppointmentsController.create_slot": {
         parameters: {
             query?: never;
             header?: never;
@@ -71783,7 +71761,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.book_for_client": {
+    "PaleeWeb.AppointmentsController.book_for_client": {
         parameters: {
             query?: never;
             header?: never;
@@ -71844,7 +71822,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.cancel_slot": {
+    "PaleeWeb.AppointmentsController.cancel_slot": {
         parameters: {
             query?: never;
             header?: never;
@@ -71912,7 +71890,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.attendance": {
+    "PaleeWeb.AppointmentsController.attendance": {
         parameters: {
             query?: never;
             header?: never;
@@ -71973,7 +71951,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.AppointmentsController.cancel (2)": {
+    "PaleeWeb.AppointmentsController.cancel (2)": {
         parameters: {
             query?: never;
             header?: never;
@@ -72027,7 +72005,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.areas": {
+    "PaleeWeb.CleaningController.areas": {
         parameters: {
             query?: never;
             header?: never;
@@ -72060,7 +72038,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.create_area": {
+    "PaleeWeb.CleaningController.create_area": {
         parameters: {
             query?: never;
             header?: never;
@@ -72103,7 +72081,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.update_area": {
+    "PaleeWeb.CleaningController.update_area": {
         parameters: {
             query?: never;
             header?: never;
@@ -72148,7 +72126,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.archive_area": {
+    "PaleeWeb.CleaningController.archive_area": {
         parameters: {
             query?: never;
             header?: never;
@@ -72184,7 +72162,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.entries": {
+    "PaleeWeb.CleaningController.entries": {
         parameters: {
             query?: {
                 area_id?: string;
@@ -72222,7 +72200,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.start": {
+    "PaleeWeb.CleaningController.start": {
         parameters: {
             query?: never;
             header?: never;
@@ -72266,7 +72244,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CleaningController.finish": {
+    "PaleeWeb.CleaningController.finish": {
         parameters: {
             query?: never;
             header?: never;
@@ -72312,7 +72290,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClientBodyController.index": {
+    "PaleeWeb.ClientBodyController.index": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -72403,7 +72381,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClientBodyController.series": {
+    "PaleeWeb.ClientBodyController.series": {
         parameters: {
             query: {
                 metric: "weight" | "body_fat" | "waist" | "hips" | "chest" | "arm" | "thigh" | "neck" | "calf" | "arm_left" | "arm_right" | "thigh_left" | "thigh_right";
@@ -72455,7 +72433,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClientBodyController.show": {
+    "PaleeWeb.ClientBodyController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -72544,7 +72522,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachNotesController.index": {
+    "PaleeWeb.CoachNotesController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -72585,7 +72563,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachNotesController.create": {
+    "PaleeWeb.CoachNotesController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -72637,7 +72615,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.JournalController.client_journal": {
+    "PaleeWeb.JournalController.client_journal": {
         parameters: {
             query?: {
                 /** @description `next_cursor` of the previous page */
@@ -72673,7 +72651,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.nutrition_plan": {
+    "PaleeWeb.CoachingExtrasController.nutrition_plan": {
         parameters: {
             query?: never;
             header?: never;
@@ -72727,7 +72705,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.save_nutrition_plan": {
+    "PaleeWeb.CoachingExtrasController.save_nutrition_plan": {
         parameters: {
             query?: never;
             header?: never;
@@ -72812,7 +72790,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.TrainingDepthController.client": {
+    "PaleeWeb.TrainingDepthController.client": {
         parameters: {
             query?: {
                 range?: "4w" | "12w" | "6m" | "1y" | "all";
@@ -72958,7 +72936,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ClientWellnessSummaryController.show": {
+    "PaleeWeb.ClientWellnessSummaryController.show": {
         parameters: {
             query?: {
                 /** @description Any date of the week; the last completed week when left out */
@@ -73013,7 +72991,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachNotesController.reads": {
+    "PaleeWeb.CoachNotesController.reads": {
         parameters: {
             query?: never;
             header?: never;
@@ -73048,7 +73026,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachNotesController.delete": {
+    "PaleeWeb.CoachNotesController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -73070,7 +73048,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachNotesController.update": {
+    "PaleeWeb.CoachNotesController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -73118,7 +73096,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingRelationshipsController.index": {
+    "PaleeWeb.CoachingRelationshipsController.index": {
         parameters: {
             query?: {
                 coach_user_id?: string;
@@ -73156,7 +73134,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingRelationshipsController.create": {
+    "PaleeWeb.CoachingRelationshipsController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -73201,7 +73179,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingRelationshipsController.finish": {
+    "PaleeWeb.CoachingRelationshipsController.finish": {
         parameters: {
             query?: never;
             header?: never;
@@ -73239,7 +73217,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.form_review_queue": {
+    "PaleeWeb.CoachingExtrasController.form_review_queue": {
         parameters: {
             query?: {
                 status?: "submitted" | "reviewed" | "withdrawn";
@@ -73283,7 +73261,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.complete_form_review": {
+    "PaleeWeb.CoachingExtrasController.complete_form_review": {
         parameters: {
             query?: never;
             header?: never;
@@ -73345,7 +73323,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.machines": {
+    "PaleeWeb.InventoryController.machines": {
         parameters: {
             query?: never;
             header?: never;
@@ -73396,7 +73374,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.create_machine": {
+    "PaleeWeb.InventoryController.create_machine": {
         parameters: {
             query?: never;
             header?: never;
@@ -73472,7 +73450,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.update_machine": {
+    "PaleeWeb.InventoryController.update_machine": {
         parameters: {
             query?: never;
             header?: never;
@@ -73550,7 +73528,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.archive_machine": {
+    "PaleeWeb.InventoryController.archive_machine": {
         parameters: {
             query?: never;
             header?: never;
@@ -73604,7 +73582,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.machine_events": {
+    "PaleeWeb.InventoryController.machine_events": {
         parameters: {
             query?: never;
             header?: never;
@@ -73647,7 +73625,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.log_machine_event": {
+    "PaleeWeb.InventoryController.log_machine_event": {
         parameters: {
             query?: never;
             header?: never;
@@ -73738,7 +73716,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.report": {
+    "PaleeWeb.InventoryController.report": {
         parameters: {
             query?: {
                 months?: number;
@@ -73790,7 +73768,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.supplies": {
+    "PaleeWeb.InventoryController.supplies": {
         parameters: {
             query?: never;
             header?: never;
@@ -73859,7 +73837,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.create_supply": {
+    "PaleeWeb.InventoryController.create_supply": {
         parameters: {
             query?: never;
             header?: never;
@@ -73946,7 +73924,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.update_supply": {
+    "PaleeWeb.InventoryController.update_supply": {
         parameters: {
             query?: never;
             header?: never;
@@ -74035,7 +74013,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.archive_supply": {
+    "PaleeWeb.InventoryController.archive_supply": {
         parameters: {
             query?: never;
             header?: never;
@@ -74061,7 +74039,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.supply_reports": {
+    "PaleeWeb.InventoryController.supply_reports": {
         parameters: {
             query?: never;
             header?: never;
@@ -74105,7 +74083,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.report_low": {
+    "PaleeWeb.InventoryController.report_low": {
         parameters: {
             query?: never;
             header?: never;
@@ -74209,7 +74187,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.movements": {
+    "PaleeWeb.InventoryController.movements": {
         parameters: {
             query?: never;
             header?: never;
@@ -74249,7 +74227,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.InventoryController.record_movement": {
+    "PaleeWeb.InventoryController.record_movement": {
         parameters: {
             query?: never;
             header?: never;
@@ -74353,7 +74331,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachNotesController.visibility": {
+    "PaleeWeb.CoachNotesController.visibility": {
         parameters: {
             query?: never;
             header?: never;
@@ -74381,7 +74359,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.StaffController.index": {
+    "PaleeWeb.StaffController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -74409,7 +74387,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.my_client_stats": {
+    "PaleeWeb.CoachingExtrasController.my_client_stats": {
         parameters: {
             query?: never;
             header?: never;
@@ -74433,7 +74411,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CoachingExtrasController.reply_queue": {
+    "PaleeWeb.CoachingExtrasController.reply_queue": {
         parameters: {
             query?: never;
             header?: never;
@@ -74469,7 +74447,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.StaffScalingController.index": {
+    "PaleeWeb.StaffScalingController.index": {
         parameters: {
             query?: {
                 status?: "pending" | "approved" | "dismissed";
@@ -74532,7 +74510,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.StaffScalingController.approve": {
+    "PaleeWeb.StaffScalingController.approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -74641,7 +74619,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.StaffScalingController.dismiss": {
+    "PaleeWeb.StaffScalingController.dismiss": {
         parameters: {
             query?: never;
             header?: never;
@@ -74727,7 +74705,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WorkoutController.show": {
+    "PaleeWeb.WorkoutController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -75279,7 +75257,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WorkoutGoalsController.show": {
+    "PaleeWeb.WorkoutGoalsController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -75332,7 +75310,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WorkoutController.scales": {
+    "PaleeWeb.WorkoutController.scales": {
         parameters: {
             query?: never;
             header?: never;
@@ -76401,7 +76379,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OrganizationSlugAliasController.show": {
+    "PaleeWeb.OrganizationSlugAliasController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -76439,7 +76417,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.OwnerOrganizationController.create": {
+    "PaleeWeb.OwnerOrganizationController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -76471,7 +76449,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PeopleController.show": {
+    "PaleeWeb.PeopleController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -76504,7 +76482,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PeopleController.posts": {
+    "PaleeWeb.PeopleController.posts": {
         parameters: {
             query?: {
                 cursor?: string;
@@ -76732,7 +76710,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlacesController.neighbourhoods": {
+    "PaleeWeb.PlacesController.neighbourhoods": {
         parameters: {
             query: {
                 q: string;
@@ -76767,7 +76745,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationPurgeController.index": {
+    "PaleeWeb.PlatformOrganizationPurgeController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -76837,7 +76815,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.index": {
+    "PaleeWeb.PlatformOrganizationController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -76857,7 +76835,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.create": {
+    "PaleeWeb.PlatformOrganizationController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -76893,7 +76871,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.delete": {
+    "PaleeWeb.PlatformOrganizationController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -76913,7 +76891,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.access": {
+    "PaleeWeb.PlatformOrganizationController.access": {
         parameters: {
             query?: never;
             header?: never;
@@ -76937,7 +76915,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationBrandingController.finalize_logo": {
+    "PaleeWeb.PlatformOrganizationBrandingController.finalize_logo": {
         parameters: {
             query?: never;
             header?: never;
@@ -76976,7 +76954,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationBrandingController.remove_logo": {
+    "PaleeWeb.PlatformOrganizationBrandingController.remove_logo": {
         parameters: {
             query?: never;
             header?: never;
@@ -77009,7 +76987,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationBrandingController.logo_upload_url": {
+    "PaleeWeb.PlatformOrganizationBrandingController.logo_upload_url": {
         parameters: {
             query?: never;
             header?: never;
@@ -77047,7 +77025,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.invite": {
+    "PaleeWeb.PlatformOrganizationController.invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -77080,7 +77058,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.invitation_email": {
+    "PaleeWeb.PlatformOrganizationController.invitation_email": {
         parameters: {
             query?: never;
             header?: never;
@@ -77107,7 +77085,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.lifecycle": {
+    "PaleeWeb.PlatformOrganizationController.lifecycle": {
         parameters: {
             query?: never;
             header?: never;
@@ -77138,7 +77116,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.membership_role": {
+    "PaleeWeb.PlatformOrganizationController.membership_role": {
         parameters: {
             query?: never;
             header?: never;
@@ -77170,7 +77148,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.rename": {
+    "PaleeWeb.PlatformOrganizationController.rename": {
         parameters: {
             query?: never;
             header?: never;
@@ -77200,7 +77178,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformPlanController.assign": {
+    "PaleeWeb.PlatformPlanController.assign": {
         parameters: {
             query?: never;
             header?: never;
@@ -77248,7 +77226,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationPurgeController.show": {
+    "PaleeWeb.PlatformOrganizationPurgeController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -77330,7 +77308,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationPurgeController.create": {
+    "PaleeWeb.PlatformOrganizationPurgeController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -77411,7 +77389,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationPurgeController.approve": {
+    "PaleeWeb.PlatformOrganizationPurgeController.approve": {
         parameters: {
             query?: never;
             header?: never;
@@ -77507,7 +77485,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationPurgeController.cancel": {
+    "PaleeWeb.PlatformOrganizationPurgeController.cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -77579,7 +77557,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationPurgeController.resume": {
+    "PaleeWeb.PlatformOrganizationPurgeController.resume": {
         parameters: {
             query?: never;
             header?: never;
@@ -77651,7 +77629,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.settings": {
+    "PaleeWeb.PlatformOrganizationController.settings": {
         parameters: {
             query?: never;
             header?: never;
@@ -77679,7 +77657,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.rename_slug": {
+    "PaleeWeb.PlatformOrganizationController.rename_slug": {
         parameters: {
             query?: never;
             header?: never;
@@ -77750,7 +77728,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformOrganizationController.slug_impact": {
+    "PaleeWeb.PlatformOrganizationController.slug_impact": {
         parameters: {
             query?: never;
             header?: never;
@@ -77794,7 +77772,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformPlanController.index": {
+    "PaleeWeb.PlatformPlanController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -77840,7 +77818,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformPlanController.create": {
+    "PaleeWeb.PlatformPlanController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -77912,7 +77890,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformPlanController.update": {
+    "PaleeWeb.PlatformPlanController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -77986,7 +77964,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformPlanController.subscriptions": {
+    "PaleeWeb.PlatformPlanController.subscriptions": {
         parameters: {
             query?: never;
             header?: never;
@@ -78022,7 +78000,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformTagSuggestionController.index": {
+    "PaleeWeb.PlatformTagSuggestionController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -78054,7 +78032,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformTagSuggestionController.resolve": {
+    "PaleeWeb.PlatformTagSuggestionController.resolve": {
         parameters: {
             query?: never;
             header?: never;
@@ -78090,7 +78068,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRSharingController.show": {
+    "PaleeWeb.PRSharingController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -78126,7 +78104,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRSharingController.update_coach_visibility": {
+    "PaleeWeb.PRSharingController.update_coach_visibility": {
         parameters: {
             query?: never;
             header?: never;
@@ -78180,7 +78158,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRSharingController.lookup_grantee": {
+    "PaleeWeb.PRSharingController.lookup_grantee": {
         parameters: {
             query: {
                 nickname: string;
@@ -78220,7 +78198,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRSharingController.create_grant": {
+    "PaleeWeb.PRSharingController.create_grant": {
         parameters: {
             query?: never;
             header?: never;
@@ -78293,7 +78271,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRSharingController.revoke_grant": {
+    "PaleeWeb.PRSharingController.revoke_grant": {
         parameters: {
             query?: never;
             header?: never;
@@ -78329,7 +78307,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRSharingController.shared_with_me": {
+    "PaleeWeb.PRSharingController.shared_with_me": {
         parameters: {
             query?: never;
             header?: never;
@@ -78392,7 +78370,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ProfilePostController.delete_comment": {
+    "PaleeWeb.ProfilePostController.delete_comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -78414,7 +78392,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ProfilePostController.create": {
+    "PaleeWeb.ProfilePostController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -78656,7 +78634,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ProfilePostController.delete": {
+    "PaleeWeb.ProfilePostController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -78678,7 +78656,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ProfilePostController.comments": {
+    "PaleeWeb.ProfilePostController.comments": {
         parameters: {
             query?: never;
             header?: never;
@@ -78721,7 +78699,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ProfilePostController.comment": {
+    "PaleeWeb.ProfilePostController.comment": {
         parameters: {
             query?: never;
             header?: never;
@@ -78771,7 +78749,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ProfilePostController.kudos": {
+    "PaleeWeb.ProfilePostController.kudos": {
         parameters: {
             query?: never;
             header?: never;
@@ -79006,7 +78984,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.index": {
+    "PaleeWeb.PRController.index": {
         parameters: {
             query?: {
                 q?: string;
@@ -79028,7 +79006,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.create": {
+    "PaleeWeb.PRController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -79075,7 +79053,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.delete": {
+    "PaleeWeb.PRController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -79107,7 +79085,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.update": {
+    "PaleeWeb.PRController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -79164,7 +79142,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.edit": {
+    "PaleeWeb.PRController.edit": {
         parameters: {
             query?: never;
             header?: never;
@@ -79221,7 +79199,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.history": {
+    "PaleeWeb.PRController.history": {
         parameters: {
             query?: never;
             header?: never;
@@ -79253,7 +79231,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PRController.share": {
+    "PaleeWeb.PRController.share": {
         parameters: {
             query?: never;
             header?: never;
@@ -79285,7 +79263,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PublicBoxController.show": {
+    "PaleeWeb.PublicBoxController.show": {
         parameters: {
             query?: never;
             header?: never;
@@ -79433,7 +79411,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.PlatformPlanController.index_public": {
+    "PaleeWeb.PlatformPlanController.index_public": {
         parameters: {
             query?: {
                 audience?: "gym" | "coach";
@@ -79481,7 +79459,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReferralController.invite": {
+    "PaleeWeb.ReferralController.invite": {
         parameters: {
             query?: never;
             header?: never;
@@ -79549,7 +79527,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ReferralController.claim": {
+    "PaleeWeb.ReferralController.claim": {
         parameters: {
             query?: never;
             header?: never;
@@ -79600,30 +79578,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ThemeController.show": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Active theme */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @enum {string} */
-                        theme_slug: "ember" | "sage" | "steel" | "aurora" | "royal" | "volt" | "noir" | "daybreak" | "paper" | "lagoon" | "sunset";
-                    };
-                };
-            };
-        };
-    };
-    "MilosTrainingWeb.WalletController.download": {
+    "PaleeWeb.WalletController.download": {
         parameters: {
             query?: never;
             header?: never;
@@ -79656,7 +79611,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CheckInController.index": {
+    "PaleeWeb.CheckInController.index": {
         parameters: {
             query?: {
                 from?: string;
@@ -79707,7 +79662,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CheckInController.create": {
+    "PaleeWeb.CheckInController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -79762,7 +79717,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.CheckInController.delete": {
+    "PaleeWeb.CheckInController.delete": {
         parameters: {
             query?: never;
             header?: never;
@@ -79782,7 +79737,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellbeingController.index": {
+    "PaleeWeb.WellbeingController.index": {
         parameters: {
             query?: never;
             header?: never;
@@ -79856,7 +79811,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellbeingController.create": {
+    "PaleeWeb.WellbeingController.create": {
         parameters: {
             query?: never;
             header?: never;
@@ -79946,7 +79901,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellbeingController.update": {
+    "PaleeWeb.WellbeingController.update": {
         parameters: {
             query?: never;
             header?: never;
@@ -80034,7 +79989,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellbeingController.heal": {
+    "PaleeWeb.WellbeingController.heal": {
         parameters: {
             query?: never;
             header?: never;
@@ -80117,7 +80072,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WellbeingController.reopen": {
+    "PaleeWeb.WellbeingController.reopen": {
         parameters: {
             query?: never;
             header?: never;
@@ -80193,7 +80148,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WidgetController.snapshot": {
+    "PaleeWeb.WidgetController.snapshot": {
         parameters: {
             query?: {
                 /** @description The phone's IANA zone (UTC by default) */
@@ -80258,7 +80213,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.WidgetController.add_water": {
+    "PaleeWeb.WidgetController.add_water": {
         parameters: {
             query?: never;
             header?: never;
@@ -80338,7 +80293,7 @@ export interface operations {
             };
         };
     };
-    "MilosTrainingWeb.ExecutionController.timer_sequence": {
+    "PaleeWeb.ExecutionController.timer_sequence": {
         parameters: {
             query: {
                 /** @description Scale slug */

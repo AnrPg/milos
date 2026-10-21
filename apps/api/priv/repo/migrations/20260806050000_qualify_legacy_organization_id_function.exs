@@ -1,11 +1,11 @@
-defmodule MilosTraining.Repo.Migrations.QualifyLegacyOrganizationIdFunction do
+defmodule Palee.Repo.Migrations.QualifyLegacyOrganizationIdFunction do
   use Ecto.Migration
 
-  # `milos_legacy_organization_id()` (added in 20260803223000) reads
+  # `palee_legacy_organization_id()` (added in 20260803223000) reads
   # `organizations` unqualified. That resolves fine for an ordinary SELECT via
   # the caller's search_path, but every RLS-protected table it backstops
   # (memberships, membership_payments, finance_credit_ledger_entries, etc. -
-  # via `COALESCE(current_setting('app.organization_id'), milos_legacy_organization_id())`)
+  # via `COALESCE(current_setting('app.organization_id'), palee_legacy_organization_id())`)
   # gets this function *inlined* into its policy predicate. CREATE MATERIALIZED
   # VIEW's rewrite/planning pass resolves that inlined, unqualified
   # `organizations` reference differently than a plain SELECT does, and fails
@@ -26,7 +26,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyLegacyOrganizationIdFunction do
   # already ran successfully elsewhere.
   def up do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_legacy_organization_id()
+    CREATE OR REPLACE FUNCTION palee_legacy_organization_id()
     RETURNS uuid
     LANGUAGE sql
     STABLE
@@ -38,7 +38,7 @@ defmodule MilosTraining.Repo.Migrations.QualifyLegacyOrganizationIdFunction do
 
   def down do
     execute("""
-    CREATE OR REPLACE FUNCTION milos_legacy_organization_id()
+    CREATE OR REPLACE FUNCTION palee_legacy_organization_id()
     RETURNS uuid
     LANGUAGE sql
     STABLE
