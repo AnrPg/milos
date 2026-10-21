@@ -94,6 +94,15 @@ defmodule MilosTrainingWeb.WidgetsGeofenceNfcTest do
 
   defp as_owner(ctx), do: build_conn() |> put_bearer_token(ctx.owner)
 
+  # Etc/GMT names flip the sign: "Etc/GMT-3" is UTC+3.
+  defp midday_zone do
+    case 12 - DateTime.utc_now().hour do
+      0 -> "Etc/UTC"
+      offset when offset > 0 -> "Etc/GMT-#{offset}"
+      offset -> "Etc/GMT+#{-offset}"
+    end
+  end
+
   # ------------------------------------------------------------------ NFC
 
   describe "NFC door tag" do
@@ -240,7 +249,9 @@ defmodule MilosTrainingWeb.WidgetsGeofenceNfcTest do
 
       %{"id" => id, "token" => token} = issue(user) |> json_response(201)
 
-      snapshot = token |> widget() |> get("/api/widget/snapshot?timezone=Europe/Athens")
+      # A zone where it is about noon now, so the class an hour away is still
+      # "today" there whatever time the suite runs.
+      snapshot = token |> widget() |> get("/api/widget/snapshot", %{timezone: midday_zone()})
 
       assert %{
                "water" => %{"ml" => 0, "glass_ml" => 250, "can_add" => false},
