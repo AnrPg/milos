@@ -8186,6 +8186,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/training-log/voice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether the current user may log a workout by voice */
+        get: operations["MilosTrainingWeb.MyVoiceLogController.show"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/training-log/voice/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Transcribe one recording into a draft training-log entry (nothing is saved) */
+        post: operations["MilosTrainingWeb.MyVoiceLogController.create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/videos": {
         parameters: {
             query?: never;
@@ -20538,6 +20572,7 @@ export interface components {
                 since: string;
                 suggestions: number;
             };
+            voice_enabled: boolean;
         };
         /** GymAiSettingsResponse */
         GymAiSettingsResponse: {
@@ -20559,6 +20594,7 @@ export interface components {
                     since: string;
                     suggestions: number;
                 };
+                voice_enabled: boolean;
             };
         };
         /** GymAiSettingsUpdate */
@@ -20567,6 +20603,7 @@ export interface components {
             model?: string | null;
             remove_key?: boolean;
             scaling_enabled?: boolean;
+            voice_enabled?: boolean;
         };
         /** GymAiUsage */
         GymAiUsage: {
@@ -27565,6 +27602,78 @@ export interface components {
             errors: {
                 [key: string]: unknown;
             };
+        };
+        /** VoiceLogAvailability */
+        VoiceLogAvailability: {
+            available: boolean;
+            daily_limit: number;
+            enabled: boolean;
+            max_seconds: number;
+            remaining_today: number;
+        };
+        /** VoiceLogAvailabilityResponse */
+        VoiceLogAvailabilityResponse: {
+            /** VoiceLogAvailability */
+            voice: {
+                available: boolean;
+                daily_limit: number;
+                enabled: boolean;
+                max_seconds: number;
+                remaining_today: number;
+            };
+        };
+        /** VoiceLogDraft */
+        VoiceLogDraft: {
+            days_ago: number | null;
+            duration_minutes: number | null;
+            exercises: {
+                load: number | null;
+                /** @enum {string|null} */
+                load_unit: "kg" | "lb" | null;
+                name: string;
+                reps: number | null;
+                sets: number | null;
+            }[];
+            notes: string | null;
+            perceived_effort: number | null;
+            title: string | null;
+        };
+        /** VoiceLogDraftExercise */
+        VoiceLogDraftExercise: {
+            load: number | null;
+            /** @enum {string|null} */
+            load_unit: "kg" | "lb" | null;
+            name: string;
+            reps: number | null;
+            sets: number | null;
+        };
+        /** VoiceLogDraftRequest */
+        VoiceLogDraftRequest: {
+            audio_base64: string;
+            duration_ms?: number;
+            locale?: string;
+            mime_type: string;
+        };
+        /** VoiceLogDraftResponse */
+        VoiceLogDraftResponse: {
+            /** VoiceLogDraft */
+            draft: {
+                days_ago: number | null;
+                duration_minutes: number | null;
+                exercises: {
+                    load: number | null;
+                    /** @enum {string|null} */
+                    load_unit: "kg" | "lb" | null;
+                    name: string;
+                    reps: number | null;
+                    sets: number | null;
+                }[];
+                notes: string | null;
+                perceived_effort: number | null;
+                title: string | null;
+            };
+            parsed: boolean;
+            transcript: string;
         };
         /** WalletAddRequest */
         WalletAddRequest: {
@@ -44465,6 +44574,7 @@ export interface operations {
                                 since: string;
                                 suggestions: number;
                             };
+                            voice_enabled: boolean;
                         };
                     };
                 };
@@ -44485,6 +44595,7 @@ export interface operations {
                     model?: string | null;
                     remove_key?: boolean;
                     scaling_enabled?: boolean;
+                    voice_enabled?: boolean;
                 };
             };
         };
@@ -44514,6 +44625,7 @@ export interface operations {
                                 since: string;
                                 suggestions: number;
                             };
+                            voice_enabled: boolean;
                         };
                     };
                 };
@@ -69098,6 +69210,127 @@ export interface operations {
                             title: string;
                             workout_type?: string | null;
                         }[];
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyVoiceLogController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Availability */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** VoiceLogAvailability */
+                        voice: {
+                            available: boolean;
+                            daily_limit: number;
+                            enabled: boolean;
+                            max_seconds: number;
+                            remaining_today: number;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "MilosTrainingWeb.MyVoiceLogController.create": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    audio_base64: string;
+                    duration_ms?: number;
+                    locale?: string;
+                    mime_type: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Draft */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** VoiceLogDraft */
+                        draft: {
+                            days_ago: number | null;
+                            duration_minutes: number | null;
+                            exercises: {
+                                load: number | null;
+                                /** @enum {string|null} */
+                                load_unit: "kg" | "lb" | null;
+                                name: string;
+                                reps: number | null;
+                                sets: number | null;
+                            }[];
+                            notes: string | null;
+                            perceived_effort: number | null;
+                            title: string | null;
+                        };
+                        parsed: boolean;
+                        transcript: string;
+                    };
+                };
+            };
+            /** @description Voice logging is off */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Unusable recording */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Daily limit reached */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+            /** @description Transcription unavailable */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

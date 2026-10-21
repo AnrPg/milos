@@ -4997,7 +4997,8 @@
       "measure": "Measurement",
       "wellness": "Water · Sleep · Meal",
       "craving": "Craving",
-      "support": "I need support"
+      "support": "I need support",
+      "voice": "By voice"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notes",
@@ -5010,7 +5011,8 @@
       "measure": "Weight, measurements, photos",
       "wellness": "A glass, last night, a meal",
       "craving": "Note it or ask for support",
-      "support": "A quick message to your buddy"
+      "support": "A quick message to your buddy",
+      "voice": "Say what you did"
     },
     "homeTitle": "Home",
     "wodToday": "Today's WOD at the gym",
@@ -8935,6 +8937,34 @@
       "override": "Custom monthly price",
       "overrideHint": "Empty uses the plan price",
       "notes": "Notes"
+    }
+  },
+  "VoiceLog": {
+    "title": "Log by voice",
+    "hint": "Say what you did, up to {seconds}″. You'll see a draft before anything is saved.",
+    "record": "Start recording",
+    "stop": "Stop recording",
+    "tapToStart": "Tap to start",
+    "recording": "Recording {elapsed} / {max}",
+    "working": "Turning it into a draft…",
+    "privacy": "The recording is not kept. Only what you confirm in the form is saved.",
+    "cancel": "Cancel",
+    "defaultTitle": "Workout",
+    "draftNotice": "Draft from your voice. Check and correct it before saving.",
+    "heard": "What was heard",
+    "errors": {
+      "unsupported": "Recording isn't supported on this device.",
+      "permission": "No access to the microphone. Allow it in your device settings.",
+      "recordFailed": "The recording didn't finish. Try again.",
+      "noSpeech": "No speech was heard. Try again.",
+      "tooLong": "The recording is too long.",
+      "dailyLimit": "You've reached today's recording limit.",
+      "off": "Voice logging isn't on at this gym.",
+      "unavailable": "Transcription isn't available right now. Try again later."
+    },
+    "settings": {
+      "enable": "Voice logging",
+      "enableHint": "Members record their workout and review a draft before saving. Audio is not kept."
     }
   }
 }

@@ -33350,10 +33350,14 @@
             ],
             "title": "GymAiUsage",
             "type": "object"
+          },
+          "voice_enabled": {
+            "type": "boolean"
           }
         },
         "required": [
           "scaling_enabled",
+          "voice_enabled",
           "key_configured",
           "key_status",
           "default_model",
@@ -33417,10 +33421,14 @@
                 ],
                 "title": "GymAiUsage",
                 "type": "object"
+              },
+              "voice_enabled": {
+                "type": "boolean"
               }
             },
             "required": [
               "scaling_enabled",
+              "voice_enabled",
               "key_configured",
               "key_status",
               "default_model",
@@ -33454,6 +33462,9 @@
             "type": "boolean"
           },
           "scaling_enabled": {
+            "type": "boolean"
+          },
+          "voice_enabled": {
             "type": "boolean"
           }
         },
@@ -56466,6 +56477,299 @@
           "code",
           "errors"
         ],
+        "type": "object"
+      },
+      "VoiceLogAvailability": {
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "daily_limit": {
+            "type": "integer"
+          },
+          "enabled": {
+            "type": "boolean"
+          },
+          "max_seconds": {
+            "type": "integer"
+          },
+          "remaining_today": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "available",
+          "enabled",
+          "max_seconds",
+          "daily_limit",
+          "remaining_today"
+        ],
+        "title": "VoiceLogAvailability",
+        "type": "object"
+      },
+      "VoiceLogAvailabilityResponse": {
+        "properties": {
+          "voice": {
+            "properties": {
+              "available": {
+                "type": "boolean"
+              },
+              "daily_limit": {
+                "type": "integer"
+              },
+              "enabled": {
+                "type": "boolean"
+              },
+              "max_seconds": {
+                "type": "integer"
+              },
+              "remaining_today": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "available",
+              "enabled",
+              "max_seconds",
+              "daily_limit",
+              "remaining_today"
+            ],
+            "title": "VoiceLogAvailability",
+            "type": "object"
+          }
+        },
+        "required": [
+          "voice"
+        ],
+        "title": "VoiceLogAvailabilityResponse",
+        "type": "object"
+      },
+      "VoiceLogDraft": {
+        "properties": {
+          "days_ago": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "exercises": {
+            "items": {
+              "properties": {
+                "load": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "load_unit": {
+                  "enum": [
+                    "kg",
+                    "lb"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "reps": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "sets": {
+                  "nullable": true,
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "name",
+                "sets",
+                "reps",
+                "load",
+                "load_unit"
+              ],
+              "title": "VoiceLogDraftExercise",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "notes": {
+            "nullable": true,
+            "type": "string"
+          },
+          "perceived_effort": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "duration_minutes",
+          "perceived_effort",
+          "days_ago",
+          "notes",
+          "exercises"
+        ],
+        "title": "VoiceLogDraft",
+        "type": "object"
+      },
+      "VoiceLogDraftExercise": {
+        "properties": {
+          "load": {
+            "nullable": true,
+            "type": "number"
+          },
+          "load_unit": {
+            "enum": [
+              "kg",
+              "lb"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "reps": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "sets": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "name",
+          "sets",
+          "reps",
+          "load",
+          "load_unit"
+        ],
+        "title": "VoiceLogDraftExercise",
+        "type": "object"
+      },
+      "VoiceLogDraftRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "audio_base64": {
+            "maxLength": 3400000,
+            "minLength": 100,
+            "type": "string"
+          },
+          "duration_ms": {
+            "maximum": 600000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "locale": {
+            "maxLength": 10,
+            "type": "string"
+          },
+          "mime_type": {
+            "maxLength": 80,
+            "type": "string"
+          }
+        },
+        "required": [
+          "audio_base64",
+          "mime_type"
+        ],
+        "title": "VoiceLogDraftRequest",
+        "type": "object"
+      },
+      "VoiceLogDraftResponse": {
+        "properties": {
+          "draft": {
+            "properties": {
+              "days_ago": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "duration_minutes": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "exercises": {
+                "items": {
+                  "properties": {
+                    "load": {
+                      "nullable": true,
+                      "type": "number"
+                    },
+                    "load_unit": {
+                      "enum": [
+                        "kg",
+                        "lb"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "reps": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "sets": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "name",
+                    "sets",
+                    "reps",
+                    "load",
+                    "load_unit"
+                  ],
+                  "title": "VoiceLogDraftExercise",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "notes": {
+                "nullable": true,
+                "type": "string"
+              },
+              "perceived_effort": {
+                "nullable": true,
+                "type": "integer"
+              },
+              "title": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "title",
+              "duration_minutes",
+              "perceived_effort",
+              "days_ago",
+              "notes",
+              "exercises"
+            ],
+            "title": "VoiceLogDraft",
+            "type": "object"
+          },
+          "parsed": {
+            "type": "boolean"
+          },
+          "transcript": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "transcript",
+          "parsed",
+          "draft"
+        ],
+        "title": "VoiceLogDraftResponse",
         "type": "object"
       },
       "WalletAddRequest": {
@@ -101782,10 +102086,14 @@
                           ],
                           "title": "GymAiUsage",
                           "type": "object"
+                        },
+                        "voice_enabled": {
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "scaling_enabled",
+                        "voice_enabled",
                         "key_configured",
                         "key_status",
                         "default_model",
@@ -101841,6 +102149,9 @@
                     "type": "boolean"
                   },
                   "scaling_enabled": {
+                    "type": "boolean"
+                  },
+                  "voice_enabled": {
                     "type": "boolean"
                   }
                 },
@@ -101910,10 +102221,14 @@
                           ],
                           "title": "GymAiUsage",
                           "type": "object"
+                        },
+                        "voice_enabled": {
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "scaling_enabled",
+                        "voice_enabled",
                         "key_configured",
                         "key_status",
                         "default_model",
@@ -168346,6 +168661,263 @@
           }
         ],
         "summary": "List classes, assignments, and library workouts that can be logged",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/training-log/voice": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyVoiceLogController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "voice": {
+                      "properties": {
+                        "available": {
+                          "type": "boolean"
+                        },
+                        "daily_limit": {
+                          "type": "integer"
+                        },
+                        "enabled": {
+                          "type": "boolean"
+                        },
+                        "max_seconds": {
+                          "type": "integer"
+                        },
+                        "remaining_today": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "available",
+                        "enabled",
+                        "max_seconds",
+                        "daily_limit",
+                        "remaining_today"
+                      ],
+                      "title": "VoiceLogAvailability",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "voice"
+                  ],
+                  "title": "VoiceLogAvailabilityResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Availability"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Whether the current user may log a workout by voice",
+        "tags": [
+          "Training Log"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/me/training-log/voice/drafts": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.MyVoiceLogController.create",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "audio_base64": {
+                    "maxLength": 3400000,
+                    "minLength": 100,
+                    "type": "string"
+                  },
+                  "duration_ms": {
+                    "maximum": 600000,
+                    "minimum": 0,
+                    "type": "integer"
+                  },
+                  "locale": {
+                    "maxLength": 10,
+                    "type": "string"
+                  },
+                  "mime_type": {
+                    "maxLength": 80,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "audio_base64",
+                  "mime_type"
+                ],
+                "title": "VoiceLogDraftRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "draft": {
+                      "properties": {
+                        "days_ago": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "exercises": {
+                          "items": {
+                            "properties": {
+                              "load": {
+                                "nullable": true,
+                                "type": "number"
+                              },
+                              "load_unit": {
+                                "enum": [
+                                  "kg",
+                                  "lb"
+                                ],
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "name": {
+                                "type": "string"
+                              },
+                              "reps": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "sets": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "name",
+                              "sets",
+                              "reps",
+                              "load",
+                              "load_unit"
+                            ],
+                            "title": "VoiceLogDraftExercise",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "notes": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "perceived_effort": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "title": {
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "title",
+                        "duration_minutes",
+                        "perceived_effort",
+                        "days_ago",
+                        "notes",
+                        "exercises"
+                      ],
+                      "title": "VoiceLogDraft",
+                      "type": "object"
+                    },
+                    "parsed": {
+                      "type": "boolean"
+                    },
+                    "transcript": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "transcript",
+                    "parsed",
+                    "draft"
+                  ],
+                  "title": "VoiceLogDraftResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Draft"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Voice logging is off"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unusable recording"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Daily limit reached"
+          },
+          "503": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Transcription unavailable"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Transcribe one recording into a draft training-log entry (nothing is saved)",
         "tags": [
           "Training Log"
         ]

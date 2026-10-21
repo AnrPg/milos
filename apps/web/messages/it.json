@@ -4997,7 +4997,8 @@
       "measure": "Misurazione",
       "wellness": "Acqua · Sonno · Pasto",
       "craving": "Voglia di cibo",
-      "support": "Ho bisogno di supporto"
+      "support": "Ho bisogno di supporto",
+      "voice": "A voce"
     },
     "entryKindHint": {
       "workout": "Punteggio, RPE, note",
@@ -5010,7 +5011,8 @@
       "measure": "Peso, circonferenze, foto",
       "wellness": "Un bicchiere, la notte scorsa, un pasto",
       "craving": "Annotala o chiedi supporto",
-      "support": "Un messaggio veloce al tuo buddy"
+      "support": "Un messaggio veloce al tuo buddy",
+      "voice": "Di cosa hai fatto"
     },
     "homeTitle": "Home",
     "wodToday": "Il WOD di oggi in palestra",
@@ -8935,6 +8937,34 @@
       "override": "Prezzo mensile personalizzato",
       "overrideHint": "Vuoto: prezzo del piano",
       "notes": "Note"
+    }
+  },
+  "VoiceLog": {
+    "title": "Registra a voce",
+    "hint": "Di cosa hai fatto, fino a {seconds}″. Vedrai una bozza prima di salvare.",
+    "record": "Avvia registrazione",
+    "stop": "Ferma registrazione",
+    "tapToStart": "Tocca per iniziare",
+    "recording": "Registrazione {elapsed} / {max}",
+    "working": "Creazione della bozza…",
+    "privacy": "La registrazione non viene conservata. Si salva solo ciò che confermi nel modulo.",
+    "cancel": "Annulla",
+    "defaultTitle": "Allenamento",
+    "draftNotice": "Bozza dalla tua voce. Controllala e correggila prima di salvare.",
+    "heard": "Cosa è stato sentito",
+    "errors": {
+      "unsupported": "La registrazione non è supportata su questo dispositivo.",
+      "permission": "Nessun accesso al microfono. Consentilo nelle impostazioni del dispositivo.",
+      "recordFailed": "La registrazione non è terminata. Riprova.",
+      "noSpeech": "Non è stata sentita nessuna voce. Riprova.",
+      "tooLong": "La registrazione è troppo lunga.",
+      "dailyLimit": "Hai raggiunto il limite di registrazioni di oggi.",
+      "off": "La registrazione vocale non è attiva in questa palestra.",
+      "unavailable": "La trascrizione non è disponibile ora. Riprova più tardi."
+    },
+    "settings": {
+      "enable": "Registrazione vocale",
+      "enableHint": "I membri registrano l'allenamento e controllano una bozza prima di salvarla. L'audio non viene conservato."
     }
   }
 }

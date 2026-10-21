@@ -4997,7 +4997,8 @@
       "measure": "Meting",
       "wellness": "Water · Slaap · Maaltijd",
       "craving": "Trek",
-      "support": "Ik heb steun nodig"
+      "support": "Ik heb steun nodig",
+      "voice": "Inspreken"
     },
     "entryKindHint": {
       "workout": "Score, RPE, notities",
@@ -5010,7 +5011,8 @@
       "measure": "Gewicht, omtrekken, foto's",
       "wellness": "Een glas, afgelopen nacht, een maaltijd",
       "craving": "Noteer het of vraag om steun",
-      "support": "Een snel bericht aan je buddy"
+      "support": "Een snel bericht aan je buddy",
+      "voice": "Zeg wat je deed"
     },
     "homeTitle": "Home",
     "wodToday": "De WOD van vandaag in de box",
@@ -8935,6 +8937,34 @@
       "override": "Aangepaste maandprijs",
       "overrideHint": "Leeg: prijs van het abonnement",
       "notes": "Notities"
+    }
+  },
+  "VoiceLog": {
+    "title": "Inspreken",
+    "hint": "Zeg wat je deed, tot {seconds}″. Je ziet een concept voordat er iets wordt opgeslagen.",
+    "record": "Opname starten",
+    "stop": "Opname stoppen",
+    "tapToStart": "Tik om te beginnen",
+    "recording": "Opname {elapsed} / {max}",
+    "working": "Concept wordt gemaakt…",
+    "privacy": "De opname wordt niet bewaard. Alleen wat je in het formulier bevestigt, wordt opgeslagen.",
+    "cancel": "Annuleren",
+    "defaultTitle": "Training",
+    "draftNotice": "Concept uit je stem. Controleer en verbeter het voor je opslaat.",
+    "heard": "Wat er gehoord is",
+    "errors": {
+      "unsupported": "Opnemen wordt op dit apparaat niet ondersteund.",
+      "permission": "Geen toegang tot de microfoon. Sta dit toe in de instellingen van je apparaat.",
+      "recordFailed": "De opname is niet voltooid. Probeer het opnieuw.",
+      "noSpeech": "Er is geen spraak gehoord. Probeer het opnieuw.",
+      "tooLong": "De opname is te lang.",
+      "dailyLimit": "Je hebt de opnamelimiet van vandaag bereikt.",
+      "off": "Inspreken staat niet aan in deze gym.",
+      "unavailable": "Omzetten is nu niet beschikbaar. Probeer het later."
+    },
+    "settings": {
+      "enable": "Inspreken",
+      "enableHint": "Leden spreken hun training in en controleren een concept voor het opslaan. Audio wordt niet bewaard."
     }
   }
 }

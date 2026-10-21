@@ -4997,7 +4997,8 @@
       "measure": "Mesure",
       "wellness": "Eau · Sommeil · Repas",
       "craving": "Fringale",
-      "support": "J'ai besoin de soutien"
+      "support": "J'ai besoin de soutien",
+      "voice": "À la voix"
     },
     "entryKindHint": {
       "workout": "Résultat, RPE, remarques",
@@ -5010,7 +5011,8 @@
       "measure": "Poids, tours, photos",
       "wellness": "Un verre, la nuit dernière, un repas",
       "craving": "Note-la ou demande du soutien",
-      "support": "Un message rapide à ton buddy"
+      "support": "Un message rapide à ton buddy",
+      "voice": "Dis ce que tu as fait"
     },
     "homeTitle": "Accueil",
     "wodToday": "Le WOD du jour à la salle",
@@ -8935,6 +8937,34 @@
       "override": "Prix mensuel personnalisé",
       "overrideHint": "Vide : prix du forfait",
       "notes": "Notes"
+    }
+  },
+  "VoiceLog": {
+    "title": "Saisie vocale",
+    "hint": "Dis ce que tu as fait, jusqu'à {seconds}″. Tu verras un brouillon avant tout enregistrement.",
+    "record": "Démarrer l'enregistrement",
+    "stop": "Arrêter l'enregistrement",
+    "tapToStart": "Touchez pour commencer",
+    "recording": "Enregistrement {elapsed} / {max}",
+    "working": "Création du brouillon…",
+    "privacy": "L'enregistrement n'est pas conservé. Seul ce que tu valides dans le formulaire est enregistré.",
+    "cancel": "Annuler",
+    "defaultTitle": "Entraînement",
+    "draftNotice": "Brouillon issu de ta voix. Vérifie et corrige-le avant d'enregistrer.",
+    "heard": "Ce qui a été entendu",
+    "errors": {
+      "unsupported": "L'enregistrement n'est pas pris en charge sur cet appareil.",
+      "permission": "Pas d'accès au micro. Autorise-le dans les réglages de l'appareil.",
+      "recordFailed": "L'enregistrement n'a pas abouti. Réessaie.",
+      "noSpeech": "Aucune parole détectée. Réessaie.",
+      "tooLong": "L'enregistrement est trop long.",
+      "dailyLimit": "Tu as atteint la limite d'enregistrements du jour.",
+      "off": "La saisie vocale n'est pas activée dans cette salle.",
+      "unavailable": "La transcription n'est pas disponible pour le moment. Réessaie plus tard."
+    },
+    "settings": {
+      "enable": "Saisie vocale",
+      "enableHint": "Les membres enregistrent leur séance et vérifient un brouillon avant de l'enregistrer. L'audio n'est pas conservé."
     }
   }
 }

@@ -62,7 +62,14 @@ const labelClass = "block text-xs font-semibold tracking-[0.16em]";
 export type TrainingLogDialogState =
   | { mode: "closed" }
   | { mode: "pick" }
-  | { mode: "create"; source: SelectedTrainingSource }
+  | {
+      mode: "create";
+      source: SelectedTrainingSource;
+      /** A prefilled form to review (voice logging, ADR-175); nothing is saved until the member confirms. */
+      draft?: TrainingLogForm;
+      /** What was heard, shown with the draft. */
+      transcript?: string;
+    }
   | { mode: "edit"; entry: TrainingLogEntry }
   | { mode: "void"; entry: TrainingLogEntry };
 
@@ -240,12 +247,32 @@ export function TrainingLogDialog({
             <EntryForm
               token={token}
               state={state}
-              onBack={state.mode === "create" ? () => onNavigate({ mode: "pick" }) : undefined}
+              onBack={state.mode === "create" && !state.draft ? () => onNavigate({ mode: "pick" }) : undefined}
               onDone={onClose}
             />
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/** Above a voice draft (ADR-175): review before saving, and what was heard. */
+function VoiceDraftNotice({ transcript }: { transcript?: string }) {
+  const t = useTranslations("VoiceLog");
+  return (
+    <div
+      className="rounded-2xl px-4 py-3 text-sm"
+      style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+      data-testid="voice-draft-notice"
+    >
+      <p className="font-semibold">{t("draftNotice")}</p>
+      {transcript ? (
+        <details className="mt-1">
+          <summary className="cursor-pointer text-xs font-semibold" style={{ color: "var(--dim)" }}>{t("heard")}</summary>
+          <p className="mt-1 break-words text-xs" style={{ color: "var(--muted)" }}>«{transcript}»</p>
+        </details>
+      ) : null}
     </div>
   );
 }
@@ -375,7 +402,7 @@ function EntryForm({
   onDone,
 }: {
   token: string;
-  state: { mode: "create"; source: SelectedTrainingSource } | { mode: "edit"; entry: TrainingLogEntry };
+  state: Extract<TrainingLogDialogState, { mode: "create" }> | { mode: "edit"; entry: TrainingLogEntry };
   onBack?: () => void;
   onDone: () => void;
 }) {
@@ -386,7 +413,9 @@ function EntryForm({
   const sections =
     state.mode === "create" ? state.source.scoreableSections : sectionsFromEntryScores(state.entry);
   const [form, setForm] = useState<TrainingLogForm>(() =>
-    state.mode === "create" ? emptyTrainingLogForm(new Date(), state.source.title) : formFromEntry(state.entry),
+    state.mode === "create"
+      ? (state.draft ?? emptyTrainingLogForm(new Date(), state.source.title))
+      : formFromEntry(state.entry),
   );
   const [idempotencyKey] = useState(newIdempotencyKey);
   const [errors, setErrors] = useState<TrainingLogFormError[]>([]);
@@ -448,6 +477,7 @@ function EntryForm({
 
   return (
     <form className="grid gap-4" onSubmit={submit} noValidate>
+      {state.mode === "create" && state.draft ? <VoiceDraftNotice transcript={state.transcript} /> : null}
       {sourceType === "freeform" ? (
         <label className={labelClass} style={{ color: "var(--dim)" }}>
           {i18n("trainingLogFormTitle")}
