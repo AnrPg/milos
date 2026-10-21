@@ -32,8 +32,22 @@ export function phoneHealthProvider(platform: NativePlatform | null = nativePlat
 
 let pluginPromise: Promise<MilosHealthPlugin> | null = null;
 
+/**
+ * Capacitor's plugin proxy answers every property, `then` included, so a
+ * promise must never resolve to it (it would wait forever on a `then` call
+ * the plugin does not have). It travels wrapped in a plain object instead.
+ */
+export function plainHealthPlugin(native: MilosHealthPlugin): MilosHealthPlugin {
+  return {
+    availability: () => native.availability(),
+    requestAuthorization: (options) => native.requestAuthorization(options),
+    read: (options) => native.read(options),
+    openInstaller: () => native.openInstaller?.() ?? Promise.resolve(),
+  };
+}
+
 export function healthPlugin(): Promise<MilosHealthPlugin> {
-  pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => registerPlugin<MilosHealthPlugin>("MilosHealth"));
+  pluginPromise ??= import("@capacitor/core").then(({ registerPlugin }) => plainHealthPlugin(registerPlugin<MilosHealthPlugin>("MilosHealth")));
   return pluginPromise;
 }
 

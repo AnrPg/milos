@@ -5,7 +5,7 @@ import type { PhoneHealthRow } from "@/api/phone-health";
 const ingest = vi.fn();
 vi.mock("@/api/phone-health", () => ({ ingestPhoneHealth: (...args: unknown[]) => ingest(...args) }));
 
-import { autoSyncDue, enabledKinds, grantedPrefs, newCount, phoneHealthProvider, syncPhoneHealth, syncWindow, type MilosHealthPlugin } from "./health";
+import { autoSyncDue, enabledKinds, grantedPrefs, newCount, phoneHealthProvider, plainHealthPlugin, syncPhoneHealth, syncWindow, type MilosHealthPlugin } from "./health";
 
 function bridge(platform: "ios" | "android", plugins: string[]) {
   (window as unknown as { Capacitor?: unknown }).Capacitor = {
@@ -115,5 +115,14 @@ describe("syncPhoneHealth", () => {
     ingest.mockResolvedValue({ counts: {}, row: row() });
     await syncPhoneHealth("token", row(), plugin);
     expect(ingest).toHaveBeenCalledWith("token", "apple_health", {});
+  });
+});
+
+describe("plainHealthPlugin", () => {
+  it("lets a promise resolve to Capacitor's thenable plugin proxy", async () => {
+    // Like Capacitor's proxy: every property, `then` included, is a method.
+    const native = new Proxy({}, { get: (_target, prop) => (prop === "availability" ? async () => ({ available: true }) : () => new Promise(() => undefined)) });
+    const plugin = await Promise.resolve(plainHealthPlugin(native as MilosHealthPlugin));
+    await expect(plugin.availability()).resolves.toEqual({ available: true });
   });
 });
