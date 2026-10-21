@@ -10,11 +10,18 @@ defmodule Palee.Repo.Migrations.PlacesGeo do
   def up do
     execute("CREATE EXTENSION IF NOT EXISTS postgis")
 
+    # The body is a SQL-standard one (BEGIN ATOMIC): PostGIS names are bound
+    # when the function is created, not looked up on every call. Since
+    # PostgreSQL 17, CREATE INDEX, REINDEX, ANALYZE and VACUUM run index
+    # expressions with search_path = pg_catalog, pg_temp, where a string body
+    # cannot find `geography`. It stays inlinable (no SET clause).
     execute("""
     CREATE FUNCTION palee_geo_point(latitude double precision, longitude double precision)
     RETURNS geography
     LANGUAGE sql IMMUTABLE STRICT PARALLEL SAFE
-    AS $$ SELECT ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography $$
+    BEGIN ATOMIC
+      SELECT ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)::geography;
+    END
     """)
 
     alter table(:facility_locations) do

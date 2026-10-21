@@ -9,7 +9,7 @@ jobs:
     runs-on: self-hosted
     services:
       postgres:
-        image: postgis/postgis:16-3.5-alpine
+        image: postgis/postgis:18-3.6-alpine
         env:
           POSTGRES_DB: palee_test
           POSTGRES_PASSWORD: postgres
@@ -96,7 +96,7 @@ jobs:
     runs-on: self-hosted
     services:
       postgres:
-        image: postgis/postgis:16-3.5-alpine
+        image: postgis/postgis:18-3.6-alpine
         env:
           POSTGRES_DB: palee_backup_drill
           POSTGRES_PASSWORD: postgres
@@ -123,7 +123,7 @@ jobs:
             -v "$PWD/ops/postgres/backup:/backup:ro" \
             -v "/tmp/palee-ci-backups:/backups/postgres" \
             -v "/tmp/palee-ci-wal:/wal-archive" \
-            postgis/postgis:16-3.5-alpine /backup/run-backup.sh
+            postgis/postgis:18-3.6-alpine /backup/run-backup.sh
           touch /tmp/palee-ci-wal/000000010000000000000001
           docker run --rm \
             -e BACKUP_ROOT=/backups/postgres \
@@ -131,7 +131,7 @@ jobs:
             -v "$PWD/ops/postgres/backup:/backup:ro" \
             -v "/tmp/palee-ci-backups:/backups/postgres:ro" \
             -v "/tmp/palee-ci-wal:/wal-archive:ro" \
-            postgis/postgis:16-3.5-alpine /backup/restore-drill.sh
+            postgis/postgis:18-3.6-alpine /backup/restore-drill.sh
 
   image-build:
     runs-on: self-hosted
