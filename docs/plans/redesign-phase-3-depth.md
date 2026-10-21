@@ -184,6 +184,9 @@ before the second market; the native shell before the native features; AI last.
 
 ### P3-M11 · Widgets, geofence and NFC (A + mobile)
 - Three widgets, geofenced check-in reminder, NFC door tags in the check-in desk settings.
+- Done (ADR-173): widget token API and snapshot, `/api/me/check-in/geofences`, NFC tag per location
+  next to the poster; NFC and the reminder check in bookings only; plugins MilosWidgets, MilosGeofence,
+  MilosNfc; reminder opt-in per phone in Box › Check-in.
 
 ### P3-M12 · AI scaling suggestions (A + W)
 - ScalingAdvisor port and adapter, coach approval queue, approved suggestions as modifications,
@@ -325,4 +328,4 @@ No board; decided for least clutter (owner's standing instruction), full list in
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
 - [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [x] P3-M3 (ADR-165) · [x] P3-M4 (ADR-166) · [x] P3-M5 (ADR-167) · [x] P3-M6 (ADR-168) · [x] P3-M7 (ADR-169)
-- [x] P3-M8 (ADR-170) · [x] P3-M9 (ADR-171) · [x] P3-M10 (ADR-172) · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
+- [x] P3-M8 (ADR-170) · [x] P3-M9 (ADR-171) · [x] P3-M10 (ADR-172) · [x] P3-M11 (ADR-173) · [ ] P3-M12 · [ ] P3-M13
