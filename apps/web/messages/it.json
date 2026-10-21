@@ -8031,7 +8031,10 @@
       "primary": "Primario",
       "secondary": "Secondario",
       "stabilizer": "Stabilizzatore",
-      "felt": "Sentito"
+      "felt": "Sentito",
+      "heat-low": "Copertura bassa",
+      "heat-medium": "Copertura media",
+      "heat-high": "Copertura alta"
     },
     "quality": {
       "cardiorespiratory-endurance": "Resistenza cardiorespiratoria",
@@ -8137,6 +8140,43 @@
       "soleus": "Soleo",
       "tibialis-anterior": "Tibiale anteriore",
       "fibularis": "Peronieri"
+    },
+    "about": {
+      "sternocleidomastoid": "Ruota e inclina la testa e aiuta quando respiri a fondo.",
+      "scalenes": "Inclinano il collo di lato e sollevano le coste superiori nell’inspirazione.",
+      "splenius": "Estende e ruota la testa e la tiene dritta.",
+      "deltoid": "Solleva il braccio in avanti, di lato e indietro; dà forma alla spalla.",
+      "rotator-cuff": "Quattro piccoli muscoli che centrano la spalla e ruotano il braccio.",
+      "pectoralis-major": "Porta il braccio davanti al corpo e spinge in avanti, come nel piegamento.",
+      "pectoralis-minor": "Tira la scapola in avanti e in basso.",
+      "serratus-anterior": "Tiene la scapola contro le coste e la ruota verso l’alto.",
+      "trapezius": "Solleva, avvicina e abbassa le scapole e sostiene il collo.",
+      "rhomboids": "Avvicinano le scapole, come nel rematore.",
+      "levator-scapulae": "Solleva la scapola e inclina il collo.",
+      "latissimus-dorsi": "Tira il braccio in basso e indietro, come nella trazione; il muscolo più ampio della schiena.",
+      "teres-major": "Aiuta il gran dorsale a portare il braccio in basso e verso l’interno.",
+      "erector-spinae": "Raddrizza la colonna e la tiene eretta quando sollevi.",
+      "multifidus": "Piccoli muscoli profondi che stabilizzano ogni vertebra.",
+      "quadratus-lumborum": "Inclina il busto di lato e stabilizza bacino e zona lombare.",
+      "biceps-brachii": "Flette il gomito e ruota il palmo verso l’alto.",
+      "brachialis": "Il principale flessore del gomito, comunque sia girata la mano.",
+      "triceps-brachii": "Estende il gomito, come nella distensione o nel piegamento.",
+      "brachioradialis": "Flette il gomito con il pollice in alto, come nell’hammer curl.",
+      "forearm-flexors": "Flettono polso e dita e danno la presa.",
+      "forearm-extensors": "Estendono polso e dita e bilanciano la presa.",
+      "rectus-abdominis": "Flette il busto in avanti e stabilizza la parte anteriore del core.",
+      "obliques": "Ruotano e inclinano il busto e resistono alla rotazione.",
+      "transversus-abdominis": "Il più profondo degli addominali; stringe la vita come una cintura.",
+      "diaphragm": "Il principale muscolo della respirazione; aiuta anche a stabilizzare il busto sotto carico.",
+      "glutes": "Estendono e aprono l’anca e tengono il bacino in piano; chiave negli squat e nei salti.",
+      "hip-flexors": "Portano il ginocchio verso il petto e flettono il busto all’anca.",
+      "hip-rotators": "Ruotano la coscia verso l’esterno e stabilizzano l’anca.",
+      "quadriceps": "Estendono il ginocchio; spingono squat, affondi e salti.",
+      "hamstrings": "Flettono il ginocchio ed estendono l’anca, come nello stacco.",
+      "adductors": "Avvicinano le gambe e aiutano l’anca negli squat profondi.",
+      "calves": "Sollevano il tallone; spingono nella corsa e nei salti.",
+      "tibialis-anterior": "Solleva le dita del piede e controlla il piede all’atterraggio.",
+      "fibularis": "Ruota la pianta verso l’esterno e stabilizza la caviglia."
     }
   },
   "WodGoals": {
@@ -8208,7 +8248,9 @@
     },
     "sheet": {
       "title": "Obiettivi dell’allenamento",
-      "close": "Chiudi"
+      "close": "Chiudi",
+      "atlas": "Atlante ›",
+      "openInAtlas": "Apri {muscle} nell’atlante"
     },
     "felt": {
       "title": "Cosa hai sentito?",
@@ -8236,6 +8278,60 @@
       "entries": "{count, plural, one {# registrazione} other {# registrazioni}}",
       "notShown": "Compare da 3 registrazioni.",
       "notFelt": "Obiettivi che nessuno ha sentito: {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Atlante anatomico",
+    "back": "Progressi",
+    "mode": {
+      "label": "Vista",
+      "explore": "Esplora",
+      "heat": "La mia copertura"
+    },
+    "range": {
+      "label": "Periodo",
+      "1w": "1 sett.",
+      "4w": "4 sett.",
+      "12w": "12 sett."
+    },
+    "crumbs": {
+      "label": "Livello",
+      "body": "Corpo"
+    },
+    "body": {
+      "title": "Tutto il corpo",
+      "hint": "Tocca una regione o direttamente un muscolo sulla figura. Toccalo di nuovo per il suo capo."
+    },
+    "regions": "Regioni",
+    "groups": "Gruppi muscolari",
+    "heads": "Capi",
+    "level": {
+      "none": "Nessuna",
+      "low": "Bassa",
+      "medium": "Media",
+      "high": "Alta"
+    },
+    "levelLine": "Copertura {level}",
+    "sets": "{sets} serie",
+    "perWeek": "{perWeek} serie/sett.",
+    "yours": "I tuoi dati · {range}",
+    "from": "Soprattutto da: {exercises}",
+    "felt": "{count, plural, one {Sentito in # allenamento} other {Sentito in # allenamenti}}",
+    "noData": "Ancora nessun allenamento in questo periodo.",
+    "noneHere": "Nessuna serie qui in questo periodo.",
+    "legendNote": "Un’indicazione del tuo volume di allenamento, non un obiettivo.",
+    "unrecognized": "{count, plural, one {# esercizio non è stato riconosciuto e non conta.} other {# esercizi non sono stati riconosciuti e non contano.}}",
+    "exercises": {
+      "title": "Esercizi dalla libreria del box",
+      "empty": "Nessun esercizio per questo muscolo.",
+      "unavailable": "Gli esercizi compaiono quando è selezionato un box.",
+      "more": "Tutti ({count})",
+      "less": "Meno",
+      "video": "Video: {title}",
+      "role": {
+        "primary": "Principale",
+        "secondary": "Secondario"
+      }
     }
   }
 }
