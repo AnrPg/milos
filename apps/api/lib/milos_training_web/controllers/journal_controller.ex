@@ -150,14 +150,14 @@ defmodule MilosTrainingWeb.JournalController do
     with {:ok, audience} <-
            JournalAudience.put_default(
              conn.assigns.user_context,
-             body_params(conn)["organization_ids"]
+             JournalAudience.requested(body_params(conn), "organization_ids", "coaches")
            ) do
       json(conn, audience)
     end
   end
 
   operation(:entry_audience,
-    summary: "Share one entry with specific providers (or reset it)",
+    summary: "Share one entry with specific coaches (or reset it)",
     parameters: [
       %Parameter{
         name: :kind,
@@ -186,7 +186,7 @@ defmodule MilosTrainingWeb.JournalController do
              conn.assigns.user_context,
              kind,
              id,
-             body_params(conn)["organization_ids"]
+             JournalAudience.requested(body_params(conn), "organization_ids", "coaches")
            ) do
       json(conn, result)
     end

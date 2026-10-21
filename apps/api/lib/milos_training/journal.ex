@@ -119,7 +119,9 @@ defmodule MilosTraining.Journal do
   defdelegate entry_source(organization_id, device_source, directory), to: EntrySource, as: :label
   defdelegate device_source?(source), to: EntrySource
   defdelegate shareable_kind?(kind), to: CoachAudience, as: :shareable?
-  defdelegate audience_member(active_ids, excluded_ids), to: CoachAudience, as: :member
+  defdelegate audience_member(active_ids, coaches, excluded), to: CoachAudience, as: :member
+  defdelegate resolve_audience(targets, member), to: CoachAudience, as: :resolve
+  defdelegate audience_organizations(readers), to: CoachAudience, as: :organizations
   defdelegate default_audience(member), to: CoachAudience
   defdelegate audience_readers(entry, member, override), to: CoachAudience, as: :readers
   defdelegate audience_reach(entry, member, override), to: CoachAudience, as: :reach

@@ -51,9 +51,9 @@ defmodule MilosTraining.Application.SetJournalVisibility do
 
   # ADR-162: the move may name the entry's own audience in the same request.
   defp maybe_store_audience(context, kind, entry, params) do
-    case Map.fetch(params, "audience") do
-      {:ok, ids} -> JournalAudience.store_entry(context, kind, entry, ids)
-      :error -> {:ok, nil}
+    case JournalAudience.requested(params, "audience", "audience_coaches") do
+      :none -> {:ok, nil}
+      targets -> JournalAudience.store_entry(context, kind, entry, targets)
     end
   end
 

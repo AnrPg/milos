@@ -1921,6 +1921,7 @@ defmodule MilosTrainingWeb.FallbackController do
     stale: {:conflict, "This entry changed meanwhile; reload it"},
     # ADR-162: one journal across providers.
     unknown_provider: {:unprocessable_entity, "That is not one of your active providers"},
+    unknown_coach: {:unprocessable_entity, "That is not a coach of one of your active providers"},
     empty_audience:
       {:unprocessable_entity, "Choose at least one coach, or keep the entry private"},
     audience_not_supported: {:unprocessable_entity, "This entry cannot be shared that way"},

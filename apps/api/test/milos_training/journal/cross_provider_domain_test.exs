@@ -23,13 +23,23 @@ defmodule MilosTraining.Journal.CrossProviderDomainTest do
   defp entry(kind, home, rung), do: %{kind: kind, organization_id: home, journal_visibility: rung}
 
   describe "CoachAudience matrix" do
-    # Members: active at A and B; at A only (B former); B excluded by default.
+    # Coaches: A has a1 and a2, B has b1, C (never joined) has c1.
+    @a1 {@a, "a1000000-0000-0000-0000-000000000001"}
+    @a2 {@a, "a2000000-0000-0000-0000-000000000002"}
+    @b1 {@b, "b1000000-0000-0000-0000-000000000001"}
+    @c1 {@c, "c1000000-0000-0000-0000-000000000001"}
+    @coaches [@a1, @a2, @b1, @c1]
+
+    # Members: active at A and B; at A only (B former); b1 or a2 left out by default.
     @members %{
-      both: CoachAudience.member([@a, @b]),
-      a_only: CoachAudience.member([@a]),
-      b_excluded: CoachAudience.member([@a, @b], [@b])
+      both: CoachAudience.member([@a, @b], @coaches),
+      a_only: CoachAudience.member([@a], @coaches),
+      b1_excluded: CoachAudience.member([@a, @b], @coaches, [@b1]),
+      a2_excluded: CoachAudience.member([@a, @b], @coaches, [@a2])
     }
-    @overrides [nil, [@b], [@a], [@a, @b]]
+    @overrides [nil, [@b1], [@a1], [@a1, @b1], [@a2]]
+
+    defp set(coaches), do: MapSet.new(coaches)
 
     test "nothing below a coach rung reaches anyone, whatever the audience" do
       for kind <- CoachAudience.shareable_kinds() ++ ~w(craving wellness),
@@ -45,40 +55,44 @@ defmodule MilosTraining.Journal.CrossProviderDomainTest do
       for kind <- CoachAudience.shareable_kinds() ++ ~w(injury review craving),
           home <- [nil, @a, @b, @c],
           rung <- @rungs ++ ["rated"],
-          override <- @overrides ++ [[@c]] do
+          override <- @overrides ++ [[@c1]] do
         readers = CoachAudience.readers(entry(kind, home, rung), @members.a_only, override)
-        refute MapSet.member?(readers, @b), "#{kind} #{inspect(home)} #{rung}"
-        refute MapSet.member?(readers, @c)
+        refute MapSet.member?(readers, @b1), "#{kind} #{inspect(home)} #{rung}"
+        refute MapSet.member?(readers, @c1)
       end
     end
 
-    test "the home provider always reads on a coach rung while active" do
+    test "every coach of the home provider reads on a coach rung while active" do
       for kind <- CoachAudience.shareable_kinds() ++ ~w(craving),
           rung <- @reaching,
           {_name, member} <- @members,
-          override <- @overrides do
-        assert CoachAudience.visible_to?(entry(kind, @a, rung), @a, member, override)
+          override <- @overrides,
+          coach <- [@a1, @a2] do
+        assert CoachAudience.visible_to?(entry(kind, @a, rung), coach, member, override)
       end
     end
 
-    test "an entry recorded at A reaches B only when shared with B (Q5)" do
+    test "an entry recorded at A reaches a coach at B only when shared with them (Q5)" do
       for kind <- CoachAudience.shareable_kinds(), rung <- @reaching do
         e = entry(kind, @a, rung)
-        refute CoachAudience.visible_to?(e, @b, @members.both, nil)
-        refute CoachAudience.visible_to?(e, @b, @members.both, [@a])
-        assert CoachAudience.visible_to?(e, @b, @members.both, [@b])
+        refute CoachAudience.visible_to?(e, @b1, @members.both, nil)
+        refute CoachAudience.visible_to?(e, @b1, @members.both, [@a1])
+        assert CoachAudience.visible_to?(e, @b1, @members.both, [@b1])
         # The default exclusion does not undo an explicit share.
-        assert CoachAudience.visible_to?(e, @b, @members.b_excluded, [@b])
+        assert CoachAudience.visible_to?(e, @b1, @members.b1_excluded, [@b1])
       end
     end
 
-    test "a provider-less entry goes to the default audience unless it has its own" do
+    test "a provider-less entry goes to the default coaches unless it has its own" do
       for kind <- CoachAudience.shareable_kinds(), rung <- @reaching do
         e = entry(kind, nil, rung)
-        assert CoachAudience.readers(e, @members.both, nil) == MapSet.new([@a, @b])
-        assert CoachAudience.readers(e, @members.b_excluded, nil) == MapSet.new([@a])
-        assert CoachAudience.readers(e, @members.both, [@b]) == MapSet.new([@b])
-        assert CoachAudience.readers(e, @members.a_only, [@a, @b]) == MapSet.new([@a])
+        assert CoachAudience.readers(e, @members.both, nil) == set([@a1, @a2, @b1])
+        assert CoachAudience.readers(e, @members.b1_excluded, nil) == set([@a1, @a2])
+        # Per coach: a2 left out, a1 at the same provider still reads.
+        assert CoachAudience.readers(e, @members.a2_excluded, nil) == set([@a1, @b1])
+        assert CoachAudience.readers(e, @members.both, [@b1]) == set([@b1])
+        assert CoachAudience.readers(e, @members.both, [@a2]) == set([@a2])
+        assert CoachAudience.readers(e, @members.a_only, [@a1, @b1]) == set([@a1])
       end
     end
 
@@ -88,14 +102,14 @@ defmodule MilosTraining.Journal.CrossProviderDomainTest do
                  MapSet.new()
 
         assert CoachAudience.readers(entry(kind, @a, rung), @members.both, override) ==
-                 MapSet.new([@a])
+                 set([@a1, @a2])
       end
     end
 
     test "injuries and reviews reach the home provider on any rung" do
       for kind <- ~w(injury review), rung <- @rungs ++ ["rated"] do
-        assert CoachAudience.readers(entry(kind, @a, rung), @members.both, [@b]) ==
-                 MapSet.new([@a])
+        assert CoachAudience.readers(entry(kind, @a, rung), @members.both, [@b1]) ==
+                 set([@a1, @a2])
 
         assert CoachAudience.readers(entry(kind, @b, rung), @members.a_only, nil) ==
                  MapSet.new()
@@ -103,41 +117,57 @@ defmodule MilosTraining.Journal.CrossProviderDomainTest do
     end
 
     test "reach decides which rungs a member may pick" do
+      none = CoachAudience.member([], [])
       assert CoachAudience.reach(entry("note", @a, "private"), @members.both) == :gym
       assert CoachAudience.reach(entry("note", nil, "private"), @members.both) == :audience
-      assert CoachAudience.reach(entry("note", nil, "private"), CoachAudience.member([])) == :none
+      assert CoachAudience.reach(entry("note", nil, "private"), none) == :none
 
-      assert CoachAudience.reach(entry("note", nil, "private"), CoachAudience.member([@a], [@a])) ==
-               :none
-
+      everyone_out = CoachAudience.member([@a], @coaches, [@a1, @a2])
+      assert CoachAudience.reach(entry("note", nil, "private"), everyone_out) == :none
       assert CoachAudience.reach(entry("craving", nil, "private"), @members.both) == :none
     end
 
-    test "own audiences are validated against the active providers" do
-      e = entry("note", @a, "private")
-      assert CoachAudience.validate_override(nil, e, @members.both) == {:ok, nil}
-      assert CoachAudience.validate_override([@b, @a, @b], e, @members.both) == {:ok, [@b]}
-      assert CoachAudience.validate_override([@a], e, @members.both) == {:ok, nil}
-
-      assert CoachAudience.validate_override([@c], e, @members.both) ==
-               {:error, :unknown_provider}
-
-      assert CoachAudience.validate_override([@b], e, @members.a_only) ==
-               {:error, :unknown_provider}
-
-      assert CoachAudience.validate_override([], entry("note", nil, "private"), @members.both) ==
-               {:error, :empty_audience}
-
-      assert CoachAudience.validate_override([@a], entry("craving", nil, "x"), @members.both) ==
-               {:error, :audience_not_supported}
-
-      assert CoachAudience.validate_override("x", e, @members.both) == {:error, :unknown_provider}
+    test "requests name coaches, or a provider for all its coaches" do
+      assert CoachAudience.resolve([@b1], @members.both) == {:ok, set([@b1])}
+      assert CoachAudience.resolve([@a, @b1], @members.both) == {:ok, set([@a1, @a2, @b1])}
+      assert CoachAudience.resolve([@c1], @members.both) == {:error, :unknown_coach}
+      assert CoachAudience.resolve([@b1], @members.a_only) == {:error, :unknown_coach}
+      assert CoachAudience.resolve([@c], @members.both) == {:error, :unknown_provider}
+      assert CoachAudience.resolve([1], @members.both) == {:error, :unknown_provider}
+      assert CoachAudience.resolve("x", @members.both) == {:error, :unknown_provider}
     end
 
-    test "a default audience is stored as the providers left out" do
-      assert CoachAudience.exclusions_for([@a], @members.both) == {:ok, [@b]}
-      assert CoachAudience.exclusions_for([@a, @b], @members.both) == {:ok, []}
-      assert CoachAudience.exclusions_for([@c], @members.both) == {:error, :unknown_provider}
+    test "own audiences are validated against the active providers' coaches" do
+      e = entry("note", @a, "private")
+      assert CoachAudience.validate_override(nil, e, @members.both) == {:ok, nil}
+      assert CoachAudience.validate_override(set([@b1, @a1]), e, @members.both) == {:ok, [@b1]}
+      assert CoachAudience.validate_override(set([@a1]), e, @members.both) == {:ok, nil}
+
+      assert CoachAudience.validate_override(set([@c1]), e, @members.both) ==
+               {:error, :unknown_coach}
+
+      assert CoachAudience.validate_override(set([@b1]), e, @members.a_only) ==
+               {:error, :unknown_coach}
+
+      assert CoachAudience.validate_override(set([]), entry("note", nil, "x"), @members.both) ==
+               {:error, :empty_audience}
+
+      assert CoachAudience.validate_override(
+               set([@a1]),
+               entry("craving", nil, "x"),
+               @members.both
+             ) ==
+               {:error, :audience_not_supported}
+
+      assert CoachAudience.validate_override("x", e, @members.both) == {:error, :unknown_coach}
+    end
+
+    test "a default audience is stored as the coaches left out" do
+      assert CoachAudience.exclusions_for(set([@a1, @a2]), @members.both) == {:ok, [@b1]}
+      assert CoachAudience.exclusions_for(set([@a1, @b1]), @members.both) == {:ok, [@a2]}
+      assert CoachAudience.exclusions_for(set([@a1, @a2, @b1]), @members.both) == {:ok, []}
+      assert CoachAudience.exclusions_for(set([@c1]), @members.both) == {:error, :unknown_coach}
+      assert CoachAudience.organizations(set([@a1, @a2, @b1])) == Enum.sort([@a, @b])
     end
   end
 

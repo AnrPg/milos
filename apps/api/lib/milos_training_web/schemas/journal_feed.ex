@@ -169,7 +169,13 @@ defmodule MilosTrainingWeb.Schemas.JournalFeed do
           items: %Schema{type: :string, format: :uuid},
           nullable: true,
           description:
-            "ADR-162: providers to share with besides the entry's own; null resets to the default."
+            "ADR-162: providers (all their coaches) to share with besides the entry's own; null resets to the default."
+        },
+        audience_coaches: %Schema{
+          type: :array,
+          items: MilosTrainingWeb.Schemas.CrossProvider.coach_ref(),
+          nullable: true,
+          description: "ADR-162: individual coaches to share with, with or instead of `audience`."
         }
       },
       additionalProperties: false

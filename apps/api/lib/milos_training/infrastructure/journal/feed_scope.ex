@@ -7,8 +7,8 @@ defmodule MilosTraining.Infrastructure.Journal.FeedScope do
     (`JournalFilter.to_query/1`): sources, rungs, a date window and text.
   * `{:coach, organization_id}` — what a coach of one provider may read:
     entries recorded there on a rung that reaches the coach, plus (ADR-162)
-    entries of shareable kinds the member shared with that provider
-    (`milos_journal_entry_shared_with_org`, the SQL twin of
+    entries of shareable kinds the member shared with the acting coach there
+    (`milos_journal_entry_shared_with_coach`, the SQL twin of
     `Journal.Domain.CoachAudience`). Kinds the coach always sees (injuries)
     or that are a rung of their own (reviews) pass `rung?: false`.
 
@@ -58,7 +58,7 @@ defmodule MilosTraining.Infrastructure.Journal.FeedScope do
         [row],
         row.organization_id == ^organization_id or
           fragment(
-            "milos_journal_entry_shared_with_org(?, ?, ?, ?, ?)",
+            "milos_journal_entry_shared_with_coach(?, ?, ?, ?, ?, NULLIF(current_setting('app.user_id', true), '')::uuid)",
             ^kind,
             row.id,
             row.user_id,
