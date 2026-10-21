@@ -15,7 +15,8 @@ defmodule MilosTraining.AiUsage.Domain.AiSettingsPolicy do
   @model_pattern ~r/^[a-z0-9][a-z0-9.\-]{2,79}$/
 
   @doc """
-  Changes for an update request. Accepted keys: `scaling_enabled` (boolean),
+  Changes for an update request. Accepted keys: `scaling_enabled` and
+  `voice_enabled` (booleans),
   `api_key` (string, replaces the key), `remove_key` (true), `model` (string,
   or nil/blank for the default). Returns `{:ok, changes}` or `{:error, reason}`.
   """
@@ -62,7 +63,8 @@ defmodule MilosTraining.AiUsage.Domain.AiSettingsPolicy do
       api_key_last4: nil,
       key_status: "unknown",
       key_checked_at: nil,
-      scaling_enabled: false
+      scaling_enabled: false,
+      voice_enabled: false
     }
 
   defp model_changes(params) do
@@ -83,17 +85,27 @@ defmodule MilosTraining.AiUsage.Domain.AiSettingsPolicy do
   end
 
   defp switch_changes(params) do
-    case fetch(params, :scaling_enabled) do
+    with {:ok, scaling} <- switch_change(params, :scaling_enabled, :invalid_scaling_enabled),
+         # ADR-175: voice logging has its own switch, off by default.
+         {:ok, voice} <- switch_change(params, :voice_enabled, :invalid_voice_enabled) do
+      {:ok, Map.merge(scaling, voice)}
+    end
+  end
+
+  defp switch_change(params, field, error) do
+    case fetch(params, field) do
       :missing -> {:ok, %{}}
-      value when is_boolean(value) -> {:ok, %{scaling_enabled: value}}
-      _other -> {:error, :invalid_scaling_enabled}
+      value when is_boolean(value) -> {:ok, %{field => value}}
+      _other -> {:error, error}
     end
   end
 
   defp switching_on_without_key?(current, changes) do
-    enabled = Map.get(changes, :scaling_enabled, value(current, :scaling_enabled, false))
     key = Map.get(changes, :api_key, value(current, :api_key, nil))
-    enabled == true and not present?(key)
+
+    Enum.any?([:scaling_enabled, :voice_enabled], fn field ->
+      Map.get(changes, field, value(current, field, false)) == true
+    end) and not present?(key)
   end
 
   @doc "Whether scaling suggestions may run for these settings."
@@ -102,6 +114,13 @@ defmodule MilosTraining.AiUsage.Domain.AiSettingsPolicy do
       do: present?(key)
 
   def scaling_ready?(_settings), do: false
+
+  @doc "Whether voice logging may run for these settings (ADR-175)."
+  def voice_ready?(%{voice_enabled: true, api_key: key, key_status: status})
+      when status != "rejected",
+      do: present?(key)
+
+  def voice_ready?(_settings), do: false
 
   @doc "The model to call: the gym's override, else the platform default."
   def model(%{model: model}, _default) when is_binary(model) and model != "", do: model
@@ -112,6 +131,7 @@ defmodule MilosTraining.AiUsage.Domain.AiSettingsPolicy do
     %{
       provider: value(settings, :provider, "anthropic"),
       scaling_enabled: value(settings, :scaling_enabled, false),
+      voice_enabled: value(settings, :voice_enabled, false),
       key_configured: present?(value(settings, :api_key, nil)),
       key_last4: value(settings, :api_key_last4, nil),
       key_status: value(settings, :key_status, "unknown"),

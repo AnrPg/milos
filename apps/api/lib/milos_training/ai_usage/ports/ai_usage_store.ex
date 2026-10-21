@@ -4,7 +4,9 @@ defmodule MilosTraining.AiUsage.Ports.AiUsageStore do
   @type summary_params :: %{
           optional(:from) => DateTime.t(),
           optional(:to) => DateTime.t(),
-          optional(:feature) => String.t()
+          optional(:feature) => String.t(),
+          optional(:agent) => String.t(),
+          optional(:user_id) => Ecto.UUID.t()
         }
 
   @callback insert_record(map(), map()) :: {:ok, map()} | {:error, term()}

@@ -23,6 +23,8 @@ defmodule MilosTraining.AiUsage.GymAiSettings do
     field :key_checked_at, :utc_datetime_usec
     field :model, :string
     field :scaling_enabled, :boolean, default: false
+    # ADR-175: voice logging, off by default.
+    field :voice_enabled, :boolean, default: false
     field :updated_by_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
@@ -35,6 +37,7 @@ defmodule MilosTraining.AiUsage.GymAiSettings do
     :key_checked_at,
     :model,
     :scaling_enabled,
+    :voice_enabled,
     :updated_by_id
   ]
 

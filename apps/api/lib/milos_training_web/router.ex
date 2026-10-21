@@ -475,6 +475,9 @@ defmodule MilosTrainingWeb.Router do
     patch("/entries/:id", TrainingLogController, :update)
     post("/entries/:id/void", TrainingLogController, :void)
     get("/sources", TrainingLogController, :sources)
+    # ADR-175: voice logging (a draft only; nothing is saved).
+    get("/voice", MyVoiceLogController, :show)
+    post("/voice/drafts", MyVoiceLogController, :create)
   end
 
   # ADR-124: the acting user's own injury safety warnings for a workout they
