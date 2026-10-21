@@ -131,7 +131,7 @@ export function NoReplyCard({ request, onResent }: { request: SupportRequest; on
           aria-expanded={breathing}
           onClick={() => setBreathing(!breathing)}
           className="min-h-9 rounded-full px-3 text-sm font-semibold"
-          style={{ background: breathing ? "var(--primary)" : "var(--panel-raised)", color: breathing ? "var(--bg)" : "var(--text)", border: "1px solid var(--border)" }}
+          style={{ background: breathing ? "var(--primary)" : "var(--panel-raised)", color: breathing ? "var(--primary-contrast)" : "var(--text)", border: "1px solid var(--border)" }}
         >
           {t("tryBreathing")}
         </button>

@@ -161,7 +161,7 @@ export function BoxToday({
                 <button
                   type="button"
                   className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   onClick={() => launcher.resume(today.resumeExecutionId!)}
                 >
                   {t("resumeWorkout")} ▶
@@ -247,7 +247,7 @@ export function BoxToday({
               <button
                 type="button"
                 className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 onClick={() => void start(selected)}
                 disabled={launcher.pendingKey !== null}
               >

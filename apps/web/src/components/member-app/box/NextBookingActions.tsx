@@ -61,7 +61,7 @@ export function NextBookingActions({ slot }: { slot: ScheduleSlot }) {
             onClick={() => void checkIn()}
             disabled={pending}
             className="min-h-11 flex-1 rounded-2xl px-4 text-sm font-bold disabled:opacity-60"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {pending ? t("checkingIn") : t("classCheckIn")}
           </button>

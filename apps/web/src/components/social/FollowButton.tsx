@@ -101,7 +101,7 @@ export function FollowButton({
           type="button"
           disabled={busy || !token}
           className={base}
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           onClick={() => void run(() => follow(token!, targetType, targetId))}
         >
           {followsMe ? t("followBack") : t("follow")}

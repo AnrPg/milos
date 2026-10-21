@@ -110,7 +110,7 @@ export function SupportRequestCard({ request, openChatAfterReply = true }: { req
           type="submit"
           disabled={reply.isPending || !words.trim()}
           className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("replySend")}
         </button>
@@ -123,7 +123,7 @@ export function SupportRequestCard({ request, openChatAfterReply = true }: { req
             <>
               <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("phoneShared", { name })}</p>
               <p className="select-all text-lg font-bold tabular-nums" style={{ color: "var(--text)" }}>{phone.value}</p>
-              <a href={telHref(phone.value)} className="inline-flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+              <a href={telHref(phone.value)} className="inline-flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                 {t("callName", { name })}
               </a>
             </>

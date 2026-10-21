@@ -43,7 +43,7 @@ export default function AboutPage() {
         ))}
       </div>
       <div className="mt-10 flex flex-wrap gap-3">
-        <Link className="rounded-xl px-5 py-3 font-semibold" style={{ background: "var(--primary)", color: "var(--bg)" }} href="/register">
+        <Link className="rounded-xl px-5 py-3 font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} href="/register">
           {i18n("createAnAccount3f4f547")}
         </Link>
         <Link className="rounded-xl border px-5 py-3 font-semibold" style={{ borderColor: "var(--border)" }} href="/login">

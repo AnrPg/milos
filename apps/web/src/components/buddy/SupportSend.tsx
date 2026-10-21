@@ -51,7 +51,7 @@ export function SupportComposer({ onSent, onCancel }: { onSent: (request: Suppor
         <Link
           href="/me/buddy"
           className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("setUpBuddy")}
         </Link>

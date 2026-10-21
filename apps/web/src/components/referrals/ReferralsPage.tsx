@@ -163,7 +163,7 @@ function Overview({
             aria-selected={tab === entry.value}
             onClick={() => onTab(entry.value)}
             className="min-h-11 truncate rounded-xl px-3 text-sm font-semibold"
-            style={tab === entry.value ? { background: "var(--primary)", color: "var(--bg)" } : { color: "var(--text-soft)" }}
+            style={tab === entry.value ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { color: "var(--text-soft)" }}
           >
             {entry.label}
           </button>

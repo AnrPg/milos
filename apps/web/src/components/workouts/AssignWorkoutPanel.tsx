@@ -301,7 +301,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                       <button
                         key={athlete.id}
                         className="flex w-full items-center justify-between rounded-[1rem] px-4 py-2.5 text-start text-sm transition-colors"
-                        style={selected ? { background: "var(--primary)", color: "var(--bg)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+                        style={selected ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
                         onClick={() =>
                           setSelectedIds((current) =>
                             current.includes(athlete.id) ? current.filter((id) => id !== athlete.id) : [...current, athlete.id],

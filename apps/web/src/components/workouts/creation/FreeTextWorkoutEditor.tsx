@@ -546,7 +546,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
                 >
                   {tab === "assistant" ? assistantT("tabAssistant") : assistantT("tabPreview")}
                   {tab === "assistant" && review && openIssues(review).length > 0 ? (
-                    <span className="ms-1 rounded-full px-1.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+                    <span className="ms-1 rounded-full px-1.5 text-[10px]" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                       {openIssues(review).length}
                     </span>
                   ) : null}

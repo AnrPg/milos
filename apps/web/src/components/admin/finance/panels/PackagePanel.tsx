@@ -346,7 +346,7 @@ export function PackagePanel({
               <button
                 type="button"
                 className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-40"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 disabled={retireMutation.isPending || affectedRoles.some((role) => !replacements[role])}
                 onClick={() => retireMutation.mutate()}
               >

@@ -338,7 +338,7 @@ function SessionExpiredDialog({
                 type="button"
                 onClick={() => window.open("/login", "_blank", "noopener,noreferrer")}
                 className="flex-1 rounded-2xl px-4 py-3 text-sm font-bold"
-                style={{ background: "var(--primary)", color: "var(--bg)" }}
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
               >
                 {openLoginLabel}
               </button>

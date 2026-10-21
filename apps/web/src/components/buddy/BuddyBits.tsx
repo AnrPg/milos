@@ -10,7 +10,7 @@ export function CountBadge({ count, label }: { count: number; label: string }) {
     <span
       aria-label={label}
       className="inline-flex min-w-6 items-center justify-center rounded-full px-1.5 py-0.5 text-xs font-bold tabular-nums"
-      style={{ background: "var(--primary)", color: "var(--bg)" }}
+      style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
       data-testid="buddy-unread"
     >
       {count > 99 ? "99+" : count}

@@ -616,7 +616,7 @@ function NotificationCard({
         {!notification.read_at ? (
           <span
             className="shrink-0 rounded-full px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.18em]"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
           >
             {i18n("new6403f2b")}
           </span>

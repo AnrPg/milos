@@ -300,7 +300,7 @@ function Actions({
           <Link
             href={`/login?next=${encodeURIComponent(`/b/${page.box.slug}`)}`}
             className="flex min-h-11 w-full items-center justify-center rounded-2xl text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {tSocial("follow")}
           </Link>

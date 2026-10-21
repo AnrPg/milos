@@ -833,7 +833,7 @@ export function WorkoutAdminConsole() {
                       }}
                     >
                       <span aria-hidden>📂</span>
-                      <span aria-hidden className="absolute bottom-1 end-0.5 grid h-3.5 w-3.5 place-items-center rounded-full text-[10px] font-black leading-none" style={{ background: "var(--success)", color: "var(--bg)" }}>+</span>
+                      <span aria-hidden className="absolute bottom-1 end-0.5 grid h-3.5 w-3.5 place-items-center rounded-full text-[10px] font-black leading-none" style={{ background: "var(--success)", color: "var(--success-contrast)" }}>+</span>
                     </button>
                   </HoverHint>
                 </div>

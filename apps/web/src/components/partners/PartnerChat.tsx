@@ -239,7 +239,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
               type="submit"
               disabled={send.isPending || !draft.trim()}
               className="min-h-11 self-end rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {t("send")}
             </button>
@@ -320,7 +320,7 @@ function Bubble({ message, time }: { message: PartnerMessage; time: string }) {
       ) : (
         <span
           className="whitespace-pre-wrap rounded-2xl px-3 py-2 text-sm"
-          style={{ background: mine ? "var(--primary)" : "var(--panel-raised)", color: mine ? "var(--bg)" : "var(--text)" }}
+          style={{ background: mine ? "var(--primary)" : "var(--panel-raised)", color: mine ? "var(--primary-contrast)" : "var(--text)" }}
         >
           {message.body}
         </span>

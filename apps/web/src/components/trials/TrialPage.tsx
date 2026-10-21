@@ -189,7 +189,7 @@ function CancelTrial({ trial, token }: { trial: MyTrial; token: string }) {
           disabled={cancel.isPending}
           onClick={() => cancel.mutate()}
           className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-60"
-          style={{ background: "var(--danger)", color: "var(--bg)" }}
+          style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}
         >
           {t("cancelYes")}
         </button>
@@ -233,7 +233,7 @@ export function FollowUp({ trial, token, compact }: { trial: MyTrial; token: str
           disabled={answer.isPending}
           onClick={() => answer.mutate("join")}
           className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-60"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("followUpJoin")}
         </button>

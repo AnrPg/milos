@@ -51,7 +51,7 @@ export function ComposeButton({
         onClick={() => setOpen(true)}
         aria-label={t("compose")}
         className="flex h-11 w-11 items-center justify-center rounded-full"
-        style={{ background: "var(--primary)", color: "var(--bg)" }}
+        style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
       >
         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
           <path d="M12 5v14M5 12h14" />
@@ -315,7 +315,7 @@ export function ComposeSheet({
             onClick={() => void publish()}
             disabled={!canPublish}
             className="min-h-12 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {busy ? t("publishing") : t("publish")}
           </button>

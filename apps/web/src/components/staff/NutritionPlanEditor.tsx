@@ -269,7 +269,7 @@ function PlanEditor({ userId, plan }: { userId: string; plan: NutritionPlan | nu
                 className="rounded-full px-3 py-1.5 text-sm font-semibold"
                 style={{
                   background: on ? "var(--primary)" : "var(--panel-raised)",
-                  color: on ? "var(--bg)" : "var(--text)",
+                  color: on ? "var(--primary-contrast)" : "var(--text)",
                   border: "1px solid var(--border)",
                 }}
               >

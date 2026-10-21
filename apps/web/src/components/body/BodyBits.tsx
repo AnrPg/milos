@@ -38,7 +38,7 @@ export function Chip({ selected, onClick, children }: { selected: boolean; onCli
       className="min-h-9 rounded-full px-3 py-1 text-sm font-semibold"
       style={{
         background: selected ? "var(--primary)" : "var(--panel-raised)",
-        color: selected ? "var(--bg)" : "var(--text)",
+        color: selected ? "var(--primary-contrast)" : "var(--text)",
         border: "1px solid var(--border)",
       }}
     >
@@ -70,7 +70,7 @@ export function PillButton({
       className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
       style={{
         background: primary ? "var(--primary)" : "var(--panel-raised)",
-        color: primary ? "var(--bg)" : danger ? "var(--danger)" : "var(--text)",
+        color: primary ? "var(--primary-contrast)" : danger ? "var(--danger)" : "var(--text)",
         border: primary ? "none" : "1px solid var(--border)",
       }}
     >

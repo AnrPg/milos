@@ -281,7 +281,7 @@ export function TopNav() {
                 {unreadCount > 0 ? (
                   <span
                     className="absolute -end-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px] font-bold"
-                    style={{ background: "var(--primary)", color: "var(--bg)" }}
+                    style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   >
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
@@ -308,7 +308,7 @@ export function TopNav() {
               ) : (
                 <span
                   className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
                   {initials}
                 </span>

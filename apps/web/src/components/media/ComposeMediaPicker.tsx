@@ -179,7 +179,7 @@ export const ComposeMediaPicker = forwardRef<ComposeMediaPickerHandle, { media: 
                         className="min-h-9 rounded-full px-3 text-xs font-semibold disabled:opacity-50"
                         style={{
                           background: selected.aspect === aspect ? "var(--primary)" : "transparent",
-                          color: selected.aspect === aspect ? "var(--bg)" : "var(--text)",
+                          color: selected.aspect === aspect ? "var(--primary-contrast)" : "var(--text)",
                           border: "1px solid var(--border)",
                         }}
                       >
@@ -370,7 +370,7 @@ function Tile({
           type="button"
           onClick={onRetry}
           className="absolute inset-x-1.5 bottom-1.5 min-h-7 rounded-full text-[11px] font-bold focus-visible:outline-2"
-          style={{ background: "var(--primary)", color: "var(--bg)", outlineColor: "var(--text)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)", outlineColor: "var(--text)" }}
           aria-label={[t("retry"), label].join(" · ")}
         >
           {t("retry")}

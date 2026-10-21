@@ -194,7 +194,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
             className="min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-2xl px-3 text-sm font-semibold"
             style={{
               background: tab === value ? "var(--primary)" : "var(--panel)",
-              color: tab === value ? "var(--bg)" : "var(--text)",
+              color: tab === value ? "var(--primary-contrast)" : "var(--text)",
               border: "1px solid var(--border)",
             }}
           >
@@ -299,7 +299,7 @@ function AttendeeRow({ event, row }: { event: StaffEvent; row: StaffAttendee }) 
             className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
             style={{
               background: row.checked_in_at ? "var(--primary)" : "var(--panel-raised)",
-              color: row.checked_in_at ? "var(--bg)" : "var(--text)",
+              color: row.checked_in_at ? "var(--primary-contrast)" : "var(--text)",
               border: row.checked_in_at ? "none" : "1px solid var(--border)",
             }}
           >

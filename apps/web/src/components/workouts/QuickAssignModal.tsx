@@ -297,7 +297,7 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
                           className="flex w-full items-center gap-2 rounded-[1.1rem] px-4 py-2.5 text-sm transition-colors"
                           style={
                             selected
-                              ? { background: "var(--primary)", color: "var(--bg)" }
+                              ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                               : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
                           }
                         >

@@ -265,7 +265,7 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
             <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
           </div>
           <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)" }} />
-          <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--bg)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
+          <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
           {grant.isError ? <p style={{ color: "var(--danger)" }}>{i18n("theExtensionCouldNotBeRecorded8e3fe5d")}</p> : null}
         </form>
         <div className="mt-5 space-y-2">
@@ -855,7 +855,7 @@ export function AdminUserProfile({ userId }: { userId: string }) {
                           disabled={roleMutation.isPending || selected}
                           onClick={() => roleMutation.mutate(role)}
                           className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-70"
-                          style={{ background: selected ? "var(--primary)" : "var(--panel-muted)", border: "1px solid var(--border)", color: selected ? "var(--bg)" : "var(--text-soft)" }}
+                          style={{ background: selected ? "var(--primary)" : "var(--panel-muted)", border: "1px solid var(--border)", color: selected ? "var(--primary-contrast)" : "var(--text-soft)" }}
                         >
                           <SemanticLabel value={role} />
                         </button>

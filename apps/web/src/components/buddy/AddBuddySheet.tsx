@@ -186,7 +186,7 @@ function CandidateRow({
           disabled={busy}
           aria-label={t("inviteName", { name })}
           className="min-h-9 shrink-0 rounded-full px-3 text-xs font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("invite")}
         </button>

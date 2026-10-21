@@ -139,7 +139,7 @@ export function AroundMapPanel({ origin, radiusKm }: { origin: AroundOrigin; rad
                 setCard(null);
               }}
               className="pointer-events-auto min-h-10 rounded-full px-4 text-sm font-bold shadow-lg disabled:opacity-80"
-              style={{ background: tooFar ? "var(--panel-raised)" : "var(--primary)", color: tooFar ? "var(--text-soft)" : "var(--bg)" }}
+              style={{ background: tooFar ? "var(--panel-raised)" : "var(--primary)", color: tooFar ? "var(--text-soft)" : "var(--primary-contrast)" }}
             >
               {tooFar ? t("zoomInToSearch") : t("searchHere")}
             </button>
@@ -200,7 +200,7 @@ export function AroundMapPanel({ origin, radiusKm }: { origin: AroundOrigin; rad
             <Link
               href={pinHref(cardPin)!}
               className="flex min-h-10 items-center rounded-full px-4 text-sm font-bold"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {t("open")}
             </Link>

@@ -273,7 +273,7 @@ export function ThinResultsCard({ thin, onWider, onClear }: { thin: ThinResults;
               type="button"
               onClick={() => onWider(rung.radiusKm)}
               className="min-h-11 rounded-2xl px-4 text-sm font-bold"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {t("widerButton", { distance: km(rung.radiusKm), count: rung.total })}
             </button>

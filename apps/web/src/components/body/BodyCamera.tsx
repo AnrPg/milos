@@ -191,7 +191,7 @@ export function BodyCamera({
               type="button"
               onClick={() => onKeep(shot.blob)}
               className={[control.className, "flex-1"].join(" ")}
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {t("keep")}
             </button>

@@ -210,7 +210,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                 className="rounded-full px-5 py-2 transition-colors"
                 style={
                   mode === "register"
-                    ? { background: "var(--primary)", color: "var(--bg)" }
+                    ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                     : { background: "transparent", color: "var(--dim)" }
                 }
                 onClick={() => setMode("register")}
@@ -222,7 +222,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                 className="rounded-full px-5 py-2 transition-colors"
                 style={
                   mode === "login"
-                    ? { background: "var(--primary)", color: "var(--bg)" }
+                    ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                     : { background: "transparent", color: "var(--dim)" }
                 }
                 onClick={() => setMode("login")}
@@ -430,7 +430,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   disabled={
                     busyAction === "register" ||
                     (invitationToken.trim().length > 0 && invitation === null)
@@ -501,7 +501,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
 
                 <button
                   className="w-full rounded-2xl px-4 py-3 font-semibold disabled:opacity-60"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                   disabled={busyAction === "login"}
                   onClick={() => {
                     if (!validateCredentials(loginForm.nickname, loginForm.password)) return;

@@ -71,7 +71,7 @@ export function ConnectionsPage() {
             className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold"
             style={
               tab === value
-                ? { background: "var(--primary)", color: "var(--bg)" }
+                ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                 : { background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }
             }
           >

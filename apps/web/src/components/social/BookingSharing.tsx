@@ -57,7 +57,7 @@ export function BookingSharingOffer() {
           disabled={busy}
           onClick={() => void set(true)}
           className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("bookingSharingYes")}
         </button>

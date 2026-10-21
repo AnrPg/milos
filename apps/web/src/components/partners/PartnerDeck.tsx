@@ -225,7 +225,7 @@ function SwipeCard({ card, onSwipe, busy }: { card: PartnerCard; onSwipe: (direc
           disabled={busy}
           aria-label={t("likeLabel", { name })}
           className="min-h-12 flex-1 rounded-2xl text-lg font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           ✓
         </button>
@@ -285,7 +285,7 @@ function MatchSheet({ match, onClose }: { match: PartnerMatch; onClose: () => vo
           <Link
             href={`/partners/${encodeURIComponent(match.id)}`}
             className="flex min-h-11 flex-1 items-center justify-center rounded-2xl px-4 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("sayHi")}
           </Link>

@@ -213,7 +213,7 @@ export function ComparePage() {
                     className="min-h-9 rounded-full px-3 text-sm font-semibold disabled:opacity-40"
                     style={{
                       background: item === pose ? "var(--primary)" : "var(--panel-raised)",
-                      color: item === pose ? "var(--bg)" : "var(--text)",
+                      color: item === pose ? "var(--primary-contrast)" : "var(--text)",
                       border: "1px solid var(--border)",
                     }}
                   >

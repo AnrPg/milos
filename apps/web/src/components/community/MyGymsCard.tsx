@@ -129,7 +129,7 @@ function JoinForm() {
           type="submit"
           disabled={pending || !value.trim()}
           className="min-h-11 rounded-2xl px-4 text-sm font-semibold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {pending ? t("joinPending") : t("joinSubmit")}
         </button>

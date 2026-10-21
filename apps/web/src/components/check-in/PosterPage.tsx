@@ -38,7 +38,7 @@ export function PosterPage({ locationId }: { locationId: string }) {
             type="button"
             onClick={() => window.print()}
             className="min-h-11 rounded-full px-5 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {t("posterPrint")}
           </button>

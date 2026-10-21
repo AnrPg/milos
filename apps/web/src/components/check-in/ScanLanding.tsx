@@ -71,7 +71,7 @@ export function ScanLanding({ locationId, code, source }: { locationId: string; 
         <Card>
           <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("scanFailedTitle")}</h1>
           <p role="alert" className="text-sm" style={{ color: "var(--text-soft)" }}>{t(checkInErrorKey(scan.error))}</p>
-          <button type="button" onClick={() => void scan.refetch()} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+          <button type="button" onClick={() => void scan.refetch()} className="min-h-11 rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {t("tryAgain")}
           </button>
         </Card>
@@ -177,7 +177,7 @@ function Outcome({
                 {(result.classes ?? []).map((slot) => (
                   <li key={slot.id} className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
                     <ClassLabel slot={slot} />
-                    <Link href={schedule(slot.id)} className="flex min-h-11 shrink-0 items-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+                    <Link href={schedule(slot.id)} className="flex min-h-11 shrink-0 items-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                       {t("scanBook")}
                     </Link>
                   </li>
@@ -313,7 +313,7 @@ function VisitorView({ token, result }: { token: string; result: ScanResult }) {
                   type="button"
                   onClick={() => setPicked(slot)}
                   className="min-h-11 shrink-0 rounded-2xl px-4 text-sm font-bold"
-                  style={{ background: "var(--primary)", color: "var(--bg)" }}
+                  style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                 >
                   {t("scanTrialBook")}
                 </button>

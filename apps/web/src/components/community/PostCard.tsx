@@ -146,9 +146,10 @@ export function PostCard({ post }: { post: CommunityPost }) {
           onClick={() => void run(() => setKudos(token!, post, !post.kudos_by_me))}
           className="min-h-11 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
           style={{
-            background: post.kudos_by_me ? "var(--primary)" : "var(--panel-raised)",
-            color: post.kudos_by_me ? "var(--bg)" : "var(--text)",
-            border: "1px solid var(--border)",
+            // Kudos are emotion: Heat (BRAND.md).
+            background: post.kudos_by_me ? "var(--heat)" : "var(--panel-raised)",
+            color: post.kudos_by_me ? "var(--heat-contrast)" : "var(--text)",
+            border: `1px solid ${post.kudos_by_me ? "var(--heat)" : "var(--border)"}`,
           }}
         >
           {t("kudos", { count: post.kudos_count })}
@@ -339,7 +340,7 @@ export function Attachment({ type, snapshot }: { type: string; snapshot: Snapsho
 
   return (
     <div className="rounded-2xl p-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
-      <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>
+      <p className="text-xs font-bold uppercase tracking-[0.14em]" style={{ color: type === "pr" ? "var(--heat)" : "var(--dim)" }}>
         {type === "pr" ? t("attachmentPr") : t("attachmentWorkout")}
       </p>
       <p className="font-bold" style={{ color: "var(--text)" }}>{title}</p>
@@ -442,7 +443,7 @@ function Comments({ post }: { post: CommunityPost }) {
           type="submit"
           disabled={!draft.trim()}
           className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("send")}
         </button>

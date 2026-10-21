@@ -126,7 +126,7 @@ function GroupRow({ club, group }: { club: CommunityClub; group: CommunityGroup 
             disabled={join.isPending}
             onClick={() => join.mutate()}
             className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--bg)" }}
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
             {group.join_policy === "request" ? t("groupAsk") : t("groupJoin")}
           </button>

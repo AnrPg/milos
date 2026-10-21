@@ -454,7 +454,7 @@ function WaterTile({
           onClick={onAdd}
           disabled={pending}
           className="min-h-11 rounded-2xl text-base font-extrabold disabled:opacity-60"
-          style={{ background: "var(--primary)", color: "var(--bg)" }}
+          style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         >
           {t("water.add")}
         </button>

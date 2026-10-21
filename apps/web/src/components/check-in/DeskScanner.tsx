@@ -284,7 +284,7 @@ function DeskResultCard({
           // eslint-disable-next-line @next/next/no-img-element -- member photo from the media origin
           <img src={result.member.avatar_url} alt="" className="h-16 w-16 shrink-0 rounded-full object-cover" />
         ) : (
-          <span aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-extrabold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+          <span aria-hidden="true" className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full text-xl font-extrabold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
             {name.slice(0, 2).toUpperCase() || "?"}
           </span>
         )}

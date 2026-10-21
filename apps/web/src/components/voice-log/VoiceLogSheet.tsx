@@ -124,7 +124,7 @@ export function VoiceLogSheet({
             className="flex h-20 w-20 items-center justify-center rounded-full disabled:opacity-60"
             style={{
               background: recording ? "var(--danger)" : "var(--primary)",
-              color: "var(--bg)",
+              color: "var(--primary-contrast)",
               boxShadow: recording ? "0 0 0 8px color-mix(in srgb, var(--danger) 25%, transparent)" : undefined,
             }}
           >

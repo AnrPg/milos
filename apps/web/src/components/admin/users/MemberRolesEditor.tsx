@@ -81,7 +81,7 @@ export function MemberRolesEditor({
                 style={{
                   background: selected ? "var(--primary)" : "var(--panel-muted)",
                   border: `1px ${STAFF.includes(role) ? "solid" : "dashed"} var(--border)`,
-                  color: selected ? "var(--bg)" : "var(--text-soft)",
+                  color: selected ? "var(--primary-contrast)" : "var(--text-soft)",
                 }}
               >
                 <SemanticLabel value={role} />

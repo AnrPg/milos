@@ -168,7 +168,7 @@ function Form({ token, initial }: { token: string; initial: RulesDraft }) {
           {save.isError ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{t(checkInErrorKey(save.error))}</p> : null}
           {saved ? <p role="status" className="text-sm" style={{ color: "var(--success)" }}>{t("saved")}</p> : null}
           {confirming ? null : (
-            <button type="submit" disabled={save.isPending || errors.length > 0} className="min-h-12 rounded-2xl text-sm font-bold disabled:opacity-60" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <button type="submit" disabled={save.isPending || errors.length > 0} className="min-h-12 rounded-2xl text-sm font-bold disabled:opacity-60" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {save.isPending ? t("saving") : t("save")}
             </button>
           )}

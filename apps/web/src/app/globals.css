@@ -341,6 +341,57 @@ input[type="number"] {
   outline-offset: 2px;
 }
 
+/* MapLibre's own controls (zoom buttons, attribution) in the theme: the
+   library ships white buttons with dark icon images, so the icons are drawn
+   here in the text colour instead. */
+.maplibregl-ctrl-group,
+.maplibregl-ctrl-attrib,
+.maplibregl-ctrl-attrib.maplibregl-compact {
+  background: var(--panel) !important;
+  color: var(--muted);
+  box-shadow: var(--shadow-sm) !important;
+}
+.maplibregl-ctrl-group button + button {
+  border-top-color: var(--border) !important;
+}
+.maplibregl-ctrl-group button:not(:disabled):hover {
+  background: var(--panel-muted) !important;
+}
+.maplibregl-ctrl-group button:focus-visible {
+  box-shadow: 0 0 0 2px var(--focus-ring) !important;
+}
+.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon,
+.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon {
+  background-image: none !important;
+  display: grid;
+  place-items: center;
+  color: var(--text);
+  font: 700 18px/1 var(--font-brand);
+}
+.maplibregl-ctrl-zoom-in .maplibregl-ctrl-icon::before {
+  content: "+";
+}
+.maplibregl-ctrl-zoom-out .maplibregl-ctrl-icon::before {
+  content: "\2212";
+}
+.maplibregl-ctrl-attrib a {
+  color: var(--muted) !important;
+}
+.maplibregl-ctrl-attrib-button {
+  background-color: var(--panel-muted) !important;
+  background-image: none !important;
+  color: var(--text);
+  font: italic 700 13px/24px Georgia, serif;
+  text-align: center;
+}
+.maplibregl-ctrl-attrib-button::before {
+  content: "i";
+}
+.maplibregl-canvas-container,
+.maplibregl-map {
+  background: var(--map-land);
+}
+
 /* Γύρω μου pins (ADR-154): events round in the brand colour, boxes square. */
 .palee-around-pin .palee-map-pin__dot {
   width: 16px;

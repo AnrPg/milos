@@ -178,7 +178,7 @@ function TrialRow({ trial, token, stage }: { trial: StaffTrial; token: string; s
             />
           </label>
           <div className="flex gap-2">
-            <button type="button" disabled={action.isPending} onClick={() => action.mutate("decline")} className={button} style={{ background: "var(--danger)", color: "var(--bg)" }}>
+            <button type="button" disabled={action.isPending} onClick={() => action.mutate("decline")} className={button} style={{ background: "var(--danger)", color: "var(--danger-contrast)" }}>
               {t("decline")}
             </button>
             <button type="button" onClick={() => setDeclining(false)} className={button} style={{ color: "var(--text-soft)" }}>
@@ -190,7 +190,7 @@ function TrialRow({ trial, token, stage }: { trial: StaffTrial; token: string; s
         <div className="flex flex-wrap gap-2">
           {stage === "requests" && trial.status === "requested" ? (
             <>
-              <button type="button" disabled={action.isPending} onClick={() => action.mutate("accept")} className={button} style={{ background: "var(--primary)", color: "var(--bg)" }}>
+              <button type="button" disabled={action.isPending} onClick={() => action.mutate("accept")} className={button} style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                 {t("accept")}
               </button>
               <button type="button" onClick={() => setDeclining(true)} className={button} style={{ background: "var(--panel-raised)", color: "var(--text)" }}>
@@ -200,7 +200,7 @@ function TrialRow({ trial, token, stage }: { trial: StaffTrial; token: string; s
           ) : null}
           {stage === "upcoming" && trial.status === "booked" && started ? (
             <>
-              <button type="button" disabled={action.isPending} onClick={() => action.mutate("attended")} className={button} style={{ background: "var(--primary)", color: "var(--bg)" }}>
+              <button type="button" disabled={action.isPending} onClick={() => action.mutate("attended")} className={button} style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
                 {t("markAttended")}
               </button>
               <button type="button" disabled={action.isPending} onClick={() => action.mutate("no_show")} className={button} style={{ background: "var(--panel-raised)", color: "var(--text)" }}>

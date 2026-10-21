@@ -99,7 +99,7 @@ export function ClubPage({ clubId, channelId = null }: { clubId: string; channel
             className="min-h-11 rounded-2xl px-1 text-sm font-semibold"
             style={{
               background: tab === id ? "var(--primary)" : "var(--panel)",
-              color: tab === id ? "var(--bg)" : "var(--text)",
+              color: tab === id ? "var(--primary-contrast)" : "var(--text)",
               border: "1px solid var(--border)",
             }}
           >
@@ -275,7 +275,7 @@ function ChannelRow({
           className="min-h-11 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
           style={{
             background: channel.joined ? "var(--panel-raised)" : "var(--primary)",
-            color: channel.joined ? "var(--text)" : "var(--bg)",
+            color: channel.joined ? "var(--text)" : "var(--primary-contrast)",
             border: "1px solid var(--border)",
           }}
         >

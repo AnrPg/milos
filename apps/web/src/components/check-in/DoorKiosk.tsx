@@ -179,7 +179,7 @@ export function DoorKiosk({ locationId }: { locationId: string }) {
               {t("soundOn")}
             </span>
           ) : (
-            <button type="button" onClick={enableSound} className="min-h-11 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <button type="button" onClick={enableSound} className="min-h-11 rounded-full px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {t("enableSound")}
             </button>
           )}

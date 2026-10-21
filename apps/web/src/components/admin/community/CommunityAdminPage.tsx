@@ -76,7 +76,7 @@ export function CommunityAdminPage() {
               className="min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-2xl px-3 text-sm font-semibold"
               style={{
                 background: tab === value ? "var(--primary)" : "var(--panel)",
-                color: tab === value ? "var(--bg)" : "var(--text)",
+                color: tab === value ? "var(--primary-contrast)" : "var(--text)",
                 border: "1px solid var(--border)",
               }}
             >

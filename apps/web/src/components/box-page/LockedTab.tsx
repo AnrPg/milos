@@ -35,7 +35,7 @@ export function LockedTab({ slug, tab }: { slug: string; tab: "schedule" | "even
           <p className="font-bold" style={{ color: "var(--text)" }}>{t(`locked.${tab}`)}</p>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("lockedHint")}</p>
           <div className="flex w-full flex-col gap-2">
-            <Link href={`/register?next=${next}`} className="flex min-h-11 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--bg)" }}>
+            <Link href={`/register?next=${next}`} className="flex min-h-11 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {t("createAccount")}
             </Link>
             <Link href={`/login?next=${next}`} className="flex min-h-11 items-center justify-center rounded-2xl text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>

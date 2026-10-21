@@ -63,7 +63,7 @@ export function MeHub() {
             <span
               aria-hidden="true"
               className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full text-2xl font-extrabold"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {initials}
             </span>

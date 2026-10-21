@@ -1168,7 +1168,7 @@ export function AssignedWorkoutsConsole({
                           <span
                             key={(assignment.id) + "-" + (athlete.id)}
                             className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                            style={{ background: "var(--primary)", color: "var(--bg)" }}
+                            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
                           >
                             {athlete.nickname}
                           </span>
@@ -1284,7 +1284,7 @@ export function AssignedWorkoutsConsole({
                                 className="flex w-full items-center justify-between rounded-[0.9rem] px-3 py-2 text-start text-sm transition-colors"
                                 style={
                                   selected
-                                    ? { background: "var(--primary)", color: "var(--bg)" }
+                                    ? { background: "var(--primary)", color: "var(--primary-contrast)" }
                                     : { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text-soft)" }
                                 }
                                 onClick={() =>

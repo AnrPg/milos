@@ -61,7 +61,7 @@ export function TrainingHistory({
                 aria-selected={kind === option}
                 onClick={() => setKind(option)}
                 className="rounded-full px-4 py-1.5 text-sm font-semibold"
-                style={kind === option ? { background: "var(--primary)", color: "var(--bg)" } : { color: "var(--text-soft)" }}
+                style={kind === option ? { background: "var(--primary)", color: "var(--primary-contrast)" } : { color: "var(--text-soft)" }}
               >
                 {option === "workouts" ? i18n("historyWorkouts") : i18n("historyClasses")}
               </button>

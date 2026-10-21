@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 
 import type { AroundPin, AroundViewport } from "@/api/around";
 import { mapStyleUrl } from "@/lib/map-style";
+import { followMapTheme } from "@/lib/map-theme";
 
 // The worker ships as its own module next to the bundle.
 maplibregl.setWorkerUrl(new URL("maplibre-gl/dist/maplibre-gl-worker.mjs", import.meta.url).href);
@@ -84,6 +85,7 @@ export default function AroundMap({
       return;
     }
     instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    const stopTheme = followMapTheme(instance);
     // Only the person's own panning or zooming offers «Ψάξε εδώ».
     let byPerson = false;
     const started = (event: { originalEvent?: unknown }) => {
@@ -101,6 +103,7 @@ export default function AroundMap({
     map.current = instance;
     const current = markers.current;
     return () => {
+      stopTheme();
       instance.remove();
       map.current = null;
       current.clear();

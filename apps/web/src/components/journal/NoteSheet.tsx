@@ -131,7 +131,7 @@ export function NoteSheet({
               className="rounded-full px-3 py-1.5 text-sm font-semibold"
               style={{
                 background: topic === option ? "var(--primary)" : "var(--panel-raised)",
-                color: topic === option ? "var(--bg)" : "var(--text)",
+                color: topic === option ? "var(--primary-contrast)" : "var(--text)",
                 border: "1px solid var(--border)",
               }}
             >
@@ -206,7 +206,7 @@ export function NoteSheet({
               disabled={blocked || busy}
               onClick={() => save.mutate()}
               className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--bg)" }}
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
             >
               {save.isPending ? t("saving") : !note && needsQuestion(chosen) ? t("askCoach") : t("save")}
             </button>
