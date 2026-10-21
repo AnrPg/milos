@@ -218,6 +218,21 @@ All recommended options, with every recommended extra.
 6. **Coach view (Q6 A):** totals on the workout and the class from shared entries only, shown only with 3 or more
    entries; also lists goals nobody felt.
 
+### Native wrapper (2026-10-21, ADR-171, no board: owner's standing instruction)
+1. **Shell:** Capacitor 8 in `apps/mobile`, app id `app.milos.member`, «Milos»; the app loads the deployed web app
+   (production `https://milos.4kq.net`, or `MILOS_APP_URL`), so web and apps ship together. Other hosts open in the
+   system browser (allow-list: the app host and `connect.garmin.com`). A local «Χωρίς σύνδεση» page covers a cold start
+   offline; after that the outbox and service worker behave as on the web.
+2. **Share links open the app:** `/c/`, `/join/`, `/b/`, `/r/`, `/events/`, `/trials/`, `/buddy/` through universal
+   links and App Links; `/.well-known` files come from env and answer 404 until the store ids exist.
+3. **Push:** the bell and profile switches use the OS push inside the app (APNs on iOS, FCM on Android), web push in a
+   browser; tapping a push opens its page. Off until the owner adds the keys.
+4. **No new screens, no clutter:** no install prompt (none exists on the web); in the app «Συνδεδεμένες συσκευές» shows
+   only this phone's health row, as «Σύντομα» until P3-M10; the web keeps both rows as «Με την εφαρμογή». The page draws
+   under the notch with safe-area padding, unchanged in browsers.
+5. **Owner actions:** Apple developer account and team id, APNs key, Firebase project and `google-services.json`, Play
+   Console and signing keys (fingerprints), icons and store listings (ADR-171 «Owner actions»).
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
 - [ ] Training load shown as an overload indicator, never a verdict
@@ -236,4 +251,4 @@ All recommended options, with every recommended extra.
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
 - [x] P3-M1 (ADR-163) · [ ] P3-M2 · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
-- [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
+- [ ] P3-M8 · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13
