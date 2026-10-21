@@ -9630,6 +9630,122 @@
         "title": "AthleteInjuryWarningsRequest",
         "type": "object"
       },
+      "BlockPersonRequest": {
+        "properties": {
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id"
+        ],
+        "title": "BlockPersonRequest",
+        "type": "object"
+      },
+      "BlockPersonResponse": {
+        "properties": {
+          "blocked": {
+            "type": "boolean"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "user_id",
+          "blocked"
+        ],
+        "title": "BlockPersonResponse",
+        "type": "object"
+      },
+      "BlockedPeople": {
+        "properties": {
+          "blocks": {
+            "items": {
+              "properties": {
+                "blocked_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerPerson",
+                  "type": "object"
+                }
+              },
+              "required": [
+                "person",
+                "blocked_at"
+              ],
+              "title": "BlockedPerson",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "blocks"
+        ],
+        "title": "BlockedPeople",
+        "type": "object"
+      },
+      "BlockedPerson": {
+        "properties": {
+          "blocked_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerPerson",
+            "type": "object"
+          }
+        },
+        "required": [
+          "person",
+          "blocked_at"
+        ],
+        "title": "BlockedPerson",
+        "type": "object"
+      },
       "BodyAccessLog": {
         "properties": {
           "entries": {
@@ -22558,10 +22674,14 @@
           },
           "needs_approval": {
             "type": "boolean"
+          },
+          "partners_enabled": {
+            "type": "boolean"
           }
         },
         "required": [
           "member_groups",
+          "partners_enabled",
           "can_propose",
           "needs_approval",
           "lifecycle"
@@ -22958,10 +23078,14 @@
               },
               "needs_approval": {
                 "type": "boolean"
+              },
+              "partners_enabled": {
+                "type": "boolean"
               }
             },
             "required": [
               "member_groups",
+              "partners_enabled",
               "can_propose",
               "needs_approval",
               "lifecycle"
@@ -25424,7 +25548,8 @@
             "enum": [
               "post",
               "comment",
-              "channel"
+              "channel",
+              "partner"
             ],
             "type": "string"
           }
@@ -25486,7 +25611,8 @@
             "enum": [
               "post",
               "comment",
-              "channel"
+              "channel",
+              "partner"
             ],
             "type": "string"
           }
@@ -25683,7 +25809,8 @@
             "enum": [
               "post",
               "comment",
-              "channel"
+              "channel",
+              "partner"
             ],
             "type": "string"
           }
@@ -25865,7 +25992,8 @@
                   "enum": [
                     "post",
                     "comment",
-                    "channel"
+                    "channel",
+                    "partner"
                   ],
                   "type": "string"
                 }
@@ -25899,11 +26027,12 @@
               "free"
             ],
             "type": "string"
+          },
+          "partners_enabled": {
+            "description": "Whether the gym's verified clubs offer Partners (ADR-169)",
+            "type": "boolean"
           }
         },
-        "required": [
-          "member_groups"
-        ],
         "title": "CommunitySettingsRequest",
         "type": "object"
       },
@@ -25932,10 +26061,14 @@
               "free"
             ],
             "type": "string"
+          },
+          "partners_enabled": {
+            "type": "boolean"
           }
         },
         "required": [
           "member_groups",
+          "partners_enabled",
           "lifecycle"
         ],
         "title": "CommunitySettingsResponse",
@@ -26432,10 +26565,14 @@
               },
               "needs_approval": {
                 "type": "boolean"
+              },
+              "partners_enabled": {
+                "type": "boolean"
               }
             },
             "required": [
               "member_groups",
+              "partners_enabled",
               "can_propose",
               "needs_approval",
               "lifecycle"
@@ -36134,6 +36271,1844 @@
           "score"
         ],
         "title": "PRTimelineEntry",
+        "type": "object"
+      },
+      "PartnerCard": {
+        "properties": {
+          "about": {
+            "nullable": true,
+            "type": "string"
+          },
+          "goals": {
+            "items": {
+              "enum": [
+                "strength",
+                "conditioning",
+                "weight_loss",
+                "skills",
+                "competition",
+                "consistency"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerPerson",
+            "type": "object"
+          },
+          "profile_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "shared": {
+            "properties": {
+              "goals": {
+                "items": {
+                  "enum": [
+                    "strength",
+                    "conditioning",
+                    "weight_loss",
+                    "skills",
+                    "competition",
+                    "consistency"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "same_level": {
+                "type": "boolean"
+              },
+              "times": {
+                "items": {
+                  "enum": [
+                    "early",
+                    "midday",
+                    "afternoon",
+                    "evening",
+                    "weekend"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "times",
+              "goals",
+              "same_level"
+            ],
+            "title": "PartnerShared",
+            "type": "object"
+          },
+          "times": {
+            "items": {
+              "enum": [
+                "early",
+                "midday",
+                "afternoon",
+                "evening",
+                "weekend"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "profile_id",
+          "person",
+          "level",
+          "times",
+          "goals",
+          "about",
+          "shared"
+        ],
+        "title": "PartnerCard",
+        "type": "object"
+      },
+      "PartnerDeck": {
+        "properties": {
+          "cards": {
+            "items": {
+              "properties": {
+                "about": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "goals": {
+                  "items": {
+                    "enum": [
+                      "strength",
+                      "conditioning",
+                      "weight_loss",
+                      "skills",
+                      "competition",
+                      "consistency"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "level": {
+                  "enum": [
+                    "beginner",
+                    "intermediate",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerPerson",
+                  "type": "object"
+                },
+                "profile_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "shared": {
+                  "properties": {
+                    "goals": {
+                      "items": {
+                        "enum": [
+                          "strength",
+                          "conditioning",
+                          "weight_loss",
+                          "skills",
+                          "competition",
+                          "consistency"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "same_level": {
+                      "type": "boolean"
+                    },
+                    "times": {
+                      "items": {
+                        "enum": [
+                          "early",
+                          "midday",
+                          "afternoon",
+                          "evening",
+                          "weekend"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "times",
+                    "goals",
+                    "same_level"
+                  ],
+                  "title": "PartnerShared",
+                  "type": "object"
+                },
+                "times": {
+                  "items": {
+                    "enum": [
+                      "early",
+                      "midday",
+                      "afternoon",
+                      "evening",
+                      "weekend"
+                    ],
+                    "type": "string"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "profile_id",
+                "person",
+                "level",
+                "times",
+                "goals",
+                "about",
+                "shared"
+              ],
+              "title": "PartnerCard",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "club_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "swipes_remaining": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "club_id",
+          "cards",
+          "swipes_remaining"
+        ],
+        "title": "PartnerDeck",
+        "type": "object"
+      },
+      "PartnerMatch": {
+        "properties": {
+          "club_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "club_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "end_reason": {
+            "enum": [
+              "unmatched",
+              "blocked",
+              "reported",
+              "left",
+              "hidden"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "ended_by_me": {
+            "type": "boolean"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "last_message_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "matched_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "person": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerPerson",
+            "type": "object"
+          },
+          "plannable": {
+            "description": "«Κλείστε μαζί» offers the gym's classes",
+            "type": "boolean"
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "ended"
+            ],
+            "type": "string"
+          },
+          "unread": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "club_id",
+          "club_name",
+          "person",
+          "status",
+          "end_reason",
+          "ended_by_me",
+          "read_only",
+          "plannable",
+          "unread",
+          "matched_at",
+          "last_message_at"
+        ],
+        "title": "PartnerMatch",
+        "type": "object"
+      },
+      "PartnerMatchEnded": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "active",
+              "ended"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "PartnerMatchEnded",
+        "type": "object"
+      },
+      "PartnerMatches": {
+        "properties": {
+          "matches": {
+            "items": {
+              "properties": {
+                "club_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "club_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "end_reason": {
+                  "enum": [
+                    "unmatched",
+                    "blocked",
+                    "reported",
+                    "left",
+                    "hidden"
+                  ],
+                  "nullable": true,
+                  "type": "string"
+                },
+                "ended_by_me": {
+                  "type": "boolean"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "last_message_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "matched_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "person": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerPerson",
+                  "type": "object"
+                },
+                "plannable": {
+                  "description": "«Κλείστε μαζί» offers the gym's classes",
+                  "type": "boolean"
+                },
+                "read_only": {
+                  "type": "boolean"
+                },
+                "status": {
+                  "enum": [
+                    "active",
+                    "ended"
+                  ],
+                  "type": "string"
+                },
+                "unread": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "club_id",
+                "club_name",
+                "person",
+                "status",
+                "end_reason",
+                "ended_by_me",
+                "read_only",
+                "plannable",
+                "unread",
+                "matched_at",
+                "last_message_at"
+              ],
+              "title": "PartnerMatch",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "matches"
+        ],
+        "title": "PartnerMatches",
+        "type": "object"
+      },
+      "PartnerMessage": {
+        "properties": {
+          "author": {
+            "properties": {
+              "avatar_url": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "nickname": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "nickname",
+              "avatar_url"
+            ],
+            "title": "PartnerPerson",
+            "type": "object"
+          },
+          "body": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "text",
+              "plan"
+            ],
+            "type": "string"
+          },
+          "match_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "mine": {
+            "type": "boolean"
+          },
+          "plan": {
+            "allOf": [
+              {
+                "properties": {
+                  "class_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "duration_minutes": {
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "scheduled_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "class_id",
+                  "name",
+                  "scheduled_at",
+                  "duration_minutes"
+                ],
+                "title": "PartnerPlan",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          }
+        },
+        "required": [
+          "id",
+          "match_id",
+          "kind",
+          "body",
+          "plan",
+          "mine",
+          "author",
+          "created_at"
+        ],
+        "title": "PartnerMessage",
+        "type": "object"
+      },
+      "PartnerMessagePage": {
+        "properties": {
+          "messages": {
+            "items": {
+              "properties": {
+                "author": {
+                  "properties": {
+                    "avatar_url": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "nickname": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "nickname",
+                    "avatar_url"
+                  ],
+                  "title": "PartnerPerson",
+                  "type": "object"
+                },
+                "body": {
+                  "maxLength": 2000,
+                  "nullable": true,
+                  "type": "string"
+                },
+                "created_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "text",
+                    "plan"
+                  ],
+                  "type": "string"
+                },
+                "match_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "mine": {
+                  "type": "boolean"
+                },
+                "plan": {
+                  "allOf": [
+                    {
+                      "properties": {
+                        "class_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "duration_minutes": {
+                          "nullable": true,
+                          "type": "integer"
+                        },
+                        "name": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "scheduled_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "class_id",
+                        "name",
+                        "scheduled_at",
+                        "duration_minutes"
+                      ],
+                      "title": "PartnerPlan",
+                      "type": "object"
+                    }
+                  ],
+                  "nullable": true
+                }
+              },
+              "required": [
+                "id",
+                "match_id",
+                "kind",
+                "body",
+                "plan",
+                "mine",
+                "author",
+                "created_at"
+              ],
+              "title": "PartnerMessage",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          },
+          "read_only": {
+            "type": "boolean"
+          },
+          "unread": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "messages",
+          "next_cursor",
+          "read_only",
+          "unread"
+        ],
+        "title": "PartnerMessagePage",
+        "type": "object"
+      },
+      "PartnerMessageRequest": {
+        "properties": {
+          "body": {
+            "maxLength": 2000,
+            "minLength": 1,
+            "type": "string"
+          }
+        },
+        "required": [
+          "body"
+        ],
+        "title": "PartnerMessageRequest",
+        "type": "object"
+      },
+      "PartnerMessageResponse": {
+        "properties": {
+          "message": {
+            "properties": {
+              "author": {
+                "properties": {
+                  "avatar_url": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "nickname": {
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "nickname",
+                  "avatar_url"
+                ],
+                "title": "PartnerPerson",
+                "type": "object"
+              },
+              "body": {
+                "maxLength": 2000,
+                "nullable": true,
+                "type": "string"
+              },
+              "created_at": {
+                "format": "date-time",
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "text",
+                  "plan"
+                ],
+                "type": "string"
+              },
+              "match_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "mine": {
+                "type": "boolean"
+              },
+              "plan": {
+                "allOf": [
+                  {
+                    "properties": {
+                      "class_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "duration_minutes": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "scheduled_at": {
+                        "format": "date-time",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "class_id",
+                      "name",
+                      "scheduled_at",
+                      "duration_minutes"
+                    ],
+                    "title": "PartnerPlan",
+                    "type": "object"
+                  }
+                ],
+                "nullable": true
+              }
+            },
+            "required": [
+              "id",
+              "match_id",
+              "kind",
+              "body",
+              "plan",
+              "mine",
+              "author",
+              "created_at"
+            ],
+            "title": "PartnerMessage",
+            "type": "object"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "PartnerMessageResponse",
+        "type": "object"
+      },
+      "PartnerMessagesRead": {
+        "properties": {
+          "read": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "read"
+        ],
+        "title": "PartnerMessagesRead",
+        "type": "object"
+      },
+      "PartnerOptions": {
+        "properties": {
+          "about_max": {
+            "type": "integer"
+          },
+          "daily_swipes": {
+            "type": "integer"
+          },
+          "gender_preferences": {
+            "items": {
+              "enum": [
+                "any",
+                "women",
+                "men"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "genders": {
+            "items": {
+              "enum": [
+                "woman",
+                "man",
+                "other"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "goals": {
+            "items": {
+              "enum": [
+                "strength",
+                "conditioning",
+                "weight_loss",
+                "skills",
+                "competition",
+                "consistency"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "levels": {
+            "items": {
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "max_goals": {
+            "type": "integer"
+          },
+          "times": {
+            "items": {
+              "enum": [
+                "early",
+                "midday",
+                "afternoon",
+                "evening",
+                "weekend"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "levels",
+          "times",
+          "goals",
+          "genders",
+          "gender_preferences",
+          "max_goals",
+          "about_max",
+          "daily_swipes"
+        ],
+        "title": "PartnerOptions",
+        "type": "object"
+      },
+      "PartnerPerson": {
+        "properties": {
+          "avatar_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nickname": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "nickname",
+          "avatar_url"
+        ],
+        "title": "PartnerPerson",
+        "type": "object"
+      },
+      "PartnerPlan": {
+        "properties": {
+          "class_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scheduled_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "class_id",
+          "name",
+          "scheduled_at",
+          "duration_minutes"
+        ],
+        "title": "PartnerPlan",
+        "type": "object"
+      },
+      "PartnerPlanRequest": {
+        "properties": {
+          "body": {
+            "maxLength": 2000,
+            "nullable": true,
+            "type": "string"
+          },
+          "class_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "class_id"
+        ],
+        "title": "PartnerPlanRequest",
+        "type": "object"
+      },
+      "PartnerProfile": {
+        "properties": {
+          "about": {
+            "nullable": true,
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "club_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "gender": {
+            "description": "Only used to honour preferences; never shown to anyone",
+            "enum": [
+              "woman",
+              "man",
+              "other"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "gender_preference": {
+            "enum": [
+              "any",
+              "women",
+              "men"
+            ],
+            "type": "string"
+          },
+          "goals": {
+            "items": {
+              "enum": [
+                "strength",
+                "conditioning",
+                "weight_loss",
+                "skills",
+                "competition",
+                "consistency"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "type": "string"
+          },
+          "suspended": {
+            "description": "Staff hid it after a report",
+            "type": "boolean"
+          },
+          "times": {
+            "items": {
+              "enum": [
+                "early",
+                "midday",
+                "afternoon",
+                "evening",
+                "weekend"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "club_id",
+          "active",
+          "suspended",
+          "level",
+          "times",
+          "goals",
+          "about",
+          "gender",
+          "gender_preference"
+        ],
+        "title": "PartnerProfile",
+        "type": "object"
+      },
+      "PartnerProfileRequest": {
+        "properties": {
+          "about": {
+            "maxLength": 140,
+            "nullable": true,
+            "type": "string"
+          },
+          "active": {
+            "type": "boolean"
+          },
+          "gender": {
+            "enum": [
+              "woman",
+              "man",
+              "other"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "gender_preference": {
+            "enum": [
+              "any",
+              "women",
+              "men"
+            ],
+            "type": "string"
+          },
+          "goals": {
+            "items": {
+              "enum": [
+                "strength",
+                "conditioning",
+                "weight_loss",
+                "skills",
+                "competition",
+                "consistency"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "type": "string"
+          },
+          "times": {
+            "items": {
+              "enum": [
+                "early",
+                "midday",
+                "afternoon",
+                "evening",
+                "weekend"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "title": "PartnerProfileRequest",
+        "type": "object"
+      },
+      "PartnerProfileResponse": {
+        "properties": {
+          "profile": {
+            "properties": {
+              "about": {
+                "nullable": true,
+                "type": "string"
+              },
+              "active": {
+                "type": "boolean"
+              },
+              "club_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "gender": {
+                "description": "Only used to honour preferences; never shown to anyone",
+                "enum": [
+                  "woman",
+                  "man",
+                  "other"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "gender_preference": {
+                "enum": [
+                  "any",
+                  "women",
+                  "men"
+                ],
+                "type": "string"
+              },
+              "goals": {
+                "items": {
+                  "enum": [
+                    "strength",
+                    "conditioning",
+                    "weight_loss",
+                    "skills",
+                    "competition",
+                    "consistency"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "level": {
+                "enum": [
+                  "beginner",
+                  "intermediate",
+                  "advanced"
+                ],
+                "type": "string"
+              },
+              "suspended": {
+                "description": "Staff hid it after a report",
+                "type": "boolean"
+              },
+              "times": {
+                "items": {
+                  "enum": [
+                    "early",
+                    "midday",
+                    "afternoon",
+                    "evening",
+                    "weekend"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "updated_at": {
+                "format": "date-time",
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "club_id",
+              "active",
+              "suspended",
+              "level",
+              "times",
+              "goals",
+              "about",
+              "gender",
+              "gender_preference"
+            ],
+            "title": "PartnerProfile",
+            "type": "object"
+          }
+        },
+        "required": [
+          "profile"
+        ],
+        "title": "PartnerProfileResponse",
+        "type": "object"
+      },
+      "PartnerSession": {
+        "properties": {
+          "booked_by_me": {
+            "type": "boolean"
+          },
+          "booked_by_partner": {
+            "type": "boolean"
+          },
+          "class_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "duration_minutes": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "scheduled_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "shared_time": {
+            "description": "In a time both of you chose",
+            "type": "boolean"
+          },
+          "spots_remaining": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "class_id",
+          "name",
+          "scheduled_at",
+          "duration_minutes",
+          "spots_remaining",
+          "booked_by_me",
+          "booked_by_partner",
+          "shared_time"
+        ],
+        "title": "PartnerSession",
+        "type": "object"
+      },
+      "PartnerSessions": {
+        "properties": {
+          "available": {
+            "type": "boolean"
+          },
+          "sessions": {
+            "items": {
+              "properties": {
+                "booked_by_me": {
+                  "type": "boolean"
+                },
+                "booked_by_partner": {
+                  "type": "boolean"
+                },
+                "class_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "duration_minutes": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "scheduled_at": {
+                  "format": "date-time",
+                  "type": "string"
+                },
+                "shared_time": {
+                  "description": "In a time both of you chose",
+                  "type": "boolean"
+                },
+                "spots_remaining": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "class_id",
+                "name",
+                "scheduled_at",
+                "duration_minutes",
+                "spots_remaining",
+                "booked_by_me",
+                "booked_by_partner",
+                "shared_time"
+              ],
+              "title": "PartnerSession",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "timezone": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "available",
+          "timezone",
+          "sessions"
+        ],
+        "title": "PartnerSessions",
+        "type": "object"
+      },
+      "PartnerSettings": {
+        "properties": {
+          "club_ids": {
+            "items": {
+              "format": "uuid",
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "clubs": {
+            "description": "Clubs where you have a profile",
+            "type": "integer"
+          },
+          "visible": {
+            "description": "Whether any of your profiles is on",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "visible",
+          "clubs",
+          "club_ids"
+        ],
+        "title": "PartnerSettings",
+        "type": "object"
+      },
+      "PartnerSettingsRequest": {
+        "properties": {
+          "visible": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "visible"
+        ],
+        "title": "PartnerSettingsRequest",
+        "type": "object"
+      },
+      "PartnerShared": {
+        "properties": {
+          "goals": {
+            "items": {
+              "enum": [
+                "strength",
+                "conditioning",
+                "weight_loss",
+                "skills",
+                "competition",
+                "consistency"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "same_level": {
+            "type": "boolean"
+          },
+          "times": {
+            "items": {
+              "enum": [
+                "early",
+                "midday",
+                "afternoon",
+                "evening",
+                "weekend"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "times",
+          "goals",
+          "same_level"
+        ],
+        "title": "PartnerShared",
+        "type": "object"
+      },
+      "PartnerSwipeRequest": {
+        "properties": {
+          "direction": {
+            "enum": [
+              "like",
+              "pass"
+            ],
+            "type": "string"
+          },
+          "target_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "direction"
+        ],
+        "title": "PartnerSwipeRequest",
+        "type": "object"
+      },
+      "PartnerSwipeResponse": {
+        "properties": {
+          "direction": {
+            "enum": [
+              "like",
+              "pass"
+            ],
+            "type": "string"
+          },
+          "match": {
+            "allOf": [
+              {
+                "properties": {
+                  "club_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "club_name": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "end_reason": {
+                    "enum": [
+                      "unmatched",
+                      "blocked",
+                      "reported",
+                      "left",
+                      "hidden"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "ended_by_me": {
+                    "type": "boolean"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "last_message_at": {
+                    "format": "date-time",
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "matched_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  },
+                  "person": {
+                    "properties": {
+                      "avatar_url": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "nickname": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "nickname",
+                      "avatar_url"
+                    ],
+                    "title": "PartnerPerson",
+                    "type": "object"
+                  },
+                  "plannable": {
+                    "description": "«Κλείστε μαζί» offers the gym's classes",
+                    "type": "boolean"
+                  },
+                  "read_only": {
+                    "type": "boolean"
+                  },
+                  "status": {
+                    "enum": [
+                      "active",
+                      "ended"
+                    ],
+                    "type": "string"
+                  },
+                  "unread": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "id",
+                  "club_id",
+                  "club_name",
+                  "person",
+                  "status",
+                  "end_reason",
+                  "ended_by_me",
+                  "read_only",
+                  "plannable",
+                  "unread",
+                  "matched_at",
+                  "last_message_at"
+                ],
+                "title": "PartnerMatch",
+                "type": "object"
+              }
+            ],
+            "description": "Set when the like was mutual",
+            "nullable": true
+          },
+          "swipes_remaining": {
+            "type": "integer"
+          },
+          "target_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "target_id",
+          "direction",
+          "match",
+          "swipes_remaining"
+        ],
+        "title": "PartnerSwipeResponse",
+        "type": "object"
+      },
+      "PartnerUndoResponse": {
+        "properties": {
+          "target_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "undone": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "target_id",
+          "undone"
+        ],
+        "title": "PartnerUndoResponse",
+        "type": "object"
+      },
+      "PartnersClubOverview": {
+        "properties": {
+          "club_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "member": {
+            "description": "Whether the viewer is a member of the club now",
+            "type": "boolean"
+          },
+          "offered": {
+            "type": "boolean"
+          },
+          "options": {
+            "properties": {
+              "about_max": {
+                "type": "integer"
+              },
+              "daily_swipes": {
+                "type": "integer"
+              },
+              "gender_preferences": {
+                "items": {
+                  "enum": [
+                    "any",
+                    "women",
+                    "men"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "genders": {
+                "items": {
+                  "enum": [
+                    "woman",
+                    "man",
+                    "other"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "goals": {
+                "items": {
+                  "enum": [
+                    "strength",
+                    "conditioning",
+                    "weight_loss",
+                    "skills",
+                    "competition",
+                    "consistency"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "levels": {
+                "items": {
+                  "enum": [
+                    "beginner",
+                    "intermediate",
+                    "advanced"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "max_goals": {
+                "type": "integer"
+              },
+              "times": {
+                "items": {
+                  "enum": [
+                    "early",
+                    "midday",
+                    "afternoon",
+                    "evening",
+                    "weekend"
+                  ],
+                  "type": "string"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "levels",
+              "times",
+              "goals",
+              "genders",
+              "gender_preferences",
+              "max_goals",
+              "about_max",
+              "daily_swipes"
+            ],
+            "title": "PartnerOptions",
+            "type": "object"
+          },
+          "profile": {
+            "allOf": [
+              {
+                "properties": {
+                  "about": {
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "club_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "gender": {
+                    "description": "Only used to honour preferences; never shown to anyone",
+                    "enum": [
+                      "woman",
+                      "man",
+                      "other"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "gender_preference": {
+                    "enum": [
+                      "any",
+                      "women",
+                      "men"
+                    ],
+                    "type": "string"
+                  },
+                  "goals": {
+                    "items": {
+                      "enum": [
+                        "strength",
+                        "conditioning",
+                        "weight_loss",
+                        "skills",
+                        "competition",
+                        "consistency"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "id": {
+                    "format": "uuid",
+                    "type": "string"
+                  },
+                  "level": {
+                    "enum": [
+                      "beginner",
+                      "intermediate",
+                      "advanced"
+                    ],
+                    "type": "string"
+                  },
+                  "suspended": {
+                    "description": "Staff hid it after a report",
+                    "type": "boolean"
+                  },
+                  "times": {
+                    "items": {
+                      "enum": [
+                        "early",
+                        "midday",
+                        "afternoon",
+                        "evening",
+                        "weekend"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "updated_at": {
+                    "format": "date-time",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "id",
+                  "club_id",
+                  "active",
+                  "suspended",
+                  "level",
+                  "times",
+                  "goals",
+                  "about",
+                  "gender",
+                  "gender_preference"
+                ],
+                "title": "PartnerProfile",
+                "type": "object"
+              }
+            ],
+            "nullable": true
+          },
+          "swipes_remaining": {
+            "type": "integer"
+          },
+          "unavailable_reason": {
+            "enum": [
+              "disabled",
+              "not_offered"
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "club_id",
+          "offered",
+          "unavailable_reason",
+          "member",
+          "profile",
+          "swipes_remaining",
+          "options"
+        ],
+        "title": "PartnersClubOverview",
         "type": "object"
       },
       "PersonPostsResponse": {
@@ -60874,6 +62849,192 @@
         ]
       }
     },
+    "/api/me/blocks": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.blocks",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "blocks": {
+                      "items": {
+                        "properties": {
+                          "blocked_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerPerson",
+                            "type": "object"
+                          }
+                        },
+                        "required": [
+                          "person",
+                          "blocked_at"
+                        ],
+                        "title": "BlockedPerson",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "blocks"
+                  ],
+                  "title": "BlockedPeople",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Blocked people"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "People you blocked",
+        "tags": [
+          "Partners"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.block",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "user_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "user_id"
+                ],
+                "title": "BlockPersonRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "blocked": {
+                      "type": "boolean"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "blocked"
+                  ],
+                  "title": "BlockPersonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Blocked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Block a person: Partners matches and buddy links between you end; they are not told",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/blocks/{user_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.unblock",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "blocked": {
+                      "type": "boolean"
+                    },
+                    "user_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "user_id",
+                    "blocked"
+                  ],
+                  "title": "BlockPersonResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unblocked"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Unblock a person (ended matches and links stay ended)",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
     "/api/me/body/access-log": {
       "get": {
         "callbacks": {},
@@ -67091,6 +69252,946 @@
         ]
       }
     },
+    "/api/me/clubs/{club_id}/partners": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.club",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "club_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "club_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "member": {
+                      "description": "Whether the viewer is a member of the club now",
+                      "type": "boolean"
+                    },
+                    "offered": {
+                      "type": "boolean"
+                    },
+                    "options": {
+                      "properties": {
+                        "about_max": {
+                          "type": "integer"
+                        },
+                        "daily_swipes": {
+                          "type": "integer"
+                        },
+                        "gender_preferences": {
+                          "items": {
+                            "enum": [
+                              "any",
+                              "women",
+                              "men"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "genders": {
+                          "items": {
+                            "enum": [
+                              "woman",
+                              "man",
+                              "other"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "goals": {
+                          "items": {
+                            "enum": [
+                              "strength",
+                              "conditioning",
+                              "weight_loss",
+                              "skills",
+                              "competition",
+                              "consistency"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "levels": {
+                          "items": {
+                            "enum": [
+                              "beginner",
+                              "intermediate",
+                              "advanced"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "max_goals": {
+                          "type": "integer"
+                        },
+                        "times": {
+                          "items": {
+                            "enum": [
+                              "early",
+                              "midday",
+                              "afternoon",
+                              "evening",
+                              "weekend"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "levels",
+                        "times",
+                        "goals",
+                        "genders",
+                        "gender_preferences",
+                        "max_goals",
+                        "about_max",
+                        "daily_swipes"
+                      ],
+                      "title": "PartnerOptions",
+                      "type": "object"
+                    },
+                    "profile": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "about": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "active": {
+                              "type": "boolean"
+                            },
+                            "club_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "gender": {
+                              "description": "Only used to honour preferences; never shown to anyone",
+                              "enum": [
+                                "woman",
+                                "man",
+                                "other"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "gender_preference": {
+                              "enum": [
+                                "any",
+                                "women",
+                                "men"
+                              ],
+                              "type": "string"
+                            },
+                            "goals": {
+                              "items": {
+                                "enum": [
+                                  "strength",
+                                  "conditioning",
+                                  "weight_loss",
+                                  "skills",
+                                  "competition",
+                                  "consistency"
+                                ],
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "level": {
+                              "enum": [
+                                "beginner",
+                                "intermediate",
+                                "advanced"
+                              ],
+                              "type": "string"
+                            },
+                            "suspended": {
+                              "description": "Staff hid it after a report",
+                              "type": "boolean"
+                            },
+                            "times": {
+                              "items": {
+                                "enum": [
+                                  "early",
+                                  "midday",
+                                  "afternoon",
+                                  "evening",
+                                  "weekend"
+                                ],
+                                "type": "string"
+                              },
+                              "type": "array"
+                            },
+                            "updated_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "club_id",
+                            "active",
+                            "suspended",
+                            "level",
+                            "times",
+                            "goals",
+                            "about",
+                            "gender",
+                            "gender_preference"
+                          ],
+                          "title": "PartnerProfile",
+                          "type": "object"
+                        }
+                      ],
+                      "nullable": true
+                    },
+                    "swipes_remaining": {
+                      "type": "integer"
+                    },
+                    "unavailable_reason": {
+                      "enum": [
+                        "disabled",
+                        "not_offered"
+                      ],
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "club_id",
+                    "offered",
+                    "unavailable_reason",
+                    "member",
+                    "profile",
+                    "swipes_remaining",
+                    "options"
+                  ],
+                  "title": "PartnersClubOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Overview"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Partners in a club as it applies to you: offered?, your profile, the options",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/clubs/{club_id}/partners/deck": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.deck",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "club_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "time",
+            "required": false,
+            "schema": {
+              "enum": [
+                "early",
+                "midday",
+                "afternoon",
+                "evening",
+                "weekend"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "level",
+            "required": false,
+            "schema": {
+              "enum": [
+                "beginner",
+                "intermediate",
+                "advanced"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "goal",
+            "required": false,
+            "schema": {
+              "enum": [
+                "strength",
+                "conditioning",
+                "weight_loss",
+                "skills",
+                "competition",
+                "consistency"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "cards": {
+                      "items": {
+                        "properties": {
+                          "about": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "goals": {
+                            "items": {
+                              "enum": [
+                                "strength",
+                                "conditioning",
+                                "weight_loss",
+                                "skills",
+                                "competition",
+                                "consistency"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          },
+                          "level": {
+                            "enum": [
+                              "beginner",
+                              "intermediate",
+                              "advanced"
+                            ],
+                            "type": "string"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerPerson",
+                            "type": "object"
+                          },
+                          "profile_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "shared": {
+                            "properties": {
+                              "goals": {
+                                "items": {
+                                  "enum": [
+                                    "strength",
+                                    "conditioning",
+                                    "weight_loss",
+                                    "skills",
+                                    "competition",
+                                    "consistency"
+                                  ],
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "same_level": {
+                                "type": "boolean"
+                              },
+                              "times": {
+                                "items": {
+                                  "enum": [
+                                    "early",
+                                    "midday",
+                                    "afternoon",
+                                    "evening",
+                                    "weekend"
+                                  ],
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              }
+                            },
+                            "required": [
+                              "times",
+                              "goals",
+                              "same_level"
+                            ],
+                            "title": "PartnerShared",
+                            "type": "object"
+                          },
+                          "times": {
+                            "items": {
+                              "enum": [
+                                "early",
+                                "midday",
+                                "afternoon",
+                                "evening",
+                                "weekend"
+                              ],
+                              "type": "string"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "profile_id",
+                          "person",
+                          "level",
+                          "times",
+                          "goals",
+                          "about",
+                          "shared"
+                        ],
+                        "title": "PartnerCard",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "club_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "swipes_remaining": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "club_id",
+                    "cards",
+                    "swipes_remaining"
+                  ],
+                  "title": "PartnerDeck",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deck"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The next people of the club who opted in, best fit first",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/clubs/{club_id}/partners/profile": {
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.put_profile",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "club_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "about": {
+                    "maxLength": 140,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "active": {
+                    "type": "boolean"
+                  },
+                  "gender": {
+                    "enum": [
+                      "woman",
+                      "man",
+                      "other"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "gender_preference": {
+                    "enum": [
+                      "any",
+                      "women",
+                      "men"
+                    ],
+                    "type": "string"
+                  },
+                  "goals": {
+                    "items": {
+                      "enum": [
+                        "strength",
+                        "conditioning",
+                        "weight_loss",
+                        "skills",
+                        "competition",
+                        "consistency"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  },
+                  "level": {
+                    "enum": [
+                      "beginner",
+                      "intermediate",
+                      "advanced"
+                    ],
+                    "type": "string"
+                  },
+                  "times": {
+                    "items": {
+                      "enum": [
+                        "early",
+                        "midday",
+                        "afternoon",
+                        "evening",
+                        "weekend"
+                      ],
+                      "type": "string"
+                    },
+                    "type": "array"
+                  }
+                },
+                "title": "PartnerProfileRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "profile": {
+                      "properties": {
+                        "about": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "active": {
+                          "type": "boolean"
+                        },
+                        "club_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "gender": {
+                          "description": "Only used to honour preferences; never shown to anyone",
+                          "enum": [
+                            "woman",
+                            "man",
+                            "other"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "gender_preference": {
+                          "enum": [
+                            "any",
+                            "women",
+                            "men"
+                          ],
+                          "type": "string"
+                        },
+                        "goals": {
+                          "items": {
+                            "enum": [
+                              "strength",
+                              "conditioning",
+                              "weight_loss",
+                              "skills",
+                              "competition",
+                              "consistency"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "type": "string"
+                        },
+                        "suspended": {
+                          "description": "Staff hid it after a report",
+                          "type": "boolean"
+                        },
+                        "times": {
+                          "items": {
+                            "enum": [
+                              "early",
+                              "midday",
+                              "afternoon",
+                              "evening",
+                              "weekend"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "updated_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "club_id",
+                        "active",
+                        "suspended",
+                        "level",
+                        "times",
+                        "goals",
+                        "about",
+                        "gender",
+                        "gender_preference"
+                      ],
+                      "title": "PartnerProfile",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "profile"
+                  ],
+                  "title": "PartnerProfileResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Profile"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Opt in or change your Partners profile in a club (a member of the club only)",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/clubs/{club_id}/partners/swipes": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.swipe",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "club_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "direction": {
+                    "enum": [
+                      "like",
+                      "pass"
+                    ],
+                    "type": "string"
+                  },
+                  "target_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "target_id",
+                  "direction"
+                ],
+                "title": "PartnerSwipeRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "direction": {
+                      "enum": [
+                        "like",
+                        "pass"
+                      ],
+                      "type": "string"
+                    },
+                    "match": {
+                      "allOf": [
+                        {
+                          "properties": {
+                            "club_id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "club_name": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "end_reason": {
+                              "enum": [
+                                "unmatched",
+                                "blocked",
+                                "reported",
+                                "left",
+                                "hidden"
+                              ],
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "ended_by_me": {
+                              "type": "boolean"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "last_message_at": {
+                              "format": "date-time",
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "matched_at": {
+                              "format": "date-time",
+                              "type": "string"
+                            },
+                            "person": {
+                              "properties": {
+                                "avatar_url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "nickname": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "nickname",
+                                "avatar_url"
+                              ],
+                              "title": "PartnerPerson",
+                              "type": "object"
+                            },
+                            "plannable": {
+                              "description": "«Κλείστε μαζί» offers the gym's classes",
+                              "type": "boolean"
+                            },
+                            "read_only": {
+                              "type": "boolean"
+                            },
+                            "status": {
+                              "enum": [
+                                "active",
+                                "ended"
+                              ],
+                              "type": "string"
+                            },
+                            "unread": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "club_id",
+                            "club_name",
+                            "person",
+                            "status",
+                            "end_reason",
+                            "ended_by_me",
+                            "read_only",
+                            "plannable",
+                            "unread",
+                            "matched_at",
+                            "last_message_at"
+                          ],
+                          "title": "PartnerMatch",
+                          "type": "object"
+                        }
+                      ],
+                      "description": "Set when the like was mutual",
+                      "nullable": true
+                    },
+                    "swipes_remaining": {
+                      "type": "integer"
+                    },
+                    "target_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "target_id",
+                    "direction",
+                    "match",
+                    "swipes_remaining"
+                  ],
+                  "title": "PartnerSwipeResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Swipe"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Like or pass; a like answered by a like makes a match",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/clubs/{club_id}/partners/swipes/{target_id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.undo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "club_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "target_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "target_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "undone": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "target_id",
+                    "undone"
+                  ],
+                  "title": "PartnerUndoResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Undone"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Take back a swipe that made no match",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
     "/api/me/clubs/{id}/members": {
       "get": {
         "callbacks": {},
@@ -72041,7 +75142,8 @@
                     "enum": [
                       "post",
                       "comment",
-                      "channel"
+                      "channel",
+                      "partner"
                     ],
                     "type": "string"
                   }
@@ -81918,6 +85020,968 @@
         "summary": "How much you hear from an open club",
         "tags": [
           "Community"
+        ]
+      }
+    },
+    "/api/me/partners/matches": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.matches",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "matches": {
+                      "items": {
+                        "properties": {
+                          "club_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "club_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "end_reason": {
+                            "enum": [
+                              "unmatched",
+                              "blocked",
+                              "reported",
+                              "left",
+                              "hidden"
+                            ],
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "ended_by_me": {
+                            "type": "boolean"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "last_message_at": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "matched_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "person": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerPerson",
+                            "type": "object"
+                          },
+                          "plannable": {
+                            "description": "«Κλείστε μαζί» offers the gym's classes",
+                            "type": "boolean"
+                          },
+                          "read_only": {
+                            "type": "boolean"
+                          },
+                          "status": {
+                            "enum": [
+                              "active",
+                              "ended"
+                            ],
+                            "type": "string"
+                          },
+                          "unread": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "club_id",
+                          "club_name",
+                          "person",
+                          "status",
+                          "end_reason",
+                          "ended_by_me",
+                          "read_only",
+                          "plannable",
+                          "unread",
+                          "matched_at",
+                          "last_message_at"
+                        ],
+                        "title": "PartnerMatch",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "matches"
+                  ],
+                  "title": "PartnerMatches",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Matches"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your Partners matches, latest conversation first",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/matches/{id}": {
+      "delete": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.end_match",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "status": {
+                      "enum": [
+                        "active",
+                        "ended"
+                      ],
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "status"
+                  ],
+                  "title": "PartnerMatchEnded",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Ended"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "End a match quietly; its conversation stays readable",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/matches/{id}/messages": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.messages",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "messages": {
+                      "items": {
+                        "properties": {
+                          "author": {
+                            "properties": {
+                              "avatar_url": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "nickname": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "nickname",
+                              "avatar_url"
+                            ],
+                            "title": "PartnerPerson",
+                            "type": "object"
+                          },
+                          "body": {
+                            "maxLength": 2000,
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "created_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "text",
+                              "plan"
+                            ],
+                            "type": "string"
+                          },
+                          "match_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "mine": {
+                            "type": "boolean"
+                          },
+                          "plan": {
+                            "allOf": [
+                              {
+                                "properties": {
+                                  "class_id": {
+                                    "format": "uuid",
+                                    "type": "string"
+                                  },
+                                  "duration_minutes": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "name": {
+                                    "nullable": true,
+                                    "type": "string"
+                                  },
+                                  "scheduled_at": {
+                                    "format": "date-time",
+                                    "type": "string"
+                                  }
+                                },
+                                "required": [
+                                  "class_id",
+                                  "name",
+                                  "scheduled_at",
+                                  "duration_minutes"
+                                ],
+                                "title": "PartnerPlan",
+                                "type": "object"
+                              }
+                            ],
+                            "nullable": true
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "match_id",
+                          "kind",
+                          "body",
+                          "plan",
+                          "mine",
+                          "author",
+                          "created_at"
+                        ],
+                        "title": "PartnerMessage",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "read_only": {
+                      "type": "boolean"
+                    },
+                    "unread": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "messages",
+                    "next_cursor",
+                    "read_only",
+                    "unread"
+                  ],
+                  "title": "PartnerMessagePage",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Messages"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A page of the match's conversation, newest first",
+        "tags": [
+          "Partners"
+        ]
+      },
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.post_message",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 2000,
+                    "minLength": 1,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "body"
+                ],
+                "title": "PartnerMessageRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "properties": {
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname",
+                            "avatar_url"
+                          ],
+                          "title": "PartnerPerson",
+                          "type": "object"
+                        },
+                        "body": {
+                          "maxLength": 2000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "text",
+                            "plan"
+                          ],
+                          "type": "string"
+                        },
+                        "match_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        },
+                        "plan": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "class_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "duration_minutes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scheduled_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "class_id",
+                                "name",
+                                "scheduled_at",
+                                "duration_minutes"
+                              ],
+                              "title": "PartnerPlan",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "match_id",
+                        "kind",
+                        "body",
+                        "plan",
+                        "mine",
+                        "author",
+                        "created_at"
+                      ],
+                      "title": "PartnerMessage",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "PartnerMessageResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Message"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Write in an active match's conversation",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/matches/{id}/messages/read": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.mark_read",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "read": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "read"
+                  ],
+                  "title": "PartnerMessagesRead",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Read"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Mark the conversation read",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/matches/{id}/plans": {
+      "post": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.plan",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "body": {
+                    "maxLength": 2000,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "class_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "class_id"
+                ],
+                "title": "PartnerPlanRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "message": {
+                      "properties": {
+                        "author": {
+                          "properties": {
+                            "avatar_url": {
+                              "nullable": true,
+                              "type": "string"
+                            },
+                            "id": {
+                              "format": "uuid",
+                              "type": "string"
+                            },
+                            "nickname": {
+                              "nullable": true,
+                              "type": "string"
+                            }
+                          },
+                          "required": [
+                            "id",
+                            "nickname",
+                            "avatar_url"
+                          ],
+                          "title": "PartnerPerson",
+                          "type": "object"
+                        },
+                        "body": {
+                          "maxLength": 2000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "created_at": {
+                          "format": "date-time",
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "text",
+                            "plan"
+                          ],
+                          "type": "string"
+                        },
+                        "match_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "mine": {
+                          "type": "boolean"
+                        },
+                        "plan": {
+                          "allOf": [
+                            {
+                              "properties": {
+                                "class_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "duration_minutes": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "scheduled_at": {
+                                  "format": "date-time",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "class_id",
+                                "name",
+                                "scheduled_at",
+                                "duration_minutes"
+                              ],
+                              "title": "PartnerPlan",
+                              "type": "object"
+                            }
+                          ],
+                          "nullable": true
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "match_id",
+                        "kind",
+                        "body",
+                        "plan",
+                        "mine",
+                        "author",
+                        "created_at"
+                      ],
+                      "title": "PartnerMessage",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "message"
+                  ],
+                  "title": "PartnerMessageResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Message"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Suggest a class in the conversation («Κλείστε μαζί»)",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/matches/{id}/sessions": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.sessions",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "available": {
+                      "type": "boolean"
+                    },
+                    "sessions": {
+                      "items": {
+                        "properties": {
+                          "booked_by_me": {
+                            "type": "boolean"
+                          },
+                          "booked_by_partner": {
+                            "type": "boolean"
+                          },
+                          "class_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "duration_minutes": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "scheduled_at": {
+                            "format": "date-time",
+                            "type": "string"
+                          },
+                          "shared_time": {
+                            "description": "In a time both of you chose",
+                            "type": "boolean"
+                          },
+                          "spots_remaining": {
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "class_id",
+                          "name",
+                          "scheduled_at",
+                          "duration_minutes",
+                          "spots_remaining",
+                          "booked_by_me",
+                          "booked_by_partner",
+                          "shared_time"
+                        ],
+                        "title": "PartnerSession",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "timezone": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "available",
+                    "timezone",
+                    "sessions"
+                  ],
+                  "title": "PartnerSessions",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Sessions"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "«Κλείστε μαζί»: the gym's next classes that suit you both",
+        "tags": [
+          "Partners"
+        ]
+      }
+    },
+    "/api/me/partners/settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "club_ids": {
+                      "items": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "clubs": {
+                      "description": "Clubs where you have a profile",
+                      "type": "integer"
+                    },
+                    "visible": {
+                      "description": "Whether any of your profiles is on",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "visible",
+                    "clubs",
+                    "club_ids"
+                  ],
+                  "title": "PartnerSettings",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Ρυθμίσεις › Partners: whether others in your clubs see you",
+        "tags": [
+          "Partners"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.PartnersController.put_settings",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "visible": {
+                    "type": "boolean"
+                  }
+                },
+                "required": [
+                  "visible"
+                ],
+                "title": "PartnerSettingsRequest",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "club_ids": {
+                      "items": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "clubs": {
+                      "description": "Clubs where you have a profile",
+                      "type": "integer"
+                    },
+                    "visible": {
+                      "description": "Whether any of your profiles is on",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "visible",
+                    "clubs",
+                    "club_ids"
+                  ],
+                  "title": "PartnerSettings",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Pause or resume every Partners profile at once",
+        "tags": [
+          "Partners"
         ]
       }
     },
@@ -103837,10 +107901,14 @@
                         },
                         "needs_approval": {
                           "type": "boolean"
+                        },
+                        "partners_enabled": {
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "member_groups",
+                        "partners_enabled",
                         "can_propose",
                         "needs_approval",
                         "lifecycle"
@@ -104336,7 +108404,8 @@
                             "enum": [
                               "post",
                               "comment",
-                              "channel"
+                              "channel",
+                              "partner"
                             ],
                             "type": "string"
                           }
@@ -104404,7 +108473,8 @@
                     "enum": [
                       "post",
                       "comment",
-                      "channel"
+                      "channel",
+                      "partner"
                     ],
                     "type": "string"
                   }
@@ -104483,11 +108553,12 @@
                       "free"
                     ],
                     "type": "string"
+                  },
+                  "partners_enabled": {
+                    "description": "Whether the gym's verified clubs offer Partners (ADR-169)",
+                    "type": "boolean"
                   }
                 },
-                "required": [
-                  "member_groups"
-                ],
                 "title": "CommunitySettingsRequest",
                 "type": "object"
               }
@@ -104524,10 +108595,14 @@
                         "free"
                       ],
                       "type": "string"
+                    },
+                    "partners_enabled": {
+                      "type": "boolean"
                     }
                   },
                   "required": [
                     "member_groups",
+                    "partners_enabled",
                     "lifecycle"
                   ],
                   "title": "CommunitySettingsResponse",
@@ -140043,10 +144118,14 @@
                         },
                         "needs_approval": {
                           "type": "boolean"
+                        },
+                        "partners_enabled": {
+                          "type": "boolean"
                         }
                       },
                       "required": [
                         "member_groups",
+                        "partners_enabled",
                         "can_propose",
                         "needs_approval",
                         "lifecycle"
