@@ -25,7 +25,8 @@ defmodule MilosTrainingWeb.Schemas.Devices do
         activities: %Schema{type: :boolean},
         sleep: %Schema{type: :boolean},
         weight: %Schema{type: :boolean},
-        resting_hr: %Schema{type: :boolean}
+        resting_hr: %Schema{type: :boolean},
+        steps: %Schema{type: :boolean, description: "Phones only (ADR-172)"}
       }
     }
   end
@@ -278,7 +279,15 @@ defmodule MilosTrainingWeb.Schemas.Devices do
       type: :object,
       description: "The journal's device card; show it only when `visible`",
       properties: %{
-        provider: %Schema{type: :string},
+        provider: %Schema{
+          type: :string,
+          description: "The device whose news the card shows (Garmin first when connected)"
+        },
+        providers: %Schema{
+          type: :array,
+          items: %Schema{type: :string},
+          description: "Every connected device"
+        },
         connected: %Schema{type: :boolean},
         status: @maybe_string,
         visible: %Schema{type: :boolean},
@@ -306,7 +315,10 @@ defmodule MilosTrainingWeb.Schemas.Devices do
       type: :object,
       properties: %{
         on: %Schema{type: :string, format: :date},
-        value: %Schema{type: :integer, description: "Beats per minute for resting_hr"},
+        value: %Schema{
+          type: :integer,
+          description: "Beats per minute for resting_hr, a count for steps"
+        },
         source: %Schema{
           type: :string,
           enum: ~w(garmin apple_health health_connect),
@@ -322,7 +334,7 @@ defmodule MilosTrainingWeb.Schemas.Devices do
       description:
         "Πρόοδος: one point per day and source, oldest first; `latest` and `average` are null without data",
       properties: %{
-        metric: %Schema{type: :string, enum: ["resting_hr"]},
+        metric: %Schema{type: :string, enum: ["resting_hr", "steps"]},
         range: %Schema{type: :string, enum: ~w(1m 3m 1y)},
         from: %Schema{type: :string, format: :date},
         to: %Schema{type: :string, format: :date},

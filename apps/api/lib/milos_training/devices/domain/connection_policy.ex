@@ -12,6 +12,11 @@ defmodule MilosTraining.Devices.Domain.ConnectionPolicy do
   @sync_interval_seconds 5 * 60
   @failure_threshold 3
   @backfill_window_days 10
+  # ADR-172: the phone reads 30 days back at the first sync, then from two
+  # days before the last one (late watch syncs, a night that ends after the
+  # app last looked); dedupe makes the overlap free.
+  @phone_history_days 30
+  @phone_overlap_seconds 2 * 86_400
 
   def sign_in_seconds, do: @sign_in_seconds
   def failure_threshold, do: @failure_threshold
@@ -86,6 +91,17 @@ defmodule MilosTraining.Devices.Domain.ConnectionPolicy do
 
   def backfill_progress(%{backfill_windows_total: total, backfill_windows_done: done}),
     do: div(done * 100, total)
+
+  def phone_history_days, do: @phone_history_days
+
+  @doc "Where the phone starts reading at its next sync (ADR-172)."
+  def phone_read_from(%{last_synced_at: %DateTime{} = last}),
+    do: DateTime.add(last, -@phone_overlap_seconds, :second)
+
+  def phone_read_from(%{connected_at: %DateTime{} = connected_at}),
+    do: DateTime.add(connected_at, -@phone_history_days * 86_400, :second)
+
+  def phone_read_from(_connection), do: nil
 
   @doc "The status the devices row shows."
   def row_status(nil, false), do: "unavailable"

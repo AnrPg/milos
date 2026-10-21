@@ -13,6 +13,8 @@ defmodule MilosTraining.Devices.DeviceStore do
   def insert_connection(attrs), do: adapter().insert_connection(attrs)
   @impl true
   def update_connection(connection, attrs), do: adapter().update_connection(connection, attrs)
+  @impl true
+  def list_connections(user_id), do: adapter().list_connections(user_id)
 
   @impl true
   def oauth_state_lookup(state_hash), do: adapter().oauth_state_lookup(state_hash)
@@ -55,6 +57,13 @@ defmodule MilosTraining.Devices.DeviceStore do
   def list_merged(kind, ids), do: adapter().list_merged(kind, ids)
   @impl true
   def match_candidates(from, to), do: adapter().match_candidates(from, to)
+
+  @impl true
+  def list_activities_between(user_id, from, to),
+    do: adapter().list_activities_between(user_id, from, to)
+
+  @impl true
+  def list_activities(user_id), do: adapter().list_activities(user_id)
   @impl true
   def delete_activities(user_id, provider), do: adapter().delete_activities(user_id, provider)
 
@@ -62,6 +71,8 @@ defmodule MilosTraining.Devices.DeviceStore do
   def upsert_daily_stat(attrs), do: adapter().upsert_daily_stat(attrs)
   @impl true
   def list_daily_stats(user_id, from, to), do: adapter().list_daily_stats(user_id, from, to)
+  @impl true
+  def list_all_daily_stats(user_id), do: adapter().list_all_daily_stats(user_id)
   @impl true
   def delete_daily_stats(user_id, source), do: adapter().delete_daily_stats(user_id, source)
 

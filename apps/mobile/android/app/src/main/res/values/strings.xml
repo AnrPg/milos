@@ -4,4 +4,6 @@
     <string name="title_activity_main">Milos</string>
     <string name="package_name">app.milos.member</string>
     <string name="custom_url_scheme">app.milos.member</string>
+    <!-- ADR-172: the page Health Connect links to from its permission screens. -->
+    <string name="milos_health_privacy_path" translatable="false">/me/devices</string>
 </resources>

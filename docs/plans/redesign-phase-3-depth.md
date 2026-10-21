@@ -323,7 +323,7 @@ No board; decided for least clutter (owner's standing instruction), full list in
 - [x] Partners hidden unless the member opts in, per club
 - [ ] AI suggestions never reach an athlete without coach approval
 - [x] Voice recordings deleted after transcription (never stored, ADR-175)
-- [ ] Phone health data follows D8/D11 of Phase 2 (consent, delete, export)
+- [x] Phone health data follows D8/D11 of Phase 2 (consent, delete, export; ADR-172)
 
 ## 7. Open questions
 1. Brief §10 Q2: prices for gym tiers and the solo-coach tier (ANR). Configurable in `/platform/plans`; seeded
@@ -335,4 +335,4 @@ No board; decided for least clutter (owner's standing instruction), full list in
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
 - [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [x] P3-M3 (ADR-165) · [x] P3-M4 (ADR-166) · [x] P3-M5 (ADR-167) · [x] P3-M6 (ADR-168) · [x] P3-M7 (ADR-169)
-- [x] P3-M8 (ADR-170) · [x] P3-M9 (ADR-171) · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [x] P3-M13 (ADR-175)
+- [x] P3-M8 (ADR-170) · [x] P3-M9 (ADR-171) · [x] P3-M10 (ADR-172) · [ ] P3-M11 · [ ] P3-M12 · [x] P3-M13 (ADR-175)

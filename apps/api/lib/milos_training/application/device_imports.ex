@@ -14,23 +14,26 @@ defmodule MilosTraining.Application.DeviceImports do
   alias MilosTraining.Application.{DevicePresenter, ImportDeviceSummaries}
   alias MilosTraining.Devices
 
-  @provider "garmin"
+  # The card names Garmin when it is connected, else the phone (ADR-172).
+  @provider_order ~w(garmin apple_health health_connect)
 
   def summary(%{user_id: user_id} = context) do
     Devices.with_context(context, fn ->
-      connection = Devices.get_connection(user_id, @provider)
-      seen_at = connection && connection.imports_seen_at
+      live = live_connections(user_id)
+      # The card was seen when every connected device's imports were seen.
+      seen_at = live |> Enum.map(& &1.imports_seen_at) |> earliest()
       imports = Devices.list_imports_since(user_id, seen_at)
       pending = Devices.list_pending_activities(user_id)
-
       card = Devices.device_card(imports, length(pending), seen_at)
+      shown = shown_connection(live, imports)
 
       {:ok,
        Map.merge(card, %{
-         provider: @provider,
-         connected: connection != nil and connection.status in ["active", "error"],
-         status: connection && connection.status,
-         backfill_progress: connection && Devices.backfill_progress(connection),
+         provider: (shown && shown.provider) || "garmin",
+         providers: Enum.map(live, & &1.provider),
+         connected: live != [],
+         status: shown && shown.status,
+         backfill_progress: shown && Devices.backfill_progress(shown),
          seen_at: seen_at
        })}
     end)
@@ -38,16 +41,36 @@ defmodule MilosTraining.Application.DeviceImports do
 
   def mark_seen(%{user_id: user_id} = context, now \\ DateTime.utc_now()) do
     Devices.with_context(context, fn ->
-      case Devices.get_connection(user_id, @provider) do
-        nil ->
+      case live_connections(user_id) do
+        [] ->
           {:error, :device_not_connected}
 
-        connection ->
-          with {:ok, _connection} <-
-                 Devices.update_connection(connection, %{imports_seen_at: now}),
-               do: summary(context)
+        live ->
+          Enum.each(live, &Devices.update_connection(&1, %{imports_seen_at: now}))
+          summary(context)
       end
     end)
+  end
+
+  defp live_connections(user_id) do
+    user_id
+    |> Devices.list_connections()
+    |> Enum.filter(&(&1.status in ["active", "error"]))
+    |> Enum.sort_by(&Enum.find_index(@provider_order, fn provider -> provider == &1.provider end))
+  end
+
+  defp earliest(times) do
+    if Enum.any?(times, &is_nil/1), do: nil, else: Enum.min(times, DateTime, fn -> nil end)
+  end
+
+  # The device whose news the card shows: the one that sent the latest
+  # import since the card was seen, else the first connected one.
+  defp shown_connection([], _imports), do: nil
+
+  defp shown_connection([first | _rest] = live, imports) do
+    latest = Enum.find(imports, &(&1.status in ["imported", "merged", "needs_confirmation"]))
+
+    (latest && Enum.find(live, &(&1.provider == latest.provider))) || first
   end
 
   def pending(%{user_id: user_id} = context) do
