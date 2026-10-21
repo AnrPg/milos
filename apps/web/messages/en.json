@@ -8035,7 +8035,10 @@
       "primary": "Primary",
       "secondary": "Secondary",
       "stabilizer": "Stabilizer",
-      "felt": "Felt"
+      "felt": "Felt",
+      "heat-low": "Low coverage",
+      "heat-medium": "Medium coverage",
+      "heat-high": "High coverage"
     },
     "quality": {
       "cardiorespiratory-endurance": "Cardiorespiratory endurance",
@@ -8141,6 +8144,43 @@
       "soleus": "Soleus",
       "tibialis-anterior": "Tibialis anterior",
       "fibularis": "Fibularis"
+    },
+    "about": {
+      "sternocleidomastoid": "Turns and bends the head and helps when you breathe hard.",
+      "scalenes": "Tilt the neck to the side and lift the upper ribs as you breathe in.",
+      "splenius": "Extends and turns the head and holds it up.",
+      "deltoid": "Lifts the arm forward, to the side and back; it shapes the shoulder.",
+      "rotator-cuff": "Four small muscles that keep the shoulder centred and rotate the arm.",
+      "pectoralis-major": "Brings the arm across the body and pushes forward, as in a push-up.",
+      "pectoralis-minor": "Pulls the shoulder blade forward and down.",
+      "serratus-anterior": "Holds the shoulder blade against the ribs and turns it upward overhead.",
+      "trapezius": "Lifts, squeezes and lowers the shoulder blades and supports the neck.",
+      "rhomboids": "Squeeze the shoulder blades together, as in a row.",
+      "levator-scapulae": "Lifts the shoulder blade and tilts the neck.",
+      "latissimus-dorsi": "Pulls the arm down and back, as in a pull-up; the widest back muscle.",
+      "teres-major": "Helps the lats pull the arm down and turn it inward.",
+      "erector-spinae": "Straightens the spine and holds it upright when you lift or hinge.",
+      "multifidus": "Small deep muscles that steady each vertebra.",
+      "quadratus-lumborum": "Bends the trunk to the side and steadies the pelvis and lower back.",
+      "biceps-brachii": "Bends the elbow and turns the palm up.",
+      "brachialis": "The main elbow flexor, whichever way the palm faces.",
+      "triceps-brachii": "Straightens the elbow, as in a press or a push-up.",
+      "brachioradialis": "Bends the elbow with the thumb up, as in a hammer curl.",
+      "forearm-flexors": "Bend the wrist and fingers and give you grip.",
+      "forearm-extensors": "Straighten the wrist and fingers and balance the grip.",
+      "rectus-abdominis": "Bends the trunk forward and braces the front of the core.",
+      "obliques": "Twist and side-bend the trunk and resist rotation.",
+      "transversus-abdominis": "The deepest abdominal muscle; it tightens the waist like a belt.",
+      "diaphragm": "The main breathing muscle; it also helps brace the trunk under load.",
+      "glutes": "Extend and open the hip and keep the pelvis level; key in squats and jumps.",
+      "hip-flexors": "Lift the knee towards the chest and bend the trunk at the hip.",
+      "hip-rotators": "Turn the thigh outward and keep the hip stable.",
+      "quadriceps": "Straighten the knee; they drive squats, lunges and jumps.",
+      "hamstrings": "Bend the knee and extend the hip, as in a deadlift.",
+      "adductors": "Bring the legs together and help the hip in deep squats.",
+      "calves": "Lift the heel; they push off when you run and jump.",
+      "tibialis-anterior": "Lifts the toes and controls the foot as it lands.",
+      "fibularis": "Turns the sole outward and steadies the ankle."
     }
   },
   "WodGoals": {
@@ -8212,7 +8252,9 @@
     },
     "sheet": {
       "title": "Workout goals",
-      "close": "Close"
+      "close": "Close",
+      "atlas": "Atlas ›",
+      "openInAtlas": "Open {muscle} in the atlas"
     },
     "felt": {
       "title": "How did it feel?",
@@ -8240,6 +8282,60 @@
       "entries": "{count, plural, one {# entry} other {# entries}}",
       "notShown": "Shown from 3 entries.",
       "notFelt": "Goals nobody felt: {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Anatomy atlas",
+    "back": "Progress",
+    "mode": {
+      "label": "View",
+      "explore": "Explore",
+      "heat": "My coverage"
+    },
+    "range": {
+      "label": "Period",
+      "1w": "1 wk",
+      "4w": "4 wks",
+      "12w": "12 wks"
+    },
+    "crumbs": {
+      "label": "Level",
+      "body": "Body"
+    },
+    "body": {
+      "title": "Whole body",
+      "hint": "Tap a region, or tap a muscle on the figure. Tap it again for its head."
+    },
+    "regions": "Regions",
+    "groups": "Muscle groups",
+    "heads": "Heads",
+    "level": {
+      "none": "None",
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High"
+    },
+    "levelLine": "{level} coverage",
+    "sets": "{sets} sets",
+    "perWeek": "{perWeek} sets/wk",
+    "yours": "Yours · {range}",
+    "from": "Mostly from: {exercises}",
+    "felt": "{count, plural, one {You felt it in # workout} other {You felt it in # workouts}}",
+    "noData": "No workouts in this period yet.",
+    "noneHere": "No sets here in this period.",
+    "legendNote": "An indication of your training volume, not a target.",
+    "unrecognized": "{count, plural, one {# exercise was not recognised and does not count.} other {# exercises were not recognised and do not count.}}",
+    "exercises": {
+      "title": "Exercises from the box library",
+      "empty": "No exercises for this muscle.",
+      "unavailable": "Exercises show once a box is selected.",
+      "more": "All ({count})",
+      "less": "Fewer",
+      "video": "Video: {title}",
+      "role": {
+        "primary": "Main",
+        "secondary": "Assisting"
+      }
     }
   },
   "Partners": {

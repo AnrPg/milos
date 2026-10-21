@@ -11,6 +11,9 @@ export const ROLE_COLOR: Record<AnatomyRole, string> = {
   secondary: "var(--anatomy-secondary)",
   stabilizer: "var(--anatomy-stabilizer)",
   felt: "var(--anatomy-felt)",
+  "heat-low": "var(--anatomy-heat-low)",
+  "heat-medium": "var(--anatomy-heat-medium)",
+  "heat-high": "var(--anatomy-heat-high)",
 };
 
 export function RoleDot({ role }: { role: AnatomyRole }) {

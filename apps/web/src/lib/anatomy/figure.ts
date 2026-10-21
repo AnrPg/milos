@@ -6,7 +6,7 @@
  */
 import { MUSCLE_NODES, groupOf, leafForTa2, muscleNode, type MuscleNodeId } from "./taxonomy";
 
-export const ANATOMY_ROLES = ["primary", "secondary", "stabilizer", "felt"] as const;
+export const ANATOMY_ROLES = ["primary", "secondary", "stabilizer", "felt", "heat-high", "heat-medium", "heat-low"] as const;
 export type AnatomyRole = (typeof ANATOMY_ROLES)[number];
 export type AnatomyHighlights = Partial<Record<MuscleNodeId, AnatomyRole>>;
 export type AnatomyView = "front" | "back" | "both";
@@ -27,8 +27,17 @@ export function parseAtlasNodeName(name: string): { ta2: string; side: "l" | "r"
 }
 
 // When a mesh is named by several highlights, the stronger role shows.
-// What the member felt is their own report, so it wins over the plan.
-const ROLE_RANK: Record<AnatomyRole, number> = { felt: 4, primary: 3, secondary: 2, stabilizer: 1 };
+// What the member felt is their own report, so it wins over the plan. The
+// heat-map levels (the atlas, ADR-164) are never mixed with goal roles.
+const ROLE_RANK: Record<AnatomyRole, number> = {
+  felt: 4,
+  primary: 3,
+  secondary: 2,
+  stabilizer: 1,
+  "heat-high": 3,
+  "heat-medium": 2,
+  "heat-low": 1,
+};
 
 /** ta2 id -> role to paint. Unknown node ids are ignored; meshes not in the map render neutral. */
 export function roleByTa2(highlights: AnatomyHighlights): Map<string, AnatomyRole> {
@@ -119,6 +128,9 @@ export const DEFAULT_ANATOMY_PALETTE: AnatomyPalette = {
   secondary: "#EFA36F",
   stabilizer: "#F3CDB0",
   felt: "#3FA37A",
+  "heat-low": "#D9A27E",
+  "heat-medium": "#E07A3C",
+  "heat-high": "#C2361F",
   base: "#8E7A75",
   bone: "#E3DACB",
 };
@@ -128,6 +140,9 @@ const PALETTE_TOKENS: Record<keyof AnatomyPalette, string> = {
   secondary: "--anatomy-secondary",
   stabilizer: "--anatomy-stabilizer",
   felt: "--anatomy-felt",
+  "heat-low": "--anatomy-heat-low",
+  "heat-medium": "--anatomy-heat-medium",
+  "heat-high": "--anatomy-heat-high",
   base: "--anatomy-base",
   bone: "--anatomy-bone",
 };

@@ -8035,7 +8035,10 @@
       "primary": "Principal",
       "secondary": "Secundário",
       "stabilizer": "Estabilizador",
-      "felt": "Sentido"
+      "felt": "Sentido",
+      "heat-low": "Cobertura baixa",
+      "heat-medium": "Cobertura média",
+      "heat-high": "Cobertura alta"
     },
     "quality": {
       "cardiorespiratory-endurance": "Resistência cardiorrespiratória",
@@ -8141,6 +8144,43 @@
       "soleus": "Solear",
       "tibialis-anterior": "Tibial anterior",
       "fibularis": "Peroniais"
+    },
+    "about": {
+      "sternocleidomastoid": "Roda e inclina a cabeça e ajuda quando respira com força.",
+      "scalenes": "Inclinam o pescoço para o lado e elevam as costelas superiores ao inspirar.",
+      "splenius": "Estende e roda a cabeça e mantém-na direita.",
+      "deltoid": "Eleva o braço para a frente, para o lado e para trás; dá forma ao ombro.",
+      "rotator-cuff": "Quatro pequenos músculos que centram o ombro e rodam o braço.",
+      "pectoralis-major": "Leva o braço à frente do corpo e empurra, como numa flexão.",
+      "pectoralis-minor": "Puxa a omoplata para a frente e para baixo.",
+      "serratus-anterior": "Mantém a omoplata junto às costelas e roda-a para cima.",
+      "trapezius": "Eleva, aproxima e baixa as omoplatas e apoia o pescoço.",
+      "rhomboids": "Aproximam as omoplatas, como num remo.",
+      "levator-scapulae": "Eleva a omoplata e inclina o pescoço.",
+      "latissimus-dorsi": "Puxa o braço para baixo e para trás, como numa elevação; o músculo mais largo das costas.",
+      "teres-major": "Ajuda o grande dorsal a puxar o braço para baixo e para dentro.",
+      "erector-spinae": "Endireita a coluna e mantém-na direita quando levanta peso.",
+      "multifidus": "Pequenos músculos profundos que estabilizam cada vértebra.",
+      "quadratus-lumborum": "Inclina o tronco para o lado e estabiliza a bacia e a zona lombar.",
+      "biceps-brachii": "Dobra o cotovelo e roda a palma para cima.",
+      "brachialis": "O principal flexor do cotovelo, seja qual for a posição da mão.",
+      "triceps-brachii": "Estende o cotovelo, como num press ou numa flexão.",
+      "brachioradialis": "Dobra o cotovelo com o polegar para cima, como no curl martelo.",
+      "forearm-flexors": "Dobram o pulso e os dedos e dão a pega.",
+      "forearm-extensors": "Estendem o pulso e os dedos e equilibram a pega.",
+      "rectus-abdominis": "Dobra o tronco para a frente e estabiliza a parte da frente do core.",
+      "obliques": "Rodam e inclinam o tronco e resistem à rotação.",
+      "transversus-abdominis": "O abdominal mais profundo; aperta a cintura como um cinto.",
+      "diaphragm": "O principal músculo da respiração; também ajuda a estabilizar o tronco com carga.",
+      "glutes": "Estendem e abrem a anca e mantêm a bacia nivelada; essenciais em agachamentos e saltos.",
+      "hip-flexors": "Levam o joelho ao peito e dobram o tronco na anca.",
+      "hip-rotators": "Rodam a coxa para fora e estabilizam a anca.",
+      "quadriceps": "Estendem o joelho; impulsionam agachamentos, afundos e saltos.",
+      "hamstrings": "Dobram o joelho e estendem a anca, como no peso morto.",
+      "adductors": "Aproximam as pernas e ajudam a anca nos agachamentos profundos.",
+      "calves": "Elevam o calcanhar; empurram na corrida e nos saltos.",
+      "tibialis-anterior": "Eleva os dedos do pé e controla o pé na receção.",
+      "fibularis": "Roda a planta do pé para fora e estabiliza o tornozelo."
     }
   },
   "WodGoals": {
@@ -8212,7 +8252,9 @@
     },
     "sheet": {
       "title": "Objetivos do treino",
-      "close": "Fechar"
+      "close": "Fechar",
+      "atlas": "Atlas ›",
+      "openInAtlas": "Abrir {muscle} no atlas"
     },
     "felt": {
       "title": "O que sentiu?",
@@ -8240,6 +8282,60 @@
       "entries": "{count, plural, one {# registo} other {# registos}}",
       "notShown": "Aparece a partir de 3 registos.",
       "notFelt": "Objetivos que ninguém sentiu: {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Atlas anatómico",
+    "back": "Progresso",
+    "mode": {
+      "label": "Vista",
+      "explore": "Explorar",
+      "heat": "A minha cobertura"
+    },
+    "range": {
+      "label": "Período",
+      "1w": "1 sem.",
+      "4w": "4 sem.",
+      "12w": "12 sem."
+    },
+    "crumbs": {
+      "label": "Nível",
+      "body": "Corpo"
+    },
+    "body": {
+      "title": "Corpo inteiro",
+      "hint": "Toque numa região ou diretamente num músculo da figura. Toque de novo para ver a sua cabeça."
+    },
+    "regions": "Regiões",
+    "groups": "Grupos musculares",
+    "heads": "Cabeças",
+    "level": {
+      "none": "Nenhuma",
+      "low": "Baixa",
+      "medium": "Média",
+      "high": "Alta"
+    },
+    "levelLine": "Cobertura {level}",
+    "sets": "{sets} séries",
+    "perWeek": "{perWeek} séries/sem.",
+    "yours": "Os seus dados · {range}",
+    "from": "Sobretudo com: {exercises}",
+    "felt": "{count, plural, one {Sentiu-o em # treino} other {Sentiu-o em # treinos}}",
+    "noData": "Ainda não há treinos neste período.",
+    "noneHere": "Nenhuma série aqui neste período.",
+    "legendNote": "Uma indicação do seu volume de treino, não um objetivo.",
+    "unrecognized": "{count, plural, one {# exercício não foi reconhecido e não conta.} other {# exercícios não foram reconhecidos e não contam.}}",
+    "exercises": {
+      "title": "Exercícios da biblioteca da box",
+      "empty": "Nenhum exercício para este músculo.",
+      "unavailable": "Os exercícios aparecem quando há uma box selecionada.",
+      "more": "Todos ({count})",
+      "less": "Menos",
+      "video": "Vídeo: {title}",
+      "role": {
+        "primary": "Principal",
+        "secondary": "Secundário"
+      }
     }
   },
   "Partners": {

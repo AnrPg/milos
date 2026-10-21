@@ -8035,7 +8035,10 @@
       "primary": "Principal",
       "secondary": "Secundario",
       "stabilizer": "Estabilizador",
-      "felt": "Sentido"
+      "felt": "Sentido",
+      "heat-low": "Cobertura baja",
+      "heat-medium": "Cobertura media",
+      "heat-high": "Cobertura alta"
     },
     "quality": {
       "cardiorespiratory-endurance": "Resistencia cardiorrespiratoria",
@@ -8141,6 +8144,43 @@
       "soleus": "Sóleo",
       "tibialis-anterior": "Tibial anterior",
       "fibularis": "Peroneos"
+    },
+    "about": {
+      "sternocleidomastoid": "Gira e inclina la cabeza y ayuda cuando respiras con fuerza.",
+      "scalenes": "Inclinan el cuello hacia un lado y elevan las costillas superiores al inspirar.",
+      "splenius": "Extiende y gira la cabeza y la mantiene erguida.",
+      "deltoid": "Eleva el brazo hacia delante, al lado y atrás; da forma al hombro.",
+      "rotator-cuff": "Cuatro músculos pequeños que centran el hombro y giran el brazo.",
+      "pectoralis-major": "Lleva el brazo por delante del cuerpo y empuja, como en una flexión.",
+      "pectoralis-minor": "Tira de la escápula hacia delante y abajo.",
+      "serratus-anterior": "Sujeta la escápula contra las costillas y la gira hacia arriba.",
+      "trapezius": "Eleva, junta y baja las escápulas y sostiene el cuello.",
+      "rhomboids": "Juntan las escápulas, como en un remo.",
+      "levator-scapulae": "Eleva la escápula e inclina el cuello.",
+      "latissimus-dorsi": "Tira del brazo hacia abajo y atrás, como en una dominada; el músculo más ancho de la espalda.",
+      "teres-major": "Ayuda al dorsal ancho a llevar el brazo abajo y hacia dentro.",
+      "erector-spinae": "Endereza la columna y la mantiene erguida al levantar peso.",
+      "multifidus": "Músculos profundos y pequeños que estabilizan cada vértebra.",
+      "quadratus-lumborum": "Inclina el tronco hacia un lado y estabiliza la pelvis y la zona lumbar.",
+      "biceps-brachii": "Flexiona el codo y gira la palma hacia arriba.",
+      "brachialis": "El principal flexor del codo, sea cual sea la posición de la mano.",
+      "triceps-brachii": "Extiende el codo, como en un press o una flexión.",
+      "brachioradialis": "Flexiona el codo con el pulgar arriba, como en el curl martillo.",
+      "forearm-flexors": "Flexionan la muñeca y los dedos y dan el agarre.",
+      "forearm-extensors": "Extienden la muñeca y los dedos y equilibran el agarre.",
+      "rectus-abdominis": "Flexiona el tronco hacia delante y estabiliza la parte frontal del core.",
+      "obliques": "Giran e inclinan el tronco y resisten la rotación.",
+      "transversus-abdominis": "El abdominal más profundo; aprieta la cintura como un cinturón.",
+      "diaphragm": "El principal músculo de la respiración; también ayuda a estabilizar el tronco con carga.",
+      "glutes": "Extienden y abren la cadera y mantienen la pelvis nivelada; clave en sentadillas y saltos.",
+      "hip-flexors": "Elevan la rodilla hacia el pecho y flexionan el tronco en la cadera.",
+      "hip-rotators": "Giran el muslo hacia fuera y estabilizan la cadera.",
+      "quadriceps": "Extienden la rodilla; impulsan sentadillas, zancadas y saltos.",
+      "hamstrings": "Flexionan la rodilla y extienden la cadera, como en el peso muerto.",
+      "adductors": "Juntan las piernas y ayudan a la cadera en las sentadillas profundas.",
+      "calves": "Elevan el talón; empujan al correr y saltar.",
+      "tibialis-anterior": "Eleva los dedos del pie y controla el pie al aterrizar.",
+      "fibularis": "Gira la planta hacia fuera y estabiliza el tobillo."
     }
   },
   "WodGoals": {
@@ -8212,7 +8252,9 @@
     },
     "sheet": {
       "title": "Objetivos del entrenamiento",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "atlas": "Atlas ›",
+      "openInAtlas": "Abrir {muscle} en el atlas"
     },
     "felt": {
       "title": "¿Qué sentiste?",
@@ -8240,6 +8282,60 @@
       "entries": "{count, plural, one {# registro} other {# registros}}",
       "notShown": "Se muestra a partir de 3 registros.",
       "notFelt": "Objetivos que nadie sintió: {muscles}"
+    }
+  },
+  "Atlas": {
+    "title": "Atlas anatómico",
+    "back": "Progreso",
+    "mode": {
+      "label": "Vista",
+      "explore": "Explorar",
+      "heat": "Mi cobertura"
+    },
+    "range": {
+      "label": "Periodo",
+      "1w": "1 sem.",
+      "4w": "4 sem.",
+      "12w": "12 sem."
+    },
+    "crumbs": {
+      "label": "Nivel",
+      "body": "Cuerpo"
+    },
+    "body": {
+      "title": "Todo el cuerpo",
+      "hint": "Toca una región o directamente un músculo de la figura. Tócalo de nuevo para ver su cabeza."
+    },
+    "regions": "Regiones",
+    "groups": "Grupos musculares",
+    "heads": "Cabezas",
+    "level": {
+      "none": "Ninguna",
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta"
+    },
+    "levelLine": "Cobertura {level}",
+    "sets": "{sets} series",
+    "perWeek": "{perWeek} series/sem.",
+    "yours": "Lo tuyo · {range}",
+    "from": "Sobre todo con: {exercises}",
+    "felt": "{count, plural, one {Lo sentiste en # entrenamiento} other {Lo sentiste en # entrenamientos}}",
+    "noData": "Todavía no hay entrenamientos en este periodo.",
+    "noneHere": "No hay series aquí en este periodo.",
+    "legendNote": "Una indicación de tu volumen de entrenamiento, no un objetivo.",
+    "unrecognized": "{count, plural, one {# ejercicio no se reconoció y no cuenta.} other {# ejercicios no se reconocieron y no cuentan.}}",
+    "exercises": {
+      "title": "Ejercicios de la biblioteca del box",
+      "empty": "No hay ejercicios para este músculo.",
+      "unavailable": "Los ejercicios aparecen cuando hay un box seleccionado.",
+      "more": "Todos ({count})",
+      "less": "Menos",
+      "video": "Vídeo: {title}",
+      "role": {
+        "primary": "Principal",
+        "secondary": "Secundario"
+      }
     }
   },
   "Partners": {
