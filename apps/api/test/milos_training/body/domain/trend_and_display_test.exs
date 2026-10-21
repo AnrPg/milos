@@ -36,6 +36,20 @@ defmodule MilosTraining.Body.Domain.TrendAndDisplayTest do
       assert second.smoothed == 73.0
     end
 
+    test "shape: the smoothed series normalized to 0..1, oldest first" do
+      shape = TrendPolicy.shape(Enum.reverse(points([80.0, 70.0, 75.0])))
+      # Smoothed: 80.0, 77.0, 76.4 -> normalized over 76.4..80.0.
+      assert Enum.map(shape, & &1.y) == [1.0, 0.167, 0.0]
+      assert Enum.map(shape, & &1.at) == Enum.map(points([0, 0, 0]), & &1.at)
+      assert Enum.all?(shape, &(Map.keys(&1) |> Enum.sort() == [:at, :y]))
+    end
+
+    test "shape: a flat series is 0.5 throughout; no points, no shape" do
+      assert Enum.map(TrendPolicy.shape(points([72.0, 72.0, 72.0])), & &1.y) == [0.5, 0.5, 0.5]
+      assert Enum.map(TrendPolicy.shape(points([72.0])), & &1.y) == [0.5]
+      assert TrendPolicy.shape([]) == []
+    end
+
     test "ranges" do
       now = ~U[2026-10-20 00:00:00Z]
       assert {:ok, ~U[2026-09-20 00:00:00Z]} = TrendPolicy.since("1m", now)
@@ -73,11 +87,18 @@ defmodule MilosTraining.Body.Domain.TrendAndDisplayTest do
       assert %{display: "number", trend: "down", points: [%{value: 74.5, smoothed: 74.5} | _]} =
                DisplayPolicy.series("weight", series, settings)
 
-      assert %{display: "trend", trend: "down", points: []} =
+      assert %{display: "trend", trend: "down", points: [], shape: shape} =
                DisplayPolicy.series("weight", series, %{settings | weight_display: "trend"})
 
-      assert %{display: "hidden", trend: nil, points: []} =
-               DisplayPolicy.series("body_fat", series, %{settings | weight_display: "hidden"})
+      # Under trend: a 0..1 shape, never a value in kg.
+      assert length(shape) == 6
+      assert hd(shape).y == 1.0 and List.last(shape).y == 0.0
+      assert Enum.all?(shape, &(&1.y >= 0 and &1.y <= 1))
+
+      hidden = DisplayPolicy.series("body_fat", series, %{settings | weight_display: "hidden"})
+      assert %{display: "hidden", trend: nil, points: []} = hidden
+      refute Map.has_key?(hidden, :shape)
+      refute Map.has_key?(DisplayPolicy.series("weight", series, settings), :shape)
 
       # Circumferences always show as numbers.
       assert %{display: "number", points: [_ | _]} =

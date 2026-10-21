@@ -191,7 +191,8 @@ defmodule MilosTrainingWeb.Schemas.Body do
         display: %Schema{
           type: :string,
           enum: Body.display_modes(),
-          description: "number: points with values; trend: only the trend word; hidden: neither"
+          description:
+            "number: points with values; trend: the trend word and a shape (no values); hidden: neither"
         },
         trend: %Schema{type: :string, enum: Body.trend_words(), nullable: true},
         points: %Schema{
@@ -203,6 +204,19 @@ defmodule MilosTrainingWeb.Schemas.Body do
               at: @datetime,
               value: %Schema{type: :number},
               smoothed: %Schema{type: :number}
+            }
+          }
+        },
+        shape: %Schema{
+          type: :array,
+          description:
+            "Only under trend: the smoothed series normalized to 0..1 over the shown range (no units, no values, no scale; a flat series is 0.5 throughout).",
+          items: %Schema{
+            type: :object,
+            required: [:at, :y],
+            properties: %{
+              at: @datetime,
+              y: %Schema{type: :number, minimum: 0, maximum: 1}
             }
           }
         }
@@ -377,7 +391,7 @@ defmodule MilosTrainingWeb.Schemas.Body do
             properties: %{
               id: @uuid,
               read_at: @datetime,
-              subject: %Schema{type: :string, enum: ~w(list snapshot)},
+              subject: %Schema{type: :string, enum: ~w(list snapshot series)},
               snapshot_ids: %Schema{type: :array, items: @uuid},
               photos_shown: %Schema{type: :boolean},
               reader: %Schema{
