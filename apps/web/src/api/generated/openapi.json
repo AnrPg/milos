@@ -16941,6 +16941,346 @@
         "title": "CleaningEntry",
         "type": "object"
       },
+      "ClientTrainingDepth": {
+        "description": "Only from entries the client shares with this gym's coaches",
+        "properties": {
+          "coverage": {
+            "properties": {
+              "balance": {
+                "description": "Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together",
+                "properties": {
+                  "ham": {
+                    "type": "number"
+                  },
+                  "pull": {
+                    "type": "number"
+                  },
+                  "push": {
+                    "type": "number"
+                  },
+                  "push_pull_ratio": {
+                    "nullable": true,
+                    "type": "number"
+                  },
+                  "quad": {
+                    "type": "number"
+                  },
+                  "quad_ham_ratio": {
+                    "nullable": true,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "push",
+                  "pull",
+                  "push_pull_ratio",
+                  "quad",
+                  "ham",
+                  "quad_ham_ratio"
+                ],
+                "title": "DepthBalance",
+                "type": "object"
+              },
+              "exercises": {
+                "properties": {
+                  "recognized": {
+                    "type": "integer"
+                  },
+                  "unrecognized": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "recognized",
+                  "unrecognized"
+                ],
+                "title": "DepthExerciseCounts",
+                "type": "object"
+              },
+              "felt_entries": {
+                "type": "integer"
+              },
+              "least": {
+                "description": "Up to three major groups at level none or low, lowest first",
+                "items": {
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group id",
+                      "type": "string"
+                    },
+                    "level": {
+                      "enum": [
+                        "none",
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "per_week": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "description": "Weighted sets in the range",
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sets",
+                    "per_week",
+                    "level"
+                  ],
+                  "title": "DepthCoverageGroup",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "most": {
+                "description": "Up to three major groups with the most weighted sets",
+                "items": {
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group id",
+                      "type": "string"
+                    },
+                    "level": {
+                      "enum": [
+                        "none",
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "per_week": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "description": "Weighted sets in the range",
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sets",
+                    "per_week",
+                    "level"
+                  ],
+                  "title": "DepthCoverageGroup",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sessions": {
+                "description": "Workouts done in the range",
+                "type": "integer"
+              },
+              "thresholds": {
+                "properties": {
+                  "high": {
+                    "type": "number"
+                  },
+                  "medium": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "medium",
+                  "high"
+                ],
+                "title": "DepthCoverageThresholds",
+                "type": "object"
+              }
+            },
+            "required": [
+              "sessions",
+              "exercises",
+              "felt_entries",
+              "thresholds",
+              "most",
+              "least",
+              "balance"
+            ],
+            "title": "DepthCoverage",
+            "type": "object"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "load": {
+            "description": "Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice",
+            "properties": {
+              "acute": {
+                "description": "Load of the last 7 days",
+                "type": "integer"
+              },
+              "band": {
+                "enum": [
+                  "below",
+                  "steady",
+                  "above",
+                  "well_above"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "bands": {
+                "properties": {
+                  "above_to": {
+                    "type": "number"
+                  },
+                  "below": {
+                    "type": "number"
+                  },
+                  "steady_to": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "below",
+                  "steady_to",
+                  "above_to"
+                ],
+                "title": "DepthLoadBands",
+                "type": "object"
+              },
+              "chronic": {
+                "description": "Weekly average of the last 28 days",
+                "type": "integer"
+              },
+              "rated_sessions": {
+                "description": "Last 28 days, with effort and time",
+                "type": "integer"
+              },
+              "ratio": {
+                "nullable": true,
+                "type": "number"
+              },
+              "sufficient": {
+                "type": "boolean"
+              },
+              "unrated_sessions": {
+                "description": "Last 28 days, without effort or time (not counted)",
+                "type": "integer"
+              },
+              "weeks": {
+                "items": {
+                  "properties": {
+                    "load": {
+                      "type": "integer"
+                    },
+                    "sessions": {
+                      "type": "integer"
+                    },
+                    "week_start": {
+                      "format": "date",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "week_start",
+                    "load",
+                    "sessions"
+                  ],
+                  "title": "DepthLoadWeek",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "acute",
+              "chronic",
+              "ratio",
+              "band",
+              "sufficient",
+              "rated_sessions",
+              "unrated_sessions",
+              "bands",
+              "weeks"
+            ],
+            "title": "DepthLoad",
+            "type": "object"
+          },
+          "qualities": {
+            "properties": {
+              "felt_entries": {
+                "type": "integer"
+              },
+              "qualities": {
+                "description": "All ten qualities, canonical order",
+                "items": {
+                  "properties": {
+                    "felt": {
+                      "type": "integer"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "score": {
+                      "description": "Share of the most-trained quality, 0..1",
+                      "type": "number"
+                    },
+                    "sets": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sets",
+                    "score",
+                    "felt"
+                  ],
+                  "title": "DepthQuality",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sessions": {
+                "description": "Workouts with a recognised exercise",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sessions",
+              "felt_entries",
+              "qualities"
+            ],
+            "title": "DepthQualities",
+            "type": "object"
+          },
+          "range": {
+            "enum": [
+              "4w",
+              "12w",
+              "6m",
+              "1y",
+              "all"
+            ],
+            "type": "string"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          },
+          "weeks": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "range",
+          "from",
+          "to",
+          "weeks",
+          "coverage",
+          "qualities",
+          "load"
+        ],
+        "title": "ClientTrainingDepth",
+        "type": "object"
+      },
       "ClientWellnessSummary": {
         "properties": {
           "shared": {
@@ -27916,6 +28256,474 @@
         "title": "DailyStats",
         "type": "object"
       },
+      "DepthBalance": {
+        "description": "Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together",
+        "properties": {
+          "ham": {
+            "type": "number"
+          },
+          "pull": {
+            "type": "number"
+          },
+          "push": {
+            "type": "number"
+          },
+          "push_pull_ratio": {
+            "nullable": true,
+            "type": "number"
+          },
+          "quad": {
+            "type": "number"
+          },
+          "quad_ham_ratio": {
+            "nullable": true,
+            "type": "number"
+          }
+        },
+        "required": [
+          "push",
+          "pull",
+          "push_pull_ratio",
+          "quad",
+          "ham",
+          "quad_ham_ratio"
+        ],
+        "title": "DepthBalance",
+        "type": "object"
+      },
+      "DepthCoverage": {
+        "properties": {
+          "balance": {
+            "description": "Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together",
+            "properties": {
+              "ham": {
+                "type": "number"
+              },
+              "pull": {
+                "type": "number"
+              },
+              "push": {
+                "type": "number"
+              },
+              "push_pull_ratio": {
+                "nullable": true,
+                "type": "number"
+              },
+              "quad": {
+                "type": "number"
+              },
+              "quad_ham_ratio": {
+                "nullable": true,
+                "type": "number"
+              }
+            },
+            "required": [
+              "push",
+              "pull",
+              "push_pull_ratio",
+              "quad",
+              "ham",
+              "quad_ham_ratio"
+            ],
+            "title": "DepthBalance",
+            "type": "object"
+          },
+          "exercises": {
+            "properties": {
+              "recognized": {
+                "type": "integer"
+              },
+              "unrecognized": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "recognized",
+              "unrecognized"
+            ],
+            "title": "DepthExerciseCounts",
+            "type": "object"
+          },
+          "felt_entries": {
+            "type": "integer"
+          },
+          "least": {
+            "description": "Up to three major groups at level none or low, lowest first",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "Taxonomy group id",
+                  "type": "string"
+                },
+                "level": {
+                  "enum": [
+                    "none",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "per_week": {
+                  "type": "number"
+                },
+                "sets": {
+                  "description": "Weighted sets in the range",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "sets",
+                "per_week",
+                "level"
+              ],
+              "title": "DepthCoverageGroup",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "most": {
+            "description": "Up to three major groups with the most weighted sets",
+            "items": {
+              "properties": {
+                "id": {
+                  "description": "Taxonomy group id",
+                  "type": "string"
+                },
+                "level": {
+                  "enum": [
+                    "none",
+                    "low",
+                    "medium",
+                    "high"
+                  ],
+                  "type": "string"
+                },
+                "per_week": {
+                  "type": "number"
+                },
+                "sets": {
+                  "description": "Weighted sets in the range",
+                  "type": "number"
+                }
+              },
+              "required": [
+                "id",
+                "sets",
+                "per_week",
+                "level"
+              ],
+              "title": "DepthCoverageGroup",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sessions": {
+            "description": "Workouts done in the range",
+            "type": "integer"
+          },
+          "thresholds": {
+            "properties": {
+              "high": {
+                "type": "number"
+              },
+              "medium": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "medium",
+              "high"
+            ],
+            "title": "DepthCoverageThresholds",
+            "type": "object"
+          }
+        },
+        "required": [
+          "sessions",
+          "exercises",
+          "felt_entries",
+          "thresholds",
+          "most",
+          "least",
+          "balance"
+        ],
+        "title": "DepthCoverage",
+        "type": "object"
+      },
+      "DepthCoverageGroup": {
+        "properties": {
+          "id": {
+            "description": "Taxonomy group id",
+            "type": "string"
+          },
+          "level": {
+            "enum": [
+              "none",
+              "low",
+              "medium",
+              "high"
+            ],
+            "type": "string"
+          },
+          "per_week": {
+            "type": "number"
+          },
+          "sets": {
+            "description": "Weighted sets in the range",
+            "type": "number"
+          }
+        },
+        "required": [
+          "id",
+          "sets",
+          "per_week",
+          "level"
+        ],
+        "title": "DepthCoverageGroup",
+        "type": "object"
+      },
+      "DepthCoverageThresholds": {
+        "properties": {
+          "high": {
+            "type": "number"
+          },
+          "medium": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "medium",
+          "high"
+        ],
+        "title": "DepthCoverageThresholds",
+        "type": "object"
+      },
+      "DepthExerciseCounts": {
+        "properties": {
+          "recognized": {
+            "type": "integer"
+          },
+          "unrecognized": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "recognized",
+          "unrecognized"
+        ],
+        "title": "DepthExerciseCounts",
+        "type": "object"
+      },
+      "DepthLoad": {
+        "description": "Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice",
+        "properties": {
+          "acute": {
+            "description": "Load of the last 7 days",
+            "type": "integer"
+          },
+          "band": {
+            "enum": [
+              "below",
+              "steady",
+              "above",
+              "well_above"
+            ],
+            "nullable": true,
+            "type": "string"
+          },
+          "bands": {
+            "properties": {
+              "above_to": {
+                "type": "number"
+              },
+              "below": {
+                "type": "number"
+              },
+              "steady_to": {
+                "type": "number"
+              }
+            },
+            "required": [
+              "below",
+              "steady_to",
+              "above_to"
+            ],
+            "title": "DepthLoadBands",
+            "type": "object"
+          },
+          "chronic": {
+            "description": "Weekly average of the last 28 days",
+            "type": "integer"
+          },
+          "rated_sessions": {
+            "description": "Last 28 days, with effort and time",
+            "type": "integer"
+          },
+          "ratio": {
+            "nullable": true,
+            "type": "number"
+          },
+          "sufficient": {
+            "type": "boolean"
+          },
+          "unrated_sessions": {
+            "description": "Last 28 days, without effort or time (not counted)",
+            "type": "integer"
+          },
+          "weeks": {
+            "items": {
+              "properties": {
+                "load": {
+                  "type": "integer"
+                },
+                "sessions": {
+                  "type": "integer"
+                },
+                "week_start": {
+                  "format": "date",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "week_start",
+                "load",
+                "sessions"
+              ],
+              "title": "DepthLoadWeek",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "acute",
+          "chronic",
+          "ratio",
+          "band",
+          "sufficient",
+          "rated_sessions",
+          "unrated_sessions",
+          "bands",
+          "weeks"
+        ],
+        "title": "DepthLoad",
+        "type": "object"
+      },
+      "DepthLoadBands": {
+        "properties": {
+          "above_to": {
+            "type": "number"
+          },
+          "below": {
+            "type": "number"
+          },
+          "steady_to": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "below",
+          "steady_to",
+          "above_to"
+        ],
+        "title": "DepthLoadBands",
+        "type": "object"
+      },
+      "DepthLoadWeek": {
+        "properties": {
+          "load": {
+            "type": "integer"
+          },
+          "sessions": {
+            "type": "integer"
+          },
+          "week_start": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "week_start",
+          "load",
+          "sessions"
+        ],
+        "title": "DepthLoadWeek",
+        "type": "object"
+      },
+      "DepthQualities": {
+        "properties": {
+          "felt_entries": {
+            "type": "integer"
+          },
+          "qualities": {
+            "description": "All ten qualities, canonical order",
+            "items": {
+              "properties": {
+                "felt": {
+                  "type": "integer"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "score": {
+                  "description": "Share of the most-trained quality, 0..1",
+                  "type": "number"
+                },
+                "sets": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "sets",
+                "score",
+                "felt"
+              ],
+              "title": "DepthQuality",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "sessions": {
+            "description": "Workouts with a recognised exercise",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sessions",
+          "felt_entries",
+          "qualities"
+        ],
+        "title": "DepthQualities",
+        "type": "object"
+      },
+      "DepthQuality": {
+        "properties": {
+          "felt": {
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "score": {
+            "description": "Share of the most-trained quality, 0..1",
+            "type": "number"
+          },
+          "sets": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "sets",
+          "score",
+          "felt"
+        ],
+        "title": "DepthQuality",
+        "type": "object"
+      },
       "DeviceActivity": {
         "description": "A workout from a watch: its own journal entry, or waiting for confirmation (pending)",
         "properties": {
@@ -35293,6 +36101,353 @@
           "failed_organization_ids"
         ],
         "title": "MyToday",
+        "type": "object"
+      },
+      "MyTrainingDepth": {
+        "properties": {
+          "coverage": {
+            "properties": {
+              "balance": {
+                "description": "Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together",
+                "properties": {
+                  "ham": {
+                    "type": "number"
+                  },
+                  "pull": {
+                    "type": "number"
+                  },
+                  "push": {
+                    "type": "number"
+                  },
+                  "push_pull_ratio": {
+                    "nullable": true,
+                    "type": "number"
+                  },
+                  "quad": {
+                    "type": "number"
+                  },
+                  "quad_ham_ratio": {
+                    "nullable": true,
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "push",
+                  "pull",
+                  "push_pull_ratio",
+                  "quad",
+                  "ham",
+                  "quad_ham_ratio"
+                ],
+                "title": "DepthBalance",
+                "type": "object"
+              },
+              "exercises": {
+                "properties": {
+                  "recognized": {
+                    "type": "integer"
+                  },
+                  "unrecognized": {
+                    "type": "integer"
+                  }
+                },
+                "required": [
+                  "recognized",
+                  "unrecognized"
+                ],
+                "title": "DepthExerciseCounts",
+                "type": "object"
+              },
+              "felt_entries": {
+                "type": "integer"
+              },
+              "least": {
+                "description": "Up to three major groups at level none or low, lowest first",
+                "items": {
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group id",
+                      "type": "string"
+                    },
+                    "level": {
+                      "enum": [
+                        "none",
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "per_week": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "description": "Weighted sets in the range",
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sets",
+                    "per_week",
+                    "level"
+                  ],
+                  "title": "DepthCoverageGroup",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "most": {
+                "description": "Up to three major groups with the most weighted sets",
+                "items": {
+                  "properties": {
+                    "id": {
+                      "description": "Taxonomy group id",
+                      "type": "string"
+                    },
+                    "level": {
+                      "enum": [
+                        "none",
+                        "low",
+                        "medium",
+                        "high"
+                      ],
+                      "type": "string"
+                    },
+                    "per_week": {
+                      "type": "number"
+                    },
+                    "sets": {
+                      "description": "Weighted sets in the range",
+                      "type": "number"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sets",
+                    "per_week",
+                    "level"
+                  ],
+                  "title": "DepthCoverageGroup",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sessions": {
+                "description": "Workouts done in the range",
+                "type": "integer"
+              },
+              "thresholds": {
+                "properties": {
+                  "high": {
+                    "type": "number"
+                  },
+                  "medium": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "medium",
+                  "high"
+                ],
+                "title": "DepthCoverageThresholds",
+                "type": "object"
+              }
+            },
+            "required": [
+              "sessions",
+              "exercises",
+              "felt_entries",
+              "thresholds",
+              "most",
+              "least",
+              "balance"
+            ],
+            "title": "DepthCoverage",
+            "type": "object"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "load": {
+            "description": "Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice",
+            "properties": {
+              "acute": {
+                "description": "Load of the last 7 days",
+                "type": "integer"
+              },
+              "band": {
+                "enum": [
+                  "below",
+                  "steady",
+                  "above",
+                  "well_above"
+                ],
+                "nullable": true,
+                "type": "string"
+              },
+              "bands": {
+                "properties": {
+                  "above_to": {
+                    "type": "number"
+                  },
+                  "below": {
+                    "type": "number"
+                  },
+                  "steady_to": {
+                    "type": "number"
+                  }
+                },
+                "required": [
+                  "below",
+                  "steady_to",
+                  "above_to"
+                ],
+                "title": "DepthLoadBands",
+                "type": "object"
+              },
+              "chronic": {
+                "description": "Weekly average of the last 28 days",
+                "type": "integer"
+              },
+              "rated_sessions": {
+                "description": "Last 28 days, with effort and time",
+                "type": "integer"
+              },
+              "ratio": {
+                "nullable": true,
+                "type": "number"
+              },
+              "sufficient": {
+                "type": "boolean"
+              },
+              "unrated_sessions": {
+                "description": "Last 28 days, without effort or time (not counted)",
+                "type": "integer"
+              },
+              "weeks": {
+                "items": {
+                  "properties": {
+                    "load": {
+                      "type": "integer"
+                    },
+                    "sessions": {
+                      "type": "integer"
+                    },
+                    "week_start": {
+                      "format": "date",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "week_start",
+                    "load",
+                    "sessions"
+                  ],
+                  "title": "DepthLoadWeek",
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "required": [
+              "acute",
+              "chronic",
+              "ratio",
+              "band",
+              "sufficient",
+              "rated_sessions",
+              "unrated_sessions",
+              "bands",
+              "weeks"
+            ],
+            "title": "DepthLoad",
+            "type": "object"
+          },
+          "qualities": {
+            "properties": {
+              "felt_entries": {
+                "type": "integer"
+              },
+              "qualities": {
+                "description": "All ten qualities, canonical order",
+                "items": {
+                  "properties": {
+                    "felt": {
+                      "type": "integer"
+                    },
+                    "id": {
+                      "type": "string"
+                    },
+                    "score": {
+                      "description": "Share of the most-trained quality, 0..1",
+                      "type": "number"
+                    },
+                    "sets": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "sets",
+                    "score",
+                    "felt"
+                  ],
+                  "title": "DepthQuality",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "sessions": {
+                "description": "Workouts with a recognised exercise",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "sessions",
+              "felt_entries",
+              "qualities"
+            ],
+            "title": "DepthQualities",
+            "type": "object"
+          },
+          "range": {
+            "enum": [
+              "4w",
+              "12w",
+              "6m",
+              "1y",
+              "all"
+            ],
+            "type": "string"
+          },
+          "sources": {
+            "description": "The source filter applied (none = every source)",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          },
+          "weeks": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sources",
+          "range",
+          "from",
+          "to",
+          "weeks",
+          "coverage",
+          "qualities",
+          "load"
+        ],
+        "title": "MyTrainingDepth",
         "type": "object"
       },
       "MyTrial": {
@@ -83156,6 +84311,404 @@
         "summary": "Πρόοδος across every provider",
         "tags": [
           "Training Log"
+        ]
+      }
+    },
+    "/api/me/progress/depth": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.TrainingDepthController.show",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "all",
+              "enum": [
+                "4w",
+                "12w",
+                "6m",
+                "1y",
+                "all"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "description": "Comma-separated provider ids, `freeform`, `device` (all when absent)",
+            "in": "query",
+            "name": "sources",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "coverage": {
+                      "properties": {
+                        "balance": {
+                          "description": "Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together",
+                          "properties": {
+                            "ham": {
+                              "type": "number"
+                            },
+                            "pull": {
+                              "type": "number"
+                            },
+                            "push": {
+                              "type": "number"
+                            },
+                            "push_pull_ratio": {
+                              "nullable": true,
+                              "type": "number"
+                            },
+                            "quad": {
+                              "type": "number"
+                            },
+                            "quad_ham_ratio": {
+                              "nullable": true,
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "push",
+                            "pull",
+                            "push_pull_ratio",
+                            "quad",
+                            "ham",
+                            "quad_ham_ratio"
+                          ],
+                          "title": "DepthBalance",
+                          "type": "object"
+                        },
+                        "exercises": {
+                          "properties": {
+                            "recognized": {
+                              "type": "integer"
+                            },
+                            "unrecognized": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "recognized",
+                            "unrecognized"
+                          ],
+                          "title": "DepthExerciseCounts",
+                          "type": "object"
+                        },
+                        "felt_entries": {
+                          "type": "integer"
+                        },
+                        "least": {
+                          "description": "Up to three major groups at level none or low, lowest first",
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group id",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "none",
+                                  "low",
+                                  "medium",
+                                  "high"
+                                ],
+                                "type": "string"
+                              },
+                              "per_week": {
+                                "type": "number"
+                              },
+                              "sets": {
+                                "description": "Weighted sets in the range",
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sets",
+                              "per_week",
+                              "level"
+                            ],
+                            "title": "DepthCoverageGroup",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "most": {
+                          "description": "Up to three major groups with the most weighted sets",
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group id",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "none",
+                                  "low",
+                                  "medium",
+                                  "high"
+                                ],
+                                "type": "string"
+                              },
+                              "per_week": {
+                                "type": "number"
+                              },
+                              "sets": {
+                                "description": "Weighted sets in the range",
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sets",
+                              "per_week",
+                              "level"
+                            ],
+                            "title": "DepthCoverageGroup",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sessions": {
+                          "description": "Workouts done in the range",
+                          "type": "integer"
+                        },
+                        "thresholds": {
+                          "properties": {
+                            "high": {
+                              "type": "number"
+                            },
+                            "medium": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "medium",
+                            "high"
+                          ],
+                          "title": "DepthCoverageThresholds",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "sessions",
+                        "exercises",
+                        "felt_entries",
+                        "thresholds",
+                        "most",
+                        "least",
+                        "balance"
+                      ],
+                      "title": "DepthCoverage",
+                      "type": "object"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "load": {
+                      "description": "Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice",
+                      "properties": {
+                        "acute": {
+                          "description": "Load of the last 7 days",
+                          "type": "integer"
+                        },
+                        "band": {
+                          "enum": [
+                            "below",
+                            "steady",
+                            "above",
+                            "well_above"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "bands": {
+                          "properties": {
+                            "above_to": {
+                              "type": "number"
+                            },
+                            "below": {
+                              "type": "number"
+                            },
+                            "steady_to": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "below",
+                            "steady_to",
+                            "above_to"
+                          ],
+                          "title": "DepthLoadBands",
+                          "type": "object"
+                        },
+                        "chronic": {
+                          "description": "Weekly average of the last 28 days",
+                          "type": "integer"
+                        },
+                        "rated_sessions": {
+                          "description": "Last 28 days, with effort and time",
+                          "type": "integer"
+                        },
+                        "ratio": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "sufficient": {
+                          "type": "boolean"
+                        },
+                        "unrated_sessions": {
+                          "description": "Last 28 days, without effort or time (not counted)",
+                          "type": "integer"
+                        },
+                        "weeks": {
+                          "items": {
+                            "properties": {
+                              "load": {
+                                "type": "integer"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              },
+                              "week_start": {
+                                "format": "date",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "week_start",
+                              "load",
+                              "sessions"
+                            ],
+                            "title": "DepthLoadWeek",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "acute",
+                        "chronic",
+                        "ratio",
+                        "band",
+                        "sufficient",
+                        "rated_sessions",
+                        "unrated_sessions",
+                        "bands",
+                        "weeks"
+                      ],
+                      "title": "DepthLoad",
+                      "type": "object"
+                    },
+                    "qualities": {
+                      "properties": {
+                        "felt_entries": {
+                          "type": "integer"
+                        },
+                        "qualities": {
+                          "description": "All ten qualities, canonical order",
+                          "items": {
+                            "properties": {
+                              "felt": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "score": {
+                                "description": "Share of the most-trained quality, 0..1",
+                                "type": "number"
+                              },
+                              "sets": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sets",
+                              "score",
+                              "felt"
+                            ],
+                            "title": "DepthQuality",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sessions": {
+                          "description": "Workouts with a recognised exercise",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sessions",
+                        "felt_entries",
+                        "qualities"
+                      ],
+                      "title": "DepthQualities",
+                      "type": "object"
+                    },
+                    "range": {
+                      "enum": [
+                        "4w",
+                        "12w",
+                        "6m",
+                        "1y",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "sources": {
+                      "description": "The source filter applied (none = every source)",
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "weeks": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "sources",
+                    "range",
+                    "from",
+                    "to",
+                    "weeks",
+                    "coverage",
+                    "qualities",
+                    "load"
+                  ],
+                  "title": "MyTrainingDepth",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Training depth"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your muscle coverage, qualities radar and training load across every provider",
+        "tags": [
+          "Progress"
         ]
       }
     },
@@ -156518,6 +158071,427 @@
         "summary": "Write a client's nutrition plan; the client is notified",
         "tags": [
           "Coaching"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/staff/clients/{user_id}/progress-depth": {
+      "get": {
+        "callbacks": {},
+        "operationId": "MilosTrainingWeb.TrainingDepthController.client",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "range",
+            "required": false,
+            "schema": {
+              "default": "4w",
+              "enum": [
+                "4w",
+                "12w",
+                "6m",
+                "1y",
+                "all"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "description": "Only from entries the client shares with this gym's coaches",
+                  "properties": {
+                    "coverage": {
+                      "properties": {
+                        "balance": {
+                          "description": "Exercise sets by primary muscles; a ratio only once both sides have sets and reach 4 together",
+                          "properties": {
+                            "ham": {
+                              "type": "number"
+                            },
+                            "pull": {
+                              "type": "number"
+                            },
+                            "push": {
+                              "type": "number"
+                            },
+                            "push_pull_ratio": {
+                              "nullable": true,
+                              "type": "number"
+                            },
+                            "quad": {
+                              "type": "number"
+                            },
+                            "quad_ham_ratio": {
+                              "nullable": true,
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "push",
+                            "pull",
+                            "push_pull_ratio",
+                            "quad",
+                            "ham",
+                            "quad_ham_ratio"
+                          ],
+                          "title": "DepthBalance",
+                          "type": "object"
+                        },
+                        "exercises": {
+                          "properties": {
+                            "recognized": {
+                              "type": "integer"
+                            },
+                            "unrecognized": {
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "recognized",
+                            "unrecognized"
+                          ],
+                          "title": "DepthExerciseCounts",
+                          "type": "object"
+                        },
+                        "felt_entries": {
+                          "type": "integer"
+                        },
+                        "least": {
+                          "description": "Up to three major groups at level none or low, lowest first",
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group id",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "none",
+                                  "low",
+                                  "medium",
+                                  "high"
+                                ],
+                                "type": "string"
+                              },
+                              "per_week": {
+                                "type": "number"
+                              },
+                              "sets": {
+                                "description": "Weighted sets in the range",
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sets",
+                              "per_week",
+                              "level"
+                            ],
+                            "title": "DepthCoverageGroup",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "most": {
+                          "description": "Up to three major groups with the most weighted sets",
+                          "items": {
+                            "properties": {
+                              "id": {
+                                "description": "Taxonomy group id",
+                                "type": "string"
+                              },
+                              "level": {
+                                "enum": [
+                                  "none",
+                                  "low",
+                                  "medium",
+                                  "high"
+                                ],
+                                "type": "string"
+                              },
+                              "per_week": {
+                                "type": "number"
+                              },
+                              "sets": {
+                                "description": "Weighted sets in the range",
+                                "type": "number"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sets",
+                              "per_week",
+                              "level"
+                            ],
+                            "title": "DepthCoverageGroup",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sessions": {
+                          "description": "Workouts done in the range",
+                          "type": "integer"
+                        },
+                        "thresholds": {
+                          "properties": {
+                            "high": {
+                              "type": "number"
+                            },
+                            "medium": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "medium",
+                            "high"
+                          ],
+                          "title": "DepthCoverageThresholds",
+                          "type": "object"
+                        }
+                      },
+                      "required": [
+                        "sessions",
+                        "exercises",
+                        "felt_entries",
+                        "thresholds",
+                        "most",
+                        "least",
+                        "balance"
+                      ],
+                      "title": "DepthCoverage",
+                      "type": "object"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "load": {
+                      "description": "Session RPE (effort × minutes) as of today: an indicator against the athlete's own usual week, never advice",
+                      "properties": {
+                        "acute": {
+                          "description": "Load of the last 7 days",
+                          "type": "integer"
+                        },
+                        "band": {
+                          "enum": [
+                            "below",
+                            "steady",
+                            "above",
+                            "well_above"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "bands": {
+                          "properties": {
+                            "above_to": {
+                              "type": "number"
+                            },
+                            "below": {
+                              "type": "number"
+                            },
+                            "steady_to": {
+                              "type": "number"
+                            }
+                          },
+                          "required": [
+                            "below",
+                            "steady_to",
+                            "above_to"
+                          ],
+                          "title": "DepthLoadBands",
+                          "type": "object"
+                        },
+                        "chronic": {
+                          "description": "Weekly average of the last 28 days",
+                          "type": "integer"
+                        },
+                        "rated_sessions": {
+                          "description": "Last 28 days, with effort and time",
+                          "type": "integer"
+                        },
+                        "ratio": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "sufficient": {
+                          "type": "boolean"
+                        },
+                        "unrated_sessions": {
+                          "description": "Last 28 days, without effort or time (not counted)",
+                          "type": "integer"
+                        },
+                        "weeks": {
+                          "items": {
+                            "properties": {
+                              "load": {
+                                "type": "integer"
+                              },
+                              "sessions": {
+                                "type": "integer"
+                              },
+                              "week_start": {
+                                "format": "date",
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "week_start",
+                              "load",
+                              "sessions"
+                            ],
+                            "title": "DepthLoadWeek",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        }
+                      },
+                      "required": [
+                        "acute",
+                        "chronic",
+                        "ratio",
+                        "band",
+                        "sufficient",
+                        "rated_sessions",
+                        "unrated_sessions",
+                        "bands",
+                        "weeks"
+                      ],
+                      "title": "DepthLoad",
+                      "type": "object"
+                    },
+                    "qualities": {
+                      "properties": {
+                        "felt_entries": {
+                          "type": "integer"
+                        },
+                        "qualities": {
+                          "description": "All ten qualities, canonical order",
+                          "items": {
+                            "properties": {
+                              "felt": {
+                                "type": "integer"
+                              },
+                              "id": {
+                                "type": "string"
+                              },
+                              "score": {
+                                "description": "Share of the most-trained quality, 0..1",
+                                "type": "number"
+                              },
+                              "sets": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "id",
+                              "sets",
+                              "score",
+                              "felt"
+                            ],
+                            "title": "DepthQuality",
+                            "type": "object"
+                          },
+                          "type": "array"
+                        },
+                        "sessions": {
+                          "description": "Workouts with a recognised exercise",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "sessions",
+                        "felt_entries",
+                        "qualities"
+                      ],
+                      "title": "DepthQualities",
+                      "type": "object"
+                    },
+                    "range": {
+                      "enum": [
+                        "4w",
+                        "12w",
+                        "6m",
+                        "1y",
+                        "all"
+                      ],
+                      "type": "string"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "weeks": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "range",
+                    "from",
+                    "to",
+                    "weeks",
+                    "coverage",
+                    "qualities",
+                    "load"
+                  ],
+                  "title": "ClientTrainingDepth",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Client training depth"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Error"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "A client's muscle coverage, qualities radar and training load, from shared entries",
+        "tags": [
+          "Progress"
         ]
       }
     },

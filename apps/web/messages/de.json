@@ -8333,5 +8333,59 @@
         "secondary": "Unterstützend"
       }
     }
+  },
+  "Depth": {
+    "noData": "Keine Trainings in diesem Zeitraum.",
+    "coverage": {
+      "title": "Muskelabdeckung",
+      "atlas": "Atlas ›",
+      "most": "Am meisten trainiert",
+      "least": "Am wenigsten trainiert",
+      "noneMost": "Keine erkannte Übung in diesem Zeitraum.",
+      "noneLeast": "Alle großen Muskelgruppen haben mittlere oder hohe Abdeckung.",
+      "pushPull": "Drücken : Ziehen",
+      "quadHam": "Quadrizeps : Beinbeuger",
+      "ratioMissing": "Noch ein paar Sätze nötig",
+      "note": "Ein Hinweis auf das Trainingsvolumen, kein Ziel."
+    },
+    "qualities": {
+      "title": "Fitnessqualitäten",
+      "most": "Am meisten: {qualities}",
+      "felt": "„Gespürt“: {qualities}",
+      "row": "{quality}: {sets} Sätze",
+      "note": "Die Form zeigt, wohin das Training ging, keine Note.",
+      "short": {
+        "cardiorespiratory-endurance": "Ausdauer",
+        "stamina": "Kraftausd.",
+        "strength": "Kraft",
+        "flexibility": "Beweglichk.",
+        "power": "Schnellkraft",
+        "speed": "Tempo",
+        "coordination": "Koordination",
+        "agility": "Agilität",
+        "balance": "Balance",
+        "accuracy": "Präzision"
+      }
+    },
+    "load": {
+      "title": "Trainingsbelastung",
+      "ratio": "Diese Woche: {ratio}× deiner üblichen",
+      "insufficient": "Der Vergleich erscheint nach 3 Wochen Training mit RPE und Dauer.",
+      "weeks": "Belastung pro Woche · 8 Wo.",
+      "weekOf": "Woche vom {date}: {load}",
+      "unrated": "{count, plural, one {# Training der letzten 4 Wochen hat kein RPE oder keine Dauer und zählt nicht.} other {# Trainings der letzten 4 Wochen haben kein RPE oder keine Dauer und zählen nicht.}}",
+      "note": "Belastung = RPE × Minuten. Ein Hinweis im Vergleich zu deiner üblichen Woche, kein medizinischer Rat.",
+      "band": {
+        "below": "Leichter",
+        "steady": "Nahe am Üblichen",
+        "above": "Über dem Üblichen",
+        "well_above": "Deutlich über dem Üblichen"
+      }
+    },
+    "coach": {
+      "title": "Abdeckung, Qualitäten, Belastung",
+      "range": "Zeitraum",
+      "sharedOnly": "Nur aus Einträgen, die das Mitglied mit den Coaches der Box teilt."
+    }
   }
 }

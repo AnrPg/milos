@@ -23,6 +23,7 @@ import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipR
 import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/FilterPage";
 import { useRememberedFilter } from "@/components/filters/use-remembered-filter";
 import { HistoryExportCard } from "@/components/member-app/progress/HistoryExportCard";
+import { ProgressDepthSections } from "@/components/member-app/progress/ProgressDepthSections";
 import { ProgressOverview } from "@/components/member-app/progress/ProgressOverview";
 import { RestingHeartRateCard } from "@/components/devices/RestingHeartRateCard";
 import { PantheonSection } from "@/components/pantheon/PantheonSection";
@@ -41,7 +42,8 @@ import { useTranslations } from "next-intl";
  * resting heart rate from a connected device (ADR-161, only with data),
  * then personal records, the history export and the statistics across every
  * provider (ADR-162, board 17 Q4): «Όλοι» by default, a provider chip next to
- * the time range narrows it.
+ * the time range narrows it. The depth slots follow in a fixed order
+ * (ADR-165): Μυϊκή κάλυψη (into the atlas), Ποιότητες, Φορτίο.
  */
 export function ProgressConsole() {
   const i18n = useUiTranslations();
@@ -86,6 +88,7 @@ function ProgressContent() {
           <ScoreHistory series={query.data.score_history ?? []} />
         </>
       )}
+      {filter ? <ProgressDepthSections filter={filter} /> : null}
     </div>
   );
 }
