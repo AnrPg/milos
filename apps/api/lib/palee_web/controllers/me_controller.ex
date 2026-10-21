@@ -74,7 +74,7 @@ defmodule PaleeWeb.MeController do
                 type: :string,
                 nullable: true,
                 enum: Palee.Themes.slugs() ++ [nil],
-                description: "Your own theme; null follows your gym's"
+                description: "Your own theme: graphite (dark) or frost (light); null is frost"
               }
             }
           }

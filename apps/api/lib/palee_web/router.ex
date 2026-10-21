@@ -251,7 +251,6 @@ defmodule PaleeWeb.Router do
     get("/health", PaleeWeb.HealthController, :index)
     get("/openapi", OpenApiSpex.Plug.RenderSpec, [])
     get("/calendar/feed.ics", PaleeWeb.CalendarFeedController, :feed)
-    get("/theme", PaleeWeb.ThemeController, :show)
     get("/box-vocabulary", PaleeWeb.BoxVocabularyController, :show)
   end
 

@@ -5,7 +5,7 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
 
   alias Palee.Organizations
 
-  test "admin can patch only the global theme", %{conn: conn} do
+  test "admin can patch only the gamification settings", %{conn: conn} do
     admin = admin_fixture()
     organization = org_with_owner!(admin)
 
@@ -14,12 +14,12 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
       |> put_bearer_token(admin)
       |> patch(
         "/api/org/#{organization.slug}/admin/settings",
-        %{gamification: %{theme_slug: "aurora"}}
+        %{gamification: %{weekly_workout_target: 4}}
       )
       |> json_response(200)
 
-    assert get_in(payload, ["gamification", "theme_slug"]) == "aurora"
-    assert get_in(payload, ["gamification", "weekly_workout_target"]) == 2
+    assert get_in(payload, ["gamification", "weekly_workout_target"]) == 4
+    refute Map.has_key?(payload["gamification"], "theme_slug")
     assert get_in(payload, ["gamification", "leaderboard_enabled"]) == true
     assert get_in(payload, ["notifications", "enabled"]) == false
 
@@ -32,7 +32,7 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
       |> get("/api/org/#{organization.slug}/admin/settings")
       |> json_response(200)
 
-    assert get_in(fetched, ["gamification", "theme_slug"]) == "aurora"
+    assert get_in(fetched, ["gamification", "weekly_workout_target"]) == 4
 
     untouched =
       conn
@@ -43,7 +43,7 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
       })
       |> json_response(200)
 
-    assert get_in(untouched, ["gamification", "theme_slug"]) == "aurora"
+    assert get_in(untouched, ["gamification", "weekly_workout_target"]) == 4
   end
 
   test "admin can configure browser push service settings", %{conn: conn} do
@@ -137,11 +137,14 @@ defmodule PaleeWeb.AdminSettingsControllerTest do
              as.(admin) |> get(path) |> json_response(200) |> Map.fetch!("provider")
 
     assert as.(admin)
-           |> patch(path, %{provider: %{kind: "gym"}, gamification: %{theme_slug: "aurora"}})
+           |> patch(path, %{provider: %{kind: "gym"}, gamification: %{weekly_workout_target: 4}})
            |> json_response(403)
 
-    assert as.(owner) |> get(path) |> json_response(200) |> get_in(["gamification", "theme_slug"]) !=
-             "aurora"
+    assert as.(owner)
+           |> get(path)
+           |> json_response(200)
+           |> get_in(["gamification", "weekly_workout_target"]) !=
+             4
 
     assert as.(owner) |> patch(path, %{provider: %{kind: "studio"}}) |> json_response(422)
   end

@@ -17,7 +17,7 @@ defmodule Palee.Identity.User do
     field :security_version, :integer, default: 1
     field :avatar_url, :string
     field :preferred_locale, :string, default: "en"
-    # Nil follows the gym's theme.
+    # "frost" (light) or "graphite" (dark); nil is the default, frost.
     field :preferred_theme_slug, :string
     # Nullable: every account created before F-10 predates this column.
     field :email, :string
