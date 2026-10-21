@@ -230,9 +230,20 @@ No board; decided for least clutter (owner's standing instruction), full list in
    when > 0, gym exercises (first 5, «Όλες (n)») with on-demand videos matched by tag/title behind the package gate.
 6. **Entry from goals:** «Άτλαντας ›» in the goals sheet and tappable muscle chips; the strip is unchanged.
 
+### Coverage, qualities and load (2026-10-21, ADR-165)
+No board; decided for least clutter (owner's standing instruction), full list in ADR-165 «Decisions».
+1. **Slots:** three fixed cards after the existing statistics: Μυϊκή κάλυψη, then Ποιότητες and Φορτίο; the page's
+   range and provider chips drive coverage and qualities; load is always as of today (7/28 days, 8-week chart).
+2. **Coverage:** three most and three least trained of 14 major groups as chips into `atlasHref(group)`, «Άτλαντας ›»
+   in the header; push:pull and quad:ham as numbers only (no verdict), from 4 sets on.
+3. **Qualities:** radar of the ten qualities relative to the athlete's own top one, «Ένιωσα»: line for felt ones.
+4. **Load:** session RPE (RPE × minutes), ratio and neutral band only after 3 of 4 weeks with rated sessions;
+   unrated sessions are counted, never estimated; «όχι ιατρική συμβουλή» always.
+5. **Coach:** same cards in the client profile's Προπόνηση tab, from shared entries only, own clients (head coach: all).
+
 ## 6. Ethics and safety checklist (brief §8.6)
 - [ ] Insights labelled as indicators, never medical advice; none before enough data
-- [ ] Training load shown as an overload indicator, never a verdict
+- [x] Training load shown as an overload indicator, never a verdict (ADR-165)
 - [ ] Partners: club-verified only, mutual consent, report/block, optional gender preference, «training partner» copy
 - [ ] Partners hidden unless the member opts in, per club
 - [ ] AI suggestions never reach an athlete without coach approval
@@ -247,5 +258,5 @@ No board; decided for least clutter (owner's standing instruction), full list in
 
 ## 8. Progress
 - [x] Step 1 explore · [x] Step 2 decisions · [x] Step 3 plan
-- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [ ] P3-M3 · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
+- [x] P3-M1 (ADR-163) · [x] P3-M2 (ADR-164) · [x] P3-M3 (ADR-165) · [ ] P3-M4 · [ ] P3-M5 · [ ] P3-M6 · [ ] P3-M7
 - [ ] P3-M8 · [ ] P3-M9 · [ ] P3-M10 · [ ] P3-M11 · [ ] P3-M12 · [ ] P3-M13

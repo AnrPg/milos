@@ -165,3 +165,4 @@ must have an ADR. See `template.md` for the format.
 | ADR-162 | One journal across providers and the Box ▾ provider switch | Accepted |
 | ADR-163 | WOD goals, «τι ένιωσες» feedback and the anatomy taxonomy | Accepted |
 | ADR-164 | Anatomy atlas, coverage weighting and the gym's exercises per muscle | Accepted |
+| ADR-165 | Muscle coverage, the qualities radar and training load in Πρόοδος | Accepted |
