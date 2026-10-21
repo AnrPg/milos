@@ -6943,7 +6943,22 @@
     "integrationStatus_error": "Da ricollegare",
     "integrationHint_error": "Garmin non risponde più; ricollegalo.",
     "integrationStatus_native_soon": "Presto",
-    "integrationHint_native_soon": "Arriva in una prossima versione dell'app."
+    "integrationHint_native_soon": "Arriva in una prossima versione dell'app.",
+    "geofenceReminder": "Promemoria di arrivo nell'app",
+    "geofenceReminderHint": "I membri che lo attivano nell'app ricevono un promemoria quando arrivano con una prenotazione; un tocco fa il check-in.",
+    "nfcTitle": "Tag NFC alla porta",
+    "nfcHint": "Un tocco con il telefono fa il check-in a una prenotazione aperta ora. Non cambia da solo.",
+    "nfcWrite": "Scrivi su un tag",
+    "nfcCopy": "Copia link",
+    "nfcCopied": "Link copiato.",
+    "nfcHoldNear": "Avvicina il tag al retro del telefono.",
+    "nfcWritten": "Il tag è stato scritto.",
+    "nfcWriteFailed": "Il tag non è stato scritto. Riprova.",
+    "nfcWriteElsewhere": "Per scrivere il tag, apri questa pagina nell'app Milos o copia il link in un'app NFC.",
+    "nfcRotated": "Nuovo codice del tag. Riscrivi i tuoi tag.",
+    "newNfcCode": "Nuovo codice del tag",
+    "newNfcCodeConfirm": "Tutti i tag già scritti smetteranno di funzionare.",
+    "newNfcCodeAction": "Cambia codice"
   },
   "Media": {
     "add": "Aggiungi foto o un video",
@@ -8909,5 +8924,25 @@
       "overrideHint": "Vuoto: prezzo del piano",
       "notes": "Note"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Acqua",
+    "widgetAddGlass": "+1 bicchiere",
+    "widgetToday": "Oggi",
+    "widgetNothingToday": "Niente per oggi",
+    "widgetCheckIn": "Check-in",
+    "widgetNoClass": "Nessuna prenotazione oggi",
+    "widgetOpenApp": "Apri Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Programma",
+    "widgetKind_class": "Lezione",
+    "widgetKind_appointment": "Appuntamento",
+    "reminderTitle": "Sei a {box}",
+    "reminderBody": "Tocca per il check-in a {className} delle {time}.",
+    "reminderBodyNoName": "Tocca per il check-in alla prenotazione delle {time}.",
+    "reminderToggle": "Ricordamelo quando arrivo",
+    "reminderToggleHint": "Quando arrivi al box con una prenotazione, il telefono ti ricorda il check-in. La tua posizione resta sul telefono.",
+    "reminderNeedsAlways": "Perché funzioni con l'app chiusa, scegli «Sempre» per l'accesso alla posizione nelle impostazioni del telefono.",
+    "reminderDenied": "Senza accesso alla posizione non c'è promemoria. Puoi consentirlo nelle impostazioni del telefono."
   }
 }

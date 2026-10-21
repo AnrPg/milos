@@ -9,11 +9,12 @@ import { fetchPoster, posterKey, rotateDoor, rotatePoster, setPosterEnabled } fr
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 
 import { ConfirmButton } from "./ConfirmButton";
+import { NfcTagRow } from "./NfcTagRow";
 
 /**
  * Check-in at one location (ADR-155): open its door screen, give the door a
  * new code (every QR shown so far stops working), and the printed poster:
- * on or off, print it, give it a new code. Lives in the location's settings,
+ * on or off, print it, give it a new code; and the NFC door tag (ADR-173). Lives in the location's settings,
  * never on the kiosk itself.
  */
 export function LocationCheckIn({ token, locationId }: { token: string; locationId: string }) {
@@ -110,6 +111,8 @@ export function LocationCheckIn({ token, locationId }: { token: string; location
           </div>
         ) : null}
       </div>
+
+      <NfcTagRow token={token} locationId={locationId} />
 
       {notice ? (
         <p role={notice.tone === "error" ? "alert" : "status"} className="text-sm" style={{ color: notice.tone === "error" ? "var(--danger)" : "var(--success)" }}>

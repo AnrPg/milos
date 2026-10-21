@@ -6943,7 +6943,22 @@
     "integrationStatus_error": "Θέλει επανασύνδεση",
     "integrationHint_error": "Το Garmin σταμάτησε να απαντά· κάνε επανασύνδεση.",
     "integrationStatus_native_soon": "Σύντομα",
-    "integrationHint_native_soon": "Έρχεται σε επόμενη έκδοση της εφαρμογής."
+    "integrationHint_native_soon": "Έρχεται σε επόμενη έκδοση της εφαρμογής.",
+    "geofenceReminder": "Υπενθύμιση άφιξης στην εφαρμογή",
+    "geofenceReminderHint": "Όσα μέλη το ενεργοποιήσουν στο κινητό τους παίρνουν υπενθύμιση όταν φτάνουν με κράτηση· με ένα πάτημα γίνεται check-in στην κράτηση.",
+    "nfcTitle": "Ετικέτα NFC στην πόρτα",
+    "nfcHint": "Ένα άγγιγμα με το κινητό κάνει check-in σε κράτηση που είναι ανοιχτή τώρα. Δεν αλλάζει μόνη της.",
+    "nfcWrite": "Γράψε σε ετικέτα",
+    "nfcCopy": "Αντιγραφή συνδέσμου",
+    "nfcCopied": "Ο σύνδεσμος αντιγράφηκε.",
+    "nfcHoldNear": "Πλησίασε την ετικέτα στο πίσω μέρος του κινητού.",
+    "nfcWritten": "Η ετικέτα γράφτηκε.",
+    "nfcWriteFailed": "Η ετικέτα δεν γράφτηκε. Δοκίμασε ξανά.",
+    "nfcWriteElsewhere": "Για να γράψεις την ετικέτα, άνοιξε αυτή τη σελίδα στην εφαρμογή Milos ή αντέγραψε τον σύνδεσμο σε μια εφαρμογή NFC.",
+    "nfcRotated": "Νέος κωδικός ετικέτας. Γράψε ξανά τις ετικέτες.",
+    "newNfcCode": "Νέος κωδικός ετικέτας",
+    "newNfcCodeConfirm": "Όλες οι ετικέτες που έχεις γράψει θα σταματήσουν να λειτουργούν.",
+    "newNfcCodeAction": "Αλλαγή κωδικού"
   },
   "Media": {
     "add": "Πρόσθεσε φωτογραφίες ή βίντεο",
@@ -8909,5 +8924,25 @@
       "overrideHint": "Κενό: η τιμή του πλάνου",
       "notes": "Σημειώσεις"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Νερό",
+    "widgetAddGlass": "+1 ποτήρι",
+    "widgetToday": "Σήμερα",
+    "widgetNothingToday": "Τίποτα για σήμερα",
+    "widgetCheckIn": "Check-in",
+    "widgetNoClass": "Καμία κράτηση σήμερα",
+    "widgetOpenApp": "Άνοιξε το Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Πρόγραμμα",
+    "widgetKind_class": "Μάθημα",
+    "widgetKind_appointment": "Ραντεβού",
+    "reminderTitle": "Έφτασες στο {box}",
+    "reminderBody": "Πάτα για check-in στο {className} των {time}.",
+    "reminderBodyNoName": "Πάτα για check-in στην κράτηση των {time}.",
+    "reminderToggle": "Υπενθύμιση όταν φτάνω",
+    "reminderToggleHint": "Όταν φτάνεις στο box με κράτηση, το κινητό σου θυμίζει το check-in. Η τοποθεσία σου μένει στο κινητό.",
+    "reminderNeedsAlways": "Για να λειτουργεί με κλειστή την εφαρμογή, επίλεξε «Πάντα» στην πρόσβαση τοποθεσίας από τις ρυθμίσεις του κινητού.",
+    "reminderDenied": "Χωρίς πρόσβαση στην τοποθεσία δεν γίνεται υπενθύμιση. Μπορείς να την επιτρέψεις από τις ρυθμίσεις του κινητού."
   }
 }

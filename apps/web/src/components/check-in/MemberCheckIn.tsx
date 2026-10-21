@@ -12,6 +12,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 
 import { countdownLabel, memberCodeRefetchDelay } from "./check-in";
+import { ArrivalReminderRow } from "./ArrivalReminderRow";
 import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey, errorCode } from "./errors";
 import { QrCode } from "./QrCode";
@@ -152,6 +153,8 @@ export function MemberCheckIn() {
       ) : data ? (
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("memberRotatingNote")}</p>
       ) : null}
+
+      <ArrivalReminderRow />
 
       <p className="text-center text-xs" style={{ color: "var(--dim)" }}>{t("memberHowItWorks")}</p>
     </main>

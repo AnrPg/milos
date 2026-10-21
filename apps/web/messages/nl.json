@@ -6943,7 +6943,22 @@
     "integrationStatus_error": "Opnieuw koppelen",
     "integrationHint_error": "Garmin reageert niet meer; koppel het opnieuw.",
     "integrationStatus_native_soon": "Binnenkort",
-    "integrationHint_native_soon": "Komt in een latere versie van de app."
+    "integrationHint_native_soon": "Komt in een latere versie van de app.",
+    "geofenceReminder": "Aankomstherinnering in de app",
+    "geofenceReminderHint": "Leden die het in de app aanzetten, krijgen een herinnering als ze met een boeking aankomen; één tik checkt ze in.",
+    "nfcTitle": "NFC-tag bij de deur",
+    "nfcHint": "Een tik met de telefoon checkt in voor een boeking die nu open is. Hij verandert niet vanzelf.",
+    "nfcWrite": "Op een tag schrijven",
+    "nfcCopy": "Link kopiëren",
+    "nfcCopied": "Link gekopieerd.",
+    "nfcHoldNear": "Houd de tag tegen de achterkant van de telefoon.",
+    "nfcWritten": "De tag is geschreven.",
+    "nfcWriteFailed": "De tag is niet geschreven. Probeer het opnieuw.",
+    "nfcWriteElsewhere": "Open deze pagina in de Milos-app of kopieer de link naar een NFC-app om de tag te schrijven.",
+    "nfcRotated": "Nieuwe tagcode. Schrijf je tags opnieuw.",
+    "newNfcCode": "Nieuwe tagcode",
+    "newNfcCodeConfirm": "Alle tags die je hebt geschreven, werken dan niet meer.",
+    "newNfcCodeAction": "Code wijzigen"
   },
   "Media": {
     "add": "Foto's of een video toevoegen",
@@ -8909,5 +8924,25 @@
       "overrideHint": "Leeg: prijs van het abonnement",
       "notes": "Notities"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Water",
+    "widgetAddGlass": "+1 glas",
+    "widgetToday": "Vandaag",
+    "widgetNothingToday": "Niets voor vandaag",
+    "widgetCheckIn": "Check-in",
+    "widgetNoClass": "Vandaag geen boeking",
+    "widgetOpenApp": "Milos openen",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Programma",
+    "widgetKind_class": "Les",
+    "widgetKind_appointment": "Afspraak",
+    "reminderTitle": "Je bent bij {box}",
+    "reminderBody": "Tik om in te checken voor {className} om {time}.",
+    "reminderBodyNoName": "Tik om in te checken voor je boeking van {time}.",
+    "reminderToggle": "Herinner me bij aankomst",
+    "reminderToggleHint": "Kom je met een boeking aan bij de box, dan herinnert je telefoon je aan de check-in. Je locatie blijft op je telefoon.",
+    "reminderNeedsAlways": "Kies 'Altijd' voor locatietoegang in de instellingen van je telefoon, zodat het ook werkt als de app dicht is.",
+    "reminderDenied": "Zonder locatietoegang is er geen herinnering. Je kunt het toestaan in de instellingen van je telefoon."
   }
 }

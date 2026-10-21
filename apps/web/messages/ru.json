@@ -6943,7 +6943,22 @@
     "integrationStatus_error": "Нужно переподключить",
     "integrationHint_error": "Garmin перестал отвечать; подключите его заново.",
     "integrationStatus_native_soon": "Скоро",
-    "integrationHint_native_soon": "Появится в следующей версии приложения."
+    "integrationHint_native_soon": "Появится в следующей версии приложения.",
+    "geofenceReminder": "Напоминание о прибытии в приложении",
+    "geofenceReminderHint": "Участники, включившие его в приложении, получают напоминание, когда приходят с бронью; одно касание отмечает их.",
+    "nfcTitle": "NFC-метка у двери",
+    "nfcHint": "Касание телефоном отмечает по брони, открытой сейчас. Сама метка не меняется.",
+    "nfcWrite": "Записать на метку",
+    "nfcCopy": "Копировать ссылку",
+    "nfcCopied": "Ссылка скопирована.",
+    "nfcHoldNear": "Поднеси метку к задней стороне телефона.",
+    "nfcWritten": "Метка записана.",
+    "nfcWriteFailed": "Метка не записана. Попробуй ещё раз.",
+    "nfcWriteElsewhere": "Чтобы записать метку, открой эту страницу в приложении Milos или скопируй ссылку в NFC-приложение.",
+    "nfcRotated": "Новый код метки. Запиши метки заново.",
+    "newNfcCode": "Новый код метки",
+    "newNfcCodeConfirm": "Все записанные метки перестанут работать.",
+    "newNfcCodeAction": "Сменить код"
   },
   "Media": {
     "add": "Добавить фото или видео",
@@ -8909,5 +8924,25 @@
       "overrideHint": "Пусто — цена тарифа",
       "notes": "Заметки"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Вода",
+    "widgetAddGlass": "+1 стакан",
+    "widgetToday": "Сегодня",
+    "widgetNothingToday": "На сегодня ничего",
+    "widgetCheckIn": "Чек-ин",
+    "widgetNoClass": "Сегодня нет брони",
+    "widgetOpenApp": "Открыть Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Программа",
+    "widgetKind_class": "Занятие",
+    "widgetKind_appointment": "Встреча",
+    "reminderTitle": "Ты в {box}",
+    "reminderBody": "Нажми, чтобы отметиться на {className} в {time}.",
+    "reminderBodyNoName": "Нажми, чтобы отметиться по брони на {time}.",
+    "reminderToggle": "Напоминать по прибытии",
+    "reminderToggleHint": "Когда ты приходишь в зал с бронью, телефон напоминает отметиться. Твоё местоположение остаётся в телефоне.",
+    "reminderNeedsAlways": "Чтобы работало при закрытом приложении, выбери «Всегда» для доступа к геопозиции в настройках телефона.",
+    "reminderDenied": "Без доступа к геопозиции напоминаний не будет. Его можно разрешить в настройках телефона."
   }
 }

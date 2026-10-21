@@ -6943,7 +6943,22 @@
     "integrationStatus_error": "Трябва повторно свързване",
     "integrationHint_error": "Garmin спря да отговаря; свържи го отново.",
     "integrationStatus_native_soon": "Скоро",
-    "integrationHint_native_soon": "Идва в следваща версия на приложението."
+    "integrationHint_native_soon": "Идва в следваща версия на приложението.",
+    "geofenceReminder": "Напомняне при пристигане в приложението",
+    "geofenceReminderHint": "Членовете, които го включат в приложението, получават напомняне при пристигане с резервация; едно докосване ги чекира.",
+    "nfcTitle": "NFC етикет на вратата",
+    "nfcHint": "Докосване с телефона чекира в резервация, отворена сега. Не се променя сам.",
+    "nfcWrite": "Запиши на етикет",
+    "nfcCopy": "Копирай връзката",
+    "nfcCopied": "Връзката е копирана.",
+    "nfcHoldNear": "Доближи етикета до гърба на телефона.",
+    "nfcWritten": "Етикетът е записан.",
+    "nfcWriteFailed": "Етикетът не е записан. Опитай отново.",
+    "nfcWriteElsewhere": "За да запишеш етикета, отвори тази страница в приложението Milos или копирай връзката в NFC приложение.",
+    "nfcRotated": "Нов код на етикета. Запиши етикетите отново.",
+    "newNfcCode": "Нов код на етикета",
+    "newNfcCodeConfirm": "Всички записани досега етикети ще спрат да работят.",
+    "newNfcCodeAction": "Смени кода"
   },
   "Media": {
     "add": "Добави снимки или видео",
@@ -8909,5 +8924,25 @@
       "overrideHint": "Празно: цената на плана",
       "notes": "Бележки"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Вода",
+    "widgetAddGlass": "+1 чаша",
+    "widgetToday": "Днес",
+    "widgetNothingToday": "Нищо за днес",
+    "widgetCheckIn": "Чек-ин",
+    "widgetNoClass": "Няма резервация днес",
+    "widgetOpenApp": "Отвори Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Програма",
+    "widgetKind_class": "Занятие",
+    "widgetKind_appointment": "Час",
+    "reminderTitle": "Пристигна в {box}",
+    "reminderBody": "Докосни за чек-ин в {className} в {time}.",
+    "reminderBodyNoName": "Докосни за чек-ин в резервацията в {time}.",
+    "reminderToggle": "Напомняне при пристигане",
+    "reminderToggleHint": "Когато пристигнеш в залата с резервация, телефонът ти напомня за чек-ин. Местоположението ти остава в телефона.",
+    "reminderNeedsAlways": "За да работи при затворено приложение, избери „Винаги“ за достъп до местоположението в настройките на телефона.",
+    "reminderDenied": "Без достъп до местоположението няма напомняне. Можеш да го разрешиш от настройките на телефона."
   }
 }

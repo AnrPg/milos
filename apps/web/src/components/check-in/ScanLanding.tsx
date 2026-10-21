@@ -11,13 +11,13 @@ import { FollowButton } from "@/components/social/FollowButton";
 import { TrialSheet } from "@/components/trials/TrialSheet";
 import { adminHref } from "@/lib/organization-slug";
 
-import { clockOffset, nothingReasonKey, scanView, undoSecondsLeft } from "./check-in";
+import { clockOffset, nothingReasonKey, scanBody, scanView, undoSecondsLeft, type ScanSource } from "./check-in";
 import { checkInErrorKey } from "./errors";
 
 /** A trial without an approval rule books straight away. */
 const AUTO_APPROVAL = "auto" as const;
 
-type Source = "door" | "poster";
+type Source = ScanSource;
 
 /**
  * Where the phone camera lands after scanning the door (`/c/<location>/<code>`)
@@ -25,7 +25,9 @@ type Source = "door" | "poster";
  * the person signs in and comes back here. One scan answers with what
  * happened: checked in (with a minute to undo), pick a booking, already in,
  * nothing to check in to with classes to book, or «not a member yet» with
- * the box's trial classes. The poster only ever checks in to a booking.
+ * the box's trial classes. The poster only ever checks in to a booking, and
+ * so do an NFC door tag (`/c/<location>/n/<code>`) and the store app's
+ * arrival reminder (`/c/<location>/g/<token>`), ADR-173.
  */
 export function ScanLanding({ locationId, code, source }: { locationId: string; code: string; source: Source }) {
   const t = useTranslations("CheckIn");
@@ -44,8 +46,7 @@ export function ScanLanding({ locationId, code, source }: { locationId: string; 
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
     queryFn: async () => {
-      const body = source === "poster" ? { location_id: locationId, poster_code: code } : { location_id: locationId, code };
-      const result = await scanDoor(token!, body);
+      const result = await scanDoor(token!, scanBody(source, locationId, code));
       return { result, receivedAt: Date.now() };
     },
   });

@@ -2,7 +2,9 @@
 
 import { deletePushSubscription } from "@/api/notifications";
 import { isNative } from "@/lib/platform";
+import { forgetGeofences } from "@/lib/platform/geofence";
 import { unregisterNativePush } from "@/lib/platform/native-push";
+import { forgetWidgets } from "@/lib/platform/widgets";
 
 export async function registerAppServiceWorker() {
   if (typeof window === "undefined" || !("serviceWorker" in navigator)) {
@@ -45,7 +47,8 @@ export async function clearWorkoutCache() {
 export async function clearBrowserPushSubscription(accessToken?: string | null) {
   // ADR-171: inside the store apps the install's push token is forgotten instead.
   if (isNative()) {
-    await unregisterNativePush(accessToken);
+    // ADR-173: the widgets go blank and the arrival reminder stops too.
+    await Promise.all([unregisterNativePush(accessToken), forgetWidgets(accessToken), forgetGeofences()]);
     return;
   }
 

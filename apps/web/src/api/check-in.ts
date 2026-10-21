@@ -15,6 +15,9 @@ type Schemas = components["schemas"];
 export type DoorDisplay = Schemas["CheckInDoorDisplay"];
 export type DoorCode = DoorDisplay["codes"][number];
 export type Poster = Schemas["CheckInPoster"];
+export type NfcTag = Schemas["CheckInNfcTag"];
+export type Geofences = Schemas["CheckInGeofences"];
+export type GeofenceRegion = Geofences["regions"][number];
 export type CheckInRules = Schemas["CheckInRules"];
 export type MemberCodeMode = NonNullable<CheckInRules["member_code_mode"]>;
 export type ScanResult = Schemas["CheckInScanResult"];
@@ -39,6 +42,7 @@ export type Integration = ConnectedDevices["integrations"][number];
 export const CHECK_IN_RULES_KEY = ["admin", "check-in", "settings"] as const;
 export const doorKey = (locationId: string) => ["admin", "check-in", "door", locationId] as const;
 export const posterKey = (locationId: string) => ["admin", "check-in", "poster", locationId] as const;
+export const nfcTagKey = (locationId: string) => ["admin", "check-in", "nfc", locationId] as const;
 export const VISITORS_KEY = ["admin", "check-in", "visitors"] as const;
 export const myCodeKey = (slug: string) => ["check-in", "my-code", slug] as const;
 export const CONNECTED_DEVICES_KEY = ["me", "connected-devices"] as const;
@@ -67,6 +71,21 @@ export function setPosterEnabled(token: string, locationId: string, enabled: boo
 
 export function rotatePoster(token: string, locationId: string) {
   return apiRequest<Poster>(`${door(locationId)}/poster/rotate`, { method: "POST", token });
+}
+
+// Staff: the NFC door tag (ADR-173) -----------------------------------------------
+
+export function fetchNfcTag(token: string, locationId: string) {
+  return apiRequest<NfcTag>(`${door(locationId)}/nfc`, { token });
+}
+
+export function setNfcTagEnabled(token: string, locationId: string, enabled: boolean) {
+  return apiRequest<NfcTag>(`${door(locationId)}/nfc`, { method: "PUT", token, body: { enabled } });
+}
+
+/** «Νέος κωδικός ετικέτας»: every tag written so far stops working. */
+export function rotateNfcTag(token: string, locationId: string) {
+  return apiRequest<NfcTag>(`${door(locationId)}/nfc/rotate`, { method: "POST", token });
 }
 
 // Staff: rules, desk and visitors ------------------------------------------------
@@ -124,6 +143,11 @@ export function scanDoor(token: string, body: ScanRequest) {
 
 export function undoScan(token: string, undoToken: string) {
   return apiRequest<UndoResult>(`/check-in/scan/${encodeURIComponent(undoToken)}`, { method: "DELETE", token });
+}
+
+/** The store app's arrival reminder regions (ADR-173), across the member's boxes. */
+export function fetchGeofences(token: string) {
+  return apiRequest<Geofences>("/me/check-in/geofences", { token });
 }
 
 // Member: the personal code and Wallet ---------------------------------------------

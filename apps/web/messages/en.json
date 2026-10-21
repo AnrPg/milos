@@ -6943,7 +6943,22 @@
     "integrationStatus_error": "Needs reconnecting",
     "integrationHint_error": "Garmin stopped answering; reconnect it.",
     "integrationStatus_native_soon": "Soon",
-    "integrationHint_native_soon": "Coming in a later version of the app."
+    "integrationHint_native_soon": "Coming in a later version of the app.",
+    "geofenceReminder": "Arrival reminder in the app",
+    "geofenceReminderHint": "Members who turn it on in the app get a reminder when they arrive with a booking; one tap checks in to it.",
+    "nfcTitle": "NFC tag at the door",
+    "nfcHint": "A tap with the phone checks in to a booking open now. It doesn't change by itself.",
+    "nfcWrite": "Write to a tag",
+    "nfcCopy": "Copy link",
+    "nfcCopied": "Link copied.",
+    "nfcHoldNear": "Hold the tag near the back of the phone.",
+    "nfcWritten": "The tag was written.",
+    "nfcWriteFailed": "The tag wasn't written. Try again.",
+    "nfcWriteElsewhere": "To write the tag, open this page in the Milos app or copy the link into an NFC app.",
+    "nfcRotated": "New tag code. Write your tags again.",
+    "newNfcCode": "New tag code",
+    "newNfcCodeConfirm": "Every tag you have written will stop working.",
+    "newNfcCodeAction": "Change code"
   },
   "Media": {
     "add": "Add photos or a video",
@@ -8909,5 +8924,25 @@
       "overrideHint": "Empty uses the plan price",
       "notes": "Notes"
     }
+  },
+  "NativeExtras": {
+    "widgetWater": "Water",
+    "widgetAddGlass": "+1 glass",
+    "widgetToday": "Today",
+    "widgetNothingToday": "Nothing for today",
+    "widgetCheckIn": "Check-in",
+    "widgetNoClass": "No booking today",
+    "widgetOpenApp": "Open Milos",
+    "widgetKind_wod": "WOD",
+    "widgetKind_program": "Programme",
+    "widgetKind_class": "Class",
+    "widgetKind_appointment": "Appointment",
+    "reminderTitle": "You're at {box}",
+    "reminderBody": "Tap to check in to {className} at {time}.",
+    "reminderBodyNoName": "Tap to check in to your {time} booking.",
+    "reminderToggle": "Remind me when I arrive",
+    "reminderToggleHint": "When you arrive at the box with a booking, your phone reminds you to check in. Your location stays on your phone.",
+    "reminderNeedsAlways": "To work while the app is closed, choose \"Always\" for location access in your phone's settings.",
+    "reminderDenied": "Without location access there is no reminder. You can allow it in your phone's settings."
   }
 }
