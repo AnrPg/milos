@@ -368,3 +368,24 @@ input[type="number"] {
   .checkin-print-root { min-height: auto !important; background: #fff !important; color: #000 !important; }
   @page { size: A4 portrait; margin: 14mm; }
 }
+
+/* ADR-171: inside the store apps the page draws edge to edge (viewport-fit=cover),
+   so the content starts below the status bar and a strip in the page colour sits
+   behind it. Browsers never set data-platform, so the web is unchanged. */
+html[data-platform] {
+  --safe-top: env(safe-area-inset-top, 0px);
+}
+
+html[data-platform] body {
+  padding-top: var(--safe-top);
+}
+
+html[data-platform]::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: var(--safe-top);
+  background: var(--bg);
+  z-index: 1000;
+  pointer-events: none;
+}

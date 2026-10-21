@@ -6910,7 +6910,9 @@
     "integrationHint_unavailable": "Todavía no hay conexión.",
     "integrationHint_native_only": "Necesita la app del móvil; no se puede desde el navegador.",
     "integrationStatus_error": "Hay que reconectar",
-    "integrationHint_error": "Garmin ha dejado de responder; vuelve a conectarlo."
+    "integrationHint_error": "Garmin ha dejado de responder; vuelve a conectarlo.",
+    "integrationStatus_native_soon": "Pronto",
+    "integrationHint_native_soon": "Llega en una próxima versión de la app."
   },
   "Media": {
     "add": "Añadir fotos o un vídeo",

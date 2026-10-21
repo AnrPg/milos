@@ -6910,7 +6910,9 @@
     "integrationHint_unavailable": "עדיין אין חיבור.",
     "integrationHint_native_only": "צריך את האפליקציה לנייד; מהדפדפן זה לא אפשרי.",
     "integrationStatus_error": "צריך לחבר מחדש",
-    "integrationHint_error": "Garmin הפסיק להגיב; חברו אותו מחדש."
+    "integrationHint_error": "Garmin הפסיק להגיב; חברו אותו מחדש.",
+    "integrationStatus_native_soon": "בקרוב",
+    "integrationHint_native_soon": "יגיע בגרסה הבאה של האפליקציה."
   },
   "Media": {
     "add": "הוספת תמונות או סרטון",

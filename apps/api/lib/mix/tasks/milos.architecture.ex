@@ -73,6 +73,7 @@ defmodule Mix.Tasks.Milos.Architecture do
     execution/training_log_store
     wellbeing/wellbeing_store
     notifications/notification_store
+    notifications/native_push_token_store
     coaching/coaching_store
     pantheon/pr_store
     journal/journal_store
