@@ -41,13 +41,19 @@ export default function LocationPinMap({
 
   useEffect(() => {
     if (!container.current) return;
-    const instance = new maplibregl.Map({
-      container: container.current,
-      style: mapStyleUrl(),
-      center: ATHENS,
-      zoom: 11,
-      attributionControl: { compact: true },
-    });
+    let instance: maplibregl.Map;
+    try {
+      instance = new maplibregl.Map({
+        container: container.current,
+        style: mapStyleUrl(),
+        center: ATHENS,
+        zoom: 11,
+        attributionControl: { compact: true },
+      });
+    } catch {
+      // No WebGL2 (old devices, some test browsers): the page works without the map.
+      return;
+    }
     instance.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     instance.on("click", (event) => onMoveRef.current({ latitude: event.lngLat.lat, longitude: event.lngLat.lng }));
     map.current = instance;

@@ -88,7 +88,7 @@ export function ChatsPageContent() {
       fetchThreads(accessToken, activeTab as ThreadContextType)
         .then((d) => {
           if (!cancelled) {
-            setThreads(d.threads);
+            setThreads(d.threads ?? []);
             setLoadingThreads(false);
             setSearchedTabs((current) =>
               current.includes(activeTab) ? current : [...current, activeTab],

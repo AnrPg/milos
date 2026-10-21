@@ -10,7 +10,8 @@ jobs:
     container: cimg/elixir:1.18.1-erlang-27.2.2-browsers
     services:
       postgres:
-        image: postgres:16-alpine
+        # PostGIS: the migrations create the postgis extension.
+        image: postgis/postgis:16-3.5-alpine
         env:
           POSTGRES_DB: milos_training_test
           POSTGRES_PASSWORD: postgres

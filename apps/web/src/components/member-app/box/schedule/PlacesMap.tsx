@@ -40,13 +40,19 @@ export default function PlacesMap({
 
   useEffect(() => {
     if (!container.current) return;
-    const instance = new maplibregl.Map({
-      container: container.current,
-      style: mapStyleUrl(),
-      center: [23.7275, 37.9838],
-      zoom: 11,
-      attributionControl: { compact: true },
-    });
+    let instance: maplibregl.Map;
+    try {
+      instance = new maplibregl.Map({
+        container: container.current,
+        style: mapStyleUrl(),
+        center: [23.7275, 37.9838],
+        zoom: 11,
+        attributionControl: { compact: true },
+      });
+    } catch {
+      // No WebGL2 (old devices, some test browsers): the page works without the map.
+      return;
+    }
     const report = () => {
       const bounds = instance.getBounds();
       callbacks.current.onBoundsChange({
