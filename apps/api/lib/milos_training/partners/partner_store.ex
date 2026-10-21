@@ -26,6 +26,9 @@ defmodule MilosTraining.Partners.PartnerStore do
   def list_profiles_of(context, user_id), do: scoped(context, :list_profiles_of, [user_id])
 
   @impl true
+  def profile_ids_for(context, pairs), do: scoped(context, :profile_ids_for, [pairs])
+
+  @impl true
   def list_live_profiles(context, club_id, user_ids),
     do: scoped(context, :list_live_profiles, [club_id, user_ids])
 

@@ -36575,6 +36575,12 @@
             "format": "date-time",
             "type": "string"
           },
+          "partner_profile_id": {
+            "description": "The other person's profile in the club, what a report names",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "person": {
             "properties": {
               "avatar_url": {
@@ -36621,6 +36627,7 @@
           "club_id",
           "club_name",
           "person",
+          "partner_profile_id",
           "status",
           "end_reason",
           "ended_by_me",
@@ -36694,6 +36701,12 @@
                   "format": "date-time",
                   "type": "string"
                 },
+                "partner_profile_id": {
+                  "description": "The other person's profile in the club, what a report names",
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
                 "person": {
                   "properties": {
                     "avatar_url": {
@@ -36740,6 +36753,7 @@
                 "club_id",
                 "club_name",
                 "person",
+                "partner_profile_id",
                 "status",
                 "end_reason",
                 "ended_by_me",
@@ -37794,6 +37808,12 @@
                     "format": "date-time",
                     "type": "string"
                   },
+                  "partner_profile_id": {
+                    "description": "The other person's profile in the club, what a report names",
+                    "format": "uuid",
+                    "nullable": true,
+                    "type": "string"
+                  },
                   "person": {
                     "properties": {
                       "avatar_url": {
@@ -37840,6 +37860,7 @@
                   "club_id",
                   "club_name",
                   "person",
+                  "partner_profile_id",
                   "status",
                   "end_reason",
                   "ended_by_me",
@@ -70036,6 +70057,12 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "partner_profile_id": {
+                              "description": "The other person's profile in the club, what a report names",
+                              "format": "uuid",
+                              "nullable": true,
+                              "type": "string"
+                            },
                             "person": {
                               "properties": {
                                 "avatar_url": {
@@ -70082,6 +70109,7 @@
                             "club_id",
                             "club_name",
                             "person",
+                            "partner_profile_id",
                             "status",
                             "end_reason",
                             "ended_by_me",
@@ -85072,6 +85100,12 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "partner_profile_id": {
+                            "description": "The other person's profile in the club, what a report names",
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "person": {
                             "properties": {
                               "avatar_url": {
@@ -85118,6 +85152,7 @@
                           "club_id",
                           "club_name",
                           "person",
+                          "partner_profile_id",
                           "status",
                           "end_reason",
                           "ended_by_me",

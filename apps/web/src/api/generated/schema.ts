@@ -20796,6 +20796,11 @@ export interface components {
             last_message_at: string | null;
             /** Format: date-time */
             matched_at: string;
+            /**
+             * Format: uuid
+             * @description The other person's profile in the club, what a report names
+             */
+            partner_profile_id: string | null;
             /** PartnerPerson */
             person: {
                 avatar_url: string | null;
@@ -20832,6 +20837,11 @@ export interface components {
                 last_message_at: string | null;
                 /** Format: date-time */
                 matched_at: string;
+                /**
+                 * Format: uuid
+                 * @description The other person's profile in the club, what a report names
+                 */
+                partner_profile_id: string | null;
                 /** PartnerPerson */
                 person: {
                     avatar_url: string | null;
@@ -21119,6 +21129,11 @@ export interface components {
                 last_message_at: string | null;
                 /** Format: date-time */
                 matched_at: string;
+                /**
+                 * Format: uuid
+                 * @description The other person's profile in the club, what a report names
+                 */
+                partner_profile_id: string | null;
                 /** PartnerPerson */
                 person: {
                     avatar_url: string | null;
@@ -32340,6 +32355,11 @@ export interface operations {
                             last_message_at: string | null;
                             /** Format: date-time */
                             matched_at: string;
+                            /**
+                             * Format: uuid
+                             * @description The other person's profile in the club, what a report names
+                             */
+                            partner_profile_id: string | null;
                             /** PartnerPerson */
                             person: {
                                 avatar_url: string | null;
@@ -37948,6 +37968,11 @@ export interface operations {
                             last_message_at: string | null;
                             /** Format: date-time */
                             matched_at: string;
+                            /**
+                             * Format: uuid
+                             * @description The other person's profile in the club, what a report names
+                             */
+                            partner_profile_id: string | null;
                             /** PartnerPerson */
                             person: {
                                 avatar_url: string | null;

@@ -96,7 +96,7 @@ defmodule MilosTraining.Application.Partners do
          {:ok, direction} <- Partners.normalize_direction(param(params, "direction")),
          {:ok, target_id} <- cast_id(param(params, "target_id")),
          {:ok, viewer} <- live_profile(scope, club, user_id),
-         {:ok, _target} <- swipeable(scope, club, viewer, target_id, now),
+         {:ok, target} <- swipeable(scope, club, viewer, target_id, now),
          :ok <- rate(scope, user_id, now),
          {:ok, result} <-
            Partners.record_swipe(
@@ -112,7 +112,8 @@ defmodule MilosTraining.Application.Partners do
        %{
          target_id: target_id,
          direction: direction,
-         match: result.match && PartnerMatches.present_summary(context, club, result.match),
+         match:
+           result.match && PartnerMatches.present_summary(context, club, result.match, target.id),
          swipes_remaining: Partners.swipes_remaining(used)
        }}
     end

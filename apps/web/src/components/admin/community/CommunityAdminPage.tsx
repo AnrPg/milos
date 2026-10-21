@@ -26,7 +26,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 
-import { MemberGroupsSetting } from "./CommunitySettings";
+import { MemberGroupsSetting, PartnersSetting } from "./CommunitySettings";
 import { EventsTab } from "./EventsTab";
 import { OpenClubsTab } from "./OpenClubsTab";
 
@@ -111,7 +111,12 @@ function GroupsTab() {
 
   return (
     <>
-      {can(membership, "manage_community") ? <MemberGroupsSetting current={settings.member_groups} /> : null}
+      {can(membership, "manage_community") ? (
+        <>
+          <MemberGroupsSetting current={settings.member_groups} />
+          <PartnersSetting current={settings.partners_enabled} />
+        </>
+      ) : null}
       {pending.length > 0 ? (
         <Panel title={t("groupsPending", { count: pending.length })}>
           <ul className="flex flex-col gap-2">

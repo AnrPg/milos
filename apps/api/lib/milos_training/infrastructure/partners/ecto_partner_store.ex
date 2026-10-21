@@ -38,6 +38,21 @@ defmodule MilosTraining.Infrastructure.Partners.EctoPartnerStore do
   end
 
   @impl true
+  def profile_ids_for(_context, []), do: %{}
+
+  def profile_ids_for(_context, pairs) do
+    wanted = MapSet.new(pairs)
+    {club_ids, user_ids} = pairs |> Enum.unzip()
+
+    Profile
+    |> where([p], p.club_id in ^Enum.uniq(club_ids) and p.user_id in ^Enum.uniq(user_ids))
+    |> select([p], {{p.club_id, p.user_id}, p.id})
+    |> Repo.all()
+    |> Enum.filter(fn {pair, _id} -> MapSet.member?(wanted, pair) end)
+    |> Map.new()
+  end
+
+  @impl true
   def list_live_profiles(_context, _club_id, []), do: []
 
   def list_live_profiles(_context, club_id, user_ids) do

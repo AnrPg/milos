@@ -146,10 +146,19 @@ defmodule MilosTrainingWeb.PartnersControllerTest do
 
       assert %{
                "matches" => [
-                 %{"id" => ^match_id, "read_only" => false, "unread" => 0, "plannable" => true}
+                 %{
+                   "id" => ^match_id,
+                   "read_only" => false,
+                   "unread" => 0,
+                   "plannable" => true,
+                   "partner_profile_id" => partner_profile_id
+                 }
                ]
              } =
                as.(member) |> get("/api/me/partners/matches") |> json_response(200)
+
+      # What a report from the conversation names.
+      assert partner_profile_id == card["profile_id"]
 
       assert %{"message" => %{"body" => "07:00 Thursday?", "mine" => true}} =
                as.(member)

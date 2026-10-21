@@ -109,6 +109,7 @@ defmodule MilosTraining.Partners do
   defdelegate get_profile(context, club_id, user_id), to: PartnerStore
   defdelegate get_profile_by_id(context, id), to: PartnerStore
   defdelegate list_profiles_of(context, user_id), to: PartnerStore
+  defdelegate profile_ids_for(context, pairs), to: PartnerStore
   defdelegate list_live_profiles(context, club_id, user_ids), to: PartnerStore
   defdelegate create_profile(context, attrs), to: PartnerStore
   defdelegate update_profile(context, profile, changes), to: PartnerStore

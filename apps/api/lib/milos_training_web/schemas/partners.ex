@@ -192,6 +192,12 @@ defmodule MilosTrainingWeb.Schemas.Partners do
         club_id: @uuid,
         club_name: %Schema{type: :string, nullable: true},
         person: person(),
+        partner_profile_id: %Schema{
+          type: :string,
+          format: :uuid,
+          nullable: true,
+          description: "The other person's profile in the club, what a report names"
+        },
         status: enum(Partners.match_statuses()),
         end_reason: %Schema{type: :string, enum: Partners.end_reasons(), nullable: true},
         ended_by_me: %Schema{type: :boolean},
@@ -206,6 +212,7 @@ defmodule MilosTrainingWeb.Schemas.Partners do
         :club_id,
         :club_name,
         :person,
+        :partner_profile_id,
         :status,
         :end_reason,
         :ended_by_me,

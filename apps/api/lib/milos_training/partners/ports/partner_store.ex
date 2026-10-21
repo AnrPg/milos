@@ -15,6 +15,8 @@ defmodule MilosTraining.Partners.Ports.PartnerStore do
   @callback get_profile(context, club_id :: id, user_id :: id) :: Profile.t() | nil
   @callback get_profile_by_id(context, id) :: Profile.t() | nil
   @callback list_profiles_of(context, user_id :: id) :: [Profile.t()]
+  @doc "Profile ids of `{club_id, user_id}` pairs; pairs without a profile are left out."
+  @callback profile_ids_for(context, [{club_id :: id, user_id :: id}]) :: %{{id, id} => id}
   @callback list_live_profiles(context, club_id :: id, user_ids :: [id]) :: [Profile.t()]
   @callback create_profile(context, attrs :: map()) :: {:ok, Profile.t()} | {:error, term()}
   @callback update_profile(context, Profile.t(), changes :: map()) ::

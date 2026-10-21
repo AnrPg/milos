@@ -10,6 +10,8 @@ defmodule MilosTraining.Community.UserBlock do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "community_user_blocks" do
     field :user_id, :binary_id
     field :blocked_user_id, :binary_id

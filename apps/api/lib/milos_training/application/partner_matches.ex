@@ -24,21 +24,33 @@ defmodule MilosTraining.Application.PartnerMatches do
         Enum.flat_map(scopes, fn scope ->
           matches = Partners.list_matches(scope, user_id)
           unread = Partners.unread_counts(scope, user_id, matches)
-          Enum.map(matches, &{&1, scope, Map.get(unread, &1.id, 0)})
+
+          profiles =
+            Partners.profile_ids_for(scope, Enum.map(matches, &partner_pair(&1, user_id)))
+
+          Enum.map(
+            matches,
+            &{&1, scope, Map.get(unread, &1.id, 0), Map.get(profiles, partner_pair(&1, user_id))}
+          )
         end)
 
       people =
         CommunityPeople.by_ids(
-          Enum.map(rows, fn {match, _scope, _unread} -> Partners.other_party(match, user_id) end)
+          Enum.map(rows, fn {match, _scope, _unread, _profile_id} ->
+            Partners.other_party(match, user_id)
+          end)
         )
 
       members = member_cache(rows, clubs)
 
       matches =
         rows
-        |> Enum.map(fn {match, _scope, unread} ->
+        |> Enum.map(fn {match, _scope, unread, profile_id} ->
           club = Enum.find(clubs, &(&1.id == match.club_id))
-          present(match, club, user_id, people, unread, both_members?(members, club, match))
+
+          match
+          |> present(club, user_id, people, unread, both_members?(members, club, match))
+          |> Map.put(:partner_profile_id, profile_id)
         end)
         |> Enum.sort_by(&{&1.status != "active", -DateTime.to_unix(sort_time(&1), :microsecond)})
 
@@ -47,9 +59,12 @@ defmodule MilosTraining.Application.PartnerMatches do
   end
 
   @doc "One match as the swipe that made it shows it."
-  def present_summary(%{user_id: user_id}, club, match) do
+  def present_summary(%{user_id: user_id}, club, match, partner_profile_id) do
     people = CommunityPeople.by_ids([Partners.other_party(match, user_id)])
-    present(match, club, user_id, people, 0, true)
+
+    match
+    |> present(club, user_id, people, 0, true)
+    |> Map.put(:partner_profile_id, partner_profile_id)
   end
 
   @doc "Ends a match quietly; its conversation stays readable, read-only."
@@ -220,7 +235,7 @@ defmodule MilosTraining.Application.PartnerMatches do
 
   defp member_cache(rows, clubs) do
     rows
-    |> Enum.map(fn {match, scope, _unread} -> {match.club_id, scope} end)
+    |> Enum.map(fn {match, scope, _unread, _profile_id} -> {match.club_id, scope} end)
     |> Enum.uniq_by(&elem(&1, 0))
     |> Map.new(fn {club_id, scope} ->
       case Enum.find(clubs, &(&1.id == club_id)) do
@@ -294,6 +309,8 @@ defmodule MilosTraining.Application.PartnerMatches do
       last_message_at: match.last_message_at
     }
   end
+
+  defp partner_pair(match, user_id), do: {match.club_id, Partners.other_party(match, user_id)}
 
   defp sort_time(row), do: row.last_message_at || row.matched_at
 

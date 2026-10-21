@@ -12,6 +12,8 @@ defmodule MilosTraining.Partners.Message do
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
 
+  @type t :: %__MODULE__{}
+
   schema "partner_messages" do
     field :organization_id, :binary_id, read_after_writes: true
     field :match_id, :binary_id
