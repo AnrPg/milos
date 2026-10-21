@@ -8645,5 +8645,61 @@
     "tabMembers": "Mensen",
     "notFound": "Deze squad is niet beschikbaar.",
     "backToClub": "Terug naar de club"
+  },
+  "Scaling": {
+    "loading": "Laden…",
+    "settings": {
+      "title": "AI-assistent",
+      "description": "Schaalvoorstellen voor geblesseerde atleten, met jullie eigen sleutel. Een coach keurt elk voorstel goed.",
+      "enable": "Schaalvoorstellen",
+      "enableHint": "Standaard uit. Vereist een API-sleutel.",
+      "key": "API-sleutel (Anthropic)",
+      "keySet": "Er is een sleutel ingesteld die eindigt op {last4}.",
+      "keyRejected": "De aanbieder heeft de sleutel die eindigt op {last4} geweigerd. Voer een nieuwe sleutel in.",
+      "keyMissing": "Geen sleutel ingesteld.",
+      "keyPlaceholder": "Plak de sleutel",
+      "saveKey": "Sleutel opslaan",
+      "removeKey": "Sleutel verwijderen",
+      "model": "Model (optioneel)",
+      "saveModel": "Model opslaan",
+      "usage": "Deze maand · voorstellen: {count} · kosten: ${cost}",
+      "privacy": "Alleen de training en de door de gym vastgelegde blessures worden verstuurd, zonder namen. De sleutel wordt nooit meer getoond."
+    },
+    "queue": {
+      "eyebrow": "Mijn klanten",
+      "title": "Schaalvoorstellen · {count}",
+      "hint": "Voorstel met hulp van AI. De atleet ziet niets voordat jij goedkeurt.",
+      "workout": "Training",
+      "aiBadge": "AI",
+      "include": "Opnemen: {movement}",
+      "editSuggested": "Voorstel voor {movement}",
+      "scaleLevel": "Niveau: {level}",
+      "notePlaceholder": "Bericht aan de atleet (optioneel)",
+      "approve": "Goedkeuren",
+      "dismiss": "Afwijzen"
+    },
+    "member": {
+      "title": "Aangepast door je coach",
+      "scaleLevel": "Niveau: {level}",
+      "disclosure": "Met hulp van AI · goedgekeurd door je coach."
+    },
+    "change": {
+      "substitute": "{movement} → {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: overslaan"
+    },
+    "regions": {
+      "shoulder": "schouder",
+      "elbow": "elleboog",
+      "wrist": "pols",
+      "neck": "nek",
+      "back": "rug",
+      "hip": "heup",
+      "knee": "knie",
+      "hamstring": "hamstrings",
+      "ankle": "enkel",
+      "chest": "borst",
+      "core": "romp"
+    }
   }
 }

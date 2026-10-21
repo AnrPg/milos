@@ -295,15 +295,24 @@ defmodule MilosTraining.Application.ScalingSuggestions do
       |> Map.new(&{&1.id, &1.nickname})
 
     titles = workout_titles(context, Enum.map(suggestions, & &1.master_workout_id))
+    labels = scale_labels(context, suggestions)
 
     Enum.map(suggestions, fn suggestion ->
       suggestion
       |> view()
       |> Map.merge(%{
         athlete_nickname: Map.get(nicknames, suggestion.athlete_id),
-        workout_title: Map.get(titles, suggestion.master_workout_id)
+        workout_title: Map.get(titles, suggestion.master_workout_id),
+        scale_level_label: Map.get(labels, suggestion.scale_level_slug)
       })
     end)
+  end
+
+  # The gym's own names for its scale levels (ADR-128), read only when needed.
+  defp scale_labels(context, suggestions) do
+    if Enum.any?(suggestions, &is_binary(&1.scale_level_slug)),
+      do: context |> Workouts.list_scale_levels() |> Map.new(&{&1.slug, &1.label}),
+      else: %{}
   end
 
   defp workout_titles(_context, []), do: %{}
@@ -397,8 +406,12 @@ defmodule MilosTraining.Application.ScalingSuggestions do
         context
         |> Scaling.approved_for_member(user_id, workout_id, Date.add(today, -1))
         |> case do
-          nil -> {:ok, nil}
-          suggestion -> {:ok, Scaling.member_view(suggestion)}
+          nil ->
+            {:ok, nil}
+
+          suggestion ->
+            label = Map.get(scale_labels(context, [suggestion]), suggestion.scale_level_slug)
+            {:ok, suggestion |> Scaling.member_view() |> Map.put(:scale_level_label, label)}
         end
 
       :error ->

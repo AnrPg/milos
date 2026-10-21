@@ -55,6 +55,7 @@ defmodule MilosTrainingWeb.Schemas.Scaling do
         status: status(),
         summary: @maybe_string,
         scale_level_slug: @maybe_string,
+        scale_level_label: @maybe_string,
         injury_regions: %Schema{type: :array, items: %Schema{type: :string}},
         items: %Schema{type: :array, items: item()},
         coach_note: @maybe_string,
@@ -122,6 +123,7 @@ defmodule MilosTrainingWeb.Schemas.Scaling do
             id: @uuid,
             scheduled_for: @date,
             scale_level_slug: @maybe_string,
+            scale_level_label: @maybe_string,
             coach_note: @maybe_string,
             reviewed_at: @maybe_datetime,
             items: %Schema{

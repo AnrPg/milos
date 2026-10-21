@@ -241,6 +241,7 @@ defmodule MilosTraining.Web.ScalingControllerTest do
       assert %{
                "coach_note" => "Πάμε ήπια σήμερα.",
                "scale_level_slug" => "scaled",
+               "scale_level_label" => "Scaled",
                "items" => [%{"exercise_name" => "Back Squat", "suggested" => "Goblet box squat"}],
                "modifications" => [patch]
              } = member_scaling(ctx)
