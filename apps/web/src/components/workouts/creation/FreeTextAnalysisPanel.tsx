@@ -502,6 +502,7 @@ function errorMessage(t: Translate, code: string) {
   if (code === "analyzer_not_configured") return t("errors.notConfigured");
   if (code === "text_required") return t("errors.textRequired");
   if (code === "text_too_long") return t("errors.textTooLong");
+  if (code === "analyzer_quota_exhausted") return t("errors.quotaExhausted");
   return t("errors.unavailable");
 }
 
