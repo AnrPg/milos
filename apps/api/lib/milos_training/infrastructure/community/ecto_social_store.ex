@@ -10,7 +10,8 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
     SocialSettings,
     ProfilePost,
     ProfilePostComment,
-    ProfilePostReaction
+    ProfilePostReaction,
+    UserBlock
   }
 
   alias MilosTraining.Repo
@@ -431,5 +432,42 @@ defmodule MilosTraining.Infrastructure.Community.EctoSocialStore do
       body: comment.body,
       inserted_at: comment.inserted_at
     }
+  end
+
+  # Blocks (ADR-169 §5) -------------------------------------------------------
+
+  @impl true
+  def insert_block(_context, attrs) do
+    attrs
+    |> UserBlock.changeset()
+    |> Repo.insert(on_conflict: :nothing, conflict_target: [:user_id, :blocked_user_id])
+    |> case do
+      {:ok, %UserBlock{id: nil}} -> {:ok, Repo.get_by!(UserBlock, Map.to_list(attrs))}
+      {:ok, block} -> {:ok, block}
+      {:error, %Ecto.Changeset{}} -> {:error, :invalid_user}
+    end
+  end
+
+  @impl true
+  def delete_block(_context, user_id, blocked_id) do
+    UserBlock
+    |> where([b], b.user_id == ^user_id and b.blocked_user_id == ^blocked_id)
+    |> Repo.delete_all()
+
+    :ok
+  end
+
+  @impl true
+  def list_blocks(_context, user_id) do
+    UserBlock
+    |> where([b], b.user_id == ^user_id)
+    |> order_by([b], desc: b.inserted_at)
+    |> Repo.all()
+  end
+
+  @impl true
+  def blocked_user_ids(_context) do
+    %{rows: rows} = Repo.query!("SELECT milos_blocked_user_ids()")
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
   end
 end

@@ -442,6 +442,17 @@ defmodule MilosTrainingWeb.Router do
     delete("/groups/:id/members/:user_id", CommunityGroupController, :remove_member)
     post("/groups/:id/archive", CommunityGroupController, :archive)
     post("/groups/:id/reopen", CommunityGroupController, :reopen)
+    # ADR-168: PT squads.
+    get("/squads", PtSquadController, :index)
+    post("/squads", PtSquadController, :create)
+    get("/squads/:id", PtSquadController, :show)
+    patch("/squads/:id", PtSquadController, :update)
+    post("/squads/:id/invites", PtSquadController, :invite)
+    put("/squads/:id/invite", PtSquadController, :answer)
+    delete("/squads/:id/membership", PtSquadController, :leave)
+    delete("/squads/:id/members/:user_id", PtSquadController, :remove_member)
+    post("/squads/:id/archive", PtSquadController, :archive)
+    post("/squads/:id/reopen", PtSquadController, :reopen)
   end
 
   # ADR-118: standalone training log (class / offline workouts).
@@ -1275,6 +1286,24 @@ defmodule MilosTrainingWeb.Router do
     delete("/me/body/consents/:scope", MyBodyController, :withdraw_consent)
     get("/me/body/access-log", MyBodyController, :access_log)
     post("/me/body/share", MyBodyController, :share)
+    # ADR-169: Partners.
+    get("/me/clubs/:club_id/partners", PartnersController, :club)
+    put("/me/clubs/:club_id/partners/profile", PartnersController, :put_profile)
+    get("/me/clubs/:club_id/partners/deck", PartnersController, :deck)
+    post("/me/clubs/:club_id/partners/swipes", PartnersController, :swipe)
+    delete("/me/clubs/:club_id/partners/swipes/:target_id", PartnersController, :undo)
+    get("/me/partners/matches", PartnersController, :matches)
+    delete("/me/partners/matches/:id", PartnersController, :end_match)
+    get("/me/partners/matches/:id/messages", PartnersController, :messages)
+    post("/me/partners/matches/:id/messages", PartnersController, :post_message)
+    post("/me/partners/matches/:id/messages/read", PartnersController, :mark_read)
+    get("/me/partners/matches/:id/sessions", PartnersController, :sessions)
+    post("/me/partners/matches/:id/plans", PartnersController, :plan)
+    get("/me/partners/settings", PartnersController, :settings)
+    put("/me/partners/settings", PartnersController, :put_settings)
+    get("/me/blocks", PartnersController, :blocks)
+    post("/me/blocks", PartnersController, :block)
+    delete("/me/blocks/:user_id", PartnersController, :unblock)
     # ADR-160: Buddy για στήριξη.
     get("/me/buddies", MyBuddiesController, :index)
     get("/me/buddies/candidates", MyBuddiesController, :candidates)

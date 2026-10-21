@@ -27,6 +27,7 @@ defmodule MilosTraining.Notifications do
     community_group_proposed community_group_approved community_group_declined
     community_group_join_requested community_group_join_approved community_group_archive_warning
     community_report_created community_club_join_requested community_club_join_approved
+    community_squad_invited
   )
 
   @event_types ~w(
@@ -385,6 +386,30 @@ defmodule MilosTraining.Notifications do
         nickname: field(payload, :author_nickname),
         dedupe_key: field(payload, :dedupe_key),
         url: "/me/buddies/#{field(payload, :link_id)}/messages"
+      })
+
+  # ADR-169: a mutual like in a club; a message in the pair's conversation
+  # (the push names who wrote, never what).
+  def process_event("partner_match", payload),
+    do:
+      enqueue_simple(:partner_match, payload, %{
+        match_id: field(payload, :match_id),
+        club_id: field(payload, :club_id),
+        club_name: field(payload, :club_name),
+        nickname: field(payload, :partner_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/#{field(payload, :match_id)}"
+      })
+
+  def process_event("partner_message", payload),
+    do:
+      enqueue_simple(:partner_message, payload, %{
+        match_id: field(payload, :match_id),
+        message_id: field(payload, :message_id),
+        author_id: field(payload, :author_id),
+        nickname: field(payload, :author_nickname),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/partners/#{field(payload, :match_id)}"
       })
 
   # ADR-160 §4: the coach's Sunday wellness summary of a client who shares
@@ -1033,6 +1058,9 @@ defmodule MilosTraining.Notifications do
 
         "community_club_join_approved" ->
           {club_id, "/clubs/#{club_id}"}
+
+        "community_squad_invited" ->
+          {"#{group_id}:#{field(payload, :user_id)}", "/clubs/#{club_id}/squads/#{group_id}"}
 
         _group_answer ->
           {group_id, "/clubs/#{club_id}/groups/#{group_id}"}

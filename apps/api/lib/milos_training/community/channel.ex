@@ -2,13 +2,15 @@ defmodule MilosTraining.Community.Channel do
   @moduledoc """
   A channel inside a club (ADR-138). A `member_group` is one a member
   proposed in their gym's club (ADR-143): it has a creator, a join policy and,
-  while staff haven't decided, a `pending` status.
+  while staff haven't decided, a `pending` status. A `pt_squad` is a coach's
+  invite-only channel with their own clients (ADR-168); its creator is the
+  coach.
   """
 
   use Ecto.Schema
   import Ecto.Changeset
 
-  @kinds ~w(announcements wod challenges class_slot season custom member_group general)
+  @kinds ~w(announcements wod challenges class_slot season custom member_group general pt_squad)
   @write_policies ~w(staff members participants system_and_members)
   @memberships ~w(everyone opt_in invite)
   @join_policies ~w(open request)
@@ -70,6 +72,7 @@ defmodule MilosTraining.Community.Channel do
     |> validate_inclusion(:status, @statuses)
     |> validate_group()
     |> unique_constraint(:name, name: :community_channels_group_name_index)
+    |> unique_constraint(:name, name: :community_channels_squad_name_index)
     |> check_constraint(:join_policy, name: :community_channels_join_policy_check)
     |> check_constraint(:name, name: :community_channels_name_check)
     |> check_constraint(:context_id, name: :community_channels_context_check)
@@ -90,6 +93,18 @@ defmodule MilosTraining.Community.Channel do
     |> unique_constraint(:name, name: :community_channels_group_name_index)
   end
 
+  @doc "What a squad's coach may change about it (ADR-168)."
+  def squad_changeset(channel, attrs) do
+    channel
+    |> cast(attrs, [:name, :description])
+    |> update_change(:name, &String.trim/1)
+    |> update_change(:description, &blank_to_nil/1)
+    |> validate_required([:name])
+    |> validate_length(:name, min: 2, max: 60)
+    |> validate_length(:description, max: 200)
+    |> unique_constraint(:name, name: :community_channels_squad_name_index)
+  end
+
   @doc "Staff decisions and the quiet-group lifecycle."
   def lifecycle_changeset(channel, attrs) do
     channel
@@ -108,12 +123,20 @@ defmodule MilosTraining.Community.Channel do
   def join_policies, do: @join_policies
 
   defp validate_group(changeset) do
-    if get_field(changeset, :kind) == "member_group" do
-      changeset
-      |> validate_required([:name, :join_policy, :created_by_id])
-      |> validate_length(:name, min: 2)
-    else
-      put_change(changeset, :join_policy, nil)
+    case get_field(changeset, :kind) do
+      "member_group" ->
+        changeset
+        |> validate_required([:name, :join_policy, :created_by_id])
+        |> validate_length(:name, min: 2)
+
+      "pt_squad" ->
+        changeset
+        |> put_change(:join_policy, nil)
+        |> validate_required([:name, :created_by_id])
+        |> validate_length(:name, min: 2)
+
+      _other ->
+        put_change(changeset, :join_policy, nil)
     end
   end
 

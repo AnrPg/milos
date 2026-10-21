@@ -543,3 +543,18 @@ msgstr "Dein Journal-Export ist fertig"
 
 msgid "Download it within seven days from Settings."
 msgstr "Lade ihn innerhalb von sieben Tagen in den Einstellungen herunter."
+
+msgid "You found a training partner"
+msgstr "Du hast einen Trainingspartner gefunden"
+
+msgid "You and %{nickname} both want to train together. Say hi."
+msgstr "Du und %{nickname} wollt zusammen trainieren. Sag hallo."
+
+msgid "Training partner message"
+msgstr "Nachricht von deinem Trainingspartner"
+
+msgid "Squad invitation"
+msgstr "Einladung in eine Squad"
+
+msgid "%{nickname} invited you to the squad «%{group}»."
+msgstr "%{nickname} hat dich in die Squad «%{group}» eingeladen."

@@ -380,6 +380,19 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-168: PT squads.
+  def build("community_squad_invited", payload, localize) do
+    %{
+      title: localize.("Squad invitation", %{}),
+      body:
+        localize.("%{nickname} invited you to the squad «%{group}».", %{
+          nickname: payload["person_nickname"],
+          group: payload["group_name"]
+        }),
+      url: payload["url"] || "/"
+    }
+  end
+
   # ADR-153: club events.
   def build("community_event_waitlist_promoted", payload, localize) do
     %{
@@ -628,6 +641,26 @@ defmodule MilosTraining.Notifications.Domain.PushMessageBuilder do
       title: localize.("Buddy message", %{}),
       body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
       url: payload["url"] || "/me/buddies"
+    }
+  end
+
+  # ADR-169: framed as a training partner, never a date.
+  def build("partner_match", payload, localize) do
+    %{
+      title: localize.("You found a training partner", %{}),
+      body:
+        localize.("You and %{nickname} both want to train together. Say hi.", %{
+          nickname: payload["nickname"] || ""
+        }),
+      url: payload["url"] || "/partners"
+    }
+  end
+
+  def build("partner_message", payload, localize) do
+    %{
+      title: localize.("Training partner message", %{}),
+      body: localize.("%{nickname} sent you a message.", %{nickname: payload["nickname"] || ""}),
+      url: payload["url"] || "/partners"
     }
   end
 

@@ -5,12 +5,14 @@ defmodule MilosTraining.Community.ChannelMembership do
   frequent booker of a class) and `dismissed` remembers that they left or
   declined, so they are not offered it again. In a member group (ADR-143)
   `requested` waits for one of its admins, and `role` marks those admins.
+  In a PT squad (ADR-168) `pending_invite` is the coach's invitation, a
+  member only once the client accepts it (`invited`).
   """
 
   use Ecto.Schema
   import Ecto.Changeset
 
-  @sources ~w(opt_in suggested invited auto dismissed requested)
+  @sources ~w(opt_in suggested invited auto dismissed requested pending_invite)
   @roles ~w(member admin)
   @member_sources ~w(opt_in invited auto)
 
