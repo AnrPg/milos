@@ -7,6 +7,7 @@ defmodule MilosTraining.Anatomy do
 
   alias MilosTraining.Anatomy.Domain.{
     Coverage,
+    CoverageBalance,
     CoverageWeighting,
     ExerciseTargets,
     FeedbackSummary,
@@ -14,7 +15,8 @@ defmodule MilosTraining.Anatomy do
     GoalSet,
     GoalSuggestion,
     MuscleTaxonomy,
-    NodeExercises
+    NodeExercises,
+    QualityProfile
   }
 
   def taxonomy_version, do: MuscleTaxonomy.version()
@@ -72,4 +74,15 @@ defmodule MilosTraining.Anatomy do
   def exercises_for_node(node_id), do: NodeExercises.for_node(node_id)
 
   def known_node?(node_id), do: MuscleTaxonomy.known?(node_id)
+
+  # -- Πρόοδος: coverage summary and qualities radar (ADR-165) -----------------
+
+  @doc """
+  Most and least trained major groups and the push:pull and quad:ham
+  ratios, from coverage nodes and the performances behind them.
+  """
+  def coverage_summary(nodes, performances), do: CoverageBalance.summarize(nodes, performances)
+
+  @doc "Sets and felt entries per fitness quality, with a 0..1 radar score."
+  def quality_profile(performances, felt), do: QualityProfile.build(performances, felt)
 end

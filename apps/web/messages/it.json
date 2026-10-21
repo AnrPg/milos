@@ -8645,5 +8645,59 @@
     "tabMembers": "Persone",
     "notFound": "Questa squad non è disponibile.",
     "backToClub": "Torna al club"
+  },
+  "Depth": {
+    "noData": "Nessun allenamento in questo periodo.",
+    "coverage": {
+      "title": "Copertura muscolare",
+      "atlas": "Atlante ›",
+      "most": "Più lavoro",
+      "least": "Meno lavoro",
+      "noneMost": "Nessun esercizio riconosciuto in questo periodo.",
+      "noneLeast": "Tutti i grandi gruppi muscolari hanno copertura media o alta.",
+      "pushPull": "Spinta : Trazione",
+      "quadHam": "Quadricipiti : Femorali",
+      "ratioMissing": "Servono ancora alcune serie",
+      "note": "Un’indicazione del volume di allenamento, non un obiettivo."
+    },
+    "qualities": {
+      "title": "Qualità fisiche",
+      "most": "Di più: {qualities}",
+      "felt": "«Sentito»: {qualities}",
+      "row": "{quality}: {sets} serie",
+      "note": "La forma mostra dove è andato l’allenamento, non un voto.",
+      "short": {
+        "cardiorespiratory-endurance": "Cardio",
+        "stamina": "Resistenza",
+        "strength": "Forza",
+        "flexibility": "Flessibilità",
+        "power": "Potenza",
+        "speed": "Velocità",
+        "coordination": "Coordinazione",
+        "agility": "Agilità",
+        "balance": "Equilibrio",
+        "accuracy": "Precisione"
+      }
+    },
+    "load": {
+      "title": "Carico di allenamento",
+      "ratio": "Questa settimana: {ratio}× la solita",
+      "insufficient": "Il confronto appare dopo 3 settimane di allenamenti con RPE e durata.",
+      "weeks": "Carico per settimana · 8 sett.",
+      "weekOf": "Settimana del {date}: {load}",
+      "unrated": "{count, plural, one {# allenamento delle ultime 4 settimane non ha RPE o durata e non conta.} other {# allenamenti delle ultime 4 settimane non hanno RPE o durata e non contano.}}",
+      "note": "Carico = RPE × minuti. Un’indicazione rispetto alla tua settimana abituale, non un consiglio medico.",
+      "band": {
+        "below": "Più leggera",
+        "steady": "Vicino al solito",
+        "above": "Sopra il solito",
+        "well_above": "Ben sopra il solito"
+      }
+    },
+    "coach": {
+      "title": "Copertura, qualità, carico",
+      "range": "Periodo",
+      "sharedOnly": "Solo dalle voci che il cliente condivide con i coach del box."
+    }
   }
 }

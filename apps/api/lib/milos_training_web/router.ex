@@ -629,6 +629,8 @@ defmodule MilosTrainingWeb.Router do
     get("/clients/:user_id/body/series", ClientBodyController, :series)
     # ADR-160: the weekly wellness summary, only with the client's grant.
     get("/clients/:user_id/wellness-summary", ClientWellnessSummaryController, :show)
+    # ADR-165: a client's coverage, qualities and load from shared entries.
+    get("/clients/:user_id/progress-depth", TrainingDepthController, :client)
     post("/clients/:user_id/coach-notes", CoachNotesController, :create)
     patch("/coach-notes/:id", CoachNotesController, :update)
     delete("/coach-notes/:id", CoachNotesController, :delete)
@@ -1203,6 +1205,8 @@ defmodule MilosTrainingWeb.Router do
     get("/me/today", MyProvidersController, :today)
     get("/me/history", AccountTrainingController, :history)
     get("/me/progress", AccountTrainingController, :progress)
+    # ADR-165: coverage summary, qualities radar and training load.
+    get("/me/progress/depth", TrainingDepthController, :show)
     get("/me/vault", AccountTrainingController, :vault)
     # ADR-164: the anatomy atlas, the member's coverage across providers.
     get("/me/atlas", AnatomyAtlasController, :show)
