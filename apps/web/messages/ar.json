@@ -8758,62 +8758,6 @@
       "sharedOnly": "فقط من الإدخالات التي يشاركها العميل مع مدربي الصالة."
     }
   },
-  "Scaling": {
-    "loading": "جارٍ التحميل…",
-    "settings": {
-      "title": "مساعد الذكاء الاصطناعي",
-      "description": "اقتراحات تكييف للرياضيين المصابين، بمفتاحكم الخاص. يوافق المدرب على كل اقتراح.",
-      "enable": "اقتراحات التكييف",
-      "enableHint": "متوقفة افتراضيًا. تتطلب مفتاح API.",
-      "key": "مفتاح API (Anthropic)",
-      "keySet": "تم تعيين مفتاح ينتهي بـ {last4}.",
-      "keyRejected": "رفض المزوّد المفتاح المنتهي بـ {last4}. أضف مفتاحًا جديدًا.",
-      "keyMissing": "لم يتم تعيين مفتاح.",
-      "keyPlaceholder": "الصق المفتاح",
-      "saveKey": "حفظ المفتاح",
-      "removeKey": "إزالة المفتاح",
-      "model": "النموذج (اختياري)",
-      "saveModel": "حفظ النموذج",
-      "usage": "هذا الشهر · الاقتراحات: {count} · التكلفة: ${cost}",
-      "privacy": "يُرسل التمرين والإصابات التي سجلها النادي فقط، بدون أسماء. لا يُعرض المفتاح مرة أخرى."
-    },
-    "queue": {
-      "eyebrow": "عملائي",
-      "title": "اقتراحات التكييف · {count}",
-      "hint": "اقتراح بمساعدة الذكاء الاصطناعي. لا يرى الرياضي شيئًا قبل موافقتك.",
-      "workout": "التمرين",
-      "aiBadge": "ذكاء اصطناعي",
-      "include": "تضمين: {movement}",
-      "editSuggested": "اقتراح لـ {movement}",
-      "scaleLevel": "المستوى: {level}",
-      "notePlaceholder": "رسالة إلى الرياضي (اختياري)",
-      "approve": "موافقة",
-      "dismiss": "رفض"
-    },
-    "member": {
-      "title": "عدّله مدربك",
-      "scaleLevel": "المستوى: {level}",
-      "disclosure": "بمساعدة الذكاء الاصطناعي · وافق عليه مدربك."
-    },
-    "change": {
-      "substitute": "{movement} ← {target}",
-      "adjust": "{movement}: {target}",
-      "skip": "{movement}: تخطٍّ"
-    },
-    "regions": {
-      "shoulder": "الكتف",
-      "elbow": "المرفق",
-      "wrist": "الرسغ",
-      "neck": "الرقبة",
-      "back": "الظهر",
-      "hip": "الورك",
-      "knee": "الركبة",
-      "hamstring": "أوتار الركبة",
-      "ankle": "الكاحل",
-      "chest": "الصدر",
-      "core": "الجذع"
-    }
-  },
   "Insights": {
     "title": "Insights",
     "dismiss": "إخفاء",
@@ -8966,6 +8910,62 @@
       "override": "سعر شهري مخصص",
       "overrideHint": "فارغ: سعر الخطة",
       "notes": "ملاحظات"
+    }
+  },
+  "Scaling": {
+    "loading": "جارٍ التحميل…",
+    "settings": {
+      "title": "مساعد الذكاء الاصطناعي",
+      "description": "اقتراحات تكييف للرياضيين المصابين، بمفتاحكم الخاص. يوافق المدرب على كل اقتراح.",
+      "enable": "اقتراحات التكييف",
+      "enableHint": "متوقفة افتراضيًا. تتطلب مفتاح API.",
+      "key": "مفتاح API (Anthropic)",
+      "keySet": "تم تعيين مفتاح ينتهي بـ {last4}.",
+      "keyRejected": "رفض المزوّد المفتاح المنتهي بـ {last4}. أضف مفتاحًا جديدًا.",
+      "keyMissing": "لم يتم تعيين مفتاح.",
+      "keyPlaceholder": "الصق المفتاح",
+      "saveKey": "حفظ المفتاح",
+      "removeKey": "إزالة المفتاح",
+      "model": "النموذج (اختياري)",
+      "saveModel": "حفظ النموذج",
+      "usage": "هذا الشهر · الاقتراحات: {count} · التكلفة: ${cost}",
+      "privacy": "يُرسل التمرين والإصابات التي سجلها النادي فقط، بدون أسماء. لا يُعرض المفتاح مرة أخرى."
+    },
+    "queue": {
+      "eyebrow": "عملائي",
+      "title": "اقتراحات التكييف · {count}",
+      "hint": "اقتراح بمساعدة الذكاء الاصطناعي. لا يرى الرياضي شيئًا قبل موافقتك.",
+      "workout": "التمرين",
+      "aiBadge": "ذكاء اصطناعي",
+      "include": "تضمين: {movement}",
+      "editSuggested": "اقتراح لـ {movement}",
+      "scaleLevel": "المستوى: {level}",
+      "notePlaceholder": "رسالة إلى الرياضي (اختياري)",
+      "approve": "موافقة",
+      "dismiss": "رفض"
+    },
+    "member": {
+      "title": "عدّله مدربك",
+      "scaleLevel": "المستوى: {level}",
+      "disclosure": "بمساعدة الذكاء الاصطناعي · وافق عليه مدربك."
+    },
+    "change": {
+      "substitute": "{movement} ← {target}",
+      "adjust": "{movement}: {target}",
+      "skip": "{movement}: تخطٍّ"
+    },
+    "regions": {
+      "shoulder": "الكتف",
+      "elbow": "المرفق",
+      "wrist": "الرسغ",
+      "neck": "الرقبة",
+      "back": "الظهر",
+      "hip": "الورك",
+      "knee": "الركبة",
+      "hamstring": "أوتار الركبة",
+      "ankle": "الكاحل",
+      "chest": "الصدر",
+      "core": "الجذع"
     }
   },
   "VoiceLog": {
