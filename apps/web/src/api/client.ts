@@ -51,6 +51,12 @@ type ApiRequestOptions = {
   responseType?: "json" | "text";
   /** Cancels the request (react-query passes one so stale searches stop). */
   signal?: AbortSignal;
+  /**
+   * `"account"` sends the path as is, never under `/org/:slug`: the account
+   * read model (ADR-162) shares paths such as `/me/history` and
+   * `/me/progress` with their older per-gym versions.
+   */
+  scope?: "tenant" | "account";
 };
 
 function organizationSlugFromPath() {
@@ -340,7 +346,8 @@ export async function apiRequest<T>(
     allowRefresh && options.token && tokenExpiresSoon(options.token)
       ? (await refreshAccessToken()) ?? options.token
       : options.token;
-  const organizationSlug = await resolveOrganizationSlugForRequest(path, token);
+  const organizationSlug =
+    options.scope === "account" ? null : await resolveOrganizationSlugForRequest(path, token);
   const requestPath = tenantScopedPath(path, organizationSlug);
 
   const response = await fetch(`${API_BASE_URL}${requestPath}`, {

@@ -60,40 +60,67 @@ export const JOURNAL_FEED_KEY = ["my", "journal"] as const;
 
 export const NOTE_TOPICS: JournalNoteTopic[] = ["technique", "thought", "mood", "goal"];
 
-export type JournalFilter = "all" | "training" | "notes" | "wellbeing";
-
-/** The kinds each Ροή filter chip lists. */
-export const JOURNAL_FILTER_KINDS: Record<JournalFilter, JournalKind[] | null> = {
-  all: null,
-  training: ["execution", "training_log", "pr"],
-  notes: ["note"],
-  wellbeing: ["check_in", "injury", "wellness", "craving"],
-};
-
 export function typedItem(item: JournalFeedItem): TypedJournalItem {
   return item as TypedJournalItem;
 }
 
-function pageQuery(params: { cursor?: string | null; kinds?: JournalKind[] | null; limit?: number }) {
+/**
+ * Ημερολόγιο › Ροή filter (ADR-162 `JournalFilter`, version 1): Τύπος,
+ * Πηγή (provider ids, `freeform`, `device`), Ορατότητα, dates and text. The
+ * server echoes it in its canonical form and can remember it as the
+ * member's last-used filter.
+ */
+export type JournalFeedFilter = {
+  kinds: JournalKind[];
+  sources: string[];
+  visibilities: JournalVisibility[];
+  date_from: string | null;
+  date_to: string | null;
+  q: string | null;
+};
+
+export const EMPTY_JOURNAL_FILTER: JournalFeedFilter = {
+  kinds: [],
+  sources: [],
+  visibilities: [],
+  date_from: null,
+  date_to: null,
+  q: null,
+};
+
+type PageParams = {
+  cursor?: string | null;
+  kinds?: JournalKind[] | null;
+  limit?: number;
+  filter?: Partial<JournalFeedFilter>;
+  /** Also store the filter as the last-used Ημερολόγιο filter. */
+  remember?: boolean;
+};
+
+function pageQuery(params: PageParams) {
   const query = new URLSearchParams();
+  const filter = params.filter ?? {};
   if (params.cursor) query.set("cursor", params.cursor);
   if (params.kinds?.length) query.set("kinds", params.kinds.join(","));
   if (params.limit) query.set("limit", String(params.limit));
+  if (filter.sources?.length) query.set("sources", filter.sources.join(","));
+  if (filter.visibilities?.length) query.set("visibilities", filter.visibilities.join(","));
+  if (filter.date_from) query.set("date_from", filter.date_from);
+  if (filter.date_to) query.set("date_to", filter.date_to);
+  if (filter.q?.trim()) query.set("q", filter.q.trim());
+  if (params.remember) query.set("remember", "true");
   const text = query.toString();
   return text ? `?${text}` : "";
 }
 
-export function fetchJournalPage(
-  token: string,
-  params: { cursor?: string | null; kinds?: JournalKind[] | null; limit?: number } = {},
-) {
+export function fetchJournalPage(token: string, params: PageParams = {}) {
   return apiRequest<JournalFeedPage>(`/me/journal${pageQuery(params)}`, { token });
 }
 
 export function fetchClientJournalPage(
   token: string,
   clientUserId: string,
-  params: { cursor?: string | null; kinds?: JournalKind[] | null; limit?: number } = {},
+  params: Pick<PageParams, "cursor" | "kinds" | "limit"> = {},
 ) {
   return apiRequest<JournalFeedPage>(`/staff/clients/${clientUserId}/journal${pageQuery(params)}`, { token });
 }
@@ -127,4 +154,52 @@ export async function updateJournalNote(token: string, id: string, body: Journal
 
 export function deleteJournalNote(token: string, id: string) {
   return apiRequest<void>(`/me/journal/notes/${id}`, { method: "DELETE", token });
+}
+
+/**
+ * «Οι coach μου» across providers (ADR-162, board 17 Q5): which providers'
+ * coaches the coach rungs reach by default, and one entry narrowed to some.
+ */
+export type CoachAudience = components["schemas"]["CoachAudience"];
+export type EntryAudience = NonNullable<components["schemas"]["EntryAudience"]>;
+export type AudienceKind = "execution" | "training_log" | "pr" | "note" | "check_in";
+export const AUDIENCE_KINDS: readonly JournalKind[] = ["execution", "training_log", "pr", "note", "check_in"];
+export const COACH_AUDIENCE_KEY = ["my", "journal", "coach-audience"] as const;
+
+export function fetchCoachAudience(token: string) {
+  return apiRequest<CoachAudience>("/me/journal/coach-audience", { token });
+}
+
+export function saveCoachAudience(token: string, organizationIds: string[]) {
+  return apiRequest<CoachAudience>("/me/journal/coach-audience", {
+    method: "PUT",
+    token,
+    body: { organization_ids: organizationIds },
+  });
+}
+
+/** `null` puts the entry back on the default audience. */
+export async function setEntryAudience(token: string, kind: AudienceKind, id: string, organizationIds: string[] | null) {
+  const data = await apiRequest<components["schemas"]["EntryAudienceResponse"]>(
+    `/me/journal/entries/${kind}/${id}/audience`,
+    { method: "PUT", token, body: { organization_ids: organizationIds } },
+  );
+  return data.audience;
+}
+
+/** «Εξαγωγή» of the whole journal, every provider (board 17 Q6 extra). */
+export type JournalExport = components["schemas"]["JournalExport"];
+export const JOURNAL_EXPORTS_KEY = ["my", "journal", "exports"] as const;
+
+export async function requestJournalExport(token: string) {
+  const data = await apiRequest<components["schemas"]["JournalExportResponse"]>("/me/journal/export", {
+    method: "POST",
+    token,
+  });
+  return data.export as JournalExport;
+}
+
+export async function fetchJournalExports(token: string) {
+  const data = await apiRequest<components["schemas"]["JournalExports"]>("/me/journal/exports", { token });
+  return data.exports as JournalExport[];
 }

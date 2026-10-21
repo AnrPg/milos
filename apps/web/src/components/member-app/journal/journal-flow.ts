@@ -1,4 +1,4 @@
-import type { JournalFeedItem, JournalFeedPage, JournalVisibilityResult, TypedJournalItem } from "@/api/journal";
+import type { EntryAudience, JournalFeedItem, JournalFeedPage, JournalVisibilityResult, TypedJournalItem } from "@/api/journal";
 import { typedItem } from "@/api/journal";
 import { entryDay, type HistoryEntry } from "@/components/client/vault";
 
@@ -44,6 +44,18 @@ export function withVisibility(pages: JournalFeedPage[], result: JournalVisibili
           }
         : item,
     ),
+  }));
+}
+
+/** The feed pages with one entry's coach audience, as the server answered. */
+export function withAudience(
+  pages: JournalFeedPage[],
+  target: Pick<JournalFeedItem, "kind" | "id">,
+  audience: EntryAudience | null,
+): JournalFeedPage[] {
+  return pages.map((page) => ({
+    ...page,
+    items: page.items.map((item) => (item.kind === target.kind && item.id === target.id ? { ...item, audience } : item)),
   }));
 }
 

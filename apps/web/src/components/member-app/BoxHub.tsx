@@ -10,12 +10,16 @@ import { useMyClubs } from "@/components/community/use-community";
 import { AccessNotice, EntitlementCard } from "@/components/finance/MembershipEntitlement";
 import { BoxToday } from "@/components/member-app/box/BoxToday";
 import { HubActionTile, HubButton, HubCard, HubIcons, HubPage } from "@/components/member-app/HubParts";
+import { ProviderTitle } from "@/components/providers/ProviderSwitcher";
+import { TodayAcrossCard } from "@/components/providers/TodayAcrossCard";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 /**
  * Box (brief §6.1, §7.4, mockup 08): "where and with whom do I train?".
- * Fixed order: today's workout · next booking · actions · membership (with
- * «Φέρε φίλο», ADR-156) · announcements (the gym club's #ανακοινώσεις, ADR-138).
+ * Fixed order: «Σήμερα» across providers (ADR-162, only with more than one)
+ * · today's workout · next booking · actions · membership (with «Φέρε φίλο»,
+ * ADR-156) · announcements (the gym club's #ανακοινώσεις, ADR-138). The title
+ * ▾ switches provider (board 17 Q1); everything below it is that provider's.
  */
 export function BoxHub() {
   const t = useTranslations("MemberApp");
@@ -33,7 +37,8 @@ export function BoxHub() {
   ].filter((action) => action.shown);
 
   return (
-    <HubPage title={title}>
+    <HubPage title={<ProviderTitle title={title} />}>
+      <TodayAcrossCard />
       <BoxToday />
 
       <nav aria-label={t("boxActions")} className="grid gap-2" style={{ gridTemplateColumns: `repeat(${actions.length}, minmax(0, 1fr))` }}>

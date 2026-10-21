@@ -7,7 +7,7 @@ import type { ReactNode } from "react";
 // slots: a card keeps its place and shows an empty state instead of moving
 // (brief §4.2, §8.5).
 
-export function HubPage({ title, actions, children }: { title: string; actions?: ReactNode; children: ReactNode }) {
+export function HubPage({ title, actions, children }: { title: ReactNode; actions?: ReactNode; children: ReactNode }) {
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-6 pt-4">
       <header className="flex items-center justify-between gap-3">
