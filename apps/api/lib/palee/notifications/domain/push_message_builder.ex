@@ -944,7 +944,7 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       body:
         localize.("%{client} booked a session for %{time}.", %{
           client: payload["client_nickname"] || "",
-          time: payload["starts_at"] || ""
+          time: payload["starts_when"] || payload["starts_at"] || ""
         }),
       url: payload["url"] || "/admin/appointments"
     }
@@ -954,7 +954,9 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     %{
       title: localize.("Appointment cancelled", %{}),
       body:
-        localize.("The session on %{time} was cancelled.", %{time: payload["starts_at"] || ""}),
+        localize.("The session on %{time} was cancelled.", %{
+          time: payload["starts_when"] || payload["starts_at"] || ""
+        }),
       url: payload["url"] || "/appointments"
     }
   end

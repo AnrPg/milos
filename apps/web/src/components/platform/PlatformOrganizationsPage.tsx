@@ -90,6 +90,7 @@ export function PlatformOrganizationsPage() {
     enabled: Boolean(accessToken),
   });
   const organizations = organizationsQuery.data?.organizations ?? [];
+  const unconfirmedZones = organizations.filter(zoneUnconfirmed).length;
   const forbidden = organizationsQuery.error instanceof ApiError && organizationsQuery.error.status === 403;
 
   // A vendor who also holds a real membership somewhere (owner/admin/coach/
@@ -355,6 +356,11 @@ export function PlatformOrganizationsPage() {
       <div className="mt-8">
         <section aria-labelledby="organization-list-title">
           <h2 id="organization-list-title" className="sr-only">{copy.title}</h2>
+          {unconfirmedZones > 0 ? (
+            <p className="mb-3 text-sm text-[var(--warning)]">
+              {copy.timezoneUnconfirmedCount.replace("{count}", String(unconfirmedZones))}
+            </p>
+          ) : null}
           {organizations.length === 0 ? (
             <p className="border-t border-[var(--border)] py-8 text-sm text-[var(--text-soft)]">{copy.empty}</p>
           ) : (
@@ -378,7 +384,14 @@ export function PlatformOrganizationsPage() {
                     </div>
                   </div>
                   <dl className="mt-4 grid gap-3 text-sm sm:grid-cols-3">
-                    <Detail label={copy.timezone} value={entry.settings?.timezone ?? "-"} />
+                    <div>
+                      <Detail label={copy.timezone} value={entry.settings?.timezone ?? "-"} />
+                      {zoneUnconfirmed(entry) ? (
+                        <span className="mt-1 inline-flex border border-[var(--warning)] px-2 py-0.5 text-xs font-semibold text-[var(--warning)]" title={copy.timezoneUnconfirmedTitle}>
+                          {copy.timezoneUnconfirmed}
+                        </span>
+                      ) : null}
+                    </div>
                     <Detail label={copy.locale} value={entry.settings?.default_locale ?? "-"} />
                     <Detail label={copy.brandName} value={entry.settings?.brand_name ?? entry.organization.name} />
                   </dl>
@@ -561,6 +574,11 @@ function TextField({ label, value, onChange, type = "text", ...inputProps }: {
       />
     </label>
   );
+}
+
+/** ADR-179: a live gym whose clock is still a guess (inferred or default). */
+function zoneUnconfirmed(entry: PlatformOrganization) {
+  return entry.organization.status === "active" && entry.settings?.timezone_source !== "confirmed";
 }
 
 function Detail({ label, value }: { label: string; value: string }) {

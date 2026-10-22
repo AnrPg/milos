@@ -4358,7 +4358,10 @@
     "apiErrorClassNotPublished": "Esta clase aún no admite reservas.",
     "apiErrorInvalidTimeZone": "Elige una zona horaria conocida.",
     "apiErrorTimeZoneRequired": "Define primero la zona horaria de tu gimnasio.",
-    "notificationFilters": "Filtros de notificaciones"
+    "notificationFilters": "Filtros de notificaciones",
+    "zonedTimeYours": "{time} tu hora",
+    "zonedTimeYoursTitle": "En tu reloj ({zone})",
+    "zonedTimeGymClock": "Las horas están en el reloj del gimnasio ({zone})."
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",
@@ -6489,7 +6492,14 @@
     "eventsSegments": "Qué eventos",
     "nearMe": "Cerca de mí",
     "fieldGoodForFriends": "Ideal para amigos",
-    "goodForFriendsHint": "Aparece primero cuando los miembros invitan a amigos a un evento."
+    "goodForFriendsHint": "Aparece primero cuando los miembros invitan a amigos a un evento.",
+    "zoneGym": "Horas en la hora del gimnasio ({zone})",
+    "zoneAway": "Horas en hora de {zone}",
+    "zoneChange": "Cambiar",
+    "zoneGymUnconfirmed": "El gimnasio aún no ha confirmado su zona horaria, así que {zone} es una estimación. El personal puede fijarla en los ajustes del gimnasio.",
+    "zoneAwayHint": "¿Es en otra zona horaria? Cambia el reloj para que las horas sean correctas para todos.",
+    "fieldTimeZone": "Zona horaria",
+    "zoneGymOption": "{zone} (la del gimnasio)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "No hay próximos eventos. Crea uno con «+ Nuevo evento».",

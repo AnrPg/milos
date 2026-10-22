@@ -12,6 +12,9 @@ import { HubActionTile, HubButton, HubCard, HubIcons } from "@/components/member
 import { useSession } from "@/components/session-provider";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { nextAppointment } from "@/lib/solo-coach";
+import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { YourTime } from "@/components/zoned-time";
 
 /** Shared with `Box › Ραντεβού`, so booking there refreshes this card. */
 const MY_APPOINTMENTS_KEY = ["me", "appointments", "mine"] as const;
@@ -55,6 +58,7 @@ export function NextCoachSession() {
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const now = useMemo(() => new Date(), []);
+  const practiceZone = useOrganizationTimeZone();
   const appointments = useQuery({
     queryKey: MY_APPOINTMENTS_KEY,
     enabled: Boolean(token),
@@ -72,7 +76,8 @@ export function NextCoachSession() {
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
               <p className="truncate text-lg font-extrabold" style={{ color: "var(--text)" }}>
-                {sessionWhen(next.slot.starts_at, now, locale, tApp("todayLabel"))}
+                {sessionWhen(next.slot.starts_at, now, locale, tApp("todayLabel"), practiceZone)}
+                <YourTime at={next.slot.starts_at} zone={practiceZone} format="day-time" />
               </p>
               <p className="truncate text-sm" style={{ color: "var(--dim)" }}>
                 {[
@@ -132,10 +137,10 @@ export function SessionPackageSummary({ entitlement }: { entitlement: EffectiveE
   );
 }
 
-function sessionWhen(iso: string, now: Date, locale: string, todayLabel: string) {
-  const at = new Date(iso);
-  const time = at.toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
-  return at.toDateString() === now.toDateString()
+// ADR-179: on the practice's clock (the coach's zone), its city added when the client's differs.
+function sessionWhen(iso: string, now: Date, locale: string, todayLabel: string, zone: string | null = null) {
+  const time = zonedText(iso, zone, locale, "time");
+  return dateKeyInZone(iso, zone) === dateKeyInZone(now, zone)
     ? `${todayLabel} ${time}`
-    : `${at.toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "short" })} ${time}`;
+    : `${formatInZone(iso, zone, locale, { weekday: "long", day: "numeric", month: "short" })} ${time}`;
 }

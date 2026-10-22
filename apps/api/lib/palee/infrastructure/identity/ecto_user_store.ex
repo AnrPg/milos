@@ -280,6 +280,23 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
   end
 
   @impl true
+  def update_time_zone(user_id, time_zone) do
+    case Repo.get(User, user_id) do
+      nil ->
+        {:error, :not_found}
+
+      %User{time_zone: ^time_zone} = user ->
+        {:ok, to_account(user)}
+
+      %User{} = user ->
+        user
+        |> User.time_zone_changeset(time_zone)
+        |> Repo.update()
+        |> wrap_result()
+    end
+  end
+
+  @impl true
   def search_users(nil), do: search_users("")
 
   def search_users("") do
@@ -376,6 +393,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
       avatar_url: user.avatar_url,
       preferred_locale: user.preferred_locale || "en",
       preferred_theme_slug: user.preferred_theme_slug,
+      time_zone: user.time_zone,
       email: user.email,
       inserted_at: user.inserted_at,
       completed_tours: user.completed_tours || []

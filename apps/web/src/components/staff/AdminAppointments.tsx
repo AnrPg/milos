@@ -46,6 +46,9 @@ import {
 import { PageHeader } from "@/components/PageHeader";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { formatInZone, zoneLabel } from "@/lib/zoned-time";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { YourTime } from "@/components/zoned-time";
 
 type View = "week" | "day";
 type Kind = AppointmentSlot["kind"];
@@ -76,7 +79,9 @@ function CreateSlotForm({
   const queryClient = useQueryClient();
   const baseId = useId();
   const [coachId, setCoachId] = useState("");
-  const [startsAt, setStartsAt] = useState(() => toDateTimeLocal(nextHour()));
+  // ADR-179: typed on the practice's clock, whatever the device's zone.
+  const zone = useOrganizationTimeZone();
+  const [startsAt, setStartsAt] = useState(() => toDateTimeLocal(nextHour(), zone));
   const [duration, setDuration] = useState("60");
   const [kind, setKind] = useState<Kind>("pt_session");
   const [format, setFormat] = useState<Format>("one_to_one");
@@ -87,7 +92,7 @@ function CreateSlotForm({
   const [meetingUrl, setMeetingUrl] = useState("");
 
   const durationValue = Number(duration);
-  const startsIso = fromDateTimeLocal(startsAt);
+  const startsIso = fromDateTimeLocal(startsAt, zone);
   const valid =
     Boolean(startsIso) &&
     Number.isInteger(durationValue) &&
@@ -158,6 +163,9 @@ function CreateSlotForm({
           type="datetime-local"
           value={startsAt}
         />
+        {zone ? (
+          <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("zonedTimeGymClock", { zone: zoneLabel(zone) })}</p>
+        ) : null}
       </div>
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-duration`} style={captionStyle}>
@@ -318,11 +326,13 @@ function SlotCard({
   coachName,
   locationName,
   now,
+  zone,
 }: {
   slot: AppointmentSlot;
   coachName: string;
   locationName: string | null;
   now: number;
+  zone: string | null;
 }) {
   const i18n = useUiTranslations();
   const tCoach = useTranslations("SoloCoach");
@@ -336,7 +346,7 @@ function SlotCard({
 
   const start = new Date(slot.starts_at);
   const end = new Date(start.getTime() + slot.duration_minutes * 60_000);
-  const time = new Intl.DateTimeFormat(uiLocale, { hour: "numeric", minute: "2-digit" });
+  const time = { format: (at: Date) => formatInZone(at, zone, uiLocale, { hour: "numeric", minute: "2-digit" }) };
   const bookings = slot.bookings ?? [];
   const taken = activeBookings(bookings).length;
   const cancelled = Boolean(slot.cancelled_at);
@@ -381,7 +391,8 @@ function SlotCard({
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-            {time.format(start)}–{time.format(end)} ·{" "}
+            {time.format(start)}–{time.format(end)}
+            <YourTime at={start} zone={zone} /> ·{" "}
             {slot.kind === "pt_session" ? i18n("stfKindPtSession") : i18n("stfKindAssessment")}
           </p>
           <p className="mt-0.5 text-xs" style={{ color: "var(--dim)" }}>
@@ -523,7 +534,8 @@ export function AdminAppointments() {
   const [view, setView] = useState<View>("week");
   const [anchor, setAnchor] = useState(() => new Date());
   const [showCreate, setShowCreate] = useState(false);
-  const range = useMemo(() => appointmentRange(anchor, view), [anchor, view]);
+  const zone = useOrganizationTimeZone();
+  const range = useMemo(() => appointmentRange(anchor, view, zone), [anchor, view, zone]);
 
   const slotsQuery = useQuery({
     queryKey: [...SLOTS_KEY, range.from.toISOString(), range.to.toISOString()],
@@ -556,12 +568,14 @@ export function AdminAppointments() {
   const locationName = (id: string | null | undefined) =>
     id ? ((locationsQuery.data ?? []).find((location) => location.id === id)?.name ?? null) : null;
 
-  const groups = groupSlotsByDay(slotsQuery.data ?? []);
+  const groups = groupSlotsByDay(slotsQuery.data ?? [], zone);
   const dayLabel = new Intl.DateTimeFormat(uiLocale, { weekday: "long", day: "numeric", month: "long" });
+  // The range's bounds are moments; their days are read on the practice's clock.
+  const onClock = (at: Date, options: Intl.DateTimeFormatOptions) => formatInZone(at, zone, uiLocale, options);
   const rangeLabel =
     view === "day"
-      ? dayLabel.format(range.from)
-      : `${new Intl.DateTimeFormat(uiLocale, { day: "numeric", month: "short" }).format(range.from)} – ${new Intl.DateTimeFormat(uiLocale, { day: "numeric", month: "short", year: "numeric" }).format(addDays(range.to, -1))}`;
+      ? onClock(range.from, { weekday: "long", day: "numeric", month: "long" })
+      : `${onClock(range.from, { day: "numeric", month: "short" })} – ${onClock(new Date(range.to.getTime() - 1), { day: "numeric", month: "short", year: "numeric" })}`;
   const step = view === "day" ? 1 : 7;
 
   return (
@@ -656,6 +670,7 @@ export function AdminAppointments() {
                         locationName={locationName(slot.location_id)}
                         now={slotsQuery.dataUpdatedAt}
                         slot={slot}
+                        zone={zone}
                       />
                     ))}
                   </ul>

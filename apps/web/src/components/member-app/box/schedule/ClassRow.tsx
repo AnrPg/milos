@@ -5,6 +5,7 @@ import { useLocale, useTranslations } from "next-intl";
 import type { ScheduleSlot } from "@/api/schedule";
 import { memberSlotState, waitlistPositionLabel } from "@/components/schedule/member-booking";
 import { useUiTranslations } from "@/i18n/ui";
+import { zonedText } from "@/lib/zoned-time";
 
 /**
  * One class in the day view (plan §5a decision 8): time with a subtle
@@ -14,11 +15,14 @@ import { useUiTranslations } from "@/i18n/ui";
  */
 export function ClassRow({
   slot,
+  timeZone = null,
   coachName,
   locationName,
   onOpen,
 }: {
   slot: ScheduleSlot;
+  /** ADR-179: the gym's zone; the class shows on its clock. */
+  timeZone?: string | null;
   coachName: string | null;
   locationName: string | null;
   onOpen: () => void;
@@ -27,9 +31,7 @@ export function ClassRow({
   const i18n = useUiTranslations();
   const locale = useLocale();
   const state = memberSlotState(slot);
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(
-    new Date(slot.scheduled_at),
-  );
+  const time = zonedText(slot.scheduled_at, timeZone, locale, "time");
   const outside = slot.covered_by_package === false;
   const detail = [coachName, locationName].filter(Boolean).join(" · ");
   const friends = slot.friends_going ?? [];

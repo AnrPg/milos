@@ -28,6 +28,8 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { downloadIcsEvent } from "@/lib/ics";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
+import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
 
 /** The WOD as the sheet shows it (board 2, Q7): each part with its movement names. */
@@ -49,6 +51,7 @@ export function wodOutline(workout: WorkoutPreview) {
  */
 export function ClassSheet({
   slot,
+  timeZone = null,
   coachName,
   locations,
   accessToken,
@@ -61,6 +64,8 @@ export function ClassSheet({
   onCancelled,
 }: {
   slot: ScheduleSlot;
+  /** ADR-179: the gym's zone; the class shows on its clock. */
+  timeZone?: string | null;
   coachName: string | null;
   locations: ScheduleLocation[];
   accessToken: string;
@@ -87,8 +92,8 @@ export function ClassSheet({
   const [messageError, setMessageError] = useState<string | null>(null);
 
   const start = new Date(slot.scheduled_at);
-  const when = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(start);
-  const clock = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" });
+  const when = formatInZone(start, timeZone, locale, { weekday: "long", day: "numeric", month: "long" });
+  const clock = { format: (at: Date) => zonedText(at, timeZone, locale, "time") };
   const location = slotLocationName(slot, locations);
   const credits = slotCreditCost(slot);
   const level = slot.class_type.level;
@@ -96,11 +101,11 @@ export function ClassSheet({
   const ownBooking = state.kind === "booked";
   const cancelUntil = slot.cancel_free_until ? new Date(slot.cancel_free_until) : null;
   const cancelUntilText = cancelUntil
-    ? new Intl.DateTimeFormat(locale, {
-        weekday: cancelUntil.toDateString() === start.toDateString() ? undefined : "short",
+    ? zonedText(cancelUntil, timeZone, locale, {
+        weekday: dateKeyInZone(cancelUntil, timeZone) === dateKeyInZone(start, timeZone) ? undefined : "short",
         hour: "2-digit",
         minute: "2-digit",
-      }).format(cancelUntil)
+      })
     : null;
 
   async function run(action: () => Promise<void>, kind: "waitlist" | "withdraw") {
@@ -231,6 +236,7 @@ export function ClassSheet({
       description={
         <span className="block font-semibold first-letter:uppercase">
           {when} · {clock.format(start)} · {t("minutes", { count: slot.duration_minutes })}
+          <YourTime at={start} zone={timeZone} format="day-time" />
         </span>
       }
       size="xl"

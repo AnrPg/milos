@@ -4358,7 +4358,10 @@
     "apiErrorClassNotPublished": "Ce cours n'est pas encore ouvert aux réservations.",
     "apiErrorInvalidTimeZone": "Choisissez un fuseau horaire connu.",
     "apiErrorTimeZoneRequired": "Définissez d'abord le fuseau horaire de votre salle.",
-    "notificationFilters": "Filtres des notifications"
+    "notificationFilters": "Filtres des notifications",
+    "zonedTimeYours": "{time} chez vous",
+    "zonedTimeYoursTitle": "Sur votre horloge ({zone})",
+    "zonedTimeGymClock": "Les heures suivent l'horloge de la salle ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -6489,7 +6492,14 @@
     "eventsSegments": "Quels événements",
     "nearMe": "Près de moi",
     "fieldGoodForFriends": "Idéal pour les amis",
-    "goodForFriendsHint": "Apparaît en premier quand les membres invitent des amis à un événement."
+    "goodForFriendsHint": "Apparaît en premier quand les membres invitent des amis à un événement.",
+    "zoneGym": "Heures de la salle ({zone})",
+    "zoneAway": "Heures de {zone}",
+    "zoneChange": "Modifier",
+    "zoneGymUnconfirmed": "La salle n'a pas encore confirmé son fuseau horaire : {zone} est une estimation. L'équipe peut le définir dans les réglages de la salle.",
+    "zoneAwayHint": "Ça se passe dans un autre fuseau ? Changez l'horloge pour que les heures soient justes pour tous.",
+    "fieldTimeZone": "Fuseau horaire",
+    "zoneGymOption": "{zone} (celui de la salle)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Aucun événement à venir. Crée-en un avec «+ Nouvel événement».",

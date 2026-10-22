@@ -4358,7 +4358,10 @@
     "apiErrorClassNotPublished": "Deze les is nog niet te boeken.",
     "apiErrorInvalidTimeZone": "Kies een bekende tijdzone.",
     "apiErrorTimeZoneRequired": "Stel eerst de tijdzone van je gym in.",
-    "notificationFilters": "Meldingsfilters"
+    "notificationFilters": "Meldingsfilters",
+    "zonedTimeYours": "{time} jouw tijd",
+    "zonedTimeYoursTitle": "Op jouw klok ({zone})",
+    "zonedTimeGymClock": "Tijden volgen de klok van de gym ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -6489,7 +6492,14 @@
     "eventsSegments": "Welke events",
     "nearMe": "Dichtbij",
     "fieldGoodForFriends": "Leuk voor vrienden",
-    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event."
+    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event.",
+    "zoneGym": "Tijden in gymtijd ({zone})",
+    "zoneAway": "Tijden in {zone}-tijd",
+    "zoneChange": "Wijzigen",
+    "zoneGymUnconfirmed": "De gym heeft zijn tijdzone nog niet bevestigd, dus {zone} is een schatting. Het team kan die instellen in de gyminstellingen.",
+    "zoneAwayHint": "Vindt het plaats in een andere tijdzone? Wijzig de klok zodat de tijden voor iedereen kloppen.",
+    "fieldTimeZone": "Tijdzone",
+    "zoneGymOption": "{zone} (van de gym)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",

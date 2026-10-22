@@ -16,7 +16,9 @@ defmodule Palee.Inventory do
 
   # ── Machines ────────────────────────────────────────────────────────────
 
-  def list_machines(context, today \\ Date.utc_today()) do
+  def list_machines(context, today \\ nil) do
+    today = today || gym_today(context)
+
     context
     |> InventoryStore.list_machines(%{})
     |> Enum.map(&with_service(&1, today))
@@ -28,7 +30,7 @@ defmodule Palee.Inventory do
     attrs = Map.drop(attrs, [:status, :archived_at, :organization_id])
 
     with {:ok, machine} <- InventoryStore.save_machine(context, id, attrs) do
-      {:ok, with_service(machine, Date.utc_today())}
+      {:ok, with_service(machine, gym_today(context))}
     end
   end
 
@@ -222,7 +224,8 @@ defmodule Palee.Inventory do
   # ── Report ──────────────────────────────────────────────────────────────
 
   @doc "Consumption, spend per item and monthly inventory expenses."
-  def report(context, months \\ 12, today \\ Date.utc_today()) do
+  def report(context, months \\ 12, today \\ nil) do
+    today = today || gym_today(context)
     months = months |> max(1) |> min(36)
     from = today |> Date.beginning_of_month() |> Date.shift(month: -(months - 1))
     from_at = DateTime.new!(from, ~T[00:00:00], "Etc/UTC")
@@ -256,4 +259,10 @@ defmodule Palee.Inventory do
 
   def purge_tenant_data(context),
     do: Palee.TenantData.TableStore.purge(tenant_data_policy(), context)
+
+  # ADR-179: a machine's service date and the report's months follow the gym's day.
+  defp gym_today(%{organization_id: organization_id}) when is_binary(organization_id),
+    do: Palee.Organizations.local_today(organization_id)
+
+  defp gym_today(_context), do: Date.utc_today()
 end

@@ -32,6 +32,7 @@ function event(overrides: Partial<CommunityEvent> = {}): CommunityEvent {
     id: "event-1",
     organization_id: "org-1",
     club_id: "club-1",
+    time_zone: "Europe/Athens",
     club: { id: "club-1", name: "Box Kypseli", kind: "gym" },
     box: { name: "Box Kypseli", slug: "kypseli", logo_url: null },
     title: "Open WOD",
@@ -175,6 +176,7 @@ describe("the create form", () => {
     repeatWeekly: true,
     repeatUntil: "2026-12-20",
     coverMediaId: null,
+    timeZone: null,
   };
 
   it("parses prices in either decimal style", () => {
@@ -189,6 +191,20 @@ describe("the create form", () => {
     const instant = localInstant("2026-10-25", "09:30")!;
     expect(localInputs(instant.toISOString())).toEqual({ date: "2026-10-25", time: "09:30" });
     expect(localInstant("2026-10-25", "")).toBeNull();
+  });
+
+  it("reads the date and time on the event's clock, whatever the device's", () => {
+    expect(localInstant("2026-10-24", "19:00", "Europe/Athens")!.toISOString()).toBe("2026-10-24T16:00:00.000Z");
+    expect(localInstant("2026-11-03", "19:00", "Europe/Athens")!.toISOString()).toBe("2026-11-03T17:00:00.000Z");
+    expect(localInputs("2026-10-24T16:00:00Z", "America/New_York")).toEqual({ date: "2026-10-24", time: "12:00" });
+  });
+
+  it("sends an event's own zone only when it differs from the gym's", () => {
+    const athens = { ...form, timeZone: "Europe/Athens" };
+    expect(eventRequest(athens, { gymTimeZone: "Europe/Athens" }).time_zone).toBeNull();
+    expect(eventRequest({ ...form, timeZone: "Europe/Madrid" }, { gymTimeZone: "Europe/Athens" }).time_zone).toBe("Europe/Madrid");
+    expect("time_zone" in eventRequest(athens)).toBe(false);
+    expect(eventRequest({ ...form, date: "2026-10-24", time: "19:00", timeZone: "Europe/Athens" }).starts_at).toBe("2026-10-24T16:00:00.000Z");
   });
 
   it("says what is missing", () => {

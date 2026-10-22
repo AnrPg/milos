@@ -234,7 +234,9 @@ defmodule Palee.Application.CommunityEvents do
   """
   def manage_create(%{organization_id: organization_id} = manager, club, params) do
     attrs = editable(params)
-    zone = Organizations.organization_timezone(organization_id)
+
+    zone =
+      Community.event_time_zone(attrs, Organizations.organization_timezone(organization_id))
 
     with {:ok, channel} <- group_channel(manager, club, params[:channel_id]),
          :ok <- authorize_event(manager, channel),
@@ -262,7 +264,13 @@ defmodule Palee.Application.CommunityEvents do
   def manage_update(%{organization_id: organization_id} = manager, event, params) do
     attrs = editable(params)
     now = DateTime.utc_now()
-    zone = Organizations.organization_timezone(organization_id)
+
+    # A repeat stays at the same local time on the clock it is planned on.
+    zone =
+      Community.event_time_zone(
+        Map.merge(Map.take(event, [:time_zone]), Map.take(attrs, [:time_zone])),
+        Organizations.organization_timezone(organization_id)
+      )
 
     with :ok <- own_event(manager, event),
          :ok <- authorize_event(manager, event_channel(manager, event)),

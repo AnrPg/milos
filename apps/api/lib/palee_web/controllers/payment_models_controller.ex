@@ -228,7 +228,9 @@ defmodule PaleeWeb.PaymentModelsController do
   )
 
   def create_invoice(conn, %{id: id}) do
-    on = Map.get(body_params(conn), :on) || Date.utc_today()
+    on =
+      Map.get(body_params(conn), :on) ||
+        Palee.Organizations.local_today(conn.assigns.tenant_context.organization_id)
 
     with {:ok, invoice} <- Finance.generate_corporate_invoice(conn.assigns.tenant_context, id, on) do
       conn |> put_status(:created) |> json(%{invoice: invoice})

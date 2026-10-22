@@ -91,6 +91,7 @@ export function ClubEventsTab({ club, group = null }: { club: CommunityClub; gro
           group={Boolean(group)}
           locations={locations.data ?? []}
           coverSlug={runsEvents && can(membership, "manage_settings") ? club.organization_slug : null}
+          gymSlug={club.organization_slug}
           onSubmit={async (body) => {
             await createClubEvent(tokens!.access_token, club.id, group ? { ...body, channel_id: group.id } : body);
             setScope("upcoming");

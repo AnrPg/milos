@@ -38,6 +38,11 @@ defmodule PaleeWeb.AuthController do
         enum: Palee.Themes.slugs() ++ [nil],
         description: "The member's own theme: graphite (dark) or frost (light); null is frost"
       },
+      time_zone: %Schema{
+        type: :string,
+        nullable: true,
+        description: "ADR-179: the zone this account's device last reported"
+      },
       completed_tours: %Schema{
         type: :array,
         items: %Schema{type: :string, enum: ~w(admin member athlete)}
@@ -467,6 +472,7 @@ defmodule PaleeWeb.AuthController do
       vendor: vendor?(user),
       preferred_locale: user.preferred_locale,
       preferred_theme_slug: Map.get(user, :preferred_theme_slug),
+      time_zone: Map.get(user, :time_zone),
       completed_tours: Map.get(user, :completed_tours) || []
     }
   end

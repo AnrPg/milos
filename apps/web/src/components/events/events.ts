@@ -1,5 +1,16 @@
 import { ApiError } from "@/api/client";
 import type { CommunityEvent, EventDraft, EventPlace } from "@/api/events";
+import {
+  dateKeyInZone,
+  deviceTimeZone,
+  formatInZone,
+  isValidTimeZone,
+  sameClock,
+  timeKeyInZone,
+  zoneLabel,
+  zonedText,
+  zonedToInstant,
+} from "@/lib/zoned-time";
 
 /**
  * Pure helpers for club events (ADR-153): what «Θα έρθω» shows, late
@@ -53,27 +64,36 @@ export function formatPrice(cents: number, currency: string, locale: string): st
   }).format(cents / 100);
 }
 
-/** The date block of a row: short weekday (upper case) over the day of the month. */
-export function dateBlock(iso: string, locale: string, timeZone?: string) {
+/**
+ * The date block of a row: short weekday (upper case) over the day of the
+ * month, on the event's own clock (ADR-179: `timeZone` is the event's zone).
+ */
+export function dateBlock(iso: string, locale: string, timeZone?: string | null) {
+  const zone = isValidTimeZone(timeZone) ? timeZone : undefined;
   const date = new Date(iso);
-  const weekday = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone })
+  const weekday = new Intl.DateTimeFormat(locale, { weekday: "short", timeZone: zone })
     .format(date)
     .replace(/\.$/, "")
     .toLocaleUpperCase(locale);
-  const day = new Intl.DateTimeFormat(locale, { day: "numeric", timeZone }).format(date);
+  const day = new Intl.DateTimeFormat(locale, { day: "numeric", timeZone: zone }).format(date);
   return { weekday, day };
 }
 
-export function formatTime(iso: string, locale: string, timeZone?: string) {
-  return new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit", timeZone }).format(new Date(iso));
+/**
+ * «19:00» on the event's clock; «19:00 Athens» when the viewer's clock reads
+ * it differently (ADR-179). Without a zone, the device's clock.
+ */
+export function formatTime(iso: string, locale: string, timeZone?: string | null) {
+  return zonedText(iso, timeZone, locale, "time");
 }
 
-/** «Σάββατο 25 Οκτωβρίου · 10:00–12:00». */
-export function formatWhen(startsAt: string, endsAt: string, locale: string, timeZone?: string) {
-  const day = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long", timeZone }).format(
-    new Date(startsAt),
-  );
-  return [day, [formatTime(startsAt, locale, timeZone), formatTime(endsAt, locale, timeZone)].join("–")].join(" · ");
+/** «Σάββατο 25 Οκτωβρίου · 10:00–12:00», on the event's clock. */
+export function formatWhen(startsAt: string, endsAt: string, locale: string, timeZone?: string | null) {
+  const day = formatInZone(startsAt, timeZone, locale, { weekday: "long", day: "numeric", month: "long" });
+  const range = [formatInZone(startsAt, timeZone, locale, "time"), formatInZone(endsAt, timeZone, locale, "time")].join("–");
+  const viewer = deviceTimeZone();
+  const differs = isValidTimeZone(timeZone) && isValidTimeZone(viewer) && !sameClock(startsAt, timeZone, viewer);
+  return [day, differs ? `${range} ${zoneLabel(timeZone)}` : range].join(" · ");
 }
 
 /** The place's name, else its address. */
@@ -143,6 +163,11 @@ export type EventForm = {
   repeatWeekly: boolean;
   repeatUntil: string;
   coverMediaId: string | null;
+  /**
+   * ADR-179: the clock the date and time are read on: the gym's, or the
+   * event's own when it happens elsewhere. Null: this device's clock.
+   */
+  timeZone: string | null;
 };
 
 export const DURATIONS = [30, 45, 60, 90, 120, 180, 240];
@@ -154,23 +179,16 @@ export function parsePriceCents(value: string): number | null {
   return Math.round(Number(normalized) * 100);
 }
 
-/** The local date and time inputs as one instant. */
-export function localInstant(date: string, time: string): Date | null {
+/** The date and time inputs, read on `timeZone` (the device's clock without one), as one instant. */
+export function localInstant(date: string, time: string, timeZone: string | null = null): Date | null {
   if (!/^\d{4}-\d{2}-\d{2}$/.test(date) || !/^\d{2}:\d{2}$/.test(time)) return null;
-  const [year, month, day] = date.split("-").map(Number);
-  const [hours, minutes] = time.split(":").map(Number);
-  const instant = new Date(year, month - 1, day, hours, minutes);
+  const instant = zonedToInstant(date, time, timeZone);
   return Number.isNaN(instant.getTime()) ? null : instant;
 }
 
-/** yyyy-mm-dd and HH:mm of an instant in local time, for the inputs. */
-export function localInputs(iso: string) {
-  const date = new Date(iso);
-  const pad = (value: number) => String(value).padStart(2, "0");
-  return {
-    date: [date.getFullYear(), pad(date.getMonth() + 1), pad(date.getDate())].join("-"),
-    time: [pad(date.getHours()), pad(date.getMinutes())].join(":"),
-  };
+/** yyyy-mm-dd and HH:mm of an instant on `timeZone` (the device's clock without one), for the inputs. */
+export function localInputs(iso: string, timeZone: string | null = null) {
+  return { date: dateKeyInZone(iso, timeZone), time: timeKeyInZone(iso, timeZone) };
 }
 
 export type FormProblem = "title" | "when" | "past" | "place" | "capacity" | "price" | "repeat";
@@ -178,7 +196,7 @@ export type FormProblem = "title" | "when" | "past" | "place" | "capacity" | "pr
 /** What stops the form from being sent, or null. */
 export function formProblem(form: EventForm, now: Date = new Date(), { editing = false } = {}): FormProblem | null {
   if (!form.title.trim()) return "title";
-  const start = localInstant(form.date, form.time);
+  const start = localInstant(form.date, form.time, form.timeZone);
   if (!start) return "when";
   if (!editing && start.getTime() <= now.getTime()) return "past";
   if (form.place.kind === "location" ? !form.place.locationId : !form.place.name.trim() && !form.place.address.trim()) return "place";
@@ -192,8 +210,11 @@ export function formProblem(form: EventForm, now: Date = new Date(), { editing =
  * The request body of a valid form. A member group's event is always free,
  * for its members and without guest passes (the API enforces it too).
  */
-export function eventRequest(form: EventForm, { group = false, editing = false } = {}) {
-  const start = localInstant(form.date, form.time)!;
+export function eventRequest(
+  form: EventForm,
+  { group = false, editing = false, gymTimeZone = null }: { group?: boolean; editing?: boolean; gymTimeZone?: string | null } = {},
+) {
+  const start = localInstant(form.date, form.time, form.timeZone)!;
   const end = new Date(start.getTime() + form.durationMinutes * 60_000);
   const capacity = form.capacity.trim() ? Number(form.capacity.trim()) : null;
   const place =
@@ -216,13 +237,17 @@ export function eventRequest(form: EventForm, { group = false, editing = false }
     good_for_friends: !group && (form.openToAll || form.guestPass) && form.goodForFriends,
     cover_media_id: form.coverMediaId,
   };
+  // ADR-179: an event's own zone only when it differs from its gym's; while
+  // the gym's zone is unknown here, the stored one is left as it is.
+  if (gymTimeZone) body.time_zone = form.timeZone && form.timeZone !== gymTimeZone ? form.timeZone : null;
   if (!editing && form.repeatWeekly) body.repeat_until = form.repeatUntil;
   return body;
 }
 
 /** The form filled from an event, for editing. */
 export function formFromEvent(event: CommunityEvent): EventForm {
-  const { date, time } = localInputs(event.starts_at);
+  const timeZone = event.time_zone ?? null;
+  const { date, time } = localInputs(event.starts_at, timeZone);
   const minutes = Math.max(15, Math.round((new Date(event.ends_at).getTime() - new Date(event.starts_at).getTime()) / 60_000));
   return {
     title: event.title,
@@ -243,6 +268,7 @@ export function formFromEvent(event: CommunityEvent): EventForm {
     repeatWeekly: false,
     repeatUntil: "",
     coverMediaId: event.cover_media_id ?? null,
+    timeZone,
   };
 }
 

@@ -30,7 +30,8 @@ defmodule Palee.Workers.SubscriptionExpiryJob do
   end
 
   @doc "Runs the job for one organization (`context` carries its id)."
-  def run(context, today \\ Date.utc_today()) do
+  def run(context, today \\ nil) do
+    today = today || Organizations.local_today(context.organization_id)
     settings = Finance.get_finance_settings(context)
     reminder_days = Map.get(settings, :subscription_expiry_reminder_days, 5) || 0
     grace_days = Map.get(settings, :subscription_grace_days, 3) || 0

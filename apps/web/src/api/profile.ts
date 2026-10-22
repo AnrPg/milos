@@ -49,3 +49,16 @@ export async function searchAllUsers(token: string, query: string) {
     { token },
   );
 }
+
+/**
+ * ADR-179: tells the API which zone this device is in, so server-written
+ * texts (push notifications) can add "your time" when it differs from the
+ * organiser's clock. UTC aliases are ignored by the API.
+ */
+export async function reportMyTimeZone(token: string, timeZone: string) {
+  return apiRequest<{ time_zone: string | null }>("/me/time-zone", {
+    method: "PUT",
+    token,
+    body: { time_zone: timeZone },
+  });
+}

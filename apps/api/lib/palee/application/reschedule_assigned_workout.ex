@@ -6,7 +6,7 @@ defmodule Palee.Application.RescheduleAssignedWorkout do
 
   def call(context, assignment_id, athlete_id, new_date_str) do
     with {:ok, new_date} <- parse_date(new_date_str),
-         :ok <- guard_future_date(new_date),
+         :ok <- guard_future_date(new_date, context),
          assignment when not is_nil(assignment) <-
            Workouts.get_assigned_workout(context, assignment_id),
          :ok <- verify_athlete_access(assignment, athlete_id),
@@ -31,8 +31,9 @@ defmodule Palee.Application.RescheduleAssignedWorkout do
     end
   end
 
-  defp guard_future_date(date) do
-    if Date.compare(date, Date.utc_today()) == :lt do
+  # ADR-179: "the past" is before the gym's today.
+  defp guard_future_date(date, context) do
+    if Date.compare(date, Palee.Organizations.local_today(context.organization_id)) == :lt do
       {:error, :past_date}
     else
       :ok

@@ -5,6 +5,8 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
   alias Ecto.Multi
   alias Palee.Repo
+  alias Palee.Infrastructure.Tenancy.GymClock
+  alias Palee.TimeZones.ZonedTime
 
   alias Palee.Scheduling.{
     Booking,
@@ -166,7 +168,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
     starts_on = parse_series_date(params["starts_on"])
     ends_on = parse_optional_series_date(params["ends_on"])
-    horizon = ends_on || Date.add(starts_on || Date.utc_today(), 365)
+    horizon = ends_on || Date.add(starts_on || GymClock.today(), 365)
     params = Map.put(params, "materialized_through", horizon)
     changeset = ClassSeries.changeset(%ClassSeries{}, params)
 
@@ -1666,12 +1668,13 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
   @impl true
   def count_classes_today(%{organization_id: organization_id}) do
-    today = Date.utc_today()
-    start_of_day = DateTime.new!(today, ~T[00:00:00], "Etc/UTC")
-    end_of_day = DateTime.new!(today, ~T[23:59:59], "Etc/UTC")
+    zone = GymClock.zone(organization_id)
+    today = ZonedTime.local_date(DateTime.utc_now(), zone)
+    start_of_day = ZonedTime.start_of_day(today, zone)
+    next_day = ZonedTime.start_of_day(Date.add(today, 1), zone)
 
     ScheduledClass
-    |> where([s], s.scheduled_at >= ^start_of_day and s.scheduled_at <= ^end_of_day)
+    |> where([s], s.scheduled_at >= ^start_of_day and s.scheduled_at < ^next_day)
     |> for_organization(organization_id)
     |> select([s], count(s.id))
     |> Repo.one()
@@ -1694,7 +1697,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
 
   @impl true
   def list_active_class_series(%{organization_id: organization_id}) do
-    today = Date.utc_today()
+    today = GymClock.today_for(organization_id)
 
     ClassSeries
     |> for_organization(organization_id)

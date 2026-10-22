@@ -11,10 +11,9 @@ defmodule Palee.Workers.CorporateInvoicingJob do
 
   @impl Oban.Worker
   def perform(_job) do
-    today = Date.utc_today()
-
+    # ADR-179: each gym's own "today".
     Organizations.list_active_organizations_for_system()
-    |> Enum.each(&CorporateInvoicing.run(&1, today))
+    |> Enum.each(&CorporateInvoicing.run(&1, Organizations.local_today(&1.organization.id)))
 
     :ok
   end

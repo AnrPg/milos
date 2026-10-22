@@ -8,6 +8,8 @@ defmodule Palee.Community.Event do
   use Ecto.Schema
   import Ecto.Changeset
 
+  alias Palee.TimeZones.ZonedTime
+
   @editable [
     :title,
     :description,
@@ -25,7 +27,8 @@ defmodule Palee.Community.Event do
     :guest_pass_allowed,
     :guests_per_member,
     :good_for_friends,
-    :cover_media_id
+    :cover_media_id,
+    :time_zone
   ]
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -55,6 +58,8 @@ defmodule Palee.Community.Event do
     field :guests_per_member, :integer, default: 1
     field :good_for_friends, :boolean, default: false
     field :cover_media_id, :binary_id
+    # ADR-179: the zone of an event held away from its gym; nil: the gym's.
+    field :time_zone, :string
     field :series_id, :binary_id
     field :cancelled_at, :utc_datetime_usec
     field :cancel_reason, :string
@@ -66,6 +71,10 @@ defmodule Palee.Community.Event do
   end
 
   def editable_fields, do: @editable
+
+  @doc "ADR-179: the clock the event is planned on: its own zone, else its gym's."
+  def time_zone(%{time_zone: zone}, _gym_zone) when is_binary(zone) and zone != "", do: zone
+  def time_zone(_event, gym_zone), do: gym_zone
 
   def create_changeset(attrs) do
     %__MODULE__{}
@@ -111,6 +120,10 @@ defmodule Palee.Community.Event do
     |> validate_number(:guests_per_member, greater_than: 0, less_than_or_equal_to: 10)
     |> validate_number(:latitude, greater_than_or_equal_to: -90, less_than_or_equal_to: 90)
     |> validate_number(:longitude, greater_than_or_equal_to: -180, less_than_or_equal_to: 180)
+    |> update_change(:time_zone, &trim/1)
+    |> validate_change(:time_zone, fn :time_zone, zone ->
+      if ZonedTime.valid?(zone), do: [], else: [time_zone: "is not a known time zone"]
+    end)
     |> validate_place()
     |> validate_times()
     |> validate_group()

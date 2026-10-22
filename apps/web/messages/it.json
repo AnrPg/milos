@@ -4358,7 +4358,10 @@
     "apiErrorClassNotPublished": "Questa lezione non è ancora prenotabile.",
     "apiErrorInvalidTimeZone": "Scegli un fuso orario noto.",
     "apiErrorTimeZoneRequired": "Imposta prima il fuso orario della palestra.",
-    "notificationFilters": "Filtri delle notifiche"
+    "notificationFilters": "Filtri delle notifiche",
+    "zonedTimeYours": "{time} ora tua",
+    "zonedTimeYoursTitle": "Sul tuo orologio ({zone})",
+    "zonedTimeGymClock": "Gli orari seguono l'orologio della palestra ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -6489,7 +6492,14 @@
     "eventsSegments": "Quali eventi",
     "nearMe": "Vicino a me",
     "fieldGoodForFriends": "Adatto agli amici",
-    "goodForFriendsHint": "Compare per primo quando i membri invitano amici a un evento."
+    "goodForFriendsHint": "Compare per primo quando i membri invitano amici a un evento.",
+    "zoneGym": "Orari della palestra ({zone})",
+    "zoneAway": "Orari nel fuso di {zone}",
+    "zoneChange": "Cambia",
+    "zoneGymUnconfirmed": "La palestra non ha ancora confermato il suo fuso orario, quindi {zone} è una stima. Lo staff può impostarlo nelle impostazioni della palestra.",
+    "zoneAwayHint": "Si svolge in un altro fuso orario? Cambia l'orologio così gli orari sono giusti per tutti.",
+    "fieldTimeZone": "Fuso orario",
+    "zoneGymOption": "{zone} (della palestra)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Nessun evento in arrivo. Creane uno con «+ Nuovo evento».",

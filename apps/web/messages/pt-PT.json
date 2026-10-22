@@ -4358,7 +4358,10 @@
     "apiErrorClassNotPublished": "Esta aula ainda não está aberta a reservas.",
     "apiErrorInvalidTimeZone": "Escolhe um fuso horário conhecido.",
     "apiErrorTimeZoneRequired": "Define primeiro o fuso horário do ginásio.",
-    "notificationFilters": "Filtros de notificações"
+    "notificationFilters": "Filtros de notificações",
+    "zonedTimeYours": "{time} a tua hora",
+    "zonedTimeYoursTitle": "No teu relógio ({zone})",
+    "zonedTimeGymClock": "As horas seguem o relógio do ginásio ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -6489,7 +6492,14 @@
     "eventsSegments": "Que eventos",
     "nearMe": "Perto de mim",
     "fieldGoodForFriends": "Bom para amigos",
-    "goodForFriendsHint": "Aparece primeiro quando os membros convidam amigos para um evento."
+    "goodForFriendsHint": "Aparece primeiro quando os membros convidam amigos para um evento.",
+    "zoneGym": "Horas na hora do ginásio ({zone})",
+    "zoneAway": "Horas na hora de {zone}",
+    "zoneChange": "Alterar",
+    "zoneGymUnconfirmed": "O ginásio ainda não confirmou o fuso horário, por isso {zone} é uma estimativa. A equipa pode defini-lo nas definições do ginásio.",
+    "zoneAwayHint": "Acontece noutro fuso horário? Altera o relógio para que as horas fiquem certas para todos.",
+    "fieldTimeZone": "Fuso horário",
+    "zoneGymOption": "{zone} (do ginásio)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Não há próximos eventos. Cria um com «+ Novo evento».",

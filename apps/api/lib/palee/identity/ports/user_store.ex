@@ -20,6 +20,8 @@ defmodule Palee.Identity.Ports.UserStore do
               {:ok, map()} | {:error, :not_found | :invalid_tour | Ecto.Changeset.t()}
   @callback update_avatar(Ecto.UUID.t(), String.t()) ::
               {:ok, Account.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
+  @callback update_time_zone(Ecto.UUID.t(), String.t()) ::
+              {:ok, Account.t()} | {:error, Ecto.Changeset.t()} | {:error, :not_found}
   @callback search_users(String.t() | nil) :: [Account.t()]
   @callback count_by_role(atom() | String.t()) :: non_neg_integer()
   @callback bump_security_version(Ecto.UUID.t()) ::

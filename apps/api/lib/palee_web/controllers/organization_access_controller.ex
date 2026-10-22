@@ -56,7 +56,17 @@ defmodule PaleeWeb.OrganizationAccessController do
       name: %Schema{type: :string},
       slug: %Schema{type: :string},
       # ADR-170: a gym or an independent coach's practice (memberships only).
-      provider_kind: %Schema{type: :string, enum: ["gym", "coach"]}
+      provider_kind: %Schema{type: :string, enum: ["gym", "coach"]},
+      timezone: %Schema{
+        type: :string,
+        description:
+          "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock"
+      },
+      timezone_confirmed: %Schema{
+        type: :boolean,
+        description:
+          "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)"
+      }
     },
     required: [:id, :name, :slug]
   }
@@ -392,7 +402,9 @@ defmodule PaleeWeb.OrganizationAccessController do
         id: organization.id,
         name: organization.name,
         slug: organization.slug,
-        provider_kind: Map.get(organization, :provider_kind) || "gym"
+        provider_kind: Map.get(organization, :provider_kind) || "gym",
+        timezone: Palee.Organizations.resolve_timezone(Map.get(entry, :settings)),
+        timezone_confirmed: Palee.Organizations.timezone_confirmed?(Map.get(entry, :settings))
       },
       settings: serialize_settings(Map.get(entry, :settings))
     }

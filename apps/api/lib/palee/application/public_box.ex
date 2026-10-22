@@ -30,6 +30,7 @@ defmodule Palee.Application.PublicBox do
            |> Map.put(:coaches, coaches(context, snapshot["coach_ids"] || [])),
          published_at: profile && profile.published_at,
          followers_count: box_followers(box.organization_id),
+         time_zone: Organizations.organization_timezone(box.organization_id),
          open_clubs: OpenClubs.for_box(context),
          locations:
            context
@@ -72,6 +73,7 @@ defmodule Palee.Application.PublicBox do
          box: box,
          start_at: start_at,
          end_at: end_at,
+         time_zone: Organizations.organization_timezone(box.organization_id),
          trial_offer: offer && Map.delete(offer, :seats),
          slots:
            Enum.map(slots, fn slot ->

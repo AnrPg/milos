@@ -15,7 +15,10 @@ defmodule Palee.Application.CancelAppointmentSlot do
           "Appointment slot cancelled"
         )
 
-        NotifyAppointment.cancelled(booking.user_id, slot)
+        NotifyAppointment.cancelled(
+          booking.user_id,
+          Map.put_new(slot, :organization_id, context.organization_id)
+        )
       end)
 
       {:ok, %{slot | bookings: []}}

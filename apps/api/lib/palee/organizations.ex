@@ -168,17 +168,23 @@ defmodule Palee.Organizations do
   end
 
   @doc "ADR-176: the gym's local date now."
-  def local_today(organization_id, now \\ DateTime.utc_now()) do
-    case DateTime.shift_zone(now, organization_timezone(organization_id)) do
-      {:ok, local} -> DateTime.to_date(local)
-      {:error, _reason} -> DateTime.to_date(now)
-    end
-  end
+  def local_today(organization_id, now \\ DateTime.utc_now()),
+    do: Palee.TimeZones.ZonedTime.local_date(now, organization_timezone(organization_id))
+
+  @doc "ADR-179: `timezone_status/1` of several gyms, by id."
+  def timezone_statuses(organization_ids) when is_list(organization_ids),
+    do: organization_ids |> Enum.uniq() |> Map.new(&{&1, timezone_status(&1)})
 
   @doc "ADR-176: confirm the gym's zone (`\"confirmed\"`) or report a guess (`\"inferred\"`)."
   defdelegate set_timezone(context, zone, source),
     to: Palee.Organizations.Commands.SetTimeZone,
     as: :call
+
+  @doc "ADR-179: the zone gym-local rules read from a gym's settings (default while unknown)."
+  defdelegate resolve_timezone(settings), to: TimeZonePolicy, as: :resolve
+
+  @doc "ADR-179: whether an admin confirmed the zone in a gym's settings."
+  def timezone_confirmed?(settings), do: TimeZonePolicy.confirmed?(settings || %{})
 
   @doc "ADR-176: the best guess among candidate zones (device first, then IP)."
   defdelegate infer_timezone(candidates), to: TimeZonePolicy, as: :infer

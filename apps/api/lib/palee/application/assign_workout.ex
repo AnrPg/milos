@@ -127,7 +127,7 @@ defmodule Palee.Application.AssignWorkout do
         capability: :receive_coaching_touchpoints,
         allowance: :coaching_touchpoints,
         quantity: 1,
-        occurred_on: Date.utc_today(),
+        occurred_on: Palee.Organizations.local_today(context.organization_id),
         source_context: "workouts",
         source_id: delivery_id,
         idempotency_key: "programming-delivery:#{delivery_id}:#{athlete.id}",

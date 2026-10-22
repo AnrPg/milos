@@ -10,6 +10,7 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
   }
 
   alias Palee.Gamification.GamificationStore
+  alias Palee.TimeZones.ZonedTime
 
   def call(
         %{
@@ -36,10 +37,15 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
       )
 
     pr_scores = PRDetector.detect(current_scores, previous_scores)
-    completed_dates = Enum.map(completed_executions, &DateTime.to_date(&1.completed_at_utc))
+    # ADR-179: days are the person's own (their device's zone).
+    zone = person_zone(account)
+
+    completed_dates =
+      Enum.map(completed_executions, &ZonedTime.local_date(&1.completed_at_utc, zone))
+
     prefs = GamificationStore.get_user_preferences(user_id) || %{}
     off_days = Map.get(prefs, :off_days, [])
-    today = Date.utc_today()
+    today = ZonedTime.local_date(DateTime.utc_now(), zone)
 
     day_streaks = DayStreakCalculator.calculate(completed_dates, off_days, today)
 
@@ -380,4 +386,7 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
     do: NaiveDateTime.to_date(inserted_at)
 
   defp signup_anchor_date(_, completed_dates), do: Enum.min(completed_dates)
+
+  defp person_zone(%{time_zone: zone}), do: ZonedTime.or_default(zone)
+  defp person_zone(_account), do: ZonedTime.default_zone()
 end

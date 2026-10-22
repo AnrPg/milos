@@ -33,6 +33,8 @@ import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
@@ -81,6 +83,7 @@ export function BoxToday({
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
   const now = useMemo(() => new Date(), []);
+  const gymZone = useOrganizationTimeZone();
   const [selectedKey, setSelectedKey] = useState<string | null>(null);
   const [logDialog, setLogDialog] = useState<TrainingLogDialogState>({ mode: "closed" });
   const launcher = useWorkoutLauncher();
@@ -119,11 +122,12 @@ export function BoxToday({
     today.items.find((item) => item.key === selectedKey) ?? defaultTodayItem(today.items);
   const loading = schedule.isPending || assignments.isPending;
   const booking = nextBooking(schedule.data?.slots ?? [], now);
-  const time = (iso: string) => new Date(iso).toLocaleTimeString(locale, { hour: "2-digit", minute: "2-digit" });
+  // ADR-179: class times on the gym's clock.
+  const time = (iso: string) => zonedText(iso, gymZone, locale, "time");
   const day = (iso: string) =>
-    localIsoDate(new Date(iso)) === localIsoDate(now)
+    dateKeyInZone(iso, gymZone) === dateKeyInZone(now, gymZone)
       ? t("todayLabel")
-      : new Date(iso).toLocaleDateString(locale, { weekday: "long", day: "numeric", month: "short" });
+      : formatInZone(iso, gymZone, locale, { weekday: "long", day: "numeric", month: "short" });
 
   function chipLabel(item: TodayTrainingItem) {
     return item.kind === "class" && item.scheduledAt
