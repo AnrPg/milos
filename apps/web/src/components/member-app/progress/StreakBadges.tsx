@@ -66,12 +66,10 @@ export function StreakBadges({
         {/* Day streak chip */}
         <div
           className="flex items-baseline gap-1.5 rounded-2xl px-4 py-2.5"
-          style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
+          style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
         >
-          <span className="text-3xl font-bold tabular-nums" style={{ color: "var(--warning)" }}>
-            {animatedStreak}
-          </span>
-          <span className="text-sm font-semibold" style={{ color: "var(--dim)" }}>{i18n("dayStreakca360c4")}</span>
+          <span className="text-3xl font-bold tabular-nums">{animatedStreak}</span>
+          <span className="text-sm font-semibold">{i18n("dayStreakca360c4")}</span>
         </div>
 
         {/* Advancement chip */}

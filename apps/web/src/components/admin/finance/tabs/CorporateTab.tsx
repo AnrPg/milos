@@ -317,7 +317,7 @@ function SeatsSection({ client }: { client: CorporateClient }) {
 }
 
 function seatTone(status: string) {
-  return status === "active" ? ("success" as const) : ("neutral" as const);
+  return status === "active" ? ("spark" as const) : ("neutral" as const);
 }
 
 function invoiceTone(status: CorporateInvoice["status"]) {

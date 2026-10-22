@@ -112,12 +112,13 @@ export function ChallengeCard({ challenge }: { challenge: ChallengeRecord }) {
         </div>
       </div>
 
-      <div className="mt-3 h-2 overflow-hidden rounded-full" style={{ background: "var(--border)" }}>
+      {/* A live challenge charges up in Spark on the deep track. */}
+      <div className="mt-3 h-2 overflow-hidden rounded-full" style={{ background: "var(--deep)" }}>
         <div
           className="h-full rounded-full transition-all"
           style={{
             width: (progressPct) + "%",
-            background: challenge.completed ? "var(--success)" : "var(--primary)",
+            background: challenge.completed ? "var(--success)" : "var(--spark)",
           }}
         />
       </div>

@@ -24,9 +24,10 @@ import {
   type FullPhonePrefs,
 } from "@/components/devices/phone-health-model";
 import { grantedPrefs, healthPlugin, newCount, syncPhoneHealth } from "@/lib/platform/health";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 const PILL = {
-  connected: { color: "var(--success)", background: "color-mix(in srgb, var(--success) 16%, transparent)" },
+  connected: SPARK_ACTIVE_STYLE,
   unavailable: { color: "var(--dim)", background: "var(--panel)" },
 } as const;
 

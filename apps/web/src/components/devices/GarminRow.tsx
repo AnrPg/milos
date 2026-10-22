@@ -21,11 +21,12 @@ import {
   togglePref,
   type FullSyncPrefs,
 } from "@/components/devices/garmin-model";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 const PILL = {
   soon: { color: "var(--dim)", background: "var(--panel)" },
   disconnected: { color: "var(--text-soft)", background: "var(--panel)" },
-  connected: { color: "var(--success)", background: "color-mix(in srgb, var(--success) 16%, transparent)" },
+  connected: SPARK_ACTIVE_STYLE,
   reconnect: { color: "var(--danger)", background: "color-mix(in srgb, var(--danger) 16%, transparent)" },
 } as const;
 

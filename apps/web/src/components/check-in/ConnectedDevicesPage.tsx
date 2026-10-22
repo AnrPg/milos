@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { type CSSProperties, useEffect, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
@@ -18,6 +18,7 @@ import { integrationStatusKey, visibleIntegrations } from "@/lib/platform/device
 
 import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey } from "./errors";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 /**
  * Εγώ › Συνδεδεμένες συσκευές (ADR-155 §11, vision §7.11): the Wallet cards
@@ -114,7 +115,7 @@ function WalletSection({ token, wallet }: { token: string; wallet: ConnectedDevi
                     {t(["walletPlatform", pass.platform].join("_"))} · {t("walletAddedOn", { date: date(pass.added_at) })}
                   </span>
                 </span>
-                <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" style={{ background: "color-mix(in srgb, var(--success) 16%, transparent)", color: "var(--success)" }}>
+                <span className="shrink-0 rounded-full px-2 py-0.5 text-xs font-bold" style={SPARK_ACTIVE_STYLE}>
                   {t("walletActive")}
                 </span>
               </div>
@@ -230,8 +231,8 @@ function IntegrationsSection({ token, integrations }: { token: string; integrati
   // This app install's phone-health provider, when its plugin ships (ADR-172).
   const appProvider =
     platform === "ios" && capabilities.healthKit ? "apple_health" : platform === "android" && capabilities.healthConnect ? "health_connect" : null;
-  const tone: Record<string, { color: string; background: string }> = {
-    connected: { color: "var(--success)", background: "color-mix(in srgb, var(--success) 16%, transparent)" },
+  const tone: Record<string, { color?: CSSProperties["color"]; background?: CSSProperties["background"] }> = {
+    connected: SPARK_ACTIVE_STYLE,
     disconnected: { color: "var(--text-soft)", background: "var(--panel-raised)" },
     unavailable: { color: "var(--dim)", background: "var(--panel-raised)" },
     native_only: { color: "var(--text-soft)", background: "var(--panel-raised)" },

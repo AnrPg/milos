@@ -7,6 +7,7 @@ import { ApiError } from "@/api/client";
 import { ADMIN_PLAN_KEY, fetchAdminPlan, type OrganizationPlan } from "@/api/platform-plans";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { formatCents, shownMonthlyPrice, usageShare, usageTone, type UsageTone } from "@/lib/solo-coach";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 const TONE_COLOR: Record<UsageTone, string> = {
   ok: "var(--primary)",
@@ -48,7 +49,7 @@ export function PlanCard({ token }: { token: string }) {
       <div className="flex flex-wrap items-baseline justify-between gap-2">
         <p className="text-lg font-bold" style={{ color: "var(--text)" }}>{data.plan.name}</p>
         {data.status ? (
-          <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}>
+          <span className="rounded-full px-3 py-1 text-xs font-semibold" style={data.status === "active" ? SPARK_ACTIVE_STYLE : { background: "var(--panel-muted)", color: "var(--text-soft)" }}>
             {t(`plan.status.${data.status}`)}
           </span>
         ) : null}

@@ -35,6 +35,7 @@ import {
   rulesFromProgram,
   type ProgramRules,
 } from "@/components/admin/finance/referrals/program-rules";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -738,7 +739,7 @@ function StatusBadge({ active }: { active: boolean }) {
   return (
     <span
       className="rounded-full px-3 py-1 text-xs font-semibold"
-      style={active ? { background: "color-mix(in srgb, var(--success) 12%, transparent)", color: "var(--success)" } : { background: "var(--border)", color: "var(--dim)" }}
+      style={active ? SPARK_ACTIVE_STYLE : { background: "var(--border)", color: "var(--dim)" }}
     >
       {active ? i18n("activea733b80") : i18n("inactive09af574")}
     </span>

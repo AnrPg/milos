@@ -15,6 +15,7 @@ import { createPromotionCampaign, fetchPromotionCampaigns, type FinanceRecord } 
 import { useSession } from "@/components/session-provider";
 import { CampaignPanel } from "@/components/admin/finance/panels/CampaignPanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
+import { SPARK_ACTIVE_STYLE, SPARK_CREATE_STYLE } from "@/lib/spark";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -80,7 +81,7 @@ export function PromotionsTab() {
         </p>
         <button
           className="rounded-full px-4 py-2 text-sm font-semibold"
-          style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+          style={SPARK_CREATE_STYLE}
           onClick={() => setParam("new", "true")}
           type="button"
         >
@@ -212,7 +213,7 @@ function CampaignRows({ campaigns, onOpen }: { campaigns: FinanceRecord[]; onOpe
         </p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: "var(--border)", color: campaign.active === false ? "var(--dim)" : "var(--success)" }}>
+        <span className="rounded-full px-3 py-1 text-xs font-semibold" style={campaign.active === false ? { background: "var(--border)", color: "var(--dim)" } : SPARK_ACTIVE_STYLE}>
           {campaign.active === false ? i18n("inactive09af574") : i18n("activea733b80")}
         </span>
         <span style={{ color: "var(--dim)" }}>→</span>

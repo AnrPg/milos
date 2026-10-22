@@ -199,7 +199,7 @@ function VideoRow({ video, onEdit }: { video: ContentVideo; onEdit: () => void }
         </div>
         <div className="flex flex-wrap items-center gap-2">
           {state === "published" ? (
-            <Pill tone="success">{i18n("stfVideoPublished")}</Pill>
+            <Pill tone="spark">{i18n("stfVideoPublished")}</Pill>
           ) : state === "archived" ? (
             <Pill tone="neutral">{i18n("stfVideoArchived")}</Pill>
           ) : (

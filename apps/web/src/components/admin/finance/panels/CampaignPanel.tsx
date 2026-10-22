@@ -17,6 +17,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { SemanticLabel } from "@/components/semantic-label";
+import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -110,7 +111,7 @@ export function CampaignPanel({
           </p>
           <button
             className="rounded-full px-3 py-1 text-xs font-semibold"
-            style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+            style={SPARK_CREATE_STYLE}
             onClick={() => setShowCodeForm((v) => !v)}
             type="button"
           >

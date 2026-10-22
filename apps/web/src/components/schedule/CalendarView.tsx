@@ -12,6 +12,7 @@ import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, type Sched
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 import { semanticLabel } from "@/i18n/presentation";
 import { isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
+import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
 type CalendarViewProps = {
   days: ScheduleDays;
@@ -187,7 +188,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                 {isAdmin ? (
                     <button
                       className="rounded-full px-3 py-1 text-xs font-semibold transition-colors"
-                      style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+                      style={SPARK_CREATE_STYLE}
                       onClick={() => onCreateSlot(date)}
                       type="button"
                     >
