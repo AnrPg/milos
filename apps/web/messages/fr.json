@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "ex. 5 tours : 10 tractions, 15 pompes",
     "workoutEditorTabsLabel": "Réglages de la séance",
     "sectionScoredByLabel": "Cette partie est notée par :",
-    "sectionScoredByPlaceholder": "ex. tours, répétitions, temps",
-    "addScoreMetric": "Ajouter une mesure",
-    "addScoreMetricNamed": "+ Ajouter « {label} »",
-    "removeScoreMetric": "Retirer {label}",
+    "sectionScoredByPlaceholder": "Choisir ou écrire : tours, répétitions, temps…",
+    "addScoreMetric": "Ajouter une autre mesure",
     "scoreMetricKindLabel": "Ce que compte « {label} »",
     "scoreKind_rounds": "Tours",
     "scoreKind_reps": "Répétitions",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Suggestions de l’assistant pour ces mots",
     "zonedTimeYours": "{time} chez vous",
     "zonedTimeYoursTitle": "Sur votre horloge ({zone})",
-    "zonedTimeGymClock": "Les heures suivent l'horloge de la salle ({zone})."
+    "zonedTimeGymClock": "Les heures suivent l'horloge de la salle ({zone}).",
+    "scoreFieldLabel": "Mesure {number}",
+    "removeScoreField": "Retirer la mesure {number}"
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",

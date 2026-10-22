@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "p. ej. 5 rondas: 10 dominadas, 15 flexiones",
     "workoutEditorTabsLabel": "Ajustes del entrenamiento",
     "sectionScoredByLabel": "Esta sección se puntúa por:",
-    "sectionScoredByPlaceholder": "p. ej. rondas, repeticiones, tiempo",
-    "addScoreMetric": "Añadir puntuación",
-    "addScoreMetricNamed": "+ Añadir «{label}»",
-    "removeScoreMetric": "Quitar {label}",
+    "sectionScoredByPlaceholder": "Elige o escribe: rondas, repeticiones, tiempo…",
+    "addScoreMetric": "Añadir otra puntuación",
     "scoreMetricKindLabel": "Qué cuenta «{label}»",
     "scoreKind_rounds": "Rondas",
     "scoreKind_reps": "Repeticiones",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Sugerencias del asistente para estas palabras",
     "zonedTimeYours": "{time} tu hora",
     "zonedTimeYoursTitle": "En tu reloj ({zone})",
-    "zonedTimeGymClock": "Las horas están en el reloj del gimnasio ({zone})."
+    "zonedTimeGymClock": "Las horas están en el reloj del gimnasio ({zone}).",
+    "scoreFieldLabel": "Puntuación {number}",
+    "removeScoreField": "Quitar puntuación {number}"
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",

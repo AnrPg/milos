@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "напр. 5 рунда: 10 набирания, 15 лицеви опори",
     "workoutEditorTabsLabel": "Настройки на тренировката",
     "sectionScoredByLabel": "Тази част се оценява по:",
-    "sectionScoredByPlaceholder": "напр. кръгове, повторения, време",
-    "addScoreMetric": "Добави показател",
-    "addScoreMetricNamed": "+ Добави „{label}“",
-    "removeScoreMetric": "Премахни {label}",
+    "sectionScoredByPlaceholder": "Избери или напиши: кръгове, повторения, време…",
+    "addScoreMetric": "Добави още показател",
     "scoreMetricKindLabel": "Какво отчита „{label}“",
     "scoreKind_rounds": "Кръгове",
     "scoreKind_reps": "Повторения",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Предложения на асистента за тези думи",
     "zonedTimeYours": "{time} твое време",
     "zonedTimeYoursTitle": "По твоя часовник ({zone})",
-    "zonedTimeGymClock": "Часовете са по часовника на залата ({zone})."
+    "zonedTimeGymClock": "Часовете са по часовника на залата ({zone}).",
+    "scoreFieldLabel": "Показател {number}",
+    "removeScoreField": "Премахни показател {number}"
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",

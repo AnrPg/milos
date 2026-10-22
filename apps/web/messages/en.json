@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "e.g. 5 rounds: 10 pull-ups, 15 push-ups",
     "workoutEditorTabsLabel": "Workout settings",
     "sectionScoredByLabel": "This section is scored by:",
-    "sectionScoredByPlaceholder": "e.g. rounds, reps, time",
-    "addScoreMetric": "Add score",
-    "addScoreMetricNamed": "+ Add “{label}”",
-    "removeScoreMetric": "Remove {label}",
+    "sectionScoredByPlaceholder": "Choose or type: rounds, reps, time…",
+    "addScoreMetric": "Add another score",
     "scoreMetricKindLabel": "What “{label}” counts",
     "scoreKind_rounds": "Rounds",
     "scoreKind_reps": "Reps",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Assistant suggestions for these words",
     "zonedTimeYours": "{time} your time",
     "zonedTimeYoursTitle": "On your clock ({zone})",
-    "zonedTimeGymClock": "Times are on the gym's clock ({zone})."
+    "zonedTimeGymClock": "Times are on the gym's clock ({zone}).",
+    "scoreFieldLabel": "Score {number}",
+    "removeScoreField": "Remove score {number}"
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",

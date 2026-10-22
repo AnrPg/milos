@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "π.χ. 5 γύροι: 10 pull-ups, 15 push-ups",
     "workoutEditorTabsLabel": "Ρυθμίσεις προπόνησης",
     "sectionScoredByLabel": "Αυτή η ενότητα βαθμολογείται με:",
-    "sectionScoredByPlaceholder": "π.χ. γύροι, επαναλήψεις, χρόνος",
+    "sectionScoredByPlaceholder": "Διάλεξε ή γράψε: γύροι, επαναλήψεις, χρόνος…",
     "addScoreMetric": "Προσθήκη μέτρησης",
-    "addScoreMetricNamed": "+ Προσθήκη «{label}»",
-    "removeScoreMetric": "Αφαίρεση {label}",
     "scoreMetricKindLabel": "Τι μετράει το «{label}»",
     "scoreKind_rounds": "Γύροι",
     "scoreKind_reps": "Επαναλήψεις",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Προτάσεις του βοηθού για αυτές τις λέξεις",
     "zonedTimeYours": "{time} η ώρα σου",
     "zonedTimeYoursTitle": "Στο ρολόι σου ({zone})",
-    "zonedTimeGymClock": "Οι ώρες είναι στο ρολόι του γυμναστηρίου ({zone})."
+    "zonedTimeGymClock": "Οι ώρες είναι στο ρολόι του γυμναστηρίου ({zone}).",
+    "scoreFieldLabel": "Μέτρηση {number}",
+    "removeScoreField": "Αφαίρεση μέτρησης {number}"
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
