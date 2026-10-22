@@ -262,7 +262,7 @@ export function sectionGroupFor(
 }
 
 /**
- * ADR-177: the screens a role most likely opens next, preloaded once the app
+ * ADR-178: the screens a role most likely opens next, preloaded once the app
  * is idle so a tap renders without a server round trip. Bar links first, then
  * the sub-pages each role opens most; never fewer than six where the role has
  * that many pages.

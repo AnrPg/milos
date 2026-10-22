@@ -1,4 +1,4 @@
-# ADR-177: Fewer round trips per navigation
+# ADR-178: Fewer round trips per navigation
 Date: 2026-10-22
 Status: Accepted
 

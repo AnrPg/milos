@@ -230,7 +230,7 @@ defmodule PaleeWeb.AuthControllerTest do
       refute Map.has_key?(json_response(conn, 200), "refresh_token")
       assert conn.resp_cookies["milos_refresh"].http_only
 
-      # ADR-177: the user comes with the tokens, so no /auth/me round trip.
+      # ADR-178: the user comes with the tokens, so no /auth/me round trip.
       assert %{"nickname" => "hermes", "role" => "member", "vendor" => false} =
                json_response(conn, 200)["user"]
     end

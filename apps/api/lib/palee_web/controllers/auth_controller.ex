@@ -18,7 +18,7 @@ defmodule PaleeWeb.AuthController do
 
   action_fallback PaleeWeb.FallbackController
 
-  # ADR-177: returned by /auth/me, and with the tokens from login and refresh
+  # ADR-178: returned by /auth/me, and with the tokens from login and refresh
   # so opening the app needs no separate /auth/me round trip.
   @current_user_schema %Schema{
     type: :object,

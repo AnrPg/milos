@@ -6,7 +6,7 @@ import { use } from "react";
 
 import type { AppLocale } from "@/i18n/locales";
 
-// ADR-177: the client reads the catalogue from its own content-hashed chunk
+// ADR-178: the client reads the catalogue from its own content-hashed chunk
 // (one per locale, cached by the browser for good) instead of receiving it
 // inline in every page's HTML, where it was 450-700 KB on each full load.
 const catalogues = new Map<AppLocale, Promise<AbstractIntlMessages>>();
