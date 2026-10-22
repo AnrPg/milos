@@ -259,7 +259,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
 
         {!ready ? (
           <div
-            className="pointer-events-none absolute end-0 top-full z-50 mt-2 rounded-xl p-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"
+            className="pointer-events-none absolute end-0 top-full z-(--z-popover) mt-2 rounded-xl p-3 text-xs opacity-0 transition-opacity group-hover:opacity-100"
             style={{ background: "var(--card)", border: "1px solid var(--dim)", color: "var(--muted)" }}
           >
             {publishMessages.map((message) => (

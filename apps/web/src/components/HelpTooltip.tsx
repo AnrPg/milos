@@ -28,7 +28,7 @@ export function HelpTooltip({ label, children }: { label: string; children: Reac
       <span
         id={id}
         role="tooltip"
-        className={`${open ? "visible opacity-100" : "invisible opacity-0 group-hover:visible group-hover:opacity-100"} pointer-events-none absolute start-1/2 top-full z-[110] mt-2 w-64 -translate-x-1/2 rounded-xl px-3 py-2 text-start text-xs font-normal normal-case leading-5 tracking-normal shadow-xl transition-opacity`}
+        className={`${open ? "visible opacity-100" : "invisible opacity-0 group-hover:visible group-hover:opacity-100"} pointer-events-none absolute start-1/2 top-full z-(--z-popover) mt-2 w-64 -translate-x-1/2 rounded-xl px-3 py-2 text-start text-xs font-normal normal-case leading-5 tracking-normal shadow-xl transition-opacity`}
         style={{
           background: "var(--panel-raised)",
           border: "1px solid var(--border-strong)",
@@ -68,7 +68,7 @@ export function HoverHint({
       {children}
       <span
         role="tooltip"
-        className={`pointer-events-none invisible absolute top-full z-[110] mt-2 w-max max-w-56 rounded-lg px-2.5 py-1.5 text-start text-xs font-medium normal-case leading-5 tracking-normal opacity-0 shadow-xl transition-opacity delay-150 ${suppressed ? "" : "group-hover/hint:visible group-hover/hint:opacity-100 group-has-[:focus-visible]/hint:visible group-has-[:focus-visible]/hint:opacity-100"} ${position}`}
+        className={`pointer-events-none invisible absolute top-full z-(--z-popover) mt-2 w-max max-w-56 rounded-lg px-2.5 py-1.5 text-start text-xs font-medium normal-case leading-5 tracking-normal opacity-0 shadow-xl transition-opacity delay-150 ${suppressed ? "" : "group-hover/hint:visible group-hover/hint:opacity-100 group-has-[:focus-visible]/hint:visible group-has-[:focus-visible]/hint:opacity-100"} ${position}`}
         style={{
           ...(align === "center" ? CENTERED_HINT_STYLE : null),
           background: "var(--panel-raised)",

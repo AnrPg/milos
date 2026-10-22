@@ -32,7 +32,7 @@ import { CommentList } from "@/components/journal/CommentList";
 import { useSession } from "@/components/session-provider";
 import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { removeComment, sortComments } from "@/lib/journal-comments";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 import { PRShareFlow } from "@/components/pantheon/PRShareFlow";
 
 function todayIso() {
@@ -166,7 +166,6 @@ export function PRFormModal({
   const queryClient = useQueryClient();
   const isExisting = Boolean(pr);
   const titleId = useId();
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
   const [name, setName] = useState(pr?.name ?? "");
   const [score, setScore] = useState(pr ? String(pr.current_score) : "");
@@ -247,25 +246,53 @@ export function PRFormModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-start justify-center overflow-y-auto overscroll-contain p-2 sm:p-4"
-      style={{ background: "var(--scrim)" }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    <Dialog
+      onClose={onClose}
+      title={isExisting ? i18n("exportPersonalRecord") : i18n("newPr1c0d9f2")}
+      titleId={titleId}
+      size="md"
+      dismissible={!mutation.isPending}
+      onSubmit={handleSubmit}
+      footer={
+          <div className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3">
+            <button
+              type="submit"
+              disabled={mutation.isPending}
+              className="rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            >
+              {mutation.isPending && mutation.variables !== "edit"
+                ? i18n("saving56a2285")
+                : isExisting
+                  ? i18n("recordBetterPr")
+                  : i18n("addPr24c8c6f")}
+            </button>
+            {isExisting && (
+              <button
+                type="button"
+                onClick={() => save("edit")}
+                disabled={mutation.isPending}
+                className="rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50"
+                style={{ background: "var(--border)", color: "var(--text)" }}
+              >
+                {mutation.isPending && mutation.variables === "edit"
+                  ? i18n("saving56a2285")
+                  : i18n("applyPrEdits")}
+              </button>
+            )}
+            <button
+              type="button"
+              onClick={onClose}
+              disabled={mutation.isPending}
+              className="col-span-2 rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50 sm:col-span-1"
+              style={{ background: "var(--border)", color: "var(--text-soft)" }}
+            >
+              {i18n("cancel77dfd21")}
+            </button>
+          </div>
+      }
     >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="my-auto max-h-[calc(100dvh-1rem)] w-full max-w-md overflow-y-auto overscroll-contain rounded-[2rem] p-4 outline-none sm:max-h-[calc(100dvh-2rem)] sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <h2 id={titleId} className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-          {isExisting ? i18n("exportPersonalRecord") : i18n("newPr1c0d9f2")}
-        </h2>
-
-        <form className="mt-5 space-y-4" onSubmit={handleSubmit}>
+        <div className="space-y-4">
           <div className="space-y-1.5">
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
               {i18n("exerciseName9a5c1af")}
@@ -441,48 +468,7 @@ export function PRFormModal({
           {error && (
             <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>{error}</p>
           )}
-
-          <div
-            className="sticky bottom-0 grid grid-cols-2 gap-2 rounded-xl pt-2 sm:grid-cols-3"
-            style={{ background: "var(--panel)" }}
-          >
-            <button
-              type="submit"
-              disabled={mutation.isPending}
-              className="rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            >
-              {mutation.isPending && mutation.variables !== "edit"
-                ? i18n("saving56a2285")
-                : isExisting
-                  ? i18n("recordBetterPr")
-                  : i18n("addPr24c8c6f")}
-            </button>
-            {isExisting && (
-              <button
-                type="button"
-                onClick={() => save("edit")}
-                disabled={mutation.isPending}
-                className="rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50"
-                style={{ background: "var(--border)", color: "var(--text)" }}
-              >
-                {mutation.isPending && mutation.variables === "edit"
-                  ? i18n("saving56a2285")
-                  : i18n("applyPrEdits")}
-              </button>
-            )}
-            <button
-              type="button"
-              onClick={onClose}
-              disabled={mutation.isPending}
-              className="col-span-2 rounded-xl px-3 py-2.5 text-sm font-semibold disabled:opacity-50 sm:col-span-1"
-              style={{ background: "var(--border)", color: "var(--text-soft)" }}
-            >
-              {i18n("cancel77dfd21")}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
+        </div>
+    </Dialog>
   );
 }

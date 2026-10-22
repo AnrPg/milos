@@ -148,7 +148,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
             ref={tabsRef}
             role="tablist"
             aria-label={t("tabsAria")}
-            className="sticky top-0 z-30 mt-4 flex gap-1 overflow-x-auto px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] lg:mt-0 lg:px-0"
+            className="sticky top-0 z-(--z-sticky) mt-4 flex gap-1 overflow-x-auto px-4 pb-2 pt-[max(0.5rem,env(safe-area-inset-top))] lg:mt-0 lg:px-0"
             style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}
           >
             {TABS.map((value) => (
@@ -229,7 +229,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
       {/* Phones: the actions stay in reach above the member tab bar (board 4 Q9). */}
       <div aria-hidden="true" className="h-24 lg:hidden" />
       <div
-        className="fixed inset-x-0 z-40 px-4 pt-3 lg:hidden"
+        className="fixed inset-x-0 z-(--z-sticky) px-4 pt-3 lg:hidden"
         style={{
           bottom: tabBar ? BOTTOM_TAB_BAR_HEIGHT : 0,
           paddingBottom: tabBar ? "0.75rem" : "max(0.75rem, env(safe-area-inset-bottom))",

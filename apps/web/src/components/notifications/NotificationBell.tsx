@@ -36,6 +36,7 @@ import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { Dialog } from "@/components/ui/Dialog";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return new Intl.DateTimeFormat(uiLocale, {
@@ -992,17 +993,15 @@ export function NotificationBell({
       </button>
 
       {open ? (
-        <div
-          className="fixed inset-0 z-30"
-          style={{ background: "var(--scrim)" }}
-          onClick={() => setOpen(false)}
-          role="presentation"
+        <Dialog
+          onClose={() => setOpen(false)}
+          bare
+          variant="drawer"
+          size="md"
+          ariaLabel={i18n("notifications753a22b")}
+          panelClassName="overflow-y-auto p-6"
+          panelStyle={{ paddingTop: "max(1.5rem, env(safe-area-inset-top))" }}
         >
-          <aside
-            className="absolute end-0 top-0 h-full w-full max-w-md overflow-y-auto p-6 shadow-[var(--shadow-lg)] rtl:shadow-[var(--shadow-lg)]"
-            style={{ background: "var(--panel)", borderInlineStart: "1px solid var(--border)" }}
-            onClick={(e) => e.stopPropagation()}
-          >
             <div className="flex items-start justify-between gap-4">
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{i18n("notifications753a22b")}</p>
@@ -1188,8 +1187,7 @@ export function NotificationBell({
                 </button>
               ) : null}
             </div>
-          </aside>
-        </div>
+        </Dialog>
       ) : null}
     </>
   );

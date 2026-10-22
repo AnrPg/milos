@@ -53,6 +53,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { LocalizedScore } from "@/components/localized-score";
 import { PageHeader } from "@/components/PageHeader";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
+import { Popover } from "@/components/ui/Popover";
 
 type ViewMode = "3day" | "week" | "month";
 
@@ -61,7 +62,7 @@ function ScoreTooltip({ scores }: { scores: SectionScore[] }) {
   if (scores.length === 0) return null;
   return (
     <div
-      className="pointer-events-none absolute bottom-full start-1/2 z-50 mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[var(--shadow-md)]"
+      className="pointer-events-none absolute bottom-full start-1/2 z-(--z-popover) mb-2 -translate-x-1/2 rounded-[1rem] px-3 py-2 shadow-[var(--shadow-md)]"
       style={{
         background: "var(--panel)",
         border: "1px solid var(--border-strong)",
@@ -259,7 +260,7 @@ function DraggableMonthChip({
         {isDone ? " ✓" : ""}
       </div>
       {isDone && hasScores ? (
-        <div className="invisible absolute bottom-full start-1/2 z-50 mb-1 -translate-x-1/2 group-hover:visible">
+        <div className="invisible absolute bottom-full start-1/2 z-(--z-popover) mb-1 -translate-x-1/2 group-hover:visible">
           <ScoreTooltip scores={assignment.execution_scores!} />
         </div>
       ) : null}
@@ -389,6 +390,7 @@ export function AssignedWorkoutsConsole({
   const [filterQuery, setFilterQuery] = useState("");
   const [filterAthletes, setFilterAthletes] = useState<AthleteOption[]>([]);
   const [filterDropdownOpen, setFilterDropdownOpen] = useState(false);
+  const filterInputRef = useRef<HTMLInputElement>(null);
   const [showQuickAssign, setShowQuickAssign] = useState(false);
   const [requestingDate, setRequestingDate] = useState<string | null>(null);
   const [requestDate, setRequestDate] = useState("");
@@ -951,7 +953,7 @@ export function AssignedWorkoutsConsole({
                       style={{ background: "var(--panel-muted)", border: `1px solid ${isWeekDone ? "color-mix(in srgb, var(--success) 25%, var(--border))" : "var(--border)"}`, borderRadius: "0.8rem", position: "relative" }}
                     >
                       {isWeekDone && (a.execution_scores?.length ?? 0) > 0 ? (
-                        <div className="invisible absolute bottom-full start-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
+                        <div className="invisible absolute bottom-full start-1/2 z-(--z-popover) mb-1.5 -translate-x-1/2 group-hover:visible">
                           <ScoreTooltip scores={a.execution_scores!} />
                         </div>
                       ) : null}
@@ -1145,7 +1147,7 @@ export function AssignedWorkoutsConsole({
                             {i18n("donea821d15")}
                           </span>
                           {(assignment.execution_scores?.length ?? 0) > 0 ? (
-                            <div className="invisible absolute bottom-full start-1/2 z-50 mb-1.5 -translate-x-1/2 group-hover:visible">
+                            <div className="invisible absolute bottom-full start-1/2 z-(--z-popover) mb-1.5 -translate-x-1/2 group-hover:visible">
                               <ScoreTooltip scores={assignment.execution_scores!} />
                             </div>
                           ) : null}
@@ -1430,6 +1432,7 @@ export function AssignedWorkoutsConsole({
             <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
               <div className="relative">
                 <input
+                  ref={filterInputRef}
                   className="rounded-full px-4 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)", minWidth: "14rem" }}
                   placeholder={i18n("filterByAthletea7eb7e6")}
@@ -1441,11 +1444,15 @@ export function AssignedWorkoutsConsole({
                     setFilterDropdownOpen(true);
                   }}
                 />
-                {filterDropdownOpen && filterAthletes.length > 0 ? (
-                  <div
-                    className="absolute start-0 top-full z-30 mt-1 w-64 rounded-[1rem] py-1 shadow-xl"
-                    style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-                  >
+                <Popover
+                  anchorRef={filterInputRef}
+                  open={filterDropdownOpen && filterAthletes.length > 0}
+                  onClose={() => setFilterDropdownOpen(false)}
+                  restoreFocus={false}
+                  width={256}
+                  className="rounded-[1rem] py-1 shadow-xl"
+                  style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+                >
                     {filterAthletes.map((athlete) => {
                       const selected = filterAthleteIds.includes(athlete.id);
                       return (
@@ -1474,8 +1481,7 @@ export function AssignedWorkoutsConsole({
                         </button>
                       );
                     })}
-                  </div>
-                ) : null}
+                </Popover>
               </div>
 
               {filterAthleteIds.length > 0 ? (

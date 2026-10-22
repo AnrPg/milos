@@ -26,6 +26,7 @@ import { MyInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -143,17 +144,16 @@ export function AssignedWorkoutPanel({
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40"
-        style={{ background: "var(--scrim)" }}
-        onClick={onClose}
-      />
-
       {/* Panel */}
-      <div
-        className="fixed end-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
-        style={{ background: "var(--bg)", borderInlineStart: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
+      <Dialog
+        onClose={onClose}
+        bare
+        variant="drawer"
+        layer="drawer"
+        size="full"
+        ariaLabel={assignment.workout.title}
+        panelClassName="md:max-w-[480px]"
+        panelStyle={{ background: "var(--bg)" }}
       >
         {/* Sticky header */}
         <div
@@ -500,7 +500,7 @@ export function AssignedWorkoutPanel({
           )}
           </div>
         ) : null}
-      </div>
+      </Dialog>
     </>
   );
 }

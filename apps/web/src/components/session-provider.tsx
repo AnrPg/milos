@@ -38,7 +38,7 @@ import { endLoginSession, startLoginSession } from "@/lib/login-session";
 import { resetRealtimeSocket } from "@/lib/realtime";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { isAppLocale, persistLocaleCookie } from "@/i18n/locales";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 type SessionStatus = "loading" | "guest" | "authenticated";
 
@@ -296,48 +296,18 @@ function SessionExpiredDialog({
   requiredLabel: string;
   openLoginLabel: string;
 }) {
-  
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onDismiss);
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.currentTarget === event.target) onDismiss();
-      }}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="session-expired-title"
-        tabIndex={-1}
-        className="w-full max-w-lg rounded-[28px] border p-6 shadow-[var(--shadow-md)]"
-        style={{ background: "var(--panel)", borderColor: "var(--border-strong)", color: "var(--text)" }}
-      >
-            <div className="text-xs font-black uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>
-              {requiredLabel}
-            </div>
-            <h2 id="session-expired-title" className="mt-2 text-2xl font-bold">{state.title}</h2>
-            <p className="mt-3 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-              {state.message}
-            </p>
-
-            <div
-              className="mt-4 rounded-2xl border px-4 py-3 text-sm"
-              style={{ background: "var(--panel-muted)", borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
-            >
-              {state.instructions.map((instruction) => (
-                <div key={instruction} className="flex gap-2">
-                  <span style={{ color: "var(--warning)" }}>•</span>
-                  <span>{instruction}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+    <Dialog
+      onClose={onDismiss}
+      layer="toast"
+      eyebrow={requiredLabel}
+      title={state.title}
+      titleId="session-expired-title"
+      closeLabel={dismissLabel}
+      size="lg"
+      footer={
+        <div className="w-full flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
                 onClick={() => window.open("/login", "_blank", "noopener,noreferrer")}
@@ -355,8 +325,24 @@ function SessionExpiredDialog({
                 {dismissLabel}
               </button>
             </div>
-      </div>
-    </div>
+      }
+    >
+            <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>
+              {state.message}
+            </p>
+
+            <div
+              className="mt-4 rounded-2xl border px-4 py-3 text-sm"
+              style={{ background: "var(--panel-muted)", borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
+            >
+              {state.instructions.map((instruction) => (
+                <div key={instruction} className="flex gap-2">
+                  <span style={{ color: "var(--warning)" }}>•</span>
+                  <span>{instruction}</span>
+                </div>
+              ))}
+            </div>
+    </Dialog>
   );
 }
 

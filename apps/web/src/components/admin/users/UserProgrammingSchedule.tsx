@@ -26,6 +26,7 @@ import {
   programmingSuccessKey,
 } from "@/lib/member-programming";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   token: string;
@@ -251,15 +252,7 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
       {message ? <p className="text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
       {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
 
-      {assignmentModalOpen ? <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={() => setAssignmentModalOpen(false)} role="presentation">
-      <div className="w-full max-w-3xl rounded-2xl p-4 shadow-[var(--shadow-lg)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} onClick={(event) => event.stopPropagation()}>
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--primary)" }}>{i18n("featureScheduleProgramming")}</p>
-            <h3 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{selectedDate}</h3>
-          </div>
-          <button type="button" className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }} onClick={() => setAssignmentModalOpen(false)}>{i18n("closebbfa773")}</button>
-        </div>
+      {assignmentModalOpen ? <Dialog onClose={() => setAssignmentModalOpen(false)} eyebrow={i18n("featureScheduleProgramming")} title={selectedDate} size="3xl" variant="center">
       {isMember ? <fieldset className="mb-4 rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
         <legend className="px-1 text-xs font-semibold">{i18n("memberProgrammingModeLegend")}</legend>
         <div className="grid gap-2 md:grid-cols-3">
@@ -309,10 +302,9 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
         {message ? <p className="mt-3 text-sm" style={{ color: "var(--success)" }}>{message}</p> : null}
         {error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
       </div>
-      </div>
-      </div> : null}
+      </Dialog> : null}
 
-      {creating ? <div className="fixed inset-0 z-[80] flex items-center justify-center p-3" style={{ background: "var(--scrim)" }}><div className="w-full max-w-[96rem] overflow-hidden rounded-3xl"><WorkoutCreationCanvas embedded initialDraftId={editingDraftId} onCancel={() => { setCreating(false); setEditingDraftId(null); }} onPublished={(workout) => { setCreating(false); setEditingDraftId(null); void program(workout.id, false); }} /></div></div> : null}
+      {creating ? <Dialog bare dismissible={false} onClose={() => { setCreating(false); setEditingDraftId(null); }} ariaLabel={i18n("featureCreateNewWod")} size="full" variant="center"><WorkoutCreationCanvas embedded initialDraftId={editingDraftId} onCancel={() => { setCreating(false); setEditingDraftId(null); }} onPublished={(workout) => { setCreating(false); setEditingDraftId(null); void program(workout.id, false); }} /></Dialog> : null}
     </div>
   );
 }

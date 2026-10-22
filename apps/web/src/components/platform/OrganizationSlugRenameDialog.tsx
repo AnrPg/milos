@@ -11,6 +11,7 @@ import {
   type PlatformOrganization,
 } from "@/api/platform-organizations";
 import { formatSlugCopy, platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug";
+import { Dialog } from "@/components/ui/Dialog";
 
 const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
@@ -95,19 +96,21 @@ export function OrganizationSlugRenameDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
-      <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-[var(--text)]">{copy.title}</h2>
-            <p className="mt-1 text-sm text-[var(--text-soft)]">{organization.organization.name}</p>
-          </div>
+    <Dialog
+      onClose={onClose}
+      title={copy.title}
+      ariaLabel={copy.title}
+      description={organization.organization.name}
+      size="2xl"
+      variant="center"
+      showClose={false}
+      headerActions={
           <button type="button" onClick={onClose} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
             {copy.close}
           </button>
-        </div>
-
-        <p className="mt-4 text-sm leading-6 text-[var(--text-soft)]">{formatSlugCopy(copy.intro, { slug: currentSlug })}</p>
+        }
+    >
+        <p className="text-sm leading-6 text-[var(--text-soft)]">{formatSlugCopy(copy.intro, { slug: currentSlug })}</p>
 
         {result ? (
           <p className="mt-5 border-l-4 border-[var(--accent)] bg-[var(--panel-muted)] px-4 py-3 text-sm font-semibold text-[var(--text)]" role="status">
@@ -193,7 +196,6 @@ export function OrganizationSlugRenameDialog({
             </section>
           </form>
         ) : null}
-      </div>
-    </div>
+    </Dialog>
   );
 }

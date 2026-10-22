@@ -5,8 +5,8 @@ import { useId, useRef, useState } from "react";
 import { createDirectThread, searchUsers, sendMessage } from "@/api/messaging";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useUiTranslations } from "@/i18n/ui";
+import { Dialog } from "@/components/ui/Dialog";
 
 type UserResult = { id: string; nickname: string; role: string };
 
@@ -30,7 +30,6 @@ export function InAppShareDialog({
   const [error, setError] = useState<string | null>(null);
   const searchTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const titleId = useId();
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
   function handleQueryChange(value: string) {
     setQuery(value);
@@ -69,40 +68,17 @@ export function InAppShareDialog({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-end justify-center p-3 sm:items-center sm:p-6"
-      onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
-      role="presentation"
-      style={{ background: "var(--scrim)", backdropFilter: "blur(8px)" }}
+    <Dialog
+      onClose={onClose}
+      eyebrow={i18n("shareInPalee")}
+      title={<span className="block truncate">{title}</span>}
+      titleId={titleId}
+      closeLabel={i18n("closebbfa773")}
+      size="lg"
     >
-      <div
-        ref={dialogRef}
-        aria-labelledby={titleId}
-        aria-modal="true"
-        className="max-h-[88vh] w-full max-w-lg overflow-y-auto rounded-[1.5rem] p-5 outline-none sm:p-6"
-        role="dialog"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        tabIndex={-1}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }}>
-              {i18n("shareInPalee")}
-            </p>
-            <h2 id={titleId} className="mt-1 truncate text-xl font-bold" style={{ color: "var(--text)" }}>{title}</h2>
-          </div>
-          <button
-            aria-label={i18n("closebbfa773")}
-            className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-            onClick={onClose}
-            style={{ background: "var(--border)", color: "var(--muted)" }}
-            type="button"
-          >
-            {i18n("closebbfa773")}
-          </button>
-        </div>
+        
 
-        <p className="mt-4 whitespace-pre-wrap text-sm leading-6" style={{ color: "var(--muted)" }}>{message}</p>
+        <p className="whitespace-pre-wrap text-sm leading-6" style={{ color: "var(--muted)" }}>{message}</p>
 
         {sent ? (
           <p className="mt-5 rounded-xl px-4 py-3 text-center text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--success) 12%, transparent)", color: "var(--success)" }}>
@@ -174,7 +150,6 @@ export function InAppShareDialog({
             </button>
           </div>
         )}
-      </div>
-    </div>
+    </Dialog>
   );
 }

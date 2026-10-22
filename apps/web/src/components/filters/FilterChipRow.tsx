@@ -1,7 +1,9 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+
+import { Popover } from "@/components/ui/Popover";
 
 // The list-screen filter pattern (vision §7.2, plan §5a): one horizontally
 // scrolling chip row whose first chip is «Φίλτρα (n)» with a ✕ that clears
@@ -146,43 +148,9 @@ function ChipMenu({
   onClose: () => void;
 }) {
   const menu = useRef<HTMLDivElement>(null);
-  const [position, setPosition] = useState<{ top: number; left: number } | null>(null);
-
-  // The row scrolls sideways, so the menu is placed against the viewport.
-  useLayoutEffect(() => {
-    if (!anchor) return;
-    const place = () => {
-      const rect = anchor.getBoundingClientRect();
-      const width = menu.current?.offsetWidth ?? 220;
-      setPosition({ top: rect.bottom + 6, left: Math.max(8, Math.min(rect.left, window.innerWidth - width - 8)) });
-    };
-    place();
-    window.addEventListener("resize", place);
-    window.addEventListener("scroll", place, true);
-    return () => {
-      window.removeEventListener("resize", place);
-      window.removeEventListener("scroll", place, true);
-    };
-  }, [anchor]);
-
-  useEffect(() => {
-    const onPointer = (event: PointerEvent) => {
-      const target = event.target as Node;
-      if (!menu.current?.contains(target) && !anchor?.contains(target)) onClose();
-    };
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        anchor?.focus();
-      }
-    };
-    document.addEventListener("pointerdown", onPointer);
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("pointerdown", onPointer);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [anchor, onClose]);
+  // The row scrolls sideways, so the menu floats on the popover layer,
+  // placed against the viewport next to its chip.
+  const anchorRef = useMemo(() => ({ current: anchor }), [anchor]);
 
   useEffect(() => {
     menu.current?.querySelector<HTMLElement>("[role^=menuitem]")?.focus();
@@ -200,18 +168,17 @@ function ChipMenu({
   }
 
   return (
-    <div
-      ref={menu}
+    <Popover
+      anchorRef={anchorRef}
+      open
+      onClose={onClose}
       role="menu"
-      aria-label={chip.label}
-      className="fixed z-[60] grid max-h-80 min-w-48 max-w-72 gap-0.5 overflow-y-auto rounded-2xl p-1.5 shadow-2xl"
-      style={{
-        top: position?.top ?? -9999,
-        left: position?.left ?? -9999,
-        background: "var(--panel-raised)",
-        border: "1px solid var(--border)",
-      }}
+      ariaLabel={chip.label}
+      minWidth={192}
+      className="max-w-72 rounded-2xl shadow-2xl"
+      style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", maxHeight: "20rem" }}
     >
+      <div ref={menu} className="grid gap-0.5 p-1.5">
       {chip.options.map((option) => {
         const checked = chip.selected.includes(option.value);
         return (
@@ -225,7 +192,8 @@ function ChipMenu({
           </MenuItem>
         );
       })}
-    </div>
+      </div>
+    </Popover>
   );
 }
 

@@ -8,7 +8,6 @@ import {useUiTranslations} from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 
 import {
   createDirectThread,
@@ -31,6 +30,7 @@ import { TypingIndicator } from "./TypingIndicator";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PartnerThreads } from "@/components/partners/PartnerThreads";
 import { BoxConversationsList } from "@/components/trials/BoxConversationsList";
+import { Dialog } from "@/components/ui/Dialog";
 
 interface SearchResult {
   id: string;
@@ -176,24 +176,15 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
 
   const visibleThreads = threads.filter((t) => !isThreadHidden(currentUserId ?? "", t.id));
 
-  // Portalled to the body: inside the header's stacking context the member
-  // tab bar would cover the composer.
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[70]"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-      role="presentation"
+  return (
+    <Dialog
+      onClose={onClose}
+      bare
+      variant="drawer"
+      size="md"
+      ariaLabel={i18n("chat2ced57f")}
+      panelStyle={{ background: "var(--panel-muted)", borderColor: "var(--border-strong)" }}
     >
-      <aside
-        aria-label={i18n("chat2ced57f")}
-        className="absolute end-0 top-0 flex h-full w-full max-w-md flex-col overflow-hidden shadow-[var(--shadow-lg)] rtl:shadow-[var(--shadow-lg)]"
-        style={{
-          background: "var(--panel-muted)",
-          borderInlineStart: "1px solid var(--border-strong)",
-        }}
-        onClick={(event) => event.stopPropagation()}
-      >
       {/* Header */}
       <div
         className="flex items-center justify-between px-4 py-3 border-b"
@@ -396,8 +387,6 @@ export function DirectMessagesPanel({ onClose }: { onClose: () => void }) {
           </div>
         </>
       )}
-      </aside>
-    </div>,
-    document.body,
+    </Dialog>
   );
 }

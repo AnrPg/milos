@@ -87,7 +87,7 @@ export function AroundMapPanel({ origin, radiusKm }: { origin: AroundOrigin; rad
       aria-label={t("mapLabel")}
       className={
         expanded
-          ? "fixed inset-0 z-[65] flex flex-col"
+          ? "fixed inset-0 z-(--z-drawer) flex flex-col"
           : "relative flex h-[33dvh] min-h-52 flex-col overflow-hidden rounded-3xl md:h-[42vh]"
       }
       style={{ background: "var(--panel)", border: expanded ? undefined : "1px solid var(--border)" }}

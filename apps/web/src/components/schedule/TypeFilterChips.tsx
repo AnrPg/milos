@@ -61,7 +61,7 @@ export function TypeFilterChips({ classTypes, value, onChange }: TypeFilterChips
 
       {open ? (
         <div
-          className="absolute start-0 top-full z-30 mt-2 w-full max-w-md rounded-[1.4rem] p-4 shadow-[var(--shadow-lg)]"
+          className="absolute start-0 top-full z-(--z-popover) mt-2 w-full max-w-md rounded-[1.4rem] p-4 shadow-[var(--shadow-lg)]"
           style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}
         >
           <div className="max-h-64 space-y-2 overflow-y-auto">

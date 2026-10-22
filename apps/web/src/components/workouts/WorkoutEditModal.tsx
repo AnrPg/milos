@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 
 import { duplicateWorkout, reopenWorkout } from "@/api/workouts";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { Dialog } from "@/components/ui/Dialog";
 
 type GlobalContext = {
   kind: "global";
@@ -96,39 +97,16 @@ export function WorkoutEditModal({
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: "var(--scrim)" }}
-        onClick={onClose}
-        role="presentation"
-      >
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={headingId}
-          className="w-full max-w-md rounded-[2rem] p-6"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-            {isContextual ? i18n("editPublishedWorkout6237097") : i18n("editingLiveWorkout405d607")}
-          </p>
-
-          <h2 id={headingId} className="mt-2 text-xl font-bold" style={{ color: "var(--text)" }}>
-            {workoutTitle}
-          </h2>
-
-          <p className="mt-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
-            {isContextual
-              ? i18n("thisWorkoutIsPublishedAndMayBeAssigned9cf5e5b")
-              : i18n("thisWorkoutIsLiveEditingAndRePublishing953b61a")}
-          </p>
-
-          {error ? (
-            <p className="mt-3 text-xs" style={{ color: "var(--primary-strong)" }}>{error}</p>
-          ) : null}
-
-          <div className="mt-6 flex flex-col gap-3">
+      <Dialog
+        onClose={onClose}
+        dismissible={busy === null}
+        eyebrow={isContextual ? i18n("editPublishedWorkout6237097") : i18n("editingLiveWorkout405d607")}
+        title={workoutTitle}
+        titleId={headingId}
+        size="md"
+        variant="center"
+        footer={
+          <div className="w-full flex flex-col gap-3">
             {isContextual ? (
               <>
                 <button
@@ -178,8 +156,18 @@ export function WorkoutEditModal({
               {i18n("cancel77dfd21")}
             </button>
           </div>
-        </div>
-      </div>
+        }
+      >
+          <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
+            {isContextual
+              ? i18n("thisWorkoutIsPublishedAndMayBeAssigned9cf5e5b")
+              : i18n("thisWorkoutIsLiveEditingAndRePublishing953b61a")}
+          </p>
+
+          {error ? (
+            <p className="mt-3 text-xs" style={{ color: "var(--primary-strong)" }}>{error}</p>
+          ) : null}
+      </Dialog>
     </>
   );
 }

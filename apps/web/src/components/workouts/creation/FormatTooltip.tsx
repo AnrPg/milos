@@ -40,7 +40,7 @@ export function FormatTooltip({ format, children }: Props) {
       {children}
       {state.visible ? (
         <div
-          className="pointer-events-none fixed z-50 w-[240px] rounded-xl p-4 text-xs"
+          className="pointer-events-none fixed z-(--z-popover) w-[240px] rounded-xl p-4 text-xs"
           style={{
             top: tooltipTop,
             left: tooltipLeft,

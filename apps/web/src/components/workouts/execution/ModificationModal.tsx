@@ -11,8 +11,8 @@ import { useId, useState } from "react";
 import type { ExerciseModification, TimerSegment } from "@/api/executions";
 import type { JournalComment } from "@/api/journal-comments";
 import { CommentList } from "@/components/journal/CommentList";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import type { ChecklistStep } from "./WorkoutChecklist";
+import { Dialog } from "@/components/ui/Dialog";
 
 /** What the athlete recorded on a step: a change, text and tags, or both (ADR-140 §1). */
 export type StepComment = { change: ExerciseModification | null; body: string | null; tags: string[] };
@@ -66,7 +66,6 @@ export function ModificationModal({
   const [actualSets, setActualSets] = useState(
     hasSets ? String(exercise.sets) : "",
   );
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const titleId = useId();
 
   function handleSkip() {
@@ -143,37 +142,47 @@ export function ModificationModal({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="w-full max-w-lg rounded-t-3xl p-6 pb-10"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="mb-5">
-          <p
-            className="text-xs font-semibold uppercase tracking-[0.2em]"
+    <Dialog
+      onClose={onClose}
+      eyebrow={<span style={{ color: "var(--dim)" }}>{i18n("modifyStepbc84bb7")}</span>}
+      title={exercise.name}
+      titleId={titleId}
+      description={step.stepLabel ? <span style={{ color: "var(--primary)" }}>{i18n("setLabel")} {step.stepLabel}</span> : undefined}
+      size="lg"
+      footer={
+        <div className="w-full flex flex-col gap-2">
+          <button
+            type="button"
+            onClick={handleSave}
+            className="w-full rounded-2xl py-3.5 text-base font-semibold"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {i18n("saveChanges179359b")}
+          </button>
+          <button
+            type="button"
+            onClick={handleSkip}
+            className="w-full rounded-2xl py-3.5 text-base font-semibold"
+            style={{
+              background: "color-mix(in srgb, var(--danger, var(--primary)) 12%, transparent)",
+              color: "var(--danger, var(--primary))",
+              border: "1px solid color-mix(in srgb, var(--danger, var(--primary)) 25%, transparent)",
+            }}
+          >
+            {i18n("iSkippedThisStepCompletely6410954")}
+          </button>
+          <button
+            type="button"
+            onClick={onClose}
+            className="w-full rounded-2xl py-3 text-sm font-semibold"
             style={{ color: "var(--dim)" }}
           >
-            {i18n("modifyStepbc84bb7")}
-          </p>
-          <h3 id={titleId} className="mt-1 text-lg font-bold" style={{ color: "var(--text)" }}>
-            {exercise.name}
-          </h3>
-          {step.stepLabel && (
-            <p className="text-sm" style={{ color: "var(--primary)" }}>
-              {i18n("setLabel")} {step.stepLabel}
-            </p>
-          )}
+            {i18n("cancel77dfd21")}
+          </button>
         </div>
+      }
+    >
+        
 
         <div className="space-y-3 mb-6">
           {hasSets && (
@@ -273,38 +282,6 @@ export function ModificationModal({
             />
           </div>
         ) : null}
-
-        <div className="flex flex-col gap-2">
-          <button
-            type="button"
-            onClick={handleSave}
-            className="w-full rounded-2xl py-3.5 text-base font-semibold"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          >
-            {i18n("saveChanges179359b")}
-          </button>
-          <button
-            type="button"
-            onClick={handleSkip}
-            className="w-full rounded-2xl py-3.5 text-base font-semibold"
-            style={{
-              background: "color-mix(in srgb, var(--danger, var(--primary)) 12%, transparent)",
-              color: "var(--danger, var(--primary))",
-              border: "1px solid color-mix(in srgb, var(--danger, var(--primary)) 25%, transparent)",
-            }}
-          >
-            {i18n("iSkippedThisStepCompletely6410954")}
-          </button>
-          <button
-            type="button"
-            onClick={onClose}
-            className="w-full rounded-2xl py-3 text-sm font-semibold"
-            style={{ color: "var(--dim)" }}
-          >
-            {i18n("cancel77dfd21")}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

@@ -549,7 +549,7 @@ export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null,
 
   return (
     <div
-      className={embedded ? "relative flex h-[min(88vh,54rem)] min-w-0 flex-col overflow-hidden overflow-x-clip" : "relative flex h-[calc(100dvh-3.25rem)] min-w-0 flex-col overflow-hidden overflow-x-clip"}
+      className={embedded ? "relative flex h-[min(88dvh,54rem)] max-h-full min-w-0 flex-col overflow-hidden overflow-x-clip" : "relative flex h-[calc(100dvh-3.25rem)] min-w-0 flex-col overflow-hidden overflow-x-clip"}
       style={{
         background: "var(--bg)",
         color: "var(--text)",
@@ -581,7 +581,7 @@ export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null,
       <button
         type="button"
         onClick={() => setShowShortcuts(true)}
-        className={(embedded ? "absolute" : "fixed") + " bottom-4 end-4 z-40 hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
+        className={(embedded ? "absolute" : "fixed") + " bottom-4 end-4 z-(--z-sticky) hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--muted)" }}
         title={i18n("keyboardShortcuts72933ee")}
       >
@@ -600,7 +600,7 @@ export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null,
                 top: 0,
                 left: 0,
                 transform: "translate(" + (overlayInitPos.x) + "px, " + (overlayInitPos.y) + "px)",
-                zIndex: 9999,
+                zIndex: "var(--z-popover)",
                 pointerEvents: "none",
                 width: activeDrag.width,
                 minWidth: "14rem",

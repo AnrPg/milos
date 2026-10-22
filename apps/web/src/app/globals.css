@@ -17,6 +17,21 @@
   --amber: var(--warning);
   --lime: var(--success);
   --red: var(--danger);
+
+  /*
+   * Layering scale: every fixed or floating layer takes one of these, never a
+   * literal z-index, so a menu can't fall behind a card or a sheet behind the
+   * nav. Dialogs, sheets and popovers render through a portal into <body>, so
+   * equal layers stack in the order they opened. Use them as z-(--z-modal).
+   */
+  --z-raised: 10;     /* a card lifted over its siblings */
+  --z-sticky: 30;     /* sticky toolbars and page-level floating bars */
+  --z-nav: 50;        /* top bar and bottom tab bar */
+  --z-drawer: 60;     /* side panels and full-page pickers over the app */
+  --z-modal: 70;      /* dialogs and bottom sheets */
+  --z-fullscreen: 80; /* camera, media viewer, cast view */
+  --z-popover: 90;    /* menus, dropdowns, tooltips: above whatever opened them */
+  --z-toast: 100;     /* session and system notices */
 }
 
 @theme inline {
@@ -473,6 +488,6 @@ html[data-platform]::before {
   inset: 0 0 auto 0;
   height: var(--safe-top);
   background: var(--bg);
-  z-index: 1000;
+  z-index: calc(var(--z-toast) + 1);
   pointer-events: none;
 }

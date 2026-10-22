@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -33,6 +33,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import type { PRRecord } from "@/api/gamification";
 import { pollDelay } from "@/lib/post-media";
+import { Popover } from "@/components/ui/Popover";
 
 /**
  * One post (vision §7.1): its origin (`Club › #channel`) on top, then the
@@ -253,9 +254,11 @@ function origin(post: CommunityPost, t: ReturnType<typeof useTranslations>) {
 /** ⋯ on a post or comment: a short menu of what the reader may do with it. */
 export function MoreMenu({ label, items }: { label: string; items: { label: string; onSelect: () => void }[] }) {
   const [open, setOpen] = useState(false);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   return (
     <div className="relative shrink-0">
       <button
+        ref={buttonRef}
         type="button"
         aria-label={label}
         aria-haspopup="menu"
@@ -266,14 +269,16 @@ export function MoreMenu({ label, items }: { label: string; items: { label: stri
       >
         ⋯
       </button>
-      {open ? (
-        <>
-          <button type="button" aria-hidden="true" tabIndex={-1} className="fixed inset-0 z-10 cursor-default" onClick={() => setOpen(false)} />
-          <ul
-            role="menu"
-            className="absolute right-0 z-20 mt-1 min-w-40 overflow-hidden rounded-2xl py-1 shadow-lg"
-            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-          >
+      <Popover
+        anchorRef={buttonRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        align="end"
+        minWidth={160}
+        className="rounded-2xl py-1 shadow-lg"
+        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+      >
+          <ul role="menu" aria-label={label}>
             {items.map((item) => (
               <li key={item.label} role="none">
                 <button
@@ -283,7 +288,7 @@ export function MoreMenu({ label, items }: { label: string; items: { label: stri
                     setOpen(false);
                     item.onSelect();
                   }}
-                  className="block min-h-11 w-full px-4 text-left text-sm font-semibold"
+                  className="block min-h-11 w-full px-4 text-start text-sm font-semibold"
                   style={{ color: "var(--text)" }}
                 >
                   {item.label}
@@ -291,8 +296,7 @@ export function MoreMenu({ label, items }: { label: string; items: { label: stri
               </li>
             ))}
           </ul>
-        </>
-      ) : null}
+      </Popover>
     </div>
   );
 }

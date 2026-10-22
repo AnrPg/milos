@@ -1,11 +1,7 @@
 "use client";
 
-
-
-
 import {useUiTranslations} from "@/i18n/ui";
-import { useId } from "react";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 type InfoModalProps = {
   title: string;
@@ -14,43 +10,12 @@ type InfoModalProps = {
 };
 
 export function InfoModal({ title, onClose, children }: InfoModalProps) {
-  const i18n = useUiTranslations();
-  const ref = useModalFocusTrap<HTMLDivElement>(onClose);
-  const titleId = useId();
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-      role="presentation"
-    >
-      <div
-        ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        className="w-full max-w-md rounded-[2rem] p-6 outline-none"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        tabIndex={-1}
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <h2 id={titleId} className="text-lg font-bold" style={{ color: "var(--text)" }}>{title}</h2>
-          <button
-            className="shrink-0 rounded-full px-3 py-1 text-xs font-semibold"
-            style={{ background: "var(--border)", color: "var(--muted)" }}
-            onClick={onClose}
-            type="button"
-          >
-            {i18n("closebbfa773")}
-          </button>
-        </div>
-        <div className="mt-4 space-y-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
-          {children}
-        </div>
+    <Dialog onClose={onClose} title={title} size="md" variant="center">
+      <div className="space-y-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
+        {children}
       </div>
-    </div>
+    </Dialog>
   );
 }
 

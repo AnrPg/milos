@@ -118,7 +118,7 @@ export function MusclePickerSheet({
       role="dialog"
       aria-modal="true"
       aria-labelledby={labelId}
-      className="fixed inset-0 z-[80] flex flex-col"
+      className="fixed inset-0 z-(--z-fullscreen) flex flex-col"
       style={{ background: "var(--bg)", color: "var(--text)" }}
     >
       <header className="flex items-center justify-between gap-3 border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>

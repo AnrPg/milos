@@ -18,12 +18,12 @@ import { gymClubFor } from "@/components/community/community";
 import { useMyClubs } from "@/components/community/use-community";
 import { InviteClientsDialog } from "@/components/invites/InviteClients";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useReportGymTimeZone } from "@/hooks/useReportGymTimeZone";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { TOUR_STEPS, checklistSnoozed, snoozeChecklist, type TourAudience } from "@/lib/onboarding";
 import { setView } from "@/lib/view-mode";
+import { Dialog } from "@/components/ui/Dialog";
 
 const OPEN_TOUR_EVENT = "palee:open-tour";
 const OPEN_CHECKLIST_EVENT = "palee:open-onboarding";
@@ -219,37 +219,31 @@ function AdminChecklistDialog({
 }) {
   const t = useTranslations("Onboarding");
   const navParams = useNavigationParams();
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onLater);
 
   return (
-    <div className="fixed inset-0 z-[65] flex items-end justify-center sm:items-center sm:p-4" style={{ background: "var(--scrim)" }} role="presentation" onClick={onLater}>
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="onboarding-title"
-        aria-describedby="onboarding-intro"
-        tabIndex={-1}
-        onClick={(event) => event.stopPropagation()}
-        className="max-h-[92dvh] w-full max-w-lg overflow-y-auto rounded-t-[1.6rem] p-5 sm:rounded-[1.6rem] sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid color-mix(in srgb, var(--warning) 45%, var(--border))" }}
-      >
-        <p className="flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--warning)" }}>
+    <Dialog
+      onClose={onLater}
+      eyebrow={
+        <span className="flex items-center gap-2" style={{ color: "var(--warning)" }}>
           <span aria-hidden="true">⚠</span>
           {t("popupEyebrow")}
-        </p>
-        <h2 id="onboarding-title" className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{t(checklist.audience === "coach" ? "popupTitleCoach" : "popupTitle")}</h2>
-        <p id="onboarding-intro" className="mt-1 text-sm leading-6" style={{ color: "var(--muted)" }}>{t(checklist.audience === "coach" ? "popupIntroCoach" : "popupIntro", navParams)}</p>
-        <div className="mt-4">
-          <ChecklistView checklist={checklist} slug={slug} busy={busy} onAction={onAction} onNavigate={onLater} onTour={onTour} onInvite={onInvite} />
-        </div>
-        <div className="sticky bottom-0 -mx-5 -mb-5 mt-5 flex flex-col-reverse gap-2 px-5 pb-5 pt-3 sm:static sm:m-0 sm:mt-5 sm:flex-row sm:justify-end sm:p-0" style={{ background: "var(--panel)" }}>
+        </span>
+      }
+      title={t(checklist.audience === "coach" ? "popupTitleCoach" : "popupTitle")}
+      titleId="onboarding-title"
+      description={<span className="leading-6">{t(checklist.audience === "coach" ? "popupIntroCoach" : "popupIntro", navParams)}</span>}
+      size="lg"
+      panelStyle={{ borderColor: "color-mix(in srgb, var(--warning) 45%, var(--border))" }}
+      footer={
           <button type="button" onClick={onLater} className="rounded-xl px-4 py-2 text-sm font-semibold" style={{ background: "var(--text)", color: "var(--bg)" }}>
             {t("later")}
           </button>
+      }
+    >
+        <div>
+          <ChecklistView checklist={checklist} slug={slug} busy={busy} onAction={onAction} onNavigate={onLater} onTour={onTour} onInvite={onInvite} />
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 
@@ -428,7 +422,6 @@ export function ProductTour({ audience, slug, onClose }: { audience: TourAudienc
   const router = useRouter();
   const steps = TOUR_STEPS[audience];
   const [index, setIndex] = useState(0);
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const step = steps[index]!;
   const last = index === steps.length - 1;
   const href = step.href ? (audience === "admin" ? adminHref(step.href, slug) : step.href) : null;
@@ -443,18 +436,13 @@ export function ProductTour({ audience, slug, onClose }: { audience: TourAudienc
   }, [steps.length]);
 
   return (
-    <div className="fixed inset-0 z-[75] flex items-end justify-center sm:items-center sm:p-4" style={{ background: "var(--scrim)" }} role="presentation">
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-roledescription={t("tour.roleDescription")}
-        aria-labelledby="tour-step-title"
-        aria-describedby="tour-step-body"
-        tabIndex={-1}
-        className="w-full max-w-md rounded-t-[1.6rem] p-6 sm:rounded-[1.6rem]"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
+    <Dialog
+      onClose={onClose}
+      bare
+      labelledBy="tour-step-title"
+      size="md"
+      panelClassName="overflow-y-auto p-6"
+    >
         <div className="flex items-center justify-between">
           <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--primary)" }} aria-live="polite">
             {t("tour.stepOf", { current: index + 1, total: steps.length })}
@@ -508,8 +496,7 @@ export function ProductTour({ audience, slug, onClose }: { audience: TourAudienc
             </button>
           </div>
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 

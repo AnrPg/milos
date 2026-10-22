@@ -1,11 +1,11 @@
 "use client";
 
-
-
-
 import {useUiTranslations} from "@/i18n/ui";
-import { useEffect, type ReactNode } from "react";
+import type { ReactNode } from "react";
 
+import { Dialog } from "@/components/ui/Dialog";
+
+/** An end-edge detail drawer (full screen on phones) on the shared dialog shell. */
 export function SidePanel({
   title,
   subtitle,
@@ -25,60 +25,22 @@ export function SidePanel({
   bare?: boolean;
 }) {
   const i18n = useUiTranslations();
-  useEffect(() => {
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") onClose();
-    }
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
 
   return (
-    <>
-      <div
-        className="fixed inset-0 z-40"
-        style={{ background: "var(--scrim)" }}
-        onClick={onClose}
-      />
-      <div
-        className={"fixed end-0 z-50 flex w-full flex-col overflow-hidden " + (width)}
-        style={{ background: "var(--bg)", borderInlineStart: "1px solid var(--border)", top: "3.25rem", bottom: 0 }}
-      >
-        <div
-          className="sticky top-0 z-10 flex items-start justify-between gap-4 px-6 py-5"
-          style={{ background: "var(--bg)", borderBottom: "1px solid var(--border)" }}
-        >
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--dim)" }}>
-              {subtitle ?? i18n("detail7c9a7c0")}
-            </p>
-            <h2 className="mt-2 text-xl font-semibold tracking-tight" style={{ color: "var(--text)" }}>
-              {title}
-            </h2>
-          </div>
-          <button
-            className="rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-            onClick={onClose}
-            type="button"
-          >
-            {i18n("closebbfa773")}
-          </button>
-        </div>
-
-        <div className={bare ? "flex min-h-0 flex-1 flex-col" : "flex-1 overflow-y-auto px-6 py-6 space-y-6"}>
-          {children}
-        </div>
-
-        {footer ? (
-          <div
-            className="px-6 py-4"
-            style={{ borderTop: "1px solid var(--border)", background: "var(--bg)" }}
-          >
-            {footer}
-          </div>
-        ) : null}
-      </div>
-    </>
+    <Dialog
+      onClose={onClose}
+      eyebrow={<span style={{ color: "var(--dim)" }}>{subtitle ?? i18n("detail7c9a7c0")}</span>}
+      title={title}
+      variant="drawer"
+      layer="drawer"
+      size="full"
+      panelClassName={width}
+      panelStyle={{ background: "var(--bg)" }}
+      plainBody={bare}
+      bodyClassName={bare ? "" : "space-y-6 pt-1"}
+      footer={footer ? <div className="w-full">{footer}</div> : undefined}
+    >
+      {children}
+    </Dialog>
   );
 }

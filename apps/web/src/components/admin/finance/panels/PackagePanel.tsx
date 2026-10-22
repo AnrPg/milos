@@ -36,6 +36,7 @@ import {
   wizardSteps,
   type PackageDraft,
 } from "@/components/admin/finance/packages/package-catalog";
+import { Dialog } from "@/components/ui/Dialog";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -313,11 +314,31 @@ export function PackagePanel({
         </div>
       )}
       {showReconciliation ? (
-        <div className="fixed inset-0 z-[90] grid place-items-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-labelledby="package-retirement-title">
-          <div className="w-full max-w-lg rounded-[1.75rem] p-6 shadow-2xl" style={{ background: "var(--bg)", border: "1px solid var(--border-strong)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--warning)" }}>{i18n("requiredReconciliationd3a0ead")}</p>
-            <h3 id="package-retirement-title" className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("moveCurrentSubscribersBeforeRetiringThisPackage8116b72")}</h3>
-            <p className="mt-2 text-sm leading-6" style={{ color: "var(--dim)" }}>
+        <Dialog
+          onClose={() => setShowReconciliation(false)}
+          eyebrow={<span style={{ color: "var(--warning)" }}>{i18n("requiredReconciliationd3a0ead")}</span>}
+          title={i18n("moveCurrentSubscribersBeforeRetiringThisPackage8116b72")}
+          titleId="package-retirement-title"
+          size="lg"
+          variant="center"
+          footer={
+            <div className="w-full flex flex-wrap gap-3">
+              <button
+                type="button"
+                className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-40"
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                disabled={retireMutation.isPending || affectedRoles.some((role) => !replacements[role])}
+                onClick={() => retireMutation.mutate()}
+              >
+                {retireMutation.isPending ? i18n("reconciling4bfc2e9") : i18n("reassignAndRetirec6fc878")}
+              </button>
+              <button type="button" className="rounded-full px-5 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={() => setShowReconciliation(false)}>
+                {i18n("keepPackageActivef655e90")}
+              </button>
+            </div>
+          }
+        >
+            <p className="text-sm leading-6" style={{ color: "var(--dim)" }}>
               {i18n("packageSubscribersRequireReplacement", {count: affectedMembers.length})}
             </p>
             <div className="mt-5 space-y-3">
@@ -342,22 +363,7 @@ export function PackagePanel({
             </div>
             {replacementOptions.length === 0 ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{i18n("createAnotherActivePackageBeforeRetiringThisOne619ea88")}</p> : null}
             {retireMutation.error instanceof Error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{localizeError(retireMutation.error, i18n)}</p> : null}
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="button"
-                className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-40"
-                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-                disabled={retireMutation.isPending || affectedRoles.some((role) => !replacements[role])}
-                onClick={() => retireMutation.mutate()}
-              >
-                {retireMutation.isPending ? i18n("reconciling4bfc2e9") : i18n("reassignAndRetirec6fc878")}
-              </button>
-              <button type="button" className="rounded-full px-5 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={() => setShowReconciliation(false)}>
-                {i18n("keepPackageActivef655e90")}
-              </button>
-            </div>
-          </div>
-        </div>
+        </Dialog>
       ) : null}
     </SidePanel>
   );

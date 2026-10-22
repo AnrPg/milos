@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { canvasToAvatarFile, drawAvatarCrop } from "@/components/profile/avatar-crop";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   file: File;
@@ -67,13 +68,22 @@ export function AvatarEditorModal({ file, pending, uploadError, onCancel, onSave
   }
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-labelledby="avatar-editor-title">
-      <div className="flex min-h-full items-center justify-center py-2">
-        <div className="max-h-[calc(100vh-2rem)] w-full max-w-lg overflow-y-auto rounded-[2rem] p-6 shadow-2xl" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-          <h2 id="avatar-editor-title" className="text-xl font-bold" style={{ color: "var(--text)" }}>{tProfile("avatarEditorTitle")}</h2>
-          <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{tProfile("avatarEditorDescription")}</p>
-
-          <div className="mx-auto mt-5 aspect-square w-full max-w-72 overflow-hidden rounded-full sm:max-w-80" style={{ border: "3px solid var(--primary)", background: "var(--panel-muted)" }}>
+    <Dialog
+        onClose={onCancel}
+        dismissible={!pending}
+        title={tProfile("avatarEditorTitle")}
+        titleId="avatar-editor-title"
+        description={tProfile("avatarEditorDescription")}
+        size="lg"
+        variant="center"
+        footer={
+          <div className="w-full flex justify-end gap-3">
+            <button type="button" disabled={pending} onClick={onCancel} className="rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50" style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}>{tCommon("cancel")}</button>
+            <button type="button" disabled={pending || !image} onClick={() => void save()} className="rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{pending ? tCommon("saving") : tProfile("avatarApply")}</button>
+          </div>
+        }
+      >
+          <div className="mx-auto aspect-square w-full max-w-72 overflow-hidden rounded-full sm:max-w-80" style={{ border: "3px solid var(--primary)", background: "var(--panel-muted)" }}>
             <canvas ref={canvasRef} width={512} height={512} className="h-full w-full" aria-label={tProfile("avatarPreviewLabel")} />
           </div>
 
@@ -124,12 +134,6 @@ export function AvatarEditorModal({ file, pending, uploadError, onCancel, onSave
           </div>
 
           {error || uploadError ? <p className="mt-4 text-sm font-semibold" style={{ color: "var(--danger)" }}>{error ?? uploadError}</p> : null}
-          <div className="mt-6 flex justify-end gap-3">
-            <button type="button" disabled={pending} onClick={onCancel} className="rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50" style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}>{tCommon("cancel")}</button>
-            <button type="button" disabled={pending || !image} onClick={() => void save()} className="rounded-xl px-5 py-2.5 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{pending ? tCommon("saving") : tProfile("avatarApply")}</button>
-          </div>
-        </div>
-      </div>
-    </div>
+      </Dialog>
   );
 }

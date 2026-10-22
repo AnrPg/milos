@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 import type { PriorityNavLink } from "@/components/nav/PriorityNav";
+import { Popover } from "@/components/ui/Popover";
 
 // Small screens: one ☰ button that opens every link of the bar as a vertical
 // list (ADR-103). Larger screens use PriorityNav instead.
@@ -17,29 +18,14 @@ export function MobileNavMenu({
   label: string;
 }) {
   const [open, setOpen] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: MouseEvent) => {
-      if (ref.current && !ref.current.contains(event.target as Node)) setOpen(false);
-    };
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", escape);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", escape);
-    };
-  }, [open]);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   if (links.length === 0) return null;
 
   return (
-    <div ref={ref} className="relative shrink-0 sm:hidden">
+    <div className="relative shrink-0 sm:hidden">
       <button
+        ref={buttonRef}
         type="button"
         aria-expanded={open}
         aria-haspopup="true"
@@ -51,12 +37,15 @@ export function MobileNavMenu({
       >
         <span aria-hidden="true">☰</span>
       </button>
-      {open ? (
-        <nav
-          aria-label={label}
-          className="absolute start-0 top-full mt-1 w-64 max-w-[calc(100vw-1rem)] rounded-2xl py-1.5 shadow-[var(--shadow-lg)]"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-        >
+      <Popover
+        anchorRef={buttonRef}
+        open={open}
+        onClose={() => setOpen(false)}
+        width={256}
+        className="rounded-2xl py-1.5 shadow-[var(--shadow-lg)]"
+        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+      >
+        <nav aria-label={label}>
           {links.map((link) => {
             const active = link.id === activeId;
             return (
@@ -73,7 +62,7 @@ export function MobileNavMenu({
             );
           })}
         </nav>
-      ) : null}
+      </Popover>
     </div>
   );
 }

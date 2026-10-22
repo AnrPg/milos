@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
+import { Layer } from "@/components/ui/Layer";
 
 // «Φίλτρα (n)» opens this full-screen page (plan §5a decision 3): one section
 // per filter, «Καθαρισμός» and «Δείξε N» pinned at the bottom.
@@ -41,13 +42,14 @@ export function FilterPage({
   }, [onClose]);
 
   return (
+    <Layer>
     <div
       ref={page}
       role="dialog"
       aria-modal="true"
       aria-labelledby={headingId}
       tabIndex={-1}
-      className="fixed inset-0 z-[60] flex flex-col outline-none"
+      className="fixed inset-0 z-(--z-drawer) flex flex-col outline-none"
       style={{ background: "var(--bg)" }}
     >
       <header className="mx-auto flex w-full max-w-xl items-center gap-2 px-4 pb-2 pt-4">
@@ -91,6 +93,7 @@ export function FilterPage({
         </button>
       </footer>
     </div>
+    </Layer>
   );
 }
 

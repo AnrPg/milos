@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { createPortal } from "react-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -25,9 +24,9 @@ import { ComposeMediaPicker } from "@/components/media/ComposeMediaPicker";
 import { useComposeMedia } from "@/components/media/useComposeMedia";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { Dialog } from "@/components/ui/Dialog";
 
 /**
  * ⊕ button that opens compose (vision §7.1). Everyone can post: to a club
@@ -117,7 +116,6 @@ export function ComposeSheet({
     media.release(true);
     onClose();
   };
-  const trapRef = useModalFocusTrap<HTMLDivElement>(cancel);
   const groups = composeTargetGroups(clubs);
   const [target, setTarget] = useState<ComposeTarget>(() =>
     initialComposeTarget(clubs, initialAttachment ? null : readStored<ComposeTarget>(LAST_TARGET_KEY), clubId, channelId),
@@ -196,22 +194,35 @@ export function ComposeSheet({
     }
   }
 
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={cancel}
-    >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("compose")}
-        className="flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-y-auto rounded-t-3xl p-5 sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(event) => event.stopPropagation()}
+  return (
+    <>
+      <Dialog
+        onClose={cancel}
+        title={t("compose")}
+        size="md"
+        bodyClassName="flex flex-col gap-4"
+        footer={
+        <div className="flex w-full gap-2">
+          <button
+            type="button"
+            onClick={cancel}
+            className="min-h-12 flex-1 rounded-2xl text-sm font-semibold"
+            style={{ border: "1px solid var(--border)", color: "var(--text)" }}
+          >
+            {t("cancel")}
+          </button>
+          <button
+            type="button"
+            onClick={() => void publish()}
+            disabled={!canPublish}
+            className="min-h-12 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {busy ? t("publishing") : t("publish")}
+          </button>
+        </div>
+        }
       >
-        <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("compose")}</h2>
         <ComposeMediaPicker media={media} />
         <label className="sr-only" htmlFor="compose-body">{t("composePlaceholder")}</label>
         <textarea
@@ -301,26 +312,7 @@ export function ComposeSheet({
           </p>
         ) : null}
         {error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
-        <div className="flex gap-2">
-          <button
-            type="button"
-            onClick={cancel}
-            className="min-h-12 flex-1 rounded-2xl text-sm font-semibold"
-            style={{ border: "1px solid var(--border)", color: "var(--text)" }}
-          >
-            {t("cancel")}
-          </button>
-          <button
-            type="button"
-            onClick={() => void publish()}
-            disabled={!canPublish}
-            className="min-h-12 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          >
-            {busy ? t("publishing") : t("publish")}
-          </button>
-        </div>
-      </div>
+      </Dialog>
       {picking ? (
         <AudienceSheet
           groups={groups}
@@ -332,8 +324,7 @@ export function ComposeSheet({
           onClose={() => setPicking(false)}
         />
       ) : null}
-    </div>,
-    document.body,
+    </>
   );
 }
 
@@ -363,30 +354,12 @@ function AudienceSheet({
   onClose: () => void;
 }) {
   const t = useTranslations("Community");
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const option = (target: ComposeTarget, label: string, hint: string, key: string) => (
     <Choice key={key} name="audience" checked={sameTarget(target, selected)} onChange={() => onPick(target)} label={label} hint={hint} />
   );
 
   return (
-    <div
-      className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={(event) => {
-        event.stopPropagation();
-        onClose();
-      }}
-    >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("composeWhere")}
-        className="flex max-h-[85vh] w-full max-w-md flex-col gap-4 overflow-y-auto rounded-t-3xl p-5 sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("composeWhere")}</h2>
+    <Dialog onClose={onClose} title={t("composeWhere")} size="md" bodyClassName="flex flex-col gap-4">
         {groups.map(({ club, channels, publicChannel }) => (
           <fieldset key={club.id} className="flex flex-col gap-2">
             <legend className="mb-1 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
@@ -417,8 +390,7 @@ function AudienceSheet({
           {option({ kind: "profile", audience: "followers" }, t("audienceFollowers"), t("audienceFollowersHint"), "followers")}
           {option({ kind: "profile", audience: "public" }, t("audiencePublic"), t("audiencePublicHint"), "public")}
         </fieldset>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 

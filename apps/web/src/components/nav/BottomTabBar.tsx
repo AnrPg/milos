@@ -85,7 +85,7 @@ export function BottomTabBar() {
       <div aria-hidden="true" style={{ height: BOTTOM_TAB_BAR_HEIGHT }} />
       <nav
         aria-label={t("memberTabs")}
-        className="fixed inset-x-0 bottom-0 z-50 grid grid-cols-4"
+        className="fixed inset-x-0 bottom-0 z-(--z-nav) grid grid-cols-4"
         style={{
           background: "var(--bg)",
           borderTop: "1px solid var(--border)",
