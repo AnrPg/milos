@@ -17,7 +17,7 @@ export function EventPostCard({ event }: { event: CommunityEvent }) {
   const locale = useLocale();
   const going = useGoingLabel();
   const line = [
-    formatTime(event.starts_at, locale),
+    formatTime(event.starts_at, locale, event.time_zone),
     placeName(event.place),
     going(event),
     formatPrice(event.price_cents, event.currency, locale) ?? t("free"),
@@ -27,7 +27,7 @@ export function EventPostCard({ event }: { event: CommunityEvent }) {
 
   return (
     <div className="flex flex-wrap items-center gap-3 rounded-2xl p-3" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)" }}>
-      <DateBlock iso={event.starts_at} />
+      <DateBlock iso={event.starts_at} timeZone={event.time_zone} />
       <Link href={`/events/${event.id}`} className="min-w-0 grow basis-40">
         <span className="block truncate font-bold" style={{ color: "var(--text)", textDecoration: event.cancelled ? "line-through" : undefined }}>
           {event.title}

@@ -6,10 +6,11 @@ defmodule Palee.Application.GetScheduleCalendar do
 
   def call(%{organization_id: organization_id} = context, actor, params)
       when is_binary(organization_id) do
-    # ADR-177: a window given as dates covers the gym's own days.
-    zone = Organizations.organization_timezone(organization_id)
+    with {:ok, window, days, class_type_ids} <- normalize_window(params) do
+      # ADR-177: a window given as dates covers the gym's own days.
+      zone = Organizations.organization_timezone(organization_id)
+      {start_at, end_at} = window_bounds(window, days, zone)
 
-    with {:ok, start_at, end_at, days, class_type_ids} <- normalize_window(params, zone) do
       slots =
         get_calendar_week(context, %{
           start_at: start_at,
@@ -412,37 +413,47 @@ defmodule Palee.Application.GetScheduleCalendar do
     |> Enum.sort_by(&{&1.sort_order, &1.name})
   end
 
-  defp normalize_window(params, zone) do
+  defp normalize_window(params) do
     with {:ok, days} <- parse_days(params["days"] || params[:days]),
-         {:ok, start_at, end_at} <- parse_explicit_window(params, days, zone),
+         {:ok, window} <- parse_explicit_window(params),
          {:ok, class_type_ids} <-
            parse_class_type_ids(params["class_type_ids"] || params[:class_type_ids]) do
-      {:ok, start_at, end_at, days, class_type_ids}
+      {:ok, window, days, class_type_ids}
     end
   end
 
-  defp parse_explicit_window(params, days, zone) do
+  # Dates are read on the gym's clock: `nil` is the gym's today.
+  defp window_bounds({:dates, nil}, days, zone),
+    do: window_bounds({:dates, ZonedTime.local_date(DateTime.utc_now(), zone)}, days, zone)
+
+  defp window_bounds({:dates, start_date}, days, zone),
+    do:
+      {ZonedTime.start_of_day(start_date, zone),
+       ZonedTime.start_of_day(Date.add(start_date, days), zone)}
+
+  defp window_bounds({:instants, start_at, end_at}, _days, _zone), do: {start_at, end_at}
+
+  defp parse_explicit_window(params) do
     start_at_param = params["start_at"] || params[:start_at]
     end_at_param = params["end_at"] || params[:end_at]
 
     if is_nil(start_at_param) and is_nil(end_at_param) do
-      with {:ok, start_date} <- parse_date(params["start_date"] || params[:start_date], zone) do
-        {:ok, ZonedTime.start_of_day(start_date, zone),
-         ZonedTime.start_of_day(Date.add(start_date, days), zone)}
+      with {:ok, start_date} <- parse_date(params["start_date"] || params[:start_date]) do
+        {:ok, {:dates, start_date}}
       end
     else
       with {:ok, start_at} <- parse_datetime(start_at_param),
            {:ok, end_at} <- parse_datetime(end_at_param),
            :ok <- validate_window_order(start_at, end_at) do
-        {:ok, start_at, end_at}
+        {:ok, {:instants, start_at, end_at}}
       end
     end
   end
 
-  defp parse_date(nil, zone), do: {:ok, ZonedTime.local_date(DateTime.utc_now(), zone)}
-  defp parse_date(%Date{} = value, _zone), do: {:ok, value}
+  defp parse_date(nil), do: {:ok, nil}
+  defp parse_date(%Date{} = value), do: {:ok, value}
 
-  defp parse_date(value, _zone) when is_binary(value) do
+  defp parse_date(value) when is_binary(value) do
     case Date.from_iso8601(value) do
       {:ok, date} -> {:ok, date}
       {:error, _reason} -> {:error, :bad_request}

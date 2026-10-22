@@ -44,10 +44,13 @@ export type DayCount = { total: number; mine: number };
  */
 export function MonthGrid({
   selectedDate,
+  today: todayKey,
   counts,
   onSelect,
 }: {
   selectedDate: string;
+  /** ADR-177: the gym's today ("YYYY-MM-DD"); the device's when absent. */
+  today?: string;
   counts: Map<string, DayCount>;
   onSelect: (isoDate: string) => void;
 }) {
@@ -55,7 +58,7 @@ export function MonthGrid({
   const locale = useLocale();
   const start = monthGridStart(selectedDate);
   const month = parseLocalDate(selectedDate).getMonth();
-  const today = formatLocalIsoDate(new Date());
+  const today = todayKey ?? formatLocalIsoDate(new Date());
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "narrow" });
   const full = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" });
   const days = Array.from({ length: MONTH_GRID_DAYS }, (_, index) => shift(start, index));

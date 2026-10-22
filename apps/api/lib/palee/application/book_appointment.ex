@@ -33,7 +33,11 @@ defmodule Palee.Application.BookAppointment do
 
       case Appointments.create_booking(context, attrs, check) do
         {:ok, booking} ->
-          NotifyAppointment.booked(slot, client)
+          NotifyAppointment.booked(
+            Map.put_new(slot, :organization_id, context.organization_id),
+            client
+          )
+
           {:ok, Map.put(booking, :slot, slot)}
 
         {:error, reason} ->

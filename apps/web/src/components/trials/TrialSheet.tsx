@@ -11,6 +11,7 @@ import { MY_TRIALS_KEY, requestTrial, type MyTrial, type TrialOffer } from "@/ap
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 import { newOperationId, trialErrorKey } from "./trial-ui";
+import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 
 type Slot = PublicBoxSchedule["slots"][number];
 /** What the sheet needs of a class picked before it opens (the box schedule, or a door scan's offer). */
@@ -53,6 +54,8 @@ export function TrialSheet({
   const [phone, setPhone] = useState("");
   const [done, setDone] = useState<MyTrial | null>(null);
   const operation = useRef(newOperationId());
+  // ADR-177: the gym's days and clock, wherever the visitor is.
+  const zone = (page as { time_zone?: string | null }).time_zone ?? null;
 
   const classes = useQuery({
     queryKey: ["social", "box-trial-classes", page.box.slug],
@@ -68,11 +71,11 @@ export function TrialSheet({
     const open = (classes.data?.slots ?? []).filter((slot) => (slot.trial_seats ?? 0) > 0);
     const byDay = new Map<string, Slot[]>();
     for (const slot of open) {
-      const key = new Date(slot.scheduled_at).toDateString();
+      const key = dateKeyInZone(slot.scheduled_at, zone);
       byDay.set(key, [...(byDay.get(key) ?? []), slot]);
     }
     return [...byDay.values()];
-  }, [classes.data]);
+  }, [classes.data, zone]);
 
   const ask = useMutation({
     mutationFn: () =>
@@ -92,9 +95,8 @@ export function TrialSheet({
     },
   });
 
-  const dayLabel = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(new Date(iso));
-  const clock = (iso: string) => new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  const dayLabel = (iso: string) => formatInZone(iso, zone, locale, { weekday: "long", day: "numeric", month: "long" });
+  const clock = (iso: string) => zonedText(iso, zone, locale, "time");
   const manual = offer.approval === "manual";
   const phoneValid = phone.trim() === "" || /^\+?[0-9 ()-]{6,24}$/.test(phone.trim());
 

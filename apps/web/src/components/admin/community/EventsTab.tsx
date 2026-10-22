@@ -91,6 +91,7 @@ export function EventsTab() {
           clubId={chosenClub}
           onClubChange={setClubId}
           coverSlug={can(membership, "manage_settings") ? selectedOrganizationSlug : null}
+          gymSlug={selectedOrganizationSlug}
           onSubmit={async (body) => {
             await createStaffEvent(token, { ...body, club_id: chosenClub });
             setScope("upcoming");
@@ -118,11 +119,11 @@ function StaffEventItem({ event, past, href }: { event: StaffEventRow; past: boo
   return (
     <li>
       <Link href={href} className="flex items-center gap-3 rounded-2xl px-3 py-3" style={{ background: "var(--panel-raised)" }}>
-        <DateBlock iso={event.starts_at} />
+        <DateBlock iso={event.starts_at} timeZone={event.time_zone} />
         <span className="min-w-0 grow">
           <span className="block truncate font-bold" style={{ color: "var(--text)", textDecoration: event.cancelled ? "line-through" : undefined }}>{event.title}</span>
           <span className="block truncate text-xs" style={{ color: "var(--dim)" }}>
-            {[event.group?.name ?? event.club.name, formatTime(event.starts_at, locale), placeName(event.place), price(event)].filter(Boolean).join(" · ")}
+            {[event.group?.name ?? event.club.name, formatTime(event.starts_at, locale, event.time_zone), placeName(event.place), price(event)].filter(Boolean).join(" · ")}
           </span>
           <span className="block text-xs font-semibold" style={{ color: "var(--text-soft)" }}>
             {event.cancelled ? tEvents("pillCancelled") : numbers.filter(Boolean).join(" · ")}

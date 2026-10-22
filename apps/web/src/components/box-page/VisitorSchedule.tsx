@@ -12,6 +12,8 @@ import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calend
 import { TrialSheet } from "@/components/trials/TrialSheet";
 import type { TrialOffer } from "@/api/trials";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone, zonedText } from "@/lib/zoned-time";
+import { YourTime } from "@/components/zoned-time";
 
 type Slot = PublicBoxSchedule["slots"][number];
 const ALL = "";
@@ -29,7 +31,9 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
   const tSchedule = useTranslations("BoxSchedule");
   const tTrials = useTranslations("Trials");
   const locale = useLocale();
-  const [selectedDate, setSelectedDate] = useState(() => formatLocalIsoDate(new Date()));
+  // ADR-177: the gym's days and clock, wherever the visitor is.
+  const zone = (page as { time_zone?: string | null }).time_zone ?? null;
+  const [selectedDate, setSelectedDate] = useState(() => dateKeyInZone(new Date(), zone));
   const [type, setType] = useState(ALL);
   const [level, setLevel] = useState(ALL);
   const [audience, setAudience] = useState(ALL);
@@ -39,13 +43,12 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
   const monday = weekStart(selectedDate);
 
   const schedule = useQuery({
-    queryKey: ["social", "box-schedule", page.box.slug, monday],
-    queryFn: () => {
-      const start = parseLocalDate(monday);
-      const end = new Date(start);
-      end.setDate(end.getDate() + 7);
-      return fetchBoxSchedule(token, page.box.slug, { startAt: start.toISOString(), endAt: end.toISOString() });
-    },
+    queryKey: ["social", "box-schedule", page.box.slug, monday, zone],
+    queryFn: () =>
+      fetchBoxSchedule(token, page.box.slug, {
+        startAt: startOfDayInZone(monday, zone).toISOString(),
+        endAt: startOfDayInZone(addDaysToKey(monday, 7), zone).toISOString(),
+      }),
   });
 
   const slots = useMemo(() => schedule.data?.slots ?? [], [schedule.data]);
@@ -59,7 +62,7 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
   const audiences = useMemo(() => [...new Set(slots.flatMap((slot) => slot.class_type?.audiences ?? []))], [slots]);
   const levels = CLASS_LEVELS.filter((value) => slots.some((slot) => slot.class_type?.level === value));
   const day = slots
-    .filter((slot) => formatLocalIsoDate(new Date(slot.scheduled_at)) === selectedDate)
+    .filter((slot) => dateKeyInZone(slot.scheduled_at, zone) === selectedDate)
     .filter((slot) => !type || slot.class_type?.id === type)
     .filter((slot) => !level || slot.class_type?.level === level)
     .filter((slot) => !audience || (slot.class_type?.audiences ?? []).includes(audience))
@@ -70,7 +73,7 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
 
   return (
     <div className="flex flex-col gap-3">
-      <WeekStrip selectedDate={selectedDate} onSelect={setSelectedDate} />
+      <WeekStrip selectedDate={selectedDate} today={dateKeyInZone(new Date(), zone)} onSelect={setSelectedDate} />
       <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0" role="group" aria-label={tSchedule("filtersAria")}>
         <Chip label={tSchedule("chipType")} value={type} onChange={setType} options={types.map(([id, name]) => ({ value: id, label: name }))} />
         <Chip
@@ -119,13 +122,14 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
       <ul className="flex flex-col gap-2">
         {day.map((slot) => (
           <li key={slot.id}>
-            <Row slot={slot} locale={locale} location={locationName(slot.location_id)} trial={takesTrials(slot)} onOpen={() => setOpen(slot)} />
+            <Row slot={slot} locale={locale} zone={zone} location={locationName(slot.location_id)} trial={takesTrials(slot)} onOpen={() => setOpen(slot)} />
           </li>
         ))}
       </ul>
       {open ? (
         <VisitorClassSheet
           slot={open}
+          zone={zone}
           location={page.locations.find((location) => location.id === open.location_id)?.name ?? null}
           memberHref={member ? `/org/${page.box.slug}/box/schedule?open_slot=${open.id}` : null}
           onTrial={takesTrials(open) && new Date(open.scheduled_at) > new Date() ? () => (setTrialSlot(open), setOpen(null)) : null}
@@ -188,19 +192,21 @@ function Chip({
 function Row({
   slot,
   locale,
+  zone,
   location,
   trial,
   onOpen,
 }: {
   slot: Slot;
   locale: string;
+  zone: string | null;
   location: string | null;
   trial: boolean;
   onOpen: () => void;
 }) {
   const t = useTranslations("BoxSchedule");
   const tTrials = useTranslations("Trials");
-  const time = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(new Date(slot.scheduled_at));
+  const time = zonedText(slot.scheduled_at, zone, locale, "time");
   const detail = [slot.coach?.nickname, location].filter(Boolean).join(" · ");
   const past = new Date(slot.scheduled_at) < new Date();
   return (
@@ -236,12 +242,14 @@ function Row({
 
 function VisitorClassSheet({
   slot,
+  zone,
   location,
   memberHref,
   onTrial,
   onClose,
 }: {
   slot: Slot;
+  zone: string | null;
   location: string | null;
   memberHref: string | null;
   onTrial: (() => void) | null;
@@ -253,8 +261,8 @@ function VisitorClassSheet({
   const locale = useLocale();
   const dialog = useModalFocusTrap<HTMLElement>(onClose);
   const start = new Date(slot.scheduled_at);
-  const when = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(start);
-  const clock = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(start);
+  const when = formatInZone(start, zone, locale, { weekday: "long", day: "numeric", month: "long" });
+  const clock = zonedText(start, zone, locale, "time");
   const level = slot.class_type?.level;
   const facts = [
     slot.coach?.nickname ? [tSchedule("coach"), slot.coach.nickname] : null,
@@ -284,6 +292,7 @@ function VisitorClassSheet({
           <h2 id="visitor-class-title" className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{slot.name}</h2>
           <p className="mt-1 text-sm font-semibold first-letter:uppercase" style={{ color: "var(--text-soft)" }}>
             {when} · {clock}
+            <YourTime at={start} zone={zone} format="day-time" />
             {slot.duration_minutes ? ` · ${tSchedule("minutes", { count: slot.duration_minutes })}` : ""}
           </p>
           <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">

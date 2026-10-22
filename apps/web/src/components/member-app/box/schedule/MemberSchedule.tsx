@@ -9,7 +9,7 @@ import { fetchMyEntitlement } from "@/api/my-finance";
 import { fetchBookablePlaces } from "@/api/places";
 import { CLASS_LEVELS, fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { FilterChipRow, type FilterChip } from "@/components/filters/FilterChipRow";
-import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calendar-window";
+import { parseLocalDate } from "@/components/schedule/calendar-window";
 import { includesGuestPasses, localizeMemberBookingError } from "@/components/schedule/member-booking";
 import { useSession } from "@/components/session-provider";
 import { useOutboxCommand } from "@/hooks/useOutboxCommand";
@@ -17,6 +17,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { OFFLINE_COMMAND_OUTBOX_EVENT } from "@/lib/offline-command-outbox";
 import { organizationTopic, subscribeToTopic } from "@/lib/realtime";
+import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone } from "@/lib/zoned-time";
 
 import { ClassRow } from "./ClassRow";
 import { ClassSheet } from "./ClassSheet";
@@ -41,15 +42,7 @@ import { WeekStrip } from "./WeekStrip";
  */
 type ScheduleView = "day" | "month";
 
-function addDays(isoDate: string, days: number) {
-  const date = parseLocalDate(isoDate);
-  date.setDate(date.getDate() + days);
-  return formatLocalIsoDate(date);
-}
-
-function localDay(iso: string) {
-  return formatLocalIsoDate(new Date(iso));
-}
+const addDays = addDaysToKey;
 
 /**
  * Box › Πρόγραμμα for members (plan §5a): location in the title, the filter
@@ -63,10 +56,13 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const token = tokens?.access_token ?? null;
   const { membership } = useSelectedMembershipRole();
   const organizationId = membership?.organization.id ?? null;
+  // ADR-177: days and times are the gym's own, wherever the member is.
+  const gymZone = (membership?.organization as { timezone?: string | null } | undefined)?.timezone ?? null;
+  const localDay = useCallback((iso: string | Date) => dateKeyInZone(iso, gymZone), [gymZone]);
   const prefs = useSchedulePreferences(token, organizationId);
   const submitCommand = useOutboxCommand();
 
-  const [selectedDate, setSelectedDate] = useState(() => formatLocalIsoDate(new Date()));
+  const [selectedDate, setSelectedDate] = useState(() => dateKeyInZone(new Date(), gymZone));
   const [view, setView] = useState<ScheduleView>("day");
   const [filtersOpen, setFiltersOpen] = useState(false);
   const [openSlotId, setOpenSlotId] = useState<string | null>(initialOpenSlotId);
@@ -77,12 +73,12 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   // The grid starts on the Monday of the 1st, so the selected day's week is always inside it.
   const windowStart = monthGridStart(selectedDate);
   const windowQuery = useQuery({
-    queryKey: ["member-schedule", organizationId, windowStart],
+    queryKey: ["member-schedule", organizationId, windowStart, gymZone],
     enabled: Boolean(token && organizationId),
     queryFn: () =>
       fetchSchedule(token!, {
-        startAt: parseLocalDate(windowStart).toISOString(),
-        endAt: parseLocalDate(addDays(windowStart, MONTH_GRID_DAYS)).toISOString(),
+        startAt: startOfDayInZone(windowStart, gymZone).toISOString(),
+        endAt: startOfDayInZone(addDays(windowStart, MONTH_GRID_DAYS), gymZone).toISOString(),
         days: 7,
         classTypeIds: [],
       }),
@@ -162,8 +158,8 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
       counts.set(day, { total: count.total + 1, mine: count.mine + (isBookedByMe(slot) ? 1 : 0) });
     });
     return counts;
-  }, [matching]);
-  const dayEnd = parseLocalDate(addDays(selectedDate, 1));
+  }, [localDay, matching]);
+  const dayEnd = startOfDayInZone(addDays(selectedDate, 1), gymZone);
   const upcoming = daySlots.length === 0 ? nextMatch(matching, dayEnd) : null;
   const openSlot = slots.find((slot) => slot.id === openSlotId) ?? null;
   const activeCount = activeFilterCount(filters);
@@ -283,6 +279,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
       {view === "month" ? (
         <MonthGrid
           selectedDate={selectedDate}
+          today={localDay(new Date())}
           counts={dayCounts}
           onSelect={(day) => {
             setSelectedDate(day);
@@ -290,7 +287,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
           }}
         />
       ) : (
-        <WeekStrip selectedDate={selectedDate} onSelect={setSelectedDate} />
+        <WeekStrip selectedDate={selectedDate} today={localDay(new Date())} onSelect={setSelectedDate} />
       )}
 
       {notice ? (
@@ -328,6 +325,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
             <ClassRow
               key={slot.id}
               slot={slot}
+              timeZone={gymZone}
               coachName={slot.coach_user_id ? coaches.get(slot.coach_user_id) ?? null : null}
               locationName={
                 !locationId && severalLocations && slot.location_id ? locationNames.get(slot.location_id) ?? null : null
@@ -338,6 +336,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
         ) : (
           <EmptyDay
             date={selectedDate}
+            timeZone={gymZone}
             next={upcoming}
             onJump={(slot) => {
               setSelectedDate(localDay(slot.scheduled_at));
@@ -362,6 +361,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
         <ClassSheet
           key={openSlot.id}
           slot={openSlot}
+          timeZone={gymZone}
           coachName={openSlot.coach_user_id ? coaches.get(openSlot.coach_user_id) ?? null : null}
           locations={data?.locations ?? []}
           accessToken={token ?? ""}
@@ -448,10 +448,12 @@ function ViewSwitch({
 
 function EmptyDay({
   date,
+  timeZone,
   next,
   onJump,
 }: {
   date: string;
+  timeZone: string | null;
   next: ScheduleSlot | null;
   onJump: (slot: ScheduleSlot) => void;
 }) {
@@ -461,9 +463,7 @@ function EmptyDay({
     parseLocalDate(date),
   );
   const when = next
-    ? new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(
-        new Date(next.scheduled_at),
-      )
+    ? formatInZone(next.scheduled_at, timeZone, locale, { weekday: "short", day: "numeric", hour: "2-digit", minute: "2-digit" })
     : null;
 
   return (

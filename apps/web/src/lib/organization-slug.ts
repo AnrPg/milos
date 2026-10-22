@@ -60,3 +60,32 @@ export function useOrganizationSlug(): string | null {
   const pathOrganizationSlug = pathname.match(/^\/org\/([^/]+)/)?.[1] ?? null;
   return pathOrganizationSlug ?? storedOrganizationSlug() ?? memberships[0]?.organization.slug ?? null;
 }
+
+/**
+ * ADR-177: the IANA zone of a gym the signed-in account belongs to (the
+ * current one by default): the clock its classes and events are planned
+ * on, and whether an admin confirmed it. `zone` is null while unknown, so
+ * callers fall back to the device's clock.
+ */
+export function useOrganizationTimeZoneStatus(slug?: string | null): { zone: string | null; confirmed: boolean } {
+  const currentSlug = useOrganizationSlug();
+  const { status, tokens } = useSession();
+  const authenticated = status === "authenticated" && Boolean(tokens?.access_token);
+  const membershipsQuery = useQuery({
+    queryKey: ["organization-memberships", tokens?.access_token],
+    enabled: authenticated,
+    queryFn: () => fetchOrganizationMemberships(tokens!.access_token),
+    staleTime: 60_000,
+  });
+  const target = slug ?? currentSlug;
+  const memberships = Array.isArray(membershipsQuery.data) ? membershipsQuery.data : [];
+  const organization = memberships.find((membership) => membership.organization.slug === target)?.organization as
+    | { timezone?: string | null; timezone_confirmed?: boolean }
+    | undefined;
+  return { zone: organization?.timezone ?? null, confirmed: organization?.timezone_confirmed === true };
+}
+
+/** ADR-177: the zone of a gym the account belongs to (the current one by default), or null. */
+export function useOrganizationTimeZone(slug?: string | null): string | null {
+  return useOrganizationTimeZoneStatus(slug).zone;
+}

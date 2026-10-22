@@ -4,22 +4,11 @@ import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 
 import { fetchAdminSettings, updateTimeZone, type TimeZoneStatus } from "@/api/settings";
-import { deviceTimeZone } from "@/hooks/useReportGymTimeZone";
+import { deviceTimeZone, timeZoneOptions as zoneOptions } from "@/lib/zoned-time";
 import { useUiTranslations } from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
 
 const QUERY_KEY = ["admin", "time-zone"];
-
-/** Every IANA zone the browser knows, with the given ones kept even if it doesn't. */
-function zoneOptions(...always: Array<string | null | undefined>) {
-  let zones: string[] = [];
-  try {
-    zones = (Intl as unknown as { supportedValuesOf?: (key: string) => string[] }).supportedValuesOf?.("timeZone") ?? [];
-  } catch {
-    zones = [];
-  }
-  return Array.from(new Set([...always.filter((zone): zone is string => Boolean(zone)), ...zones])).sort();
-}
 
 /**
  * ADR-176: the gym's time zone. Class days, the 07:00 missing-WOD alert,

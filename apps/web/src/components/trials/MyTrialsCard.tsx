@@ -9,6 +9,7 @@ import { HubCard } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 
 import { FollowUp, StatusPill } from "./TrialPage";
+import { zonedText } from "@/lib/zoned-time";
 
 /**
  * Αρχική (board 6 Q5–Q6): upcoming trials at other boxes, and after a visit
@@ -29,8 +30,9 @@ export function MyTrialsCard() {
   const followUps = (trials.data ?? []).filter((trial) => trial.follow_up && trial.box);
   if (upcoming.length === 0 && followUps.length === 0) return null;
 
-  const when = (iso: string) =>
-    new Intl.DateTimeFormat(locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }).format(new Date(iso));
+  // ADR-177: on each gym's clock, its city added when the visitor's differs.
+  const when = (iso: string, zone?: string | null) =>
+    zonedText(iso, zone, locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 
   return (
     <>
@@ -53,7 +55,7 @@ export function MyTrialsCard() {
                     <span className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>
                       {trial.box?.name} · {trial.class.name}
                     </span>
-                    <span className="text-xs first-letter:uppercase" style={{ color: "var(--text-soft)" }}>{when(trial.class.scheduled_at)}</span>
+                    <span className="text-xs first-letter:uppercase" style={{ color: "var(--text-soft)" }}>{when(trial.class.scheduled_at, trial.time_zone)}</span>
                   </span>
                   <StatusPill status={trial.status} />
                 </Link>

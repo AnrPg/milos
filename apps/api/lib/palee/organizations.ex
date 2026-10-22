@@ -183,6 +183,9 @@ defmodule Palee.Organizations do
   @doc "ADR-177: the zone gym-local rules read from a gym's settings (default while unknown)."
   defdelegate resolve_timezone(settings), to: TimeZonePolicy, as: :resolve
 
+  @doc "ADR-177: whether an admin confirmed the zone in a gym's settings."
+  def timezone_confirmed?(settings), do: TimeZonePolicy.confirmed?(settings || %{})
+
   @doc "ADR-176: the best guess among candidate zones (device first, then IP)."
   defdelegate infer_timezone(candidates), to: TimeZonePolicy, as: :infer
 

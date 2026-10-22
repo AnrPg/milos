@@ -29,6 +29,7 @@ import { EventEditorSheet, ScopePicker, useEventLocations } from "./EventEditorS
 import { DateBlock, Goers, RsvpButton, useEventError } from "./EventParts";
 import { invalidateEvents } from "./use-events";
 import { useEventReferral } from "@/components/referrals/use-referral-link";
+import { YourTime } from "@/components/zoned-time";
 
 /**
  * The event page (board 8 Q2–Q4): cover, when, where with directions, the
@@ -109,7 +110,7 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
           <div className="aspect-[16/7] w-full" />
         )}
         <span className="absolute bottom-3 start-3 rounded-xl" style={{ boxShadow: "var(--shadow-md)" }}>
-          <DateBlock iso={event.starts_at} size="lg" />
+          <DateBlock iso={event.starts_at} size="lg" timeZone={event.time_zone} />
         </span>
       </div>
 
@@ -147,7 +148,8 @@ function EventView({ event, invite }: { event: CommunityEvent; invite: string | 
       <HubCard>
         <dl className="flex flex-col gap-3 text-sm">
           <InfoRow label={t("infoWhen")}>
-            <span className="first-letter:uppercase">{formatWhen(event.starts_at, event.ends_at, locale)}</span>
+            <span className="first-letter:uppercase">{formatWhen(event.starts_at, event.ends_at, locale, event.time_zone)}</span>
+            <YourTime at={event.starts_at} zone={event.time_zone} format="day-time" />
           </InfoRow>
           <InfoRow label={t("infoWhere")}>
             <span className="flex flex-col">
@@ -370,6 +372,7 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
           group={Boolean(event.channel_id)}
           locations={locations.data ?? []}
           coverSlug={can(membership, "manage_settings") ? event.box.slug : null}
+          gymSlug={event.box.slug}
           onSubmit={async (body, scope) => saved(await updateEvent(tokens!.access_token, event.id, { ...body, scope }))}
           onClose={() => setEditing(false)}
         />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -13,6 +13,8 @@ import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/communit
 import { SmallButton } from "@/components/community/GroupPage";
 import { useSession } from "@/components/session-provider";
 import { BoxPhotoUploadError, uploadBoxPhoto } from "@/lib/box-photo-upload";
+import { useOrganizationTimeZoneStatus } from "@/lib/organization-slug";
+import { timeZoneOptions, zoneLabel } from "@/lib/zoned-time";
 
 import { DURATIONS, eventRequest, formProblem, type EventForm } from "./events";
 import { useEventError } from "./EventParts";
@@ -69,6 +71,7 @@ export function blankEventForm(locations: EventLocation[], now: Date = new Date(
     repeatWeekly: false,
     repeatUntil: "",
     coverMediaId: null,
+    timeZone: null,
   };
 }
 
@@ -94,6 +97,7 @@ export function EventEditorSheet({
   clubId,
   onClubChange,
   coverSlug,
+  gymSlug = null,
   onSubmit,
   onClose,
 }: {
@@ -109,6 +113,8 @@ export function EventEditorSheet({
   onClubChange?: (id: string) => void;
   /** The box whose photos the cover goes to; no cover without one. */
   coverSlug?: string | null;
+  /** ADR-177: the event's gym, whose clock the date and time are read on. */
+  gymSlug?: string | null;
   onSubmit: (body: Body, scope: EventScope) => Promise<unknown>;
   onClose: () => void;
 }) {
@@ -122,9 +128,16 @@ export function EventEditorSheet({
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [tried, setTried] = useState(false);
-  const problem = formProblem(form, new Date(), { editing: Boolean(editing) });
+  const [zoneOpen, setZoneOpen] = useState(false);
+  // ADR-177: the date and time are on the event's clock: its own zone when
+  // it happens elsewhere, else the gym's (the device's while unknown).
+  const gym = useOrganizationTimeZoneStatus(gymSlug);
+  const clock = { ...form, timeZone: form.timeZone ?? gym.zone };
+  const zones = useMemo(() => timeZoneOptions(clock.timeZone, gym.zone), [clock.timeZone, gym.zone]);
+  const away = Boolean(gym.zone && clock.timeZone && clock.timeZone !== gym.zone);
+  const problem = formProblem(clock, new Date(), { editing: Boolean(editing) });
   const save = useMutation({
-    mutationFn: () => onSubmit(eventRequest(form, { group, editing: Boolean(editing) }), scope),
+    mutationFn: () => onSubmit(eventRequest(clock, { group, editing: Boolean(editing), gymTimeZone: gym.zone }), scope),
     onSuccess: onClose,
   });
   const set = <K extends keyof EventForm>(key: K, value: EventForm[K]) => setForm((current) => ({ ...current, [key]: value }));
@@ -203,6 +216,40 @@ export function EventEditorSheet({
             <input type="time" value={form.time} onChange={(event) => set("time", event.target.value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle} />
           </Field>
         </div>
+        {clock.timeZone ? (
+          <div className="-mt-2 flex flex-col gap-2 text-xs" style={{ color: "var(--dim)" }}>
+            <p className="flex flex-wrap items-center gap-x-2">
+              <span>{t(away ? "zoneAway" : "zoneGym", { zone: zoneLabel(clock.timeZone) })}</span>
+              {!zoneOpen ? (
+                <button type="button" className="font-semibold underline" style={{ color: "var(--primary)" }} onClick={() => setZoneOpen(true)}>
+                  {t("zoneChange")}
+                </button>
+              ) : null}
+            </p>
+            {!gym.confirmed && gym.zone ? (
+              <p role="status" className="rounded-xl px-3 py-2" style={{ background: "color-mix(in srgb, var(--warning) 12%, transparent)", color: "var(--text)" }}>
+                {t("zoneGymUnconfirmed", { zone: zoneLabel(gym.zone) })}
+              </p>
+            ) : null}
+            {form.place.kind === "address" && !away && !zoneOpen ? <p>{t("zoneAwayHint")}</p> : null}
+            {zoneOpen ? (
+              <Field label={t("fieldTimeZone")}>
+                <select
+                  value={clock.timeZone}
+                  onChange={(event) => set("timeZone", event.target.value)}
+                  className="min-h-11 rounded-2xl px-3 text-sm font-normal"
+                  style={inputStyle}
+                >
+                  {zones.map((zone) => (
+                    <option key={zone} value={zone}>
+                      {zone === gym.zone ? t("zoneGymOption", { zone }) : zone}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            ) : null}
+          </div>
+        ) : null}
         <Field label={t("fieldDuration")}>
           <select
             value={form.durationMinutes}

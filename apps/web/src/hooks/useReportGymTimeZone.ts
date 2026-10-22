@@ -4,15 +4,9 @@ import { useEffect } from "react";
 
 import { updateTimeZone } from "@/api/settings";
 import { readStorage, writeStorage } from "@/lib/onboarding";
+import { deviceTimeZone } from "@/lib/zoned-time";
 
-/** This device's IANA zone, or null when the browser does not say. */
-export function deviceTimeZone(): string | null {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().timeZone || null;
-  } catch {
-    return null;
-  }
-}
+export { deviceTimeZone };
 
 /**
  * ADR-176: until an admin confirms the gym's time zone, an owner's or admin's

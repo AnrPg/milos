@@ -129,7 +129,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
         </p>
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)", textDecoration: event.cancelled ? "line-through" : undefined }}>{event.title}</h1>
         <p className="text-sm first-letter:uppercase" style={{ color: "var(--text-soft)" }}>
-          {[formatWhen(event.starts_at, event.ends_at, locale), placeName(event.place), price(event)].filter(Boolean).join(" · ")}
+          {[formatWhen(event.starts_at, event.ends_at, locale, event.time_zone), placeName(event.place), price(event)].filter(Boolean).join(" · ")}
         </p>
         {event.cancelled ? (
           <p role="status" className="mt-2 rounded-2xl px-4 py-3 text-sm font-semibold" style={{ background: "color-mix(in srgb, var(--danger) 14%, var(--panel))", color: "var(--text)" }}>
@@ -224,6 +224,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
           group={Boolean(event.channel_id)}
           locations={locations.data ?? []}
           coverSlug={can(membership, "manage_settings") ? event.box.slug : null}
+          gymSlug={event.box.slug}
           onSubmit={async (body, scope) => applied(await updateStaffEvent(token, event.id, { ...body, scope }))}
           onClose={() => setSheet(null)}
         />

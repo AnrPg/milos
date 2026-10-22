@@ -24,7 +24,12 @@ defmodule Palee.Application.CancelAppointment do
         else: AppointmentLedger.release(context, booking, "Appointment cancelled")
 
       recipient = if booking.user_id == actor_id, do: booking.slot.coach_id, else: booking.user_id
-      NotifyAppointment.cancelled(recipient, booking.slot)
+
+      NotifyAppointment.cancelled(
+        recipient,
+        Map.put_new(booking.slot, :organization_id, context.organization_id)
+      )
+
       {:ok, cancelled}
     end
   end
