@@ -43,6 +43,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // The on-screen keyboard shrinks the layout viewport, so dialogs sized to
+  // 100dvh keep their footer actions above it instead of under it.
+  interactiveWidget: "resizes-content",
   // The browser and status bar colour; ThemeProvider keeps it in step with
   // the member's light or dark choice.
   themeColor: APP_THEMES[DEFAULT_THEME_SLUG].tokens.bg,
