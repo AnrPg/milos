@@ -65086,6 +65086,10 @@
                         "timezone": {
                           "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -65163,6 +65167,10 @@
                         "timezone": {
                           "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -104745,6 +104753,10 @@
                           "timezone": {
                             "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                             "type": "string"
+                          },
+                          "timezone_confirmed": {
+                            "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -104879,6 +104891,10 @@
                         "timezone": {
                           "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -104984,6 +105000,10 @@
                         "timezone": {
                           "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -105128,6 +105148,10 @@
                         "timezone": {
                           "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -166713,6 +166737,10 @@
                         "timezone": {
                           "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [

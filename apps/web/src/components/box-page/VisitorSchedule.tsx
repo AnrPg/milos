@@ -8,7 +8,6 @@ import { useLocale, useTranslations } from "next-intl";
 import { CLASS_LEVELS } from "@/api/schedule";
 import { fetchBoxSchedule, type PublicBoxPage, type PublicBoxSchedule } from "@/api/social";
 import { WeekStrip, weekStart } from "@/components/member-app/box/schedule/WeekStrip";
-import { formatLocalIsoDate, parseLocalDate } from "@/components/schedule/calendar-window";
 import { TrialSheet } from "@/components/trials/TrialSheet";
 import type { TrialOffer } from "@/api/trials";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";

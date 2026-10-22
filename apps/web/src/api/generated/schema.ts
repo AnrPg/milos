@@ -30664,6 +30664,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         token?: string | null;
@@ -30699,6 +30701,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         /** @enum {string} */
                         role: "member" | "athlete";
@@ -45831,6 +45835,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -45886,6 +45892,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -45928,6 +45936,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -45988,6 +45998,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -68632,6 +68644,8 @@ export interface operations {
                             slug: string;
                             /** @description ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock */
                             timezone?: string;
+                            /** @description ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         token?: string | null;

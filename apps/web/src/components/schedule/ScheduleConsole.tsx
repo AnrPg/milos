@@ -49,6 +49,8 @@ import { can } from "@/lib/role-navigation";
 /** A class may name its coach (ADR-100). */
 type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 import { PageHeader } from "@/components/PageHeader";
+import { dateTimeLocalInZone, dateTimeLocalToIso, zoneLabel, zonedText, zonedToInstant } from "@/lib/zoned-time";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
 
 type SlotEditorState = {
   slotId: string | null;
@@ -65,23 +67,23 @@ type SeriesEditorState = {
   timezone: string;
 };
 
-function formatDateTimeLocal(isoString: string) {
-  const date = new Date(isoString);
-  const tzOffset = date.getTimezoneOffset();
-  const local = new Date(date.getTime() - tzOffset * 60_000);
-  return local.toISOString().slice(0, 16);
+// ADR-177: a class's date and time are typed on the gym's clock (`zone`),
+// whatever the device's zone; without one, the device's clock.
+function formatDateTimeLocal(isoString: string, zone: string | null) {
+  return dateTimeLocalInZone(isoString, zone);
 }
 
-function toIsoDateTime(localValue: string) {
-  return new Date(localValue).toISOString();
+function toIsoDateTime(localValue: string, zone: string | null) {
+  return dateTimeLocalToIso(localValue, zone);
 }
 
 function defaultSlotValues(
   isoDate: string,
   classTypes: ClassTypeRecord[],
   defaults?: SchedulingSettings,
+  zone: string | null = null,
 ): ScheduleSlotPayload {
-  const date = new Date(`${isoDate}T09:00:00`);
+  const date = zonedToInstant(isoDate, "09:00", zone);
 
   return {
     // ADR-176: the WOD can be linked later; until then the class is a draft.
@@ -130,6 +132,9 @@ export function ScheduleConsole({
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   // ADR-176: series follow the gym's time zone, not the editing device's.
   const [gymTimeZone, setGymTimeZone] = useState<string | null>(null);
+  // ADR-177: the gym's clock (staff settings first, else the membership's).
+  const membershipZone = useOrganizationTimeZone();
+  const gymZone = gymTimeZone ?? membershipZone;
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
   const { role, isLoading: roleLoading, membership } = useSelectedMembershipRole();
@@ -151,7 +156,7 @@ export function ScheduleConsole({
   });
   const coaches = coachOptions(coachesQuery.data ?? []);
   const isMemberSurface = !roleLoading && !isAdmin;
-  const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days), [days, startDate]);
+  const calendarWindow = useMemo(() => buildScheduleWindow(startDate, days, gymZone), [days, gymZone, startDate]);
   const title = pageTitle ?? t("title");
 
   const loadSchedule = useCallback(async () => {
@@ -287,8 +292,8 @@ export function ScheduleConsole({
 
   const editorDateValue = useMemo(() => {
     if (!editor) return "";
-    return formatDateTimeLocal(editor.values.scheduled_at);
-  }, [editor]);
+    return formatDateTimeLocal(editor.values.scheduled_at, gymZone);
+  }, [editor, gymZone]);
 
   async function handleBook() {
     if (!tokens?.access_token || !bookingTarget) return;
@@ -430,12 +435,12 @@ export function ScheduleConsole({
 
     setEditor({
       slotId: null,
-      values: defaultSlotValues(isoDate, classTypes, schedulingDefaults),
+      values: defaultSlotValues(isoDate, classTypes, schedulingDefaults, gymZone),
     });
   }
 
   function openSeriesEditor() {
-    const base = defaultSlotValues(startDate, classTypes, schedulingDefaults);
+    const base = defaultSlotValues(startDate, classTypes, schedulingDefaults, gymZone);
     setSeriesEditor({
       values: {
         master_workout_id: null,
@@ -451,7 +456,7 @@ export function ScheduleConsole({
       time: "09:00",
       weekdays: [new Date(`${startDate}T12:00:00`).getDay() || 7],
       excludedDates: "",
-      timezone: gymTimeZone ?? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC"),
+      timezone: gymZone ?? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC"),
     });
   }
 
@@ -594,6 +599,7 @@ export function ScheduleConsole({
             onSelectSlot={setSelectedSlot}
             slots={schedule}
             startDate={startDate}
+            timeZone={gymZone}
           />
         )}
       </div>
@@ -601,6 +607,7 @@ export function ScheduleConsole({
       {selectedSlot ? (
         <SlotPopup
           key={selectedSlot.id}
+          timeZone={gymZone}
           accessToken={tokens?.access_token ?? ""}
           isAdmin={isAdmin}
           onApproveBooking={(booking) => {
@@ -633,13 +640,13 @@ export function ScheduleConsole({
           confirmLabel={t("confirmBooking")}
           description={t("bookClassDescription", {
             workoutTitle: bookingTarget.workout?.title ?? t("thisSlot"),
-            scheduledAt: new Intl.DateTimeFormat(locale, {
+            scheduledAt: zonedText(bookingTarget.scheduled_at, gymZone, locale, {
               weekday: "long",
               month: "short",
               day: "numeric",
               hour: "numeric",
               minute: "2-digit",
-            }).format(new Date(bookingTarget.scheduled_at)),
+            }),
           })}
           onCancel={() => setBookingTarget(null)}
           onConfirm={() => void handleBook()}
@@ -758,17 +765,22 @@ export function ScheduleConsole({
                       value={editor.values.duration_minutes}
                     />
                   ) : type === "datetime" ? (
+                    <>
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       onChange={(event) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, scheduled_at: toIsoDateTime(event.target.value) } } : current,
+                          current ? { ...current, values: { ...current.values, scheduled_at: toIsoDateTime(event.target.value, gymZone) } } : current,
                         )
                       }
                       type="datetime-local"
                       value={editorDateValue}
                     />
+                    {gymZone ? (
+                      <p className="mt-1 text-xs" style={{ color: "var(--dim)" }}>{i18n("zonedTimeGymClock", { zone: zoneLabel(gymZone) })}</p>
+                    ) : null}
+                    </>
                   ) : type === "number-cap" ? (
                     <IntegerInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"

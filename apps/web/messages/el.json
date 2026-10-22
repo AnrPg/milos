@@ -4357,7 +4357,10 @@
     "gymTimeZoneSaving": "Αποθήκευση…",
     "apiErrorClassNotPublished": "Το μάθημα δεν είναι ακόμη ανοιχτό για κρατήσεις.",
     "apiErrorInvalidTimeZone": "Διάλεξε μια γνωστή ζώνη ώρας.",
-    "apiErrorTimeZoneRequired": "Όρισε πρώτα τη ζώνη ώρας του γυμναστηρίου."
+    "apiErrorTimeZoneRequired": "Όρισε πρώτα τη ζώνη ώρας του γυμναστηρίου.",
+    "zonedTimeYours": "{time} η ώρα σου",
+    "zonedTimeYoursTitle": "Στο ρολόι σου ({zone})",
+    "zonedTimeGymClock": "Οι ώρες είναι στο ρολόι του γυμναστηρίου ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -6488,7 +6491,14 @@
     "eventsSegments": "Ποια events",
     "nearMe": "Κοντά μου",
     "fieldGoodForFriends": "Καλό για φίλους",
-    "goodForFriendsHint": "Μπαίνει πρώτο όταν τα μέλη καλούν φίλους σε event."
+    "goodForFriendsHint": "Μπαίνει πρώτο όταν τα μέλη καλούν φίλους σε event.",
+    "zoneGym": "Ώρες στην ώρα του γυμναστηρίου ({zone})",
+    "zoneAway": "Ώρες σε ώρα {zone}",
+    "zoneChange": "Αλλαγή",
+    "zoneGymUnconfirmed": "Το γυμναστήριο δεν έχει επιβεβαιώσει ακόμη τη ζώνη ώρας του, οπότε το {zone} είναι εκτίμηση. Το προσωπικό μπορεί να την ορίσει στις ρυθμίσεις του γυμναστηρίου.",
+    "zoneAwayHint": "Γίνεται σε άλλη ζώνη ώρας; Άλλαξε το ρολόι ώστε οι ώρες να είναι σωστές για όλους.",
+    "fieldTimeZone": "Ζώνη ώρας",
+    "zoneGymOption": "{zone} (του γυμναστηρίου)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Κανένα επερχόμενο event. Φτιάξε ένα με «+ Νέο event».",

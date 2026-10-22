@@ -159,18 +159,18 @@ export function zonedToInstant(dateKey: string, time: string, zone: string | nul
   if (!isValidTimeZone(zone)) return new Date(year, month - 1, day, hour, minute, 0, 0);
 
   const asUtc = Date.UTC(year, month - 1, day, hour, minute, 0);
-  const firstOffset = offsetMinutes(new Date(asUtc), zone);
-  let candidate = asUtc - firstOffset * 60_000;
-  const secondOffset = offsetMinutes(new Date(candidate), zone);
-  if (secondOffset !== firstOffset) {
-    const retry = asUtc - secondOffset * 60_000;
-    // A repeated hour: both offsets fit, take the earlier moment. A skipped
-    // hour: neither fits, take the later one (after the jump).
-    const fits = (instant: number) => timeKeyInZone(new Date(instant), zone) === `${pad(hour)}:${pad(minute)}`;
-    if (fits(candidate) && fits(retry)) candidate = Math.min(candidate, retry);
-    else if (fits(retry)) candidate = retry;
-    else candidate = Math.max(candidate, retry);
-  }
+  const wanted = `${pad(hour)}:${pad(minute)}`;
+  // The zone's offsets on either side of that day: a DST change falls
+  // between them. Each gives one candidate moment.
+  const candidates = Array.from(
+    new Set([-86_400_000, 0, 86_400_000].map((shift) => asUtc - offsetMinutes(new Date(asUtc + shift), zone) * 60_000)),
+  ).sort((a, b) => a - b);
+  const fits = candidates.filter(
+    (instant) => dateKeyInZone(new Date(instant), zone) === dateKey && timeKeyInZone(new Date(instant), zone) === wanted,
+  );
+  // A repeated hour: several fit, take the earlier moment. A skipped hour:
+  // none fits, take the later one (just after the jump).
+  const candidate = fits.length > 0 ? fits[0] : candidates[candidates.length - 1];
   return new Date(candidate);
 }
 

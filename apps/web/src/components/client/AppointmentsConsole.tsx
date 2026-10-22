@@ -24,6 +24,8 @@ import { CLIENT_ENTITLEMENT_QUERY_KEY, useClientEntitlement } from "@/components
 import { entryDay } from "@/components/client/vault";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { YourTime } from "@/components/zoned-time";
 
 const SLOTS_KEY = ["me", "appointments", "slots"] as const;
 const MINE_KEY = ["me", "appointments", "mine"] as const;
@@ -168,7 +170,9 @@ function OfferedSlots({
 }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
-  const days = useMemo(() => groupSlotsByDay(slots), [slots]);
+  // ADR-177: the practice's days and clock, wherever the client is.
+  const zone = useOrganizationTimeZone();
+  const days = useMemo(() => groupSlotsByDay(slots, zone ?? undefined), [slots, zone]);
   if (days.length === 0) return <EmptyLine>{i18n("clApptNoSlots")}</EmptyLine>;
 
   return (
@@ -187,7 +191,7 @@ function OfferedSlots({
               >
                 <div className="min-w-0">
                   <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
-                    <time dateTime={slot.starts_at}>{formatTime(slot.starts_at, locale)}</time>
+                    <time dateTime={slot.starts_at}>{formatTime(slot.starts_at, locale, zone)}</time>
                     {" · "}
                     {kindLabel(slot.kind, i18n)}
                   </p>
@@ -302,6 +306,7 @@ function AppointmentItem({
 }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
+  const zone = useOrganizationTimeZone();
   const [confirming, setConfirming] = useState(false);
   const slot = bookingSlot(booking);
   const startsAt = slot?.starts_at ?? null;
@@ -313,9 +318,12 @@ function AppointmentItem({
         <div className="min-w-0">
           <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>
             {startsAt ? (
+              <>
               <time dateTime={startsAt}>
-                {formatDay(entryDay(startsAt), locale, { weekday: "short", month: "short" })} · {formatTime(startsAt, locale)}
+                {formatDay(entryDay(startsAt, zone), locale, { weekday: "short", month: "short" })} · {formatTime(startsAt, locale, zone)}
               </time>
+              <YourTime at={startsAt} zone={zone} format="day-time" />
+              </>
             ) : null}
           </p>
           <p className="mt-0.5 flex flex-wrap gap-x-2 text-xs" style={{ color: "var(--dim)" }}>

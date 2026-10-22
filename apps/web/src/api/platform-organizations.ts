@@ -21,6 +21,8 @@ export type PlatformOrganization = {
 export type OrganizationSettings = {
   organization_id: string;
   timezone: string;
+  /** ADR-176/177: "confirmed" once staff set it; "inferred" (from a sign-in) or null otherwise. */
+  timezone_source?: "confirmed" | "inferred" | null;
   default_locale: string;
   invitation_lifetime_seconds: number;
   brand_name: string | null;

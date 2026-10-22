@@ -4357,7 +4357,10 @@
     "gymTimeZoneSaving": "Сохранение…",
     "apiErrorClassNotPublished": "Запись на это занятие ещё не открыта.",
     "apiErrorInvalidTimeZone": "Выберите известный часовой пояс.",
-    "apiErrorTimeZoneRequired": "Сначала задайте часовой пояс зала."
+    "apiErrorTimeZoneRequired": "Сначала задайте часовой пояс зала.",
+    "zonedTimeYours": "{time} по вашему времени",
+    "zonedTimeYoursTitle": "По вашим часам ({zone})",
+    "zonedTimeGymClock": "Время указано по часам зала ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",
@@ -6488,7 +6491,14 @@
     "eventsSegments": "Какие события",
     "nearMe": "Рядом со мной",
     "fieldGoodForFriends": "Подходит для друзей",
-    "goodForFriendsHint": "Показывается первым, когда участники приглашают друзей на событие."
+    "goodForFriendsHint": "Показывается первым, когда участники приглашают друзей на событие.",
+    "zoneGym": "Время зала ({zone})",
+    "zoneAway": "Время по {zone}",
+    "zoneChange": "Изменить",
+    "zoneGymUnconfirmed": "Зал ещё не подтвердил часовой пояс, поэтому {zone} — предположение. Сотрудники могут указать его в настройках зала.",
+    "zoneAwayHint": "Проходит в другом часовом поясе? Смените часы, чтобы время было верным для всех.",
+    "fieldTimeZone": "Часовой пояс",
+    "zoneGymOption": "{zone} (пояс зала)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Нет предстоящих событий. Создайте через «+ Новое событие».",
