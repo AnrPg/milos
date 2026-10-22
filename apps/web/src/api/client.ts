@@ -21,7 +21,7 @@ export type ApiErrorPayload = {
   params?: Record<string, unknown>;
   error?: string;
   errors?: Record<string, unknown>;
-  /** Extra structured detail for some codes (e.g. ADR-179 `invalid_text_sections`). */
+  /** Extra structured detail for some codes (e.g. ADR-180 `invalid_text_sections`). */
   details?: Record<string, unknown>;
   diagnostics?: Array<{
     code: string;

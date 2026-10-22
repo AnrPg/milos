@@ -1,6 +1,6 @@
 defmodule Palee.Workouts.Domain.SectionScoring do
   @moduledoc """
-  How a text section is scored (ADR-179), pure.
+  How a text section is scored (ADR-180), pure.
 
   A coach may say what a section counts («This section is scored by»): one
   or more metrics, each from the common paradigms below or a custom one with

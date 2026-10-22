@@ -71,7 +71,7 @@ defmodule Palee.Execution do
     do: ClassTimerStore.save_class_timer(context, scheduled_class_id, attrs, expected_version)
 
   @doc """
-  The segments an execution of this workout runs. ADR-179: a workout written
+  The segments an execution of this workout runs. ADR-180: a workout written
   in text sections runs each section's own timer preset.
   """
   def build_timer_sequence(%{authoring_mode: "sectioned_text"} = workout),
@@ -79,7 +79,7 @@ defmodule Palee.Execution do
 
   def build_timer_sequence(workout), do: TimerSequenceBuilder.build(workout)
 
-  @doc "ADR-179: the athlete's results for the scores a coach set on text sections."
+  @doc "ADR-180: the athlete's results for the scores a coach set on text sections."
   defdelegate normalize_text_section_scores(entries, sections),
     to: TextSectionScores,
     as: :normalize

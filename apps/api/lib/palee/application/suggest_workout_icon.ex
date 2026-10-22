@@ -31,7 +31,7 @@ defmodule Palee.Application.SuggestWorkoutIcon do
 
   def enqueue(_context, _workout_id), do: :ok
 
-  # ADR-179: a gym that switched the WOD assistant off gets no AI calls for
+  # ADR-180: a gym that switched the WOD assistant off gets no AI calls for
   # its workouts; the keyword rules keep giving them an icon.
   def call(context, workout_id) do
     if Organizations.wod_assistant_enabled?(context),

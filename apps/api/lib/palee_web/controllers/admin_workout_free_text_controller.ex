@@ -36,6 +36,12 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
         type: :string,
         description: "Canonical field path, or \"text\" for a text-only correction"
       },
+      anchor: %Schema{
+        type: :string,
+        nullable: true,
+        description:
+          "The words of the coach's text the issue is about, exactly as written; the editor marks them in place (nil: the panel only)"
+      },
       code: %Schema{
         type: :string,
         description:
@@ -151,7 +157,7 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
   )
 
   operation(:authoring_settings,
-    summary: "What the workout editor may offer in this gym (ADR-179)",
+    summary: "What the workout editor may offer in this gym (ADR-180)",
     responses: [
       ok:
         {"Authoring settings", "application/json",

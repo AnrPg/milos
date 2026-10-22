@@ -74,7 +74,7 @@ export type AdminSettingsPayload = {
 export type WorkoutAuthoringSettings = {
   /** Starting value of «Εμφάνιση στόχων στα μέλη» on a workout without goals of its own. */
   wod_goals_visible_by_default: boolean;
-  /** ADR-179: whether coaches may use the WOD assistant (on by default). */
+  /** ADR-180: whether coaches may use the WOD assistant (on by default). */
   wod_assistant_enabled: boolean;
 };
 

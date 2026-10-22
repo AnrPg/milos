@@ -14,7 +14,7 @@ import {
   suggestScoreKinds,
 } from "./text-sections";
 
-describe("text sections (ADR-179)", () => {
+describe("text sections (ADR-180)", () => {
   it("reads a sectioned workout's sections and ignores other workouts", () => {
     const sections = readTextSections({
       authoring_mode: "sectioned_text",
@@ -65,7 +65,7 @@ describe("text sections (ADR-179)", () => {
   });
 });
 
-describe("section scoring (ADR-179)", () => {
+describe("section scoring (ADR-180)", () => {
   const labels = {
     rounds: "Rounds",
     reps: "Reps",

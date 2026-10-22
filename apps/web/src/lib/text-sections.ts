@@ -3,7 +3,7 @@ import type { JSONContent } from "@tiptap/react";
 import { type FreeTextTimerPreset, parseFreeTextTimerPreset } from "@/lib/free-text-timer";
 
 /**
- * Workouts written without the assistant (ADR-179) are a list of text
+ * Workouts written without the assistant (ADR-180) are a list of text
  * sections, each with the timer the coach picked for it. The athlete runs
  * those timers one section at a time.
  */

@@ -162,7 +162,7 @@ defmodule PaleeWeb.Schemas.Workout do
           type: :string,
           nullable: true,
           maxLength: 20_000,
-          description: "ADR-179: a text section's text (sectioned workouts)"
+          description: "ADR-180: a text section's text (sectioned workouts)"
         },
         free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true},
         timer_preset: section_timer_preset_schema(),
@@ -174,7 +174,7 @@ defmodule PaleeWeb.Schemas.Workout do
     }
   end
 
-  @doc "ADR-179: the timer a coach picked for one text section (the free-text preset shape)."
+  @doc "ADR-180: the timer a coach picked for one text section (the free-text preset shape)."
   def section_timer_preset_schema do
     %Schema{
       title: "SectionTimerPreset",

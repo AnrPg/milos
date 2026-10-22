@@ -5,7 +5,7 @@ import { useId } from "react";
 import { useUiTranslations } from "@/i18n/ui";
 
 /**
- * ADR-179: the workout editor's «AI assistant» switch. On, the coach writes
+ * ADR-180: the workout editor's «AI assistant» switch. On, the coach writes
  * one free text the assistant reads (guided execution); off, the workout is
  * written in sections with a timer each. When the gym switched the assistant
  * off in Settings, the switch stays off and says so.

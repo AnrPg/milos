@@ -115,7 +115,7 @@ defmodule Palee.Execution.Domain.TimerPresets do
   def build(_preset), do: [segment(0, %{format: "untimed", kind: :countup})]
 
   @doc """
-  ADR-179: the segments of a workout written in text sections: each
+  ADR-180: the segments of a workout written in text sections: each
   section's own preset, in order, keyed and named by its section. Sections
   without a valid preset are skipped.
   """

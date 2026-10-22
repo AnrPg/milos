@@ -1,7 +1,7 @@
 defmodule Palee.Execution.Domain.TextSectionScores do
   @moduledoc """
   The athlete's results for the scores a coach set on text sections
-  (ADR-179), pure.
+  (ADR-180), pure.
 
   Each entry names a section and one of its metrics (`metric_key`) and
   carries a number (time in seconds). It becomes an ordinary section score

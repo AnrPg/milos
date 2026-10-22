@@ -10,7 +10,7 @@ import { useUiTranslations } from "@/i18n/ui";
 const SETTINGS_KEY = ["admin", "settings"] as const;
 
 /**
- * ADR-179: the gym's WOD assistant switch. Off, the assistant is never called
+ * ADR-180: the gym's WOD assistant switch. Off, the assistant is never called
  * and coaches write every workout in text sections, a timer each.
  */
 export function WodAssistantSetting({ token }: { token: string }) {

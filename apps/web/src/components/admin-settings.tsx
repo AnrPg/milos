@@ -1223,7 +1223,7 @@ function AiAssistantSection({ token }: { token: string }) {
   const t = useTranslations("Scaling");
   return (
     <CollapsibleSection id="ai-assistant" title={t("settings.title")} description={t("settings.description")} defaultOpen={false}>
-      {/* ADR-179: the WOD assistant runs on the platform's credits, so it needs no key of the gym's. */}
+      {/* ADR-180: the WOD assistant runs on the platform's credits, so it needs no key of the gym's. */}
       <div className="mb-5 border-b pb-5" style={{ borderColor: "var(--border)" }}>
         <WodAssistantSetting token={token} />
       </div>

@@ -61,7 +61,7 @@ describe("FinishWizard free-text comments", () => {
   });
 });
 
-describe("FinishWizard: ADR-179 text-section scores", () => {
+describe("FinishWizard: ADR-180 text-section scores", () => {
   it("asks for each score the coach set, by name, and sends them as numbers", () => {
     const onConfirm = vi.fn();
     render(

@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Число",
     "textSectionScoringInvalid": "Всеки показател трябва да има собствено име (до 40 знака, 6 на част).",
     "addSectionScoring": "Оценяване…",
-    "textSectionResultsHint": "Попълни каквото можеш; всички полета са по избор."
+    "textSectionResultsHint": "Попълни каквото можеш; всички полета са по избор.",
+    "assistantMarksLegend": "Отбелязано в текста:",
+    "assistantMark_error": "Грешки",
+    "assistantMark_correction": "Правопис и мерни единици",
+    "assistantMark_assumption": "Допускания",
+    "assistantMark_advice": "Предложения",
+    "assistantSuggestionsHere": "Предложения на асистента за тези думи"
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",

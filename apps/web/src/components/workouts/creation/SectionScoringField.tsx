@@ -25,7 +25,7 @@ export function useScoreKindLabels(): Record<ScoreKind, string> {
 type Option = { id: string; label: string; kind: ScoreKind; custom: boolean };
 
 /**
- * ADR-179: «This section is scored by» on a text section. The coach types
+ * ADR-180: «This section is scored by» on a text section. The coach types
  * what the section counts; live suggestions offer the common paradigms
  * (rounds, reps, time, load, calories, distance) and «+» adds the typed name
  * as its own score, its kind guessed and changeable on the chip. After the

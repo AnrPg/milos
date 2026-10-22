@@ -8,7 +8,7 @@ defmodule Palee.Application.AnalyzeFreeTextWorkout do
 
   alias Palee.{Organizations, Workouts}
 
-  @doc "Analyzes the text, or `{:error, :assistant_disabled}` when the gym switched the assistant off (ADR-179)."
+  @doc "Analyzes the text, or `{:error, :assistant_disabled}` when the gym switched the assistant off (ADR-180)."
   def call(context, params) when is_map(params) do
     if Organizations.wod_assistant_enabled?(context),
       do: analyze(context, params),

@@ -11,7 +11,7 @@ export type FreeTextExecutionWorkout = {
   source_reference_id?: string | null;
   /** Timer the coach attached to the workout, if any. */
   timer_preset?: FreeTextTimerPreset | null;
-  /** ADR-179: the workout's text sections, each with its own timer ([] for plain free text). */
+  /** ADR-180: the workout's text sections, each with its own timer ([] for plain free text). */
   sections?: TextSection[];
 };
 

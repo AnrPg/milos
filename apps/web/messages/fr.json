@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Nombre",
     "textSectionScoringInvalid": "Chaque mesure doit avoir son propre nom (40 caractères max, 6 par partie).",
     "addSectionScoring": "Notation…",
-    "textSectionResultsHint": "Remplis ce que tu peux ; tous les champs sont facultatifs."
+    "textSectionResultsHint": "Remplis ce que tu peux ; tous les champs sont facultatifs.",
+    "assistantMarksLegend": "Marqué dans le texte :",
+    "assistantMark_error": "Erreurs",
+    "assistantMark_correction": "Orthographe et unités",
+    "assistantMark_assumption": "Supposé",
+    "assistantMark_advice": "Suggestions",
+    "assistantSuggestionsHere": "Suggestions de l’assistant pour ces mots"
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",

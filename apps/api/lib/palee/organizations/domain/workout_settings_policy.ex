@@ -6,7 +6,7 @@ defmodule Palee.Organizations.Domain.WorkoutSettingsPolicy do
   - `wod_goals_visible_by_default`: the starting value of the editor's
     «Εμφάνιση στόχων στα μέλη» toggle for a workout without goals of its own
     (off by default).
-  - `wod_assistant_enabled` (ADR-179): whether coaches may use the WOD
+  - `wod_assistant_enabled` (ADR-180): whether coaches may use the WOD
     assistant at all. On by default, so gyms keep what they had; off, the
     assistant is never called and every new workout is written in text
     sections with a timer each.
@@ -34,7 +34,7 @@ defmodule Palee.Organizations.Domain.WorkoutSettingsPolicy do
 
   def from_settings(_settings), do: @defaults
 
-  @doc "Whether the gym lets coaches use the WOD assistant (ADR-179)."
+  @doc "Whether the gym lets coaches use the WOD assistant (ADR-180)."
   def wod_assistant_enabled?(settings), do: Map.get(settings, :wod_assistant_enabled, true)
 
   @doc """

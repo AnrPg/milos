@@ -50,7 +50,7 @@ type Props = {
   draftId: string | null;
   folderId?: string | null;
   onDraftReady: (id: string) => void;
-  /** Whether the gym lets coaches use the assistant (ADR-179). */
+  /** Whether the gym lets coaches use the assistant (ADR-180). */
   assistantAvailable: boolean;
   /** Switch this workout to the assistant's free-text editor (the draft is saved first). */
   onUseAssistant: () => void;
@@ -61,7 +61,7 @@ type SaveStatus = "idle" | "saving" | "saved" | "error";
 const WORKOUT_TYPES: WorkoutType[] = ["crossfit", "strength", "gymnastics", "aerobics", "flexibility", "recovery"];
 
 /**
- * ADR-179: a workout written without the assistant. The coach adds sections
+ * ADR-180: a workout written without the assistant. The coach adds sections
  * («+ Προσθήκη ενότητας»), writes each one's text and picks its own timer;
  * athletes run those timers one section at a time. Nothing is parsed.
  */

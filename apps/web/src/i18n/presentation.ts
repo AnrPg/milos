@@ -477,7 +477,7 @@ export function formatScore(
   }
 
   if (scoreType === "pass_fail") return semanticLabel(text, translate);
-  // ADR-179: section results store time as seconds.
+  // ADR-180: section results store time as seconds.
   if (scoreType === "time" && unit === "s" && typeof value === "number" && value >= 0) return clockFromSeconds(value);
   const localizedUnit = semanticLabel(unit, translate);
   return localizedUnit ? `${text} ${localizedUnit}` : text;

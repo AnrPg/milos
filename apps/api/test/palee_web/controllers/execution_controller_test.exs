@@ -621,7 +621,7 @@ defmodule PaleeWeb.ExecutionControllerTest do
              ]
     end
 
-    test "ADR-179: results for a text section's scores become section scores of their own",
+    test "ADR-180: results for a text section's scores become section scores of their own",
          %{conn: conn} do
       admin = create_admin!("text_score_admin")
       athlete_conn = authenticate_as_member(conn, "text_score_member")

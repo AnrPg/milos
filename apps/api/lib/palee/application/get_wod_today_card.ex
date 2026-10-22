@@ -101,7 +101,7 @@ defmodule Palee.Application.GetWodTodayCard do
   end
 
   # The WOD's scored section; for a workout written in text sections
-  # (ADR-179), the first score its coach set.
+  # (ADR-180), the first score its coach set.
   defp ranked_section(workout) do
     case Execution.training_log_scoreable_sections(workout) do
       [section | _rest] -> section

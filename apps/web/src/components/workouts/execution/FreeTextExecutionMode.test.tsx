@@ -83,7 +83,7 @@ describe("FreeTextExecutionMode", () => {
     });
   });
 
-  describe("ADR-179: a workout written in text sections", () => {
+  describe("ADR-180: a workout written in text sections", () => {
     beforeEach(() => {
       window.sessionStorage.clear();
       storeFreeTextExecutionWorkout(

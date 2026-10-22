@@ -18,7 +18,7 @@ defmodule Palee.Execution.Domain.ScoreRanking do
   """
   def rank(results, %{id: section_id, score_type: score_type} = section) do
     lower? = lower_is_better?(score_type)
-    # ADR-179: a text section may count several things; rank by one of them.
+    # ADR-180: a text section may count several things; rank by one of them.
     section_id = Map.get(section, :section_key) || section_id
 
     {ranked, unranked} =

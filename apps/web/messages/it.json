@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Numero",
     "textSectionScoringInvalid": "Ogni punteggio ha bisogno di un nome proprio (max 40 caratteri, 6 per sezione).",
     "addSectionScoring": "Punteggio…",
-    "textSectionResultsHint": "Compila ciò che puoi; tutti i campi sono facoltativi."
+    "textSectionResultsHint": "Compila ciò che puoi; tutti i campi sono facoltativi.",
+    "assistantMarksLegend": "Segnato nel testo:",
+    "assistantMark_error": "Errori",
+    "assistantMark_correction": "Ortografia e unità",
+    "assistantMark_assumption": "Ipotesi",
+    "assistantMark_advice": "Suggerimenti",
+    "assistantSuggestionsHere": "Suggerimenti dell’assistente per queste parole"
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",

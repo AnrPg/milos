@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Número",
     "textSectionScoringInvalid": "Cada pontuação precisa de um nome próprio (até 40 caracteres, 6 por secção).",
     "addSectionScoring": "Pontuação…",
-    "textSectionResultsHint": "Preenche o que puderes; todos os campos são opcionais."
+    "textSectionResultsHint": "Preenche o que puderes; todos os campos são opcionais.",
+    "assistantMarksLegend": "Assinalado no texto:",
+    "assistantMark_error": "Erros",
+    "assistantMark_correction": "Ortografia e unidades",
+    "assistantMark_assumption": "Assumido",
+    "assistantMark_advice": "Sugestões",
+    "assistantSuggestionsHere": "Sugestões do assistente para estas palavras"
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",

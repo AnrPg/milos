@@ -91,7 +91,7 @@ defmodule PaleeWeb.AdminWorkoutFreeTextControllerTest do
     |> json_response(403)
   end
 
-  describe "ADR-179: the gym's WOD assistant switch" do
+  describe "ADR-180: the gym's WOD assistant switch" do
     test "is on by default, and off it stops the assistant before any call", %{conn: conn} do
       {conn, organization} = authenticate(conn, "free_text_ai_switch", :owner)
       base = "/api/org/#{organization.slug}/admin"

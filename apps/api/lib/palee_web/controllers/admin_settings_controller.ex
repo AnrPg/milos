@@ -121,7 +121,7 @@ defmodule PaleeWeb.AdminSettingsController do
   @wod_assistant_enabled_schema %Schema{
     type: :boolean,
     description:
-      "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each"
+      "ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each"
   }
 
   @workout_settings_schema %Schema{

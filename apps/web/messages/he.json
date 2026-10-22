@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "מספר",
     "textSectionScoringInvalid": "לכל מדד צריך שם משלו (עד 40 תווים, 6 לכל חלק).",
     "addSectionScoring": "ניקוד…",
-    "textSectionResultsHint": "מלאו מה שאפשר; כל השדות רשות."
+    "textSectionResultsHint": "מלאו מה שאפשר; כל השדות רשות.",
+    "assistantMarksLegend": "מסומן בטקסט:",
+    "assistantMark_error": "שגיאות",
+    "assistantMark_correction": "איות ויחידות",
+    "assistantMark_assumption": "הנחות",
+    "assistantMark_advice": "הצעות",
+    "assistantSuggestionsHere": "הצעות העוזר למילים האלה"
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",

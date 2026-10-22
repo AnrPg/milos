@@ -26,7 +26,7 @@ export type TextSectionScoreView = {
 const fieldKey = (sectionId: string, metricKey: string) => `${sectionId}:${metricKey}`;
 
 /**
- * ADR-179: after a workout written in text sections, one named field for
+ * ADR-180: after a workout written in text sections, one named field for
  * each score the coach set («Rounds», «Top set»…), grouped by section. Time
  * is typed as m:ss; everything is optional.
  */

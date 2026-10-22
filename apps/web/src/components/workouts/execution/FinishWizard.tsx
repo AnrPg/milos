@@ -23,7 +23,7 @@ import type { TextSection, TextSectionResult } from "@/lib/text-sections";
 
 type SectionScore = {
   section_id: string;
-  /** One series per section and metric (ADR-179); the section id otherwise. */
+  /** One series per section and metric (ADR-180); the section id otherwise. */
   section_key?: string;
   section_name?: string | null;
   value: number | string;
@@ -960,7 +960,7 @@ export function FinishWizard({
   pendingCommentIds?: string[];
   clockAdjustments?: ClockAdjustmentSummary[];
   freeText?: boolean;
-  /** ADR-179: a workout written in text sections; the scores its coach set are asked for here. */
+  /** ADR-180: a workout written in text sections; the scores its coach set are asked for here. */
   textSections?: TextSection[];
   /** Offers «Τι ένιωσες;» (WOD goals feedback) on this execution before the confirm step. */
   feltExecutionId?: string | null;

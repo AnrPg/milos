@@ -22,7 +22,7 @@ defmodule Palee.Workouts.Domain.FreeTextAnalysis do
   """
 
   alias Palee.Workouts.Domain.{TimerConfig, WorkoutType}
-  alias Palee.Workouts.Domain.WorkoutAssistant.Proofreading
+  alias Palee.Workouts.Domain.WorkoutAssistant.{IssueAnchor, Proofreading}
   alias Palee.Workouts.Domain.WorkoutDsl.Vocabulary
 
   @difficulties ~w(beginner intermediate advanced all-levels)
@@ -95,7 +95,7 @@ defmodule Palee.Workouts.Domain.FreeTextAnalysis do
       raw
       |> list_value("assumptions")
       |> Enum.take(@max_assumptions)
-      |> Enum.flat_map(&normalize_assumption(&1, workout))
+      |> Enum.flat_map(&normalize_assumption(&1, workout, source))
       |> merge_assumptions()
 
     issues =
@@ -104,7 +104,12 @@ defmodule Palee.Workouts.Domain.FreeTextAnalysis do
       |> dedupe_issues()
       |> Enum.take(@max_issues)
       |> Enum.with_index(1)
-      |> Enum.map(fn {issue, index} -> Map.put(issue, "id", "issue-#{index}") end)
+      |> Enum.map(fn {issue, index} ->
+        issue
+        |> Map.put("id", "issue-#{index}")
+        # Where the editor marks it in the text (nil: the panel only).
+        |> Map.put_new_lazy("anchor", fn -> IssueAnchor.find(issue, workout, nil, source) end)
+      end)
 
     issue_paths = MapSet.new(issues, & &1["path"])
 
@@ -461,6 +466,7 @@ defmodule Palee.Workouts.Domain.FreeTextAnalysis do
           "current_value" => get_path(workout, path),
           "suggestion" => suggestion
         }
+        |> with_anchor(workout, raw, source)
       ]
     else
       _ -> []
@@ -472,7 +478,7 @@ defmodule Palee.Workouts.Domain.FreeTextAnalysis do
   # An assumption is a value the assistant inferred (a convention, a computed
   # number, an expanded abbreviation). Keep accepts the current value; Reject
   # clears the field like any other rejection.
-  defp normalize_assumption(raw, workout) when is_map(raw) do
+  defp normalize_assumption(raw, workout, source) when is_map(raw) do
     with path when is_binary(path) <- raw |> map_value_raw("path") |> canonical_path(),
          true <- path_exists?(workout, path),
          value when not is_nil(value) <- get_path(workout, path),
@@ -488,13 +494,19 @@ defmodule Palee.Workouts.Domain.FreeTextAnalysis do
           "current_value" => value,
           "suggestion" => %{"label" => nil, "value" => value, "text_edit" => nil}
         }
+        |> with_anchor(workout, raw, source)
       ]
     else
       _ -> []
     end
   end
 
-  defp normalize_assumption(_raw, _workout), do: []
+  defp normalize_assumption(_raw, _workout, _source), do: []
+
+  defp with_anchor(issue, workout, raw, source) do
+    quote = raw |> map_value_raw("source_text") |> then(&if(is_binary(&1), do: &1))
+    Map.put(issue, "anchor", IssueAnchor.find(issue, workout, quote, source))
+  end
 
   # Several inferred timer keys share one canonical field (timer_config): one
   # card explains them all, so Keep/Reject acts on the whole timer once.

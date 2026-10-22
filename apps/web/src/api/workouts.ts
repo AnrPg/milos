@@ -141,15 +141,15 @@ export type WorkoutSectionRecord = {
   timer_config?: Record<string, unknown> | null;
   note?: string | null;
   section_metadata?: Record<string, unknown> | null;
-  /** ADR-179: a text section of a workout written without the assistant. */
+  /** ADR-180: a text section of a workout written without the assistant. */
   free_text_body?: string | null;
   free_text_document?: Record<string, unknown> | null;
-  /** ADR-179: the timer the coach picked for this text section. */
+  /** ADR-180: the timer the coach picked for this text section. */
   timer_preset?: FreeTextTimerPreset | null;
   exercises: WorkoutExerciseRecord[];
 };
 
-/** How a workout was written; `sectioned_text` = text sections without the assistant (ADR-179). */
+/** How a workout was written; `sectioned_text` = text sections without the assistant (ADR-180). */
 export type WorkoutAuthoringMode = "structured" | "quick_text" | "free_text" | "sectioned_text";
 
 export type WorkoutRecord = {
@@ -250,7 +250,7 @@ export async function listScaleLevels(token: string) {
 
 export type FreeTextWorkoutAnalysis = components["schemas"]["FreeTextWorkoutAnalysis"];
 
-/** ADR-179: what the workout editor may offer in this gym. */
+/** ADR-180: what the workout editor may offer in this gym. */
 export type WodAssistantAvailability = { wod_assistant_enabled: boolean };
 
 export const WOD_ASSISTANT_AVAILABILITY_KEY = ["admin", "workouts", "authoring-settings"] as const;

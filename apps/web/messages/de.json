@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Zahl",
     "textSectionScoringInvalid": "Jede Wertung braucht einen eigenen Namen (bis 40 Zeichen, 6 pro Abschnitt).",
     "addSectionScoring": "Wertung…",
-    "textSectionResultsHint": "Trag ein, was du weißt; alle Felder sind optional."
+    "textSectionResultsHint": "Trag ein, was du weißt; alle Felder sind optional.",
+    "assistantMarksLegend": "Im Text markiert:",
+    "assistantMark_error": "Fehler",
+    "assistantMark_correction": "Schreibweise & Einheiten",
+    "assistantMark_assumption": "Angenommen",
+    "assistantMark_advice": "Vorschläge",
+    "assistantSuggestionsHere": "Vorschläge des Assistenten zu diesen Wörtern"
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",

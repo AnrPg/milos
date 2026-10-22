@@ -22,10 +22,10 @@ export function hasStructuredContent(sections: StructuredSection[] | null | unde
  * its structured timers. The manual timer is the fallback for free-text
  * workouts that have no runnable structure, or whose timers the assistant
  * could not infer (`workout_metadata.timer_inference = "incomplete"`), and
- * the only timer of workouts written in text sections (ADR-179).
+ * the only timer of workouts written in text sections (ADR-180).
  */
 export function usesManualTimer(workout: ExecutableWorkout | null | undefined): boolean {
-  // ADR-179: text sections never run a structured sequence, only their own timers.
+  // ADR-180: text sections never run a structured sequence, only their own timers.
   if (workout?.authoring_mode === "sectioned_text") return true;
   if (!workout || workout.authoring_mode !== "free_text") return false;
   if (!hasStructuredContent(workout.sections)) return true;

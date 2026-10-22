@@ -237,6 +237,41 @@ input[type="number"] {
   color: var(--text);
 }
 
+/* ADR-181: words the WOD assistant has a suggestion for, coloured by kind.
+   Overlapping marks nest, so each keeps its own underline. */
+.assistant-mark {
+  --mark-color: var(--primary);
+  cursor: pointer;
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--mark-color) 10%, transparent);
+  text-decoration-line: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: var(--mark-color);
+  text-decoration-thickness: 1.5px;
+  text-underline-offset: 3px;
+}
+
+.assistant-mark .assistant-mark {
+  text-underline-offset: 6px;
+}
+
+.assistant-mark:hover {
+  background: color-mix(in srgb, var(--mark-color) 22%, transparent);
+}
+
+.assistant-mark-error { --mark-color: var(--danger); }
+.assistant-mark-correction { --mark-color: var(--warning); }
+.assistant-mark-assumption { --mark-color: var(--primary); }
+.assistant-mark-advice { --mark-color: var(--success); }
+
+.assistant-mark-swatch {
+  display: inline-block;
+  width: 0.9rem;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: var(--mark-color);
+}
+
 .free-text-rich-content :where(p, ul, ol, blockquote, pre, h1, h2, h3, h4, h5) {
   margin-block: 0.65rem;
 }

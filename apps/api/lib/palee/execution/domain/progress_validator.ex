@@ -99,7 +99,7 @@ defmodule Palee.Execution.Domain.ProgressValidator do
   # their single clock may be reset by the athlete, so it may go back.
   defp validate_monotonic(_progress, _previous, []), do: :ok
 
-  # ADR-179: a workout written in text sections runs one clock per section and
+  # ADR-180: a workout written in text sections runs one clock per section and
   # the athlete may restart a section's clock, so its time may go back too.
   defp validate_monotonic(progress, previous, segments) do
     if Enum.all?(segments, &text_section_segment?/1),

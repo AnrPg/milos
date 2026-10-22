@@ -488,7 +488,7 @@ export function WorkoutPreviewDetail({
 
   // Free text is how coaches write; everyone reads the structured workout. The
   // text is shown only for free-text workouts that have no structure, and for
-  // workouts written in text sections (ADR-179: their text holds every section).
+  // workouts written in text sections (ADR-180: their text holds every section).
   if ((authoringMode === "free_text" && !hasStructuredContent(sections)) || authoringMode === "sectioned_text") {
     const richContent = renderFreeTextDocument(freeTextDocument);
 

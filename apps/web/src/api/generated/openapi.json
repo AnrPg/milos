@@ -32975,6 +32975,11 @@
           "issues": {
             "items": {
               "properties": {
+                "anchor": {
+                  "description": "The words of the coach's text the issue is about, exactly as written; the editor marks them in place (nil: the panel only)",
+                  "nullable": true,
+                  "type": "string"
+                },
                 "code": {
                   "description": "assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
                   "type": "string"
@@ -49709,6 +49714,48 @@
         "title": "SeasonUpdate",
         "type": "object"
       },
+      "SectionTimerPreset": {
+        "nullable": true,
+        "properties": {
+          "duration_seconds": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "format": {
+            "enum": [
+              "untimed",
+              "for_time",
+              "amrap",
+              "emom",
+              "tabata",
+              "custom_hiit",
+              "death_by"
+            ],
+            "type": "string"
+          },
+          "interval_seconds": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "rest_seconds": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "rounds": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "work_seconds": {
+            "nullable": true,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "format"
+        ],
+        "title": "SectionTimerPreset",
+        "type": "object"
+      },
       "SelectProviderRequest": {
         "additionalProperties": false,
         "properties": {
@@ -60178,6 +60225,19 @@
         "title": "WodTodayCard",
         "type": "object"
       },
+      "WorkoutAuthoringSettings": {
+        "properties": {
+          "wod_assistant_enabled": {
+            "description": "Off: no assistant; workouts are written in text sections with a timer each",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "wod_assistant_enabled"
+        ],
+        "title": "WorkoutAuthoringSettings",
+        "type": "object"
+      },
       "WorkoutDslAuthoringResponse": {
         "additionalProperties": false,
         "properties": {
@@ -69602,6 +69662,41 @@
                       "type": "integer"
                     },
                     "type": "object"
+                  },
+                  "text_section_scores": {
+                    "description": "ADR-179: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds).",
+                    "items": {
+                      "properties": {
+                        "metric_key": {
+                          "maxLength": 64,
+                          "type": "string"
+                        },
+                        "section_id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "value": {
+                          "nullable": true,
+                          "oneOf": [
+                            {
+                              "type": "number"
+                            },
+                            {
+                              "maxLength": 32,
+                              "type": "string"
+                            }
+                          ]
+                        }
+                      },
+                      "required": [
+                        "section_id",
+                        "metric_key",
+                        "value"
+                      ],
+                      "type": "object"
+                    },
+                    "maxItems": 180,
+                    "type": "array"
                   },
                   "timezone": {
                     "default": "UTC",
@@ -140182,13 +140277,18 @@
                     "workouts": {
                       "description": "ADR-163: workout-authoring defaults",
                       "properties": {
+                        "wod_assistant_enabled": {
+                          "description": "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
+                          "type": "boolean"
+                        },
                         "wod_goals_visible_by_default": {
                           "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
                           "type": "boolean"
                         }
                       },
                       "required": [
-                        "wod_goals_visible_by_default"
+                        "wod_goals_visible_by_default",
+                        "wod_assistant_enabled"
                       ],
                       "type": "object"
                     }
@@ -140352,6 +140452,10 @@
                   },
                   "workouts": {
                     "properties": {
+                      "wod_assistant_enabled": {
+                        "description": "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
+                        "type": "boolean"
+                      },
                       "wod_goals_visible_by_default": {
                         "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
                         "type": "boolean"
@@ -140600,13 +140704,18 @@
                     "workouts": {
                       "description": "ADR-163: workout-authoring defaults",
                       "properties": {
+                        "wod_assistant_enabled": {
+                          "description": "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
+                          "type": "boolean"
+                        },
                         "wod_goals_visible_by_default": {
                           "description": "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own",
                           "type": "boolean"
                         }
                       },
                       "required": [
-                        "wod_goals_visible_by_default"
+                        "wod_goals_visible_by_default",
+                        "wod_assistant_enabled"
                       ],
                       "type": "object"
                     }
@@ -147005,6 +147114,44 @@
         ]
       }
     },
+    "/api/org/{organization_slug}/admin/workouts/authoring-settings": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminWorkoutFreeTextController.authoring_settings",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "wod_assistant_enabled": {
+                      "description": "Off: no assistant; workouts are written in text sections with a timer each",
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "wod_assistant_enabled"
+                  ],
+                  "title": "WorkoutAuthoringSettings",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Authoring settings"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "What the workout editor may offer in this gym (ADR-179)",
+        "tags": [
+          "Admin Workouts"
+        ]
+      }
+    },
     "/api/org/{organization_slug}/admin/workouts/dsl/manual": {
       "get": {
         "callbacks": {},
@@ -147544,6 +147691,11 @@
                     "issues": {
                       "items": {
                         "properties": {
+                          "anchor": {
+                            "description": "The words of the coach's text the issue is about, exactly as written; the editor marks them in place (nil: the panel only)",
+                            "nullable": true,
+                            "type": "string"
+                          },
                           "code": {
                             "description": "assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format",
                             "type": "string"
@@ -147727,6 +147879,28 @@
               }
             },
             "description": "Analysis"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "code",
+                    "error"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "The gym switched the assistant off"
           },
           "422": {
             "content": {
@@ -148082,7 +148256,8 @@
                           "enum": [
                             "structured",
                             "quick_text",
-                            "free_text"
+                            "free_text",
+                            "sectioned_text"
                           ],
                           "type": "string"
                         },
@@ -149042,6 +149217,17 @@
                                 },
                                 "type": "array"
                               },
+                              "free_text_body": {
+                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "maxLength": 20000,
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "free_text_document": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
                               "id": {
                                 "format": "uuid",
                                 "nullable": true,
@@ -149847,6 +150033,17 @@
                                       },
                                       "type": "array"
                                     },
+                                    "free_text_body": {
+                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "maxLength": 20000,
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "free_text_document": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    },
                                     "id": {
                                       "format": "uuid",
                                       "nullable": true,
@@ -149903,6 +150100,48 @@
                                       "additionalProperties": true,
                                       "nullable": true,
                                       "type": "object"
+                                    },
+                                    "timer_preset": {
+                                      "nullable": true,
+                                      "properties": {
+                                        "duration_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "format": {
+                                          "enum": [
+                                            "untimed",
+                                            "for_time",
+                                            "amrap",
+                                            "emom",
+                                            "tabata",
+                                            "custom_hiit",
+                                            "death_by"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interval_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rest_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rounds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "work_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "format"
+                                      ],
+                                      "title": "SectionTimerPreset",
+                                      "type": "object"
                                     }
                                   },
                                   "required": [
@@ -149920,6 +150159,48 @@
                               "timer_config": {
                                 "additionalProperties": true,
                                 "nullable": true,
+                                "type": "object"
+                              },
+                              "timer_preset": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
                                 "type": "object"
                               }
                             },
@@ -150102,7 +150383,8 @@
                     "enum": [
                       "structured",
                       "quick_text",
-                      "free_text"
+                      "free_text",
+                      "sectioned_text"
                     ],
                     "nullable": true,
                     "type": "string"
@@ -151012,6 +151294,17 @@
                           },
                           "type": "array"
                         },
+                        "free_text_body": {
+                          "description": "ADR-179: a text section's text (sectioned workouts)",
+                          "maxLength": 20000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "free_text_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
                         "id": {
                           "format": "uuid",
                           "nullable": true,
@@ -151817,6 +152110,17 @@
                                 },
                                 "type": "array"
                               },
+                              "free_text_body": {
+                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "maxLength": 20000,
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "free_text_document": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
                               "id": {
                                 "format": "uuid",
                                 "nullable": true,
@@ -151873,6 +152177,48 @@
                                 "additionalProperties": true,
                                 "nullable": true,
                                 "type": "object"
+                              },
+                              "timer_preset": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
+                                "type": "object"
                               }
                             },
                             "required": [
@@ -151890,6 +152236,48 @@
                         "timer_config": {
                           "additionalProperties": true,
                           "nullable": true,
+                          "type": "object"
+                        },
+                        "timer_preset": {
+                          "nullable": true,
+                          "properties": {
+                            "duration_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "format": {
+                              "enum": [
+                                "untimed",
+                                "for_time",
+                                "amrap",
+                                "emom",
+                                "tabata",
+                                "custom_hiit",
+                                "death_by"
+                              ],
+                              "type": "string"
+                            },
+                            "interval_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "rest_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "rounds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "work_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "format"
+                          ],
+                          "title": "SectionTimerPreset",
                           "type": "object"
                         }
                       },
@@ -153287,7 +153675,8 @@
                     "enum": [
                       "structured",
                       "quick_text",
-                      "free_text"
+                      "free_text",
+                      "sectioned_text"
                     ],
                     "nullable": true,
                     "type": "string"
@@ -154197,6 +154586,17 @@
                           },
                           "type": "array"
                         },
+                        "free_text_body": {
+                          "description": "ADR-179: a text section's text (sectioned workouts)",
+                          "maxLength": 20000,
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "free_text_document": {
+                          "additionalProperties": true,
+                          "nullable": true,
+                          "type": "object"
+                        },
                         "id": {
                           "format": "uuid",
                           "nullable": true,
@@ -155002,6 +155402,17 @@
                                 },
                                 "type": "array"
                               },
+                              "free_text_body": {
+                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "maxLength": 20000,
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "free_text_document": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
                               "id": {
                                 "format": "uuid",
                                 "nullable": true,
@@ -155058,6 +155469,48 @@
                                 "additionalProperties": true,
                                 "nullable": true,
                                 "type": "object"
+                              },
+                              "timer_preset": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
+                                "type": "object"
                               }
                             },
                             "required": [
@@ -155075,6 +155528,48 @@
                         "timer_config": {
                           "additionalProperties": true,
                           "nullable": true,
+                          "type": "object"
+                        },
+                        "timer_preset": {
+                          "nullable": true,
+                          "properties": {
+                            "duration_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "format": {
+                              "enum": [
+                                "untimed",
+                                "for_time",
+                                "amrap",
+                                "emom",
+                                "tabata",
+                                "custom_hiit",
+                                "death_by"
+                              ],
+                              "type": "string"
+                            },
+                            "interval_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "rest_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "rounds": {
+                              "nullable": true,
+                              "type": "integer"
+                            },
+                            "work_seconds": {
+                              "nullable": true,
+                              "type": "integer"
+                            }
+                          },
+                          "required": [
+                            "format"
+                          ],
+                          "title": "SectionTimerPreset",
                           "type": "object"
                         }
                       },
@@ -155138,7 +155633,8 @@
                           "enum": [
                             "structured",
                             "quick_text",
-                            "free_text"
+                            "free_text",
+                            "sectioned_text"
                           ],
                           "type": "string"
                         },
@@ -156098,6 +156594,17 @@
                                 },
                                 "type": "array"
                               },
+                              "free_text_body": {
+                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "maxLength": 20000,
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "free_text_document": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
                               "id": {
                                 "format": "uuid",
                                 "nullable": true,
@@ -156903,6 +157410,17 @@
                                       },
                                       "type": "array"
                                     },
+                                    "free_text_body": {
+                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "maxLength": 20000,
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "free_text_document": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    },
                                     "id": {
                                       "format": "uuid",
                                       "nullable": true,
@@ -156959,6 +157477,48 @@
                                       "additionalProperties": true,
                                       "nullable": true,
                                       "type": "object"
+                                    },
+                                    "timer_preset": {
+                                      "nullable": true,
+                                      "properties": {
+                                        "duration_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "format": {
+                                          "enum": [
+                                            "untimed",
+                                            "for_time",
+                                            "amrap",
+                                            "emom",
+                                            "tabata",
+                                            "custom_hiit",
+                                            "death_by"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interval_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rest_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rounds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "work_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "format"
+                                      ],
+                                      "title": "SectionTimerPreset",
+                                      "type": "object"
                                     }
                                   },
                                   "required": [
@@ -156976,6 +157536,48 @@
                               "timer_config": {
                                 "additionalProperties": true,
                                 "nullable": true,
+                                "type": "object"
+                              },
+                              "timer_preset": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
                                 "type": "object"
                               }
                             },
@@ -182857,7 +183459,8 @@
                           "enum": [
                             "structured",
                             "quick_text",
-                            "free_text"
+                            "free_text",
+                            "sectioned_text"
                           ],
                           "type": "string"
                         },
@@ -183817,6 +184420,17 @@
                                 },
                                 "type": "array"
                               },
+                              "free_text_body": {
+                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "maxLength": 20000,
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "free_text_document": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
                               "id": {
                                 "format": "uuid",
                                 "nullable": true,
@@ -184622,6 +185236,17 @@
                                       },
                                       "type": "array"
                                     },
+                                    "free_text_body": {
+                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "maxLength": 20000,
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "free_text_document": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    },
                                     "id": {
                                       "format": "uuid",
                                       "nullable": true,
@@ -184678,6 +185303,48 @@
                                       "additionalProperties": true,
                                       "nullable": true,
                                       "type": "object"
+                                    },
+                                    "timer_preset": {
+                                      "nullable": true,
+                                      "properties": {
+                                        "duration_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "format": {
+                                          "enum": [
+                                            "untimed",
+                                            "for_time",
+                                            "amrap",
+                                            "emom",
+                                            "tabata",
+                                            "custom_hiit",
+                                            "death_by"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interval_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rest_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rounds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "work_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "format"
+                                      ],
+                                      "title": "SectionTimerPreset",
+                                      "type": "object"
                                     }
                                   },
                                   "required": [
@@ -184695,6 +185362,48 @@
                               "timer_config": {
                                 "additionalProperties": true,
                                 "nullable": true,
+                                "type": "object"
+                              },
+                              "timer_preset": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
                                 "type": "object"
                               }
                             },
@@ -184951,7 +185660,8 @@
                             "enum": [
                               "structured",
                               "quick_text",
-                              "free_text"
+                              "free_text",
+                              "sectioned_text"
                             ],
                             "type": "string"
                           },
@@ -185911,6 +186621,17 @@
                                   },
                                   "type": "array"
                                 },
+                                "free_text_body": {
+                                  "description": "ADR-179: a text section's text (sectioned workouts)",
+                                  "maxLength": 20000,
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "free_text_document": {
+                                  "additionalProperties": true,
+                                  "nullable": true,
+                                  "type": "object"
+                                },
                                 "id": {
                                   "format": "uuid",
                                   "nullable": true,
@@ -186716,6 +187437,17 @@
                                         },
                                         "type": "array"
                                       },
+                                      "free_text_body": {
+                                        "description": "ADR-179: a text section's text (sectioned workouts)",
+                                        "maxLength": 20000,
+                                        "nullable": true,
+                                        "type": "string"
+                                      },
+                                      "free_text_document": {
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "type": "object"
+                                      },
                                       "id": {
                                         "format": "uuid",
                                         "nullable": true,
@@ -186772,6 +187504,48 @@
                                         "additionalProperties": true,
                                         "nullable": true,
                                         "type": "object"
+                                      },
+                                      "timer_preset": {
+                                        "nullable": true,
+                                        "properties": {
+                                          "duration_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "format": {
+                                            "enum": [
+                                              "untimed",
+                                              "for_time",
+                                              "amrap",
+                                              "emom",
+                                              "tabata",
+                                              "custom_hiit",
+                                              "death_by"
+                                            ],
+                                            "type": "string"
+                                          },
+                                          "interval_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rest_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "rounds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          },
+                                          "work_seconds": {
+                                            "nullable": true,
+                                            "type": "integer"
+                                          }
+                                        },
+                                        "required": [
+                                          "format"
+                                        ],
+                                        "title": "SectionTimerPreset",
+                                        "type": "object"
                                       }
                                     },
                                     "required": [
@@ -186789,6 +187563,48 @@
                                 "timer_config": {
                                   "additionalProperties": true,
                                   "nullable": true,
+                                  "type": "object"
+                                },
+                                "timer_preset": {
+                                  "nullable": true,
+                                  "properties": {
+                                    "duration_seconds": {
+                                      "nullable": true,
+                                      "type": "integer"
+                                    },
+                                    "format": {
+                                      "enum": [
+                                        "untimed",
+                                        "for_time",
+                                        "amrap",
+                                        "emom",
+                                        "tabata",
+                                        "custom_hiit",
+                                        "death_by"
+                                      ],
+                                      "type": "string"
+                                    },
+                                    "interval_seconds": {
+                                      "nullable": true,
+                                      "type": "integer"
+                                    },
+                                    "rest_seconds": {
+                                      "nullable": true,
+                                      "type": "integer"
+                                    },
+                                    "rounds": {
+                                      "nullable": true,
+                                      "type": "integer"
+                                    },
+                                    "work_seconds": {
+                                      "nullable": true,
+                                      "type": "integer"
+                                    }
+                                  },
+                                  "required": [
+                                    "format"
+                                  ],
+                                  "title": "SectionTimerPreset",
                                   "type": "object"
                                 }
                               },
@@ -186850,7 +187666,8 @@
                           "enum": [
                             "structured",
                             "quick_text",
-                            "free_text"
+                            "free_text",
+                            "sectioned_text"
                           ],
                           "type": "string"
                         },
@@ -187810,6 +188627,17 @@
                                 },
                                 "type": "array"
                               },
+                              "free_text_body": {
+                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "maxLength": 20000,
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "free_text_document": {
+                                "additionalProperties": true,
+                                "nullable": true,
+                                "type": "object"
+                              },
                               "id": {
                                 "format": "uuid",
                                 "nullable": true,
@@ -188615,6 +189443,17 @@
                                       },
                                       "type": "array"
                                     },
+                                    "free_text_body": {
+                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "maxLength": 20000,
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "free_text_document": {
+                                      "additionalProperties": true,
+                                      "nullable": true,
+                                      "type": "object"
+                                    },
                                     "id": {
                                       "format": "uuid",
                                       "nullable": true,
@@ -188671,6 +189510,48 @@
                                       "additionalProperties": true,
                                       "nullable": true,
                                       "type": "object"
+                                    },
+                                    "timer_preset": {
+                                      "nullable": true,
+                                      "properties": {
+                                        "duration_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "format": {
+                                          "enum": [
+                                            "untimed",
+                                            "for_time",
+                                            "amrap",
+                                            "emom",
+                                            "tabata",
+                                            "custom_hiit",
+                                            "death_by"
+                                          ],
+                                          "type": "string"
+                                        },
+                                        "interval_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rest_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "rounds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        },
+                                        "work_seconds": {
+                                          "nullable": true,
+                                          "type": "integer"
+                                        }
+                                      },
+                                      "required": [
+                                        "format"
+                                      ],
+                                      "title": "SectionTimerPreset",
+                                      "type": "object"
                                     }
                                   },
                                   "required": [
@@ -188688,6 +189569,48 @@
                               "timer_config": {
                                 "additionalProperties": true,
                                 "nullable": true,
+                                "type": "object"
+                              },
+                              "timer_preset": {
+                                "nullable": true,
+                                "properties": {
+                                  "duration_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "format": {
+                                    "enum": [
+                                      "untimed",
+                                      "for_time",
+                                      "amrap",
+                                      "emom",
+                                      "tabata",
+                                      "custom_hiit",
+                                      "death_by"
+                                    ],
+                                    "type": "string"
+                                  },
+                                  "interval_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rest_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "rounds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  },
+                                  "work_seconds": {
+                                    "nullable": true,
+                                    "type": "integer"
+                                  }
+                                },
+                                "required": [
+                                  "format"
+                                ],
+                                "title": "SectionTimerPreset",
                                 "type": "object"
                               }
                             },

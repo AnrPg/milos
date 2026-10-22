@@ -1100,7 +1100,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
       tags: workout.tags,
       content: visible_content(workout.content, audience),
       workout_metadata: workout.workout_metadata,
-      # ADR-179: execution builds a sectioned workout's timers (and checks its
+      # ADR-180: execution builds a sectioned workout's timers (and checks its
       # athletes' section results) from the mode.
       authoring_mode: workout.authoring_mode,
       created_by_id: workout.created_by_id,
@@ -1438,7 +1438,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     |> stringify_keys_deep()
   end
 
-  # ADR-179: a sectioned workout is validated and its body composed up front;
+  # ADR-180: a sectioned workout is validated and its body composed up front;
   # every other mode passes through unchanged.
   defp prepare_authoring_mode(params) do
     if SectionedText.sectioned?(params),

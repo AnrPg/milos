@@ -91,7 +91,7 @@ defmodule Palee.Application.ClassTimerView do
     end
   end
 
-  # ADR-179: a workout written in text sections runs each section's own timer.
+  # ADR-180: a workout written in text sections runs each section's own timer.
   defp workout_segments("sectioned_text", workout),
     do: TimerPresets.build_sections(Map.get(workout, :sections) || [])
 

@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "رقم",
     "textSectionScoringInvalid": "يحتاج كل مقياس إلى اسم خاص به (حتى 40 حرفًا، و6 لكل قسم).",
     "addSectionScoring": "الاحتساب…",
-    "textSectionResultsHint": "املأ ما تستطيع؛ كل الحقول اختيارية."
+    "textSectionResultsHint": "املأ ما تستطيع؛ كل الحقول اختيارية.",
+    "assistantMarksLegend": "مُعلَّم في النص:",
+    "assistantMark_error": "أخطاء",
+    "assistantMark_correction": "الإملاء والوحدات",
+    "assistantMark_assumption": "افتراضات",
+    "assistantMark_advice": "اقتراحات",
+    "assistantSuggestionsHere": "اقتراحات المساعد لهذه الكلمات"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",

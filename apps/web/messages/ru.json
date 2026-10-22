@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Число",
     "textSectionScoringInvalid": "У каждого показателя должно быть своё имя (до 40 символов, не больше 6 на часть).",
     "addSectionScoring": "Оценка…",
-    "textSectionResultsHint": "Заполни, что можешь; все поля необязательны."
+    "textSectionResultsHint": "Заполни, что можешь; все поля необязательны.",
+    "assistantMarksLegend": "Отмечено в тексте:",
+    "assistantMark_error": "Ошибки",
+    "assistantMark_correction": "Орфография и единицы",
+    "assistantMark_assumption": "Предположения",
+    "assistantMark_advice": "Советы",
+    "assistantSuggestionsHere": "Советы ассистента к этим словам"
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",

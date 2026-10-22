@@ -28,7 +28,7 @@ defmodule Palee.Workouts.WorkoutSection do
     field :rest_before_next_section_seconds, :integer
     field :content, {:array, :map}, default: []
     field :section_metadata, :map, default: %{}
-    # ADR-179: a text section of a workout written without the assistant.
+    # ADR-180: a text section of a workout written without the assistant.
     field :free_text_body, :string
     field :free_text_document, :map
     field :timer_preset, :map

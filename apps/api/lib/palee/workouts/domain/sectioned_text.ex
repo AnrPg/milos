@@ -1,6 +1,6 @@
 defmodule Palee.Workouts.Domain.SectionedText do
   @moduledoc """
-  Workouts written without the assistant (ADR-179), pure.
+  Workouts written without the assistant (ADR-180), pure.
 
   When a gym (or a coach, for one workout) turns the WOD assistant off, the
   workout is not parsed into exercises. The coach writes it as a list of text
@@ -107,7 +107,7 @@ defmodule Palee.Workouts.Domain.SectionedText do
          "free_text_body" => body,
          "free_text_document" => document(value(section, :free_text_document), body),
          "timer_preset" => preset,
-         # ADR-179: what the section counts, if the coach said (optional).
+         # ADR-180: what the section counts, if the coach said (optional).
          "score_config" => elem(scoring, 1),
          "section_metadata" => %{"untitled" => title == ""},
          "exercises" => []

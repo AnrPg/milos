@@ -44,7 +44,7 @@ export function WorkoutAuthoringModes() {
     queryFn: () => fetchAdminWorkout(tokens!.access_token, draftId!),
     staleTime: Infinity,
   });
-  // ADR-179: the gym may switch the WOD assistant off; then every workout is
+  // ADR-180: the gym may switch the WOD assistant off; then every workout is
   // written in text sections. With it on, the coach can still switch it off
   // for one workout (the editor's «AI assistant» switch).
   const availability = useQuery({

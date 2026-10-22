@@ -35,7 +35,7 @@ defmodule Palee.Workouts.Domain.WorkoutAuthoringMetadata do
       "recovery_condition" => :short_string,
       "target_condition" => :short_string,
       "score_label" => :short_string,
-      # ADR-179: a text section the coach left without a title.
+      # ADR-180: a text section the coach left without a title.
       "untitled" => :boolean
     },
     exercise: %{

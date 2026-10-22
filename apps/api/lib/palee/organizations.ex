@@ -388,7 +388,7 @@ defmodule Palee.Organizations do
   def get_workout_settings(context),
     do: Palee.Organizations.Queries.GetWorkoutSettings.call(context)
 
-  @doc "ADR-179: whether the gym lets coaches use the WOD assistant (on by default)."
+  @doc "ADR-180: whether the gym lets coaches use the WOD assistant (on by default)."
   def wod_assistant_enabled?(context),
     do: context |> get_workout_settings() |> WorkoutSettingsPolicy.wod_assistant_enabled?()
 

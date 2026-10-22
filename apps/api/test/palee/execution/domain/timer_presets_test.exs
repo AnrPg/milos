@@ -35,7 +35,7 @@ defmodule Palee.Execution.Domain.TimerPresetsTest do
              TimerPresets.parse(%{"format" => "amrap", "duration_seconds" => -3})
   end
 
-  test "ADR-179: chains each text section's timer, keyed and named by its section" do
+  test "ADR-180: chains each text section's timer, keyed and named by its section" do
     segments =
       TimerPresets.build_sections([
         %{

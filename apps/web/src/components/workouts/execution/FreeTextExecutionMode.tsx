@@ -95,7 +95,7 @@ export function FreeTextExecutionMode() {
     setRun(readFreeTextRun(runExecutionId));
   }
 
-  // ADR-179: a workout written in text sections runs each section's own timer,
+  // ADR-180: a workout written in text sections runs each section's own timer,
   // one section at a time; the athlete marks a section complete and starts the next.
   const sections = useMemo(() => workout?.sections ?? [], [workout?.sections]);
   const sectioned = sections.length > 0;

@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Getal",
     "textSectionScoringInvalid": "Elke score heeft een eigen naam nodig (max. 40 tekens, 6 per onderdeel).",
     "addSectionScoring": "Score…",
-    "textSectionResultsHint": "Vul in wat je weet; alle velden zijn optioneel."
+    "textSectionResultsHint": "Vul in wat je weet; alle velden zijn optioneel.",
+    "assistantMarksLegend": "Gemarkeerd in de tekst:",
+    "assistantMark_error": "Fouten",
+    "assistantMark_correction": "Spelling en eenheden",
+    "assistantMark_assumption": "Aangenomen",
+    "assistantMark_advice": "Suggesties",
+    "assistantSuggestionsHere": "Suggesties van de assistent voor deze woorden"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

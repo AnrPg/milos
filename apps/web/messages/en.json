@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Number",
     "textSectionScoringInvalid": "Each score needs its own name (up to 40 characters, 6 per section).",
     "addSectionScoring": "Scored by…",
-    "textSectionResultsHint": "Fill in what you can; every field is optional."
+    "textSectionResultsHint": "Fill in what you can; every field is optional.",
+    "assistantMarksLegend": "Marked in the text:",
+    "assistantMark_error": "Errors",
+    "assistantMark_correction": "Spelling & units",
+    "assistantMark_assumption": "Assumed",
+    "assistantMark_advice": "Suggestions",
+    "assistantSuggestionsHere": "Assistant suggestions for these words"
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",

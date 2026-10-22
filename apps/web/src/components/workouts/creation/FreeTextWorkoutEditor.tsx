@@ -58,16 +58,24 @@ import { editorSectionsFrom, SECTIONED_TEXT_MODE, sectionsToFreeText } from "@/l
 
 import { AssistantSwitch } from "./AssistantSwitch";
 import { EditorTabs } from "./EditorTabs";
+import { InlineSuggestionBubble } from "./InlineSuggestionBubble";
+import {
+  AssistantHighlights,
+  MARK_CATEGORIES,
+  anchoredIssues,
+  assistantHighlightsKey,
+  type MarkClick,
+} from "./assistant-highlights";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
-import { FreeTextAnalysisPanel, type AnalysisStatus } from "./FreeTextAnalysisPanel";
+import { FreeTextAnalysisPanel, IssueCard, type AnalysisStatus } from "./FreeTextAnalysisPanel";
 import { readToken } from "@/lib/theme";
 
 type Props = {
   draftId: string | null;
   folderId?: string | null;
   onDraftReady: (id: string) => void;
-  /** ADR-179: switch this workout off the assistant, to text sections (the draft is saved first). */
+  /** ADR-180: switch this workout off the assistant, to text sections (the draft is saved first). */
   onUseSections?: () => void;
 };
 
@@ -110,6 +118,8 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   const [notice, setNotice] = useState<string | null>(null);
   /** The settings tab that is open over the text (none: all the room for writing). */
   const [openTab, setOpenTab] = useState<EditorTabKey | null>("details");
+  /** ADR-181: the marked words clicked in the text, whose suggestions show above them. */
+  const [markClick, setMarkClick] = useState<MarkClick | null>(null);
   /** Optional timer the athlete gets pre-selected; kept in `workout_metadata`. */
   const [timerPreset, setTimerPreset] = useState<FreeTextTimerPreset | null>(null);
   const metadataRef = useRef<Record<string, unknown>>({});
@@ -134,6 +144,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
       Placeholder.configure({ placeholder: i18n("freeTextEditorPlaceholder") }),
       CharacterCount.configure({ limit: 200_000 }),
       FreeTextEditingAssist,
+      AssistantHighlights.configure({ onOpen: setMarkClick }),
     ],
     content: emptyDocument(),
     immediatelyRender: false,
@@ -185,7 +196,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
         metadataRef.current = workout.workout_metadata ?? {};
         setTimerPreset(parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY]));
         revisionRef.current = workout.dsl_source_revision ?? 0;
-        // ADR-179: a workout written in sections comes back as one text, a
+        // ADR-180: a workout written in sections comes back as one text, a
         // heading per titled section; the assistant reads its timers from it.
         const fromSections =
           workout.authoring_mode === SECTIONED_TEXT_MODE ? sectionsToFreeText(editorSectionsFrom(workout, null)) : null;
@@ -229,6 +240,20 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
     }, 1_000);
     return () => window.clearTimeout(timer);
   }, [body, draftId, review, saveDraft, timerPreset, title, type]);
+
+  // ADR-181: the open issues' words are marked in the text, coloured by kind.
+  const openIssueList = useMemo(() => (review ? openIssues(review) : []), [review]);
+  useEffect(() => {
+    if (!editor || editor.isDestroyed) return;
+    editor.view.dispatch(
+      editor.state.tr.setMeta(assistantHighlightsKey, anchoredIssues(openIssueList)).setMeta("addToHistory", false),
+    );
+  }, [editor, openIssueList]);
+  const clickedIssues = markClick ? openIssueList.filter((issue) => markClick.ids.includes(issue.id)) : [];
+  const markedCategories = useMemo(
+    () => MARK_CATEGORIES.filter((category) => anchoredIssues(openIssueList).some((issue) => issue.category === category)),
+    [openIssueList],
+  );
 
   const stale = Boolean(review && review.analyzedText.trim() !== body.trim());
   const blocking = blockingProblems(title, type, review);
@@ -488,9 +513,40 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
           {openTab === "tools" ? <FreeTextToolbar editor={editor} /> : null}
         </EditorTabs>
 
+        {markedCategories.length > 0 ? (
+          <div
+            className="flex flex-wrap items-center gap-x-3 gap-y-1 border-b px-4 py-1.5 text-[11px] font-semibold"
+            style={{ borderColor: "var(--dim)", color: "var(--muted)" }}
+            aria-label={i18n("assistantMarksLegend")}
+          >
+            <span>{i18n("assistantMarksLegend")}</span>
+            {markedCategories.map((category) => (
+              <span key={category} className="inline-flex items-center gap-1">
+                <span aria-hidden="true" className={`assistant-mark-swatch assistant-mark-${category}`} />
+                {i18n(`assistantMark_${category}`)}
+              </span>
+            ))}
+          </div>
+        ) : null}
+
         <div className="min-h-0 min-w-0 flex-1 overflow-auto overflow-x-clip">
           <EditorContent editor={editor} />
         </div>
+
+        {editor && markClick && clickedIssues.length > 0 && review ? (
+          <InlineSuggestionBubble editor={editor} click={markClick} onClose={() => setMarkClick(null)}>
+            {clickedIssues.map((issue) => (
+              <IssueCard
+                key={issue.id}
+                t={assistantT}
+                issue={issue}
+                workout={review.workout}
+                onAccept={handleAccept}
+                onReject={handleReject}
+              />
+            ))}
+          </InlineSuggestionBubble>
+        ) : null}
 
         <footer className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 sm:px-5" style={{ borderColor: "var(--dim)" }}>
           <span className="text-xs" style={{ color: "var(--muted)" }}>

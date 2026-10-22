@@ -1,6 +1,6 @@
 defmodule Palee.Repo.Migrations.SectionedTextWorkouts do
   @moduledoc """
-  ADR-179: a workout written without the assistant is a list of text
+  ADR-180: a workout written without the assistant is a list of text
   sections, each with its own timer (`authoring_mode = 'sectioned_text'`).
   A section keeps its rich text (plain and TipTap JSON, as the workout itself
   does for free text) and the timer preset the coach chose for it (the same

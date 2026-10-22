@@ -208,7 +208,7 @@ defmodule Palee.Application.CompleteWorkout do
     end
   end
 
-  # ADR-179: the athlete's results for the scores the coach set on the
+  # ADR-180: the athlete's results for the scores the coach set on the
   # sections of a workout written without the assistant.
   defp text_section_scores(%{authoring_mode: "sectioned_text", sections: sections}, params),
     do:

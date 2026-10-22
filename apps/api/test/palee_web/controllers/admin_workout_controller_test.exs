@@ -247,7 +247,7 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
       assert workout["available_scale_levels"] == []
     end
 
-    test "ADR-179: publishes a workout written in text sections, a timer each", %{conn: conn} do
+    test "ADR-180: publishes a workout written in text sections, a timer each", %{conn: conn} do
       {admin_conn, organization} = authenticate_as_admin(conn, "sectioned_text_author")
       base = "/api/org/#{organization.slug}/admin/workouts"
 

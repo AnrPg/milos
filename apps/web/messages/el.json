@@ -4399,7 +4399,13 @@
     "scoreKind_custom": "Αριθμός",
     "textSectionScoringInvalid": "Κάθε μέτρηση θέλει δικό της όνομα (έως 40 χαρακτήρες, 6 ανά ενότητα).",
     "addSectionScoring": "Βαθμολογία…",
-    "textSectionResultsHint": "Συμπλήρωσε ό,τι μπορείς· όλα τα πεδία είναι προαιρετικά."
+    "textSectionResultsHint": "Συμπλήρωσε ό,τι μπορείς· όλα τα πεδία είναι προαιρετικά.",
+    "assistantMarksLegend": "Σημειωμένα στο κείμενο:",
+    "assistantMark_error": "Λάθη",
+    "assistantMark_correction": "Ορθογραφία & μονάδες",
+    "assistantMark_assumption": "Υποθέσεις",
+    "assistantMark_advice": "Προτάσεις",
+    "assistantSuggestionsHere": "Προτάσεις του βοηθού για αυτές τις λέξεις"
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
