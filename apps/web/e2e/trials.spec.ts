@@ -149,6 +149,8 @@ test.describe("trials", () => {
     await page.goto(`/b/${box.slug}#schedule`);
 
     await expect(page.getByRole("button", { name: /Competitors/ })).toBeVisible();
+    // The filters sit behind the filter button (CollapsibleFilterBar).
+    await page.getByRole("button", { name: "Filters", exact: true }).click();
     await page.getByRole("button", { name: "Trial classes" }).click();
     await expect(page.getByRole("button", { name: /Competitors/ })).toBeHidden();
     await page.getByRole("button", { name: /CrossFit Basics/ }).click();

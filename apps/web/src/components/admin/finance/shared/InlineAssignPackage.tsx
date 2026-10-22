@@ -8,6 +8,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useEffect, useRef, useState } from "react";
 import type { FinanceRecord } from "@/api/finance";
 import { AnchoredOverlay } from "./AnchoredOverlay";
+import { Select } from "@/components/ui/Select";
 
 interface Props {
   userId: string;
@@ -91,9 +92,9 @@ export function InlineAssignPackage({ currentCode, currentLabel, packages, pendi
             boxShadow: "var(--shadow-md)",
           }}
         >
-          <select
+          <Select
             value={selectedId}
-            onChange={(e) => setSelectedId(e.target.value)}
+            onValueChange={(value) => setSelectedId(value)}
             className="mb-3 w-full rounded-lg px-3 py-2.5 text-sm"
             style={{ background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border-strong)" }}
           >
@@ -108,7 +109,7 @@ export function InlineAssignPackage({ currentCode, currentLabel, packages, pendi
                 {pkg.active === false ? i18n("inactive0e9b582") : ""}
               </option>
             ))}
-          </select>
+          </Select>
           <button
             type="button"
             onClick={handleAssign}

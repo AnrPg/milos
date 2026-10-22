@@ -100,7 +100,7 @@ function Landing({ club }: { club: OpenClub }) {
               <SheetButton disabled={toggle.isPending} onClick={() => toggle.mutate(false)}>{t("groupCancelRequest")}</SheetButton>
             </>
           ) : (
-            <SheetButton primary disabled={toggle.isPending} onClick={() => toggle.mutate(true)}>
+            <SheetButton spark disabled={toggle.isPending} onClick={() => toggle.mutate(true)}>
               {club.join_policy === "approval" ? t("clubAsk") : t("clubJoin")}
             </SheetButton>
           )}

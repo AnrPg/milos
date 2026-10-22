@@ -9103,5 +9103,21 @@
       "enable": "Saisie vocale",
       "enableHint": "Les membres enregistrent leur séance et vérifient un brouillon avant de l'enregistrer. L'audio n'est pas conservé."
     }
+  },
+  "Pickers": {
+    "chooseDate": "Choisir une date",
+    "chooseTime": "Choisir une heure",
+    "chooseMonthYear": "Choisir le mois et l’année",
+    "previousMonth": "Mois précédent",
+    "nextMonth": "Mois suivant",
+    "previousYear": "Année précédente",
+    "nextYear": "Année suivante",
+    "previousYears": "Années précédentes",
+    "nextYears": "Années suivantes",
+    "clear": "Effacer",
+    "today": "Aujourd’hui",
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "done": "Terminé"
   }
 }

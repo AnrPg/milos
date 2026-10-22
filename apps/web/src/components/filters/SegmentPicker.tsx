@@ -3,6 +3,7 @@
 import { useCallback, useLayoutEffect, useRef, useState, type CSSProperties, type KeyboardEvent, type ReactNode } from "react";
 
 import { chooseSegmentLayout, fittingColumns, type SegmentLayout } from "@/lib/segment-layout";
+import { Select } from "@/components/ui/Select";
 
 // One control for every set of mutually exclusive options shown as tabs or
 // chips (user types, list tabs, sources, boxes). It never scrolls sideways:
@@ -161,10 +162,10 @@ export function SegmentPicker<T extends string>({
       </div>
 
       {layout.kind === "select" ? (
-        <select
+        <Select
           aria-label={ariaLabel}
           value={value}
-          onChange={(event) => onChange(event.target.value as T)}
+          onValueChange={(value) => onChange(value as T)}
           aria-controls={panelId}
           className="min-h-10 w-full rounded-xl px-3 text-sm font-semibold"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
@@ -174,7 +175,7 @@ export function SegmentPicker<T extends string>({
               {hasCount(option.count) ? `${option.label} (${option.count})` : option.label}
             </option>
           ))}
-        </select>
+        </Select>
       ) : (
         <div
           role={semantics}

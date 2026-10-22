@@ -330,7 +330,8 @@ test.describe("Garmin in the journal", () => {
     await expect(detail).toContainText("Highest heart rate");
     await expect(detail).toContainText("max 178 bpm");
     await expect(detail).not.toContainText(/kcal|calorie/i);
-    await detail.getByRole("button", { name: "Close" }).click();
+    // The header × and the footer button both close it.
+    await detail.getByRole("button", { name: "Close" }).first().click();
 
     await page.getByTestId("journal-device-attachment").click();
     await expect(page.getByRole("dialog", { name: "Fran" })).toContainText("avg 148 bpm");
@@ -384,7 +385,8 @@ test.describe("Garmin in the journal", () => {
 
     const recent = page.getByRole("dialog", { name: "New from Garmin" });
     await expect(recent).toContainText("Morning run");
-    await recent.getByRole("button", { name: "Close" }).click();
+    // The header × and the footer button both close it.
+    await recent.getByRole("button", { name: "Close" }).first().click();
     await expect(card).toHaveCount(0);
   });
 

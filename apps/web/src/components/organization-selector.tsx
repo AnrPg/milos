@@ -10,6 +10,7 @@ import { fetchOrganizationMemberships } from "@/api/organizations";
 import { selectProvider } from "@/api/providers";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { Select } from "@/components/ui/Select";
 
 type OrganizationSelectorProps = {
   variant?: "nav" | "menu";
@@ -96,11 +97,11 @@ export function OrganizationSelector({ variant = "nav", onSelect }: Organization
           width={28}
         />
       ) : null}
-      <select
+      <Select
         aria-label={i18n("organization")}
         className={selectClassName}
-        onChange={(event) => {
-          const slug = event.target.value;
+        onValueChange={(value) => {
+          const slug = value;
           const membership = membershipsBySlug.get(slug);
           if (!membership) return;
 
@@ -129,7 +130,7 @@ export function OrganizationSelector({ variant = "nav", onSelect }: Organization
             {organizationDisplayName(entry)}
           </option>
         ))}
-      </select>
+      </Select>
     </div>
   );
 }

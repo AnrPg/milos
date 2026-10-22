@@ -279,6 +279,7 @@ function CloseButton({ label, onClick, disabled }: { label: string; onClick: () 
       onClick={onClick}
       disabled={disabled}
       aria-label={label}
+      data-dialog-close=""
       className="-me-2 -mt-1 grid h-11 w-11 place-items-center rounded-full text-2xl leading-none transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] disabled:opacity-40"
       style={{ color: "var(--text-soft)" }}
     >

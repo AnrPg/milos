@@ -53,6 +53,8 @@ import { commitmentConflict } from "@/components/admin/finance/shared/membership
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { sharedSubscriptions } from "@/components/staff/staff-helpers";
 import { SubscriptionBeneficiaries } from "@/components/staff/SubscriptionBeneficiaries";
+import { Select as ThemedSelect } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -1121,13 +1123,17 @@ function Input({
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
-      <input
-        className="w-full rounded-2xl border border-[var(--border)] px-4 py-3"
-        required={required}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
+      {type === "date" ? (
+        <DateInput className="w-full rounded-2xl border border-[var(--border)] px-4 py-3 flex" required={required} value={value} onValueChange={onChange} />
+      ) : (
+        <input
+          className="w-full rounded-2xl border border-[var(--border)] px-4 py-3"
+          required={required}
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      )}
     </label>
   );
 }
@@ -1155,12 +1161,12 @@ function Select({
   return (
     <label className="block space-y-1 text-sm font-semibold">
       <span>{label}</span>
-      <select
+      <ThemedSelect
         className="w-full rounded-2xl border border-[var(--border)] px-4 py-3"
         required={required}
         disabled={disabled}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={(value) => onChange(value)}
       >
         {showPlaceholder ? (
           <option value="" disabled={required}>
@@ -1172,7 +1178,7 @@ function Select({
             {optionLabel ? optionLabel(option) : option}
           </option>
         ))}
-      </select>
+      </ThemedSelect>
     </label>
   );
 }
@@ -1378,10 +1384,9 @@ function InvoiceFileActions({
             <label className="text-xs font-semibold uppercase tracking-[0.15em] text-[var(--muted)]">
               {i18n("dueDate4c1aeeb")}
             </label>
-            <input
-              type="date"
+            <DateInput
               value={editDueDate}
-              onChange={(e) => setEditDueDate(e.target.value)}
+              onValueChange={(value) => setEditDueDate(value)}
               className="w-full rounded-lg border border-[var(--border)] bg-[var(--panel)] px-3 py-1.5 text-sm text-[var(--text)]"
             />
           </div>

@@ -29,6 +29,7 @@ import {
 } from "@/components/staff/staff-ui";
 import { PageHeader } from "@/components/PageHeader";
 import { useUiTranslations } from "@/i18n/ui";
+import { Select } from "@/components/ui/Select";
 
 const VIDEOS_KEY = ["admin", "videos"] as const;
 type Filter = "all" | VideoState;
@@ -290,10 +291,10 @@ export function AdminContent() {
               <label className="sr-only" htmlFor={filterId}>
                 {i18n("statusbae7d5b")}
               </label>
-              <select
+              <Select
                 id={filterId}
                 className="rounded-xl px-3 py-1.5 text-sm"
-                onChange={(event) => setFilter(event.target.value as Filter)}
+                onValueChange={(value) => setFilter(value as Filter)}
                 style={inputStyle}
                 value={filter}
               >
@@ -301,7 +302,7 @@ export function AdminContent() {
                 <option value="draft">{i18n("stfVideoDraft")}</option>
                 <option value="published">{i18n("stfVideoPublished")}</option>
                 <option value="archived">{i18n("stfVideoArchived")}</option>
-              </select>
+              </Select>
               {editing === null ? (
                 <button className={primaryButtonClass} onClick={() => setEditing("new")} style={primaryButtonStyle} type="button">
                   {i18n("stfAddVideo")}

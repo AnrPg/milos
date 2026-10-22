@@ -59,6 +59,7 @@ import {
   type PackageDraft,
   type QuotaValue,
 } from "./package-catalog";
+import { Select } from "@/components/ui/Select";
 
 const STORAGE_KEY = "palee.package-wizard.draft.v1";
 const TYPE_ICONS: Record<string, string> = {
@@ -201,22 +202,25 @@ export function PackageWizard({
 
   return (
     <div className="flex min-h-0 flex-1 flex-col">
-      <ol className="flex flex-wrap gap-2 px-6 pt-5" aria-label={t("pkgWizardProgress")}>
+      {/* One row on every screen: on phones the other steps shrink to their number. */}
+      <ol className="flex min-w-0 items-center gap-1.5 px-6 pt-5 sm:gap-2" aria-label={t("pkgWizardProgress")}>
         {steps.map((name, index) => {
           const state = index < stepIndex ? "done" : index === stepIndex ? "current" : "todo";
           return (
             <li
               key={name}
               aria-current={state === "current" ? ARIA_CURRENT_STEP : undefined}
-              className="flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-semibold"
+              className={`flex h-8 items-center justify-center gap-2 rounded-full text-xs font-semibold ${
+                state === "current" ? "min-w-0 flex-1 px-3 sm:flex-none" : "w-8 shrink-0 sm:w-auto sm:px-3"
+              }`}
               style={{
-                background: state === "current" ? "var(--text)" : "var(--panel-muted)",
-                color: state === "current" ? "var(--bg)" : state === "done" ? "var(--success)" : "var(--dim)",
-                border: "1px solid var(--border)",
+                background: state === "current" ? "var(--text)" : state === "done" ? "var(--spark)" : "var(--panel-muted)",
+                color: state === "current" ? "var(--bg)" : state === "done" ? "var(--spark-contrast)" : "var(--dim)",
+                border: `1px solid ${state === "done" ? "var(--spark)" : "var(--border)"}`,
               }}
             >
               <span aria-hidden="true">{state === "done" ? "✓" : index + 1}</span>
-              {t(`pkgStep_${name}`)}
+              <span className={state === "current" ? "truncate" : "sr-only sm:not-sr-only sm:whitespace-nowrap"}>{t(`pkgStep_${name}`)}</span>
             </li>
           );
         })}
@@ -534,18 +538,18 @@ export function BasicsStep({
             </div>
           </FieldShell>
           <FieldShell label={`${t("pkgFieldTermsConversionPackageId")} · ${t("pkgOptional")}`} htmlFor="pkg-conversion" hint={t("pkgFieldTermsConversionPackageIdHint")}>
-            <select
+            <Select
               id="pkg-conversion"
               className="h-11 w-full rounded-[0.9rem] px-3 text-sm outline-none"
               style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={typeof draft.fields["terms.conversion_package_id"] === "string" ? String(draft.fields["terms.conversion_package_id"]) : ""}
-              onChange={(event) => setField("terms.conversion_package_id", event.target.value || null)}
+              onValueChange={(value) => setField("terms.conversion_package_id", value || null)}
             >
               <option value="">{t("pkgNone")}</option>
               {packages.filter((pkg) => pkg.active !== false && pkg.package_type === "membership").map((pkg) => (
                 <option key={String(pkg.id)} value={String(pkg.id)}>{String(pkg.name)}</option>
               ))}
-            </select>
+            </Select>
           </FieldShell>
         </>
       ) : null}

@@ -20,6 +20,7 @@ import { activeBuddies, freeBuddySlots, key, overviewLists, personName, quietHou
 import { buddyErrorMessage } from "./errors";
 import { NeedSupportSheet } from "./SupportSend";
 import { useBuddies, useBuddyToken } from "./use-buddies";
+import { TimeInput } from "@/components/ui/DateInput";
 
 /**
  * Εγώ › Buddy για στήριξη (ADR-160, board 15, mockup «buddy»): up to two
@@ -327,11 +328,11 @@ function MySettings({ settings }: { settings: BuddySettings | null }) {
         <div className="flex flex-wrap items-end gap-3">
           <label className="flex flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
             {t("quietFrom")}
-            <input type="time" value={from} onChange={(event) => setFrom(event.target.value)} className="min-h-11 rounded-2xl px-3" style={inputStyle} />
+            <TimeInput value={from} onValueChange={(value) => setFrom(value)} className="min-h-11 rounded-2xl px-3" style={inputStyle} />
           </label>
           <label className="flex flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
             {t("quietTo")}
-            <input type="time" value={to} onChange={(event) => setTo(event.target.value)} className="min-h-11 rounded-2xl px-3" style={inputStyle} />
+            <TimeInput value={to} onValueChange={(value) => setTo(value)} className="min-h-11 rounded-2xl px-3" style={inputStyle} />
           </label>
         </div>
       ) : null}

@@ -15,6 +15,7 @@ import { fetchMyReviews, MY_REVIEWS_KEY, submitReview, type SubmitReviewRequest 
 import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { PageHeader } from "@/components/PageHeader";
+import { Select } from "@/components/ui/Select";
 
 export function isCompletedExecution(execution: WorkoutExecution) {
   return execution.status === "completed" || Boolean(execution.completed_at_utc);
@@ -119,11 +120,11 @@ export function ReviewForm() {
       }}
     >
       <div className="grid gap-3 md:grid-cols-2">
-        <select
+        <Select
           className="rounded-2xl border px-4 py-3"
           value={targetType}
-          onChange={(event) => {
-            setTargetType(event.target.value as SubmitReviewRequest["target_type"]);
+          onValueChange={(value) => {
+            setTargetType(value as SubmitReviewRequest["target_type"]);
             setTargetId("");
           }}
         >
@@ -135,7 +136,7 @@ export function ReviewForm() {
           <option value="class_slot">{i18n("classSlotb47fa4b")}</option>
           <option value="membership_package">{i18n("membershipPackage12e8323")}</option>
           <option value="general">{i18n("general9239ee2")}</option>
-        </select>
+        </Select>
         <input
           className="rounded-2xl border px-4 py-3"
           max={5}
@@ -146,25 +147,25 @@ export function ReviewForm() {
         />
       </div>
       {targetType === "workout" && workoutTargets.length > 0 ? (
-        <select
+        <Select
           className="w-full rounded-2xl border px-4 py-3"
           required
           value={selectedTargetId}
-          onChange={(event) => setTargetId(event.target.value)}
+          onValueChange={(value) => setTargetId(value)}
         >
           {workoutTargets.map((workout) => (
             <option key={workout.id} value={workout.id}>
               {workout.label}
             </option>
           ))}
-        </select>
+        </Select>
       ) : null}
       {targetType === "execution" && executionTargets.length > 0 ? (
-        <select
+        <Select
           className="w-full rounded-2xl border px-4 py-3"
           required
           value={selectedTargetId}
-          onChange={(event) => setTargetId(event.target.value)}
+          onValueChange={(value) => setTargetId(value)}
         >
           {executionTargets.map((execution) => (
             <option key={execution.id} value={execution.id}>
@@ -172,7 +173,7 @@ export function ReviewForm() {
               <SemanticLabel value={execution.status} />
             </option>
           ))}
-        </select>
+        </Select>
       ) : null}
       {targetRequiresId && !["workout", "execution"].includes(targetType) ? (
         <input

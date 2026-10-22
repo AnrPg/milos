@@ -9103,5 +9103,21 @@
       "enable": "Registo por voz",
       "enableHint": "Os membros gravam o treino e verificam um rascunho antes de guardar. O áudio não é guardado."
     }
+  },
+  "Pickers": {
+    "chooseDate": "Escolha uma data",
+    "chooseTime": "Escolha uma hora",
+    "chooseMonthYear": "Escolha o mês e o ano",
+    "previousMonth": "Mês anterior",
+    "nextMonth": "Mês seguinte",
+    "previousYear": "Ano anterior",
+    "nextYear": "Ano seguinte",
+    "previousYears": "Anos anteriores",
+    "nextYears": "Anos seguintes",
+    "clear": "Limpar",
+    "today": "Hoje",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "done": "Concluído"
   }
 }

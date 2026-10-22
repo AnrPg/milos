@@ -10,6 +10,7 @@ import { captionClass, captionStyle, inputStyle, StaffPanel, StatusText } from "
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { Select } from "@/components/ui/Select";
 
 const MONTH_OPTIONS = [3, 6, 12, 24];
 
@@ -41,13 +42,13 @@ export function InventoryReportView({ token }: { token: string }) {
         <span className={captionClass} style={captionStyle}>
           {i18n("invPeriod")}
         </span>
-        <select className="rounded-xl px-3 py-1.5 text-sm" style={inputStyle} value={months} onChange={(event) => setMonths(Number(event.target.value))}>
+        <Select className="rounded-xl px-3 py-1.5 text-sm" style={inputStyle} value={months} onValueChange={(value) => setMonths(Number(value))}>
           {MONTH_OPTIONS.map((option) => (
             <option key={option} value={option}>
               {i18n("invLastMonths", { count: option })}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       {report.isPending ? (

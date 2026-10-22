@@ -3,6 +3,7 @@
 import { useLocale, useTranslations } from "next-intl";
 
 import type { OpeningHoursSpan } from "@/api/facility";
+import { TimeInput } from "@/components/ui/DateInput";
 
 const WEEKDAYS = [1, 2, 3, 4, 5, 6, 7];
 const WORKDAYS = [2, 3, 4, 5];
@@ -68,14 +69,13 @@ export function OpeningHoursEditor({
               ) : null}
               {spans.map((span, index) => (
                 <span key={index} className="flex items-center gap-1">
-                  <input
-                    type="time"
+                  <TimeInput
                     aria-label={t("opensAt", { day: name })}
                     value={span.opens}
-                    onChange={(event) =>
+                    onValueChange={(value) =>
                       replaceDay(
                         weekday,
-                        spans.map((other, at) => (at === index ? { ...other, opens: event.target.value } : other)),
+                        spans.map((other, at) => (at === index ? { ...other, opens: value } : other)),
                       )
                     }
                     className="w-[8rem] rounded-xl px-2 py-1.5 font-mono text-sm"
@@ -84,14 +84,13 @@ export function OpeningHoursEditor({
                   <span aria-hidden="true" style={{ color: "var(--dim)" }}>
                     –
                   </span>
-                  <input
-                    type="time"
+                  <TimeInput
                     aria-label={t("closesAt", { day: name })}
                     value={span.closes}
-                    onChange={(event) =>
+                    onValueChange={(value) =>
                       replaceDay(
                         weekday,
-                        spans.map((other, at) => (at === index ? { ...other, closes: event.target.value } : other)),
+                        spans.map((other, at) => (at === index ? { ...other, closes: value } : other)),
                       )
                     }
                     className="w-[8rem] rounded-xl px-2 py-1.5 font-mono text-sm"

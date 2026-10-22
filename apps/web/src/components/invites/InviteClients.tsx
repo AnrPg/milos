@@ -20,6 +20,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { localizeError } from "@/i18n/presentation";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 type Tab = "link" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
@@ -227,16 +228,16 @@ function PersonalInvite({ t, slug, token }: { t: Translate; slug: string; token:
       </label>
       <label className="block text-sm" style={{ color: "var(--text)" }}>
         <span className="font-semibold">{t("validFor")}</span>
-        <select
+        <Select
           value={days}
-          onChange={(event) => setDays(Number(event.target.value) as (typeof LIFETIMES)[number])}
+          onValueChange={(value) => setDays(Number(value) as (typeof LIFETIMES)[number])}
           className="mt-1 w-full rounded-xl px-3 py-2 text-sm"
           style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
         >
           {LIFETIMES.map((value) => (
             <option key={value} value={value}>{t("days", { count: value })}</option>
           ))}
-        </select>
+        </Select>
       </label>
       {issue.error ? <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>{localizeError(issue.error, uiT)}</p> : null}
       <button type="submit" disabled={issue.isPending} className="w-full rounded-xl px-4 py-3 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>

@@ -36,6 +36,7 @@ import {
   type ProgramRules,
 } from "@/components/admin/finance/referrals/program-rules";
 import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
+import { Select } from "@/components/ui/Select";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -415,16 +416,16 @@ export function ReferralsTab() {
             </PanelField>
             <div className="grid gap-3 md:grid-cols-2">
               <PanelField label={i18n("rewardType9e0f28d")}>
-                <select
+                <Select
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                   value={programForm.reward_type}
-                  onChange={(e) => setProgramForm({ ...programForm, reward_type: e.target.value })}
+                  onValueChange={(value) => setProgramForm({ ...programForm, reward_type: value })}
                 >
                   {["credit", "discount", "free_period", "manual"].map((v) => (
                     <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                   ))}
-                </select>
+                </Select>
               </PanelField>
               <PanelField label={i18n("rewardValue8cb933f")}>
                 <input
@@ -817,16 +818,16 @@ function PanelSelect({
 }) {
   const i18n = useUiTranslations();
   return (
-    <select
+    <Select
       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
       value={value}
-      onChange={(event) => onChange(event.target.value)}
+      onValueChange={(value) => onChange(value)}
     >
       {options.map((option) => (
         <option key={option} value={option}>{semanticLabel(option, i18n)}</option>
       ))}
-    </select>
+    </Select>
   );
 }
 

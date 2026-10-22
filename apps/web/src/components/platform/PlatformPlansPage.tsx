@@ -23,6 +23,8 @@ import {
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 const STATUSES: SubscriptionStatus[] = ["trialing", "active", "past_due", "cancelled", "comped"];
 const inputClass = "min-h-10 w-full border-[1px] border-[var(--border)] bg-[var(--panel)] px-3 text-sm text-[var(--text)]";
@@ -210,10 +212,10 @@ function NewPlanForm({ token }: { token: string }) {
           <input className={inputClass} value={name} maxLength={80} onChange={(event) => setName(event.target.value)} />
         </Field>
         <Field label={t("console.audienceLabel")}>
-          <select className={inputClass} value={audience} onChange={(event) => setAudience(event.target.value as "gym" | "coach")}>
+          <Select className={inputClass} value={audience} onValueChange={(value) => setAudience(value as "gym" | "coach")}>
             <option value="coach">{t("console.audience.coach")}</option>
             <option value="gym">{t("console.audience.gym")}</option>
-          </select>
+          </Select>
         </Field>
       </div>
       {create.error ? <p role="alert" className="text-sm text-[var(--danger)]">{localizeError(create.error, i18n)}</p> : null}
@@ -305,22 +307,22 @@ function SubscriptionRow({
           className="mt-3 grid gap-3 sm:grid-cols-3"
         >
           <Field label={t("console.plan")}>
-            <select className={inputClass} value={planCode} onChange={(event) => setPlanCode(event.target.value)}>
+            <Select className={inputClass} value={planCode} onValueChange={(value) => setPlanCode(value)}>
               {plans.map((plan) => (
                 <option key={plan.code} value={plan.code}>{plan.name} ({plan.code})</option>
               ))}
-            </select>
+            </Select>
           </Field>
           <Field label={t("console.status")}>
-            <select className={inputClass} value={status} onChange={(event) => setStatus(event.target.value as SubscriptionStatus)}>
+            <Select className={inputClass} value={status} onValueChange={(value) => setStatus(value as SubscriptionStatus)}>
               {STATUSES.map((value) => (
                 <option key={value} value={value}>{t(`plan.status.${value}`)}</option>
               ))}
-            </select>
+            </Select>
           </Field>
           {status === "trialing" ? (
             <Field label={t("console.trialEnds")}>
-              <input type="date" className={inputClass} value={trialEnds} onChange={(event) => setTrialEnds(event.target.value)} />
+              <DateInput className={inputClass} value={trialEnds} onValueChange={(value) => setTrialEnds(value)} />
             </Field>
           ) : null}
           <Field label={t("console.override")} hint={t("console.overrideHint")}>

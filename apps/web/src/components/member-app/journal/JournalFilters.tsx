@@ -9,6 +9,7 @@ import { ChoiceChips, FilterPage, FilterSection } from "@/components/filters/Fil
 import { useSourceDirectory } from "@/components/providers/use-providers";
 import { JOURNAL_KINDS, JOURNAL_VISIBILITIES, journalFilterCount } from "@/lib/journal-filter";
 import { sourceOptions } from "@/lib/provider-sources";
+import { DateInput } from "@/components/ui/DateInput";
 
 /**
  * Ροή's filters (board 17 Q3): «Φίλτρα (n)» first, then Πηγή, Τύπος and
@@ -173,12 +174,11 @@ function DateField({
   return (
     <label className="flex flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
       {label}
-      <input
-        type="date"
+      <DateInput
         value={value ?? ""}
         min={min ?? undefined}
         max={max ?? undefined}
-        onChange={(event) => onChange(event.target.value || null)}
+        onValueChange={(value) => onChange(value || null)}
         className="min-h-11 rounded-2xl px-3 text-sm outline-none"
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
       />

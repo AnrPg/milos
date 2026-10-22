@@ -3,6 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 
 import { ShareExportDialog, type ShareExportCopy } from "@/components/share-export/ShareExportDialog";
 import type { ExportDocument, ExportFormat } from "@/lib/document-export";
+import { chooseValue } from "@/components/ui/select-test-utils";
 
 const copy: ShareExportCopy = {
   title: "Share or export",
@@ -58,8 +59,8 @@ describe("ShareExportDialog", () => {
       />,
     );
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Choose a file format" }), { target: { value: "odt" } });
-    fireEvent.change(screen.getByRole("combobox", { name: "Export to" }), { target: { value: "system" } });
+    chooseValue(screen.getByRole("combobox", { name: "Choose a file format" }), "odt");
+    chooseValue(screen.getByRole("combobox", { name: "Export to" }), "system");
     fireEvent.click(screen.getByRole("button", { name: "Export" }));
 
     await waitFor(() => expect(share).toHaveBeenCalledOnce());
@@ -73,10 +74,11 @@ describe("ShareExportDialog", () => {
 
     expect(screen.getByRole("dialog", { name: "Share or export" })).toBeVisible();
     expect(screen.getAllByRole("combobox")).toHaveLength(2);
+    expect(screen.getAllByRole("button")).toHaveLength(2);
+    fireEvent.click(screen.getByRole("combobox", { name: "Export to" }));
     expect(screen.getByRole("option", { name: "Email" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Google Drive" })).toBeInTheDocument();
     expect(screen.getByRole("option", { name: "Social apps" })).toBeInTheDocument();
-    expect(screen.getAllByRole("button")).toHaveLength(2);
   });
 
   it("shares the complete document text without downloading when social apps cannot receive files", async () => {
@@ -87,7 +89,7 @@ describe("ShareExportDialog", () => {
 
     render(<ShareExportDialog copy={copy} document={document} onClose={() => undefined} />);
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Export to" }), { target: { value: "social" } });
+    chooseValue(screen.getByRole("combobox", { name: "Export to" }), "social");
     fireEvent.click(screen.getByRole("button", { name: "Export" }));
 
     await waitFor(() => expect(share).toHaveBeenCalledOnce());
@@ -113,7 +115,7 @@ describe("ShareExportDialog", () => {
 
     render(<ShareExportDialog copy={copy} document={document} onClose={() => undefined} />);
 
-    fireEvent.change(screen.getByRole("combobox", { name: "Export to" }), { target: { value: "google" } });
+    chooseValue(screen.getByRole("combobox", { name: "Export to" }), "google");
     fireEvent.click(screen.getByRole("button", { name: "Export" }));
 
     await waitFor(() => expect(open).toHaveBeenCalledWith("https://drive.google.com/drive/my-drive", "_blank", "noopener,noreferrer"));

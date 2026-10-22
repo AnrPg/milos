@@ -33,6 +33,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can, membershipRoles } from "@/lib/role-navigation";
+import { Select } from "@/components/ui/Select";
 
 // Private coach notes on a client (ADR-101): coaches write their own; owners
 // and admins may read them unless the coach turned that off, and every such
@@ -216,11 +217,11 @@ export function CoachNotesPanel({
           {subjects.length > 0 ? (
             <label className="block text-xs" style={{ color: "var(--dim)" }}>
               {i18n("cnAbout")}
-              <select
+              <Select
                 className={`${inputClass} mt-1`}
                 style={inputStyle}
                 value={subjectKey}
-                onChange={(event) => setSubjectKey(event.target.value)}
+                onValueChange={(value) => setSubjectKey(value)}
               >
                 <option value="">{kinds ? i18n("cnAboutPick") : i18n("cnAboutNothing")}</option>
                 {subjects.map((item) => (
@@ -228,7 +229,7 @@ export function CoachNotesPanel({
                     {i18n(SUBJECT_KEYS[item.kind])} · {item.label}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           ) : null}
           <button

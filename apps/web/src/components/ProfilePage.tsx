@@ -32,6 +32,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { ReplayTourButton } from "@/components/onboarding/Onboarding";
 import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
 import { ThemeSetting } from "@/components/profile/ThemeSetting";
+import { Select } from "@/components/ui/Select";
 
 function FieldGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
@@ -253,12 +254,12 @@ export function ProfilePage() {
           defaultOpen
         >
           <FieldGroup label={tProfile("languageLabel")}>
-            <select
+            <Select
               aria-label={tProfile("languageLabel")}
               className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
               disabled={languagePending}
               value={isAppLocale(user?.preferred_locale) ? user.preferred_locale : locale}
-              onChange={(event) => void handleLanguageChange(event.target.value as AppLocale)}
+              onValueChange={(value) => void handleLanguageChange(value as AppLocale)}
               style={{
                 background: "var(--panel-muted)",
                 border: "1px solid var(--border)",
@@ -270,7 +271,7 @@ export function ProfilePage() {
                   {LOCALE_NAMES[supportedLocale]}
                 </option>
               ))}
-            </select>
+            </Select>
           </FieldGroup>
           {languagePending ? (
             <p className="mt-3 text-sm" style={{ color: "var(--muted)" }}>

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { Select } from "@/components/ui/Select";
 
 export const PERSONAL_PR_GYM = "";
 
@@ -50,17 +51,17 @@ export function PRGymField({
     <div className="space-y-1.5">
       <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
         {t("gymLabel")}
-        <select
+        <Select
           className="mt-1.5 w-full rounded-xl px-4 py-2.5 text-sm normal-case tracking-normal outline-none"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onValueChange={(value) => onChange(value)}
         >
           {gyms.map((gym) => (
             <option key={gym.slug} value={gym.slug}>{gym.name}</option>
           ))}
           <option value={PERSONAL_PR_GYM}>{t("gymPersonal")}</option>
-        </select>
+        </Select>
       </label>
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("gymHint")}</p>
     </div>

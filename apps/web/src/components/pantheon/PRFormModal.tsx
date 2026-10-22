@@ -34,6 +34,8 @@ import { useJournalCommentWriter } from "@/hooks/useJournalCommentWriter";
 import { removeComment, sortComments } from "@/lib/journal-comments";
 import { Dialog } from "@/components/ui/Dialog";
 import { PRShareFlow } from "@/components/pantheon/PRShareFlow";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -312,12 +314,12 @@ export function PRFormModal({
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
               {i18n("unitf6b935a")}
             </label>
-            <select
+            <Select
               className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={unit}
-              onChange={(e) => {
-                const next = e.target.value as PRUnit;
+              onValueChange={(value) => {
+                const next = value as PRUnit;
                 setUnit(next);
                 if (next === "mins_secs") setHigherIsBetter(false);
                 else setHigherIsBetter(true);
@@ -326,7 +328,7 @@ export function PRFormModal({
               {UNITS.map((u) => (
                 <option key={u.value} value={u.value}>{u.label}</option>
               ))}
-            </select>
+            </Select>
           </div>
 
           {unit === "mins_secs" ? (
@@ -385,12 +387,11 @@ export function PRFormModal({
             <label className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--muted)" }}>
               {i18n("dateAchieved8e4464d")}
             </label>
-            <input
+            <DateInput
               className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              type="date"
               value={beatenOn}
-              onChange={(e) => setBeatenOn(e.target.value)}
+              onValueChange={(value) => setBeatenOn(value)}
               required
             />
           </div>
@@ -423,14 +424,14 @@ export function PRFormModal({
               </div>
             )}
             {DETAIL_OPTIONS[unit].filter((metric) => !(metric in details)).length > 0 && (
-              <select className="w-full rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={detailToAdd} onChange={(event) => {
-                const metric = event.target.value as PRSupportingMetricKey;
+              <Select className="w-full rounded-xl px-4 py-2.5 text-sm outline-none" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={detailToAdd} onValueChange={(value) => {
+                const metric = value as PRSupportingMetricKey;
                 if (metric) setDetails((current) => ({ ...current, [metric]: "" }));
                 setDetailToAdd("");
               }}>
                 <option value="">{`${i18n("add61cc55a")} ${i18n("detail7c9a7c0")}`}</option>
                 {DETAIL_OPTIONS[unit].filter((metric) => !(metric in details)).map((metric) => <option key={metric} value={metric}>{metricLabel(metric, i18n)}</option>)}
-              </select>
+              </Select>
             )}
           </div>
 

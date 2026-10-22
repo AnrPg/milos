@@ -45,6 +45,7 @@ import { AssistantSwitch } from "./AssistantSwitch";
 import { EditorTabs } from "./EditorTabs";
 import { SectionScoringField } from "./SectionScoringField";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
+import { Select } from "@/components/ui/Select";
 
 type Props = {
   draftId: string | null;
@@ -292,11 +293,11 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
                 <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   {i18n("workoutType34a530c")}
                 </span>
-                <select
+                <Select
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--card)", borderColor: showProblems && !type ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
                   value={type}
-                  onChange={(event) => setType(event.target.value as WorkoutType)}
+                  onValueChange={(value) => setType(value as WorkoutType)}
                   aria-invalid={showProblems && !type}
                 >
                   <option value="" disabled>
@@ -307,7 +308,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
                       {item.replaceAll("_", " ")}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
           ) : null}

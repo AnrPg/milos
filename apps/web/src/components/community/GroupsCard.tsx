@@ -23,6 +23,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { Badge } from "./MembersTab";
 import { ProposeGroupSheet } from "./ProposeGroupSheet";
 import { ErrorLine } from "./Sheet";
+import { SPARK_GO_STYLE } from "@/lib/spark";
 
 /**
  * Κανάλια › Ομάδες μελών (board 7 Q2): the gym club's live groups with an
@@ -126,7 +127,7 @@ function GroupRow({ club, group }: { club: CommunityClub; group: CommunityGroup 
             disabled={join.isPending}
             onClick={() => join.mutate()}
             className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            style={SPARK_GO_STYLE}
           >
             {group.join_policy === "request" ? t("groupAsk") : t("groupJoin")}
           </button>

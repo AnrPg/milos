@@ -339,14 +339,17 @@ test.describe("member app shell", () => {
 
     await expect(page.getByRole("heading", { name: "Box Kypseli" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Fran" })).toBeVisible();
-    await expect(page.getByRole("tab", { name: /Strength A/ })).toBeVisible();
+    // On a phone the two sources don't fit one row, so they are a dropdown (SegmentPicker).
+    const sources = page.getByRole("combobox", { name: "Today's workouts by source" });
+    await expect(sources).toContainText("Class");
     await expect(page.getByRole("button", { name: /Start/ })).toBeEnabled();
     await expect(page.getByRole("link", { name: "Videos" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Coach" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Appointments" })).toHaveCount(0);
     await page.screenshot({ path: "test-results/member-app/box.png", fullPage: true });
 
-    await page.getByRole("tab", { name: /Strength A/ }).click();
+    await sources.click();
+    await page.getByRole("option", { name: /Strength A/ }).click();
     await expect(page.getByRole("heading", { name: "Strength A" })).toBeVisible();
   });
 

@@ -11,6 +11,7 @@ import { fetchTrialPolicy, TRIAL_POLICY_KEY, updateTrialPolicy, type TrialPolicy
 import { useSession } from "@/components/session-provider";
 import { trialErrorKey } from "@/components/trials/trial-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { Select } from "@/components/ui/Select";
 
 type Draft = {
   enabled: boolean;
@@ -167,9 +168,9 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
           </Section>
 
           <Section title={t("conversionTitle")} hint={t("conversionHint")}>
-            <select
+            <Select
               value={draft.conversion_package_id ?? ""}
-              onChange={(event) => set("conversion_package_id", event.target.value || null)}
+              onValueChange={(value) => set("conversion_package_id", value || null)}
               className="min-h-11 rounded-2xl px-3 text-sm"
               style={field}
             >
@@ -177,7 +178,7 @@ function Form({ token, initial, thisWeek }: { token: string; initial: Draft; thi
               {activePackages.map((pkg) => (
                 <option key={pkg.id} value={pkg.id}>{pkg.name}</option>
               ))}
-            </select>
+            </Select>
           </Section>
         </fieldset>
 

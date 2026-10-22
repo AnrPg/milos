@@ -202,7 +202,8 @@ test.describe("referrals", () => {
     const qr = page.getByRole("dialog", { name: "Your invite QR" });
     await expect(qr.getByRole("img", { name: "QR code of your invite link" })).toBeVisible();
     await expect(qr.getByText(CODE)).toBeVisible();
-    await qr.getByRole("button", { name: "Close" }).click();
+    // The header × and the footer button both close it.
+    await qr.getByRole("button", { name: "Close" }).first().click();
 
     await page.getByRole("button", { name: "New link" }).click();
     await page.getByRole("button", { name: "Make a new link" }).click();

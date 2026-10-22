@@ -17,6 +17,7 @@ import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCre
 import { SemanticLabel } from "@/components/semantic-label";
 import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
 import { Dialog } from "@/components/ui/Dialog";
+import { DateInput } from "@/components/ui/DateInput";
 
 type Props = {
   accessToken: string;
@@ -256,12 +257,11 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
 
                 <label className="block">
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("dateeb9a4bc")}</span>
-                  <input
+                  <DateInput
                     className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                     style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                    type="date"
                     value={scheduledFor}
-                    onChange={(e) => setScheduledFor(e.target.value)}
+                    onValueChange={(value) => setScheduledFor(value)}
                   />
                 </label>
 

@@ -21,7 +21,7 @@ export const FOLDER_KIND_ICONS: Record<FolderKind, string> = {
   year: "🗂️",
   month: "🗂️",
   day: "🗂️",
-  memberVariations: "🧬",
+  memberVariations: "🎯",
   memberVariation: "🙋",
   custom: "📁",
 };

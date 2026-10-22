@@ -49,6 +49,8 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { formatInZone, zoneLabel } from "@/lib/zoned-time";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { YourTime } from "@/components/zoned-time";
+import { Select } from "@/components/ui/Select";
+import { DateTimeInput } from "@/components/ui/DateInput";
 
 type View = "week" | "day";
 type Kind = AppointmentSlot["kind"];
@@ -135,10 +137,10 @@ function CreateSlotForm({
         <label className={captionClass} htmlFor={`${baseId}-coach`} style={captionStyle}>
           {i18n("stfCoach")}
         </label>
-        <select
+        <Select
           id={`${baseId}-coach`}
           className={inputClass}
-          onChange={(event) => setCoachId(event.target.value)}
+          onValueChange={(value) => setCoachId(value)}
           style={inputStyle}
           value={coachId}
         >
@@ -148,19 +150,18 @@ function CreateSlotForm({
               {coach.nickname}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-start`} style={captionStyle}>
           {i18n("stfStartsAt")}
         </label>
-        <input
+        <DateTimeInput
           id={`${baseId}-start`}
           className={inputClass}
-          onChange={(event) => setStartsAt(event.target.value)}
+          onValueChange={(value) => setStartsAt(value)}
           required
           style={inputStyle}
-          type="datetime-local"
           value={startsAt}
         />
         {zone ? (
@@ -189,26 +190,26 @@ function CreateSlotForm({
         <label className={captionClass} htmlFor={`${baseId}-kind`} style={captionStyle}>
           {i18n("stfKind")}
         </label>
-        <select
+        <Select
           id={`${baseId}-kind`}
           className={inputClass}
-          onChange={(event) => setKind(event.target.value as Kind)}
+          onValueChange={(value) => setKind(value as Kind)}
           style={inputStyle}
           value={kind}
         >
           <option value="pt_session">{i18n("stfKindPtSession")}</option>
           <option value="assessment">{i18n("stfKindAssessment")}</option>
-        </select>
+        </Select>
       </div>
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-format`} style={captionStyle}>
           {i18n("stfFormat")}
         </label>
-        <select
+        <Select
           id={`${baseId}-format`}
           className={inputClass}
-          onChange={(event) => {
-            const next = event.target.value as Format;
+          onValueChange={(value) => {
+            const next = value as Format;
             setFormat(next);
             setCapacity(capacityOptions(next)[0]);
           }}
@@ -217,17 +218,17 @@ function CreateSlotForm({
         >
           <option value="one_to_one">{i18n("stfFormatOneToOne")}</option>
           <option value="semi_private">{i18n("stfFormatSemiPrivate")}</option>
-        </select>
+        </Select>
       </div>
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-capacity`} style={captionStyle}>
           {i18n("capacity45bd908")}
         </label>
-        <select
+        <Select
           id={`${baseId}-capacity`}
           className={inputClass}
           disabled={format === "one_to_one"}
-          onChange={(event) => setCapacity(Number(event.target.value))}
+          onValueChange={(value) => setCapacity(Number(value))}
           style={inputStyle}
           value={capacity}
         >
@@ -236,22 +237,22 @@ function CreateSlotForm({
               {option}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-mode`} style={captionStyle}>
           {tCoach("slot.mode")}
         </label>
-        <select
+        <Select
           id={`${baseId}-mode`}
           className={inputClass}
-          onChange={(event) => setMode(event.target.value as Mode)}
+          onValueChange={(value) => setMode(value as Mode)}
           style={inputStyle}
           value={mode}
         >
           <option value="in_person">{tCoach("box.inPerson")}</option>
           <option value="online">{tCoach("box.online")}</option>
-        </select>
+        </Select>
       </div>
       {mode === "online" ? (
         <div className="space-y-1">
@@ -275,10 +276,10 @@ function CreateSlotForm({
         <label className={captionClass} htmlFor={`${baseId}-location`} style={captionStyle}>
           {i18n("stfLocation")}
         </label>
-        <select
+        <Select
           id={`${baseId}-location`}
           className={inputClass}
-          onChange={(event) => setLocationId(event.target.value)}
+          onValueChange={(value) => setLocationId(value)}
           style={inputStyle}
           value={locationId}
         >
@@ -288,7 +289,7 @@ function CreateSlotForm({
               {location.name}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       )}
       <div className="space-y-1">

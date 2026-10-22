@@ -9103,5 +9103,21 @@
       "enable": "Inspreken",
       "enableHint": "Leden spreken hun training in en controleren een concept voor het opslaan. Audio wordt niet bewaard."
     }
+  },
+  "Pickers": {
+    "chooseDate": "Kies een datum",
+    "chooseTime": "Kies een tijd",
+    "chooseMonthYear": "Kies maand en jaar",
+    "previousMonth": "Vorige maand",
+    "nextMonth": "Volgende maand",
+    "previousYear": "Vorig jaar",
+    "nextYear": "Volgend jaar",
+    "previousYears": "Eerdere jaren",
+    "nextYears": "Latere jaren",
+    "clear": "Wissen",
+    "today": "Vandaag",
+    "hours": "Uren",
+    "minutes": "Minuten",
+    "done": "Klaar"
   }
 }

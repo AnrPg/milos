@@ -4,6 +4,8 @@ import { expect, test, type Page } from "@playwright/test";
 
 import { stubApiPort } from "../playwright.config";
 
+import { chooseOption } from "./support/select";
+
 // The public box page (ADR-142, plan §5a board 4, board 5 Q1–Q2). The page is
 // server-rendered, so its read goes to a stub API on `stubApiPort`; what the
 // browser fetches afterwards is stubbed with page.route.
@@ -203,13 +205,14 @@ test.describe("public box page", () => {
 
     await expect(page.getByRole("button", { name: /Yoga 40\+/ })).toBeVisible();
     await page.getByRole("button", { name: "Filters", exact: true }).click();
-    await page.getByLabel("Level").selectOption("beginner");
+    await chooseOption(page, page.getByLabel("Level"), "beginner");
     await expect(page.getByRole("button", { name: /CrossFit.*Stelios/ })).toBeHidden();
     await page.getByRole("button", { name: /Yoga 40\+/ }).click();
     const sheet = page.getByRole("dialog", { name: "Yoga 40+" });
     // Trials are off at this box: no trial action on the class.
     await expect(sheet.getByRole("button", { name: "Book as a trial" })).toBeHidden();
-    await sheet.getByRole("button", { name: "Close" }).click();
+    // The header × and the footer button both close it.
+    await sheet.getByRole("button", { name: "Close" }).first().click();
 
     await page.getByRole("button", { name: "Follow" }).first().click();
     await expect.poll(() => follows).toEqual([{ target_type: "organization", target_id: "org-1" }]);

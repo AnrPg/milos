@@ -10,6 +10,7 @@ import { parseScannedCode, shouldAutoCheckIn } from "./check-in";
 import { ConfirmButton } from "./ConfirmButton";
 import { checkInErrorKey } from "./errors";
 import { CameraError, scannerSource, type StopScanner } from "./scanner";
+import { SPARK_GO_STYLE } from "@/lib/spark";
 
 const AUTO_KEY = "palee:desk-auto-check-in";
 const SAME_CODE_MS = 4_000;
@@ -361,7 +362,7 @@ function DeskResultCard({
             disabled={busy}
             onClick={() => onCheckIn({ bookingId: result.decision === "class" && bookings.length === 1 ? bookings[0].id : undefined })}
             className="min-h-11 rounded-full px-5 text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            style={SPARK_GO_STYLE}
             data-testid="desk-check-in"
           >
             {t("deskCheckIn")}

@@ -31,6 +31,8 @@ import {
   validateExportRange,
   type ReconciliationForm,
 } from "@/lib/finance-accounting";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 // ADR-126: refund receipts, manual provider reconciliation and accounting exports.
 
@@ -262,17 +264,17 @@ function ReconciliationSection() {
           <input className={inputClass} onChange={(e) => update({ externalReference: e.target.value })} style={inputStyle} value={form.externalReference} />
         </Field>
         <Field label={t("externalType")}>
-          <select className={inputClass} onChange={(e) => update({ externalType: e.target.value as ReconciliationForm["externalType"] })} style={inputStyle} value={form.externalType}>
+          <Select className={inputClass} onValueChange={(value) => update({ externalType: value as ReconciliationForm["externalType"] })} style={inputStyle} value={form.externalType}>
             <option value="payment">{t("typePayment")}</option>
             <option value="refund">{t("typeRefund")}</option>
-          </select>
+          </Select>
         </Field>
         <Field label={t("externalStatus")}>
-          <select className={inputClass} onChange={(e) => update({ externalStatus: e.target.value as ReconciliationForm["externalStatus"] })} style={inputStyle} value={form.externalStatus}>
+          <Select className={inputClass} onValueChange={(value) => update({ externalStatus: value as ReconciliationForm["externalStatus"] })} style={inputStyle} value={form.externalStatus}>
             <option value="settled">{t("statusSettled")}</option>
             <option value="pending">{t("statusPending")}</option>
             <option value="failed">{t("statusFailed")}</option>
-          </select>
+          </Select>
         </Field>
         <Field label={t("statementAmount")}>
           <input className={inputClass} inputMode="decimal" onChange={(e) => update({ amount: e.target.value })} style={inputStyle} value={form.amount} />
@@ -281,7 +283,7 @@ function ReconciliationSection() {
           <input className={inputClass} maxLength={3} onChange={(e) => update({ currency: e.target.value })} style={inputStyle} value={form.currency} />
         </Field>
         <Field label={t("statementDate")}>
-          <input className={inputClass} onChange={(e) => update({ occurredOn: e.target.value })} style={inputStyle} type="date" value={form.occurredOn} />
+          <DateInput className={inputClass} onValueChange={(value) => update({ occurredOn: value })} style={inputStyle} value={form.occurredOn} />
         </Field>
         <Field label={t("description")}>
           <input className={inputClass} onChange={(e) => update({ description: e.target.value })} style={inputStyle} value={form.description} />
@@ -452,10 +454,10 @@ function ExportsSection() {
     <Section intro={t("exportsIntro")} title={t("exportsTitle")}>
       <div className="flex flex-wrap items-end gap-3">
         <Field label={t("rangeStart")}>
-          <input className={inputClass} max={today} onChange={(e) => setRangeStart(e.target.value)} style={inputStyle} type="date" value={rangeStart} />
+          <DateInput className={inputClass} max={today} onValueChange={(value) => setRangeStart(value)} style={inputStyle} value={rangeStart} />
         </Field>
         <Field label={t("rangeEnd")}>
-          <input className={inputClass} onChange={(e) => setRangeEnd(e.target.value)} style={inputStyle} type="date" value={rangeEnd} />
+          <DateInput className={inputClass} onValueChange={(value) => setRangeEnd(value)} style={inputStyle} value={rangeEnd} />
         </Field>
         <button className="rounded-full px-5 py-2 text-sm font-semibold" disabled={exportMutation.isPending} onClick={submit} style={primaryButton} type="button">
           {exportMutation.isPending ? t("exporting") : t("requestExport")}

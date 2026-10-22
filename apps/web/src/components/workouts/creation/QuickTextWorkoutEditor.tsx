@@ -47,6 +47,7 @@ import {
   type WorkoutDslVocabulary,
 } from "@/lib/workout-dsl-suggestions";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 const EMPTY_VOCABULARY: WorkoutDslVocabulary = {
   version: 1,
@@ -558,16 +559,16 @@ export function QuickTextWorkoutEditor({
             style={{ borderColor: "var(--dim)" }}
           >
             <div className="flex flex-wrap items-center gap-2">
-              <select
+              <Select
                 aria-label={i18n("quickTextTemplate")}
                 defaultValue=""
-                onChange={(event) => {
+                onValueChange={(value) => {
                   insertTemplate(
-                    event.target.value === "workout"
+                    value === "workout"
                       ? manual?.templates?.workout ?? ""
-                      : manual?.templates?.sections?.[event.target.value] ?? "",
+                      : manual?.templates?.sections?.[value] ?? "",
                   );
-                  event.currentTarget.value = "";
+                  value = "";
                 }}
                 className="rounded-lg border px-3 py-2 text-sm"
                 style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
@@ -579,7 +580,7 @@ export function QuickTextWorkoutEditor({
                     {format.replaceAll("_", " ")}
                   </option>
                 ))}
-              </select>
+              </Select>
               <span className="text-xs" style={{ color: "var(--muted)" }}>
                 {i18n("quickTextSlashHint")}
               </span>

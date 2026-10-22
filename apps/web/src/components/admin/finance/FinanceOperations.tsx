@@ -119,28 +119,31 @@ export function FinanceOperations() {
         {summaryQuery.isLoading || queuesQuery.isLoading || attentionItems.length > 0 ? (
           <section
             aria-label={i18n("urgentFinanceAttention8b067dd")}
-            className="flex items-center gap-2 overflow-x-auto rounded-full px-3 py-2"
+            className="flex flex-col gap-2 rounded-2xl p-2 sm:flex-row sm:flex-wrap sm:items-center sm:rounded-full sm:px-3"
             style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
           >
-            <span className="shrink-0 px-2 text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            <span className="px-2 pt-1 text-xs font-bold uppercase tracking-[0.18em] sm:pt-0" style={{ color: "var(--dim)" }}>
               {i18n("attention74e0b9c")}
             </span>
             {summaryQuery.isLoading || queuesQuery.isLoading ? (
-            <span className="whitespace-nowrap px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("loading33ce417")}</span>
+              <span className="px-2 text-sm" style={{ color: "var(--muted)" }}>{i18n("loading33ce417")}</span>
             ) : (
-              attentionItems.map((item) => (
-                <Link
-                  key={item.label}
-                  className="shrink-0 whitespace-nowrap rounded-full px-3 py-1.5 text-sm font-semibold"
-                  href={item.href}
-                  style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}
-                >
-                  {item.label}: {item.count}
-                </Link>
-              ))
+              // Phones: a full grid (two columns for an even count, one otherwise), never a sideways scroll.
+              <div className={`grid gap-1.5 sm:flex sm:flex-wrap ${attentionItems.length % 2 === 0 ? "grid-cols-2" : "grid-cols-1"}`}>
+                {attentionItems.map((item) => (
+                  <Link
+                    key={item.label}
+                    className="min-w-0 truncate rounded-full px-3 py-1.5 text-center text-sm font-semibold sm:whitespace-nowrap"
+                    href={item.href}
+                    style={{ background: "color-mix(in srgb, var(--danger) 10%, transparent)", color: "var(--danger)" }}
+                  >
+                    {item.label}: {item.count}
+                  </Link>
+                ))}
+              </div>
             )}
             {Number(totals.overdue_invoice_balance_cents ?? 0) > 0 ? (
-              <span className="ms-auto shrink-0 whitespace-nowrap px-2 text-xs font-semibold" style={{ color: "var(--muted)" }}>
+              <span className="px-2 text-xs font-semibold sm:ms-auto sm:whitespace-nowrap" style={{ color: "var(--muted)" }}>
                 {i18n("overdueBalanced6ec7a8")} {money(uiLocale, totals.overdue_invoice_balance_cents)}
               </span>
             ) : null}

@@ -444,11 +444,14 @@ export function SmallButton({
   children,
   onClick,
   primary,
+  spark,
   disabled,
 }: {
   children: string;
   onClick: () => void;
   primary?: boolean;
+  /** A go-now action (join): Spark instead of Dojo (ADR-182). */
+  spark?: boolean;
   disabled?: boolean;
 }) {
   return (
@@ -458,9 +461,9 @@ export function SmallButton({
       disabled={disabled}
       className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
       style={{
-        background: primary ? "var(--primary)" : "var(--panel-raised)",
-        color: primary ? "var(--primary-contrast)" : "var(--text)",
-        border: primary ? "none" : "1px solid var(--border)",
+        background: spark ? "var(--spark)" : primary ? "var(--primary)" : "var(--panel-raised)",
+        color: spark ? "var(--spark-contrast)" : primary ? "var(--primary-contrast)" : "var(--text)",
+        border: primary || spark ? "none" : "1px solid var(--border)",
       }}
     >
       {children}

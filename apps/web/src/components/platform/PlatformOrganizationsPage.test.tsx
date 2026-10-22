@@ -18,6 +18,7 @@ import {
   updatePlatformOrganizationMembershipRole,
 } from "@/api/platform-organizations";
 import { fetchOrganizationMemberships } from "@/api/organizations";
+import { chooseValue } from "@/components/ui/select-test-utils";
 
 vi.mock("@/components/session-provider", () => ({
   useSession: () => ({ tokens: { access_token: "token" } }),
@@ -373,9 +374,9 @@ describe("PlatformOrganizationsPage", () => {
 
     const dialog = screen.getByRole("dialog", { name: "Access" });
     expect(await within(dialog).findByText("maria")).toBeInTheDocument();
-    expect(within(dialog).getByLabelText("Invite role")).toHaveValue("admin");
+    expect(within(dialog).getByLabelText("Invite role")).toHaveAttribute("data-value", "admin");
 
-    fireEvent.change(within(dialog).getByLabelText("Invite role"), { target: { value: "coach" } });
+    chooseValue(within(dialog).getByLabelText("Invite role"), "coach");
     fireEvent.change(within(dialog).getByLabelText("Email hint (optional)"), {
       target: { value: "coach@example.test" },
     });
@@ -392,7 +393,7 @@ describe("PlatformOrganizationsPage", () => {
     expect(await within(dialog).findByText("coach-invite-token")).toBeInTheDocument();
     expect(within(dialog).getByRole("button", { name: /Generated invitations/ })).toBeInTheDocument();
 
-    fireEvent.change(within(dialog).getByLabelText("Tenant role"), { target: { value: "athlete" } });
+    chooseValue(within(dialog).getByLabelText("Tenant role"), "athlete");
 
     await waitFor(() => {
       expect(updatePlatformOrganizationMembershipRole).toHaveBeenCalledWith(

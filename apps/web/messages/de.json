@@ -9103,5 +9103,21 @@
       "enable": "Spracherfassung",
       "enableHint": "Mitglieder sprechen ihr Training ein und prüfen einen Entwurf vor dem Speichern. Audio wird nicht gespeichert."
     }
+  },
+  "Pickers": {
+    "chooseDate": "Datum wählen",
+    "chooseTime": "Uhrzeit wählen",
+    "chooseMonthYear": "Monat und Jahr wählen",
+    "previousMonth": "Vorheriger Monat",
+    "nextMonth": "Nächster Monat",
+    "previousYear": "Vorheriges Jahr",
+    "nextYear": "Nächstes Jahr",
+    "previousYears": "Frühere Jahre",
+    "nextYears": "Spätere Jahre",
+    "clear": "Löschen",
+    "today": "Heute",
+    "hours": "Stunden",
+    "minutes": "Minuten",
+    "done": "Fertig"
   }
 }

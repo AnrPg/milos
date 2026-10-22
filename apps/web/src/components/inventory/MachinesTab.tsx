@@ -44,6 +44,8 @@ import {
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 export const MACHINES_KEY = ["staff", "inventory", "machines"] as const;
 const eventsKey = (id: string) => ["staff", "inventory", "machines", id, "events"] as const;
@@ -259,35 +261,35 @@ function EventForm({ token, machine, kinds }: { token: string; machine: Machine;
       }}
     >
       <Field label={i18n("invKind")}>
-        <select className={inputClass} style={inputStyle} value={kind} onChange={(event) => setKind(event.target.value as MachineEventKind)}>
+        <Select className={inputClass} style={inputStyle} value={kind} onValueChange={(value) => setKind(value as MachineEventKind)}>
           {kinds.map((option) => (
             <option key={option} value={option}>
               {i18n(`invKind_${option}`)}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
       {problem ? (
         <>
           <Field label={i18n("invSeverity")}>
-            <select className={inputClass} style={inputStyle} value={severity} onChange={(event) => setSeverity(event.target.value)}>
+            <Select className={inputClass} style={inputStyle} value={severity} onValueChange={(value) => setSeverity(value)}>
               <option value="">—</option>
               {SEVERITIES.map((option) => (
                 <option key={option} value={option}>
                   {i18n(`invSeverity_${option}`)}
                 </option>
               ))}
-            </select>
+            </Select>
           </Field>
           <Field label={i18n("invSymptom")}>
-            <select className={inputClass} style={inputStyle} value={symptom} onChange={(event) => setSymptom(event.target.value)}>
+            <Select className={inputClass} style={inputStyle} value={symptom} onValueChange={(value) => setSymptom(value)}>
               <option value="">—</option>
               {SYMPTOMS.map((option) => (
                 <option key={option} value={option}>
                   {i18n(`invSymptom_${option}`)}
                 </option>
               ))}
-            </select>
+            </Select>
           </Field>
           {kind === "issue" ? (
             <label className="flex items-center gap-2 self-end pb-2 text-sm" style={{ color: "var(--text-soft)" }}>
@@ -401,7 +403,8 @@ function MachineForm({ token, machine, onDone }: { token: string; machine?: Mach
     last_serviced_on: machine?.last_serviced_on ?? "",
     notes: machine?.notes ?? "",
   });
-  const set = (key: keyof typeof form) => (event: { target: { value: string } }) => setForm((current) => ({ ...current, [key]: event.target.value }));
+  const setValue = (key: keyof typeof form) => (value: string) => setForm((current) => ({ ...current, [key]: value }));
+  const set = (key: keyof typeof form) => (event: { target: { value: string } }) => setValue(key)(event.target.value);
   const text = (value: string) => value.trim() || null;
 
   const save = useMutation({
@@ -441,10 +444,10 @@ function MachineForm({ token, machine, onDone }: { token: string; machine?: Mach
         <input className={inputClass} style={inputStyle} required maxLength={120} value={form.name} onChange={set("name")} />
       </Field>
       <Field label={i18n("invCategory")}>
-        <select className={inputClass} style={inputStyle} value={form.category} onChange={set("category")}>
+        <Select className={inputClass} style={inputStyle} value={form.category} onValueChange={setValue("category")}>
           <option value="training">{i18n("invCategory_training")}</option>
           <option value="appliance">{i18n("invCategory_appliance")}</option>
-        </select>
+        </Select>
       </Field>
       <Field label={i18n("invBrand")}>
         <input className={inputClass} style={inputStyle} maxLength={120} value={form.brand} onChange={set("brand")} />
@@ -459,13 +462,13 @@ function MachineForm({ token, machine, onDone }: { token: string; machine?: Mach
         <input className={inputClass} style={inputStyle} maxLength={120} value={form.serial_number} onChange={set("serial_number")} />
       </Field>
       <Field label={i18n("invPurchasedOn")}>
-        <input className={inputClass} style={inputStyle} type="date" value={form.purchased_on} onChange={set("purchased_on")} />
+        <DateInput className={inputClass} style={inputStyle} value={form.purchased_on} onValueChange={setValue("purchased_on")} />
       </Field>
       <Field label={i18n("invPurchasePrice")}>
         <input className={inputClass} style={inputStyle} inputMode="decimal" placeholder="0.00" value={form.purchase_price} onChange={set("purchase_price")} />
       </Field>
       <Field label={i18n("invWarrantyUntil")}>
-        <input className={inputClass} style={inputStyle} type="date" value={form.warranty_until} onChange={set("warranty_until")} />
+        <DateInput className={inputClass} style={inputStyle} value={form.warranty_until} onValueChange={setValue("warranty_until")} />
       </Field>
       <Field label={i18n("invServiceContact")}>
         <input className={inputClass} style={inputStyle} maxLength={200} value={form.service_contact} onChange={set("service_contact")} />
@@ -474,7 +477,7 @@ function MachineForm({ token, machine, onDone }: { token: string; machine?: Mach
         <input className={inputClass} style={inputStyle} type="number" min={1} step={1} value={form.service_interval_days} onChange={set("service_interval_days")} />
       </Field>
       <Field label={i18n("invLastServiced")}>
-        <input className={inputClass} style={inputStyle} type="date" value={form.last_serviced_on} onChange={set("last_serviced_on")} />
+        <DateInput className={inputClass} style={inputStyle} value={form.last_serviced_on} onValueChange={setValue("last_serviced_on")} />
       </Field>
       <Field label={i18n("invNotes")} className="sm:col-span-2">
         <textarea className={inputClass} style={inputStyle} rows={2} maxLength={2000} value={form.notes} onChange={set("notes")} />

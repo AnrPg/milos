@@ -52,6 +52,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { dateTimeLocalInZone, dateTimeLocalToIso, zoneLabel, zonedText, zonedToInstant } from "@/lib/zoned-time";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
+import { DateInput, TimeInput, DateTimeInput } from "@/components/ui/DateInput";
 
 type SlotEditorState = {
   slotId: string | null;
@@ -730,12 +732,12 @@ export function ScheduleConsole({
                 <label key={label} className="space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
                   <span>{label}</span>
                   {type === "select" ? (
-                    <select
+                    <Select
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      onChange={(event) =>
+                      onValueChange={(value) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, master_workout_id: event.target.value || null } } : current,
+                          current ? { ...current, values: { ...current.values, master_workout_id: value || null } } : current,
                         )
                       }
                       value={editor.values.master_workout_id ?? ""}
@@ -744,14 +746,14 @@ export function ScheduleConsole({
                       {workouts.map((workout) => (
                         <option key={workout.id} value={workout.id}>{workout.title}</option>
                       ))}
-                    </select>
+                    </Select>
                   ) : type === "select-type" ? (
-                    <select
+                    <Select
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      onChange={(event) =>
+                      onValueChange={(value) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, class_type_id: event.target.value } } : current,
+                          current ? { ...current, values: { ...current.values, class_type_id: value } } : current,
                         )
                       }
                       value={editor.values.class_type_id}
@@ -759,7 +761,7 @@ export function ScheduleConsole({
                       {classTypes.filter((classType) => !classType.archived_at).map((option) => (
                         <option key={option.id} value={option.id}>{option.name}</option>
                       ))}
-                    </select>
+                    </Select>
                   ) : type === "name" ? (
                     <input
                       className="w-full rounded-2xl px-4 py-3 outline-none"
@@ -788,15 +790,14 @@ export function ScheduleConsole({
                     />
                   ) : type === "datetime" ? (
                     <>
-                    <input
+                    <DateTimeInput
                       className="w-full rounded-2xl px-4 py-3 outline-none"
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      onChange={(event) =>
+                      onValueChange={(value) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, scheduled_at: toIsoDateTime(event.target.value, gymZone) } } : current,
+                          current ? { ...current, values: { ...current.values, scheduled_at: toIsoDateTime(value, gymZone) } } : current,
                         )
                       }
-                      type="datetime-local"
                       value={editorDateValue}
                     />
                     {gymZone ? (
@@ -889,11 +890,11 @@ export function ScheduleConsole({
             <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
               <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
-              <label className="text-sm font-semibold">{i18n("classSeriesWod")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.master_workout_id ?? ""} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: event.target.value || null } })}><option value="">{i18n("classNoWodYet")}</option>{workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}</select><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("classSeriesWodHint")}</span></label>
-              <label className="text-sm font-semibold">{i18n("featureClassType")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: event.target.value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
-              <label className="text-sm font-semibold">{i18n("featureStarts")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="date" value={seriesEditor.startDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, startDate: event.target.value })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<input className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} type="date" value={seriesEditor.endDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, endDate: event.target.value })} /></label>
-              <label className="text-sm font-semibold">{i18n("featureTime")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="time" value={seriesEditor.time} onChange={(event) => setSeriesEditor({ ...seriesEditor, time: event.target.value })} /></label>
+              <label className="text-sm font-semibold">{i18n("classSeriesWod")}<Select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.master_workout_id ?? ""} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: value || null } })}><option value="">{i18n("classNoWodYet")}</option>{workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}</Select><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("classSeriesWodHint")}</span></label>
+              <label className="text-sm font-semibold">{i18n("featureClassType")}<Select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</Select></label>
+              <label className="text-sm font-semibold">{i18n("featureStarts")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.startDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, startDate: value })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<DateInput className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} value={seriesEditor.endDate} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, endDate: value })} /></label>
+              <label className="text-sm font-semibold">{i18n("featureTime")}<TimeInput className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.time} onValueChange={(value) => setSeriesEditor({ ...seriesEditor, time: value })} /></label>
               <div className="text-sm font-semibold">{i18n("featureWeekdays")}<div className="mt-2 flex flex-wrap gap-2">{["featureMonday", "featureTuesday", "featureWednesday", "featureThursday", "featureFriday", "featureSaturday", "featureSunday"].map((key, index) => { const day = index + 1; return <button key={key} type="button" aria-pressed={seriesEditor.weekdays.includes(day)} className="rounded-full px-3 py-2 text-xs" style={{ background: seriesEditor.weekdays.includes(day) ? "var(--primary)" : "var(--panel-muted)", color: seriesEditor.weekdays.includes(day) ? "var(--primary-contrast)" : "var(--text-soft)" }} onClick={() => setSeriesEditor({ ...seriesEditor, weekdays: seriesEditor.weekdays.includes(day) ? seriesEditor.weekdays.filter((item) => item !== day) : [...seriesEditor.weekdays, day] })}>{i18n(key)}</button>; })}</div></div>
               <label className="text-sm font-semibold">{i18n("featureExcludedDates")}<input className="mt-2 w-full rounded-xl px-3 py-2" placeholder="2026-08-15, 2026-12-25" value={seriesEditor.excludedDates} onChange={(event) => setSeriesEditor({ ...seriesEditor, excludedDates: event.target.value })} /><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("featureCommaSeparatedDates")}</span></label>
               <SlotLocationSelect className="text-sm font-semibold" locations={adminLocations} onChange={(locationId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, location_id: locationId } })} selectClassName="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.location_id} />
@@ -929,12 +930,12 @@ function ClassCoachSelect({
   return (
     <label className={className} style={selectStyle ? { color: "var(--muted)" } : undefined}>
       <span>{label}</span>
-      <select className={selectClassName} style={selectStyle} value={value ?? ""} onChange={(event) => onChange(event.target.value || null)}>
+      <Select className={selectClassName} style={selectStyle} value={value ?? ""} onValueChange={(value) => onChange(value || null)}>
         <option value="">{noneLabel}</option>
         {coaches.map((coach) => (
           <option key={coach.user_id} value={coach.user_id}>{coach.nickname ?? coach.user_id}</option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

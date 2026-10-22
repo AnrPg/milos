@@ -7,6 +7,8 @@ import { checkInOpenGym, listMemberLocations, type MemberCheckIn, type MemberLoc
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { includesOpenGym, localizeMemberBookingError } from "@/components/schedule/member-booking";
 import { useUiTranslations } from "@/i18n/ui";
+import { Select } from "@/components/ui/Select";
+import { SPARK_GO_STYLE } from "@/lib/spark";
 
 /**
  * Open-gym self check-in (ADR-097). Renders nothing unless the member's
@@ -90,21 +92,21 @@ export function OpenGymCheckIn({
       {checkIn ? null : (
         <div className="flex flex-wrap items-center gap-2">
           {locations.length > 1 ? (
-            <select
+            <Select
               aria-label={i18n("mbCheckInLocation")}
               className="rounded-full px-3 py-2 text-sm outline-none"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              onChange={(event) => setLocationId(event.target.value)}
+              onValueChange={(value) => setLocationId(value)}
               value={locationId}
             >
               {locations.map((location) => (
                 <option key={location.id} value={location.id}>{location.name}</option>
               ))}
-            </select>
+            </Select>
           ) : null}
           <button
             className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            style={SPARK_GO_STYLE}
             disabled={busy}
             onClick={() => void handleCheckIn()}
             type="button"

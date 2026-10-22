@@ -99,13 +99,16 @@ test.describe("social", () => {
     state.followers = 1;
     state.requests = 0;
     await page.goto("/me/connections");
-    await expect(page.getByRole("tab", { name: "1 follower" })).toHaveAttribute("aria-selected", "true");
+    // The tabs fall back to a dropdown when they don't fit one row (SegmentPicker).
+    const tabs = page.getByRole("combobox", { name: "Connections" });
+    await expect(tabs).toContainText("1 follower");
     await expect(page.getByRole("link", { name: /Nikos/ })).toHaveAttribute("href", "/people/person-2");
     await page.getByRole("searchbox", { name: "Search people" }).fill("maria");
     await expect(page.getByText("Nothing matches that search.")).toBeVisible();
     await page.getByRole("searchbox", { name: "Search people" }).fill("NIK");
     await expect(page.getByRole("link", { name: /Nikos/ })).toBeVisible();
-    await page.getByRole("tab", { name: "Following 2" }).click();
+    await tabs.click();
+    await page.getByRole("option", { name: "Following 2" }).click();
     await expect(page).toHaveURL(/tab=following/);
     await expect(page.getByRole("link", { name: /Eleni/ })).toBeVisible();
   });

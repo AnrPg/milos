@@ -6,6 +6,7 @@ import { linkScheduleSlotWorkout, type ScheduleSlot } from "@/api/schedule";
 import type { WorkoutRecord } from "@/api/workouts";
 import { useUiTranslations } from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
+import { Select } from "@/components/ui/Select";
 
 /** ADR-176: which notice a class without its WOD shows staff, if any. */
 export function classWorkoutNoticeKind(slot: Pick<ScheduleSlot, "published" | "workout_status">) {
@@ -67,12 +68,12 @@ export function ClassWorkoutNotice({
       </p>
       {workouts.length > 0 ? (
         <div className="flex flex-wrap items-center gap-2">
-          <select
+          <Select
             aria-label={i18n("classLinkWodLabel")}
             className="min-w-0 flex-1 rounded-xl px-3 py-2 text-sm outline-none"
             style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
             value={workoutId}
-            onChange={(event) => setWorkoutId(event.target.value)}
+            onValueChange={(value) => setWorkoutId(value)}
           >
             <option value="">{i18n("classLinkWodPlaceholder")}</option>
             {workouts.map((workout) => (
@@ -80,7 +81,7 @@ export function ClassWorkoutNotice({
                 {workout.title}
               </option>
             ))}
-          </select>
+          </Select>
           <button
             type="button"
             disabled={!workoutId || busy}

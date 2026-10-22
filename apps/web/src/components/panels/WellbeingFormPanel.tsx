@@ -12,6 +12,7 @@ import { useMutation } from "@tanstack/react-query";
 import { reportInjury, type ReportInjuryRequest } from "@/api/wellbeing";
 import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
   const i18n = useUiTranslations();
@@ -90,7 +91,7 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
               <label className="block text-xs font-semibold mb-1.5" style={{ color: "var(--muted)" }}>
                 {i18n("severityde314fa")}
               </label>
-              <select
+              <Select
                 className="w-full rounded-xl px-3 py-2.5 text-sm outline-none"
                 style={{
                   background: "var(--panel-muted)",
@@ -98,14 +99,14 @@ export function WellbeingFormPanel({ onClose }: { onClose: () => void }) {
                   color: "var(--text)",
                 }}
                 value={severity}
-                onChange={(e) =>
-                  setSeverity(e.target.value as ReportInjuryRequest["severity"])
+                onValueChange={(value) =>
+                  setSeverity(value as ReportInjuryRequest["severity"])
                 }
               >
                 <option value="mild">{i18n("mildCanTrainWithCare8b2bbe3")}</option>
                 <option value="moderate">{i18n("moderateLimitedTraining5358133")}</option>
                 <option value="severe">{i18n("severeCannotTrainf98a85c")}</option>
-              </select>
+              </Select>
             </div>
 
             <div>

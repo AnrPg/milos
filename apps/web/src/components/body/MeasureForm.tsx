@@ -45,6 +45,7 @@ import {
   toLocalInput,
   unitOf,
 } from "@/lib/body";
+import { DateTimeInput } from "@/components/ui/DateInput";
 
 const VISIBILITIES: BodyVisibility[] = ["private", "coach_numbers", "coach_full"];
 const ASKED_KEY = "palee:body:weight-display-asked";
@@ -381,11 +382,10 @@ export function MeasureForm({ snapshot }: { snapshot?: BodySnapshot }) {
       <Card label={t("whenLabel")}>
         <label className="flex flex-col gap-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
           {t("whenLabel")}
-          <input
-            type="datetime-local"
+          <DateTimeInput
             value={takenAt}
             max={toLocalInput(new Date())}
-            onChange={(event) => setTakenAt(event.target.value)}
+            onValueChange={(value) => setTakenAt(value)}
             className="min-h-11 rounded-xl px-3"
             style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
           />

@@ -9,6 +9,7 @@ import { archiveOrganization, createOwnedOrganization, transferOwnership } from 
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { rememberSelectedOrganization } from "@/lib/organization-slug";
+import { Select } from "@/components/ui/Select";
 
 const field = "w-full rounded-2xl px-4 py-3 text-sm";
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
@@ -70,12 +71,12 @@ export function OrganizationOwnerSettings({ token, slug, currentUserId }: { toke
       >
         <h3 className="text-sm font-semibold" style={{ color: "var(--text)" }}>{i18n("orgTransferTitle")}</h3>
         <p className="text-xs" style={{ color: "var(--dim)" }}>{i18n("orgTransferHelp")}</p>
-        <select className={field} style={fieldStyle} value={newOwner} onChange={(event) => setNewOwner(event.target.value)} aria-label={i18n("orgTransferTitle")}>
+        <Select className={field} style={fieldStyle} value={newOwner} onValueChange={(value) => setNewOwner(value)} aria-label={i18n("orgTransferTitle")}>
           <option value="">{i18n("orgTransferChoose")}</option>
           {candidates.map((member) => (
             <option key={member.user_id} value={member.user_id}>{member.nickname}</option>
           ))}
-        </select>
+        </Select>
         <button type="submit" className={button} disabled={!newOwner || transfer.isPending} style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}>
           {i18n("orgTransferAction")}
         </button>

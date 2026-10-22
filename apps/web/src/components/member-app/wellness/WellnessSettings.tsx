@@ -20,6 +20,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { wellnessErrorMessage } from "./wellness-errors";
 import { fullOrder, moveItem } from "./wellness-model";
 import { ErrorLine, PrimaryButton, QuietButton, SheetSection, WellnessSheet } from "./WellnessSheet";
+import { Select } from "@/components/ui/Select";
 
 const GLASS_SIZES = [200, 250, 330, 500];
 
@@ -211,16 +212,16 @@ export function WellnessCustomizeSheet({
       <SheetSection label={t("settings.water")}>
         <label className="flex items-center justify-between gap-3 text-sm" style={{ color: "var(--text)" }}>
           {t("settings.glass")}
-          <select
+          <Select
             value={glass}
-            onChange={(event) => setGlass(Number(event.target.value))}
+            onValueChange={(value) => setGlass(Number(value))}
             className="min-h-10 rounded-xl px-3"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           >
             {GLASS_SIZES.map((size) => (
               <option key={size} value={size}>{t("settings.ml", { ml: size })}</option>
             ))}
-          </select>
+          </Select>
         </label>
         <label className="flex items-center justify-between gap-3 text-sm" style={{ color: "var(--text)" }}>
           {t("settings.goalGlasses")}

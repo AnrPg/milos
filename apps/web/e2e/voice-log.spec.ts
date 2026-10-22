@@ -154,7 +154,7 @@ test.describe("Νέα καταχώρηση › Με φωνή", () => {
 
     await expect(page.getByLabel("Workout name")).toHaveValue("Squat day");
     await expect(page.getByLabel("Duration (minutes)")).toHaveValue("45");
-    await expect(page.getByLabel("Perceived effort (1–10)")).toHaveValue("8");
+    await expect(page.getByLabel("Perceived effort (1–10)")).toHaveAttribute("data-value", "8");
     await expect(page.getByRole("textbox", { name: "Exercise", exact: true })).toHaveValue("Back squat");
     await expect(page.getByRole("textbox", { name: "Sets" })).toHaveValue("5");
     await expect(page.getByRole("textbox", { name: "Reps" })).toHaveValue("5");

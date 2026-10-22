@@ -7,6 +7,7 @@ import { FREE_TEXT_TIMER_FORMATS, type FreeTextTimerFormat, type FreeTextTimerPr
 import type { SectionFormat } from "@/types/workout";
 
 import { LONG_DURATION_PRESETS, SHORT_DURATION_PRESETS, TimeInput } from "./TimeInput";
+import { Select } from "@/components/ui/Select";
 
 type Props = {
   preset: FreeTextTimerPreset;
@@ -26,9 +27,9 @@ export function FreeTextTimerFields({ preset, formatLabels, onChange }: Props) {
         <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
           {i18n("timerFormatLabel")}
         </span>
-        <select
+        <Select
           value={format}
-          onChange={(event) => onChange({ format: event.target.value as FreeTextTimerFormat })}
+          onValueChange={(value) => onChange({ format: value as FreeTextTimerFormat })}
           className="mt-2 w-full rounded-xl border px-3 py-2 text-sm"
           style={{ background: "var(--card)", borderColor: "var(--border)", color: "var(--text)" }}
         >
@@ -37,7 +38,7 @@ export function FreeTextTimerFields({ preset, formatLabels, onChange }: Props) {
               {formatLabels[item]}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
 
       {format === "amrap" || format === "for_time" ? (

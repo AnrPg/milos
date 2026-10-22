@@ -9103,5 +9103,21 @@
       "enable": "التسجيل بالصوت",
       "enableHint": "يسجّل الأعضاء تمرينهم ويراجعون مسودة قبل الحفظ. لا يُحتفظ بالصوت."
     }
+  },
+  "Pickers": {
+    "chooseDate": "اختر تاريخًا",
+    "chooseTime": "اختر وقتًا",
+    "chooseMonthYear": "اختر الشهر والسنة",
+    "previousMonth": "الشهر السابق",
+    "nextMonth": "الشهر التالي",
+    "previousYear": "السنة السابقة",
+    "nextYear": "السنة التالية",
+    "previousYears": "سنوات سابقة",
+    "nextYears": "سنوات لاحقة",
+    "clear": "مسح",
+    "today": "اليوم",
+    "hours": "الساعات",
+    "minutes": "الدقائق",
+    "done": "تم"
   }
 }

@@ -42,6 +42,8 @@ import { ChargeCategorySelect } from "@/components/admin/finance/shared/ChargeCa
 import { CHARGE_CATEGORY_LABEL_KEYS, isChargeCategory, manualInvoiceBody } from "@/components/admin/finance/shared/charge-category";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -441,11 +443,11 @@ export function MemberPanel({
 
                 {showAssignForm && (
                   <div className="space-y-2">
-                    <select
+                    <Select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                       value={selectedPackageId}
-                      onChange={(e) => setSelectedPackageId(e.target.value)}
+                      onValueChange={(value) => setSelectedPackageId(value)}
                     >
                       <option value="">{i18n("selectPackage02bf832")}</option>
                       {packages.filter((p) => p.active !== false).map((p) => (
@@ -453,7 +455,7 @@ export function MemberPanel({
                           {field(p, "name", field(p, "code"))}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                     <button
                       className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50"
                       style={{ background: "var(--text)", color: "var(--bg)" }}
@@ -523,12 +525,12 @@ export function MemberPanel({
                     />
                   </FormField>
                   <FormField label={i18n("featurePaymentPurpose")}>
-                    <select
+                    <Select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                       value={receiptPurposeValue}
-                      onChange={(e) => {
-                        const receiptPurpose = e.target.value;
+                      onValueChange={(value) => {
+                        const receiptPurpose = value;
                         if (receiptPurpose === MANUAL_RECEIPT_PURPOSE) {
                           setReceiptPackageSubscriptionId("");
                           setReceiptManualPurposeSelected(true);
@@ -560,7 +562,7 @@ export function MemberPanel({
                         );
                       })}
                       <option value={MANUAL_RECEIPT_PURPOSE}>{i18n("featureReceiptManualPurposeOption")}</option>
-                    </select>
+                    </Select>
                   </FormField>
                   {receiptPurposeValue === MANUAL_RECEIPT_PURPOSE ? (
                     <FormField label={i18n("featurePurpose")}>
@@ -573,12 +575,11 @@ export function MemberPanel({
                     </FormField>
                   ) : null}
                   <FormField label={i18n("paidOnfca3213")}>
-                    <input
+                    <DateInput
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      type="date"
                       value={paymentForm.paid_on}
-                      onChange={(e) => setPaymentForm({ ...paymentForm, paid_on: e.target.value })}
+                      onValueChange={(value) => setPaymentForm({ ...paymentForm, paid_on: value })}
                     />
                   </FormField>
                   <FormField label={i18n("notesOptional4d56ca9")}>
@@ -669,12 +670,12 @@ export function MemberPanel({
                     />
                   </FormField>
                   <FormField label={i18n("packageSubscriptionOptional9d7a12d")}>
-                    <select
+                    <Select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                       value={invoiceForm.membership_package_subscription_id}
-                      onChange={(e) => {
-                        const membership_package_subscription_id = e.target.value;
+                      onValueChange={(value) => {
+                        const membership_package_subscription_id = value;
                         const subscription = packageSubscriptions.find(
                           (sub) => field(sub, "id") === membership_package_subscription_id,
                         );
@@ -696,7 +697,7 @@ export function MemberPanel({
                           {packageLabelFromSubscription(sub, packages) || i18n("package7431e3d")} · {money(uiLocale, sub.price_cents_snapshot)}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </FormField>
                   <FormField label={i18n("description55f8ebc")}>
                     <input
@@ -717,12 +718,11 @@ export function MemberPanel({
                     </FormField>
                   ) : null}
                   <FormField label={i18n("dueDate4c1aeeb")}>
-                    <input
+                    <DateInput
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      type="date"
                       value={invoiceForm.due_date}
-                      onChange={(e) => setInvoiceForm({ ...invoiceForm, due_date: e.target.value })}
+                      onValueChange={(value) => setInvoiceForm({ ...invoiceForm, due_date: value })}
                     />
                   </FormField>
                   <button
@@ -793,12 +793,12 @@ export function MemberPanel({
                     />
                   </FormField>
                   <FormField label={i18n("invoiceOptionalaef614c")}>
-                    <select
+                    <Select
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                       value={paymentForm.finance_invoice_id}
-                      onChange={(e) => {
-                        const finance_invoice_id = e.target.value;
+                      onValueChange={(value) => {
+                        const finance_invoice_id = value;
                         const invoice = payableInvoices.find((item) => field(item, "id") === finance_invoice_id);
                         const balanceDue =
                           typeof invoice?.balance_due_cents === "number" ? invoice.balance_due_cents : null;
@@ -816,15 +816,14 @@ export function MemberPanel({
                           {field(invoice, "invoice_number", i18n("invoicef9f3881"))} · {money(uiLocale, invoice.balance_due_cents)} {i18n("due30cdf73")}
                         </option>
                       ))}
-                    </select>
+                    </Select>
                   </FormField>
                   <FormField label={i18n("paidOnfca3213")}>
-                    <input
+                    <DateInput
                       className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                       style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                      type="date"
                       value={paymentForm.paid_on}
-                      onChange={(e) => setPaymentForm({ ...paymentForm, paid_on: e.target.value })}
+                      onValueChange={(value) => setPaymentForm({ ...paymentForm, paid_on: value })}
                     />
                   </FormField>
                   <FormField label={i18n("notesOptional4d56ca9")}>
@@ -1138,10 +1137,9 @@ function InvoiceCard({
             <label className="text-xs font-semibold uppercase tracking-[0.15em]" style={{ color: "var(--dim)" }}>
               {i18n("dueDate4c1aeeb")}
             </label>
-            <input
-              type="date"
+            <DateInput
               value={editDueDate}
-              onChange={(e) => setEditDueDate(e.target.value)}
+              onValueChange={(value) => setEditDueDate(value)}
               className="w-full rounded-xl px-3 py-1.5 text-sm"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" }}
             />

@@ -7,6 +7,7 @@ import en from "../../../messages/en.json";
 
 import { CollapsibleFilterBar } from "./CollapsibleFilterBar";
 import { SegmentPicker, type SegmentOption } from "./SegmentPicker";
+import { chooseValue } from "@/components/ui/select-test-utils";
 
 function withIntl(ui: React.ReactNode) {
   return render(
@@ -58,9 +59,11 @@ describe("SegmentPicker", () => {
     render(<Picker options={ROLES.slice(0, 3)} />);
     expect(screen.queryByRole("tablist")).toBeNull();
     const select = screen.getByRole("combobox", { name: "Role" });
+    fireEvent.click(select);
     expect(screen.getByRole("option", { name: "Members (2)" })).toBeTruthy();
-    fireEvent.change(select, { target: { value: "athlete" } });
-    expect((select as HTMLSelectElement).value).toBe("athlete");
+    fireEvent.click(select);
+    chooseValue(select, "athlete");
+    expect(select).toHaveAttribute("data-value", "athlete");
   });
 
   it("moves the selection with the arrow keys", () => {

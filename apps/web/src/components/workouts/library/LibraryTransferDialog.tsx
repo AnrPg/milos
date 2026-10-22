@@ -4,6 +4,7 @@ import { useState } from "react";
 
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 export type FolderOption = { id: string | null; label: string; disabled?: boolean };
 
@@ -53,19 +54,19 @@ export function LibraryTransferDialog({
         
         <label className="block text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {i18n("featureDestinationFolder")}
-          <select
+          <Select
             autoFocus
             className="mt-2 w-full rounded-xl px-3 py-2 text-sm"
             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
             value={selected}
-            onChange={(event) => setSelected(event.target.value)}
+            onValueChange={(value) => setSelected(value)}
           >
             {options.map((option) => (
               <option key={option.id ?? "root"} value={option.id ?? ""} disabled={option.disabled}>
                 {option.label}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
     </Dialog>
   );

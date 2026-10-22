@@ -16,6 +16,7 @@ import { useSession } from "@/components/session-provider";
 import { CampaignPanel } from "@/components/admin/finance/panels/CampaignPanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { SPARK_ACTIVE_STYLE, SPARK_CREATE_STYLE } from "@/lib/spark";
+import { DateInput } from "@/components/ui/DateInput";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -160,21 +161,19 @@ export function PromotionsTab() {
             </PanelField>
             <div className="grid gap-3 md:grid-cols-2">
               <PanelField label={i18n("startsOn6d888f7")}>
-                <input
+                <DateInput
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                  type="date"
                   value={form.starts_on}
-                  onChange={(e) => setForm({ ...form, starts_on: e.target.value })}
+                  onValueChange={(value) => setForm({ ...form, starts_on: value })}
                 />
               </PanelField>
               <PanelField label={i18n("endsOn5c262f3")}>
-                <input
+                <DateInput
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                  type="date"
                   value={form.ends_on}
-                  onChange={(e) => setForm({ ...form, ends_on: e.target.value })}
+                  onValueChange={(value) => setForm({ ...form, ends_on: value })}
                 />
               </PanelField>
             </div>

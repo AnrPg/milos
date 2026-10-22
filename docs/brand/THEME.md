@@ -45,8 +45,8 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 
 | Role | Token | Use it for | Never for |
 | --- | --- | --- | --- |
-| Dojo (primary) | `--primary`, `--primary-strong`, `--primary-contrast` | Actions and navigation: buttons, links, the active tab, selected chips, check-in, booking, charts | Decoration |
-| Spark | `--spark`, `--spark-contrast` (`lib/spark.ts`: `SPARK_ACTIVE_STYLE`, `SPARK_CREATE_STYLE`) | Energy: what is alive now (LIVE, New, WOD tags, today in calendars, the streak, live challenge progress on a deep track, Active / Connected / Published status pills) and "+ New / + Add" create chips. Always a fill with dark text (`--spark-contrast`) | Text on the page; the screen's main action (Dojo); next to Heat; alone with Graphite |
+| Dojo (primary) | `--primary`, `--primary-strong`, `--primary-contrast` | Actions and navigation: buttons, links, the active tab, selected chips, booking, charts | Decoration |
+| Spark | `--spark`, `--spark-contrast` (`lib/spark.ts`: `SPARK_ACTIVE_STYLE`, `SPARK_CREATE_STYLE`, `SPARK_GO_STYLE`) | Energy: what is alive now (LIVE, New, WOD tags, today in calendars, the streak, live challenge progress on a deep track, Active / Connected / Published status pills, the done steps of a wizard), "+ New / + Add" create chips, and go-now actions (ADR-182: Check in, Start / Resume workout ▶, Join a club, group or channel, Share or export, the date picker's Today). Always a fill with dark text (`--spark-contrast`) | Text on the page; save, submit and confirm actions (Dojo); next to Heat; alone with Graphite |
 | Heat | `--heat`, `--heat-contrast` | Emotion: kudos, PRs, comebacks, the "hard moment" support | Errors (use `--danger`) |
 | Deep | `--deep`, `--deep-contrast` | One hero per screen: the WOD card, a post image frame, the QR | More than one surface per screen |
 
@@ -100,10 +100,11 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | Placeholder | `--placeholder` |
 | Invalid field border and message | `--danger` |
 | Autofilled field (WebKit) | `--control-bg` fill, `--text` text |
-| Dropdown (`<select>`): closed control | `--control-bg`, `--control-border`, `--text` |
-| Dropdown: open list (`option`, `optgroup`) / checked option | `--panel` with `--text` / `--selection` with `--selection-text` |
-| Date, time, month and week pickers: field / segments / picker icon | `--control-bg` / `--text` / follows `color-scheme` |
-| Date and time picker popups (browser-drawn) | `color-scheme` per variant and `accent-color: --primary` |
+| Dropdown (`ui/Select`, ADR-182; native `<select>` is banned by a guard test): trigger / chevron | `--control-bg`, `--control-border`, `--text` / `--muted` |
+| Dropdown: open list / group header / hovered or keyboard-active option / chosen option and its ✓ | `--panel`, `--border`, `--shadow-lg` / `--dim` / `--text` at 7% with a `--focus-ring` outline / `--primary` at 14% and `--primary` |
+| Date and time pickers (`ui/DateInput`, `TimeInput`, `DateTimeInput`, ADR-182): field / icon / placeholder | `--control-bg`, `--control-border`, `--text` / `--muted` / `--placeholder` |
+| Calendar: panel / weekday header / other-month days / today ring / chosen day / Today button / Clear | `--panel`, `--border`, `--shadow-lg` / `--dim` / `--dim` / `--spark` / `--primary` with `--primary-contrast` / `--spark` with `--spark-contrast` / `--muted` |
+| Time columns: column track / chosen hour or minute | `--panel-muted` / `--primary` with `--primary-contrast` |
 | Checkbox, radio, range, progress, meter | `accent-color: --primary` |
 | Custom switches: track on / off / knob | `--primary` / `--border` / `--control-knob` |
 | Two-thumb range slider thumbs | `--text` |

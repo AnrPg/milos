@@ -1,5 +1,7 @@
 import { expect, test, type Page } from "@playwright/test";
 
+import { chooseDate, chooseOption } from "./support/select";
+
 // Redesign Phase 3 M5 (ADR-167): seasons. A member finds the gym's open
 // season in Box › Membership, reads it and asks for a place (and a season
 // notification's link opens it straight away); staff build a season in
@@ -117,7 +119,8 @@ test.describe("seasons", () => {
     const sheet = page.getByRole("dialog", { name: "Hyrox prep" });
     await expect(sheet.getByText("You're in")).toBeVisible();
     await expect(sheet.getByRole("button", { name: "Ask for a place" })).toHaveCount(0);
-    await sheet.getByRole("button", { name: "Close" }).click();
+    // The header × and the footer button both close it.
+    await sheet.getByRole("button", { name: "Close" }).first().click();
     await expect(page).not.toHaveURL(/season=/);
   });
 
@@ -176,7 +179,7 @@ test.describe("seasons", () => {
     await row.click();
 
     await expect(page.getByRole("textbox", { name: "Title" })).toHaveValue("Hyrox prep");
-    await expect(page.getByRole("combobox", { name: "Workout" })).toHaveValue("w-1");
+    await expect(page.getByRole("combobox", { name: "Workout" })).toHaveAttribute("data-value", "w-1");
     await expect(page.getByRole("button", { name: "Nikos" })).toHaveAttribute("aria-pressed", "true");
     await page.getByRole("button", { name: "Confirm" }).click();
     await expect(page.getByText("Participants · 1/12")).toBeVisible();
@@ -188,9 +191,9 @@ test.describe("seasons", () => {
     await page.getByRole("button", { name: "Close" }).click();
     await page.getByRole("button", { name: "New season" }).click();
     await page.getByRole("textbox", { name: "Title" }).fill("Strong winter");
-    await page.getByLabel("Starts on").fill(isoDay(10));
+    await chooseDate(page, page.getByLabel("Starts on"), isoDay(10));
     await page.getByRole("button", { name: "Add workout" }).click();
-    await page.getByRole("combobox", { name: "Workout" }).selectOption("w-1");
+    await chooseOption(page, page.getByRole("combobox", { name: "Workout" }), "w-1");
     await page.getByRole("button", { name: "Save draft" }).click();
 
     await expect.poll(() => created.length).toBe(1);

@@ -27,6 +27,7 @@ import { MyWorkoutScaling } from "@/components/scaling/MyWorkoutScaling";
 import { WodGoalsStrip } from "@/components/wod-goals/WodGoalsStrip";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
 import { Dialog } from "@/components/ui/Dialog";
+import { DateInput } from "@/components/ui/DateInput";
 
 type Props = {
   assignment: AssignedWorkoutRecord;
@@ -376,13 +377,12 @@ export function AssignedWorkoutPanel({
                       </div>
                     ) : (
                       <div className="space-y-2">
-                        <input
+                        <DateInput
                           className="w-full rounded-[1rem] px-4 py-2 text-sm outline-none"
                           style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                          type="date"
                           min={todayIso}
                           value={rescheduleDate}
-                          onChange={(e) => setRescheduleDate(e.target.value)}
+                          onValueChange={(value) => setRescheduleDate(value)}
                         />
                         {rescheduleError ? (
                           <p className="text-xs" style={{ color: "var(--primary-strong)" }}>{rescheduleError}</p>

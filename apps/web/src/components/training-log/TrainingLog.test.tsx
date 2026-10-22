@@ -28,6 +28,7 @@ vi.mock("@/i18n/ui", () => ({
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
   useFormatter: () => ({ dateTime: () => "" }),
+  useLocale: () => "en",
 }));
 
 vi.mock("@/hooks/useJournalCommentWriter", () => ({

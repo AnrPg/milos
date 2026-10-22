@@ -36,6 +36,7 @@ import { platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug"
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 const defaultForm: ProvisionOrganizationInput = {
   name: "",
@@ -681,13 +682,13 @@ function AccessDialog({
         <form className="mt-5 grid gap-3 border-y border-[var(--border)] py-5 sm:grid-cols-[1fr_1fr_1fr_auto]" onSubmit={invite}>
           <label className="text-sm font-medium text-[var(--text)]">
             <span className="mb-1.5 block">{copy.inviteRole}</span>
-            <select
+            <Select
               className="w-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2.5"
               value={role}
-              onChange={(event) => setRole(event.target.value as OrganizationMembershipRole)}
+              onValueChange={(value) => setRole(value as OrganizationMembershipRole)}
             >
               {membershipRoles.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
-            </select>
+            </Select>
           </label>
           <TextField label={copy.inviteEmail} type="email" value={email} onChange={setEmail} />
           <TextField label={copy.inviteLifetime} type="number" min={1} value={lifetimeHours} required onChange={setLifetimeHours} />
@@ -727,14 +728,14 @@ function AccessDialog({
               <p className="text-sm text-[var(--text-soft)]">{membership.status}</p>
               <label className="text-xs font-semibold text-[var(--text-soft)]">
                 <span className="mb-1 block">{copy.membershipRole}</span>
-                <select
+                <Select
                   className="w-full border border-[var(--border-strong)] bg-[var(--surface)] px-3 py-2 text-sm"
                   disabled={rolePending === membership.id}
                   value={membership.role}
-                  onChange={(event) => void changeRole(membership.id, event.target.value as OrganizationMembershipRole)}
+                  onValueChange={(value) => void changeRole(membership.id, value as OrganizationMembershipRole)}
                 >
                   {membershipRoles.map((entry) => <option key={entry} value={entry}>{entry}</option>)}
-                </select>
+                </Select>
               </label>
             </div>
           ))}

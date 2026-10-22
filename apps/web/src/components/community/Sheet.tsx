@@ -43,6 +43,7 @@ export function SheetButton({
   children,
   onClick,
   primary,
+  spark,
   disabled,
   type = "button",
   form,
@@ -50,6 +51,8 @@ export function SheetButton({
   children: ReactNode;
   onClick?: () => void;
   primary?: boolean;
+  /** A go-now action (join): Spark instead of Dojo (ADR-182). */
+  spark?: boolean;
   disabled?: boolean;
   type?: "button" | "submit";
   form?: string;
@@ -62,9 +65,9 @@ export function SheetButton({
       disabled={disabled}
       className="min-h-11 flex-1 rounded-2xl px-4 text-sm font-bold disabled:opacity-50"
       style={{
-        background: primary ? "var(--primary)" : "var(--panel-raised)",
-        color: primary ? "var(--primary-contrast)" : "var(--text)",
-        border: primary ? "none" : "1px solid var(--border)",
+        background: spark ? "var(--spark)" : primary ? "var(--primary)" : "var(--panel-raised)",
+        color: spark ? "var(--spark-contrast)" : primary ? "var(--primary-contrast)" : "var(--text)",
+        border: primary || spark ? "none" : "1px solid var(--border)",
       }}
     >
       {children}

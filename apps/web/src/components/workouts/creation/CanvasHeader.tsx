@@ -15,6 +15,7 @@ import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { completionSummary, isPublishReady, useWorkoutCreationStore } from "@/stores/workout-creation";
 import { FORMAT_EXERCISE_CONTEXT, type WorkoutType } from "@/types/workout";
+import { Select } from "@/components/ui/Select";
 
 const WORKOUT_TYPES: WorkoutType[] = [
   "crossfit",
@@ -188,9 +189,9 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
         style={{ color: "var(--text)", maxWidth: 320 }}
       />
 
-      <select
+      <Select
         value={type ?? ""}
-        onChange={(event) => setType(event.target.value as WorkoutType)}
+        onValueChange={(value) => setType(value as WorkoutType)}
         className="cursor-pointer rounded-2xl px-4 py-2 text-sm font-semibold outline-none"
         style={{
           background: "var(--card)",
@@ -206,7 +207,7 @@ export function CanvasHeader({ embedded = false, onCancel, onPublished }: Props)
             {TYPE_LABELS[workoutType]}
           </option>
         ))}
-      </select>
+      </Select>
 
       <button
         type="button"

@@ -50,6 +50,7 @@ import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader } from "@/components/PageHeader";
 import { Dialog } from "@/components/ui/Dialog";
 import { Popover } from "@/components/ui/Popover";
+import { Select } from "@/components/ui/Select";
 
 type LibraryViewMode = "folders" | "tiles" | "list";
 
@@ -916,10 +917,10 @@ export function WorkoutAdminConsole() {
             </label>
             <label className="mt-4 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
               {i18n("featureParentFolder")}
-              <select aria-label={i18n("featureParentFolder")} className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={folderParentId} onChange={(event) => setFolderParentId(event.target.value)}>
+              <Select aria-label={i18n("featureParentFolder")} className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={folderParentId} onValueChange={(value) => setFolderParentId(value)}>
                 <option value="">{i18n("featureLibraryRoot")}</option>
                 {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
-              </select>
+              </Select>
             </label>
         </Dialog>
       ) : null}

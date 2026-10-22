@@ -26,6 +26,7 @@ import {
   type DirectorySort,
 } from "@/lib/users-directory";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { Select } from "@/components/ui/Select";
 
 const ROLES: DirectoryRole[] = ["all", "member", "athlete", "admin"];
 const SORTS: DirectorySort[] = ["name", "newest", "oldest"];
@@ -163,10 +164,10 @@ export function AdminUsersDirectory() {
           />
           <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
             <label className="sr-only" htmlFor="users-finance-filter">{t("financeFilter")}</label>
-            <select
+            <Select
               id="users-finance-filter"
               value={filters.finance}
-              onChange={(event) => update({ finance: event.target.value })}
+              onValueChange={(value) => update({ finance: value })}
               className="min-h-11 min-w-0 rounded-xl px-3 text-sm"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
             >
@@ -176,19 +177,19 @@ export function AdminUsersDirectory() {
                   {status === "none" ? i18n("noFinanceProfilef804f44") : status.replaceAll("_", " ")}
                 </option>
               ))}
-            </select>
+            </Select>
             <label className="sr-only" htmlFor="users-sort">{t("sortLabel")}</label>
-            <select
+            <Select
               id="users-sort"
               value={filters.sort}
-              onChange={(event) => update({ sort: event.target.value as DirectorySort })}
+              onValueChange={(value) => update({ sort: value as DirectorySort })}
               className="min-h-11 min-w-0 rounded-xl px-3 text-sm"
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
             >
               {SORTS.map((sort) => (
                 <option key={sort} value={sort}>{t(`sort.${sort}`)}</option>
               ))}
-            </select>
+            </Select>
           </div>
         </CollapsibleFilterBar>
 

@@ -33,6 +33,8 @@ import {
   type TrainingLogFormError,
 } from "@/lib/training-log";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
+import { DateTimeInput } from "@/components/ui/DateInput";
 
 export const TRAINING_LOG_ENTRIES_KEY = ["training-log", "entries"] as const;
 export const TRAINING_LOG_SOURCES_KEY = ["training-log", "sources"] as const;
@@ -474,12 +476,11 @@ function EntryForm({
 
       <label className={labelClass} style={{ color: "var(--dim)" }}>
         {i18n("trainingLogFormPerformedAt")}
-        <input
-          type="datetime-local"
+        <DateTimeInput
           className={inputClass}
           style={inputStyle}
           value={form.performedAt}
-          onChange={(event) => update({ performedAt: event.target.value })}
+          onValueChange={(value) => update({ performedAt: value })}
         />
       </label>
 
@@ -496,17 +497,17 @@ function EntryForm({
         </label>
         <label className={labelClass} style={{ color: "var(--dim)" }}>
           {i18n("trainingLogFormEffort")}
-          <select
+          <Select
             className={inputClass}
             style={inputStyle}
             value={form.perceivedEffort}
-            onChange={(event) => update({ perceivedEffort: event.target.value })}
+            onValueChange={(value) => update({ perceivedEffort: value })}
           >
             <option value="">{i18n("trainingLogFormEffortNone")}</option>
             {Array.from({ length: 10 }, (_, index) => String(index + 1)).map((value) => (
               <option key={value} value={value}>{value}</option>
             ))}
-          </select>
+          </Select>
         </label>
       </div>
 
@@ -570,17 +571,17 @@ function EntryForm({
               value={row.load}
               onChange={(event) => updateRow(index, { load: event.target.value })}
             />
-            <select
+            <Select
               aria-label={i18n("trainingLogFormLoad")}
               className={`${inputClass} col-span-1`}
               style={inputStyle}
               value={row.loadUnit}
-              onChange={(event) => updateRow(index, { loadUnit: event.target.value === "lb" ? "lb" : "kg" })}
+              onValueChange={(value) => updateRow(index, { loadUnit: value === "lb" ? "lb" : "kg" })}
             >
               {LOAD_UNITS.map((unit) => (
                 <option key={unit} value={unit}>{unit}</option>
               ))}
-            </select>
+            </Select>
             <button
               type="button"
               className="col-span-6 text-start text-xs font-semibold"

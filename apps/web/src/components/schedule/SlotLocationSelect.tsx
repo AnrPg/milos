@@ -2,6 +2,7 @@
 
 import type { FacilityLocation } from "@/api/facility";
 import { useUiTranslations } from "@/i18n/ui";
+import { Select } from "@/components/ui/Select";
 
 /**
  * Optional location of a class (ADR-097). Hidden for single-site gyms; an
@@ -29,9 +30,9 @@ export function SlotLocationSelect({
   return (
     <label className={className}>
       <span>{i18n("admSlotLocation")}</span>
-      <select
+      <Select
         className={selectClassName}
-        onChange={(event) => onChange(event.target.value || null)}
+        onValueChange={(value) => onChange(value || null)}
         style={selectStyle}
         value={value ?? ""}
       >
@@ -39,7 +40,7 @@ export function SlotLocationSelect({
         {options.map((location) => (
           <option key={location.id} value={location.id}>{location.name}</option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

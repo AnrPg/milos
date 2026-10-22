@@ -9103,5 +9103,21 @@
       "enable": "Registrazione vocale",
       "enableHint": "I membri registrano l'allenamento e controllano una bozza prima di salvarla. L'audio non viene conservato."
     }
+  },
+  "Pickers": {
+    "chooseDate": "Scegli una data",
+    "chooseTime": "Scegli un orario",
+    "chooseMonthYear": "Scegli mese e anno",
+    "previousMonth": "Mese precedente",
+    "nextMonth": "Mese successivo",
+    "previousYear": "Anno precedente",
+    "nextYear": "Anno successivo",
+    "previousYears": "Anni precedenti",
+    "nextYears": "Anni successivi",
+    "clear": "Cancella",
+    "today": "Oggi",
+    "hours": "Ore",
+    "minutes": "Minuti",
+    "done": "Fatto"
   }
 }

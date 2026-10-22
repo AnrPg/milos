@@ -140,7 +140,7 @@ export function OpenClubRow({ club, detail }: { club: OpenClub; detail?: string 
         ) : club.membership === "requested" ? (
           <Badge muted>{t("groupRequested")}</Badge>
         ) : (
-          <SmallButton primary disabled={join.isPending} onClick={() => join.mutate()}>
+          <SmallButton spark disabled={join.isPending} onClick={() => join.mutate()}>
             {club.join_policy === "approval" ? t("clubAsk") : t("clubJoin")}
           </SmallButton>
         )}
@@ -174,7 +174,7 @@ function GroupResult({ group }: { group: CommunityGroup }) {
         {group.membership === "requested" ? (
           <Badge muted>{t("groupRequested")}</Badge>
         ) : slug ? (
-          <SmallButton primary disabled={join.isPending} onClick={() => join.mutate()}>
+          <SmallButton spark disabled={join.isPending} onClick={() => join.mutate()}>
             {group.join_policy === "request" ? t("groupAsk") : t("groupJoin")}
           </SmallButton>
         ) : null}

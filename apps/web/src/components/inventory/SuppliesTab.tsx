@@ -43,6 +43,7 @@ import {
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { Select } from "@/components/ui/Select";
 
 export const SUPPLIES_KEY = ["staff", "inventory", "supplies"] as const;
 const movementsKey = (id: string) => ["staff", "inventory", "supplies", id, "movements"] as const;
@@ -337,13 +338,13 @@ function LowReportForm({ token, supply, onDone }: { token: string; supply: Suppl
   return (
     <FormShell onSubmit={() => report.mutate()}>
       <Field label={i18n("invLevel")}>
-        <select className={inputClass} style={inputStyle} value={level} onChange={(event) => setLevel(event.target.value as typeof level)}>
+        <Select className={inputClass} style={inputStyle} value={level} onValueChange={(value) => setLevel(value as typeof level)}>
           {LOW_LEVELS.map((option) => (
             <option key={option} value={option}>
               {i18n(`invLevel_${option}`)}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
       <Field label={i18n("invSeenQuantity", { unit: supply.unit ?? "" })}>
         <input className={inputClass} style={inputStyle} type="number" min={0} step="any" value={seen} onChange={(event) => setSeen(event.target.value)} />
@@ -414,16 +415,16 @@ function MovementForm({
         <Field label={i18n(priceMode === "unit" ? "invUnitPrice" : "invTotalPrice")}>
           <span className="flex gap-2">
             <input className={inputClass} style={inputStyle} inputMode="decimal" placeholder="0.00" value={price} onChange={(event) => setPrice(event.target.value)} />
-            <select
+            <Select
               aria-label={i18n("invPriceMode")}
               className="rounded-xl px-2 py-2 text-sm"
               style={inputStyle}
               value={priceMode}
-              onChange={(event) => setPriceMode(event.target.value as "unit" | "total")}
+              onValueChange={(value) => setPriceMode(value as "unit" | "total")}
             >
               <option value="unit">{i18n("invPerUnit")}</option>
               <option value="total">{i18n("invTotal")}</option>
-            </select>
+            </Select>
           </span>
         </Field>
       ) : null}
@@ -514,7 +515,8 @@ function SupplyForm({ token, supply, onDone }: { token: string; supply?: Supply;
     consumption_speed: supply?.consumption_speed ?? ("regular" as Supply["consumption_speed"]),
     reorder_level: supply?.reorder_level != null ? String(supply.reorder_level) : "",
   });
-  const set = (key: keyof typeof form) => (event: { target: { value: string } }) => setForm((current) => ({ ...current, [key]: event.target.value }));
+  const setValue = (key: keyof typeof form) => (value: string) => setForm((current) => ({ ...current, [key]: value }));
+  const set = (key: keyof typeof form) => (event: { target: { value: string } }) => setValue(key)(event.target.value);
   const text = (value: string) => value.trim() || null;
 
   const save = useMutation({
@@ -562,13 +564,13 @@ function SupplyForm({ token, supply, onDone }: { token: string; supply?: Supply;
         <input className={inputClass} style={inputStyle} type="number" min={0} step="any" value={form.reorder_level} onChange={set("reorder_level")} />
       </Field>
       <Field label={i18n("invSpeed")}>
-        <select className={inputClass} style={inputStyle} value={form.consumption_speed} onChange={set("consumption_speed")}>
+        <Select className={inputClass} style={inputStyle} value={form.consumption_speed} onValueChange={setValue("consumption_speed")}>
           {CONSUMPTION_SPEEDS.map((option) => (
             <option key={option} value={option}>
               {i18n(`invSpeed_${option}`)}
             </option>
           ))}
-        </select>
+        </Select>
       </Field>
       <Field label={i18n("invUnitPrice")}>
         <input className={inputClass} style={inputStyle} inputMode="decimal" placeholder="0.00" value={form.unit_price} onChange={set("unit_price")} />

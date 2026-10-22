@@ -176,6 +176,7 @@ export function AdminDashboard({
         { label: nav("community"), href: "/admin/community", icon: "users", show: has("moderate_community") },
         { label: i18n("finance1b48d3f"), href: "/admin/finance", icon: "wallet", show: canFinancePage },
         { label: i18n("classesed1846a"), href: "/admin/class-schedule", icon: "calendar", show: has("run_classes", "manage_schedule", "manage_coaching") },
+        { label: nav("wodsVault"), href: "/admin/workouts", icon: "dumbbell", show: has("manage_workouts") },
         { label: i18n("admCheckInTitle"), href: "/admin/check-in", icon: "check", show: has("check_in") },
         { label: i18n("personalCoaching6accdcd"), href: "/admin/coaching-assignments", icon: "coach", show: has("manage_coaching") },
         { label: nav("appointments"), href: "/admin/appointments", icon: "clock", show: has("manage_appointments") },
@@ -186,7 +187,6 @@ export function AdminDashboard({
     {
       label: i18n("content4f9be05"),
       items: [
-        { label: i18n("workoutsccb58b2"), href: "/admin/workouts", icon: "dumbbell", show: has("manage_workouts") },
         // Coaches without the full Analytics card keep their nutrition plans here.
         { label: i18n("rhNutritionPlans"), href: "/admin/coaching?tab=nutrition", icon: "leaf", show: !fullAnalytics && has("manage_coaching") },
         { label: nav("onDemandContent"), href: "/admin/content", icon: "play", show: has("manage_content") },

@@ -18,6 +18,9 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
+import { SPARK_GO_STYLE } from "@/lib/spark";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border-strong)", color: "var(--text)" };
 
@@ -121,12 +124,12 @@ export function CheckInDesk() {
                 {activeLocations.length > 0 ? (
                   <label className="space-y-1">
                     <span className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("admSlotLocation")}</span>
-                    <select className="w-full rounded-xl px-3 py-2 text-sm" onChange={(event) => setLocationId(event.target.value)} style={fieldStyle} value={locationId}>
+                    <Select className="w-full rounded-xl px-3 py-2 text-sm" onValueChange={(value) => setLocationId(value)} style={fieldStyle} value={locationId}>
                       <option value="">{i18n("admCheckInNoLocation")}</option>
                       {activeLocations.map((location) => (
                         <option key={location.id} value={location.id}>{location.name}</option>
                       ))}
-                    </select>
+                    </Select>
                   </label>
                 ) : null}
               </div>
@@ -134,7 +137,7 @@ export function CheckInDesk() {
                 className="rounded-full px-5 py-3 text-sm font-semibold disabled:opacity-50"
                 disabled={!member.id || checkIn.isPending}
                 onClick={() => checkIn.mutate()}
-                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+                style={SPARK_GO_STYLE}
                 type="button"
               >
                 {checkIn.isPending ? i18n("admCheckInPending") : i18n("admCheckInAction")}
@@ -148,13 +151,12 @@ export function CheckInDesk() {
                   {date === today ? i18n("admCheckInToday") : i18n("admCheckInOnDay")}
                   {checkInsQuery.isSuccess ? <span style={{ color: "var(--dim)" }}> · {checkIns.length}</span> : null}
                 </h2>
-                <input
+                <DateInput
                   aria-label={i18n("admCheckInDate")}
                   className="rounded-xl px-3 py-2 text-sm"
                   max={today}
-                  onChange={(event) => setDate(event.target.value || today)}
+                  onValueChange={(value) => setDate(value || today)}
                   style={fieldStyle}
-                  type="date"
                   value={date}
                 />
               </div>

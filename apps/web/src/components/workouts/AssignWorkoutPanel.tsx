@@ -18,6 +18,8 @@ import { formatLocalDate } from "@/lib/local-date";
 import { SemanticLabel } from "@/components/semantic-label";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 type Props = {
   workoutId: string;
@@ -265,11 +267,10 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                 <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                   {i18n("dateeb9a4bc")}
                 </span>
-                <input
+                <DateInput
                   className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
-                  onChange={(e) => setScheduledFor(e.target.value)}
-                  type="date"
+                  onValueChange={(value) => setScheduledFor(value)}
                   value={scheduledFor}
                 />
               </label>
@@ -329,11 +330,11 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
               <span className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--dim)" }}>
                 {i18n("featureScheduledClass")}
               </span>
-              <select
+              <Select
                 className="mt-2 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                 value={selectedSlotId}
-                onChange={(event) => setSelectedSlotId(event.target.value)}
+                onValueChange={(value) => setSelectedSlotId(value)}
               >
                 <option value="">{i18n("featureChooseClass")}</option>
                 {slots.map((slot) => (
@@ -341,7 +342,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                     {new Intl.DateTimeFormat(undefined, { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(slot.scheduled_at))} · {slot.name}
                   </option>
                 ))}
-              </select>
+              </Select>
             </label>
           )}
 

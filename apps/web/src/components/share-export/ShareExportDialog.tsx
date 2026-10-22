@@ -10,6 +10,7 @@ import {
 } from "@/lib/document-export";
 import { openEmailAttachmentFallback } from "@/lib/share-export-delivery";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 export type ShareExportCopy = {
   title: string;
@@ -181,26 +182,26 @@ export function ShareExportDialog({
         <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 text-sm font-bold" style={{ color: "var(--text)" }}>
             <span>{copy.chooseFormat}</span>
-            <select
+            <Select
               aria-describedby={formatHelpId}
               className="w-full rounded-xl px-4 py-3 text-sm font-semibold outline-none"
-              onChange={(event) => setFormat(event.target.value as ExportFormat)}
+              onValueChange={(value) => setFormat(value as ExportFormat)}
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={format}
             >
               {FORMATS.map((option) => <option key={option.value} value={option.value}>{copy[option.key]}</option>)}
-            </select>
+            </Select>
           </label>
           <label className="space-y-2 text-sm font-bold" style={{ color: "var(--text)" }}>
             <span>{copy.chooseDestination}</span>
-            <select
+            <Select
               className="w-full rounded-xl px-4 py-3 text-sm font-semibold outline-none"
-              onChange={(event) => setDestination(event.target.value as Destination)}
+              onValueChange={(value) => setDestination(value as Destination)}
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={destination}
             >
               {DESTINATIONS.map((option) => <option key={option.value} value={option.value}>{copy[option.key]}</option>)}
-            </select>
+            </Select>
           </label>
         </div>
         <p id={formatHelpId} className="mt-2 text-xs" style={{ color: "var(--dim)" }}>{copy.formatHelp}</p>

@@ -19,6 +19,7 @@ import { formatLocalDate } from "@/lib/local-date";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { SemanticLabel } from "@/components/semantic-label";
 import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { DateInput } from "@/components/ui/DateInput";
 
 type AssignWorkoutFormProps = {
   workoutId: string;
@@ -227,11 +228,10 @@ export function AssignWorkoutForm({ workoutId }: AssignWorkoutFormProps) {
           <article className="rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
             <label className="block">
               <span className="text-sm font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("dateeb9a4bc")}</span>
-              <input
+              <DateInput
                 className="mt-3 w-full rounded-[1rem] px-4 py-3 text-sm outline-none"
                 style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                onChange={(event) => setScheduledFor(event.target.value)}
-                type="date"
+                onValueChange={(value) => setScheduledFor(value)}
                 value={scheduledFor}
               />
             </label>

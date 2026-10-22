@@ -274,8 +274,8 @@ function ChannelRow({
           disabled={busy}
           className="min-h-11 rounded-full px-4 text-sm font-semibold disabled:opacity-50"
           style={{
-            background: channel.joined ? "var(--panel-raised)" : "var(--primary)",
-            color: channel.joined ? "var(--text)" : "var(--primary-contrast)",
+            background: channel.joined ? "var(--panel-raised)" : "var(--spark)",
+            color: channel.joined ? "var(--text)" : "var(--spark-contrast)",
             border: "1px solid var(--border)",
           }}
         >

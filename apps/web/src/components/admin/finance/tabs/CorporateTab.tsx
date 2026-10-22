@@ -52,6 +52,8 @@ import {
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { buildCorporateInvoiceLayout, renderCorporateInvoicePdf } from "@/lib/corporate-invoice-pdf";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 const CLIENTS_KEY = ["admin", "finance", "corporate-clients"] as const;
 
@@ -127,10 +129,10 @@ function ClientForm({ client, onDone }: { client: CorporateClient | null; onDone
           <label className={captionClass} htmlFor={`${baseId}-package`} style={captionStyle}>
             {i18n("stfCorporatePackage")}
           </label>
-          <select
+          <Select
             id={`${baseId}-package`}
             className={inputClass}
-            onChange={(event) => setPackageId(event.target.value)}
+            onValueChange={(value) => setPackageId(value)}
             required
             style={inputStyle}
             value={packageId}
@@ -141,7 +143,7 @@ function ClientForm({ client, onDone }: { client: CorporateClient | null; onDone
                 {String(pkg.name ?? pkg.code ?? pkg.id)}
               </option>
             ))}
-          </select>
+          </Select>
           {packagesQuery.isSuccess && packages.length === 0 ? (
             <p className="text-xs" style={{ color: "var(--dim)" }}>
               {i18n("stfNoCorporatePackages")}
@@ -414,10 +416,10 @@ function PaymentForm({ invoice, clientId, onDone }: { invoice: CorporateInvoice;
         <label className={captionClass} htmlFor={`${baseId}-method`} style={captionStyle}>
           {i18n("stfPaymentMethod")}
         </label>
-        <select
+        <Select
           id={`${baseId}-method`}
           className={inputClass}
-          onChange={(event) => setMethod(event.target.value as CorporatePaymentMethod)}
+          onValueChange={(value) => setMethod(value as CorporatePaymentMethod)}
           style={inputStyle}
           value={method}
         >
@@ -426,18 +428,17 @@ function PaymentForm({ invoice, clientId, onDone }: { invoice: CorporateInvoice;
               {methodLabels[option]}
             </option>
           ))}
-        </select>
+        </Select>
       </div>
       <div className="space-y-1">
         <label className={captionClass} htmlFor={`${baseId}-date`} style={captionStyle}>
           {i18n("stfPaidOn")}
         </label>
-        <input
+        <DateInput
           id={`${baseId}-date`}
           className={inputClass}
-          onChange={(event) => setPaidOn(event.target.value)}
+          onValueChange={(value) => setPaidOn(value)}
           style={inputStyle}
-          type="date"
           value={paidOn}
         />
       </div>
@@ -677,7 +678,7 @@ function InvoicesSection({ client }: { client: CorporateClient }) {
           <label className={captionClass} htmlFor={dateId} style={captionStyle}>
             {i18n("stfInvoicePeriodContaining")}
           </label>
-          <input id={dateId} className={inputClass} onChange={(event) => setOn(event.target.value)} style={inputStyle} type="date" value={on} />
+          <DateInput id={dateId} className={inputClass} onValueChange={(value) => setOn(value)} style={inputStyle} value={on} />
         </div>
         <button className={primaryButtonClass} disabled={generate.isPending} style={primaryButtonStyle} type="submit">
           {generate.isPending ? i18n("stfGenerating") : i18n("stfGenerateInvoice")}

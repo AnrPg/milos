@@ -20,6 +20,7 @@ import {
 } from "@/components/admin/users/membership-freezes";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { DateInput } from "@/components/ui/DateInput";
 
 const STATE_KEYS: Record<FreezeState, string> = {
   upcoming: "admFreezeStateUpcoming",
@@ -122,11 +123,11 @@ export function MembershipFreezes({
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
               {i18n("admFreezeFrom")}
-              <input className="mt-1 w-full rounded-xl px-3 py-2" min={today} onChange={(event) => setForm({ ...form, starts_on: event.target.value })} required style={fieldStyle} type="date" value={form.starts_on} />
+              <DateInput className="mt-1 w-full rounded-xl px-3 py-2" min={today} onValueChange={(value) => setForm({ ...form, starts_on: value })} required style={fieldStyle} value={form.starts_on} />
             </label>
             <label className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
               {i18n("admFreezeUntil")}
-              <input className="mt-1 w-full rounded-xl px-3 py-2" min={form.starts_on || today} onChange={(event) => setForm({ ...form, ends_on: event.target.value })} required style={fieldStyle} type="date" value={form.ends_on} />
+              <DateInput className="mt-1 w-full rounded-xl px-3 py-2" min={form.starts_on || today} onValueChange={(value) => setForm({ ...form, ends_on: value })} required style={fieldStyle} value={form.ends_on} />
             </label>
           </div>
           <input

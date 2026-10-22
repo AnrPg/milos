@@ -23,6 +23,7 @@ import {
   type ClassTypeRecord,
 } from "@/api/schedule";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 type ArchiveMapping = {
   source: ClassTypeRecord;
@@ -260,9 +261,9 @@ export function ClassTypeSettings({ token }: { token: string }) {
             <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
               {archiveMapping.futureCount} {i18n("futureClass2a2682f")}{archiveMapping.futureCount === 1 ? "" : "es"} {i18n("use04489a1")} {archiveMapping.source.name}{i18n("pastAndCurrentClassesWillRetainItFor19acc8f")}
             </p>
-            <select
+            <Select
               className="mt-5 w-full rounded-2xl px-4 py-3 text-sm outline-none"
-              onChange={(event) => setArchiveMapping((current) => current ? { ...current, replacementId: event.target.value } : current)}
+              onValueChange={(value) => setArchiveMapping((current) => current ? { ...current, replacementId: value } : current)}
               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={archiveMapping.replacementId}
             >
@@ -270,7 +271,7 @@ export function ClassTypeSettings({ token }: { token: string }) {
               {activeTypes.filter((type) => type.id !== archiveMapping.source.id).map((type) => (
                 <option key={type.id} value={type.id}>{type.name}</option>
               ))}
-            </select>
+            </Select>
         </Dialog>
       ) : null}
     </div>
@@ -332,10 +333,10 @@ function ClassTypeRules({
       {/* Plan §5a decision 2: members filter Πρόγραμμα by these two tags. */}
       <label className="flex items-center gap-2">
         {t("chipLevel")}
-        <select
+        <Select
           value={type.level ?? "all_levels"}
           disabled={disabled}
-          onChange={(event) => onChange({ level: event.target.value as ClassLevel })}
+          onValueChange={(value) => onChange({ level: value as ClassLevel })}
           className="rounded-lg px-2 py-1 text-xs font-semibold"
           style={{ background: "var(--bg)", border: "1px solid var(--border)", color: "var(--text)" }}
         >
@@ -344,7 +345,7 @@ function ClassTypeRules({
               {t(`level_${level}`)}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <span className="flex flex-wrap items-center gap-1.5" role="group" aria-label={t("audience")}>
         {t("audience")}

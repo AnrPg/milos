@@ -1,5 +1,7 @@
 import { expect, test, type Page, type Route } from "@playwright/test";
 
+import { chooseOption } from "./support/select";
+
 // P3-M1 WOD goals (ADR-163): the coach sets goals in the free-text editor,
 // a member sees the goals strip on Box and opens its sheet, and the finish
 // wizard's «Τι ένιωσες;» step saves what was felt. The API is stubbed; every
@@ -120,7 +122,7 @@ test("coach shows goals to members and edits them on the chips and in the picker
   });
 
   await page.goto(`/admin/workouts/new?mode=free-text&draft=${draftId}`);
-  await page.getByRole("button", { name: "Goals", exact: true }).click();
+  await page.getByRole("tab", { name: "Goals", exact: true }).click();
   const panel = page.getByTestId("wod-goals-panel");
   await expect(panel.getByText("Suggested from 2 exercises")).toBeVisible();
   await expect(panel.getByText("Suggestion · not saved yet")).toBeVisible();
@@ -143,7 +145,7 @@ test("coach shows goals to members and edits them on the chips and in the picker
   await shot(page, "picker-body");
   await picker.getByRole("radio", { name: "List" }).click();
   await picker.getByRole("searchbox", { name: "Search muscles" }).fill("hamstr");
-  await picker.getByRole("combobox", { name: "Role: Hamstrings" }).selectOption("primary");
+  await chooseOption(page, picker.getByRole("combobox", { name: "Role: Hamstrings" }), "primary");
   await shot(page, "picker-list");
   await picker.getByRole("button", { name: "Done" }).click();
   await expect(picker).toBeHidden();
@@ -261,7 +263,8 @@ test.describe("member", () => {
     await expect(sheet).toContainText("Erector spinae");
     await expect(sheet).toContainText("Stabilizing");
     await shot(page, "goals-sheet");
-    await sheet.getByRole("button", { name: "Close" }).click();
+    // The header × and the footer button both close it.
+    await sheet.getByRole("button", { name: "Close" }).first().click();
     await expect(sheet).toBeHidden();
   });
 

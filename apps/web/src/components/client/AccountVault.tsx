@@ -35,6 +35,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { DEFAULT_VAULT_FILTER, parseVaultFilter, vaultFilterCount } from "@/lib/account-filters";
 import { sourceOptions, sourceToken } from "@/lib/provider-sources";
 import { defaultHistoryKind } from "@/lib/training-history";
+import { DateInput } from "@/components/ui/DateInput";
 
 /**
  * Ημερολόγιο › Vault across providers (ADR-162, board 17 Q4): the same
@@ -224,12 +225,11 @@ function VaultFilters({
               {(["date_from", "date_to"] as const).map((key) => (
                 <label key={key} className="flex flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
                   {key === "date_from" ? t("filter.from") : t("filter.to")}
-                  <input
-                    type="date"
+                  <DateInput
                     value={filter[key] ?? ""}
                     min={key === "date_to" ? filter.date_from ?? undefined : undefined}
                     max={key === "date_from" ? filter.date_to ?? undefined : undefined}
-                    onChange={(event) => set({ [key]: event.target.value || null })}
+                    onValueChange={(value) => set({ [key]: value || null })}
                     className="min-h-11 rounded-2xl px-3 text-sm outline-none"
                     style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                   />

@@ -13,6 +13,7 @@ import {
   type ScoreKind,
   type SectionMetric,
 } from "@/lib/text-sections";
+import { Select } from "@/components/ui/Select";
 
 export function useScoreKindLabels(): Record<ScoreKind, string> {
   const i18n = useUiTranslations();
@@ -230,10 +231,10 @@ function ScoreRow({
       />
       {/* What a name of the coach's own counts; hidden while choosing from the list. */}
       {custom && !open ? (
-        <select
+        <Select
           aria-label={i18n("scoreMetricKindLabel", { label: row.text.trim() })}
           value={row.kind ?? inferScoreKind(row.text, kindLabels)}
-          onChange={(event) => onChange({ kind: event.target.value as ScoreKind })}
+          onValueChange={(value) => onChange({ kind: value as ScoreKind })}
           className="rounded-xl border px-2 py-2 text-xs font-semibold outline-none"
           style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--muted)" }}
         >
@@ -242,7 +243,7 @@ function ScoreRow({
               {kindLabels[kind]}
             </option>
           ))}
-        </select>
+        </Select>
       ) : null}
       <button
         type="button"

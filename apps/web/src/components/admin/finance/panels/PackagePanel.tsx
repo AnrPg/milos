@@ -37,6 +37,7 @@ import {
   type PackageDraft,
 } from "@/components/admin/finance/packages/package-catalog";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -345,11 +346,11 @@ export function PackagePanel({
               {affectedRoles.map((role) => (
                 <label key={role} className="block space-y-1">
                   <span className="text-xs font-semibold capitalize" style={{ color: "var(--text-soft)" }}><SemanticLabel value={role} /> {i18n("replacement898d79a")} {i18n("userCount", { count: affectedByRole[role] })}</span>
-                  <select
+                  <Select
                     className="w-full rounded-xl px-3 py-2 text-sm"
                     style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                     value={replacements[role] ?? ""}
-                    onChange={(event) => setReplacements((current) => ({ ...current, [role]: event.target.value }))}
+                    onValueChange={(value) => setReplacements((current) => ({ ...current, [role]: value }))}
                   >
                     <option value="">{i18n("selectReplacement2a95f76")}</option>
                     {replacementOptions.map((candidate) => (
@@ -357,7 +358,7 @@ export function PackagePanel({
                         {field(candidate, "name", field(candidate, "code"))}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               ))}
             </div>

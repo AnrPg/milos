@@ -14,6 +14,7 @@ import { NumberStepper } from "./NumberStepper";
 import { TimeInput } from "./TimeInput";
 import { UnitCycler } from "./UnitCycler";
 import { IntegerInput } from "@/components/integer-input";
+import { Select } from "@/components/ui/Select";
 
 type SettingKey = keyof DraftExercise["advanced"];
 
@@ -141,13 +142,13 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
           <span className="text-sm" style={{ color: "var(--muted)" }}>
             {i18n("moveToSection98d183e")}
           </span>
-          <select
+          <Select
             defaultValue=""
-            onChange={(event) => {
-              const nextSectionId = event.target.value;
+            onValueChange={(value) => {
+              const nextSectionId = value;
               if (!nextSectionId) return;
               moveExercise(exercise.localId, section.localId, nextSectionId);
-              event.target.value = "";
+              value = "";
             }}
             className="rounded-xl px-3 py-2 text-sm outline-none"
             style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--text)" }}
@@ -160,7 +161,7 @@ export function AdvancedSettingsPanel({ exercise, section, sectionOptions = [] }
                   {option.name || i18n("unnamedSection109fa70")}
                 </option>
               ))}
-          </select>
+          </Select>
         </div>
       ) : null}
 

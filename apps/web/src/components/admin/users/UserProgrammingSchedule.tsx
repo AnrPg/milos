@@ -27,6 +27,7 @@ import {
 } from "@/lib/member-programming";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 type Props = {
   token: string;
@@ -268,26 +269,26 @@ export function UserProgrammingSchedule({ token, userId, role, assignRequestDate
       <div className="rounded-2xl p-4" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
         <div className="grid gap-3 md:grid-cols-3">
           <label className="text-xs font-semibold">{i18n("featureSaveInFolder")}
-            <select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedFolderId} onChange={(event) => setSelectedFolderId(event.target.value)}>
+            <Select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedFolderId} onValueChange={(value) => setSelectedFolderId(value)}>
               <option value="">{automaticFolderLabel}</option>
               {[...folders].sort(compareFolders).map((folder) => (
                 <option key={folder.id} value={folder.id}>
                   {folderDisplayName(folder, folderLabels, locale)}
                 </option>
               ))}
-            </select>
+            </Select>
           </label>
           <label className="text-xs font-semibold">{i18n("featureExistingWod")}
-            <select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedWorkoutId} onChange={(event) => setSelectedWorkoutId(event.target.value)}>
+            <Select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedWorkoutId} onValueChange={(value) => setSelectedWorkoutId(value)}>
               <option value="">{i18n("featureChooseWod")}</option>
               {workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}
-            </select>
+            </Select>
           </label>
           {needsClass ? <label className="text-xs font-semibold">{i18n("featureBookedClass")}
-            <select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedSlotId} onChange={(event) => setSelectedSlotId(event.target.value)}>
+            <Select className="mt-2 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} value={selectedSlotId} onValueChange={(value) => setSelectedSlotId(value)}>
               <option value="">{i18n("featureChooseClass")}</option>
               {selectedDaySlots.map((item) => <option key={itemId(item)} value={itemId(item)}>{itemTitle(item, i18n("featureScheduledClass"))}</option>)}
-            </select>
+            </Select>
           </label> : <div />}
         </div>
         <div className="mt-4 flex flex-wrap gap-2">

@@ -18,6 +18,7 @@ vi.mock("@/api/gamification", async (importOriginal) => {
 vi.mock("next-intl", () => ({
   useTranslations: () => (key: string) => key,
   useFormatter: () => ({ dateTime: () => "" }),
+  useLocale: () => "en",
 }));
 
 vi.mock("@/hooks/useJournalCommentWriter", () => ({
@@ -36,6 +37,7 @@ vi.mock("@/i18n/ui", () => ({
 }));
 
 import { PRFormModal } from "@/components/pantheon/PRFormModal";
+import { chooseOption } from "@/components/ui/select-test-utils";
 
 const pr: PRRecord = {
   id: "pr-1",
@@ -131,7 +133,7 @@ describe("PRFormModal", () => {
   it("records a personal PR when no gym is chosen", async () => {
     renderNewModal("atlas-gym");
 
-    fireEvent.change(screen.getByRole("combobox", { name: "gymLabel" }), { target: { value: "" } });
+    chooseOption(screen.getByRole("combobox", { name: /gymLabel/ }), "gymPersonal");
     fireEvent.change(screen.getByPlaceholderText("eGBackSquat1rm675304b"), { target: { value: "Marathon" } });
     fireEvent.change(screen.getByRole("spinbutton"), { target: { value: "42" } });
     fireEvent.click(screen.getByRole("button", { name: "addPr24c8c6f" }));

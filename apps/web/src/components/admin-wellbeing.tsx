@@ -18,6 +18,8 @@ import { useSession } from "@/components/session-provider";
 import { SemanticLabel } from "@/components/semantic-label";
 import { semanticLabel } from "@/i18n/presentation";
 import { PageHeader } from "@/components/PageHeader";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 export function AdminWellbeing() {
   const i18n = useUiTranslations();
@@ -246,13 +248,17 @@ function Field({
   return (
     <label>
       <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>
-      <input
-        className="mt-2 w-full rounded-2xl border border-[color:var(--border)] bg-[var(--panel-muted)] px-4 py-3 text-sm outline-none"
-        required={required}
-        type={type}
-        value={value}
-        onChange={(event) => onChange(event.target.value)}
-      />
+      {type === "date" ? (
+        <DateInput className="mt-2 w-full rounded-2xl border border-[color:var(--border)] bg-[var(--panel-muted)] px-4 py-3 text-sm flex" required={required} value={value} onValueChange={onChange} />
+      ) : (
+        <input
+          className="mt-2 w-full rounded-2xl border border-[color:var(--border)] bg-[var(--panel-muted)] px-4 py-3 text-sm outline-none"
+          required={required}
+          type={type}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      )}
     </label>
   );
 }
@@ -272,17 +278,17 @@ function SelectField({
   return (
     <label>
       <span className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">{label}</span>
-      <select
+      <Select
         className="mt-2 w-full rounded-2xl border border-[color:var(--border)] bg-[var(--panel-muted)] px-4 py-3 text-sm outline-none"
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={(value) => onChange(value)}
       >
         {options.map((option) => (
           <option key={option} value={option}>
             {semanticLabel(option, i18n)}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

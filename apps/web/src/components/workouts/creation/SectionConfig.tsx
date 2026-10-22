@@ -21,6 +21,7 @@ import { FormatDropdown } from "./FormatDropdown";
 import { SHORT_DURATION_PRESETS, TimeInput } from "./TimeInput";
 import { TimerTimeline } from "./TimerTimeline";
 import { IntegerInput } from "@/components/integer-input";
+import { Select } from "@/components/ui/Select";
 
 const SCORE_TYPES: ScoreType[] = ["time", "reps", "weight", "rounds", "rounds+reps", "kcal", "hr_drop", "load"];
 
@@ -374,9 +375,9 @@ export function SectionConfig({ section }: Props) {
           <label className="mb-1 block text-xs font-bold uppercase tracking-widest" style={{ color: "var(--muted)" }}>
             {i18n("scoreType138d04a")}
           </label>
-          <select
+          <Select
             value={section.scoreType ?? ""}
-            onChange={(event) => updateSection(section.localId, { scoreType: event.target.value as ScoreType })}
+            onValueChange={(value) => updateSection(section.localId, { scoreType: value as ScoreType })}
             className="w-full rounded-xl px-3 py-2 text-sm outline-none"
             style={{ background: "var(--bg)", border: "1px solid var(--dim)", color: "var(--text)" }}
           >
@@ -386,7 +387,7 @@ export function SectionConfig({ section }: Props) {
                 {scoreType}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
       ) : null}
     </div>

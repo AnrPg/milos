@@ -12,6 +12,7 @@ import { BodyPhotoView, Card, Chip, Eyebrow, PrivacyLine, dateFormat, key } from
 import { useBodySettings, useBodySnapshots, useBodyToken, useUpdateBodySettings } from "@/components/body/use-body";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { POSES, defaultComparePair, formatDelta, sharedPoses, toDeltaRows, unitOf } from "@/lib/body";
+import { Select } from "@/components/ui/Select";
 
 /**
  * Two photos of one pose on top of each other with a divider to drag
@@ -167,9 +168,9 @@ export function ComparePage() {
   const picker = (label: string, value: string | null, onChange: (id: string) => void, exclude: string | null) => (
     <label className="flex flex-1 flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
       {label}
-      <select
+      <Select
         value={value ?? ""}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={(value) => onChange(value)}
         className="min-h-11 rounded-xl px-3 text-sm"
         style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
       >
@@ -178,7 +179,7 @@ export function ComparePage() {
           .map((item) => (
             <option key={item.id} value={item.id}>{dates.dayYear(item.taken_at)}</option>
           ))}
-      </select>
+      </Select>
     </label>
   );
 

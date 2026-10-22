@@ -9103,5 +9103,21 @@
       "enable": "רישום בקול",
       "enableHint": "חברים מקליטים את האימון ובודקים טיוטה לפני השמירה. השמע לא נשמר."
     }
+  },
+  "Pickers": {
+    "chooseDate": "בחרו תאריך",
+    "chooseTime": "בחרו שעה",
+    "chooseMonthYear": "בחרו חודש ושנה",
+    "previousMonth": "החודש הקודם",
+    "nextMonth": "החודש הבא",
+    "previousYear": "השנה הקודמת",
+    "nextYear": "השנה הבאה",
+    "previousYears": "שנים קודמות",
+    "nextYears": "שנים מאוחרות",
+    "clear": "ניקוי",
+    "today": "היום",
+    "hours": "שעות",
+    "minutes": "דקות",
+    "done": "סיום"
   }
 }

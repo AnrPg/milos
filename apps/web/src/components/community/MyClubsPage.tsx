@@ -13,6 +13,7 @@ import { useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
+import { Select } from "@/components/ui/Select";
 
 /**
  * Εγώ › Τα box και τα clubs μου (mockup «myClubs»): your gyms (and joining
@@ -77,17 +78,17 @@ function ClubRow({ club }: { club: CommunityClub }) {
         <label htmlFor={selectId} className="text-xs" style={{ color: "var(--dim)" }}>{t("notifyLabel")}</label>
         {error ? <p role="alert" className="text-xs" style={{ color: "var(--danger)" }}>{error}</p> : null}
       </div>
-      <select
+      <Select
         id={selectId}
         value={club.notify_level}
-        onChange={(event) => void change(event.target.value as NotifyLevel)}
+        onValueChange={(value) => void change(value as NotifyLevel)}
         className="min-h-11 rounded-2xl px-3 text-sm"
         style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
       >
         {NOTIFY_LEVELS.map((level) => (
           <option key={level} value={level}>{t(`notify.${level}`)}</option>
         ))}
-      </select>
+      </Select>
     </li>
   );
 }

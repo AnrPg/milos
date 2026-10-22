@@ -251,7 +251,7 @@ test.describe("member schedule", () => {
     await expect(sheet.getByText(/Χωρίς χρέωση έως/)).toBeVisible();
     await expect(sheet.getByRole("button", { name: "Κράτηση" })).toBeVisible();
     await shot(page, "class-sheet");
-    await sheet.getByRole("button", { name: "Κλείσιμο ✕" }).click();
+    await sheet.getByRole("button", { name: "Κλείσιμο" }).first().click();
     await expect(sheet).toHaveCount(0);
   });
 

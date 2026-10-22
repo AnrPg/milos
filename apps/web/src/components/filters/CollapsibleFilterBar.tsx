@@ -116,7 +116,7 @@ export function CollapsibleFilterBar({
             <span
               aria-hidden="true"
               className="grid h-5 min-w-5 place-items-center rounded-full px-1 text-[11px] font-bold tabular-nums sm:hidden"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+              style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
             >
               {activeCount}
             </span>

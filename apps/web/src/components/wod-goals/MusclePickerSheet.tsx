@@ -11,6 +11,7 @@ import { groupOf, muscleNode, type MuscleNodeId } from "@/lib/anatomy/taxonomy";
 import { searchKey, searchMuscleTree } from "@/lib/wod-goals/goals";
 
 import { MuscleChip, RoleLegend, Segmented } from "./GoalChips";
+import { Select } from "@/components/ui/Select";
 
 export type PickerEntry = { id: MuscleNodeId; role: AnatomyRole };
 
@@ -216,11 +217,11 @@ export function MusclePickerSheet({
                               {role ? `✓ ${roleLabel(roleOptions[0])}` : t("picker.add")}
                             </button>
                           ) : (
-                            <select
+                            <Select
                               aria-label={t("picker.roleFor", { muscle: name(row.id) })}
                               value={role ?? ""}
-                              onChange={(event) => {
-                                onChange(setEntry(entries, row.id, (event.target.value || null) as AnatomyRole | null));
+                              onValueChange={(value) => {
+                                onChange(setEntry(entries, row.id, (value || null) as AnatomyRole | null));
                                 setSelected(row.id);
                               }}
                               className="min-h-9 shrink-0 rounded-lg border px-2 text-xs"
@@ -230,7 +231,7 @@ export function MusclePickerSheet({
                               {roleOptions.map((option) => (
                                 <option key={option} value={option}>{roleLabel(option)}</option>
                               ))}
-                            </select>
+                            </Select>
                           )}
                         </li>
                       );

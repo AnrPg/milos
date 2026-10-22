@@ -21,6 +21,7 @@ import {
 } from "@/components/staff/staff-ui";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
+import { Select } from "@/components/ui/Select";
 
 const QUEUE_KEY = ["staff", "form-reviews"] as const;
 
@@ -106,17 +107,17 @@ export function FormReviewQueue() {
           <label className="sr-only" htmlFor={filterId}>
             {i18n("statusbae7d5b")}
           </label>
-          <select
+          <Select
             id={filterId}
             className="rounded-xl px-3 py-1.5 text-sm"
-            onChange={(event) => setStatus(event.target.value as FormReviewStatus)}
+            onValueChange={(value) => setStatus(value as FormReviewStatus)}
             style={inputStyle}
             value={status}
           >
             <option value="submitted">{i18n("stfReviewStatusSubmitted")}</option>
             <option value="reviewed">{i18n("stfReviewStatusReviewed")}</option>
             <option value="withdrawn">{i18n("stfReviewStatusWithdrawn")}</option>
-          </select>
+          </Select>
         </div>
       }
     >

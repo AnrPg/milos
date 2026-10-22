@@ -21,6 +21,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
+import { Select } from "@/components/ui/Select";
 
 // A client's coaches (ADR-100): owners and admins assign and end them.
 
@@ -118,12 +119,12 @@ export function CoachAssignmentPanel({ userId }: { userId: string }) {
             if (coachId) assign.mutate();
           }}
         >
-          <select
+          <Select
             aria-label={i18n("rhAssignCoach")}
             className={`${inputClass} sm:flex-1`}
             style={inputStyle}
             value={coachId}
-            onChange={(event) => setCoachId(event.target.value)}
+            onValueChange={(value) => setCoachId(value)}
           >
             <option value="">{options.length ? i18n("rhChooseCoach") : i18n("rhNoCoachesToAssign")}</option>
             {options.map((coach) => (
@@ -131,7 +132,7 @@ export function CoachAssignmentPanel({ userId }: { userId: string }) {
                 {coach.nickname ?? coach.user_id}
               </option>
             ))}
-          </select>
+          </Select>
           <button type="submit" disabled={!coachId || assign.isPending} className={secondaryButtonClass} style={primaryButtonStyle}>
             {i18n("rhAssignCoach")}
           </button>

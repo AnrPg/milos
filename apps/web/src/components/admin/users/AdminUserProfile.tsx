@@ -70,6 +70,8 @@ import { defaultHistoryKind } from "@/lib/training-history";
 import { sortComments } from "@/lib/journal-comments";
 import { fetchUserTrainingHistory } from "@/api/training-history";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -261,9 +263,9 @@ function AdminEntitlements({ token, userId, entitlement, onRefresh }: { token: s
         <form className="space-y-3" onSubmit={(event) => { event.preventDefault(); grant.mutate(); }}>
           <p className="font-semibold" style={{ color: "var(--text)" }}>{i18n("extendThisUserSAllowance6e08374")}</p>
           <div className="grid gap-3 sm:grid-cols-3">
-            <select aria-label={i18n("classVisits142b3b0")} value={form.allowance} onChange={(event) => setForm({ ...form, allowance: event.target.value })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}>{grantableAllowances(entitlement?.allowances).map((key) => <option key={key} value={key}>{allowanceLabel(key, i18n, entitlement?.class_type_names)}</option>)}</select>
+            <Select aria-label={i18n("classVisits142b3b0")} value={form.allowance} onValueChange={(value) => setForm({ ...form, allowance: value })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}>{grantableAllowances(entitlement?.allowances).map((key) => <option key={key} value={key}>{allowanceLabel(key, i18n, entitlement?.class_type_names)}</option>)}</Select>
             <IntegerInput aria-label={i18n("additionalUnits1d9dac0")} min={1} value={form.quantity} emptyValue={1} onValueChange={(quantity) => setForm({ ...form, quantity: quantity ?? 1 })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)" }} />
-            <select value={form.period} onChange={(event) => setForm({ ...form, period: event.target.value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></select>
+            <Select value={form.period} onValueChange={(value) => setForm({ ...form, period: value as typeof form.period })} className="rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)", colorScheme: "dark" }}><option value="calendar_week">{i18n("thisCalendarWeekb05ceca")}</option><option value="calendar_month">{i18n("thisCalendarMonthbb33495")}</option><option value="subscription_period">{i18n("subscriptionPeriod22e7508")}</option></Select>
           </div>
           <textarea required minLength={3} placeholder={i18n("reasonForThisPersonalExtensionbe8ddf7")} value={form.reason} onChange={(event) => setForm({ ...form, reason: event.target.value })} className="min-h-20 w-full rounded-xl px-3 py-2" style={{ background: "var(--panel-muted)", color: "var(--text)", border: "1px solid var(--border)" }} />
           <button disabled={grant.isPending || form.reason.trim().length < 3} className="rounded-full px-4 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>{grant.isPending ? i18n("extending80e2fcd") : i18n("extendAllowance2d3fd3a")}</button>
@@ -340,13 +342,13 @@ function FinanceDetails({
         {membership ? (
           <div className="space-y-2">
             <EditableFinanceCard label={i18n("statusbae7d5b")} editing={editing === "status"} value={<SemanticLabel value={draft.status} />} onOpen={() => setEditing("status")}>
-              <select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onChange={(event) => { const status = event.target.value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
+              <Select className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft.status} onValueChange={(value) => { const status = value; setDraft((current) => ({ ...current, status })); updateMembership.mutate({ status }); }}>
                 {['active', 'inactive', 'cancelled'].map((status) => <option key={status} value={status}>{semanticLabel(status, i18n)}</option>)}
-              </select>
+              </Select>
             </EditableFinanceCard>
             {([['starts_on', i18n("startsOn6d888f7")], ['expires_on', i18n("expiresOn549cabe")]] as const).map(([key, label]) => (
               <EditableFinanceCard key={key} label={label} editing={editing === key} value={date(draft[key])} onOpen={() => setEditing(key)}>
-                <input className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} type="date" value={draft[key]} onChange={(event) => setDraft((current) => ({ ...current, [key]: event.target.value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key] || null })} />
+                <DateInput className="w-full rounded-lg px-3 py-2 text-sm outline-none" style={fieldStyle} value={draft[key]} onValueChange={(value) => setDraft((current) => ({ ...current, [key]: value }))} onBlur={() => updateMembership.mutate({ [key]: draft[key] || null })} />
               </EditableFinanceCard>
             ))}
             <EditableFinanceCard label={i18n("packageSubscriptions09a33f1")} value={packageContent || ""} />

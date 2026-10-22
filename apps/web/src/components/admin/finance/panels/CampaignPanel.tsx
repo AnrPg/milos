@@ -18,6 +18,7 @@ import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { SemanticLabel } from "@/components/semantic-label";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
+import { Select } from "@/components/ui/Select";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -131,16 +132,16 @@ export function CampaignPanel({
             </PanelField>
             <div className="grid gap-3 md:grid-cols-2">
               <PanelField label={i18n("discountTypec5137dd")}>
-                <select
+                <Select
                   className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                   value={codeForm.discount_type}
-                  onChange={(e) => setCodeForm({ ...codeForm, discount_type: e.target.value })}
+                  onValueChange={(value) => setCodeForm({ ...codeForm, discount_type: value })}
                 >
                   {["percent", "fixed_amount", "free_period", "manual"].map((v) => (
                     <option key={v} value={v}>{semanticLabel(v, i18n)}</option>
                   ))}
-                </select>
+                </Select>
               </PanelField>
               <PanelField label={i18n("discountValuecfbd2d5")}>
                 <input

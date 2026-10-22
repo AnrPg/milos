@@ -26,6 +26,8 @@ import { listAdminWorkouts } from "@/api/workouts";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { seasonDate, seasonErrorKey, seasonMoney, seasonRange, statusTone } from "@/components/seasons/season-ui";
 import { useSession } from "@/components/session-provider";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 /**
  * Seasons (ADR-167): the gym's fixed-length programmes, sold next to its
@@ -291,7 +293,7 @@ function SeasonEditor({
         </Field>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
           <Field label={t("fieldStartsOn")}>
-            <input type="date" className={inputClass} style={inputStyle} disabled={locked} value={draft.starts_on} onChange={(event) => set("starts_on", event.target.value)} />
+            <DateInput className={inputClass} style={inputStyle} disabled={locked} value={draft.starts_on} onValueChange={(value) => set("starts_on", value)} />
           </Field>
           <Field label={t("weeksLabel")}>
             <input type="number" min={1} max={52} className={inputClass} style={inputStyle} disabled={locked} value={draft.weeks} onChange={(event) => set("weeks", event.target.value)} />
@@ -306,12 +308,12 @@ function SeasonEditor({
         {locked ? <p className="text-xs" style={{ color: "var(--warning)" }}>{t("scheduleLocked")}</p> : null}
 
         <Field label={t("fieldPackage")} hint={t("fieldPackageHint")}>
-          <select className={inputClass} style={inputStyle} value={draft.membership_package_id} onChange={(event) => set("membership_package_id", event.target.value)}>
+          <Select className={inputClass} style={inputStyle} value={draft.membership_package_id} onValueChange={(value) => set("membership_package_id", value)}>
             <option value="">{t("noPackage")}</option>
             {packageOptions.map((pkg) => (
               <option key={String(pkg.id)} value={String(pkg.id)}>{String(pkg.name ?? pkg.code ?? pkg.id)}</option>
             ))}
-          </select>
+          </Select>
         </Field>
 
         {coachCandidates.length > 0 ? (
@@ -340,13 +342,13 @@ function SeasonEditor({
           <div className="space-y-2">
             {draft.programme.map((row, index) => (
               <div key={index} className="flex gap-2">
-                <select
+                <Select
                   aria-label={t("programmeDay")}
                   className="w-40 shrink-0 rounded-xl px-2 py-2 text-sm"
                   style={inputStyle}
                   disabled={locked}
                   value={row.day}
-                  onChange={(event) => set("programme", draft.programme.map((r, i) => (i === index ? { ...r, day: Number(event.target.value) } : r)))}
+                  onValueChange={(value) => set("programme", draft.programme.map((r, i) => (i === index ? { ...r, day: Number(value) } : r)))}
                 >
                   {Array.from({ length: weeks * 7 }, (_, day) => (
                     <option key={day} value={day}>
@@ -355,20 +357,20 @@ function SeasonEditor({
                         : t("dayOption", { day: day + 1 })}
                     </option>
                   ))}
-                </select>
-                <select
+                </Select>
+                <Select
                   aria-label={t("programmeWorkout")}
                   className="min-w-0 flex-1 rounded-xl px-2 py-2 text-sm"
                   style={inputStyle}
                   disabled={locked}
                   value={row.workout_id}
-                  onChange={(event) => set("programme", draft.programme.map((r, i) => (i === index ? { ...r, workout_id: event.target.value } : r)))}
+                  onValueChange={(value) => set("programme", draft.programme.map((r, i) => (i === index ? { ...r, workout_id: value } : r)))}
                 >
                   <option value="">{t("pickWorkout")}</option>
                   {workoutOptions.map((workout) => (
                     <option key={workout.id} value={workout.id}>{workout.title}</option>
                   ))}
-                </select>
+                </Select>
                 {!locked ? (
                   <button
                     type="button"

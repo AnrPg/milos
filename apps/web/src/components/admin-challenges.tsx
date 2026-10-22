@@ -25,6 +25,8 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { addLocalDays, formatLocalDate } from "@/lib/local-date";
 import { HelpTooltip } from "@/components/HelpTooltip";
 import { PageHeader } from "@/components/PageHeader";
+import { Select } from "@/components/ui/Select";
+import { DateInput } from "@/components/ui/DateInput";
 
 type CriteriaType = SaveChallengePayload["criteria_type"];
 
@@ -218,32 +220,32 @@ function RuleRowEditor({
       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}
     >
       <div className="flex flex-wrap items-center gap-2">
-        <select
+        <Select
           className="rounded-xl border px-3 py-2 text-xs flex-1"
           style={inputStyle}
           value={row.condition}
-          onChange={(e) => onChange({ ...row, condition: e.target.value as RuleCondition })}
+          onValueChange={(value) => onChange({ ...row, condition: value as RuleCondition })}
         >
           {(Object.keys(CONDITION_LABELS) as RuleCondition[]).map((c) => (
             <option key={c} value={c}>
               {CONDITION_LABELS[c]}
             </option>
           ))}
-        </select>
+        </Select>
 
         {row.condition === "workout_type" && (
-          <select
+          <Select
             className="rounded-xl border px-3 py-2 text-xs"
             style={inputStyle}
             value={row.type}
-            onChange={(e) => onChange({ ...row, type: e.target.value })}
+            onValueChange={(value) => onChange({ ...row, type: value })}
           >
             {TRAINING_TYPES.map((t) => (
               <option key={t} value={t}>
                 {t}
               </option>
             ))}
-          </select>
+          </Select>
         )}
 
         {row.condition === "scale_level" && (
@@ -511,17 +513,17 @@ export function AdminChallenges() {
                     {i18n("criteriaTypedf7b95e")}
                     <HelpTooltip label={i18n("criteriaTypedf7b95e")}>{challengeInsight}</HelpTooltip>
                   </span>
-                  <select
+                  <Select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
                     style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     value={form.criteriaType}
-                    onChange={(event) => updateForm("criteriaType", event.target.value as CriteriaType)}
+                    onValueChange={(value) => updateForm("criteriaType", value as CriteriaType)}
                   >
                     <option value="workout_count">{i18n("workoutCountc0c4093")}</option>
                     <option value="workout_type_count">{i18n("workoutTypeCount2e4362c")}</option>
                     <option value="pr_count">{i18n("prCount5527d5d")}</option>
                     <option value="custom">{i18n("custom081ae3f")}</option>
-                  </select>
+                  </Select>
                 </label>
 
                 <label className="block space-y-2">
@@ -544,18 +546,18 @@ export function AdminChallenges() {
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     {i18n("workoutTypeFiltercfb5c8d")}
                   </span>
-                  <select
+                  <Select
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
                     style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
                     value={form.typeFilter}
-                    onChange={(event) => updateForm("typeFilter", event.target.value)}
+                    onValueChange={(value) => updateForm("typeFilter", value)}
                   >
                     {TRAINING_TYPES.map((value) => (
                       <option key={value} value={value}>
                         {value}
                       </option>
                     ))}
-                  </select>
+                  </Select>
                 </label>
               ) : null}
 
@@ -670,12 +672,11 @@ export function AdminChallenges() {
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     {i18n("startsfc612a2")}
                   </span>
-                  <input
+                  <DateInput
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
                     style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-                    type="date"
                     value={form.startsAt}
-                    onChange={(event) => updateForm("startsAt", event.target.value)}
+                    onValueChange={(value) => updateForm("startsAt", value)}
                   />
                 </label>
 
@@ -683,12 +684,11 @@ export function AdminChallenges() {
                   <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                     {i18n("ends91856dc")}
                   </span>
-                  <input
+                  <DateInput
                     className="w-full rounded-2xl border px-4 py-3 text-sm"
                     style={{ background: "var(--panel-muted)", borderColor: "var(--border)", color: "var(--text)" }}
-                    type="date"
                     value={form.endsAt}
-                    onChange={(event) => updateForm("endsAt", event.target.value)}
+                    onValueChange={(value) => updateForm("endsAt", value)}
                   />
                 </label>
               </div>

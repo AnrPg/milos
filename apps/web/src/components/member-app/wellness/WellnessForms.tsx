@@ -43,6 +43,7 @@ import {
   stepPortion,
 } from "./wellness-model";
 import { ErrorLine, Pills, PrimaryButton, QuietButton, SheetSection, WellnessSheet } from "./WellnessSheet";
+import { TimeInput } from "@/components/ui/DateInput";
 
 const SLEEP_KINDS: ("night" | "nap")[] = ["night", "nap"];
 
@@ -164,10 +165,9 @@ function TimeField({ label, value, onChange }: { label: string; value: string; o
   return (
     <label className="flex flex-col gap-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
       {label}
-      <input
-        type="time"
+      <TimeInput
         value={value}
-        onChange={(event) => event.target.value && onChange(event.target.value)}
+        onValueChange={(value) => value && onChange(value)}
         className="min-h-12 rounded-2xl px-4 text-lg tabular-nums"
         style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
       />

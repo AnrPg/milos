@@ -1,7 +1,8 @@
-import { fireEvent, render, screen } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 
 import { OrganizationSelector } from "@/components/organization-selector";
+import { chooseValue } from "@/components/ui/select-test-utils";
 
 const push = vi.fn();
 const clear = vi.fn();
@@ -60,9 +61,7 @@ describe("OrganizationSelector", () => {
 
     render(<OrganizationSelector variant="menu" onSelect={onSelect} />);
 
-    fireEvent.change(screen.getByRole("combobox", { name: "organization" }), {
-      target: { value: "atlas" },
-    });
+    chooseValue(screen.getByRole("combobox", { name: "organization" }), "atlas");
 
     expect(push).toHaveBeenCalledWith("/org/atlas/admin");
     expect(clear).toHaveBeenCalledOnce();

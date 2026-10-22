@@ -18,6 +18,8 @@ import { timeZoneOptions, zoneLabel } from "@/lib/zoned-time";
 
 import { DURATIONS, eventRequest, formProblem, type EventForm } from "./events";
 import { useEventError } from "./EventParts";
+import { Select } from "@/components/ui/Select";
+import { DateInput, TimeInput } from "@/components/ui/DateInput";
 
 export type EventLocation = { id: string; name: string };
 
@@ -189,11 +191,11 @@ export function EventEditorSheet({
       >
         {clubs && clubs.length > 1 && onClubChange ? (
           <Field label={t("fieldClub")}>
-            <select value={clubId} onChange={(event) => onClubChange(event.target.value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle}>
+            <Select value={clubId} onValueChange={(value) => onClubChange(value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle}>
               {clubs.map((club) => (
                 <option key={club.id} value={club.id}>{club.name}</option>
               ))}
-            </select>
+            </Select>
           </Field>
         ) : null}
         <Field label={t("fieldTitle")}>
@@ -210,10 +212,10 @@ export function EventEditorSheet({
         </Field>
         <div className="grid grid-cols-2 gap-2">
           <Field label={t("fieldDate")}>
-            <input type="date" value={form.date} onChange={(event) => set("date", event.target.value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle} />
+            <DateInput value={form.date} onValueChange={(value) => set("date", value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle} />
           </Field>
           <Field label={t("fieldTime")}>
-            <input type="time" value={form.time} onChange={(event) => set("time", event.target.value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle} />
+            <TimeInput value={form.time} onValueChange={(value) => set("time", value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle} />
           </Field>
         </div>
         {clock.timeZone ? (
@@ -234,9 +236,9 @@ export function EventEditorSheet({
             {form.place.kind === "address" && !away && !zoneOpen ? <p>{t("zoneAwayHint")}</p> : null}
             {zoneOpen ? (
               <Field label={t("fieldTimeZone")}>
-                <select
+                <Select
                   value={clock.timeZone}
-                  onChange={(event) => set("timeZone", event.target.value)}
+                  onValueChange={(value) => set("timeZone", value)}
                   className="min-h-11 rounded-2xl px-3 text-sm font-normal"
                   style={inputStyle}
                 >
@@ -245,22 +247,22 @@ export function EventEditorSheet({
                       {zone === gym.zone ? t("zoneGymOption", { zone }) : zone}
                     </option>
                   ))}
-                </select>
+                </Select>
               </Field>
             ) : null}
           </div>
         ) : null}
         <Field label={t("fieldDuration")}>
-          <select
+          <Select
             value={form.durationMinutes}
-            onChange={(event) => set("durationMinutes", Number(event.target.value))}
+            onValueChange={(value) => set("durationMinutes", Number(value))}
             className="min-h-11 rounded-2xl px-3 text-sm font-normal"
             style={inputStyle}
           >
             {durations.map((minutes) => (
               <option key={minutes} value={minutes}>{durationLabel(minutes)}</option>
             ))}
-          </select>
+          </Select>
         </Field>
 
         <fieldset className="flex flex-col gap-2">
@@ -357,16 +359,16 @@ export function EventEditorSheet({
               </label>
               {form.guestPass ? (
                 <Field label={t("fieldGuestsPerMember")}>
-                  <select
+                  <Select
                     value={form.guestsPerMember}
-                    onChange={(event) => set("guestsPerMember", Number(event.target.value))}
+                    onValueChange={(value) => set("guestsPerMember", Number(value))}
                     className="min-h-11 rounded-2xl px-3 text-sm font-normal"
                     style={inputStyle}
                   >
                     {[1, 2, 3, 4, 5].map((count) => (
                       <option key={count} value={count}>{t("guestsCount", { count })}</option>
                     ))}
-                  </select>
+                  </Select>
                 </Field>
               ) : null}
             </div>
@@ -390,12 +392,11 @@ export function EventEditorSheet({
             </label>
             {form.repeatWeekly ? (
               <Field label={t("fieldRepeatUntil")}>
-                <input
-                  type="date"
+                <DateInput
                   value={form.repeatUntil}
                   min={form.date}
                   aria-invalid={tried && problem === "repeat"}
-                  onChange={(event) => set("repeatUntil", event.target.value)}
+                  onValueChange={(value) => set("repeatUntil", value)}
                   className="min-h-11 rounded-2xl px-3 text-sm font-normal"
                   style={inputStyle}
                 />

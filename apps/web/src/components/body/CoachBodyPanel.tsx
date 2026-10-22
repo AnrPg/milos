@@ -11,6 +11,7 @@ import { CompareSlider } from "@/components/body/ComparePage";
 import { useBodyToken } from "@/components/body/use-body";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { METRICS, POSES, RANGES, defaultComparePair, formatDelta, formatMetric, metricDeltas, sharedPoses, snapshotChange, summaryMetrics, unitOf } from "@/lib/body";
+import { Select } from "@/components/ui/Select";
 
 /**
  * The coach's «Σώμα» tab of a client (ADR-158 §5, board 13 q7): only the
@@ -154,13 +155,13 @@ export function CoachBodyPanel({ userId, nickname }: { userId: string; nickname:
             ).map(([label, value, set, exclude]) => (
               <label key={label} className="flex flex-1 flex-col gap-1 text-xs font-semibold" style={{ color: "var(--dim)" }}>
                 {label}
-                <select value={value} onChange={(event) => set(event.target.value)} className="min-h-11 rounded-xl px-3 text-sm" style={selectStyle}>
+                <Select value={value} onValueChange={(value) => set(value)} className="min-h-11 rounded-xl px-3 text-sm" style={selectStyle}>
                   {list
                     .filter((item) => item.id !== exclude)
                     .map((item) => (
                       <option key={item.id} value={item.id}>{dates.dayYear(item.taken_at)}</option>
                     ))}
-                </select>
+                </Select>
               </label>
             ))}
           </div>

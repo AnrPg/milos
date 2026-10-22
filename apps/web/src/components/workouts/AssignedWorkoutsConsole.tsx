@@ -54,6 +54,7 @@ import { LocalizedScore } from "@/components/localized-score";
 import { PageHeader } from "@/components/PageHeader";
 import { SeasonTag } from "@/components/seasons/SeasonTag";
 import { Popover } from "@/components/ui/Popover";
+import { DateInput } from "@/components/ui/DateInput";
 
 type ViewMode = "3day" | "week" | "month";
 
@@ -1037,13 +1038,12 @@ export function AssignedWorkoutsConsole({
                       {!isAdmin && !isMember && date >= todayIso ? (
                         requestingDate === date ? (
                           <div className="space-y-2">
-                            <input
+                            <DateInput
                               className="w-full rounded-[0.8rem] px-3 py-2 text-xs outline-none"
                               style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                              type="date"
                               min={todayIso}
                               value={requestDate}
-                              onChange={(event) => setRequestDate(event.target.value)}
+                              onValueChange={(value) => setRequestDate(value)}
                             />
                             <textarea
                               className="min-h-16 w-full rounded-[0.8rem] px-3 py-2 text-xs outline-none"
@@ -1252,11 +1252,10 @@ export function AssignedWorkoutsConsole({
                           <span className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                             {i18n("dateeb9a4bc")}
                           </span>
-                          <input
+                          <DateInput
                             className="mt-2 w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                             style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-                            onChange={(event) => setEditScheduledFor(event.target.value)}
-                            type="date"
+                            onValueChange={(value) => setEditScheduledFor(value)}
                             value={editScheduledFor}
                           />
                         </label>

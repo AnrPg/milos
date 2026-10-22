@@ -7,6 +7,7 @@ import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 type Props = {
   token: string;
@@ -126,22 +127,22 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
     >
         <label className="block text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {i18n("featureMoveFromBooking")}
-          <select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={fromBookingId} disabled={loading} onChange={(event) => setFromBookingId(event.target.value)}>
+          <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={fromBookingId} disabled={loading} onValueChange={(value) => setFromBookingId(value)}>
             <option value="">{i18n("featureNoCurrentBooking")}</option>
             {bookings.map((booking) => <option key={booking.bookingId} value={booking.bookingId}>{booking.label}</option>)}
-          </select>
+          </Select>
         </label>
 
         <label className="mt-4 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {i18n("featureTargetClass")}
-          <select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={targetSlotId} disabled={loading} onChange={(event) => setTargetSlotId(event.target.value)}>
+          <Select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={targetSlotId} disabled={loading} onValueChange={(value) => setTargetSlotId(value)}>
             <option value="">{i18n("featureChooseClass")}</option>
             {targetSlots.map((slot) => (
               <option key={slot.id} value={slot.id} disabled={slot.spots_remaining <= 0}>
                 {slotLabel(slot.name, slot.scheduled_at)} · {i18n("featureSpotsLeft", { count: Math.max(slot.spots_remaining, 0) })}
               </option>
             ))}
-          </select>
+          </Select>
         </label>
 
         {!loading && targetSlots.length === 0 ? (

@@ -28,6 +28,7 @@ import { InjuryTimeline, InjuryUpdateForm } from "@/components/member-app/wellbe
 import { useWellness, wellnessWindow, WellnessPanel } from "@/components/member-app/wellness/WellnessPanel";
 import { localDate } from "@/components/member-app/wellness/wellness-model";
 import { WellnessSupportCard } from "@/components/buddy/WellnessSupportCard";
+import { Select } from "@/components/ui/Select";
 
 export function MyWellbeing() {
   const i18n = useUiTranslations();
@@ -115,15 +116,15 @@ export function MyWellbeing() {
             value={bodyArea}
             onChange={(event) => setBodyArea(event.target.value)}
           />
-          <select
+          <Select
             className="w-full rounded-2xl border px-4 py-3"
             value={severity}
-            onChange={(event) => setSeverity(event.target.value as ReportInjuryRequest["severity"])}
+            onValueChange={(value) => setSeverity(value as ReportInjuryRequest["severity"])}
           >
             <option value="mild">{i18n("mild17538a9")}</option>
             <option value="moderate">{i18n("moderateea8b09c")}</option>
             <option value="severe">{i18n("severeb7c1535")}</option>
-          </select>
+          </Select>
           <textarea
             className="min-h-28 w-full rounded-2xl border px-4 py-3"
             placeholder={i18n("trainingLimitationsOrNotes9c0ebf6")}

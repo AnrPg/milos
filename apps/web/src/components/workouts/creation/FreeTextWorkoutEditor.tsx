@@ -70,6 +70,7 @@ import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 import { FreeTextAnalysisPanel, IssueCard, type AnalysisStatus } from "./FreeTextAnalysisPanel";
 import { readToken } from "@/lib/theme";
+import { Select } from "@/components/ui/Select";
 
 type Props = {
   draftId: string | null;
@@ -462,11 +463,11 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
                 <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
                   {i18n("workoutType34a530c")}
                 </span>
-                <select
+                <Select
                   className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
                   style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
                   value={type}
-                  onChange={(event) => setType(event.target.value as WorkoutType)}
+                  onValueChange={(value) => setType(value as WorkoutType)}
                   aria-invalid={showBlocking && !type}
                 >
                   <option value="" disabled>
@@ -477,7 +478,7 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
                       {item.replaceAll("_", " ")}
                     </option>
                   ))}
-                </select>
+                </Select>
               </label>
             </div>
           ) : null}
@@ -694,14 +695,13 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
         <label className="sr-only" htmlFor="free-text-heading-select">
           {i18n("editorHeading")}
         </label>
-        <select
+        <Select
           id="free-text-heading-select"
           className="h-8 min-w-0 max-w-full flex-1 rounded-md border px-2 text-sm font-bold outline-none sm:min-w-32 sm:flex-none"
           style={{ background: "var(--bg)", borderColor: "var(--dim)", color: "var(--text)" }}
           aria-label={i18n("editorHeading")}
           value={activeHeadingLevel ? `heading-${activeHeadingLevel}` : "paragraph"}
-          onChange={(event) => {
-            const value = event.target.value;
+          onValueChange={(value) => {
             if (value === "paragraph") {
               editor.chain().focus().setParagraph().run();
               return;
@@ -717,7 +717,7 @@ function FreeTextToolbar({ editor }: { editor: Editor | null }) {
               {i18n("editorHeading")} {level}
             </option>
           ))}
-        </select>
+        </Select>
         <ToolbarGroup actions={blockActions} />
         <ToolbarGroup actions={layoutActions} />
         <div

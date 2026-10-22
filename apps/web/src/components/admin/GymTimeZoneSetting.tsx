@@ -7,6 +7,7 @@ import { fetchAdminSettings, updateTimeZone, type TimeZoneStatus } from "@/api/s
 import { deviceTimeZone, timeZoneOptions as zoneOptions } from "@/lib/zoned-time";
 import { useUiTranslations } from "@/i18n/ui";
 import { localizeError } from "@/i18n/presentation";
+import { Select } from "@/components/ui/Select";
 
 const QUERY_KEY = ["admin", "time-zone"];
 
@@ -72,18 +73,18 @@ export function GymTimeZoneSetting({ token }: { token: string }) {
 
       <label className="block space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
         <span>{i18n("gymTimeZoneLabel")}</span>
-        <select
+        <Select
           className="w-full rounded-2xl px-4 py-3 outline-none"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           value={value}
-          onChange={(event) => setDraft(event.target.value)}
+          onValueChange={(value) => setDraft(value)}
         >
           {options.map((zone) => (
             <option key={zone} value={zone}>
               {zone}
             </option>
           ))}
-        </select>
+        </Select>
         <span className="block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("gymTimeZoneHint")}</span>
       </label>
 

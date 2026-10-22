@@ -34,6 +34,9 @@ import {
   type SummaryNames,
 } from "./package-catalog";
 import { useStaffCoaches, type CoachOption } from "./use-package-authoring";
+import { Select } from "@/components/ui/Select";
+import { TimeInput } from "@/components/ui/DateInput";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 export type FieldContext = {
   classTypes: ClassTypeRecord[];
@@ -127,6 +130,7 @@ export function Toggle({
   );
 }
 
+/** Mutually exclusive choices: one row when they fit, a full grid or a dropdown when not (SegmentPicker). */
 export function Segmented<T extends string>({
   value,
   options,
@@ -138,27 +142,7 @@ export function Segmented<T extends string>({
   onChange: (value: T) => void;
   label: string;
 }) {
-  return (
-    <div role="radiogroup" aria-label={label} className="flex flex-wrap gap-1 rounded-2xl p-1" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
-      {options.map((option) => (
-        <button
-          key={option.value}
-          type="button"
-          role="radio"
-          aria-checked={value === option.value}
-          onClick={() => onChange(option.value)}
-          className="min-h-[2.5rem] flex-1 rounded-xl px-3 text-sm font-semibold"
-          style={{
-            background: value === option.value ? "var(--panel)" : "transparent",
-            color: value === option.value ? "var(--text)" : "var(--dim)",
-            boxShadow: value === option.value ? "var(--shadow-sm)" : "none",
-          }}
-        >
-          {option.label}
-        </button>
-      ))}
-    </div>
-  );
+  return <SegmentPicker ariaLabel={label} semantics="radiogroup" variant="track" stretch value={value} options={options} onChange={onChange} />;
 }
 
 export function Stepper({
@@ -238,11 +222,11 @@ export function PeriodSelect({
 }) {
   const t = useT();
   return (
-    <select aria-label={label} className={inputClass + " h-11"} style={inputStyle} value={value} onChange={(event) => onChange(event.target.value as QuotaPeriod)}>
+    <Select aria-label={label} className={inputClass + " h-11"} style={inputStyle} value={value} onValueChange={(value) => onChange(value as QuotaPeriod)}>
       {periods.map((period) => (
         <option key={period} value={period}>{t(`pkgPeriod_${period}`)}</option>
       ))}
-    </select>
+    </Select>
   );
 }
 
@@ -468,17 +452,17 @@ export function ClassTypeLimits({
     <div className="space-y-2">
       {value.map((limit, index) => (
         <div key={limit.id} className="flex flex-wrap items-center gap-2 rounded-xl p-2" style={{ background: "var(--panel-muted)" }}>
-          <select
+          <Select
             aria-label={t("pkgClassType")}
             className={inputClass + " h-11 min-w-[9rem] flex-1"}
             style={inputStyle}
             value={limit.id}
-            onChange={(event) => onChange(value.map((item, i) => (i === index ? { ...item, id: event.target.value } : item)))}
+            onValueChange={(next) => onChange(value.map((item, i) => (i === index ? { ...item, id: next } : item)))}
           >
             {eligible
               .filter((type) => type.id === limit.id || !value.some((item) => item.id === type.id))
               .map((type) => <option key={type.id} value={type.id}>{type.name}</option>)}
-          </select>
+          </Select>
           <Stepper label={t("pkgVisits")} value={limit.limit} min={1} onChange={(next) => onChange(value.map((item, i) => (i === index ? { ...item, limit: next } : item)))} />
           <div className="min-w-[9rem]">
             <PeriodSelect
@@ -530,18 +514,18 @@ export function DurationControl({
 
   return (
     <div className="space-y-2">
-      <select
+      <Select
         aria-label={label}
         className={inputClass + " h-11"}
         style={inputStyle}
         value={custom ? "custom" : `${current.amount}:${current.unit}`}
-        onChange={(event) => {
-          if (event.target.value === "custom") {
+        onValueChange={(value) => {
+          if (value === "custom") {
             setCustom(true);
             return;
           }
           setCustom(false);
-          const [amount, unit] = event.target.value.split(":");
+          const [amount, unit] = value.split(":");
           onChange({ amount: Number(amount), unit: unit as DurationValue["unit"] });
         }}
       >
@@ -551,19 +535,19 @@ export function DurationControl({
           </option>
         ))}
         <option value="custom">{t("pkgDurationCustom")}</option>
-      </select>
+      </Select>
       {custom ? (
         <div className="flex flex-wrap items-center gap-2">
           <Stepper label={label} value={current.amount} min={1} max={current.unit === "day" ? 1095 : current.unit === "week" ? 156 : 36} onChange={(amount) => onChange({ ...current, amount })} />
-          <select
+          <Select
             aria-label={t("pkgDurationUnit")}
             className={inputClass + " h-11 max-w-[10rem]"}
             style={inputStyle}
             value={current.unit}
-            onChange={(event) => onChange({ ...current, unit: event.target.value as DurationValue["unit"] })}
+            onValueChange={(value) => onChange({ ...current, unit: value as DurationValue["unit"] })}
           >
             {(["day", "week", "month"] as const).map((unit) => <option key={unit} value={unit}>{t(`pkgUnit_${unit}`)}</option>)}
-          </select>
+          </Select>
         </div>
       ) : null}
     </div>
@@ -650,17 +634,17 @@ export function CoachSelect({ id, value, onChange, label }: { id?: string; value
   const current = typeof value === "string" ? value : "";
   const options: CoachOption[] = current && !coaches.some((coach) => coach.id === current) ? [...coaches, { id: current, name: t("pkgCoachCurrent") }] : coaches;
   return (
-    <select
+    <Select
       id={id}
       aria-label={id ? undefined : label}
       className={inputClass + " h-11"}
       style={inputStyle}
       value={current}
-      onChange={(event) => onChange(event.target.value === "" ? null : event.target.value)}
+      onValueChange={(value) => onChange(value === "" ? null : value)}
     >
       <option value="">{t("pkgCoachAny")}</option>
       {options.map((coach) => <option key={coach.id} value={coach.id}>{coach.name || t("pkgCoachUnnamed")}</option>)}
-    </select>
+    </Select>
   );
 }
 
@@ -790,9 +774,9 @@ function TimeWindowsControl({ value, onChange }: { value: TimeWindow[]; onChange
             onChange={(days) => update(index, { days: days.map(Number).sort((a, b) => a - b) })}
           />
           <div className="flex flex-wrap items-center gap-2">
-            <input type="time" aria-label={t("pkgTimeWindowFrom")} className={inputClass + " h-11 max-w-[8rem]"} style={inputStyle} value={window.from} onChange={(event) => update(index, { from: event.target.value })} />
+            <TimeInput aria-label={t("pkgTimeWindowFrom")} className={inputClass + " h-11 max-w-[8rem]"} style={inputStyle} value={window.from} onValueChange={(value) => update(index, { from: value })} />
             <span className="text-sm" style={{ color: "var(--dim)" }}>{t("pkgTimeWindowTo")}</span>
-            <input type="time" aria-label={t("pkgTimeWindowTo")} className={inputClass + " h-11 max-w-[8rem]"} style={inputStyle} value={window.to} onChange={(event) => update(index, { to: event.target.value })} />
+            <TimeInput aria-label={t("pkgTimeWindowTo")} className={inputClass + " h-11 max-w-[8rem]"} style={inputStyle} value={window.to} onValueChange={(value) => update(index, { to: value })} />
             <button type="button" className="ms-auto text-sm font-semibold" style={{ color: "var(--danger)" }} onClick={() => onChange(value.filter((_, i) => i !== index))}>
               {t("pkgRemove")}
             </button>
@@ -986,18 +970,18 @@ export function FieldControl({
       control = spec.key === "personal_training.coach_id" ? (
         <CoachSelect id={id} label={label} value={value} onChange={(next) => onFieldChange(spec.key, next)} />
       ) : (
-        <select
+        <Select
           id={id}
           className={inputClass + " h-11"}
           style={inputStyle}
           value={typeof value === "string" ? value : ""}
-          onChange={(event) => onFieldChange(spec.key, event.target.value === "" ? null : event.target.value)}
+          onValueChange={(value) => onFieldChange(spec.key, value === "" ? null : value)}
         >
           <option value="">{t("pkgNone")}</option>
           {context.packages
             .filter((pkg) => pkg.active !== false && pkg.package_type === "membership")
             .map((pkg) => <option key={String(pkg.id)} value={String(pkg.id)}>{String(pkg.name)}</option>)}
-        </select>
+        </Select>
       );
       break;
     default:

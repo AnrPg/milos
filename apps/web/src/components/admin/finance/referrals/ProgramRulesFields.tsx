@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 
 import type { ProgramRules } from "./program-rules";
+import { Select } from "@/components/ui/Select";
 
 const inputStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
 const inputClass = "w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none";
@@ -30,16 +31,16 @@ export function ProgramRulesFields({
 
       <div className="grid gap-3 md:grid-cols-2">
         <Field label={t("rules.friendGift")}>
-          <select
+          <Select
             className={inputClass}
             style={inputStyle}
             value={rules.friend_reward_type}
-            onChange={(e) => set("friend_reward_type", e.target.value as ProgramRules["friend_reward_type"])}
+            onValueChange={(value) => set("friend_reward_type", value as ProgramRules["friend_reward_type"])}
           >
             {(["free_days", "credit", "custom", "none"] as const).map((value) => (
               <option key={value} value={value}>{t(`rules.gift_${value}`)}</option>
             ))}
-          </select>
+          </Select>
         </Field>
         {rules.friend_reward_type === "free_days" || rules.friend_reward_type === "credit" ? (
           <Field label={rules.friend_reward_type === "credit" ? t("rules.giftEuros") : t("rules.giftDays")}>
@@ -62,16 +63,16 @@ export function ProgramRulesFields({
 
       <div className="grid gap-3 md:grid-cols-2">
         <Field label={t("rules.counts")}>
-          <select className={inputClass} style={inputStyle} value={rules.qualifying_stage} onChange={(e) => set("qualifying_stage", e.target.value as ProgramRules["qualifying_stage"])}>
+          <Select className={inputClass} style={inputStyle} value={rules.qualifying_stage} onValueChange={(value) => set("qualifying_stage", value as ProgramRules["qualifying_stage"])}>
             <option value="paid">{t("rules.counts_paid")}</option>
             <option value="trial">{t("rules.counts_trial")}</option>
-          </select>
+          </Select>
         </Field>
         <Field label={t("rules.approval")}>
-          <select className={inputClass} style={inputStyle} value={rules.approval} onChange={(e) => set("approval", e.target.value as ProgramRules["approval"])}>
+          <Select className={inputClass} style={inputStyle} value={rules.approval} onValueChange={(value) => set("approval", value as ProgramRules["approval"])}>
             <option value="manual">{t("rules.approval_manual")}</option>
             <option value="auto">{t("rules.approval_auto")}</option>
-          </select>
+          </Select>
         </Field>
         <Field label={t("rules.window")}>
           <input className={inputClass} style={inputStyle} type="number" min={7} max={365} value={rules.attribution_days} onChange={(e) => set("attribution_days", e.target.value)} />

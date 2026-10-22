@@ -14,6 +14,7 @@ import { useBodyToken } from "@/components/body/use-body";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { sharedPoses } from "@/lib/body";
+import { Select } from "@/components/ui/Select";
 
 type Audience = { audience: Exclude<BodyShareAudience, "club_channel"> } | { audience: "club_channel"; channelId: string; label: string };
 
@@ -143,9 +144,9 @@ export function ShareBeforeAfterDialog({
 
         <label className="flex flex-col gap-1 text-sm font-semibold" style={{ color: "var(--text)" }}>
           {t("shareBefore")}
-          <select
+          <Select
             value={from}
-            onChange={(event) => setFrom(event.target.value)}
+            onValueChange={(value) => setFrom(value)}
             className="min-h-11 rounded-xl px-3"
             style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
           >
@@ -154,7 +155,7 @@ export function ShareBeforeAfterDialog({
               .map((snapshot) => (
                 <option key={snapshot.id} value={snapshot.id}>{dates.dayYear(snapshot.taken_at)}</option>
               ))}
-          </select>
+          </Select>
         </label>
 
         <div role="radiogroup" aria-label={t("posesLabel")} className="flex flex-wrap gap-2">

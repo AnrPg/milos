@@ -20,6 +20,7 @@ import {
 import { useSession } from "@/components/session-provider";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";
+import { Select } from "@/components/ui/Select";
 
 type Step = 1 | 2 | 3;
 
@@ -202,11 +203,11 @@ export function ReferralEventWizard({
             >
               {i18n("referralProgramecbeeaa")}
             </span>
-            <select
+            <Select
               className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
               style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
               value={form.referral_program_id}
-              onChange={(e) => setForm({ ...form, referral_program_id: e.target.value })}
+              onValueChange={(value) => setForm({ ...form, referral_program_id: value })}
             >
               {programs
                 .filter((p) => p.active !== false)
@@ -215,7 +216,7 @@ export function ReferralEventWizard({
                     {field(p, "name")}
                   </option>
                 ))}
-            </select>
+            </Select>
           </label>
 
           {/* Referrer search — locked when opened from the members table "+" button */}
@@ -263,9 +264,9 @@ export function ReferralEventWizard({
                   </button>
                 ) : (
                   <div className="space-y-2">
-                    <select
+                    <Select
                       value={inlinePackageId}
-                      onChange={(e) => setInlinePackageId(e.target.value)}
+                      onValueChange={(value) => setInlinePackageId(value)}
                       className="w-full rounded-lg px-2 py-1.5 text-xs"
                       style={{
                         background: "var(--panel)",
@@ -285,7 +286,7 @@ export function ReferralEventWizard({
                           {pkg.active === false ? i18n("inactive0e9b582") : ""}
                         </option>
                       ))}
-                    </select>
+                    </Select>
 
                     <div className="flex gap-2">
                       <button
@@ -485,17 +486,17 @@ export function ReferralEventWizard({
               >
                 {i18n("rewardType9e0f28d")}
               </span>
-              <select
+              <Select
                 className="w-full rounded-[0.9rem] px-3 py-2 text-sm outline-none"
                 style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
                 value={rewardForm.reward_type}
-                onChange={(e) => setRewardForm({ ...rewardForm, reward_type: e.target.value })}
+                onValueChange={(value) => setRewardForm({ ...rewardForm, reward_type: value })}
               >
                 <option value="credit">{i18n("credit8a45d33")}</option>
                 <option value="discount">{i18n("discountb524936")}</option>
                 <option value="free_period">{i18n("freePeriod55f6fa0")}</option>
                 <option value="manual">{i18n("manual4e836fd")}</option>
-              </select>
+              </Select>
             </label>
 
             {rewardForm.reward_type !== "manual" && (

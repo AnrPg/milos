@@ -7,6 +7,7 @@ import type { InjuryRecord, InjuryUpdateRequest } from "@/api/wellbeing";
 import { SemanticLabel } from "@/components/semantic-label";
 
 import { timelinePositions, type InjuryEvent } from "./injury-timeline";
+import { Select } from "@/components/ui/Select";
 
 /**
  * One injury's progress (ADR-140 §3): a line with a point at every event
@@ -110,18 +111,18 @@ export function InjuryUpdateForm({
       />
       <label className="block text-xs font-semibold" style={{ color: "var(--muted)" }}>
         {t("field.severity")}
-        <select
+        <Select
           className="mt-1 w-full rounded-2xl px-4 py-2.5 text-sm"
           style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
           value={severity}
-          onChange={(event) => setSeverity(event.target.value as InjuryRecord["severity"])}
+          onValueChange={(value) => setSeverity(value as InjuryRecord["severity"])}
         >
           {(["mild", "moderate", "severe"] as const).map((level) => (
             <option key={level} value={level}>
               {t(`severity.${level}`)}
             </option>
           ))}
-        </select>
+        </Select>
       </label>
       <label className="block text-xs font-semibold" style={{ color: "var(--muted)" }}>
         {t("field.training_limitations")}

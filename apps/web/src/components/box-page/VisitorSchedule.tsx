@@ -14,6 +14,7 @@ import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone, zonedText 
 import { YourTime } from "@/components/zoned-time";
 import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar";
 import { Dialog } from "@/components/ui/Dialog";
+import { Select } from "@/components/ui/Select";
 
 type Slot = PublicBoxSchedule["slots"][number];
 const ALL = "";
@@ -183,10 +184,10 @@ function Chip({
     >
       <span>{active ? options.find((option) => option.value === value)?.label : label}</span>
       <span aria-hidden="true" className="pointer-events-none absolute end-3 text-xs">▾</span>
-      <select
+      <Select
         aria-label={label}
         value={value}
-        onChange={(event) => onChange(event.target.value)}
+        onValueChange={(value) => onChange(value)}
         className="absolute inset-0 cursor-pointer opacity-0"
       >
         <option value={ALL}>{t("optionAll")}</option>
@@ -195,7 +196,7 @@ function Chip({
             {option.label}
           </option>
         ))}
-      </select>
+      </Select>
     </label>
   );
 }

@@ -9103,5 +9103,21 @@
       "enable": "Voice logging",
       "enableHint": "Members record their workout and review a draft before saving. Audio is not kept."
     }
+  },
+  "Pickers": {
+    "chooseDate": "Choose a date",
+    "chooseTime": "Choose a time",
+    "chooseMonthYear": "Choose month and year",
+    "previousMonth": "Previous month",
+    "nextMonth": "Next month",
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "previousYears": "Earlier years",
+    "nextYears": "Later years",
+    "clear": "Clear",
+    "today": "Today",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "done": "Done"
   }
 }
