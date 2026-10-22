@@ -93,6 +93,10 @@ defmodule Palee.Organizations.OrganizationStore do
     do: impl().put_organization_settings_entry(organization_id, key, value)
 
   @impl true
+  def put_organization_timezone(organization_id, zone, source),
+    do: impl().put_organization_timezone(organization_id, zone, source)
+
+  @impl true
   def list_active_invitations(organization_id, now),
     do: impl().list_active_invitations(organization_id, now)
 

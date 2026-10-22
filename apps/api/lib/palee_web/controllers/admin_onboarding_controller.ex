@@ -11,7 +11,7 @@ defmodule PaleeWeb.AdminOnboardingController do
   security([%{"bearerAuth" => []}])
 
   # Gym steps and an independent coach's (ADR-170).
-  @steps ~w(settings classes packages workout invite tour profile sessions team bootcamp)
+  @steps ~w(timezone settings classes packages workout invite tour profile sessions team bootcamp)
 
   @checklist_schema %Schema{
     title: "AdminOnboardingChecklist",

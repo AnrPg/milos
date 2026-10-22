@@ -1,5 +1,5 @@
 defmodule Palee.Organizations do
-  alias Palee.Organizations.Domain.{BrandLogoPolicy, Provider, TenantAuthorization}
+  alias Palee.Organizations.Domain.{BrandLogoPolicy, Provider, TenantAuthorization, TimeZonePolicy}
   alias Palee.Organizations.OrganizationStore
   alias Palee.Infrastructure.Tenancy.RepoContext
 
@@ -138,15 +138,44 @@ defmodule Palee.Organizations do
   def list_membership_organization_ids(user_ids),
     do: OrganizationStore.list_membership_organization_ids(user_ids)
 
-  @doc "IANA timezone the organization operates in (defaults to UTC)."
-  def organization_timezone(organization_id) when is_binary(organization_id) do
+  @doc """
+  ADR-176: the IANA zone the gym operates in, read by every gym-local rule:
+  the confirmed or inferred zone, else Palee's default while unknown.
+  """
+  def organization_timezone(organization_id) when is_binary(organization_id),
+    do: organization_id |> timezone_status() |> Map.fetch!(:timezone)
+
+  @doc """
+  ADR-176: the gym's zone and how it was learnt: `source` is `"confirmed"`,
+  `"inferred"` or nil (unknown; `timezone` is then the default).
+  """
+  def timezone_status(organization_id) when is_binary(organization_id) do
     RepoContext.run(%{organization_id: organization_id}, fn ->
-      case OrganizationStore.get_organization_settings(organization_id) do
-        %{timezone: timezone} when is_binary(timezone) and timezone != "" -> timezone
-        _missing -> "Etc/UTC"
-      end
+      settings = OrganizationStore.get_organization_settings(organization_id)
+
+      %{
+        timezone: TimeZonePolicy.resolve(settings),
+        source: settings && settings.timezone_source,
+        confirmed: TimeZonePolicy.confirmed?(settings || %{})
+      }
     end)
   end
+
+  @doc "ADR-176: the gym's local date now."
+  def local_today(organization_id, now \\ DateTime.utc_now()) do
+    case DateTime.shift_zone(now, organization_timezone(organization_id)) do
+      {:ok, local} -> DateTime.to_date(local)
+      {:error, _reason} -> DateTime.to_date(now)
+    end
+  end
+
+  @doc "ADR-176: confirm the gym's zone (`\"confirmed\"`) or report a guess (`\"inferred\"`)."
+  defdelegate set_timezone(context, zone, source),
+    to: Palee.Organizations.Commands.SetTimeZone,
+    as: :call
+
+  @doc "ADR-176: the best guess among candidate zones (device first, then IP)."
+  defdelegate infer_timezone(candidates), to: TimeZonePolicy, as: :infer
 
   @doc """
   ADR-155: how a box presents itself on a Wallet card - its name (the brand

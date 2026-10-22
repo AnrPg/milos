@@ -41,6 +41,7 @@ import { IntegerInput } from "@/components/integer-input";
 import { PageHeader } from "@/components/PageHeader";
 import { ClientAccessPanel } from "@/components/invites/InviteClients";
 import { AdminOnboardingPanel } from "@/components/onboarding/Onboarding";
+import { GymTimeZoneSetting } from "@/components/admin/GymTimeZoneSetting";
 import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting";
 import { WodGoalsDefaultSetting } from "@/components/wod-goals/WodGoalsDefaultSetting";
 import { AiScalingSettings } from "@/components/scaling/AiScalingSettings";
@@ -1291,6 +1292,15 @@ export function AdminSettingsHub() {
         {token ? (
           <>
             <PlanSection token={token} />
+
+            {/* ADR-176: the zone every gym-local rule reads. */}
+            <CollapsibleSection
+              id="time-zone"
+              title={i18n("gymTimeZoneTitle")}
+              description={i18n("gymTimeZoneDescription")}
+            >
+              <GymTimeZoneSetting token={token} />
+            </CollapsibleSection>
 
             <CollapsibleSection
               id="branding"

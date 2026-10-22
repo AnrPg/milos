@@ -14,9 +14,10 @@ defmodule Palee.Organizations.Domain.OnboardingChecklist do
   # ADR-170: an independent coach sets up a practice, not a gym: their public
   # page, bookable sessions, session packages, the «Team» club, an open
   # bootcamp, then clients.
+  # ADR-176: both start with the time zone every gym-local rule reads.
   @steps_by_audience %{
-    "gym" => ~w(settings classes packages workout invite tour),
-    "coach" => ~w(profile sessions packages team bootcamp invite tour)
+    "gym" => ~w(timezone settings classes packages workout invite tour),
+    "coach" => ~w(timezone profile sessions packages team bootcamp invite tour)
   }
   @steps @steps_by_audience |> Map.values() |> List.flatten() |> Enum.uniq()
   @actions ~w(complete skip reopen dismiss restore tour_completed)

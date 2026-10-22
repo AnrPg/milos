@@ -25,6 +25,10 @@ defmodule Palee.Application.CreateScheduledSlot do
 
   defp create_slot(context, params), do: Scheduling.create_slot(context, params)
 
+  # ADR-176: a class may be saved before its WOD exists.
+  defp fetch_workout(_context, nil), do: {:ok, nil}
+  defp fetch_workout(_context, ""), do: {:ok, nil}
+
   defp fetch_workout(context, id) do
     case Workouts.get_workout(context, id) do
       nil -> {:error, :workout_not_found}

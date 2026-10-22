@@ -91,7 +91,8 @@ defmodule Palee.Notifications.Notification do
     :season_requested,
     :season_confirmed,
     :season_declined,
-    :season_cancelled
+    :season_cancelled,
+    :class_workout_missing
   ]
 
   schema "notifications" do

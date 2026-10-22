@@ -137,9 +137,20 @@ export type ScheduleBooking = {
 
 export type FriendGoing = { id: string; nickname?: string | null; avatar_url?: string | null };
 
+/**
+ * ADR-176: "linked" has its WOD; "missing" is the incomplete badge (a draft,
+ * or a series class from 00:00 on its day); "awaiting" is a series class on
+ * an earlier day.
+ */
+export type ClassWorkoutStatus = "linked" | "awaiting" | "missing";
+
 export type ScheduleSlot = {
   id: string;
-  master_workout_id: string;
+  /** Null until a WOD is linked (ADR-176). */
+  master_workout_id: string | null;
+  /** False for a draft: no WOD and not in a series, so members can't see it. */
+  published?: boolean;
+  workout_status?: ClassWorkoutStatus;
   class_series_id?: string | null;
   name: string;
   duration_minutes: number;
@@ -199,7 +210,8 @@ export type ScheduleWindow = {
 };
 
 export type ScheduleSlotPayload = {
-  master_workout_id: string;
+  /** Optional (ADR-176): a standalone class without one stays a draft. */
+  master_workout_id: string | null;
   class_type_id: string;
   name: string;
   duration_minutes: number;
@@ -360,6 +372,8 @@ export async function createScheduleSeries(
     auto_approve: boolean;
     booking_timeout_minutes: number;
     location_id?: string | null;
+    /** Optional (ADR-176): each occurrence can get its own WOD later. */
+    master_workout_id?: string | null;
   },
 ) {
   return apiRequest<{ series: { id: string; occurrence_count: number } }>(
@@ -373,6 +387,17 @@ export async function updateScheduleSlot(token: string, slotId: string, payload:
     method: "PATCH",
     token,
     body: payload,
+  });
+
+  return response.slot;
+}
+
+/** ADR-176: links a WOD to a class; publishes a draft. */
+export async function linkScheduleSlotWorkout(token: string, slotId: string, workoutId: string) {
+  const response = await apiRequest<{ slot: ScheduleSlot }>(`/admin/schedule/slots/${slotId}/workout`, {
+    method: "PUT",
+    token,
+    body: { master_workout_id: workoutId },
   });
 
   return response.slot;

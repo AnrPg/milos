@@ -56,9 +56,9 @@ defmodule Palee.Scheduling.ClassSeries do
       :booking_timeout_minutes,
       :status
     ])
+    # ADR-176: a series may run without a WOD; each occurrence gets its own.
     |> validate_required([
       :organization_id,
-      :master_workout_id,
       :class_type_id,
       :name,
       :duration_minutes,

@@ -893,6 +893,32 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-176: a class still without its WOD on its day.
+  def build("class_workout_missing", payload, localize) do
+    values = %{class: payload["class_name"] || "", when: payload["class_when"] || ""}
+
+    body =
+      cond do
+        payload["published"] in [false, "false"] ->
+          localize.(
+            "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it.",
+            values
+          )
+
+        payload["alert"] == "hour_before" ->
+          localize.("%{class} (%{when}) starts in an hour and still has no WOD.", values)
+
+        true ->
+          localize.("%{class} (%{when}) has no WOD yet. Link one before it starts.", values)
+      end
+
+    %{
+      title: localize.("A class has no WOD", %{}),
+      body: body,
+      url: payload["url"] || "/admin/schedule"
+    }
+  end
+
   def build("coaching_reply_overdue", payload, localize) do
     %{
       title: localize.("A client is waiting for a reply", %{}),

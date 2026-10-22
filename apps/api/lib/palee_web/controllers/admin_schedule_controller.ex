@@ -7,6 +7,7 @@ defmodule PaleeWeb.AdminScheduleController do
     CreateRecurringClassSeries,
     CreateScheduledSlot,
     DeleteScheduledSlot,
+    LinkClassWorkout,
     ResolveBooking,
     UpdateScheduledSlot
   }
@@ -24,6 +25,7 @@ defmodule PaleeWeb.AdminScheduleController do
               :create_slot,
               :create_series,
               :update_slot,
+              :link_workout,
               :approve_booking,
               :reject_booking
             ]
@@ -31,7 +33,9 @@ defmodule PaleeWeb.AdminScheduleController do
   @slot_body_schema %Schema{
     type: :object,
     properties: %{
-      master_workout_id: %Schema{type: :string, format: :uuid},
+      # ADR-176: optional. A class without a series and without a WOD is a
+      # draft members cannot see until a WOD is linked.
+      master_workout_id: %Schema{type: :string, format: :uuid, nullable: true},
       class_type_id: %Schema{type: :string, format: :uuid},
       location_id: %Schema{type: :string, format: :uuid, nullable: true},
       coach_user_id: %Schema{type: :string, format: :uuid, nullable: true},
@@ -43,7 +47,6 @@ defmodule PaleeWeb.AdminScheduleController do
       booking_timeout_minutes: %Schema{type: :integer}
     },
     required: [
-      :master_workout_id,
       :class_type_id,
       :scheduled_at,
       :capacity,
@@ -172,6 +175,37 @@ defmodule PaleeWeb.AdminScheduleController do
     ]
   )
 
+  operation(:link_workout,
+    summary: "Link a WOD to a class",
+    description:
+      "ADR-176: publishes a draft class (created without a WOD) or completes a series " <>
+        "occurrence. The WOD is filed in the day's Classes folder.",
+    parameters: [@id_param],
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            properties: %{master_workout_id: %Schema{type: :string, format: :uuid}},
+            required: [:master_workout_id]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Slot", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{slot: %Schema{type: :object, additionalProperties: true}},
+           required: [:slot]
+         }},
+      not_found: {"Class or workout not found", "application/json", @resolution_error}
+    ]
+  )
+
   operation(:delete_slot,
     summary: "Delete a scheduled class slot",
     parameters: [@id_param],
@@ -260,6 +294,16 @@ defmodule PaleeWeb.AdminScheduleController do
 
     with :ok <- valid_coach(conn.assigns.tenant_context, body),
          {:ok, slot} <- UpdateScheduledSlot.call(conn.assigns.tenant_context, id, body) do
+      json(conn, %{slot: slot})
+    end
+  end
+
+  def link_workout(conn, params) do
+    id = params["id"] || params[:id]
+    body = normalize_body_params(conn, params)
+    workout_id = body["master_workout_id"] || body[:master_workout_id]
+
+    with {:ok, slot} <- LinkClassWorkout.call(conn.assigns.tenant_context, id, workout_id) do
       json(conn, %{slot: slot})
     end
   end

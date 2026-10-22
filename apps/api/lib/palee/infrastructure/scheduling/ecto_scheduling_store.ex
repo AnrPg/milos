@@ -18,6 +18,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   alias Palee.Scheduling.Domain.{
     BookingOperationPolicy,
     ClassTypeArchivePolicy,
+    ClassWorkoutReadiness,
     RecurrenceRule
   }
 
@@ -255,6 +256,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         slot
         |> ScheduledClass.changeset(params)
         |> validate_capacity_not_below_approved(slot)
+        |> validate_booked_class_keeps_workout(slot)
         |> Repo.update()
         |> wrap_slot_result()
     end
@@ -409,6 +411,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     |> where([slot], slot.scheduled_at >= ^start_at and slot.scheduled_at < ^end_at)
     |> for_organization(organization_id)
     |> maybe_filter_class_types(class_type_ids)
+    |> maybe_include_drafts(opts[:include_drafts] == true)
     |> order_by([slot], asc: slot.scheduled_at)
     |> Repo.all()
     |> Repo.preload(@slot_preloads)
@@ -424,6 +427,20 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     |> for_organization(organization_id)
     |> Repo.all()
     |> Repo.preload(@slot_preloads)
+    |> Enum.map(&normalize_slot/1)
+  end
+
+  # ADR-176: classes still without a WOD that start in [from, to), for the
+  # missing-WOD alerts (served by the partial index on master_workout_id).
+  @impl true
+  def list_slots_missing_workout(%{organization_id: organization_id}, from, to) do
+    ScheduledClass
+    |> where([slot], is_nil(slot.master_workout_id))
+    |> where([slot], slot.scheduled_at >= ^from and slot.scheduled_at < ^to)
+    |> for_organization(organization_id)
+    |> order_by([slot], asc: slot.scheduled_at)
+    |> Repo.all()
+    |> Repo.preload([:class_type, :class_series])
     |> Enum.map(&normalize_slot/1)
   end
 
@@ -757,7 +774,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     |> Multi.run(:slot, fn repo, _changes ->
       case repo.get_by(ScheduledClass, id: slot_id, organization_id: organization_id) do
         nil -> {:error, :not_found}
-        slot -> {:ok, slot}
+        slot -> with :ok <- ClassWorkoutReadiness.ensure_published(slot), do: {:ok, slot}
       end
     end)
     |> Multi.insert(
@@ -788,8 +805,8 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       {:error, _step, %Ecto.Changeset{} = changeset, _changes} ->
         {:error, changeset}
 
-      {:error, :slot, :not_found, _changes} ->
-        {:error, :not_found}
+      {:error, :slot, reason, _changes} when reason in [:not_found, :class_not_published] ->
+        {:error, reason}
     end
   end
 
@@ -821,6 +838,9 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         is_nil(slot) ->
           Repo.rollback(:not_found)
 
+        not ClassWorkoutReadiness.published?(slot) ->
+          Repo.rollback(:class_not_published)
+
         approved_booking_count(organization_id, slot_id) >= slot.capacity ->
           Repo.rollback(:slot_full)
 
@@ -845,6 +865,7 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
       {:ok, booking} -> {:ok, booking |> preload_booking() |> normalize_booking()}
       {:error, :not_found} -> {:error, :not_found}
       {:error, :slot_full} -> {:error, :slot_full}
+      {:error, :class_not_published} -> {:error, :class_not_published}
       {:error, %Ecto.Changeset{} = changeset} -> {:error, changeset}
     end
   end
@@ -988,6 +1009,8 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
         |> where([slot], slot.id == ^slot_id and slot.organization_id == ^organization_id)
         |> lock("FOR UPDATE")
         |> Repo.one() || Repo.rollback(:not_found)
+
+      if not ClassWorkoutReadiness.published?(slot), do: Repo.rollback(:class_not_published)
 
       if approved_booking_count(organization_id, slot.id) < slot.capacity,
         do: Repo.rollback(:slot_not_full)
@@ -1299,6 +1322,14 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   defp maybe_filter_class_types(query, []), do: query
   defp maybe_filter_class_types(query, ids), do: where(query, [slot], slot.class_type_id in ^ids)
 
+  # ADR-176: drafts (no WOD, no series; see ClassWorkoutReadiness.published?/1)
+  # are left out unless a staff view asks for them, so a new member-facing
+  # caller can never show one by accident.
+  defp maybe_include_drafts(query, true), do: query
+
+  defp maybe_include_drafts(query, false),
+    do: where(query, [slot], not is_nil(slot.master_workout_id) or not is_nil(slot.class_series_id))
+
   defp maybe_include_archived(query, true), do: query
 
   defp maybe_include_archived(query, false),
@@ -1362,6 +1393,23 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
     else
       changeset
     end
+  end
+
+  # ADR-176: unlinking the WOD of a standalone class makes it a draft, which
+  # members cannot see; a class people already booked keeps a WOD.
+  defp validate_booked_class_keeps_workout(changeset, slot) do
+    draft? =
+      not ClassWorkoutReadiness.published?(%{
+        master_workout_id: Ecto.Changeset.get_field(changeset, :master_workout_id),
+        class_series_id: Ecto.Changeset.get_field(changeset, :class_series_id)
+      })
+
+    if draft? and Enum.any?(slot.bookings, &(&1.status in [:pending, :approved, :waitlisted])),
+      do:
+        Ecto.Changeset.add_error(changeset, :master_workout_id, "is required once people booked",
+          validation: :booked_class_needs_workout
+        ),
+      else: changeset
   end
 
   defp normalize_slot(nil), do: nil

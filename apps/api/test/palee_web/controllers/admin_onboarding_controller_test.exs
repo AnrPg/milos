@@ -42,7 +42,7 @@ defmodule PaleeWeb.AdminOnboardingControllerTest do
   test "a new organization sees an open checklist", context do
     checklist = context |> authed() |> get(path(context)) |> json_response(200)
 
-    assert checklist["total"] == 6
+    assert checklist["total"] == 7
     refute checklist["dismissed"]
     refute checklist["finished"]
 

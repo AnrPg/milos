@@ -109,6 +109,10 @@ defmodule Palee.Scheduling.SchedulingStore do
   def list_slots_by_ids(context, ids), do: tenant_call(context, :list_slots_by_ids, [ids])
 
   @impl true
+  def list_slots_missing_workout(context, from, to),
+    do: tenant_call(context, :list_slots_missing_workout, [from, to])
+
+  @impl true
   def list_member_slots(context, user_id, start_at, end_at),
     do: tenant_call(context, :list_member_slots, [user_id, start_at, end_at])
 

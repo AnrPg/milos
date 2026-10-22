@@ -101,6 +101,9 @@ defmodule Palee.Analytics.Domain.EventCatalog do
       {"scheduled_class",
        [:class_type_id, :master_workout_id, :capacity, :auto_approve, :series_id], nil},
     "class_series_created" => {"class_series", [:class_type_id, :master_workout_id], nil},
+    # ADR-176: a WOD linked to a class created without one.
+    "class_workout_linked" =>
+      {"scheduled_class", [:class_type_id, :master_workout_id, :class_series_id], nil},
     "class_slot_cancelled" => {"scheduled_class", [], nil},
     # Messaging
     "messaging_thread_created" => {"messaging_thread", [:context_type], :subject},

@@ -31,6 +31,7 @@ defmodule Palee.Scheduling.Ports.SchedulingStore do
   @callback get_slot(TenantContext.t(), Ecto.UUID.t()) :: map() | nil
   @callback list_slots_window(TenantContext.t(), DateTime.t(), DateTime.t(), keyword()) :: [map()]
   @callback list_slots_by_ids(TenantContext.t(), [Ecto.UUID.t()]) :: [map()]
+  @callback list_slots_missing_workout(TenantContext.t(), DateTime.t(), DateTime.t()) :: [map()]
   @callback list_member_slots(TenantContext.t(), Ecto.UUID.t(), DateTime.t(), DateTime.t()) :: [
               map()
             ]

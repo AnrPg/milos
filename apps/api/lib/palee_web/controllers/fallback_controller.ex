@@ -2174,6 +2174,10 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "The freeze exceeds the yearly freeze days"},
     freeze_already_cancelled: {:conflict, "The freeze is already cancelled"},
     slot_not_full: {:conflict, "The class still has free spots"},
+    # ADR-176: a draft class has no WOD yet.
+    class_not_published: {:conflict, "This class isn't open yet"},
+    invalid_time_zone: {:unprocessable_entity, "Choose a known time zone"},
+    time_zone_required: {:unprocessable_entity, "The gym's time zone must be set"},
     invalid_guest_name: {:unprocessable_entity, "Enter the guest's name"},
     guest_already_booked: {:conflict, "A guest is already booked for this class"},
     booking_not_waitlisted: {:conflict, "The booking is not on the waitlist"},

@@ -64,7 +64,11 @@ defmodule Palee.Application.GetCalendarFeed do
 
   defp do_class_events(context, user, start_at, end_at, locale) do
     slots =
-      Scheduling.get_calendar_week(context, %{start_at: start_at, end_at: end_at})
+      Scheduling.get_calendar_week(context, %{
+        start_at: start_at,
+        end_at: end_at,
+        include_drafts: organization_admin?(context)
+      })
       |> Enum.filter(&include_slot?(&1, user, organization_admin?(context)))
 
     if organization_admin?(context) do
