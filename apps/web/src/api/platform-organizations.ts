@@ -152,14 +152,6 @@ export function changePlatformOrganizationSettings(
   );
 }
 
-export function deletePlatformOrganization(token: string, organizationId: string) {
-  return apiRequest<void>(
-    `/platform/organizations/${organizationId}`,
-    { method: "DELETE", token },
-    false,
-  );
-}
-
 export function fetchPlatformOrganizationAccess(token: string, organizationId: string) {
   return apiRequest<PlatformOrganizationAccess>(`/platform/organizations/${organizationId}/access`, {
     token,

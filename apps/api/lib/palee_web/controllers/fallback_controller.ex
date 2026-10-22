@@ -269,6 +269,15 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "bad_request", error: "Required parameter is missing or invalid"})
   end
 
+  def call(conn, {:error, :organization_export_required}) do
+    conn
+    |> put_status(:conflict)
+    |> json(%{
+      code: "organization_export_required",
+      error: "Export the organization's data first: Delete permanently, then Export"
+    })
+  end
+
   def call(conn, {:error, :user_has_restricted_history}) do
     conn
     |> put_status(:conflict)

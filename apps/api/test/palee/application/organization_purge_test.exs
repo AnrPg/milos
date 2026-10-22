@@ -226,6 +226,22 @@ defmodule Palee.Application.OrganizationPurgeTest do
              GetOrganizationPurgeStatus.call(ctx.platform, org_id)
   end
 
+  test "an owner whose own logo change is in the audit log is purged with the tenant", ctx do
+    org_id = ctx.doomed.organization.id
+
+    # A tenant logo change records the owner as the event's actor.
+    Repo.insert!(%Palee.Organizations.OrganizationProvisioningEvent{
+      organization_id: org_id,
+      vendor_user_id: ctx.doomed.owner.id,
+      event: "organization_logo_uploaded",
+      metadata: %{"actor_scope" => "tenant"}
+    })
+
+    purge = approve!(ctx, org_id)
+    assert {:ok, %{status: :completed}} = ExecuteOrganizationPurge.call(ctx.platform, purge.id)
+    refute Identity.find_by_id(ctx.doomed.owner.id)
+  end
+
   test "re-running the purge is idempotent and resumes after a partial run", ctx do
     org_id = ctx.doomed.organization.id
     survivor_counts = tenant_row_counts(ctx.survivor.organization.id)

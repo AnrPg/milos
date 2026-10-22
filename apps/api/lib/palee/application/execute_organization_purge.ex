@@ -71,8 +71,14 @@ defmodule Palee.Application.ExecuteOrganizationPurge do
                purge.organization_id
              ),
            {:ok, avatar_objects} <- TenantObjectStorage.purge_user_objects(user_ids),
-           {:ok, deleted} <- delete_accounts(user_ids) do
-        {:ok, %{deleted_accounts: deleted, deleted_avatar_objects: avatar_objects}}
+           {:ok, deleted, blocked_by} <- delete_accounts(user_ids) do
+        {:ok,
+         %{
+           deleted_accounts: deleted,
+           kept_accounts: blocked_by |> Map.values() |> Enum.sum(),
+           kept_accounts_blocked_by: blocked_by,
+           deleted_avatar_objects: avatar_objects
+         }}
       end
     end)
     |> unwrap_step()
@@ -109,16 +115,27 @@ defmodule Palee.Application.ExecuteOrganizationPurge do
 
   defp unwrap_step({_continue, result}), do: result
 
+  # By now every record of this tenant is gone, so an account whose delete is
+  # still refused is needed by another organization's records (e.g. its
+  # retained accounting). It is kept, losing only its membership here with the
+  # organization row, rather than failing the purge. Kept accounts are counted
+  # by the record that holds them, so the vendor sees why.
   defp delete_accounts(user_ids) do
-    Enum.reduce_while(user_ids, {:ok, 0}, fn user_id, {:ok, deleted} ->
+    Enum.reduce_while(user_ids, {:ok, 0, %{}}, fn user_id, {:ok, deleted, blocked_by} ->
       case Identity.find_by_id(user_id) do
         nil ->
-          {:cont, {:ok, deleted}}
+          {:cont, {:ok, deleted, blocked_by}}
 
         user ->
           case Identity.delete_tenant_scoped_user(user) do
-            :ok -> {:cont, {:ok, deleted + 1}}
-            {:error, reason} -> {:halt, {:error, reason}}
+            :ok ->
+              {:cont, {:ok, deleted + 1, blocked_by}}
+
+            {:error, {:user_has_restricted_history, record}} ->
+              {:cont, {:ok, deleted, Map.update(blocked_by, record, 1, &(&1 + 1))}}
+
+            {:error, reason} ->
+              {:halt, {:error, reason}}
           end
       end
     end)

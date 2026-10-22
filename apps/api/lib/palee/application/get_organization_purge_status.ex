@@ -1,14 +1,15 @@
 defmodule Palee.Application.GetOrganizationPurgeStatus do
   @moduledoc """
-  Latest purge record for an organization plus, while the export is the
-  reviewable artifact (exported/approved), a short-lived signed download URL.
+  Latest purge record for an organization plus, while the export still exists
+  (from export until the purge's storage step removes it, including a failed
+  purge), a short-lived signed download URL.
   Works after completion too, because purge records outlive the tenant.
   """
 
   alias Palee.Application.TenantObjectStorage
   alias Palee.Organizations
 
-  @downloadable [:exported, :approved]
+  @downloadable [:exported, :approved, :purging, :failed]
 
   def call(platform_context, organization_id) do
     with {:ok, purge} <- Organizations.get_organization_purge(platform_context, organization_id),

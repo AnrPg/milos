@@ -3,6 +3,8 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
 
   import Ecto.Query
 
+  require Logger
+
   alias Palee.{
     Identity.Account,
     Identity.Domain.ProductTours,
@@ -56,8 +58,7 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
         {:error, reason}
     end
   rescue
-    _error in Ecto.ConstraintError ->
-      {:error, :user_has_restricted_history}
+    error in Ecto.ConstraintError -> restricted_history(error)
   end
 
   @impl true
@@ -73,9 +74,25 @@ defmodule Palee.Infrastructure.Identity.EctoUserStore do
         end
     end
   rescue
-    _error in Ecto.ConstraintError ->
-      {:error, :user_has_restricted_history}
+    error in Ecto.ConstraintError ->
+      {:error, :user_has_restricted_history} = restricted_history(error)
+      {:error, {:user_has_restricted_history, blocking_record(error.constraint)}}
   end
+
+  # Another record still needs the account (a RESTRICT reference). Name the
+  # constraint in the log so the blocker is findable without a database shell.
+  defp restricted_history(%Ecto.ConstraintError{constraint: constraint}) do
+    Logger.warning("account delete blocked by constraint #{constraint}")
+    {:error, :user_has_restricted_history}
+  end
+
+  # "finance_entitlement_usage_entries_membership_id_fkey" ->
+  # "finance_entitlement_usage_entries_membership_id": the table and column
+  # that still hold the account, without any personal data.
+  defp blocking_record(constraint) when is_binary(constraint),
+    do: String.replace_suffix(constraint, "_fkey", "")
+
+  defp blocking_record(_constraint), do: "unknown"
 
   @impl true
   def update_user_role(%Account{} = user, role), do: update_user_role(user.id, role)
