@@ -9,7 +9,7 @@ import { adminHref } from "@/lib/organization-slug";
 import { likelyScreens, staffNavItems } from "@/lib/role-navigation";
 
 /**
- * ADR-177: once the app is idle after sign-in, preload the screens the role
+ * ADR-178: once the app is idle after sign-in, preload the screens the role
  * most likely opens next (page payload and code), so a tap renders from the
  * client cache instead of waiting on the network. Renders nothing.
  */

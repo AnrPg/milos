@@ -62,7 +62,7 @@ type SessionExpiredState = {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
-// ADR-177: login and refresh return the user with the tokens, so opening the
+// ADR-178: login and refresh return the user with the tokens, so opening the
 // app needs no separate /auth/me round trip; registration still fetches it.
 function sessionUser(tokens: AuthTokens): Promise<CurrentUser> {
   return tokens.user ? Promise.resolve(tokens.user) : fetchCurrentUser(tokens.access_token);
