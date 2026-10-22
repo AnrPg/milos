@@ -14,8 +14,13 @@ test.use({
     ...(executablePath ? { executablePath } : {}),
     args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-dev-shm-usage"],
   },
+  // SwiftShader renders on the CPU: at the phone's 2.6x density the figure and
+  // its 24 thumbnails took more than three minutes on the CI runner. The
+  // checks below are about loading, picking and context sharing, not pixel
+  // density, so every project renders at 1x.
+  deviceScaleFactor: 1,
 });
-test.describe.configure({ timeout: 180_000 });
+test.describe.configure({ timeout: 300_000 });
 
 async function countWebglContexts(page: Page) {
   await page.addInitScript(() => {
