@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-import { fetchAdminWorkout } from "@/api/workouts";
+import { fetchAdminWorkout, fetchWorkoutAuthoringSettings, WOD_ASSISTANT_AVAILABILITY_KEY } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
@@ -12,9 +12,10 @@ import { useWorkoutCreationStore } from "@/stores/workout-creation";
 
 import { FreeTextWorkoutEditor } from "./FreeTextWorkoutEditor";
 import { QuickTextWorkoutEditor } from "./QuickTextWorkoutEditor";
+import { SectionedWorkoutEditor } from "./SectionedWorkoutEditor";
 import { WorkoutCreationCanvas } from "./WorkoutCreationCanvas";
 
-type AuthoringMode = "structured" | "quick-text" | "free-text";
+type AuthoringMode = "structured" | "quick-text" | "free-text" | "sectioned";
 
 /**
  * Free text is the only way to create new workouts. Structured and Quick Text
@@ -43,12 +44,33 @@ export function WorkoutAuthoringModes() {
     queryFn: () => fetchAdminWorkout(tokens!.access_token, draftId!),
     staleTime: Infinity,
   });
-  const mode: AuthoringMode = SHOW_AUTHORING_MODE_SWITCHER
+  // ADR-179: the gym may switch the WOD assistant off; then every workout is
+  // written in text sections. With it on, the coach can still switch it off
+  // for one workout (the editor's «AI assistant» switch).
+  const availability = useQuery({
+    queryKey: WOD_ASSISTANT_AVAILABILITY_KEY,
+    enabled: Boolean(tokens?.access_token),
+    queryFn: () => fetchWorkoutAuthoringSettings(tokens!.access_token),
+    staleTime: 60_000,
+  });
+  const assistantAvailable = availability.data?.wod_assistant_enabled !== false;
+  // The coach's switch for this visit, keyed by draft so another draft starts fresh.
+  const [assistantChoice, setAssistantChoice] = useState<{ draftId: string | null; useAssistant: boolean } | null>(null);
+  const storedMode: AuthoringMode = SHOW_AUTHORING_MODE_SWITCHER
     ? switcherMode
     : draftId
       ? legacyEditorFor(draftQuery.data)
       : "free-text";
-  const resolvingDraft = !SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId) && draftQuery.isPending;
+  const textMode = storedMode === "free-text" || storedMode === "sectioned";
+  const chosen =
+    assistantChoice && (assistantChoice.draftId === draftId || assistantChoice.draftId === null)
+      ? assistantChoice.useAssistant
+        ? "free-text"
+        : "sectioned"
+      : storedMode;
+  const mode: AuthoringMode = textMode && !assistantAvailable ? "sectioned" : textMode ? chosen : storedMode;
+  const resolvingDraft =
+    (!SHOW_AUTHORING_MODE_SWITCHER && Boolean(draftId) && draftQuery.isPending) || availability.isLoading;
 
   // New workouts started from inside a library folder are created in that folder.
   const folderId = searchParams.get("folder");
@@ -170,9 +192,23 @@ export function WorkoutAuthoringModes() {
           />
         ) : mode === "free-text" ? (
           <FreeTextWorkoutEditor
+            key="free-text"
             draftId={draftId}
             folderId={folderId}
             onDraftReady={(id) => selectMode("free-text", id)}
+            onUseSections={() => setAssistantChoice({ draftId, useAssistant: false })}
+          />
+        ) : mode === "sectioned" ? (
+          <SectionedWorkoutEditor
+            key="sectioned"
+            draftId={draftId}
+            folderId={folderId}
+            onDraftReady={(id) => {
+              setAssistantChoice((current) => (current && current.draftId === null ? { ...current, draftId: id } : current));
+              selectMode("free-text", id);
+            }}
+            assistantAvailable={assistantAvailable}
+            onUseAssistant={() => setAssistantChoice({ draftId, useAssistant: true })}
           />
         ) : (
           <WorkoutCreationCanvas />
@@ -185,6 +221,7 @@ export function WorkoutAuthoringModes() {
 function legacyEditorFor(workout: Awaited<ReturnType<typeof fetchAdminWorkout>> | undefined): AuthoringMode {
   if (!workout) return "free-text";
   if (workout.authoring_mode === "quick_text") return "quick-text";
+  if (workout.authoring_mode === "sectioned_text") return "sectioned";
   // New drafts default to "structured" before their first save; only drafts
   // that already hold structured sections need the structured canvas.
   const draftSections = (workout.draft_data as { sections?: unknown[] } | null | undefined)?.sections;

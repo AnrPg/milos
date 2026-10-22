@@ -87,16 +87,24 @@ defmodule Palee.Application.ClassTimerView do
         TimerPresets.build(preset)
 
       nil ->
-        structured =
-          if workout && Map.get(workout, :authoring_mode) != "free_text",
-            do: Execution.build_timer_sequence(workout),
-            else: []
+        workout_segments(workout && Map.get(workout, :authoring_mode), workout)
+    end
+  end
 
-        case {structured, TimerPresets.parse(workout_preset(workout))} do
-          {[_ | _], _preset} -> structured
-          {[], %{} = preset} -> TimerPresets.build(preset)
-          {[], nil} -> []
-        end
+  # ADR-179: a workout written in text sections runs each section's own timer.
+  defp workout_segments("sectioned_text", workout),
+    do: TimerPresets.build_sections(Map.get(workout, :sections) || [])
+
+  defp workout_segments(mode, workout) do
+    structured =
+      if workout && mode != "free_text",
+        do: Execution.build_timer_sequence(workout),
+        else: []
+
+    case {structured, TimerPresets.parse(workout_preset(workout))} do
+      {[_ | _], _preset} -> structured
+      {[], %{} = preset} -> TimerPresets.build(preset)
+      {[], nil} -> []
     end
   end
 

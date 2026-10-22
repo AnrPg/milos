@@ -14,6 +14,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     Workouts.AssignedWorkout,
     Workouts.AssignedWorkoutAthlete,
     Workouts.Domain.AssignmentAudiencePolicy,
+    Workouts.Domain.SectionedText,
     Workouts.Domain.WorkoutAuthoring,
     Workouts.Domain.WorkoutContent,
     Workouts.Domain.WorkoutMaterializer,
@@ -1410,6 +1411,7 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
   defp publish_locked_workout(workout, params) do
     with :ok <- validate_expected_revision(workout, params),
          merged_params <- merge_publish_params(workout, params),
+         {:ok, merged_params} <- prepare_authoring_mode(merged_params),
          {:ok, prepared_params} <- prepare_workout_structure(merged_params),
          prepared_params <- stringify_keys_deep(prepared_params),
          :ok <- validate_publish_body(prepared_params),
@@ -1432,6 +1434,16 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     |> Map.merge(stringify_keys_deep(extract_dsl_authoring_fields(params)))
     |> stringify_keys_deep()
   end
+
+  # ADR-179: a sectioned workout is validated and its body composed up front;
+  # every other mode passes through unchanged.
+  defp prepare_authoring_mode(params) do
+    if SectionedText.sectioned?(params),
+      do: SectionedText.prepare_publish(params),
+      else: {:ok, params}
+  end
+
+  defp validate_publish_body(%{"authoring_mode" => "sectioned_text"}), do: :ok
 
   defp validate_publish_body(%{"authoring_mode" => "free_text"} = params) do
     body = Map.get(params, "free_text_body")
@@ -1535,6 +1547,9 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
           ),
         rest_before_next_section_seconds: section.rest_before_next_section_seconds,
         section_metadata: section.section_metadata,
+        free_text_body: section.free_text_body,
+        free_text_document: section.free_text_document,
+        timer_preset: section.timer_preset,
         exercises:
           section.exercises
           |> Enum.sort_by(& &1.order)
@@ -1900,6 +1915,9 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
         "scoreable" => section.scoreable,
         "timer_config" => section.timer_config,
         "score_config" => section.score_config,
+        "free_text_body" => section.free_text_body,
+        "free_text_document" => section.free_text_document,
+        "timer_preset" => section.timer_preset,
         "exercises" =>
           section.exercises
           |> Enum.sort_by(& &1.order)

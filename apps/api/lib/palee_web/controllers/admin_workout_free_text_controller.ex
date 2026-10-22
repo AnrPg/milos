@@ -3,6 +3,7 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
   use OpenApiSpex.ControllerSpecs
 
   alias Palee.Application.AnalyzeFreeTextWorkout
+  alias Palee.Organizations
   alias OpenApiSpex.{MediaType, RequestBody, Schema}
 
   tags(["Admin Workouts"])
@@ -144,9 +145,36 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
       unprocessable_entity: {"Invalid text", "application/json", @error_schema},
       failed_dependency:
         {"Assistant unavailable, out of credits or unclear", "application/json", @error_schema},
+      forbidden: {"The gym switched the assistant off", "application/json", @error_schema},
       service_unavailable: {"Assistant not configured", "application/json", @error_schema}
     ]
   )
+
+  operation(:authoring_settings,
+    summary: "What the workout editor may offer in this gym (ADR-179)",
+    responses: [
+      ok:
+        {"Authoring settings", "application/json",
+         %Schema{
+           title: "WorkoutAuthoringSettings",
+           type: :object,
+           properties: %{
+             wod_assistant_enabled: %Schema{
+               type: :boolean,
+               description:
+                 "Off: no assistant; workouts are written in text sections with a timer each"
+             }
+           },
+           required: [:wod_assistant_enabled]
+         }}
+    ]
+  )
+
+  def authoring_settings(conn, _params) do
+    json(conn, %{
+      wod_assistant_enabled: Organizations.wod_assistant_enabled?(conn.assigns.tenant_context)
+    })
+  end
 
   def analyze(conn, _params) do
     case AnalyzeFreeTextWorkout.call(conn.assigns.tenant_context, conn.body_params) do
@@ -165,6 +193,9 @@ defmodule PaleeWeb.AdminWorkoutFreeTextController do
 
         :text_too_long ->
           {:unprocessable_entity, "text_too_long", "The workout text is too long to analyze"}
+
+        :assistant_disabled ->
+          {:forbidden, "assistant_disabled", "The workout assistant is switched off for this gym"}
 
         :analyzer_not_configured ->
           {:service_unavailable, "analyzer_not_configured", "The workout assistant is not set up"}

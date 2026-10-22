@@ -3,7 +3,8 @@ defmodule Palee.Organizations do
     BrandLogoPolicy,
     Provider,
     TenantAuthorization,
-    TimeZonePolicy
+    TimeZonePolicy,
+    WorkoutSettingsPolicy
   }
 
   alias Palee.Organizations.OrganizationStore
@@ -386,6 +387,10 @@ defmodule Palee.Organizations do
   @doc "ADR-163: the gym's workout-authoring defaults (any staff member may read them)."
   def get_workout_settings(context),
     do: Palee.Organizations.Queries.GetWorkoutSettings.call(context)
+
+  @doc "ADR-179: whether the gym lets coaches use the WOD assistant (on by default)."
+  def wod_assistant_enabled?(context),
+    do: context |> get_workout_settings() |> WorkoutSettingsPolicy.wod_assistant_enabled?()
 
   def update_workout_settings(context, params),
     do: Palee.Organizations.Commands.UpdateWorkoutSettings.call(context, params)

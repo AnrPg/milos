@@ -110,6 +110,7 @@ defmodule Palee.Workouts do
     as: :for_scale
 
   def supported_workout_types, do: WorkoutType.values()
+  def authoring_modes, do: Palee.Workouts.MasterWorkout.authoring_modes()
   def parse_dsl(source), do: WorkoutDsl.parse(source)
   def normalize_timer_config(config), do: TimerConfig.normalize(config)
   def format_dsl(workout, opts \\ []), do: WorkoutDsl.format(workout, opts)

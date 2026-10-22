@@ -114,6 +114,37 @@ defmodule Palee.Execution.Domain.TimerPresets do
 
   def build(_preset), do: [segment(0, %{format: "untimed", kind: :countup})]
 
+  @doc """
+  ADR-179: the segments of a workout written in text sections: each
+  section's own preset, in order, keyed and named by its section. Sections
+  without a valid preset are skipped.
+  """
+  def build_sections(sections) when is_list(sections) do
+    sections
+    |> Enum.with_index()
+    |> Enum.flat_map(fn {section, section_index} ->
+      case parse(value(section, :timer_preset)) do
+        nil ->
+          []
+
+        preset ->
+          preset
+          |> build()
+          |> Enum.with_index()
+          |> Enum.map(fn {segment, index} ->
+            %{
+              segment
+              | segment_key: "text-section:#{section_index}:#{index}",
+                section_id: value(section, :id) || "text-section-#{section_index}",
+                section_name: value(section, :name) || ""
+            }
+          end)
+      end
+    end)
+  end
+
+  def build_sections(_sections), do: []
+
   defp segment(index, attrs) do
     Map.merge(
       %{

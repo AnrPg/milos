@@ -34,4 +34,24 @@ defmodule Palee.Execution.Domain.TimerPresetsTest do
     assert %{"duration_seconds" => nil} =
              TimerPresets.parse(%{"format" => "amrap", "duration_seconds" => -3})
   end
+
+  test "ADR-179: chains each text section's timer, keyed and named by its section" do
+    segments =
+      TimerPresets.build_sections([
+        %{
+          id: "a",
+          name: "Strength",
+          timer_preset: %{"format" => "amrap", "duration_seconds" => 300}
+        },
+        %{id: "b", name: "Skip me", timer_preset: nil},
+        %{"id" => "c", "name" => "Finisher", "timer_preset" => %{"format" => "tabata"}}
+      ])
+
+    assert [%{section_id: "a", section_name: "Strength", segment_key: "text-section:0:0"} | rest] =
+             segments
+
+    assert length(rest) == 15
+    assert Enum.all?(rest, &(&1.section_id == "c" and &1.section_name == "Finisher"))
+    assert segments |> Enum.map(& &1.segment_key) |> Enum.uniq() |> length() == 16
+  end
 end

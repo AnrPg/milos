@@ -34,7 +34,9 @@ defmodule Palee.Workouts.Domain.WorkoutAuthoringMetadata do
       "auto_advance" => :boolean,
       "recovery_condition" => :short_string,
       "target_condition" => :short_string,
-      "score_label" => :short_string
+      "score_label" => :short_string,
+      # ADR-179: a text section the coach left without a title.
+      "untitled" => :boolean
     },
     exercise: %{
       "distance_meters" => :positive_number,

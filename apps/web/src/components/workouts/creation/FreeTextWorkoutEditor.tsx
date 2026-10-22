@@ -54,6 +54,9 @@ import { getFormatLabels, type WorkoutType } from "@/types/workout";
 
 import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel";
 
+import { editorSectionsFrom, SECTIONED_TEXT_MODE, sectionsToFreeText } from "@/lib/text-sections";
+
+import { AssistantSwitch } from "./AssistantSwitch";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 import { FreeTextAnalysisPanel, type AnalysisStatus } from "./FreeTextAnalysisPanel";
@@ -63,6 +66,8 @@ type Props = {
   draftId: string | null;
   folderId?: string | null;
   onDraftReady: (id: string) => void;
+  /** ADR-179: switch this workout off the assistant, to text sections (the draft is saved first). */
+  onUseSections?: () => void;
 };
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -78,7 +83,7 @@ const WORKOUT_TYPES: WorkoutType[] = [
   "recovery",
 ];
 
-export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }: Props) {
+export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, onUseSections }: Props) {
   const i18n = useUiTranslations();
   const assistantT = useTranslations("WorkoutAssistant");
   const goalsT = useTranslations("WodGoals");
@@ -185,12 +190,16 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
           setReview(storedReview);
           setAnalysisStatus("ready");
         }
-        const nextBody = workout.free_text_body ?? "";
         metadataRef.current = workout.workout_metadata ?? {};
         setTimerPreset(parseFreeTextTimerPreset(metadataRef.current[FREE_TEXT_TIMER_METADATA_KEY]));
         revisionRef.current = workout.dsl_source_revision ?? 0;
+        // ADR-179: a workout written in sections comes back as one text, a
+        // heading per titled section; the assistant reads its timers from it.
+        const fromSections =
+          workout.authoring_mode === SECTIONED_TEXT_MODE ? sectionsToFreeText(editorSectionsFrom(workout, null)) : null;
+        const nextBody = fromSections?.body ?? workout.free_text_body ?? "";
         setBody(nextBody);
-        editor.commands.setContent(workout.free_text_document ?? textToDocument(nextBody));
+        editor.commands.setContent(fromSections?.document ?? workout.free_text_document ?? textToDocument(nextBody));
         setHtml(editor.getHTML());
       })
       .catch(() => {
@@ -403,8 +412,20 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady }
                   {i18n("freeTextDescription")}
                 </p>
               </div>
-              <div className="text-end text-xs font-semibold" style={{ color: "var(--muted)" }}>
-                {saveStatusText(saveStatus, i18n)}
+              <div className="flex flex-col items-end gap-1">
+                {onUseSections ? (
+                  <AssistantSwitch
+                    enabled
+                    available
+                    onChange={(enabled) => {
+                      if (enabled) return;
+                      void saveDraft().then(onUseSections);
+                    }}
+                  />
+                ) : null}
+                <div className="text-end text-xs font-semibold" style={{ color: "var(--muted)" }}>
+                  {saveStatusText(saveStatus, i18n)}
+                </div>
               </div>
             </div>
           </header>

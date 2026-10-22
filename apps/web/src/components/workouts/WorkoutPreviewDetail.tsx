@@ -11,6 +11,7 @@ import { useState, type CSSProperties, type ReactNode } from "react";
 
 import { scaleLevelVar, translucent } from "@/lib/theme";
 import { hasStructuredContent } from "@/lib/workout-execution-mode";
+import type { WorkoutAuthoringMode } from "@/api/workouts";
 import { ExerciseContent, WorkoutContentBlock, type WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 
 export type PreviewExercise = {
@@ -92,7 +93,7 @@ type Props = {
   initiallyExpanded?: boolean;
   activeScaleOverride?: string | null;
   hideScaleChips?: boolean;
-  authoringMode?: "structured" | "quick_text" | "free_text";
+  authoringMode?: WorkoutAuthoringMode;
   freeTextBody?: string | null;
   freeTextDocument?: Record<string, unknown> | null;
 };
@@ -486,8 +487,9 @@ export function WorkoutPreviewDetail({
   const [sectionScales, setSectionScales] = useState<Record<string, string | null>>({});
 
   // Free text is how coaches write; everyone reads the structured workout. The
-  // text is shown only for free-text workouts that have no structure.
-  if (authoringMode === "free_text" && !hasStructuredContent(sections)) {
+  // text is shown only for free-text workouts that have no structure, and for
+  // workouts written in text sections (ADR-179: their text holds every section).
+  if ((authoringMode === "free_text" && !hasStructuredContent(sections)) || authoringMode === "sectioned_text") {
     const richContent = renderFreeTextDocument(freeTextDocument);
 
     return (

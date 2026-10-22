@@ -82,4 +82,57 @@ describe("FreeTextExecutionMode", () => {
       expect(typeof payload.kpi_counters.first_started_at_ms).toBe("number");
     });
   });
+
+  describe("ADR-179: a workout written in text sections", () => {
+    beforeEach(() => {
+      window.sessionStorage.clear();
+      storeFreeTextExecutionWorkout(
+        {
+          id: "workout-1",
+          title: "Sectioned",
+          free_text_body: "Strength\nBack squat\n\nFran",
+          authoring_mode: "sectioned_text",
+          sections: [
+            { id: "s1", name: "Strength", free_text_body: "Back squat 5x5", timer_preset: { format: "amrap", duration_seconds: 300 } },
+            {
+              id: "s2",
+              name: "2",
+              section_metadata: { untitled: true },
+              free_text_body: "21-15-9 thrusters",
+              timer_preset: { format: "tabata" },
+            },
+          ],
+        },
+        { id: "execution-1", source: "self_selected" },
+      );
+    });
+
+    it("runs each section's own timer and waits for Start before the next", async () => {
+      render(<FreeTextExecutionMode />);
+
+      // No preset chooser: the coach picked this section's timer.
+      expect(screen.queryByRole("button", { name: "timerPreset_tabata" })).not.toBeInTheDocument();
+      expect(screen.getByRole("timer")).toHaveTextContent("5:00");
+      expect(screen.getByRole("list", { name: "textSectionsLabel" }).children).toHaveLength(2);
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "startTimerLabel" }));
+      });
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "textSectionComplete" }));
+      });
+
+      // Section 2 is up next with its own timer, and does not start on its own.
+      expect(screen.getByText("textSectionUpNext")).toBeInTheDocument();
+      expect(screen.getByRole("timer")).toHaveTextContent("0:20");
+      expect(screen.getByRole("button", { name: "startTimerLabel" })).toBeInTheDocument();
+      expect(screen.queryByRole("button", { name: "textSectionComplete" })).not.toBeInTheDocument();
+
+      await act(async () => {
+        fireEvent.click(screen.getByRole("button", { name: "startTimerLabel" }));
+      });
+      // The last section's button finishes the workout.
+      expect(screen.getAllByRole("button", { name: "finishb74bdee" }).length).toBeGreaterThan(0);
+    });
+  });
 });

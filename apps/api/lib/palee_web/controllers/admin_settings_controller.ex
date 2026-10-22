@@ -118,11 +118,20 @@ defmodule PaleeWeb.AdminSettingsController do
       "ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own"
   }
 
+  @wod_assistant_enabled_schema %Schema{
+    type: :boolean,
+    description:
+      "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each"
+  }
+
   @workout_settings_schema %Schema{
     type: :object,
     description: "ADR-163: workout-authoring defaults",
-    properties: %{wod_goals_visible_by_default: @wod_goals_visible_by_default_schema},
-    required: [:wod_goals_visible_by_default]
+    properties: %{
+      wod_goals_visible_by_default: @wod_goals_visible_by_default_schema,
+      wod_assistant_enabled: @wod_assistant_enabled_schema
+    },
+    required: [:wod_goals_visible_by_default, :wod_assistant_enabled]
   }
 
   @time_zone_schema %Schema{
@@ -222,7 +231,10 @@ defmodule PaleeWeb.AdminSettingsController do
       },
       workouts: %Schema{
         type: :object,
-        properties: %{wod_goals_visible_by_default: @wod_goals_visible_by_default_schema},
+        properties: %{
+          wod_goals_visible_by_default: @wod_goals_visible_by_default_schema,
+          wod_assistant_enabled: @wod_assistant_enabled_schema
+        },
         required: []
       },
       provider: %Schema{
