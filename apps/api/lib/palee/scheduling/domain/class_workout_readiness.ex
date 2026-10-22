@@ -18,6 +18,8 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadiness do
   sweep never sends a stale morning alert after the hour-before one.
   """
 
+  alias Palee.TimeZones.ZonedTime
+
   @morning ~T[07:00:00]
   @hour_before_minutes 60
 
@@ -57,10 +59,18 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadiness do
   @spec workout_status(slot(), DateTime.t(), String.t()) :: workout_status()
   def workout_status(slot, %DateTime{} = now, zone) do
     cond do
-      linked?(slot) -> :linked
-      not published?(slot) -> :missing
-      Date.compare(local_date(now, zone), local_date(slot.scheduled_at, zone)) != :lt -> :missing
-      true -> :awaiting
+      linked?(slot) ->
+        :linked
+
+      not published?(slot) ->
+        :missing
+
+      Date.compare(ZonedTime.local_date(now, zone), ZonedTime.local_date(slot.scheduled_at, zone)) !=
+          :lt ->
+        :missing
+
+      true ->
+        :awaiting
     end
   end
 
@@ -73,15 +83,9 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadiness do
   def alert_moments(%{scheduled_at: %DateTime{} = starts_at}, zone) do
     hour_before = DateTime.add(starts_at, -@hour_before_minutes, :minute)
 
-    morning =
-      case DateTime.new(local_date(starts_at, zone), @morning, zone) do
-        {:ok, at} -> DateTime.shift_zone!(at, "Etc/UTC")
-        {:ambiguous, first, _second} -> DateTime.shift_zone!(first, "Etc/UTC")
-        {:gap, _before, after_gap} -> DateTime.shift_zone!(after_gap, "Etc/UTC")
-        {:error, _reason} -> nil
-      end
+    morning = ZonedTime.to_utc(ZonedTime.local_date(starts_at, zone), @morning, zone)
 
-    if morning && DateTime.compare(morning, hour_before) == :lt,
+    if DateTime.compare(morning, hour_before) == :lt,
       do: [{:morning, morning}, {:hour_before, hour_before}],
       else: [{:hour_before, hour_before}]
   end
@@ -107,11 +111,4 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadiness do
   day before it starts.
   """
   def alert_horizon_hours, do: 24
-
-  defp local_date(%DateTime{} = at, zone) do
-    case DateTime.shift_zone(at, zone) do
-      {:ok, local} -> DateTime.to_date(local)
-      {:error, _reason} -> DateTime.to_date(at)
-    end
-  end
 end

@@ -474,6 +474,8 @@ defmodule PaleeWeb.PlatformOrganizationController do
     %{
       organization_id: settings.organization_id,
       timezone: settings.timezone,
+      # ADR-177: "confirmed", "inferred" or nil; the console flags the rest.
+      timezone_source: Map.get(settings, :timezone_source),
       default_locale: settings.default_locale,
       invitation_lifetime_seconds: settings.invitation_lifetime_seconds,
       brand_name: settings.brand_name,

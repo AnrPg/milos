@@ -17,6 +17,22 @@ defmodule Palee.Identity do
   defdelegate regenerate_calendar_feed_token(user), to: UserStore
   defdelegate update_profile(user_id, params), to: UserStore
   defdelegate update_avatar(user_id, avatar_url), to: UserStore
+  defdelegate update_time_zone(user_id, time_zone), to: UserStore
+
+  @doc """
+  ADR-177: the clock a person's own days follow (streaks, progress, "today"
+  in their logs): the zone their device last reported, else the default.
+  """
+  def time_zone(%{time_zone: zone}), do: Palee.TimeZones.ZonedTime.or_default(zone)
+  def time_zone(_account), do: Palee.TimeZones.ZonedTime.default_zone()
+
+  @doc "ADR-177: the person's local date now."
+  def local_today(user_id, now \\ DateTime.utc_now())
+
+  def local_today(user_id, now) when is_binary(user_id),
+    do: Palee.TimeZones.ZonedTime.local_date(now, time_zone(find_by_id(user_id)))
+
+  def local_today(_user_id, now), do: Palee.TimeZones.ZonedTime.local_date(now, time_zone(nil))
   defdelegate mark_tour_completed(user_id, audience), to: UserStore
   defdelegate search_users(query), to: UserStore
   defdelegate count_by_role(role), to: UserStore

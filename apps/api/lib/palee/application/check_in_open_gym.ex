@@ -12,7 +12,7 @@ defmodule Palee.Application.CheckInOpenGym do
   παρ' όλα αυτά» at the desk) records the visit without touching the package.
   """
 
-  alias Palee.{Facility, Finance, Identity}
+  alias Palee.{Facility, Finance, Identity, Organizations}
   alias Palee.Facility.Domain.CheckInPolicy
   alias Palee.Workers.FinalizeScanCheckInJob
 
@@ -149,11 +149,9 @@ defmodule Palee.Application.CheckInOpenGym do
   defp reservation_id(%{id: id}), do: id
   defp reservation_id(_reservation), do: nil
 
-  defp timezone(context) do
-    context
-    |> Finance.get_finance_settings()
-    |> Map.get(:entitlement_timezone)
-  end
+  # ADR-177: entitlement days follow the gym's own zone (one clock per gym).
+  defp timezone(%{organization_id: organization_id}),
+    do: Organizations.organization_timezone(organization_id)
 
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(value), do: value

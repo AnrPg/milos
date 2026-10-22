@@ -599,3 +599,7 @@ msgstr "Το %{class} (%{when}) ξεκινά σε μία ώρα και ακόμ�
 msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
 msgstr "Το %{class} (%{when}) δεν έχει ακόμη WOD. Σύνδεσε ένα πριν ξεκινήσει."
 
+
+# ADR-177: a moment on the organiser's clock, then on the reader's when theirs differs.
+msgid "%{time} %{zone} · %{local} your time"
+msgstr "%{time} %{zone} · %{local} δική σου ώρα"

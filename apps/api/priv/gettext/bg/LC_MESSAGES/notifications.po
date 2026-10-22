@@ -599,3 +599,7 @@ msgstr "%{class} (%{when}) започва след час и все още ня�
 msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
 msgstr "%{class} (%{when}) все още няма WOD. Свържи WOD, преди да започне."
 
+
+# ADR-177: a moment on the organiser's clock, then on the reader's when theirs differs.
+msgid "%{time} %{zone} · %{local} your time"
+msgstr "%{time} %{zone} · %{local} твое време"

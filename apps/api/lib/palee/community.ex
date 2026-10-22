@@ -201,6 +201,9 @@ defmodule Palee.Community do
 
   def event_capability, do: EventPolicy.capability()
   def event_editable_fields, do: Palee.Community.Event.editable_fields()
+
+  @doc "ADR-177: the clock an event is planned on: its own zone, else its gym's."
+  def event_time_zone(event, gym_zone), do: Palee.Community.Event.time_zone(event, gym_zone)
   def event_scopes, do: EventPolicy.scopes()
   def event_reminder_minutes, do: EventPolicy.reminder_minutes()
   def event_conversion_days, do: EventPolicy.conversion_days()

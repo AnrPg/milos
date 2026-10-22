@@ -38,6 +38,7 @@ defmodule Palee.Application.Trials do
     Trials
   }
 
+  alias Palee.TimeZones.ZonedTime
   alias Palee.Trials.TrialRequest
 
   @stages ~w(requests upcoming visited joined)
@@ -648,17 +649,25 @@ defmodule Palee.Application.Trials do
     box = box(context.organization_id)
     policy = Trials.policy(context)
     locations = locations_by_id(context)
+    zone = Organizations.organization_timezone(context.organization_id)
 
     requests
     |> Enum.filter(&visible_to_person?(&1, now))
-    |> Enum.map(&present_mine_row(&1, slots[&1.scheduled_class_id], box, policy, locations, now))
+    |> Enum.map(
+      &(&1
+        |> present_mine_row(slots[&1.scheduled_class_id], box, policy, locations, now)
+        |> Map.put(:time_zone, zone))
+    )
   end
 
   defp present_mine(context, request, box \\ nil) do
     slot = Scheduling.get_slot(context, request.scheduled_class_id)
     box = box || box(context.organization_id)
     policy = Trials.policy(context)
-    present_mine_row(request, slot, box, policy, locations_by_id(context), DateTime.utc_now())
+
+    request
+    |> present_mine_row(slot, box, policy, locations_by_id(context), DateTime.utc_now())
+    |> Map.put(:time_zone, Organizations.organization_timezone(context.organization_id))
   end
 
   defp present_mine_row(request, slot, box, policy, locations, now) do
@@ -760,32 +769,12 @@ defmodule Palee.Application.Trials do
   @doc false
   def class_when(nil, _organization_id), do: nil
 
-  def class_when(at, organization_id) do
-    zone = Organizations.organization_timezone(organization_id)
-
-    case DateTime.shift_zone(at, zone) do
-      {:ok, local} -> Calendar.strftime(local, "%d/%m %H:%M")
-      {:error, _reason} -> Calendar.strftime(at, "%d/%m %H:%M UTC")
-    end
-  end
+  def class_when(at, organization_id),
+    do: ZonedTime.format(at, Organizations.organization_timezone(organization_id))
 
   # The follow-up goes out at 10:00 (box time) the day after the class.
-  defp next_morning(at, zone) do
-    local =
-      case DateTime.shift_zone(at, zone) do
-        {:ok, local} -> local
-        {:error, _reason} -> at
-      end
-
-    date = local |> DateTime.to_date() |> Date.add(1)
-
-    case DateTime.new(date, ~T[10:00:00], zone) do
-      {:ok, morning} -> DateTime.shift_zone!(morning, "Etc/UTC")
-      {:gap, _before, after_gap} -> DateTime.shift_zone!(after_gap, "Etc/UTC")
-      {:ambiguous, first, _second} -> DateTime.shift_zone!(first, "Etc/UTC")
-      {:error, _reason} -> DateTime.add(at, 18, :hour)
-    end
-  end
+  defp next_morning(at, zone),
+    do: ZonedTime.to_utc(at |> ZonedTime.local_date(zone) |> Date.add(1), ~T[10:00:00], zone)
 
   # -- small helpers
 

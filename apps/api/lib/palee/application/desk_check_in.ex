@@ -260,7 +260,7 @@ defmodule Palee.Application.DeskCheckIn do
   defp day_bounds(date, zone) when is_binary(date) do
     case Date.from_iso8601(date) do
       {:ok, date} -> day_bounds(date, zone)
-      _invalid -> day_bounds(Date.utc_today(), zone)
+      _invalid -> day_bounds(Palee.TimeZones.ZonedTime.local_date(DateTime.utc_now(), zone), zone)
     end
   end
 

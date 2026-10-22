@@ -2,9 +2,14 @@ defmodule Palee.Application.GetScheduleCalendar do
   alias Palee.{Community, Facility, Finance, Identity, Organizations, Scheduling, Workouts}
   alias Palee.Application.BookingTerms
   alias Palee.Scheduling.Domain.BookingPolicy
+  alias Palee.TimeZones.ZonedTime
 
-  def call(context, actor, params) do
-    with {:ok, start_at, end_at, days, class_type_ids} <- normalize_window(params) do
+  def call(%{organization_id: organization_id} = context, actor, params)
+      when is_binary(organization_id) do
+    # ADR-177: a window given as dates covers the gym's own days.
+    zone = Organizations.organization_timezone(organization_id)
+
+    with {:ok, start_at, end_at, days, class_type_ids} <- normalize_window(params, zone) do
       slots =
         get_calendar_week(context, %{
           start_at: start_at,
@@ -23,8 +28,8 @@ defmodule Palee.Application.GetScheduleCalendar do
 
       {:ok,
        %{
-         start_date: DateTime.to_date(start_at),
-         end_date: DateTime.to_date(DateTime.add(end_at, -1, :second)),
+         start_date: ZonedTime.local_date(start_at, zone),
+         end_date: ZonedTime.local_date(DateTime.add(end_at, -1, :second), zone),
          days: days,
          class_types: class_types,
          locations: Facility.list_locations(context, include_archived: true),
@@ -33,6 +38,8 @@ defmodule Palee.Application.GetScheduleCalendar do
        }}
     end
   end
+
+  def call(_context, _actor, _params), do: {:error, :organization_context_required}
 
   def call(_actor, _params), do: {:error, :organization_context_required}
 
@@ -405,23 +412,23 @@ defmodule Palee.Application.GetScheduleCalendar do
     |> Enum.sort_by(&{&1.sort_order, &1.name})
   end
 
-  defp normalize_window(params) do
+  defp normalize_window(params, zone) do
     with {:ok, days} <- parse_days(params["days"] || params[:days]),
-         {:ok, start_at, end_at} <- parse_explicit_window(params, days),
+         {:ok, start_at, end_at} <- parse_explicit_window(params, days, zone),
          {:ok, class_type_ids} <-
            parse_class_type_ids(params["class_type_ids"] || params[:class_type_ids]) do
       {:ok, start_at, end_at, days, class_type_ids}
     end
   end
 
-  defp parse_explicit_window(params, days) do
+  defp parse_explicit_window(params, days, zone) do
     start_at_param = params["start_at"] || params[:start_at]
     end_at_param = params["end_at"] || params[:end_at]
 
     if is_nil(start_at_param) and is_nil(end_at_param) do
-      with {:ok, start_date} <- parse_date(params["start_date"] || params[:start_date]) do
-        start_at = DateTime.new!(start_date, ~T[00:00:00], "Etc/UTC")
-        {:ok, start_at, DateTime.add(start_at, 86_400 * days, :second)}
+      with {:ok, start_date} <- parse_date(params["start_date"] || params[:start_date], zone) do
+        {:ok, ZonedTime.start_of_day(start_date, zone),
+         ZonedTime.start_of_day(Date.add(start_date, days), zone)}
       end
     else
       with {:ok, start_at} <- parse_datetime(start_at_param),
@@ -432,10 +439,10 @@ defmodule Palee.Application.GetScheduleCalendar do
     end
   end
 
-  defp parse_date(nil), do: {:ok, Date.utc_today()}
-  defp parse_date(%Date{} = value), do: {:ok, value}
+  defp parse_date(nil, zone), do: {:ok, ZonedTime.local_date(DateTime.utc_now(), zone)}
+  defp parse_date(%Date{} = value, _zone), do: {:ok, value}
 
-  defp parse_date(value) when is_binary(value) do
+  defp parse_date(value, _zone) when is_binary(value) do
     case Date.from_iso8601(value) do
       {:ok, date} -> {:ok, date}
       {:error, _reason} -> {:error, :bad_request}

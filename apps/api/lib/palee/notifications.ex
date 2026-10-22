@@ -591,6 +591,7 @@ defmodule Palee.Notifications do
         organization_id: field(payload, :organization_id),
         scheduled_class_id: field(payload, :scheduled_class_id),
         class_name: field(payload, :class_name),
+        class_starts_at: field(payload, :class_starts_at),
         class_when: field(payload, :class_when),
         alert: field(payload, :alert),
         published: field(payload, :published),
@@ -617,6 +618,7 @@ defmodule Palee.Notifications do
   def process_event("appointment_booked", payload),
     do:
       enqueue_simple(:appointment_booked, payload, %{
+        organization_id: field(payload, :organization_id),
         slot_id: field(payload, :slot_id),
         kind: field(payload, :kind),
         starts_at: field(payload, :starts_at),
@@ -627,6 +629,7 @@ defmodule Palee.Notifications do
   def process_event("appointment_cancelled", payload),
     do:
       enqueue_simple(:appointment_cancelled, payload, %{
+        organization_id: field(payload, :organization_id),
         slot_id: field(payload, :slot_id),
         kind: field(payload, :kind),
         starts_at: field(payload, :starts_at),
@@ -1139,6 +1142,7 @@ defmodule Palee.Notifications do
       event_title: field(payload, :event_title),
       event_starts_at: field(payload, :event_starts_at),
       event_when: field(payload, :event_when),
+      time_zone: field(payload, :time_zone),
       changes: field(payload, :changes),
       reason: field(payload, :reason),
       person_nickname: field(payload, :person_nickname),
@@ -1336,13 +1340,16 @@ defmodule Palee.Notifications do
   end
 
   defp deliver_notification(user_id, type, payload) do
-    locale =
+    reader =
       case Identity.find_by_id(user_id) do
-        %{preferred_locale: preferred_locale} when is_binary(preferred_locale) -> preferred_locale
-        _ -> "en"
+        %{preferred_locale: locale} = account when is_binary(locale) ->
+          %{locale: locale, time_zone: Map.get(account, :time_zone)}
+
+        _missing ->
+          %{locale: "en"}
       end
 
-    case DispatchNotification.call(user_id, type, payload, locale) do
+    case DispatchNotification.call(user_id, type, payload, reader) do
       :ok ->
         :ok
 

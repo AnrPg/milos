@@ -30,6 +30,7 @@ defmodule Palee.Application.CheckInActions do
     Trials
   }
 
+  alias Palee.TimeZones.ZonedTime
   alias Palee.Trials.TrialRequest
 
   @undo_seconds 60
@@ -203,7 +204,7 @@ defmodule Palee.Application.CheckInActions do
         box_name: door.name,
         location_name: door.location_name,
         scanned_at: scan.scanned_at,
-        scanned_when: scan.scanned_at |> DateTime.shift_zone!(zone) |> Calendar.strftime("%H:%M"),
+        scanned_when: ZonedTime.format(scan.scanned_at, zone, :time),
         trial_available: trial_available?,
         hour: div(DateTime.to_unix(scan.scanned_at), @visitor_notice_seconds),
         url: "/admin/check-in?visitor=" <> scan.id

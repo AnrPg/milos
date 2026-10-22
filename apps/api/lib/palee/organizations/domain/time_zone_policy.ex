@@ -12,20 +12,17 @@ defmodule Palee.Organizations.Domain.TimeZonePolicy do
     * `nil` - never set; the platform default applies and onboarding asks.
   """
 
+  alias Palee.TimeZones.ZonedTime
+
   @sources ~w(confirmed inferred)
-  @utc_zones ["UTC", "Etc/UTC", "Etc/GMT", "GMT"]
 
   def sources, do: @sources
 
   @doc "Palee's default zone, used only while a gym's zone is unknown."
-  def default_zone,
-    do: Application.get_env(:palee, :default_organization_timezone, "Europe/Athens")
+  defdelegate default_zone, to: ZonedTime
 
   @doc "An IANA zone the time zone database knows."
-  def valid?(zone) when is_binary(zone) and zone != "",
-    do: String.length(zone) <= 100 and match?({:ok, _now}, DateTime.now(zone))
-
-  def valid?(_zone), do: false
+  defdelegate valid?(zone), to: ZonedTime
 
   @doc "The zone gym-local rules read: the stored one once known, else the default."
   def resolve(%{timezone: zone, timezone_source: source}) when source in @sources,
@@ -48,5 +45,5 @@ defmodule Palee.Organizations.Domain.TimeZonePolicy do
   is and is skipped.
   """
   def infer(candidates) when is_list(candidates),
-    do: Enum.find(candidates, &(valid?(&1) and &1 not in @utc_zones))
+    do: Enum.find(candidates, &(valid?(&1) and not ZonedTime.utc?(&1)))
 end

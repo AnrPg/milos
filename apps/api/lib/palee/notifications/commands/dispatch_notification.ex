@@ -3,28 +3,41 @@ defmodule Palee.Notifications.Commands.DispatchNotification do
   alias Palee.Notifications.Commands.EnqueueNativePushDispatch
   alias Palee.Notifications.Commands.EnqueuePushDispatch
   alias Palee.Notifications.NotificationStore
-  alias Palee.Notifications.Domain.{PayloadNormalizer, PushMessageBuilder}
+  alias Palee.Notifications.Domain.{PayloadNormalizer, PayloadTimes, PushMessageBuilder}
   alias Palee.Notifications.PushConfig
   alias Palee.Localization
+  alias Palee.Organizations
   alias Palee.Organizations.OrganizationStore
+  alias Palee.TimeZones.ZonedTime
 
   # Notifications are owner-only under RLS (`user_id = app.user_id`, including
   # on insert), so a notification addressed to someone other than the session
   # user - staff notified of a member's action, or any Oban event job - is
   # written inside the recipient's scope (TD-046). The outer organization
   # scope is preserved.
-  def call(user_id, type, payload, locale \\ "en") do
+  #
+  # `reader` carries the recipient's `locale` and `time_zone` (ADR-177): the
+  # texts are written in their language, and the times on the organiser's
+  # clock plus theirs when it differs.
+  def call(user_id, type, payload, reader \\ %{})
+
+  def call(user_id, type, payload, locale) when is_binary(locale),
+    do: call(user_id, type, payload, %{locale: locale})
+
+  def call(user_id, type, payload, reader) when is_map(reader) do
     NotificationStore.with_user_context(%{user_id: user_id}, fn ->
-      dispatch(user_id, type, payload, locale)
+      dispatch(user_id, type, payload, reader)
     end)
   end
 
-  defp dispatch(user_id, type, payload, locale) do
+  defp dispatch(user_id, type, payload, reader) do
+    locale = Map.get(reader, :locale) || "en"
+
     normalized_payload =
       payload
       |> PayloadNormalizer.normalize()
       |> put_organization_slug(payload)
-      |> enrich_payload(type, locale)
+      |> enrich_payload(type, locale, Map.get(reader, :time_zone))
 
     with {:ok, notification} <-
            CreateNotification.call(%{
@@ -77,8 +90,24 @@ defmodule Palee.Notifications.Commands.DispatchNotification do
     end
   end
 
-  defp enrich_payload(payload, type, locale) do
+  # The clock the moments were planned on: the payload's own zone (an event
+  # held away), else its gym's.
+  defp organiser_zone(payload) do
+    cond do
+      ZonedTime.valid?(payload["time_zone"]) ->
+        payload["time_zone"]
+
+      is_binary(payload["organization_id"]) and PayloadTimes.mentions_moment?(payload) ->
+        Organizations.organization_timezone(payload["organization_id"])
+
+      true ->
+        nil
+    end
+  end
+
+  defp enrich_payload(payload, type, locale, viewer_zone) do
     localize = fn message, bindings -> Localization.translate(locale, message, bindings) end
+    payload = PayloadTimes.localize(payload, organiser_zone(payload), viewer_zone, localize)
     message = PushMessageBuilder.build(type, payload, localize)
 
     payload

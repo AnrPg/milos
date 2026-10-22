@@ -7,6 +7,7 @@ defmodule Palee.Application.NotifyAppointment do
   def booked(slot, client) do
     Notifications.process_event("appointment_booked", %{
       user_id: slot.coach_id,
+      organization_id: slot.organization_id,
       slot_id: slot.id,
       kind: slot.kind,
       starts_at: slot.starts_at,
@@ -21,6 +22,7 @@ defmodule Palee.Application.NotifyAppointment do
     Notifications.process_event("appointment_cancelled", %{
       user_id: recipient_id,
       url: url,
+      organization_id: slot.organization_id,
       slot_id: slot.id,
       kind: slot.kind,
       starts_at: slot.starts_at

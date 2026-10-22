@@ -1,13 +1,18 @@
 defmodule Palee.Application.GrantUserAllowance do
   alias Palee.Application.BroadcastUserSync
   alias Palee.Application.TenantUserAccess
-  alias Palee.Finance
+  alias Palee.{Finance, Organizations}
 
   def call(tenant_context, user_id, admin_id, params) do
     with {:ok, %{role: role}} when role in [:member, :athlete] <-
            TenantUserAccess.fetch_active_user(tenant_context, user_id),
          {:ok, entry} <-
-           Finance.grant_allowance(tenant_context, user_id, admin_id, normalize(params)),
+           Finance.grant_allowance(
+             tenant_context,
+             user_id,
+             admin_id,
+             normalize(params, tenant_context)
+           ),
          entitlement when not is_nil(entitlement) <-
            Finance.get_effective_entitlement(tenant_context, user_id) do
       BroadcastUserSync.for_user(user_id, ["finance_entitlement"],
@@ -22,13 +27,13 @@ defmodule Palee.Application.GrantUserAllowance do
     end
   end
 
-  defp normalize(params) do
+  defp normalize(params, %{organization_id: organization_id}) do
     params = Map.new(params, fn {key, value} -> {normalize_key(key), value} end)
 
     params
     |> Map.update(:allowance, nil, &normalize_allowance/1)
     |> Map.update(:period, nil, &normalize_period/1)
-    |> Map.update(:occurred_on, Date.utc_today(), &normalize_date/1)
+    |> Map.update(:occurred_on, Organizations.local_today(organization_id), &normalize_date/1)
     |> Map.put_new(:idempotency_key, "admin-allowance:#{Ecto.UUID.generate()}")
   end
 

@@ -5,6 +5,7 @@ defmodule PaleeWeb.MeController do
   alias Palee.Application.CompleteProductTour
 
   alias Palee.Application.{
+    ReportTimeZone,
     RequestAvatarUpload,
     ResolvePlatformContext,
     ResolveTenantContext,
@@ -22,7 +23,7 @@ defmodule PaleeWeb.MeController do
 
   plug OpenApiSpex.Plug.CastAndValidate,
        [json_render_error_v2: true]
-       when action in [:update_profile, :avatar_upload_url, :update_avatar]
+       when action in [:update_profile, :avatar_upload_url, :update_avatar, :update_time_zone]
 
   operation(:complete_tour,
     summary: "Record that the current account finished a product tour",
@@ -50,6 +51,41 @@ defmodule PaleeWeb.MeController do
 
     with {:ok, account} <- CompleteProductTour.call(user, audience) do
       json(conn, %{completed_tours: account.completed_tours})
+    end
+  end
+
+  operation(:update_time_zone,
+    summary: "Report the zone this account's device is in (ADR-177)",
+    description:
+      "Server-written texts add the reader's own time beside the organiser's when the two zones read a moment differently. UTC aliases are ignored.",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            properties: %{time_zone: %Schema{type: :string, maxLength: 100}},
+            required: [:time_zone]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Stored zone", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{time_zone: %Schema{type: :string, nullable: true}},
+           required: [:time_zone]
+         }}
+    ]
+  )
+
+  def update_time_zone(conn, _params) do
+    user = Guardian.Plug.current_resource(conn)
+
+    with {:ok, zone} <- ReportTimeZone.call(user, Map.get(conn.body_params, :time_zone)) do
+      json(conn, %{time_zone: zone})
     end
   end
 
