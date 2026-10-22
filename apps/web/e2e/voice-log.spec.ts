@@ -87,8 +87,12 @@ async function stubMember(page: Page, extra: Handler) {
 
 async function openVoice(page: Page) {
   await page.goto("/journal");
-  await page.getByRole("button", { name: "New entry" }).click();
   const menu = page.getByRole("dialog", { name: "New entry" });
+  // A tap before the page hydrates is lost, so tap again until the menu opens.
+  await expect(async () => {
+    await page.getByRole("button", { name: "New entry" }).click();
+    await expect(menu).toBeVisible({ timeout: 2_000 });
+  }).toPass({ timeout: 20_000 });
   await menu.getByRole("button", { name: /By voice/ }).click();
   const sheet = page.getByRole("dialog", { name: "Log by voice" });
   await expect(sheet).toBeVisible();
@@ -250,9 +254,12 @@ test.describe("Νέα καταχώρηση › Με φωνή", () => {
     // Asserts only after the availability answer arrived, so «not shown» is not just «not loaded yet».
     const openMenu = async () => {
       const answered = page.waitForResponse((response) => response.url().endsWith("/me/training-log/voice"));
-      await page.getByRole("button", { name: "New entry" }).click();
-      await answered;
       const menu = page.getByRole("dialog", { name: "New entry" });
+      await expect(async () => {
+        await page.getByRole("button", { name: "New entry" }).click();
+        await expect(menu).toBeVisible({ timeout: 2_000 });
+      }).toPass({ timeout: 20_000 });
+      await answered;
       await expect(menu.getByRole("button", { name: /Workout/ })).toBeVisible();
       return menu;
     };
