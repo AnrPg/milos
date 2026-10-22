@@ -15,7 +15,10 @@ defmodule Palee.Workouts.Domain.WorkoutAssistant.IssueAnchor do
 
   @doc "The anchor for `issue` (a normalized issue map) in `source`, or nil."
   def find(%{} = issue, %{} = workout, quote, source) when is_binary(source) do
-    [get_in(issue, ["suggestion", "text_edit", "find"]), quote | path_words(issue["path"], workout)]
+    [
+      get_in(issue, ["suggestion", "text_edit", "find"]),
+      quote | path_words(issue["path"], workout)
+    ]
     |> Enum.find_value(&locate(&1, source))
   end
 
