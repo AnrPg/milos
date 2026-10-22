@@ -334,7 +334,7 @@ export function MembersTab() {
           )}
           <button
             className="rounded-full px-3 py-1.5 text-xs font-semibold"
-            style={{ background: "color-mix(in srgb, var(--success) 14%, transparent)", color: "var(--success)" }}
+            style={{ background: "var(--spark)", color: "var(--spark-contrast)" }}
             onClick={() => setShareOpen(true)}
             type="button"
           >

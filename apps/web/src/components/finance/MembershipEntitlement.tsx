@@ -5,6 +5,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import type { EffectiveEntitlement } from "@/api/my-finance";
 import { SemanticLabel } from "@/components/semantic-label";
 import { allowanceLabel } from "@/i18n/presentation";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 import {
   shouldShowAllowanceQuota,
   visibleBillingAllowances,
@@ -38,14 +39,16 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function StatusBadge({ status }: { status: string }) {
   const color = STATUS_COLORS[status] ?? "var(--muted)";
+  // Active is alive now: a Spark pill; every other status is tinted in its colour.
+  const style = status === "active" ? SPARK_ACTIVE_STYLE : { background: `color-mix(in srgb, ${color} 13%, transparent)`, color };
   return (
     <span
       className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide"
-      style={{ background: `${color}22`, color }}
+      style={style}
     >
       <span
         className="inline-block w-1.5 h-1.5 rounded-full"
-        style={{ background: color }}
+        style={{ background: "currentColor" }}
       />
       <SemanticLabel value={status} />
     </span>

@@ -46,7 +46,7 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | Role | Token | Use it for | Never for |
 | --- | --- | --- | --- |
 | Dojo (primary) | `--primary`, `--primary-strong`, `--primary-contrast` | Actions and navigation: buttons, links, the active tab, selected chips, check-in, booking, charts | Decoration |
-| Spark | `--spark`, `--spark-contrast` | What is alive right now: LIVE, New, WOD tags, active challenges. Always with dark text (`--spark-contrast`) | Next to Heat; alone with Graphite |
+| Spark | `--spark`, `--spark-contrast` (`lib/spark.ts`: `SPARK_ACTIVE_STYLE`, `SPARK_CREATE_STYLE`) | Energy: what is alive now (LIVE, New, WOD tags, today in calendars, the streak, live challenge progress on a deep track, Active / Connected / Published status pills) and "+ New / + Add" create chips. Always a fill with dark text (`--spark-contrast`) | Text on the page; the screen's main action (Dojo); next to Heat; alone with Graphite |
 | Heat | `--heat`, `--heat-contrast` | Emotion: kudos, PRs, comebacks, the "hard moment" support | Errors (use `--danger`) |
 | Deep | `--deep`, `--deep-contrast` | One hero per screen: the WOD card, a post image frame, the QR | More than one surface per screen |
 

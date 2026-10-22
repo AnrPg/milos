@@ -41,6 +41,7 @@ import { SubscriptionBeneficiaries } from "@/components/staff/SubscriptionBenefi
 import { ChargeCategorySelect } from "@/components/admin/finance/shared/ChargeCategorySelect";
 import { CHARGE_CATEGORY_LABEL_KEYS, isChargeCategory, manualInvoiceBody } from "@/components/admin/finance/shared/charge-category";
 import { generateExportFile, type ExportDocument } from "@/lib/document-export";
+import { SPARK_CREATE_STYLE } from "@/lib/spark";
 
 const MANUAL_RECEIPT_PURPOSE = "__manual_receipt_purpose__";
 
@@ -430,7 +431,7 @@ export function MemberPanel({
                   </p>
                   <button
                     className="rounded-full px-3 py-1 text-xs font-semibold"
-                    style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+                    style={SPARK_CREATE_STYLE}
                     onClick={() => setShowAssignForm((v) => !v)}
                     type="button"
                   >
@@ -648,7 +649,7 @@ export function MemberPanel({
                 </p>
                 <button
                   className="rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+                  style={SPARK_CREATE_STYLE}
                   onClick={() => setShowInvoiceForm((v) => !v)}
                   type="button"
                 >
@@ -772,7 +773,7 @@ export function MemberPanel({
                 </p>
                 <button
                   className="rounded-full px-3 py-1 text-xs font-semibold"
-                  style={{ background: "color-mix(in srgb, var(--primary) 10%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 20%, transparent)", color: "var(--primary)" }}
+                  style={SPARK_CREATE_STYLE}
                   onClick={() => setShowPaymentForm((v) => !v)}
                   type="button"
                 >

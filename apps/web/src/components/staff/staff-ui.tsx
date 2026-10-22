@@ -1,6 +1,7 @@
 "use client";
 
 import type { CSSProperties, ReactNode } from "react";
+import { SPARK_ACTIVE_STYLE } from "@/lib/spark";
 
 // Small presentational pieces shared by the staff screens, styled like the
 // existing admin panels.
@@ -74,7 +75,15 @@ export function StatusText({ tone, children }: { tone: "error" | "success" | "mu
   );
 }
 
-export function Pill({ tone, children }: { tone: "danger" | "warning" | "success" | "neutral" | "primary"; children: ReactNode }) {
+export function Pill({ tone, children }: { tone: "danger" | "warning" | "success" | "neutral" | "primary" | "spark"; children: ReactNode }) {
+  // Spark: live and active things, a fill with dark text (docs/brand/THEME.md).
+  if (tone === "spark") {
+    return (
+      <span className="inline-flex shrink-0 items-center rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.14em]" style={SPARK_ACTIVE_STYLE}>
+        {children}
+      </span>
+    );
+  }
   const color =
     tone === "danger"
       ? "var(--danger)"

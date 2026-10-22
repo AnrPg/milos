@@ -93,10 +93,16 @@ export function MonthGrid({
                 onClick={() => onSelect(day)}
                 className="flex min-h-12 flex-col items-center justify-center gap-1 rounded-xl text-sm font-bold"
                 style={{
-                  background: selected ? "var(--primary)" : "transparent",
-                  color: selected ? "var(--primary-contrast)" : inMonth ? "var(--text-soft)" : "var(--dim)",
+                  // Today is what is alive now: Spark, unless it is the Dojo-selected day.
+                  background: selected ? "var(--primary)" : day === today ? "var(--spark)" : "transparent",
+                  color: selected
+                    ? "var(--primary-contrast)"
+                    : day === today
+                      ? "var(--spark-contrast)"
+                      : inMonth
+                        ? "var(--text-soft)"
+                        : "var(--dim)",
                   opacity: inMonth ? 1 : 0.45,
-                  boxShadow: !selected && day === today ? "inset 0 0 0 1px var(--border)" : undefined,
                 }}
               >
                 {date.getDate()}

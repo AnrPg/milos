@@ -59,13 +59,13 @@ export function WeekStrip({
                 aria-current={day === today ? "date" : undefined}
                 className="flex min-h-12 w-full flex-col items-center justify-center rounded-xl text-[11px] font-semibold"
                 style={{
-                  background: selected ? "var(--primary)" : "transparent",
-                  color: selected ? "var(--primary-contrast)" : "var(--dim)",
-                  boxShadow: !selected && day === today ? "inset 0 0 0 1px var(--border)" : undefined,
+                  // Today is what is alive now: Spark, unless it is the Dojo-selected day.
+                  background: selected ? "var(--primary)" : day === today ? "var(--spark)" : "transparent",
+                  color: selected ? "var(--primary-contrast)" : day === today ? "var(--spark-contrast)" : "var(--dim)",
                 }}
               >
                 {weekday.format(date)}
-                <span className="text-base font-bold" style={{ color: selected ? "var(--primary-contrast)" : "var(--text-soft)" }}>
+                <span className="text-base font-bold" style={{ color: selected ? "var(--primary-contrast)" : day === today ? "var(--spark-contrast)" : "var(--text-soft)" }}>
                   {date.getDate()}
                 </span>
               </button>
