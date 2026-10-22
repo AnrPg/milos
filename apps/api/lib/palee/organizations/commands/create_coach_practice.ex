@@ -52,6 +52,7 @@ defmodule Palee.Organizations.Commands.CreateCoachPractice do
       provider_kind: @kind,
       slug: free_slug(value(params, :name)),
       timezone: value(params, :timezone),
+      timezone_source: value(params, :timezone_source),
       default_locale: value(params, :default_locale)
     }
   end

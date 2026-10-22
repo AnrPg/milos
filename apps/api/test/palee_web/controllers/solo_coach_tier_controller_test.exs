@@ -74,7 +74,8 @@ defmodule PaleeWeb.SoloCoachTierControllerTest do
              |> get("/api/org/#{slug}/admin/onboarding")
              |> json_response(200)
 
-    assert ~w(profile sessions packages team bootcamp invite tour) == Enum.map(steps, & &1["id"])
+    assert ~w(timezone profile sessions packages team bootcamp invite tour) ==
+             Enum.map(steps, & &1["id"])
 
     assert %{"code" => "coach_practice_exists"} =
              ctx.coach_conn

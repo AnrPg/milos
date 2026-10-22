@@ -44,6 +44,7 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
           organization_id: organization.id,
           # ADR-176: a zone given at creation is confirmed; none leaves it unset.
           timezone: value(params, :timezone),
+          timezone_source: value(params, :timezone_source),
           default_locale: value(params, :default_locale) || "en",
           invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
           brand_name: value(params, :brand_name) || organization.name,
@@ -442,6 +443,7 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
         without_unset_timezone(%{
           organization_id: organization.id,
           timezone: value(organization_params, :timezone),
+          timezone_source: value(organization_params, :timezone_source),
           default_locale: value(organization_params, :default_locale) || "en",
           invitation_lifetime_seconds:
             value(organization_params, :invitation_lifetime_seconds) || 604_800,
@@ -1198,7 +1200,7 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
 
   # ADR-176: without a zone the settings keep the default and no source.
   defp without_unset_timezone(%{timezone: zone} = attrs) when zone in [nil, ""],
-    do: Map.delete(attrs, :timezone)
+    do: Map.drop(attrs, [:timezone, :timezone_source])
 
   defp without_unset_timezone(attrs), do: attrs
 
