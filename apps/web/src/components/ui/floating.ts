@@ -52,15 +52,15 @@ export function useAnchoredPosition(
     };
 
     update();
-    const observer = new ResizeObserver(schedule);
-    if (floatingRef.current) observer.observe(floatingRef.current);
-    if (anchorRef.current) observer.observe(anchorRef.current);
+    const observer = typeof ResizeObserver === "undefined" ? null : new ResizeObserver(schedule);
+    if (floatingRef.current) observer?.observe(floatingRef.current);
+    if (anchorRef.current) observer?.observe(anchorRef.current);
     window.addEventListener("resize", schedule);
     window.addEventListener("scroll", schedule, true);
     window.visualViewport?.addEventListener("resize", schedule);
     return () => {
       cancelAnimationFrame(frame);
-      observer.disconnect();
+      observer?.disconnect();
       window.removeEventListener("resize", schedule);
       window.removeEventListener("scroll", schedule, true);
       window.visualViewport?.removeEventListener("resize", schedule);

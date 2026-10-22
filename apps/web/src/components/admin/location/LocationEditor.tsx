@@ -267,7 +267,7 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
             <ul
               id={`${listId}-list`}
               role="listbox"
-              className="absolute inset-x-0 top-[4.9rem] z-20 overflow-hidden rounded-2xl"
+              className="absolute inset-x-0 top-[4.9rem] z-(--z-popover) overflow-hidden rounded-2xl"
               style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", boxShadow: "var(--shadow-md)" }}
             >
               {searchFailed ? (
@@ -347,7 +347,7 @@ function EditorForm({ token, location }: { token: string; location: FacilityLoca
         <LocationCheckIn token={token} locationId={location.id} />
 
         <div
-          className="fixed inset-x-0 bottom-0 z-[60] px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3"
+          className="fixed inset-x-0 bottom-0 z-(--z-nav) px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3"
           style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)", borderTop: "1px solid var(--border)" }}
         >
           <div className="mx-auto flex max-w-3xl items-center justify-end gap-3">

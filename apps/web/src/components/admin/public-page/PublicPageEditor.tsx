@@ -409,7 +409,7 @@ function Editor({ token, profile, vocabulary }: { token: string; profile: BoxPub
       </div>
 
       <div
-        className="fixed inset-x-0 bottom-0 z-[55] px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3"
+        className="fixed inset-x-0 bottom-0 z-(--z-nav) px-6 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3"
         style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)", borderTop: "1px solid var(--border)" }}
       >
         <div className="mx-auto flex max-w-3xl flex-wrap items-center justify-end gap-x-3 gap-y-2">

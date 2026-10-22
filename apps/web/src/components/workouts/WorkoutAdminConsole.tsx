@@ -49,6 +49,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader } from "@/components/PageHeader";
 import { Dialog } from "@/components/ui/Dialog";
+import { Popover } from "@/components/ui/Popover";
 
 type LibraryViewMode = "folders" | "tiles" | "list";
 
@@ -135,21 +136,6 @@ export function WorkoutAdminConsole() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [previewWorkoutId]);
 
-  useEffect(() => {
-    if (!viewMenuOpen) return;
-    function handlePointerDown(event: PointerEvent) {
-      if (!viewMenuRef.current?.contains(event.target as Node)) setViewMenuOpen(false);
-    }
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setViewMenuOpen(false);
-    }
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [viewMenuOpen]);
 
   useEffect(() => {
     function handleUserSync(event: Event) {
@@ -793,13 +779,17 @@ export function WorkoutAdminConsole() {
                         <span aria-hidden className="text-[10px]" style={{ color: "var(--dim)" }}>▾</span>
                       </button>
                     </HoverHint>
-                    {viewMenuOpen ? (
-                      <div
-                        role="menu"
-                        aria-label={i18n("featureViewLabel")}
-                        className="absolute end-0 top-full z-30 mt-2 w-44 overflow-hidden rounded-xl py-1 shadow-xl"
-                        style={{ background: "var(--panel-raised)", border: "1px solid var(--border-strong)" }}
-                      >
+                    <Popover
+                      anchorRef={viewMenuRef}
+                      open={viewMenuOpen}
+                      onClose={() => setViewMenuOpen(false)}
+                      align="end"
+                      width={176}
+                      role="menu"
+                      ariaLabel={i18n("featureViewLabel")}
+                      className="rounded-xl py-1 shadow-xl"
+                      style={{ background: "var(--panel-raised)", border: "1px solid var(--border-strong)" }}
+                    >
                         {LIBRARY_VIEW_MODES.map((mode) => (
                           <button
                             key={mode}
@@ -818,8 +808,7 @@ export function WorkoutAdminConsole() {
                             {viewMode === mode ? <span aria-hidden style={{ color: "var(--primary)" }}>✓</span> : null}
                           </button>
                         ))}
-                      </div>
-                    ) : null}
+                    </Popover>
                   </div>
 
                   <HoverHint hint={i18n("featureNewFolderHint")} align="end">

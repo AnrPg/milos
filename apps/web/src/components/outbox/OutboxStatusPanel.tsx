@@ -24,7 +24,7 @@ export function OutboxStatusPanel() {
       {total > 0 ? (
         <button
           type="button"
-          className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] start-4 z-40 flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-lg"
+          className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom))] start-4 z-(--z-sticky) flex min-h-11 max-w-[calc(100vw-2rem)] items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold shadow-lg"
           style={
             snapshot.failed.length > 0
               ? { background: "var(--danger)", color: "var(--primary-contrast)" }

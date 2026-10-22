@@ -1045,7 +1045,7 @@ export function ExecutionMode() {
           role="dialog"
           aria-modal="true"
           aria-labelledby="execution-paused-title"
-          className="fixed inset-0 z-40 flex flex-col items-center justify-center gap-4 px-6"
+          className="fixed inset-0 z-(--z-drawer) flex flex-col items-center justify-center gap-4 px-6"
           style={{ background: "color-mix(in srgb, var(--bg) 92%, transparent)" }}
         >
           <div id="execution-paused-title" className="mb-2 text-4xl font-bold" style={{ color: "var(--text)" }}>
@@ -1129,7 +1129,7 @@ export function ExecutionMode() {
       {resumeCountdown !== null && (
         <div
           role="timer"
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-4 px-6"
+          className="fixed inset-0 z-(--z-modal) flex flex-col items-center justify-center gap-4 px-6"
           style={{ background: `color-mix(in srgb, ${PHASE_COLORS.transition} 12%, var(--bg))` }}
         >
           <div className="text-lg font-bold uppercase tracking-widest" style={{ color: "var(--text-soft)" }}>

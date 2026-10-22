@@ -191,7 +191,7 @@ function PRHistoryTooltip({
             position: "absolute",
             top: pos.top,
             left: pos.left,
-            zIndex: 9999,
+            zIndex: "var(--z-popover)",
             width: 300,
             background: "var(--panel)",
             border: "1px solid var(--border)",

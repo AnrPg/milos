@@ -114,13 +114,13 @@ export function WorkoutAuthoringModes() {
       {SHOW_AUTHORING_MODE_SWITCHER ? (
       <>
       <div
-        className="fixed inset-x-0 top-[3.25rem] z-40 h-3"
+        className="fixed inset-x-0 top-[3.25rem] z-(--z-sticky) h-3"
         onFocus={revealModeBar}
         onMouseEnter={revealModeBar}
         aria-hidden
       />
       <div
-        className="fixed inset-x-0 top-[3.25rem] z-50 flex items-center justify-center gap-1 border-b px-4 py-2 shadow-lg transition-[opacity,transform] duration-200"
+        className="fixed inset-x-0 top-[3.25rem] z-(--z-nav) flex items-center justify-center gap-1 border-b px-4 py-2 shadow-lg transition-[opacity,transform] duration-200"
         onFocus={revealModeBar}
         onMouseEnter={revealModeBar}
         onMouseLeave={hideModeBar}

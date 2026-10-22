@@ -7,6 +7,7 @@ import {useUiTranslations} from "@/i18n/ui";
 import { useCallback, useRef, useState } from "react";
 
 import { getFormatGroups, getFormatLabels, getFormatTooltips, type SectionFormat } from "@/types/workout";
+import { Layer } from "@/components/ui/Layer";
 
 type FormatDropdownProps = {
   value: SectionFormat;
@@ -82,13 +83,13 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
       </button>
 
       {open && dropdownRect ? (
-        <>
+        <Layer>
           {/* Click-away overlay — scrolling in section config works independently */}
-          <div className="fixed inset-0 z-40" onClick={close} />
+          <div className="fixed inset-0 z-(--z-popover)" onClick={close} />
 
           {/* Dropdown panel — fixed to viewport, escapes all overflow containers */}
           <div
-            className="fixed z-50 flex"
+            className="fixed z-(--z-popover) flex"
             style={{
               top: dropdownRect.top,
               bottom: dropdownRect.bottom,
@@ -172,7 +173,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
               </div>
             ) : null}
           </div>
-        </>
+        </Layer>
       ) : null}
     </div>
   );

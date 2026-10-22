@@ -546,7 +546,7 @@ export function QuickTextWorkoutEditor({
         </div>
 
         <div
-          className="sticky top-[3.25rem] z-50"
+          className="sticky top-[3.25rem] z-(--z-sticky)"
           style={{
             background: "color-mix(in srgb, var(--bg) 96%, transparent)",
             backdropFilter: "blur(12px)",
@@ -746,7 +746,7 @@ function SuggestionMenu({
 
   return (
     <div
-      className="z-50 overflow-y-auto rounded-lg border shadow-xl"
+      className="z-(--z-popover) overflow-y-auto rounded-lg border shadow-xl"
       style={{
         ...position,
         background: "var(--panel)",
