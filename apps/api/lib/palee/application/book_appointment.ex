@@ -74,7 +74,7 @@ defmodule Palee.Application.BookAppointment do
            context,
            client.id,
            AppointmentPolicy.allowance(slot),
-           DateTime.to_date(slot.starts_at)
+           Organizations.local_date(context, slot.starts_at)
          ) do
       nil -> :ok
       terms -> AppointmentPolicy.terms_allow?(slot, terms)

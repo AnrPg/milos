@@ -13,7 +13,9 @@ defmodule Palee.Application.SubmitFormReview do
 
     request =
       id
-      |> FormReviewPolicy.entitlement_request(Date.utc_today())
+      |> FormReviewPolicy.entitlement_request(
+        Organizations.local_date(context, DateTime.utc_now())
+      )
       |> Map.put(:actor_role, actor.role)
 
     with {:ok, reservation} <- Finance.reserve_entitlement(context, user_id, request) do

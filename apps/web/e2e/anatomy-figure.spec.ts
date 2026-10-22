@@ -1,6 +1,7 @@
 import { expect, test, type Page } from "./support/test";
 
-import { requireWebgl } from "./support/webgl";
+import { chromeArgs } from "../playwright.config";
+import { requireWebgl, waitForFigure } from "./support/webgl";
 
 // ADR-164 smoke test: the 3D anatomy figure renders (WebGL headless through
 // SwiftShader), loads three and the atlas lazily, answers taps (group, then
@@ -12,7 +13,7 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 test.use({
   launchOptions: {
     ...(executablePath ? { executablePath } : {}),
-    args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--disable-dev-shm-usage"],
+    args: [...chromeArgs, "--use-gl=angle"],
   },
   // SwiftShader renders on the CPU: at the phone's 2.6x density the figure and
   // its 24 thumbnails took more than three minutes on the CI runner. The
@@ -47,7 +48,8 @@ test("renders the figure, picks, focuses and shares one context across thumbnail
 
   await page.goto("/dev/anatomy");
   const figure = page.locator("[data-anatomy-status]");
-  await expect(figure).toHaveAttribute("data-anatomy-status", "ready", { timeout: 120_000 });
+  await waitForFigure(page, figure);
+  await expect(figure).toHaveAttribute("data-anatomy-status", "ready");
   await expect(figure).toHaveAttribute("aria-label", /Primary: .*Quadriceps/);
   expect(glb).toEqual(expect.arrayContaining(["/anatomy/v1/muscles.glb", "/anatomy/v1/bones.glb"]));
 

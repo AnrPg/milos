@@ -33,6 +33,18 @@ defmodule Palee.DataCase do
   end
 
   @doc """
+  Today in the test gym's zone (ADR-176/179): the day gym-local rules see.
+  A subscription assigned "today" starts on it, so a test asserting dates
+  against `Date.utc_today/0` breaks while the two differ (late UTC evening).
+  """
+  def gym_today,
+    do:
+      Palee.TimeZones.ZonedTime.local_date(
+        DateTime.utc_now(),
+        Palee.TimeZones.ZonedTime.default_zone()
+      )
+
+  @doc """
   Sets up the sandbox based on the test tags.
   """
   def setup_sandbox(tags) do

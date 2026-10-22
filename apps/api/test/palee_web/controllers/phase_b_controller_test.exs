@@ -99,7 +99,7 @@ defmodule PaleeWeb.PhaseBControllerTest do
     schedule =
       admin_conn
       |> recycle()
-      |> get("#{base}/schedule?start_date=#{Date.utc_today()}&days=7")
+      |> get("#{base}/schedule?start_date=#{gym_today()}&days=7")
       |> json_response(200)
 
     assert %{"level" => "beginner", "audiences" => ["women_only"]} =
@@ -221,7 +221,7 @@ defmodule PaleeWeb.PhaseBControllerTest do
     schedule =
       second_conn
       |> recycle()
-      |> get("#{base}/schedule?start_date=#{Date.utc_today()}&days=7")
+      |> get("#{base}/schedule?start_date=#{gym_today()}&days=7")
       |> json_response(200)
 
     assert Enum.any?(schedule["locations"], &(&1["id"] == location["id"]))
@@ -299,7 +299,7 @@ defmodule PaleeWeb.PhaseBControllerTest do
       })
 
     {:ok, _subscription} = Finance.assign_package(membership.id, package.id, %{})
-    today = Date.utc_today()
+    today = gym_today()
 
     assert %{"code" => "freeze_allowance_exceeded"} =
              admin_conn

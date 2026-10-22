@@ -4,7 +4,7 @@ defmodule Palee.Application.ListOfferedAppointmentSlots do
   the format, coach and session length of a package they hold for that kind.
   """
 
-  alias Palee.{Appointments, Finance, Identity}
+  alias Palee.{Appointments, Finance, Identity, Organizations}
   alias Palee.Appointments.Domain.AppointmentPolicy
 
   @horizon_days 60
@@ -35,7 +35,7 @@ defmodule Palee.Application.ListOfferedAppointmentSlots do
           context,
           user_id,
           AppointmentPolicy.allowance(slot),
-          DateTime.to_date(slot.starts_at)
+          Organizations.local_date(context, slot.starts_at)
         )
 
       booked? = Enum.any?(slot.bookings, &(&1.user_id == user_id))

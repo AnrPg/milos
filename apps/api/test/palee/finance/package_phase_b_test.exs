@@ -54,7 +54,7 @@ defmodule Palee.Finance.PackagePhaseBTest do
         source_context: "scheduling",
         source_id: Ecto.UUID.generate(),
         quantity: 1,
-        occurred_on: Date.utc_today(),
+        occurred_on: gym_today(),
         idempotency_key: key
       },
       extra
@@ -73,7 +73,7 @@ defmodule Palee.Finance.PackagePhaseBTest do
 
     {user, membership} = member()
     {:ok, subscription} = Finance.assign_package(membership.id, pack.id, %{})
-    today = Date.utc_today()
+    today = gym_today()
 
     assert {:ok, freeze} =
              Finance.create_freeze(user.id, owner.id, %{
@@ -124,7 +124,7 @@ defmodule Palee.Finance.PackagePhaseBTest do
 
     assert {:ok, _} = Finance.reserve_entitlement(user.id, visit("first-use:1"))
     entitlement = Finance.get_effective_entitlement(user.id)
-    assert entitlement.subscription.activated_on == Date.utc_today()
+    assert entitlement.subscription.activated_on == gym_today()
     assert entitlement.subscription.ends_on
   end
 
@@ -212,7 +212,7 @@ defmodule Palee.Finance.PackagePhaseBTest do
       })
 
     {user, membership} = member()
-    previous_month = Date.utc_today() |> Date.beginning_of_month() |> Date.add(-1)
+    previous_month = gym_today() |> Date.beginning_of_month() |> Date.add(-1)
 
     {:ok, _} =
       Finance.assign_package(membership.id, package.id, %{
@@ -243,16 +243,14 @@ defmodule Palee.Finance.PackagePhaseBTest do
     {user, membership} = member()
     {:ok, _} = Finance.assign_package(membership.id, pack.id, %{})
 
-    terms = Finance.booking_terms(user.id, Date.utc_today())
+    terms = Finance.booking_terms(user.id, gym_today())
     assert terms.cancellation_cutoff_hours == 6
     assert terms.waitlist_priority == "high"
 
-    assert [] = Finance.FinanceStore.subscriptions_due_for_expiry_reminder(Date.utc_today())
+    assert [] = Finance.FinanceStore.subscriptions_due_for_expiry_reminder(gym_today())
 
     assert [%{user_id: user_id, days: 3}] =
-             Finance.FinanceStore.subscriptions_due_for_expiry_reminder(
-               Date.add(Date.utc_today(), -1)
-             )
+             Finance.FinanceStore.subscriptions_due_for_expiry_reminder(Date.add(gym_today(), -1))
 
     assert user_id == user.id
   end
@@ -271,7 +269,7 @@ defmodule Palee.Finance.PackagePhaseBTest do
 
     {user, membership} = member()
     {:ok, _} = Finance.assign_package(membership.id, package.id, %{})
-    date = Date.utc_today()
+    date = gym_today()
 
     # 05:00 UTC is 07:00 or 08:00 in Athens; 15:00 UTC is in the afternoon.
     morning = DateTime.new!(date, ~T[05:00:00], "Etc/UTC")

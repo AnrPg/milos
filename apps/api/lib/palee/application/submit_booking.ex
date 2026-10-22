@@ -112,7 +112,6 @@ defmodule Palee.Application.SubmitBooking do
     request =
       Map.merge(entitlement_request, %{
         actor_role: actor.role,
-        occurred_on: DateTime.to_date(slot.scheduled_at),
         starts_at: slot.scheduled_at,
         location_id: Map.get(slot, :location_id),
         source_context: "scheduling",

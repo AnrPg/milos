@@ -10,6 +10,7 @@ import {
   mealSlots,
   mealsBySlot,
   moveItem,
+  planFit,
   nightInstants,
   occurredAt,
   openCraving,
@@ -179,5 +180,16 @@ describe("week card and cravings", () => {
     expect(openCraving({ outcome: null } as unknown as Craving)).toBe(true);
     expect(openCraving({ outcome: "ongoing" } as unknown as Craving)).toBe(true);
     expect(openCraving({ outcome: "rode_it_out" } as unknown as Craving)).toBe(false);
+  });
+});
+
+describe("planFit", () => {
+  const meal = (value: Record<string, unknown>) => ({ kind: "meal", value }) as unknown as WellnessEntry;
+
+  it("reads the known fits and ignores unknown or missing ones", () => {
+    expect(planFit(meal({ plan_fit: "in_plan" }))).toBe("in_plan");
+    expect(planFit(meal({ plan_fit: "off_plan" }))).toBe("off_plan");
+    expect(planFit(meal({ plan_fit: "on_plan" }))).toBeNull();
+    expect(planFit(meal({}))).toBeNull();
   });
 });

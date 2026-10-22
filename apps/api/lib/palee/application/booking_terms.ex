@@ -4,31 +4,33 @@ defmodule Palee.Application.BookingTerms do
   Finance, falling back to the gym's scheduling defaults (ADR-097).
   """
 
-  alias Palee.{Finance, Scheduling}
+  alias Palee.{Finance, Organizations, Scheduling}
   alias Palee.Scheduling.Domain.BookingPolicy
 
   def for_slot(context, user_id, slot) do
-    date = DateTime.to_date(slot.scheduled_at)
+    date = Organizations.local_date(context, slot.scheduled_at)
     resolve(finance_terms(context, user_id, date), settings(context))
   end
 
   @doc """
   The moment each slot stops being free to cancel for this member, or nil when
-  no cutoff applies. Terms are read once per class date, not once per slot.
+  no cutoff applies. Terms are read once per gym-local class date, not once
+  per slot.
   """
   def cancel_free_until(context, user_id, slots) do
     settings = settings(context)
+    date_of = fn slot -> Organizations.local_date(context, slot.scheduled_at) end
 
     cutoffs =
       slots
-      |> Enum.map(&DateTime.to_date(&1.scheduled_at))
+      |> Enum.map(date_of)
       |> Enum.uniq()
       |> Map.new(fn date ->
         {date, resolve(finance_terms(context, user_id, date), settings).cancellation_cutoff_hours}
       end)
 
     Enum.map(slots, fn slot ->
-      case cutoffs[DateTime.to_date(slot.scheduled_at)] do
+      case cutoffs[date_of.(slot)] do
         hours when is_integer(hours) -> DateTime.add(slot.scheduled_at, -hours * 3600, :second)
         _ -> nil
       end

@@ -113,6 +113,46 @@ defmodule Palee.Application.PhaseBBookingTest do
              SubmitBooking.call(context, member, second.id)
   end
 
+  test "a class after the gym's midnight belongs to that gym day (ADR-176)", %{
+    workout: workout
+  } do
+    # Every booking needs a package, and none covers a day past its last
+    # (no grace slack).
+    {:ok, _settings} =
+      Finance.update_finance_settings(%{
+        entitlement_enforcement_mode: "enforce_all",
+        subscription_grace_days: 0
+      })
+
+    zone = Palee.TimeZones.ZonedTime.default_zone()
+    last_day = Date.add(gym_today(), 3)
+
+    {member, context} =
+      member_with(
+        "class_pack",
+        %{"group_classes.visits" => %{"limit" => 2, "period" => "subscription_period"}},
+        %{"ends_on" => Date.to_iso8601(last_day)}
+      )
+
+    at = fn date, time -> date |> DateTime.new!(time, zone) |> DateTime.shift_zone!("Etc/UTC") end
+
+    # Late on the last day is covered; 00:30 the next gym day is not, although
+    # it is still the last day in UTC east of Greenwich.
+    assert {:ok, %{status: :approved}} =
+             SubmitBooking.call(
+               context,
+               member,
+               slot(workout, %{scheduled_at: at.(last_day, ~T[23:30:00])}).id
+             )
+
+    assert {:error, :finance_entitlement_plan_missing} =
+             SubmitBooking.call(
+               context,
+               member,
+               slot(workout, %{scheduled_at: at.(Date.add(last_day, 1), ~T[00:30:00])}).id
+             )
+  end
+
   test "events are booked on event visits and need the events perk", %{
     admin_context: admin_context,
     workout: workout
@@ -309,7 +349,7 @@ defmodule Palee.Application.PhaseBBookingTest do
 
   test "members are reminded before their package ends" do
     Testing.with_testing_mode(:manual, fn ->
-      today = Date.utc_today()
+      today = gym_today()
       {member, _context} = member_with("trial", %{}, %{starts_on: Date.add(today, -4)})
 
       assert :ok = PackageExpiryReminderJob.perform(%Oban.Job{args: %{}})

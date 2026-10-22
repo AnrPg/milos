@@ -5,7 +5,7 @@ defmodule Palee.Application.RecordAppointmentAttendance do
   """
 
   alias Palee.Application.AppointmentLedger
-  alias Palee.{Appointments, Finance}
+  alias Palee.{Appointments, Finance, Organizations}
   alias Palee.Appointments.Domain.AppointmentPolicy
 
   def call(context, _staff, booking_id, status) when status in ["attended", "no_show"] do
@@ -24,7 +24,7 @@ defmodule Palee.Application.RecordAppointmentAttendance do
 
   defp waived?(context, booking) do
     allowance = String.to_existing_atom(booking.allowance)
-    date = DateTime.to_date(booking.slot.starts_at)
+    date = Organizations.local_date(context, booking.slot.starts_at)
 
     case Finance.allowance_terms(context, booking.user_id, allowance, date) do
       %{no_show_penalty_waived: true} -> true

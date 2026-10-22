@@ -76,7 +76,7 @@ function overview(options: { consented?: boolean; waterMl?: number; withPlan?: b
         occurred_on: today,
         occurred_tz: "UTC",
         journal_visibility: "private",
-        value: { slot: "breakfast", plan_fit: "on_plan", portions: { protein: 2, veg: 1 } },
+        value: { slot: "breakfast", plan_fit: "in_plan", portions: { protein: 2, veg: 1 } },
       },
     ],
     cravings: [craving],

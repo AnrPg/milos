@@ -703,8 +703,12 @@ defmodule PaleeWeb.CommunityEventsControllerTest do
           starts_at: DateTime.to_iso8601(first_start),
           ends_at: first_start |> DateTime.add(1, :hour) |> DateTime.to_iso8601(),
           place_name: "Λόφος Φιλοπάππου",
+          # The last day is gym-local (ADR-176), so it is the gym's date of the 4th start.
           repeat_until:
-            first_start |> DateTime.add(21, :day) |> DateTime.to_date() |> Date.to_iso8601()
+            first_start
+            |> DateTime.add(21, :day)
+            |> Palee.TimeZones.ZonedTime.local_date(Palee.TimeZones.ZonedTime.default_zone())
+            |> Date.to_iso8601()
         })
         |> json_response(201)
 

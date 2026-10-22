@@ -59,7 +59,7 @@ defmodule Palee.Finance.PackageTypesTest do
       source_context: "scheduling",
       source_id: Ecto.UUID.generate(),
       quantity: 1,
-      occurred_on: Date.utc_today(),
+      occurred_on: gym_today(),
       idempotency_key: key
     }
   end
@@ -123,7 +123,7 @@ defmodule Palee.Finance.PackageTypesTest do
       assert package.changed_fields == ["group_classes.visits"]
 
       {_user, membership} = member()
-      {:ok, _} = Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+      {:ok, _} = Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
 
       assert {:error, :package_type_change_requires_copy} =
                Finance.update_package(package.id, %{package_type: "class_pack"})
@@ -242,7 +242,7 @@ defmodule Palee.Finance.PackageTypesTest do
                Finance.grant_allowance(user.id, admin.id, %{
                  allowance: "class_visits:" <> @class_type_b,
                  quantity: 1,
-                 occurred_on: Date.utc_today(),
+                 occurred_on: gym_today(),
                  reason: "Make-up class",
                  idempotency_key: "grant:reformer"
                })
@@ -294,7 +294,7 @@ defmodule Palee.Finance.PackageTypesTest do
                  capability: :receive_coaching_touchpoints,
                  allowance: :coaching_touchpoints,
                  quantity: 1,
-                 occurred_on: Date.utc_today(),
+                 occurred_on: gym_today(),
                  source_context: "workouts",
                  idempotency_key: "coaching:1"
                })

@@ -36,6 +36,7 @@ import {
   mealsBySlot,
   occurredAt,
   openCraving,
+  planFit,
   portionBars,
   usualNight,
   visibleItems,
@@ -46,10 +47,9 @@ import {
 } from "./wellness-model";
 
 const [FIT_LOGGED, FIT_EMPTY, FIT_OPTIONAL] = ["logged", "empty", "optional"];
-
 /** The chip state of a meal slot: the plan fit when logged, else whether the slot is expected. */
 function slotFit(meal: WellnessEntry | null | undefined, slot: MealSlot | null): string {
-  if (meal) return (meal.value.plan_fit as string | undefined) ?? FIT_LOGGED;
+  if (meal) return planFit(meal) ?? FIT_LOGGED;
   return slot && isMainSlot(slot) ? FIT_EMPTY : FIT_OPTIONAL;
 }
 
@@ -535,7 +535,7 @@ function MealsTile({
 }
 
 function fitWord(t: ReturnType<typeof useTranslations>, meal: WellnessEntry, hasPlan: boolean) {
-  const fit = meal.value.plan_fit as string | undefined;
+  const fit = planFit(meal);
   if (!fit) return t("meal.logged");
   return t(`meal.fit.${hasPlan ? "plan" : "own"}.${fit}`);
 }

@@ -66,7 +66,7 @@ defmodule Palee.Finance.ReconciliationAndExportsTest do
     end)
   end
 
-  defp payment(%{context: context, member: member}, amount_cents, paid_on \\ Date.utc_today()) do
+  defp payment(%{context: context, member: member}, amount_cents, paid_on \\ gym_today()) do
     {:ok, membership} =
       Finance.upsert_membership(context, member.id, %{
         user_type_snapshot: "member",
@@ -112,7 +112,7 @@ defmodule Palee.Finance.ReconciliationAndExportsTest do
         "external_type" => "payment",
         "statement_amount_cents" => 5_000,
         "statement_currency" => "EUR",
-        "statement_occurred_on" => Date.to_iso8601(Date.utc_today())
+        "statement_occurred_on" => Date.to_iso8601(gym_today())
       },
       overrides
     )
@@ -296,12 +296,12 @@ defmodule Palee.Finance.ReconciliationAndExportsTest do
       other = tenant("Export Gym Other")
       paid = payment(tenant, 5_000)
       reversal = refund(tenant, paid, 1_250)
-      _outside = payment(tenant, 9_999, Date.add(Date.utc_today(), -90))
-      today = Date.to_iso8601(Date.utc_today())
+      _outside = payment(tenant, 9_999, Date.add(gym_today(), -90))
+      today = Date.to_iso8601(gym_today())
 
       assert {:ok, export} =
                RequestFinanceAccountingExport.call(tenant.context, tenant.owner.id, %{
-                 "range_start" => Date.to_iso8601(Date.add(Date.utc_today(), -6)),
+                 "range_start" => Date.to_iso8601(Date.add(gym_today(), -6)),
                  "range_end" => today
                })
 
@@ -370,12 +370,12 @@ defmodule Palee.Finance.ReconciliationAndExportsTest do
 
     test "large ranges are queued and built by the background job" do
       tenant = tenant("Background Export Gym")
-      _paid = payment(tenant, 7_000, Date.add(Date.utc_today(), -40))
+      _paid = payment(tenant, 7_000, Date.add(gym_today(), -40))
 
       assert {:ok, export} =
                RequestFinanceAccountingExport.call(tenant.context, tenant.owner.id, %{
-                 "range_start" => Date.to_iso8601(Date.add(Date.utc_today(), -60)),
-                 "range_end" => Date.to_iso8601(Date.utc_today())
+                 "range_start" => Date.to_iso8601(Date.add(gym_today(), -60)),
+                 "range_end" => Date.to_iso8601(gym_today())
                })
 
       assert export.status == "queued"

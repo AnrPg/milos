@@ -138,6 +138,14 @@ export function mealSlots(plan: WellnessPlan | null | undefined): MealSlot[] {
 }
 
 /** Each slot with the meals logged in it that day; snacks can repeat. */
+export const PLAN_FITS = ["in_plan", "off_plan"] as const;
+
+/** A meal's plan fit, or null when unset or a value this client does not know. */
+export function planFit(meal: WellnessEntry): (typeof PLAN_FITS)[number] | null {
+  const fit = meal.value.plan_fit;
+  return PLAN_FITS.find((known) => known === fit) ?? null;
+}
+
 export function mealsBySlot(meals: WellnessEntry[], slots: MealSlot[]) {
   const named = slots.map((slot) => ({ slot, meals: meals.filter((meal) => meal.value.slot === slot) }));
   const other = meals.filter((meal) => !slots.includes(meal.value.slot as MealSlot));

@@ -76,7 +76,7 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
       quantity: 1,
       source_context: "scheduling",
       source_id: Ecto.UUID.generate(),
-      occurred_on: Date.utc_today(),
+      occurred_on: gym_today(),
       idempotency_key: key
     })
   end
@@ -308,7 +308,7 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
            |> json_response(422)
 
     assert invoice["invoice_number"] =~ ~r/^INV-\d{6}-CORP-/
-    assert invoice["due_on"] == Date.to_iso8601(Date.add(Date.utc_today(), 14))
+    assert invoice["due_on"] == Date.to_iso8601(Date.add(gym_today(), 14))
     invoice_path = "#{base}/admin/finance/corporate-invoices/#{invoice["id"]}"
 
     pay = fn amount ->
@@ -395,7 +395,7 @@ defmodule PaleeWeb.PaymentModelsControllerTest do
 
     # A day early in next month's period, so the period starts after the client.
     issue_day =
-      Date.utc_today() |> Date.beginning_of_month() |> Date.shift(month: 1) |> Date.add(2)
+      gym_today() |> Date.beginning_of_month() |> Date.shift(month: 1) |> Date.add(2)
 
     assert %{issued: 1, reminded: 0} = CorporateInvoicing.run(tenant, issue_day)
     assert_email_sent(fn email -> String.starts_with?(email.subject, "Invoice ") end)

@@ -58,7 +58,7 @@ defmodule Palee.Application.SchedulePackageCoverageTest do
       })
 
     {:ok, _subscription} =
-      Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+      Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
 
     {member, context}
   end
@@ -66,7 +66,7 @@ defmodule Palee.Application.SchedulePackageCoverageTest do
   defp coverage(context, member, slot_id) do
     {:ok, %{slots: slots}} =
       GetScheduleCalendar.call(context, member, %{
-        "start_date" => Date.to_iso8601(Date.utc_today())
+        "start_date" => Date.to_iso8601(gym_today())
       })
 
     slots |> Enum.find(&(&1.id == slot_id)) |> Map.fetch!(:covered_by_package)
@@ -112,7 +112,7 @@ defmodule Palee.Application.SchedulePackageCoverageTest do
 
     {:ok, %{coaches: coaches}} =
       GetScheduleCalendar.call(context, admin, %{
-        "start_date" => Date.to_iso8601(Date.utc_today())
+        "start_date" => Date.to_iso8601(gym_today())
       })
 
     assert [%{id: id, nickname: nickname}] = coaches
@@ -145,7 +145,7 @@ defmodule Palee.Application.SchedulePackageCoverageTest do
 
     {:ok, %{slots: slots}} =
       GetScheduleCalendar.call(context, member, %{
-        "start_date" => Date.to_iso8601(Date.utc_today())
+        "start_date" => Date.to_iso8601(gym_today())
       })
 
     listed = Enum.find(slots, &(&1.id == slot.id))
@@ -158,7 +158,7 @@ defmodule Palee.Application.SchedulePackageCoverageTest do
 
     {:ok, %{slots: slots}} =
       GetScheduleCalendar.call(context, member, %{
-        "start_date" => Date.to_iso8601(Date.utc_today())
+        "start_date" => Date.to_iso8601(gym_today())
       })
 
     assert Enum.find(slots, &(&1.id == slot.id)).cancel_free_until == nil

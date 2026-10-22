@@ -102,7 +102,7 @@ defmodule Palee.FinanceTest do
              Finance.create_receipt(membership.id, %{
                amount_cents: 4_500,
                payment_method: "cash",
-               paid_on: Date.add(Date.utc_today(), -1),
+               paid_on: Date.add(gym_today(), -1),
                description: "Corrected cash receipt"
              })
 
@@ -135,12 +135,12 @@ defmodule Palee.FinanceTest do
              Finance.create_invoice(membership.id, %{
                amount_cents: 7_500,
                description: "Mistaken invoice",
-               due_date: Date.add(Date.utc_today(), -3)
+               due_date: Date.add(gym_today(), -3)
              })
 
     assert {:ok, issued_invoice} =
              Finance.issue_invoice(invoice.id, %{
-               due_date: Date.add(Date.utc_today(), -3)
+               due_date: Date.add(gym_today(), -3)
              })
 
     assert issued_invoice.balance_due_cents == 7_500
@@ -225,7 +225,7 @@ defmodule Palee.FinanceTest do
 
     assert {:ok, subscription} =
              Finance.assign_package(membership.id, package.id, %{
-               starts_on: Date.utc_today()
+               starts_on: gym_today()
              })
 
     assert subscription.package_code_snapshot == "unlimited_monthly"
@@ -284,7 +284,7 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 60)
+               expires_on: Date.add(gym_today(), 60)
              })
 
     assert {:error, :package_inactive} =
@@ -292,8 +292,8 @@ defmodule Palee.FinanceTest do
 
     assert {:ok, future_subscription} =
              Finance.assign_package(membership.id, active_package.id, %{
-               starts_on: Date.add(Date.utc_today(), 10),
-               ends_on: Date.add(Date.utc_today(), 40)
+               starts_on: Date.add(gym_today(), 10),
+               ends_on: Date.add(gym_today(), 40)
              })
 
     assert Finance.get_entitlement(user.id).status == "inactive"
@@ -305,8 +305,8 @@ defmodule Palee.FinanceTest do
 
     assert {:ok, expired_subscription} =
              Finance.assign_package(membership.id, active_package.id, %{
-               starts_on: Date.add(Date.utc_today(), -40),
-               ends_on: Date.add(Date.utc_today(), -10)
+               starts_on: Date.add(gym_today(), -40),
+               ends_on: Date.add(gym_today(), -10)
              })
 
     assert Finance.get_entitlement(user.id).status == "inactive"
@@ -337,19 +337,19 @@ defmodule Palee.FinanceTest do
              })
 
     assert {:ok, subscription} =
-             Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+             Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
 
     assert {:error, :invalid_renewal_period} =
              Finance.generate_renewal_invoice(membership.id, %{
                membership_package_subscription_id: subscription.id,
-               service_period_start: Date.utc_today()
+               service_period_start: gym_today()
              })
 
     assert {:error, :invalid_renewal_period} =
              Finance.generate_renewal_invoice(membership.id, %{
                membership_package_subscription_id: subscription.id,
-               service_period_start: Date.utc_today(),
-               service_period_end: Date.utc_today()
+               service_period_start: gym_today(),
+               service_period_end: gym_today()
              })
   end
 
@@ -378,7 +378,7 @@ defmodule Palee.FinanceTest do
                amount_cents: 9900,
                payment_method: "cash",
                payment_status: "paid",
-               paid_on: Date.add(Date.utc_today(), -45)
+               paid_on: Date.add(gym_today(), -45)
              })
 
     scoped_summary = Finance.financial_summary(%{"days" => "30"})
@@ -445,7 +445,7 @@ defmodule Palee.FinanceTest do
                amount_cents: 8_000,
                payment_method: "cash",
                payment_status: "paid",
-               paid_on: Date.add(Date.utc_today(), -45)
+               paid_on: Date.add(gym_today(), -45)
              })
 
     assert {:ok, _reversal} =
@@ -487,7 +487,7 @@ defmodule Palee.FinanceTest do
     assert credit.entry_type == "grant"
     assert credit.source_type == "manual_credit"
     assert credit.currency == "EUR"
-    assert credit.occurred_on == Date.utc_today()
+    assert credit.occurred_on == gym_today()
     assert credit.idempotency_key != "caller-controlled-key"
 
     assert {:ok, ^credit} =
@@ -636,17 +636,17 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 30)
+               expires_on: Date.add(gym_today(), 30)
              })
 
     assert {:ok, subscription} =
-             Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+             Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
 
     assert {:ok, invoice} =
              Finance.generate_renewal_invoice(membership.id, %{
                membership_package_subscription_id: subscription.id,
-               service_period_start: Date.utc_today(),
-               due_date: Date.add(Date.utc_today(), 7)
+               service_period_start: gym_today(),
+               due_date: Date.add(gym_today(), 7)
              })
 
     assert invoice.invoice_type == "renewal"
@@ -720,16 +720,16 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 30)
+               expires_on: Date.add(gym_today(), 30)
              })
 
     assert {:ok, subscription} =
-             Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+             Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
 
     assert {:ok, invoice} =
              Finance.create_invoice(membership.id, %{
                membership_package_subscription_id: subscription.id,
-               due_date: Date.add(Date.utc_today(), 7)
+               due_date: Date.add(gym_today(), 7)
              })
 
     assert invoice.membership_package_subscription_id == subscription.id
@@ -796,14 +796,14 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 30)
+               expires_on: Date.add(gym_today(), 30)
              })
 
     assert {:ok, invoice} =
              Finance.create_invoice(membership.id, %{
                amount_cents: 6000,
                description: "Refundable invoice",
-               due_date: Date.add(Date.utc_today(), 7)
+               due_date: Date.add(gym_today(), 7)
              })
 
     assert {:ok, issued_invoice} = Finance.issue_invoice(invoice.id)
@@ -907,7 +907,7 @@ defmodule Palee.FinanceTest do
              Finance.create_invoice(context, membership.id, %{
                amount_cents: 4_000,
                description: "Credit analytics invoice",
-               due_date: Date.add(Date.utc_today(), 7)
+               due_date: Date.add(gym_today(), 7)
              })
 
     assert {:ok, invoice} = Finance.issue_invoice(context, invoice.id, %{})
@@ -953,7 +953,7 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 30)
+               expires_on: Date.add(gym_today(), 30)
              })
 
     assert {:ok, invoice} =
@@ -961,7 +961,7 @@ defmodule Palee.FinanceTest do
                amount_cents: 4500,
                description: "Late charge",
                # Beyond the default 3-day grace slack (ADR-112).
-               due_date: Date.add(Date.utc_today(), -10)
+               due_date: Date.add(gym_today(), -10)
              })
 
     assert {:ok, overdue_invoice} = Finance.issue_invoice(invoice.id)
@@ -1259,13 +1259,13 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 30)
+               expires_on: Date.add(gym_today(), 30)
              })
 
     assert {:ok, subscription} =
-             Finance.assign_package(membership.id, package.id, %{starts_on: Date.utc_today()})
+             Finance.assign_package(membership.id, package.id, %{starts_on: gym_today()})
 
-    period_start = Date.utc_today()
+    period_start = gym_today()
 
     assert {:ok, _invoice} =
              Finance.generate_renewal_invoice(membership.id, %{
@@ -1289,7 +1289,7 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 7)
+               expires_on: Date.add(gym_today(), 7)
              })
 
     assert {:ok, payment} =
@@ -1304,7 +1304,7 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), -7)
+               expires_on: Date.add(gym_today(), -7)
              })
 
     queues = Finance.operational_queues(%{"expires_within_days" => "30", "limit" => "10"})
@@ -1327,8 +1327,8 @@ defmodule Palee.FinanceTest do
     assert {:ok, campaign} =
              Finance.create_promotion_campaign(%{
                name: "Founders",
-               starts_on: Date.add(Date.utc_today(), -7),
-               ends_on: Date.add(Date.utc_today(), 30)
+               starts_on: Date.add(gym_today(), -7),
+               ends_on: Date.add(gym_today(), 30)
              })
 
     assert {:ok, code} =
@@ -1361,7 +1361,7 @@ defmodule Palee.FinanceTest do
                signup_source: "promo"
              })
 
-    today = Date.utc_today()
+    today = gym_today()
 
     assert {:ok, inactive_campaign} =
              Finance.create_promotion_campaign(%{
@@ -1469,8 +1469,8 @@ defmodule Palee.FinanceTest do
     assert {:ok, campaign} =
              Finance.create_promotion_campaign(%{
                name: "Concurrent limit",
-               starts_on: Date.add(Date.utc_today(), -1),
-               ends_on: Date.add(Date.utc_today(), 1)
+               starts_on: Date.add(gym_today(), -1),
+               ends_on: Date.add(gym_today(), 1)
              })
 
     assert {:ok, _code} =
@@ -1551,8 +1551,8 @@ defmodule Palee.FinanceTest do
         assert {:ok, campaign} =
                  Finance.create_promotion_campaign(%{
                    name: "Aggregate Promo",
-                   starts_on: Date.add(Date.utc_today(), -1),
-                   ends_on: Date.add(Date.utc_today(), 1)
+                   starts_on: Date.add(gym_today(), -1),
+                   ends_on: Date.add(gym_today(), 1)
                  })
 
         assert {:ok, _code_a} =
@@ -1841,7 +1841,7 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), -1)
+               expires_on: Date.add(gym_today(), -1)
              })
 
     assert expired_membership.status == "expired"
@@ -1851,7 +1851,7 @@ defmodule Palee.FinanceTest do
                user_type_snapshot: "member",
                status: "active",
                signup_source: "direct",
-               expires_on: Date.add(Date.utc_today(), 7)
+               expires_on: Date.add(gym_today(), 7)
              })
 
     assert expiring_membership.status == "expiring"
@@ -1870,8 +1870,8 @@ defmodule Palee.FinanceTest do
     assert {:ok, campaign} =
              Finance.create_promotion_campaign(%{
                name: "Manual Campaign",
-               starts_on: Date.add(Date.utc_today(), -1),
-               ends_on: Date.add(Date.utc_today(), 1)
+               starts_on: Date.add(gym_today(), -1),
+               ends_on: Date.add(gym_today(), 1)
              })
 
     assert {:error, :promotion_discount_required} =

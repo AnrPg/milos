@@ -1,6 +1,7 @@
 import { expect, test, type Page, type Route } from "./support/test";
 
-import { requireWebgl } from "./support/webgl";
+import { chromeArgs } from "../playwright.config";
+import { requireWebgl, waitForFigure } from "./support/webgl";
 
 // P3-M2 anatomy atlas (ADR-164): a member opens the atlas from the WOD goals
 // sheet on a muscle, reads what it does, their own sets and the gym's
@@ -13,8 +14,13 @@ const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 test.use({
   launchOptions: {
     ...(executablePath ? { executablePath } : {}),
-    args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"],
+    // The shared flags keep /dev/shm out of the GPU process, which crashes it on a CI runner.
+    args: [...chromeArgs, "--use-gl=angle"],
   },
+  // SwiftShader renders on the CPU, and at the phone's 2.6x density the figure
+  // alone outlasted the 5-minute budget on the CI runner. The checks are about
+  // the panel, framing, heat map and picking, not pixel density, so 1x.
+  deviceScaleFactor: 1,
 });
 test.describe.configure({ timeout: 300_000 });
 
@@ -205,7 +211,8 @@ test("the goals sheet opens the atlas on a muscle; the panel, breadcrumb, figure
 
   // The 3D figure loads and frames the muscle.
   const figure = page.getByTestId("atlas-figure").locator("[data-anatomy-status]");
-  await expect(figure).toHaveAttribute("data-anatomy-status", "ready", { timeout: 120_000 });
+  await waitForFigure(page, figure);
+  await expect(figure).toHaveAttribute("data-anatomy-status", "ready");
   await expect(figure).toHaveAttribute("data-anatomy-framed", "quadriceps");
   await expect(figure).toHaveAttribute("aria-label", /Primary: Quadriceps/);
   await shot(page, "atlas-group");

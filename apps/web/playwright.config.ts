@@ -6,14 +6,15 @@ export const stubApiPort = Number(process.env.PLAYWRIGHT_STUB_API_PORT ?? 18302)
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 // Software WebGL (SwiftShader through ANGLE) so the maps and the 3D body
 // figure render the same on a GPU-less CI runner as on a laptop.
-const args = [
+// Specs that set their own launch options extend these rather than replace them.
+export const chromeArgs = [
   "--use-angle=swiftshader",
   "--enable-unsafe-swiftshader",
   "--ignore-gpu-blocklist",
   // Docker gives /dev/shm 64 MB, which crashes Chrome's GPU process.
   "--disable-dev-shm-usage",
 ];
-const launchOptions = executablePath ? { executablePath, args } : { args };
+const launchOptions = executablePath ? { executablePath, args: chromeArgs } : { args: chromeArgs };
 
 export default defineConfig({
   testDir: "./e2e",

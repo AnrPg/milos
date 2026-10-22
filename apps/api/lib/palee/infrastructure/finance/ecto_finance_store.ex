@@ -1152,12 +1152,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
         subscriptions_on =
           requests
-          |> Enum.map(&local_date/1)
+          |> Enum.map(&request_date/1)
           |> Enum.uniq()
           |> Map.new(&{&1, effective_subscriptions(membership.id, &1)})
 
         Enum.map(requests, fn request ->
-          Enum.any?(subscriptions_on[local_date(request)], fn subscription ->
+          Enum.any?(subscriptions_on[request_date(request)], fn subscription ->
             EntitlementPolicy.covers?(
               entitlement,
               subscription.params_snapshot || %{},
@@ -1176,6 +1176,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       _error -> DateTime.to_date(starts_at)
     end
   end
+
+  # ADR-176/179: the day a request draws on is the gym-local day of the
+  # session it books (a 00:30 class belongs to the gym's day, not UTC's);
+  # without a session, the given day, else the gym's today.
+  defp request_date(%{starts_at: %DateTime{}} = request), do: local_date(request)
+  defp request_date(request), do: Map.get(request, :occurred_on) || GymClock.today()
 
   @impl true
   def reserve_entitlement(user_id, request) do
@@ -2360,7 +2366,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp reserve_for_membership!(membership, request) do
-    occurred_on = Map.get(request, :occurred_on, GymClock.today())
+    occurred_on = request_date(request)
     base_entitlement = entitlement_for_membership(membership)
     mode = entitlement_enforcement_mode()
     request = put_local_start(request)

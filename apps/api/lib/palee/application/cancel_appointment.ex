@@ -49,7 +49,7 @@ defmodule Palee.Application.CancelAppointment do
         context,
         booking.user_id,
         allowance,
-        DateTime.to_date(slot.starts_at)
+        Organizations.local_date(context, slot.starts_at)
       )
 
     AppointmentPolicy.late_cancellation?(

@@ -31,7 +31,7 @@ defmodule Palee.Workers.SubscriptionExpiryJobTest do
 
     {:ok, subscription} =
       Finance.assign_package(context, membership.id, package.id, %{
-        starts_on: Date.add(Date.utc_today(), -27)
+        starts_on: Date.add(gym_today(), -27)
       })
 
     %{
@@ -62,7 +62,7 @@ defmodule Palee.Workers.SubscriptionExpiryJobTest do
   end
 
   test "reminds the client once before the subscription ends", ctx do
-    end_subscription_on(ctx.subscription, Date.add(Date.utc_today(), 3))
+    end_subscription_on(ctx.subscription, Date.add(gym_today(), 3))
 
     assert :ok = perform_job(SubscriptionExpiryJob, %{})
     assert :ok = perform_job(SubscriptionExpiryJob, %{})
@@ -74,7 +74,7 @@ defmodule Palee.Workers.SubscriptionExpiryJobTest do
   end
 
   test "a renewed subscription gets no reminder", ctx do
-    end_subscription_on(ctx.subscription, Date.add(Date.utc_today(), 3))
+    end_subscription_on(ctx.subscription, Date.add(gym_today(), 3))
 
     Repo.query!(
       """
@@ -94,23 +94,23 @@ defmodule Palee.Workers.SubscriptionExpiryJobTest do
   end
 
   test "after the end the client keeps access during the grace days, then loses it", ctx do
-    end_subscription_on(ctx.subscription, Date.add(Date.utc_today(), -1))
+    end_subscription_on(ctx.subscription, Date.add(gym_today(), -1))
 
     assert :ok = perform_job(SubscriptionExpiryJob, %{})
     assert [["subscription_grace", payload]] = notifications(ctx.member.id)
-    assert payload["grace_until"] == Date.to_iso8601(Date.add(Date.utc_today(), 2))
+    assert payload["grace_until"] == Date.to_iso8601(Date.add(gym_today(), 2))
 
     assert %{status: "grace", source: "subscription_grace"} =
              Finance.get_effective_entitlement(ctx.context, ctx.member.id)
 
-    end_subscription_on(ctx.subscription, Date.add(Date.utc_today(), -5))
+    end_subscription_on(ctx.subscription, Date.add(gym_today(), -5))
 
     assert %{status: "inactive"} = Finance.get_effective_entitlement(ctx.context, ctx.member.id)
   end
 
   test "when the slack is over every entitlement is revoked and upcoming bookings are cancelled",
        ctx do
-    end_subscription_on(ctx.subscription, Date.add(Date.utc_today(), -1))
+    end_subscription_on(ctx.subscription, Date.add(gym_today(), -1))
     assert :ok = perform_job(SubscriptionExpiryJob, %{})
 
     class_type = Palee.TestFixtures.class_type_fixture(%{tenant_context: ctx.context})
@@ -138,7 +138,7 @@ defmodule Palee.Workers.SubscriptionExpiryJobTest do
       })
 
     # Grace is over.
-    end_subscription_on(ctx.subscription, Date.add(Date.utc_today(), -5))
+    end_subscription_on(ctx.subscription, Date.add(gym_today(), -5))
     assert :ok = perform_job(SubscriptionExpiryJob, %{})
 
     assert Repo.get(Booking, booking.id) == nil

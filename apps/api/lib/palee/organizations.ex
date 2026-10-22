@@ -170,7 +170,20 @@ defmodule Palee.Organizations do
 
   @doc "ADR-176: the gym's local date now."
   def local_today(organization_id, now \\ DateTime.utc_now()),
-    do: Palee.TimeZones.ZonedTime.local_date(now, organization_timezone(organization_id))
+    do: local_date(organization_id, now)
+
+  @doc """
+  ADR-176: the gym-local day an instant falls on (the day a class at 00:30
+  belongs to). Takes a gym id or a tenant context; without a gym, the UTC day.
+  """
+  def local_date(organization_id, %DateTime{} = at) when is_binary(organization_id),
+    do: Palee.TimeZones.ZonedTime.local_date(at, organization_timezone(organization_id))
+
+  def local_date(%{organization_id: organization_id}, %DateTime{} = at)
+      when is_binary(organization_id),
+      do: local_date(organization_id, at)
+
+  def local_date(_organization_id, %DateTime{} = at), do: DateTime.to_date(at)
 
   @doc "ADR-179: `timezone_status/1` of several gyms, by id."
   def timezone_statuses(organization_ids) when is_list(organization_ids),

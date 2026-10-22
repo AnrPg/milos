@@ -21,7 +21,6 @@ defmodule Palee.Appointments.Domain.AppointmentPolicy do
       allowance: allowance,
       quantity: 1,
       starts_at: slot.starts_at,
-      occurred_on: DateTime.to_date(slot.starts_at),
       location_id: slot.location_id
     }
   end

@@ -30,7 +30,7 @@ defmodule PaleeWeb.ConnCase do
       import Plug.Conn
       import Phoenix.ConnTest
       import PaleeWeb.ConnCase
-      import Palee.DataCase, only: [bypass_rls: 1]
+      import Palee.DataCase, only: [bypass_rls: 1, gym_today: 0]
     end
   end
 

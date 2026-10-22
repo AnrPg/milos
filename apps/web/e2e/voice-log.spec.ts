@@ -1,3 +1,4 @@
+import { chromeArgs } from "../playwright.config";
 import { expect, test, type Page, type Request, type Route } from "./support/test";
 
 // P3-M13 voice logging (ADR-175): «Με φωνή» in Νέα καταχώρηση records with
@@ -11,7 +12,7 @@ test.use({
   launchOptions: {
     ...(executablePath ? { executablePath } : {}),
     // A synthetic microphone (a beep) that needs no permission prompt.
-    args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
+    args: [...chromeArgs, "--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream"],
   },
   permissions: ["microphone"],
 });

@@ -176,8 +176,18 @@ export class AnatomyScene {
   }
 }
 
+/**
+ * A WebGL renderer for the figure. Multisampling is the first thing a weak or
+ * busy GPU (or a software one) refuses, so a context that cannot be made with
+ * it is retried once without it before the caller shows its fallback.
+ */
 export function createRenderer(canvas?: HTMLCanvasElement, preserveDrawingBuffer = false): THREE.WebGLRenderer {
-  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer });
+  let renderer: THREE.WebGLRenderer;
+  try {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, preserveDrawingBuffer });
+  } catch {
+    renderer = new THREE.WebGLRenderer({ canvas, antialias: false, alpha: true, preserveDrawingBuffer });
+  }
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
   renderer.outputColorSpace = THREE.SRGBColorSpace;
   renderer.setClearColor(0x000000, 0);

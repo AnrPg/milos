@@ -89,7 +89,7 @@ defmodule Palee.Web.SeasonsControllerTest do
           title: "Hyrox prep",
           description: "Οκτώ εβδομάδες για τον αγώνα.",
           welcome_message: "Καλώς ήρθατε! Ξεκινάμε τη Δευτέρα.",
-          starts_on: Date.to_iso8601(Date.add(Date.utc_today(), 1)),
+          starts_on: Date.to_iso8601(Date.add(gym_today(), 1)),
           weeks: 1,
           capacity: 1,
           price_cents: 9900,
@@ -236,10 +236,10 @@ defmodule Palee.Web.SeasonsControllerTest do
 
       assert subscription.id == subscription_id
       assert subscription.price_cents_snapshot == 9900
-      assert subscription.ends_on == Date.add(Date.utc_today(), 7)
+      assert subscription.ends_on == Date.add(gym_today(), 7)
 
       # The programme: two workouts labelled with the season.
-      starts = Date.add(Date.utc_today(), 1)
+      starts = Date.add(gym_today(), 1)
       assert season_assignments(id, ctx.first.id) == [starts, Date.add(starts, 2)]
 
       week =
@@ -408,7 +408,7 @@ defmodule Palee.Web.SeasonsControllerTest do
 
       {:ok, _} =
         Seasons.update_offering(ctx.owner_context, offering, %{
-          starts_on: Date.add(Date.utc_today(), -14),
+          starts_on: Date.add(gym_today(), -14),
           programme: []
         })
 
