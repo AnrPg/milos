@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Тази тренировка още не е отворена за записване.",
     "apiErrorInvalidTimeZone": "Избери позната часова зона.",
     "apiErrorTimeZoneRequired": "Първо задай часовата зона на залата.",
+    "notificationFilters": "Филтри за известия",
     "zonedTimeYours": "{time} твое време",
     "zonedTimeYoursTitle": "По твоя часовник ({zone})",
     "zonedTimeGymClock": "Часовете са по часовника на залата ({zone})."

@@ -26,6 +26,7 @@ import { SeasonsTab } from "@/components/admin/finance/tabs/SeasonsTab";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
 
@@ -147,23 +148,13 @@ export function FinanceOperations() {
         ) : null}
 
         {/* Tab switcher */}
-        <div className="flex max-w-full overflow-x-auto rounded-full p-0.5 self-start" style={{ background: "var(--border)" }}>
-          {TABS.map(({ id, label }) => (
-            <button
-              key={id}
-              className="shrink-0 rounded-full px-5 py-2 text-sm font-semibold transition-colors"
-              style={
-                activeTab === id
-                  ? { background: "var(--text)", color: "var(--bg)" }
-                  : { color: "var(--dim)" }
-              }
-              onClick={() => setTab(id)}
-              type="button"
-            >
-              {label}
-            </button>
-          ))}
-        </div>
+        <SegmentPicker
+          ariaLabel={i18n("financeOperations60f9e5a")}
+          variant="track"
+          value={activeTab}
+          onChange={setTab}
+          options={TABS.map(({ id, label }) => ({ value: id, label }))}
+        />
 
         {/* Active tab */}
         {activeTab === "members" && <MembersTab />}

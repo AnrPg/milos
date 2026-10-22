@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Запись на это занятие ещё не открыта.",
     "apiErrorInvalidTimeZone": "Выберите известный часовой пояс.",
     "apiErrorTimeZoneRequired": "Сначала задайте часовой пояс зала.",
+    "notificationFilters": "Фильтры уведомлений",
     "zonedTimeYours": "{time} по вашему времени",
     "zonedTimeYoursTitle": "По вашим часам ({zone})",
     "zonedTimeGymClock": "Время указано по часам зала ({zone})."

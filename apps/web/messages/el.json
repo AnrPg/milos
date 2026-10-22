@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Το μάθημα δεν είναι ακόμη ανοιχτό για κρατήσεις.",
     "apiErrorInvalidTimeZone": "Διάλεξε μια γνωστή ζώνη ώρας.",
     "apiErrorTimeZoneRequired": "Όρισε πρώτα τη ζώνη ώρας του γυμναστηρίου.",
+    "notificationFilters": "Φίλτρα ειδοποιήσεων",
     "zonedTimeYours": "{time} η ώρα σου",
     "zonedTimeYoursTitle": "Στο ρολόι σου ({zone})",
     "zonedTimeGymClock": "Οι ώρες είναι στο ρολόι του γυμναστηρίου ({zone})."

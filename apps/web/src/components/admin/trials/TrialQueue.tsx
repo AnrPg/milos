@@ -23,6 +23,7 @@ import { trialErrorKey } from "@/components/trials/trial-ui";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 /**
  * Staff's trial queue (board 6 Q4): Αιτήματα · Επερχόμενα · Ήρθαν · Έγιναν
@@ -73,26 +74,12 @@ export function TrialQueue() {
           </section>
         ) : null}
 
-        <div role="tablist" aria-label={t("queueTitle")} className="-mx-4 flex gap-2 overflow-x-auto px-4 md:mx-0 md:px-0">
-          {TRIAL_STAGES.map((value) => {
-            const active = value === stage;
-            const count = queue.data?.counts[value];
-            return (
-              <button
-                key={value}
-                type="button"
-                role="tab"
-                aria-selected={active}
-                onClick={() => setStage(value)}
-                className="flex min-h-10 shrink-0 items-center gap-2 rounded-full px-4 text-sm font-semibold"
-                style={active ? { background: "var(--text)", color: "var(--bg)" } : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-              >
-                {t(`stage_${value}`)}
-                {count ? <span className="text-xs font-bold opacity-80">{count}</span> : null}
-              </button>
-            );
-          })}
-        </div>
+        <SegmentPicker
+          ariaLabel={t("queueTitle")}
+          value={stage}
+          onChange={setStage}
+          options={TRIAL_STAGES.map((value) => ({ value, label: t(`stage_${value}`), count: queue.data?.counts[value] || null }))}
+        />
 
         {queue.isPending ? <p className="py-8 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
         {queue.isError ? <p className="py-8 text-center text-sm" style={{ color: "var(--danger)" }}>{t(trialErrorKey(queue.error))}</p> : null}

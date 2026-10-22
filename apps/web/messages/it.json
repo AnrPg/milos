@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Questa lezione non è ancora prenotabile.",
     "apiErrorInvalidTimeZone": "Scegli un fuso orario noto.",
     "apiErrorTimeZoneRequired": "Imposta prima il fuso orario della palestra.",
+    "notificationFilters": "Filtri delle notifiche",
     "zonedTimeYours": "{time} ora tua",
     "zonedTimeYoursTitle": "Sul tuo orologio ({zone})",
     "zonedTimeGymClock": "Gli orari seguono l'orologio della palestra ({zone})."

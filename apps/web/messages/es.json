@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Esta clase aún no admite reservas.",
     "apiErrorInvalidTimeZone": "Elige una zona horaria conocida.",
     "apiErrorTimeZoneRequired": "Define primero la zona horaria de tu gimnasio.",
+    "notificationFilters": "Filtros de notificaciones",
     "zonedTimeYours": "{time} tu hora",
     "zonedTimeYoursTitle": "En tu reloj ({zone})",
     "zonedTimeGymClock": "Las horas están en el reloj del gimnasio ({zone})."

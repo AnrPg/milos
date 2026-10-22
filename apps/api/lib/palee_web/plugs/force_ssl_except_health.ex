@@ -2,6 +2,10 @@ defmodule PaleeWeb.Plugs.ForceSslExceptHealth do
   @moduledoc """
   Applies production SSL redirects while allowing Kubernetes-style health probes
   to hit the dedicated health endpoint over internal HTTP.
+
+  The web server's retired-slug lookup (ADR-122) also calls the API over the
+  cluster network; redirecting it to https broke the lookup on every
+  `/org/...` page load.
   """
 
   @behaviour Plug
@@ -12,15 +16,20 @@ defmodule PaleeWeb.Plugs.ForceSslExceptHealth do
   def init(opts), do: opts
 
   @impl Plug
-  def call(%Plug.Conn{path_info: @health_path} = conn, _opts) do
+  def call(%Plug.Conn{path_info: @health_path} = conn, _opts), do: internal_or_ssl(conn)
+
+  def call(%Plug.Conn{path_info: ["api", "organization-slug-aliases", _slug]} = conn, _opts),
+    do: internal_or_ssl(conn)
+
+  def call(conn, _opts), do: enforce_ssl(conn)
+
+  defp internal_or_ssl(conn) do
     if internal_probe?(conn.remote_ip) do
       conn
     else
       enforce_ssl(conn)
     end
   end
-
-  def call(conn, _opts), do: enforce_ssl(conn)
 
   defp enforce_ssl(conn) do
     case Application.get_env(:palee, :force_ssl) do

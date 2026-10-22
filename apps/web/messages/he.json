@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "עדיין אי אפשר להירשם לשיעור הזה.",
     "apiErrorInvalidTimeZone": "בחרו אזור זמן מוכר.",
     "apiErrorTimeZoneRequired": "הגדירו קודם את אזור הזמן של המכון.",
+    "notificationFilters": "מסנני התראות",
     "zonedTimeYours": "{time} לפי השעה שלך",
     "zonedTimeYoursTitle": "לפי השעון שלך ({zone})",
     "zonedTimeGymClock": "השעות לפי שעון המכון ({zone})."

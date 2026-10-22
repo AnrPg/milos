@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Ce cours n'est pas encore ouvert aux réservations.",
     "apiErrorInvalidTimeZone": "Choisissez un fuseau horaire connu.",
     "apiErrorTimeZoneRequired": "Définissez d'abord le fuseau horaire de votre salle.",
+    "notificationFilters": "Filtres des notifications",
     "zonedTimeYours": "{time} chez vous",
     "zonedTimeYoursTitle": "Sur votre horloge ({zone})",
     "zonedTimeGymClock": "Les heures suivent l'horloge de la salle ({zone})."

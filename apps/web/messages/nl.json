@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Deze les is nog niet te boeken.",
     "apiErrorInvalidTimeZone": "Kies een bekende tijdzone.",
     "apiErrorTimeZoneRequired": "Stel eerst de tijdzone van je gym in.",
+    "notificationFilters": "Meldingsfilters",
     "zonedTimeYours": "{time} jouw tijd",
     "zonedTimeYoursTitle": "Op jouw klok ({zone})",
     "zonedTimeGymClock": "Tijden volgen de klok van de gym ({zone})."

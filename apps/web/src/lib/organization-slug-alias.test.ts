@@ -76,16 +76,34 @@ describe("lookupCanonicalOrganizationSlug", () => {
     expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 
-  test("fails open without caching when the API is unavailable or rate limited", async () => {
+  test("fails open and retries a failed lookup only after a short pause", async () => {
     const cache = new Map();
+    let clock = 1_000;
+    const now = () => clock;
     const unavailable = vi.fn(async () => jsonResponse(429, { code: "rate_limited" }));
+    const redirected = vi.fn(async () => new Response(null, { status: 301, headers: { location: "https://api/" } }));
     const broken = vi.fn(async () => {
       throw new Error("connection refused");
     });
 
-    await expect(lookupCanonicalOrganizationSlug("harbor-gym", { fetchImpl: unavailable, cache })).resolves.toBeNull();
-    await expect(lookupCanonicalOrganizationSlug("harbor-gym", { fetchImpl: broken, cache })).resolves.toBeNull();
-    expect(cache.size).toBe(0);
+    for (const fetchImpl of [unavailable, redirected, broken]) {
+      cache.clear();
+      await expect(lookupCanonicalOrganizationSlug("harbor-gym", { fetchImpl, cache, now })).resolves.toBeNull();
+      await expect(lookupCanonicalOrganizationSlug("harbor-gym", { fetchImpl, cache, now })).resolves.toBeNull();
+      expect(fetchImpl).toHaveBeenCalledTimes(1);
+
+      clock += 10_001;
+      await lookupCanonicalOrganizationSlug("harbor-gym", { fetchImpl, cache, now });
+      expect(fetchImpl).toHaveBeenCalledTimes(2);
+    }
+  });
+
+  test("never follows a redirect from the API", async () => {
+    const fetchImpl = vi.fn<typeof fetch>(async () => jsonResponse(200, { canonical_slug: null }));
+
+    await lookupCanonicalOrganizationSlug("harbor-gym", { fetchImpl, cache: new Map() });
+
+    expect(fetchImpl.mock.calls[0][1]).toMatchObject({ redirect: "manual" });
   });
 
   test("ignores malformed canonical slugs", async () => {

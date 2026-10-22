@@ -13,6 +13,7 @@ import type { TrialOffer } from "@/api/trials";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone, zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
+import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar";
 
 type Slot = PublicBoxSchedule["slots"][number];
 const ALL = "";
@@ -73,36 +74,47 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
   return (
     <div className="flex flex-col gap-3">
       <WeekStrip selectedDate={selectedDate} today={dateKeyInZone(new Date(), zone)} onSelect={setSelectedDate} />
-      <div className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 lg:mx-0 lg:px-0" role="group" aria-label={tSchedule("filtersAria")}>
-        <Chip label={tSchedule("chipType")} value={type} onChange={setType} options={types.map(([id, name]) => ({ value: id, label: name }))} />
-        <Chip
-          label={tSchedule("chipLevel")}
-          value={level}
-          onChange={setLevel}
-          options={levels.map((value) => ({ value, label: tSchedule(`level_${value}`) }))}
-        />
-        <Chip
-          label={tSchedule("audience")}
-          value={audience}
-          onChange={setAudience}
-          options={audiences.map((value) => ({ value, label: audienceLabel(tSchedule, value) }))}
-        />
-        {canAsk && slots.some(takesTrials) ? (
-          <button
-            type="button"
-            aria-pressed={trialOnly}
-            onClick={() => setTrialOnly((value) => !value)}
-            className="flex min-h-10 shrink-0 items-center rounded-full px-3.5 text-sm font-semibold"
-            style={
-              trialOnly
-                ? { background: "var(--text)", color: "var(--bg)" }
-                : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }
-            }
-          >
-            {tTrials("chipTrial")}
-          </button>
-        ) : null}
-      </div>
+      <CollapsibleFilterBar
+        ariaLabel={tSchedule("filtersAria")}
+        activeCount={[type, level, audience].filter((value) => value !== ALL).length + (trialOnly ? 1 : 0)}
+        onClear={() => {
+          setType(ALL);
+          setLevel(ALL);
+          setAudience(ALL);
+          setTrialOnly(false);
+        }}
+      >
+        <div className="flex flex-wrap gap-2">
+          <Chip label={tSchedule("chipType")} value={type} onChange={setType} options={types.map(([id, name]) => ({ value: id, label: name }))} />
+          <Chip
+            label={tSchedule("chipLevel")}
+            value={level}
+            onChange={setLevel}
+            options={levels.map((value) => ({ value, label: tSchedule(`level_${value}`) }))}
+          />
+          <Chip
+            label={tSchedule("audience")}
+            value={audience}
+            onChange={setAudience}
+            options={audiences.map((value) => ({ value, label: audienceLabel(tSchedule, value) }))}
+          />
+          {canAsk && slots.some(takesTrials) ? (
+            <button
+              type="button"
+              aria-pressed={trialOnly}
+              onClick={() => setTrialOnly((value) => !value)}
+              className="flex min-h-10 shrink-0 items-center rounded-full px-3.5 text-sm font-semibold"
+              style={
+                trialOnly
+                  ? { background: "var(--text)", color: "var(--bg)" }
+                  : { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }
+              }
+            >
+              {tTrials("chipTrial")}
+            </button>
+          ) : null}
+        </div>
+      </CollapsibleFilterBar>
 
       {schedule.isPending ? <p className="py-6 text-center text-sm" style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
       {schedule.isError ? (

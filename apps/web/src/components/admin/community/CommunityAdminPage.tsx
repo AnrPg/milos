@@ -29,6 +29,7 @@ import { can } from "@/lib/role-navigation";
 import { MemberGroupsSetting, PartnersSetting } from "./CommunitySettings";
 import { EventsTab } from "./EventsTab";
 import { OpenClubsTab } from "./OpenClubsTab";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type Tab = "groups" | "events" | "reports" | "clubs";
 const TABS: Tab[] = ["groups", "events", "reports", "clubs"];
@@ -65,26 +66,13 @@ export function CommunityAdminPage() {
     <main className="min-h-screen px-4 py-8 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto flex max-w-3xl flex-col gap-5 pb-28">
         <h1 className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{t("title")}</h1>
-        <div role="tablist" aria-label={t("title")} className="flex gap-2 overflow-x-auto">
-          {TABS.map((value) => (
-            <button
-              key={value}
-              type="button"
-              role="tab"
-              aria-selected={tab === value}
-              onClick={() => select(value)}
-              className="min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-2xl px-3 text-sm font-semibold"
-              style={{
-                background: tab === value ? "var(--primary)" : "var(--panel)",
-                color: tab === value ? "var(--primary-contrast)" : "var(--text)",
-                border: "1px solid var(--border)",
-              }}
-            >
-              {t(`tab_${value}`)}
-              {counts[value] ? ` · ${counts[value]}` : ""}
-            </button>
-          ))}
-        </div>
+        <SegmentPicker
+          ariaLabel={t("title")}
+          stretch
+          value={tab}
+          onChange={select}
+          options={TABS.map((value) => ({ value, label: t(`tab_${value}`), count: counts[value] || null }))}
+        />
         {tab === "groups" ? <GroupsTab /> : tab === "events" ? <EventsTab /> : tab === "reports" ? <ReportsTab /> : <OpenClubsTab />}
       </div>
     </main>

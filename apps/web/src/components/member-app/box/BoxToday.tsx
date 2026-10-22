@@ -35,6 +35,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -176,28 +177,12 @@ export function BoxToday({
         ) : (
           <div className="flex flex-col gap-3">
             {today.items.length > 1 ? (
-              <div role="tablist" aria-label={t("todaySources")} className="flex gap-2 overflow-x-auto" style={{ scrollbarWidth: "none" }}>
-                {today.items.map((item) => {
-                  const current = item.key === selected.key;
-                  return (
-                    <button
-                      key={item.key}
-                      type="button"
-                      role="tab"
-                      aria-selected={current}
-                      onClick={() => setSelectedKey(item.key)}
-                      className="shrink-0 rounded-xl px-3 py-1.5 text-xs font-bold"
-                      style={{
-                        background: current ? "color-mix(in srgb, var(--primary) 18%, transparent)" : "var(--panel-raised)",
-                        color: current ? "var(--primary-strong)" : "var(--text-soft)",
-                      }}
-                    >
-                      {chipLabel(item)}
-                      {item.completed ? " ✓" : ""}
-                    </button>
-                  );
-                })}
-              </div>
+              <SegmentPicker
+                ariaLabel={t("todaySources")}
+                value={selected.key}
+                onChange={setSelectedKey}
+                options={today.items.map((item) => ({ value: item.key, label: `${chipLabel(item)}${item.completed ? " ✓" : ""}` }))}
+              />
             ) : (
               <p className="text-xs font-bold" style={{ color: "var(--primary-strong)" }}>{chipLabel(selected)}</p>
             )}

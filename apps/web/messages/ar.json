@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "هذه الحصة غير متاحة للحجز بعد.",
     "apiErrorInvalidTimeZone": "اختر منطقة زمنية معروفة.",
     "apiErrorTimeZoneRequired": "حدّد أولًا المنطقة الزمنية لناديك.",
+    "notificationFilters": "عوامل تصفية الإشعارات",
     "zonedTimeYours": "{time} بتوقيتك",
     "zonedTimeYoursTitle": "حسب ساعتك ({zone})",
     "zonedTimeGymClock": "الأوقات حسب ساعة النادي ({zone})."

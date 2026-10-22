@@ -26,6 +26,7 @@ import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useSocialSummary } from "@/components/social/use-social";
 import { useDebounced } from "@/hooks/useDebounced";
 import { useUiTranslations } from "@/i18n/ui";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 const TABS = ["followers", "following", "boxes", "clubs", "prs"] as const;
 type Tab = (typeof TABS)[number];
@@ -60,26 +61,15 @@ export function ConnectionsPage() {
 
   return (
     <HubPage title={t("connectionsTitle")}>
-      <div role="tablist" aria-label={t("connectionsTitle")} className="-mx-4 flex gap-1 overflow-x-auto px-4">
-        {TABS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            onClick={() => router.replace(`/me/connections?tab=${value}`, { scroll: false })}
-            className="min-h-11 shrink-0 rounded-full px-4 text-sm font-semibold"
-            style={
-              tab === value
-                ? { background: "var(--primary)", color: "var(--primary-contrast)" }
-                : { background: "var(--panel)", color: "var(--text-soft)", border: "1px solid var(--border)" }
-            }
-          >
-            {label(value)}
-          </button>
-        ))}
-      </div>
-      <div role="tabpanel" className="flex flex-col gap-2">
+      <SegmentPicker
+        ariaLabel={t("connectionsTitle")}
+        idPrefix="connections"
+        panelId="connections-panel"
+        value={tab}
+        onChange={(value) => router.replace(`/me/connections?tab=${value}`, { scroll: false })}
+        options={TABS.map((value) => ({ value, label: label(value) }))}
+      />
+      <div id="connections-panel" role="tabpanel" aria-labelledby={`connections-tab-${tab}`} className="flex flex-col gap-2">
         {tab === "followers" ? <Followers /> : null}
         {tab === "following" ? <People type="user" /> : null}
         {tab === "boxes" ? <People type="organization" /> : null}

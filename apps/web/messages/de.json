@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "Diese Stunde ist noch nicht buchbar.",
     "apiErrorInvalidTimeZone": "Wähle eine bekannte Zeitzone.",
     "apiErrorTimeZoneRequired": "Lege zuerst die Zeitzone deines Gyms fest.",
+    "notificationFilters": "Benachrichtigungsfilter",
     "zonedTimeYours": "{time} deine Zeit",
     "zonedTimeYoursTitle": "Auf deiner Uhr ({zone})",
     "zonedTimeGymClock": "Zeiten nach der Uhr des Gyms ({zone})."

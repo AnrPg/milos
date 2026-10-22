@@ -4358,6 +4358,7 @@
     "apiErrorClassNotPublished": "This class isn't open for booking yet.",
     "apiErrorInvalidTimeZone": "Choose a known time zone.",
     "apiErrorTimeZoneRequired": "Set your gym's time zone first.",
+    "notificationFilters": "Notification filters",
     "zonedTimeYours": "{time} your time",
     "zonedTimeYoursTitle": "On your clock ({zone})",
     "zonedTimeGymClock": "Times are on the gym's clock ({zone})."

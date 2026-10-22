@@ -35,6 +35,7 @@ import {
 import { fetchOrganizationMemberships } from "@/api/organizations";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
   return new Intl.DateTimeFormat(uiLocale, {
@@ -1019,23 +1020,14 @@ export function NotificationBell({
 
             <FollowRequestsRow onNavigate={() => setOpen(false)} />
 
-            <div className="mt-5 flex gap-2 overflow-x-auto pb-1">
-              {FILTER_TABS.map((tab) => (
-                <button
-                  key={tab.key}
-                  className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors"
-                  style={
-                    activeFilter === tab.key
-                      ? { background: "var(--primary)", color: "var(--primary-contrast)" }
-                      : { background: "var(--border)", color: "var(--muted)" }
-                  }
-                  onClick={() => { setActiveFilter(tab.key); setReadSectionOpen(false); }}
-                  type="button"
-                >
-                  {tab.label}
-                </button>
-              ))}
-            </div>
+            <SegmentPicker
+              className="mt-5"
+              ariaLabel={i18n("notificationFilters")}
+              semantics="radiogroup"
+              value={activeFilter}
+              onChange={(value) => { setActiveFilter(value); setReadSectionOpen(false); }}
+              options={FILTER_TABS.map((tab) => ({ value: tab.key, label: tab.label }))}
+            />
 
             {shouldShowPushControl && !push.enabled ? (
               <div
