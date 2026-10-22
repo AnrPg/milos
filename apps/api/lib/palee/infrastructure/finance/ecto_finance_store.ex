@@ -54,7 +54,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   }
 
   alias Palee.Repo
-  alias Palee.Infrastructure.Tenancy.RepoContext
+  alias Palee.Infrastructure.Tenancy.{GymClock, RepoContext}
 
   @impl true
   def create_package(params) do
@@ -178,7 +178,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           "membership_id" => membership.id,
           "membership_package_id" => replacement.id,
           "status" => "active",
-          "starts_on" => Date.utc_today(),
+          "starts_on" => GymClock.today(),
           "ends_on" => subscription.ends_on,
           "package_code_snapshot" => package_identity_snapshot(replacement),
           "package_family_snapshot" => replacement.family,
@@ -373,12 +373,12 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
         with {:ok, base} <-
                membership.id
-               |> effective_subscriptions(Date.utc_today())
+               |> effective_subscriptions(GymClock.today())
                |> PaymentModelPolicy.add_on_base(compatible, params["base_subscription_id"]) do
           {:ok,
            params
            |> Map.put("base_subscription_id", base.id)
-           |> Map.put("starts_on", params["starts_on"] || Date.utc_today())}
+           |> Map.put("starts_on", params["starts_on"] || GymClock.today())}
         end
 
       "corporate" ->
@@ -397,7 +397,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       params
       |> string_key_map()
       |> Map.put("membership_id", membership_id)
-      |> Map.put_new("paid_on", Date.utc_today())
+      |> Map.put_new("paid_on", GymClock.today())
 
     Repo.transaction(fn ->
       with %Membership{} = membership <- locked_membership(membership_id),
@@ -425,7 +425,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   def create_receipt(membership_id, params) do
     params = string_key_map(params)
     amount_cents = parse_integer(params["amount_cents"], 0)
-    paid_on = parse_date(params["paid_on"], Date.utc_today())
+    paid_on = parse_date(params["paid_on"], GymClock.today())
     description = params["description"] || params["notes"] || "Payment received"
     currency = params["currency"] || "EUR"
 
@@ -524,7 +524,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "entry_type" => "grant",
                "amount_cents" => amount_cents,
                "currency" => "EUR",
-               "occurred_on" => Date.utc_today(),
+               "occurred_on" => GymClock.today(),
                "occurred_at" => utc_now(),
                "description" => params["description"] || params["notes"],
                "created_by_id" => params["created_by_id"],
@@ -573,7 +573,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "entry_type" => "application",
                "amount_cents" => -amount_cents,
                "currency" => payment.currency || "EUR",
-               "occurred_on" => Date.utc_today(),
+               "occurred_on" => GymClock.today(),
                "occurred_at" => utc_now(),
                "description" => params["description"] || params["notes"],
                "created_by_id" => params["created_by_id"],
@@ -626,7 +626,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "reversal_type" => params["reversal_type"] || payment_reversal_type(payment),
                "amount_cents" => amount_cents,
                "currency" => payment.currency || "EUR",
-               "occurred_on" => Date.utc_today(),
+               "occurred_on" => GymClock.today(),
                "occurred_at" => utc_now(),
                "reason" => params["reason"] || params["description"] || params["notes"],
                "created_by_id" => params["created_by_id"],
@@ -677,7 +677,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "entry_type" => "reversal",
                "amount_cents" => amount_cents,
                "currency" => original_entry.currency || "EUR",
-               "occurred_on" => Date.utc_today(),
+               "occurred_on" => GymClock.today(),
                "occurred_at" => utc_now(),
                "description" => params["reason"] || params["description"] || params["notes"],
                "created_by_id" => params["created_by_id"],
@@ -733,7 +733,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         {:error, :not_found}
 
       %FinanceInvoice{} = invoice ->
-        today = Date.utc_today()
+        today = GymClock.today()
 
         due_date =
           case params["due_date"] do
@@ -765,7 +765,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def mark_overdue_invoices do
-    today = Date.utc_today()
+    today = GymClock.today()
 
     {_, _} =
       tenant_scope(FinanceInvoice)
@@ -895,7 +895,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
          :ok <- not_corporate_seat(subscription),
          :ok <- add_on_base_active(subscription),
          :ok <- SubscriptionSelection.renewable?(subscription.params_snapshot || %{}) do
-      period_start = parse_date(params["service_period_start"], Date.utc_today())
+      period_start = parse_date(params["service_period_start"], GymClock.today())
 
       with {:ok, {period_start, period_end}} <-
              InvoiceLifecycle.renewal_period(
@@ -1010,7 +1010,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           invoice
           |> FinanceInvoice.changeset(%{
             status: "issued",
-            issue_date: params["issue_date"] || invoice.issue_date || Date.utc_today(),
+            issue_date: params["issue_date"] || invoice.issue_date || GymClock.today(),
             due_date: params["due_date"] || invoice.due_date || default_invoice_due_date(invoice)
           })
           |> Repo.update()
@@ -1099,7 +1099,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                "entry_type" => "invoice_offset",
                "amount_cents" => -amount_cents,
                "currency" => invoice.currency || "EUR",
-               "occurred_on" => Date.utc_today(),
+               "occurred_on" => GymClock.today(),
                "occurred_at" => utc_now(),
                "description" => params["description"] || params["notes"],
                "created_by_id" => params["created_by_id"],
@@ -1132,7 +1132,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
          |> where([membership], membership.user_id == ^user_id)
          |> Repo.one() do
       nil -> nil
-      %Membership{} = membership -> effective_entitlement(membership, Date.utc_today())
+      %Membership{} = membership -> effective_entitlement(membership, GymClock.today())
     end
   end
 
@@ -1169,7 +1169,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp local_date(%{starts_at: %DateTime{} = starts_at}) do
-    timezone = Map.get(get_finance_settings(), :entitlement_timezone) || "Etc/UTC"
+    timezone = GymClock.zone() || "Etc/UTC"
 
     case DateTime.shift_zone(starts_at, timezone) do
       {:ok, local} -> DateTime.to_date(local)
@@ -1230,7 +1230,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         ) ||
           Repo.rollback(:finance_profile_missing)
 
-      occurred_on = Map.get(params, :occurred_on, Date.utc_today())
+      occurred_on = Map.get(params, :occurred_on, GymClock.today())
       allowance = Map.get(params, :allowance)
       candidates = effective_subscriptions(membership.id, occurred_on)
       if candidates == [], do: Repo.rollback(:finance_entitlement_inactive)
@@ -1290,7 +1290,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           from m in tenant_scope(Membership), where: m.user_id == ^user_id, lock: "FOR UPDATE"
         ) || Repo.rollback(:finance_profile_missing)
 
-      today = Date.utc_today()
+      today = GymClock.today()
       starts_on = parse_date(params["starts_on"], today)
       ends_on = parse_date(params["ends_on"], nil) || Repo.rollback(:invalid_freeze_dates)
 
@@ -1364,7 +1364,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
       if freeze.cancelled_at, do: Repo.rollback(:freeze_already_cancelled)
 
-      today = Date.utc_today()
+      today = GymClock.today()
 
       # Unused freeze days are given back: the freeze ends yesterday (or is
       # removed entirely when it has not started) and the extension shrinks.
@@ -1657,7 +1657,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       package = Repo.get!(MembershipPackage, client.membership_package_id)
       terms = package_terms(package.params)
       membership = ensure_member_membership!(user_id)
-      seats = active_corporate_seats(client.id, Date.utc_today())
+      seats = active_corporate_seats(client.id, GymClock.today())
 
       if Enum.any?(seats, &(&1.membership_id == membership.id)),
         do: Repo.rollback(:already_enrolled)
@@ -1694,7 +1694,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         subscription
         |> MembershipPackageSubscription.changeset(%{
           "status" => "cancelled",
-          "ends_on" => Date.utc_today()
+          "ends_on" => GymClock.today()
         })
         |> Repo.update()
 
@@ -1749,7 +1749,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       package = Repo.get!(MembershipPackage, client.membership_package_id)
       period = PaymentModelPolicy.corporate_period(package.billing_period, on)
 
-      case insert_corporate_invoice(client, package, period, Date.utc_today()) do
+      case insert_corporate_invoice(client, package, period, GymClock.today()) do
         {:ok, invoice} -> invoice_with_payments(invoice)
         {:error, changeset} -> Repo.rollback(changeset)
       end
@@ -1872,7 +1872,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                corporate_invoice_id: invoice.id,
                amount_cents: amount,
                payment_method: params["payment_method"],
-               paid_on: parse_date(params["paid_on"], Date.utc_today()),
+               paid_on: parse_date(params["paid_on"], GymClock.today()),
                reference: params["reference"],
                notes: params["notes"],
                recorded_by_id: admin_id
@@ -2005,7 +2005,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   # invoice in its API shape.
   defp settle_corporate_invoice!(invoice) do
     paid = corporate_paid_cents(invoice.id)
-    today = Date.utc_today()
+    today = GymClock.today()
     status = CorporateInvoicePolicy.status_after_payments(invoice, paid, today)
 
     paid_on =
@@ -2080,7 +2080,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       enrollment_domain: terms[:enrollment_domain],
       seats: terms[:seats],
       seat_billing: terms[:seat_billing] || "agreed",
-      active_seats: length(active_corporate_seats(client.id, Date.utc_today())),
+      active_seats: length(active_corporate_seats(client.id, GymClock.today())),
       payment_terms_days: client.payment_terms_days,
       auto_invoice: client.auto_invoice,
       status: client.status
@@ -2360,7 +2360,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp reserve_for_membership!(membership, request) do
-    occurred_on = Map.get(request, :occurred_on, Date.utc_today())
+    occurred_on = Map.get(request, :occurred_on, GymClock.today())
     base_entitlement = entitlement_for_membership(membership)
     mode = entitlement_enforcement_mode()
     request = put_local_start(request)
@@ -2747,7 +2747,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp put_local_start(%{starts_at: %DateTime{} = starts_at} = request) do
-    timezone = Map.get(get_finance_settings(), :entitlement_timezone) || "Etc/UTC"
+    timezone = GymClock.zone() || "Etc/UTC"
 
     local =
       case DateTime.shift_zone(starts_at, timezone) do
@@ -2966,8 +2966,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def list_expiring_memberships(days) do
-    today = Date.utc_today()
-    cutoff = Date.add(Date.utc_today(), parse_integer(days, 30))
+    today = GymClock.today()
+    cutoff = Date.add(GymClock.today(), parse_integer(days, 30))
 
     Membership
     |> where([membership], not is_nil(membership.expires_on))
@@ -3002,7 +3002,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     params = string_key_map(params || %{})
     since = summary_since(params["days"])
     renewal_metrics = renewal_invoice_metrics()
-    first_month = Date.utc_today() |> Date.beginning_of_month() |> Date.shift(month: -23)
+    first_month = GymClock.today() |> Date.beginning_of_month() |> Date.shift(month: -23)
 
     {aggregate_status, aggregate_error, aggregate_rows} =
       case RepoContext.current_setting("app.organization_id") do
@@ -3528,7 +3528,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       "entry_type" => referral_reward_credit_entry_type(delta_cents),
       "amount_cents" => delta_cents,
       "currency" => "EUR",
-      "occurred_on" => Date.utc_today(),
+      "occurred_on" => GymClock.today(),
       "occurred_at" => referral_reward_credit_occurred_at(reward, delta_cents),
       "description" => referral_reward_credit_description(delta_cents),
       "reversed_credit_ledger_entry_id" =>
@@ -3852,7 +3852,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp payment_reversal_type(%MembershipPayment{}), do: "refund"
 
   defp default_invoice_due_date(%FinanceInvoice{} = invoice) do
-    if receipt_invoice?(invoice), do: nil, else: Date.utc_today()
+    if receipt_invoice?(invoice), do: nil, else: GymClock.today()
   end
 
   defp receipt_invoice?(%FinanceInvoice{} = invoice),
@@ -4013,7 +4013,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
            base.status,
            base.starts_on,
            base.ends_on,
-           Date.utc_today()
+           GymClock.today()
          ),
        do: :ok,
        else: {:error, :add_on_base_ended}
@@ -4056,7 +4056,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
   # ADR-097: member discount for manual charges in the member's discount scope.
   defp apply_member_discount(membership, %{"lines" => lines} = params) when is_list(lines) do
-    case effective_subscription(membership.id, Date.utc_today()) do
+    case effective_subscription(membership.id, GymClock.today()) do
       nil ->
         params
 
@@ -4136,7 +4136,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp renewal_subscription(membership_id, nil) do
-    today = Date.utc_today()
+    today = GymClock.today()
 
     MembershipPackageSubscription
     |> where([subscription], subscription.membership_id == ^membership_id)
@@ -4167,7 +4167,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
                  subscription.status,
                  subscription.starts_on,
                  subscription.ends_on,
-                 Date.utc_today()
+                 GymClock.today()
                ) do
           subscription
         else
@@ -4317,7 +4317,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
               invoice_paid_cents(invoice.id),
               invoice_credit_applied_cents(invoice.id),
               invoice.due_date,
-              Date.utc_today(),
+              GymClock.today(),
               invoice.status,
               invoice.params
             )
@@ -4349,7 +4349,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       |> where([invoice], is_nil(invoice.deleted_at))
       |> Repo.all()
 
-    today = Date.utc_today()
+    today = GymClock.today()
 
     open_invoice_count =
       Enum.count(blocking_invoices, fn invoice -> invoice_balance_due(invoice.id) > 0 end)
@@ -4496,7 +4496,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp effective_subscriptions_for_package(package_id) do
-    today = Date.utc_today()
+    today = GymClock.today()
 
     MembershipPackageSubscription
     |> where([subscription], subscription.membership_package_id == ^package_id)
@@ -4669,7 +4669,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           with %PromotionCampaign{} = campaign <-
                  PromotionCampaign |> tenant_scope() |> Repo.get(params["promotion_campaign_id"]),
                :ok <- validate_campaign_active(campaign),
-               :ok <- validate_campaign_window(campaign, Date.utc_today()),
+               :ok <- validate_campaign_window(campaign, GymClock.today()),
                {:ok, {discount_type, discount_value}} <-
                  PromotionRedemptionPolicy.validate_manual_discount(
                    params["discount_type_snapshot"],
@@ -4831,13 +4831,13 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         params["status"],
         params["starts_on"],
         params["expires_on"],
-        Date.utc_today()
+        GymClock.today()
       )
     )
   end
 
   defp active_membership_count do
-    today = Date.utc_today()
+    today = GymClock.today()
 
     Membership
     |> where([membership], membership.status in ["active", "trial", "expiring", "comped"])
@@ -4875,7 +4875,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     with %PromotionCampaign{} = campaign <-
            PromotionCampaign |> tenant_scope() |> Repo.get(code.promotion_campaign_id),
          :ok <- validate_campaign_active(campaign),
-         :ok <- validate_campaign_window(campaign, Date.utc_today()),
+         :ok <- validate_campaign_window(campaign, GymClock.today()),
          :ok <- validate_code_redemption_limit(code) do
       {:ok, code}
     else
@@ -5062,7 +5062,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp total_overdue_invoice_balance_cents do
     FinanceInvoice
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
-    |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^Date.utc_today())
+    |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^GymClock.today())
     |> where([invoice], is_nil(invoice.deleted_at))
     |> Repo.all()
     |> Enum.reduce(0, fn invoice, acc -> acc + invoice_balance_due(invoice.id) end)
@@ -5081,7 +5081,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp list_overdue_invoices(limit) do
     FinanceInvoice
     |> where([invoice], invoice.status in ["issued", "partially_paid", "overdue"])
-    |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^Date.utc_today())
+    |> where([invoice], not is_nil(invoice.due_date) and invoice.due_date < ^GymClock.today())
     |> where([invoice], is_nil(invoice.deleted_at))
     |> order_by([invoice], asc: invoice.due_date)
     |> limit(^limit)
@@ -5175,10 +5175,10 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Enum.map(&Ecto.UUID.dump!/1)
   end
 
-  defp summary_since(nil), do: Date.add(Date.utc_today(), -30)
+  defp summary_since(nil), do: Date.add(GymClock.today(), -30)
 
   defp summary_since(days) when is_integer(days) do
-    Date.add(Date.utc_today(), -max(days, 1))
+    Date.add(GymClock.today(), -max(days, 1))
   end
 
   defp summary_since(days) when is_binary(days) do
@@ -5538,7 +5538,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
         paid_cents,
         credit_applied_cents,
         invoice.due_date,
-        Date.utc_today(),
+        GymClock.today(),
         invoice.status,
         invoice.params
       )
@@ -5826,7 +5826,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   defp put_subscription_window(params, package) do
-    starts_on = parse_date(params["starts_on"], Date.utc_today())
+    starts_on = parse_date(params["starts_on"], GymClock.today())
     terms = package_terms(package.params)
 
     ends_on =
@@ -5874,7 +5874,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
     case SubscriptionTerms.cancellation_allowed?(
            commitment,
-           Date.utc_today(),
+           GymClock.today(),
            params["commitment_override_reason"]
          ) do
       :ok -> :ok
@@ -6105,7 +6105,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
 
   @impl true
   def subscriptions_needing_expiry_notice(:expiry_reminder, days) when days > 0 do
-    today = Date.utc_today()
+    today = GymClock.today()
 
     :expiry_reminder_sent_at
     |> subscription_notices(today, Date.add(today, days))
@@ -6116,7 +6116,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   end
 
   def subscriptions_needing_expiry_notice(:grace_notice, days) when days > 0 do
-    today = Date.utc_today()
+    today = GymClock.today()
 
     :grace_notice_sent_at
     |> subscription_notices(Date.add(today, -days), Date.add(today, -1))

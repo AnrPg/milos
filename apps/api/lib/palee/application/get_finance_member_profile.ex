@@ -18,7 +18,11 @@ defmodule Palee.Application.GetFinanceMemberProfile do
           end
 
         {:ok,
-         Map.put(profile, :drill_down, MemberDrillDown.build(user, profile, Date.utc_today()))}
+         Map.put(
+           profile,
+           :drill_down,
+           MemberDrillDown.build(user, profile, today(tenant_context))
+         )}
     end
   end
 
@@ -41,4 +45,10 @@ defmodule Palee.Application.GetFinanceMemberProfile do
       entitlement: nil
     }
   end
+
+  # ADR-179: the gym's day inside a gym; the UTC day for the vendor's view.
+  defp today(%{organization_id: organization_id}) when is_binary(organization_id),
+    do: Palee.Organizations.local_today(organization_id)
+
+  defp today(_context), do: Date.utc_today()
 end

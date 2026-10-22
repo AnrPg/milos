@@ -2362,6 +2362,14 @@
                 "format": "date-time",
                 "type": "string"
               },
+              "time_zone": {
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "type": "string"
+              },
+              "time_zone_confirmed": {
+                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                "type": "boolean"
+              },
               "title": {
                 "type": "string"
               },
@@ -2377,6 +2385,7 @@
               "starts_at",
               "ends_at",
               "place",
+              "time_zone",
               "going_count",
               "waitlist_count",
               "price_cents",
@@ -2737,6 +2746,14 @@
                       "format": "date-time",
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "type": "string"
+                    },
+                    "time_zone_confirmed": {
+                      "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                      "type": "boolean"
+                    },
                     "title": {
                       "type": "string"
                     },
@@ -2752,6 +2769,7 @@
                     "starts_at",
                     "ends_at",
                     "place",
+                    "time_zone",
                     "going_count",
                     "waitlist_count",
                     "price_cents",
@@ -3402,6 +3420,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -3417,6 +3443,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -4193,6 +4220,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -4208,6 +4243,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -5349,6 +5385,14 @@
                     "format": "date-time",
                     "type": "string"
                   },
+                  "time_zone": {
+                    "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                    "type": "string"
+                  },
+                  "time_zone_confirmed": {
+                    "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                    "type": "boolean"
+                  },
                   "title": {
                     "type": "string"
                   },
@@ -5364,6 +5408,7 @@
                   "starts_at",
                   "ends_at",
                   "place",
+                  "time_zone",
                   "going_count",
                   "waitlist_count",
                   "price_cents",
@@ -5983,6 +6028,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -5998,6 +6051,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -7190,6 +7244,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -7205,6 +7267,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -7710,6 +7773,14 @@
                                   "format": "date-time",
                                   "type": "string"
                                 },
+                                "time_zone": {
+                                  "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                  "type": "string"
+                                },
+                                "time_zone_confirmed": {
+                                  "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                  "type": "boolean"
+                                },
                                 "title": {
                                   "type": "string"
                                 },
@@ -7725,6 +7796,7 @@
                                 "starts_at",
                                 "ends_at",
                                 "place",
+                                "time_zone",
                                 "going_count",
                                 "waitlist_count",
                                 "price_cents",
@@ -8632,6 +8704,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -8647,6 +8727,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -9152,6 +9233,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -9167,6 +9256,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -19565,6 +19655,14 @@
             "format": "date-time",
             "type": "string"
           },
+          "time_zone": {
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "type": "string"
+          },
+          "time_zone_confirmed": {
+            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+            "type": "boolean"
+          },
           "title": {
             "type": "string"
           },
@@ -19580,6 +19678,7 @@
           "starts_at",
           "ends_at",
           "place",
+          "time_zone",
           "going_count",
           "waitlist_count",
           "price_cents",
@@ -20633,6 +20732,14 @@
                 "format": "date-time",
                 "type": "string"
               },
+              "time_zone": {
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "type": "string"
+              },
+              "time_zone_confirmed": {
+                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                "type": "boolean"
+              },
               "title": {
                 "type": "string"
               },
@@ -20648,6 +20755,7 @@
               "starts_at",
               "ends_at",
               "place",
+              "time_zone",
               "going_count",
               "waitlist_count",
               "price_cents",
@@ -20925,6 +21033,12 @@
           },
           "starts_at": {
             "format": "date-time",
+            "type": "string"
+          },
+          "time_zone": {
+            "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+            "maxLength": 100,
+            "nullable": true,
             "type": "string"
           },
           "title": {
@@ -21267,6 +21381,14 @@
                 "format": "date-time",
                 "type": "string"
               },
+              "time_zone": {
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "type": "string"
+              },
+              "time_zone_confirmed": {
+                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                "type": "boolean"
+              },
               "title": {
                 "type": "string"
               },
@@ -21282,6 +21404,7 @@
               "starts_at",
               "ends_at",
               "place",
+              "time_zone",
               "going_count",
               "waitlist_count",
               "price_cents",
@@ -21493,6 +21616,12 @@
           },
           "starts_at": {
             "format": "date-time",
+            "type": "string"
+          },
+          "time_zone": {
+            "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+            "maxLength": 100,
+            "nullable": true,
             "type": "string"
           },
           "title": {
@@ -21831,6 +21960,14 @@
                   "format": "date-time",
                   "type": "string"
                 },
+                "time_zone": {
+                  "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                  "type": "string"
+                },
+                "time_zone_confirmed": {
+                  "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                  "type": "boolean"
+                },
                 "title": {
                   "type": "string"
                 },
@@ -21846,6 +21983,7 @@
                 "starts_at",
                 "ends_at",
                 "place",
+                "time_zone",
                 "going_count",
                 "waitlist_count",
                 "price_cents",
@@ -22330,6 +22468,14 @@
                       "format": "date-time",
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "type": "string"
+                    },
+                    "time_zone_confirmed": {
+                      "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                      "type": "boolean"
+                    },
                     "title": {
                       "type": "string"
                     },
@@ -22345,6 +22491,7 @@
                     "starts_at",
                     "ends_at",
                     "place",
+                    "time_zone",
                     "going_count",
                     "waitlist_count",
                     "price_cents",
@@ -22948,6 +23095,14 @@
                       "format": "date-time",
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "type": "string"
+                    },
+                    "time_zone_confirmed": {
+                      "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                      "type": "boolean"
+                    },
                     "title": {
                       "type": "string"
                     },
@@ -22963,6 +23118,7 @@
                     "starts_at",
                     "ends_at",
                     "place",
+                    "time_zone",
                     "going_count",
                     "waitlist_count",
                     "price_cents",
@@ -25241,6 +25397,14 @@
                 "format": "date-time",
                 "type": "string"
               },
+              "time_zone": {
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "type": "string"
+              },
+              "time_zone_confirmed": {
+                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                "type": "boolean"
+              },
               "title": {
                 "type": "string"
               },
@@ -25256,6 +25420,7 @@
               "starts_at",
               "ends_at",
               "place",
+              "time_zone",
               "going_count",
               "waitlist_count",
               "price_cents",
@@ -25781,6 +25946,14 @@
             "format": "date-time",
             "type": "string"
           },
+          "time_zone": {
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "type": "string"
+          },
+          "time_zone_confirmed": {
+            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+            "type": "boolean"
+          },
           "title": {
             "type": "string"
           },
@@ -25796,6 +25969,7 @@
           "starts_at",
           "ends_at",
           "place",
+          "time_zone",
           "going_count",
           "waitlist_count",
           "price_cents",
@@ -26302,6 +26476,14 @@
                     "format": "date-time",
                     "type": "string"
                   },
+                  "time_zone": {
+                    "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                    "type": "string"
+                  },
+                  "time_zone_confirmed": {
+                    "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                    "type": "boolean"
+                  },
                   "title": {
                     "type": "string"
                   },
@@ -26317,6 +26499,7 @@
                   "starts_at",
                   "ends_at",
                   "place",
+                  "time_zone",
                   "going_count",
                   "waitlist_count",
                   "price_cents",
@@ -38614,6 +38797,10 @@
             ],
             "type": "string"
           },
+          "time_zone": {
+            "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
+            "type": "string"
+          },
           "user_id": {
             "format": "uuid",
             "type": "string"
@@ -38832,6 +39019,10 @@
                   "no_show",
                   "converted"
                 ],
+                "type": "string"
+              },
+              "time_zone": {
+                "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                 "type": "string"
               },
               "user_id": {
@@ -39060,6 +39251,10 @@
                     "no_show",
                     "converted"
                   ],
+                  "type": "string"
+                },
+                "time_zone": {
+                  "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                   "type": "string"
                 },
                 "user_id": {
@@ -42545,6 +42740,14 @@
                       "format": "date-time",
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "type": "string"
+                    },
+                    "time_zone_confirmed": {
+                      "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                      "type": "boolean"
+                    },
                     "title": {
                       "type": "string"
                     },
@@ -42560,6 +42763,7 @@
                     "starts_at",
                     "ends_at",
                     "place",
+                    "time_zone",
                     "going_count",
                     "waitlist_count",
                     "price_cents",
@@ -45839,6 +46043,14 @@
                       "format": "date-time",
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "type": "string"
+                    },
+                    "time_zone_confirmed": {
+                      "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                      "type": "boolean"
+                    },
                     "title": {
                       "type": "string"
                     },
@@ -45854,6 +46066,7 @@
                     "starts_at",
                     "ends_at",
                     "place",
+                    "time_zone",
                     "going_count",
                     "waitlist_count",
                     "price_cents",
@@ -46578,6 +46791,10 @@
             "format": "date-time",
             "nullable": true,
             "type": "string"
+          },
+          "time_zone": {
+            "description": "ADR-179: the gym's IANA zone; its classes show on this clock",
+            "type": "string"
           }
         },
         "required": [
@@ -46731,6 +46948,10 @@
             "format": "date-time",
             "type": "string"
           },
+          "time_zone": {
+            "description": "ADR-179: the gym's IANA zone; the classes show on this clock",
+            "type": "string"
+          },
           "trial_offer": {
             "description": "What the box offers a visitor; null for members and when trials are off",
             "nullable": true,
@@ -46808,6 +47029,7 @@
           "box",
           "start_at",
           "end_at",
+          "time_zone",
           "slots"
         ],
         "title": "PublicBoxScheduleResponse",
@@ -50722,6 +50944,14 @@
             "title": "CommunityEventStats",
             "type": "object"
           },
+          "time_zone": {
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "type": "string"
+          },
+          "time_zone_confirmed": {
+            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+            "type": "boolean"
+          },
           "title": {
             "type": "string"
           },
@@ -50760,6 +50990,7 @@
           "starts_at",
           "ends_at",
           "place",
+          "time_zone",
           "going_count",
           "waitlist_count",
           "price_cents",
@@ -51639,6 +51870,14 @@
                 "title": "CommunityEventStats",
                 "type": "object"
               },
+              "time_zone": {
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "type": "string"
+              },
+              "time_zone_confirmed": {
+                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                "type": "boolean"
+              },
               "title": {
                 "type": "string"
               },
@@ -51677,6 +51916,7 @@
               "starts_at",
               "ends_at",
               "place",
+              "time_zone",
               "going_count",
               "waitlist_count",
               "price_cents",
@@ -51799,6 +52039,12 @@
           },
           "starts_at": {
             "format": "date-time",
+            "type": "string"
+          },
+          "time_zone": {
+            "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+            "maxLength": 100,
+            "nullable": true,
             "type": "string"
           },
           "title": {
@@ -52675,6 +52921,14 @@
                 "title": "CommunityEventStats",
                 "type": "object"
               },
+              "time_zone": {
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "type": "string"
+              },
+              "time_zone_confirmed": {
+                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                "type": "boolean"
+              },
               "title": {
                 "type": "string"
               },
@@ -52713,6 +52967,7 @@
               "starts_at",
               "ends_at",
               "place",
+              "time_zone",
               "going_count",
               "waitlist_count",
               "price_cents",
@@ -53112,6 +53367,14 @@
             "title": "CommunityEventStats",
             "type": "object"
           },
+          "time_zone": {
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "type": "string"
+          },
+          "time_zone_confirmed": {
+            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+            "type": "boolean"
+          },
           "title": {
             "type": "string"
           },
@@ -53127,6 +53390,7 @@
           "starts_at",
           "ends_at",
           "place",
+          "time_zone",
           "going_count",
           "waitlist_count",
           "price_cents",
@@ -53520,6 +53784,14 @@
                   "title": "CommunityEventStats",
                   "type": "object"
                 },
+                "time_zone": {
+                  "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                  "type": "string"
+                },
+                "time_zone_confirmed": {
+                  "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                  "type": "boolean"
+                },
                 "title": {
                   "type": "string"
                 },
@@ -53535,6 +53807,7 @@
                 "starts_at",
                 "ends_at",
                 "place",
+                "time_zone",
                 "going_count",
                 "waitlist_count",
                 "price_cents",
@@ -57503,6 +57776,10 @@
                   "no_show",
                   "converted"
                 ],
+                "type": "string"
+              },
+              "time_zone": {
+                "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                 "type": "string"
               },
               "user_id": {
@@ -62415,6 +62692,14 @@
                                         "format": "date-time",
                                         "type": "string"
                                       },
+                                      "time_zone": {
+                                        "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                        "type": "string"
+                                      },
+                                      "time_zone_confirmed": {
+                                        "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                        "type": "boolean"
+                                      },
                                       "title": {
                                         "type": "string"
                                       },
@@ -62430,6 +62715,7 @@
                                       "starts_at",
                                       "ends_at",
                                       "place",
+                                      "time_zone",
                                       "going_count",
                                       "waitlist_count",
                                       "price_cents",
@@ -62935,6 +63221,14 @@
                                             "format": "date-time",
                                             "type": "string"
                                           },
+                                          "time_zone": {
+                                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                            "type": "string"
+                                          },
+                                          "time_zone_confirmed": {
+                                            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                            "type": "boolean"
+                                          },
                                           "title": {
                                             "type": "string"
                                           },
@@ -62950,6 +63244,7 @@
                                           "starts_at",
                                           "ends_at",
                                           "place",
+                                          "time_zone",
                                           "going_count",
                                           "waitlist_count",
                                           "price_cents",
@@ -63717,6 +64012,14 @@
                                     "format": "date-time",
                                     "type": "string"
                                   },
+                                  "time_zone": {
+                                    "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                    "type": "string"
+                                  },
+                                  "time_zone_confirmed": {
+                                    "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                    "type": "boolean"
+                                  },
                                   "title": {
                                     "type": "string"
                                   },
@@ -63732,6 +64035,7 @@
                                   "starts_at",
                                   "ends_at",
                                   "place",
+                                  "time_zone",
                                   "going_count",
                                   "waitlist_count",
                                   "price_cents",
@@ -64508,6 +64812,14 @@
                                         "format": "date-time",
                                         "type": "string"
                                       },
+                                      "time_zone": {
+                                        "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                        "type": "string"
+                                      },
+                                      "time_zone_confirmed": {
+                                        "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                        "type": "boolean"
+                                      },
                                       "title": {
                                         "type": "string"
                                       },
@@ -64523,6 +64835,7 @@
                                       "starts_at",
                                       "ends_at",
                                       "place",
+                                      "time_zone",
                                       "going_count",
                                       "waitlist_count",
                                       "price_cents",
@@ -64829,6 +65142,14 @@
                         },
                         "slug": {
                           "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -64902,6 +65223,14 @@
                         },
                         "slug": {
                           "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -65044,6 +65373,11 @@
                           "type": "string"
                         },
                         "role": {
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the zone this account's device last reported",
+                          "nullable": true,
                           "type": "string"
                         },
                         "vendor": {
@@ -65231,6 +65565,11 @@
                     "role": {
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the zone this account's device last reported",
+                      "nullable": true,
+                      "type": "string"
+                    },
                     "vendor": {
                       "type": "boolean"
                     }
@@ -65385,6 +65724,11 @@
                           "type": "string"
                         },
                         "role": {
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the zone this account's device last reported",
+                          "nullable": true,
                           "type": "string"
                         },
                         "vendor": {
@@ -67001,6 +67345,14 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "time_zone": {
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "type": "string"
+                          },
+                          "time_zone_confirmed": {
+                            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                            "type": "boolean"
+                          },
                           "title": {
                             "type": "string"
                           },
@@ -67016,6 +67368,7 @@
                           "starts_at",
                           "ends_at",
                           "place",
+                          "time_zone",
                           "going_count",
                           "waitlist_count",
                           "price_cents",
@@ -67574,6 +67927,14 @@
                                 "format": "date-time",
                                 "type": "string"
                               },
+                              "time_zone": {
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "type": "string"
+                              },
+                              "time_zone_confirmed": {
+                                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                "type": "boolean"
+                              },
                               "title": {
                                 "type": "string"
                               },
@@ -67589,6 +67950,7 @@
                               "starts_at",
                               "ends_at",
                               "place",
+                              "time_zone",
                               "going_count",
                               "waitlist_count",
                               "price_cents",
@@ -67938,6 +68300,10 @@
                       "format": "date-time",
                       "type": "string"
                     },
+                    "time_zone": {
+                      "description": "ADR-179: the gym's IANA zone; the classes show on this clock",
+                      "type": "string"
+                    },
                     "trial_offer": {
                       "description": "What the box offers a visitor; null for members and when trials are off",
                       "nullable": true,
@@ -68015,6 +68381,7 @@
                     "box",
                     "start_at",
                     "end_at",
+                    "time_zone",
                     "slots"
                   ],
                   "title": "PublicBoxScheduleResponse",
@@ -68303,6 +68670,10 @@
                             "no_show",
                             "converted"
                           ],
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -69664,7 +70035,7 @@
                     "type": "object"
                   },
                   "text_section_scores": {
-                    "description": "ADR-179: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds).",
+                    "description": "ADR-180: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds).",
                     "items": {
                       "properties": {
                         "metric_key": {
@@ -73811,6 +74182,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -73826,6 +74205,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -79301,6 +79681,14 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "time_zone": {
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "type": "string"
+                          },
+                          "time_zone_confirmed": {
+                            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                            "type": "boolean"
+                          },
                           "title": {
                             "type": "string"
                           },
@@ -79316,6 +79704,7 @@
                           "starts_at",
                           "ends_at",
                           "place",
+                          "time_zone",
                           "going_count",
                           "waitlist_count",
                           "price_cents",
@@ -79461,6 +79850,12 @@
                   },
                   "starts_at": {
                     "format": "date-time",
+                    "type": "string"
+                  },
+                  "time_zone": {
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "maxLength": 100,
+                    "nullable": true,
                     "type": "string"
                   },
                   "title": {
@@ -79811,6 +80206,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -79826,6 +80229,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -80698,6 +81102,14 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "time_zone": {
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "type": "string"
+                          },
+                          "time_zone_confirmed": {
+                            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                            "type": "boolean"
+                          },
                           "title": {
                             "type": "string"
                           },
@@ -80713,6 +81125,7 @@
                           "starts_at",
                           "ends_at",
                           "place",
+                          "time_zone",
                           "going_count",
                           "waitlist_count",
                           "price_cents",
@@ -81274,6 +81687,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -81289,6 +81710,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -82224,6 +82646,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -82239,6 +82669,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -82902,6 +83333,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -82917,6 +83356,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -83580,6 +84020,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -83595,6 +84043,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -87507,6 +87956,14 @@
                             "format": "date-time",
                             "type": "string"
                           },
+                          "time_zone": {
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "type": "string"
+                          },
+                          "time_zone_confirmed": {
+                            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                            "type": "boolean"
+                          },
                           "title": {
                             "type": "string"
                           },
@@ -87522,6 +87979,7 @@
                           "starts_at",
                           "ends_at",
                           "place",
+                          "time_zone",
                           "going_count",
                           "waitlist_count",
                           "price_cents",
@@ -87919,6 +88377,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -87934,6 +88400,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -88075,6 +88542,12 @@
                   },
                   "starts_at": {
                     "format": "date-time",
+                    "type": "string"
+                  },
+                  "time_zone": {
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "maxLength": 100,
+                    "nullable": true,
                     "type": "string"
                   },
                   "title": {
@@ -88420,6 +88893,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -88435,6 +88916,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -88846,6 +89328,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -88861,6 +89351,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -89332,6 +89823,14 @@
                           "format": "date-time",
                           "type": "string"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -89347,6 +89846,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -89900,6 +90400,14 @@
                                 "format": "date-time",
                                 "type": "string"
                               },
+                              "time_zone": {
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "type": "string"
+                              },
+                              "time_zone_confirmed": {
+                                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                "type": "boolean"
+                              },
                               "title": {
                                 "type": "string"
                               },
@@ -89915,6 +90423,7 @@
                               "starts_at",
                               "ends_at",
                               "place",
+                              "time_zone",
                               "going_count",
                               "waitlist_count",
                               "price_cents",
@@ -90518,6 +91027,14 @@
                                 "format": "date-time",
                                 "type": "string"
                               },
+                              "time_zone": {
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "type": "string"
+                              },
+                              "time_zone_confirmed": {
+                                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                "type": "boolean"
+                              },
                               "title": {
                                 "type": "string"
                               },
@@ -90533,6 +91050,7 @@
                               "starts_at",
                               "ends_at",
                               "place",
+                              "time_zone",
                               "going_count",
                               "waitlist_count",
                               "price_cents",
@@ -99970,6 +100488,63 @@
         ]
       }
     },
+    "/api/me/time-zone": {
+      "put": {
+        "callbacks": {},
+        "description": "Server-written texts add the reader's own time beside the organiser's when the two zones read a moment differently. UTC aliases are ignored.",
+        "operationId": "PaleeWeb.MeController.update_time_zone",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "time_zone": {
+                    "maxLength": 100,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "time_zone"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "time_zone": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "time_zone"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Stored zone"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Report the zone this account's device is in (ADR-179)",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
     "/api/me/today": {
       "get": {
         "callbacks": {},
@@ -100403,6 +100978,10 @@
                             ],
                             "type": "string"
                           },
+                          "time_zone": {
+                            "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
+                            "type": "string"
+                          },
                           "user_id": {
                             "format": "uuid",
                             "type": "string"
@@ -100665,6 +101244,10 @@
                             "no_show",
                             "converted"
                           ],
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -100947,6 +101530,10 @@
                             "no_show",
                             "converted"
                           ],
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -101410,6 +101997,10 @@
                             "no_show",
                             "converted"
                           ],
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -104399,6 +104990,14 @@
                           },
                           "slug": {
                             "type": "string"
+                          },
+                          "timezone": {
+                            "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                            "type": "string"
+                          },
+                          "timezone_confirmed": {
+                            "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                            "type": "boolean"
                           }
                         },
                         "required": [
@@ -104529,6 +105128,14 @@
                         },
                         "slug": {
                           "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -104630,6 +105237,14 @@
                         },
                         "slug": {
                           "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -104770,6 +105385,14 @@
                         },
                         "slug": {
                           "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -112607,6 +113230,14 @@
                             "title": "CommunityEventStats",
                             "type": "object"
                           },
+                          "time_zone": {
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "type": "string"
+                          },
+                          "time_zone_confirmed": {
+                            "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                            "type": "boolean"
+                          },
                           "title": {
                             "type": "string"
                           },
@@ -112622,6 +113253,7 @@
                           "starts_at",
                           "ends_at",
                           "place",
+                          "time_zone",
                           "going_count",
                           "waitlist_count",
                           "price_cents",
@@ -112762,6 +113394,12 @@
                   },
                   "starts_at": {
                     "format": "date-time",
+                    "type": "string"
+                  },
+                  "time_zone": {
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "maxLength": 100,
+                    "nullable": true,
                     "type": "string"
                   },
                   "title": {
@@ -113646,6 +114284,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -113684,6 +114330,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -114609,6 +115256,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -114647,6 +115302,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -114791,6 +115447,12 @@
                   },
                   "starts_at": {
                     "format": "date-time",
+                    "type": "string"
+                  },
+                  "time_zone": {
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "maxLength": 100,
+                    "nullable": true,
                     "type": "string"
                   },
                   "title": {
@@ -115669,6 +116331,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -115707,6 +116377,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -116637,6 +117308,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -116675,6 +117354,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -117624,6 +118304,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -117662,6 +118350,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -118617,6 +119306,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -118655,6 +119352,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -119602,6 +120300,14 @@
                           "title": "CommunityEventStats",
                           "type": "object"
                         },
+                        "time_zone": {
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "type": "string"
+                        },
+                        "time_zone_confirmed": {
+                          "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                          "type": "boolean"
+                        },
                         "title": {
                           "type": "string"
                         },
@@ -119640,6 +120346,7 @@
                         "starts_at",
                         "ends_at",
                         "place",
+                        "time_zone",
                         "going_count",
                         "waitlist_count",
                         "price_cents",
@@ -140278,7 +140985,7 @@
                       "description": "ADR-163: workout-authoring defaults",
                       "properties": {
                         "wod_assistant_enabled": {
-                          "description": "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
+                          "description": "ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
                           "type": "boolean"
                         },
                         "wod_goals_visible_by_default": {
@@ -140453,7 +141160,7 @@
                   "workouts": {
                     "properties": {
                       "wod_assistant_enabled": {
-                        "description": "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
+                        "description": "ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
                         "type": "boolean"
                       },
                       "wod_goals_visible_by_default": {
@@ -140705,7 +141412,7 @@
                       "description": "ADR-163: workout-authoring defaults",
                       "properties": {
                         "wod_assistant_enabled": {
-                          "description": "ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
+                          "description": "ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each",
                           "type": "boolean"
                         },
                         "wod_goals_visible_by_default": {
@@ -147146,7 +147853,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "What the workout editor may offer in this gym (ADR-179)",
+        "summary": "What the workout editor may offer in this gym (ADR-180)",
         "tags": [
           "Admin Workouts"
         ]
@@ -149218,7 +149925,7 @@
                                 "type": "array"
                               },
                               "free_text_body": {
-                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "description": "ADR-180: a text section's text (sectioned workouts)",
                                 "maxLength": 20000,
                                 "nullable": true,
                                 "type": "string"
@@ -150034,7 +150741,7 @@
                                       "type": "array"
                                     },
                                     "free_text_body": {
-                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "description": "ADR-180: a text section's text (sectioned workouts)",
                                       "maxLength": 20000,
                                       "nullable": true,
                                       "type": "string"
@@ -151295,7 +152002,7 @@
                           "type": "array"
                         },
                         "free_text_body": {
-                          "description": "ADR-179: a text section's text (sectioned workouts)",
+                          "description": "ADR-180: a text section's text (sectioned workouts)",
                           "maxLength": 20000,
                           "nullable": true,
                           "type": "string"
@@ -152111,7 +152818,7 @@
                                 "type": "array"
                               },
                               "free_text_body": {
-                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "description": "ADR-180: a text section's text (sectioned workouts)",
                                 "maxLength": 20000,
                                 "nullable": true,
                                 "type": "string"
@@ -154587,7 +155294,7 @@
                           "type": "array"
                         },
                         "free_text_body": {
-                          "description": "ADR-179: a text section's text (sectioned workouts)",
+                          "description": "ADR-180: a text section's text (sectioned workouts)",
                           "maxLength": 20000,
                           "nullable": true,
                           "type": "string"
@@ -155403,7 +156110,7 @@
                                 "type": "array"
                               },
                               "free_text_body": {
-                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "description": "ADR-180: a text section's text (sectioned workouts)",
                                 "maxLength": 20000,
                                 "nullable": true,
                                 "type": "string"
@@ -156595,7 +157302,7 @@
                                 "type": "array"
                               },
                               "free_text_body": {
-                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "description": "ADR-180: a text section's text (sectioned workouts)",
                                 "maxLength": 20000,
                                 "nullable": true,
                                 "type": "string"
@@ -157411,7 +158118,7 @@
                                       "type": "array"
                                     },
                                     "free_text_body": {
-                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "description": "ADR-180: a text section's text (sectioned workouts)",
                                       "maxLength": 20000,
                                       "nullable": true,
                                       "type": "string"
@@ -161938,6 +162645,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -161953,6 +162668,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -162888,6 +163604,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -162903,6 +163627,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -163566,6 +164291,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -163581,6 +164314,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -164244,6 +164978,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -164259,6 +165001,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -166738,6 +167481,14 @@
                         },
                         "slug": {
                           "type": "string"
+                        },
+                        "timezone": {
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "type": "string"
+                        },
+                        "timezone_confirmed": {
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "type": "boolean"
                         }
                       },
                       "required": [
@@ -184421,7 +185172,7 @@
                                 "type": "array"
                               },
                               "free_text_body": {
-                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "description": "ADR-180: a text section's text (sectioned workouts)",
                                 "maxLength": 20000,
                                 "nullable": true,
                                 "type": "string"
@@ -185237,7 +185988,7 @@
                                       "type": "array"
                                     },
                                     "free_text_body": {
-                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "description": "ADR-180: a text section's text (sectioned workouts)",
                                       "maxLength": 20000,
                                       "nullable": true,
                                       "type": "string"
@@ -186622,7 +187373,7 @@
                                   "type": "array"
                                 },
                                 "free_text_body": {
-                                  "description": "ADR-179: a text section's text (sectioned workouts)",
+                                  "description": "ADR-180: a text section's text (sectioned workouts)",
                                   "maxLength": 20000,
                                   "nullable": true,
                                   "type": "string"
@@ -187438,7 +188189,7 @@
                                         "type": "array"
                                       },
                                       "free_text_body": {
-                                        "description": "ADR-179: a text section's text (sectioned workouts)",
+                                        "description": "ADR-180: a text section's text (sectioned workouts)",
                                         "maxLength": 20000,
                                         "nullable": true,
                                         "type": "string"
@@ -188628,7 +189379,7 @@
                                 "type": "array"
                               },
                               "free_text_body": {
-                                "description": "ADR-179: a text section's text (sectioned workouts)",
+                                "description": "ADR-180: a text section's text (sectioned workouts)",
                                 "maxLength": 20000,
                                 "nullable": true,
                                 "type": "string"
@@ -189444,7 +190195,7 @@
                                       "type": "array"
                                     },
                                     "free_text_body": {
-                                      "description": "ADR-179: a text section's text (sectioned workouts)",
+                                      "description": "ADR-180: a text section's text (sectioned workouts)",
                                       "maxLength": 20000,
                                       "nullable": true,
                                       "type": "string"
@@ -190406,6 +191157,14 @@
                                 "format": "date-time",
                                 "type": "string"
                               },
+                              "time_zone": {
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "type": "string"
+                              },
+                              "time_zone_confirmed": {
+                                "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                                "type": "boolean"
+                              },
                               "title": {
                                 "type": "string"
                               },
@@ -190421,6 +191180,7 @@
                               "starts_at",
                               "ends_at",
                               "place",
+                              "time_zone",
                               "going_count",
                               "waitlist_count",
                               "price_cents",
@@ -195129,6 +195889,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -195144,6 +195912,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -196079,6 +196848,14 @@
                               "format": "date-time",
                               "type": "string"
                             },
+                            "time_zone": {
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "type": "string"
+                            },
+                            "time_zone_confirmed": {
+                              "description": "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)",
+                              "type": "boolean"
+                            },
                             "title": {
                               "type": "string"
                             },
@@ -196094,6 +196871,7 @@
                             "starts_at",
                             "ends_at",
                             "place",
+                            "time_zone",
                             "going_count",
                             "waitlist_count",
                             "price_cents",
@@ -197201,6 +197979,10 @@
                     "published_at": {
                       "format": "date-time",
                       "nullable": true,
+                      "type": "string"
+                    },
+                    "time_zone": {
+                      "description": "ADR-179: the gym's IANA zone; its classes show on this clock",
                       "type": "string"
                     }
                   },

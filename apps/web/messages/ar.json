@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "الإملاء والوحدات",
     "assistantMark_assumption": "افتراضات",
     "assistantMark_advice": "اقتراحات",
-    "assistantSuggestionsHere": "اقتراحات المساعد لهذه الكلمات"
+    "assistantSuggestionsHere": "اقتراحات المساعد لهذه الكلمات",
+    "zonedTimeYours": "{time} بتوقيتك",
+    "zonedTimeYoursTitle": "حسب ساعتك ({zone})",
+    "zonedTimeGymClock": "الأوقات حسب ساعة النادي ({zone})."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "أي فعاليات",
     "nearMe": "بالقرب مني",
     "fieldGoodForFriends": "مناسب للأصدقاء",
-    "goodForFriendsHint": "يظهر أولًا عندما يدعو الأعضاء أصدقاءهم إلى فعالية."
+    "goodForFriendsHint": "يظهر أولًا عندما يدعو الأعضاء أصدقاءهم إلى فعالية.",
+    "zoneGym": "الأوقات بتوقيت النادي ({zone})",
+    "zoneAway": "الأوقات بتوقيت {zone}",
+    "zoneChange": "تغيير",
+    "zoneGymUnconfirmed": "لم يؤكد النادي منطقته الزمنية بعد، لذا فإن {zone} تقدير. يمكن للطاقم ضبطها في إعدادات النادي.",
+    "zoneAwayHint": "هل يقام في منطقة زمنية أخرى؟ غيّر الساعة لتكون الأوقات صحيحة للجميع.",
+    "fieldTimeZone": "المنطقة الزمنية",
+    "zoneGymOption": "{zone} (توقيت النادي)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "لا فعاليات قادمة. أنشئ واحدة عبر «+ فعالية جديدة».",

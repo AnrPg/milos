@@ -20,6 +20,8 @@ import { useSession } from "@/components/session-provider";
 import { mapsSearchUrl, mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 
 import { downloadFile, trialErrorKey } from "./trial-ui";
+import { formatInZone, zonedText } from "@/lib/zoned-time";
+import { YourTime } from "@/components/zoned-time";
 
 const OPEN = new Set(["requested", "booked"]);
 
@@ -46,8 +48,10 @@ export function TrialPage({ trialId }: { trialId: string }) {
 
   const data = trial.data;
   const start = new Date(data.class.scheduled_at);
-  const when = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" }).format(start);
-  const clock = new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(start);
+  // ADR-179: on the gym's clock, with the visitor's own when it differs.
+  const zone = (data as { time_zone?: string | null }).time_zone ?? null;
+  const when = formatInZone(start, zone, locale, { weekday: "long", day: "numeric", month: "long" });
+  const clock = zonedText(start, zone, locale, "time");
   const place = data.location;
   const address = [place?.address, place?.neighbourhood, place?.city].filter(Boolean).join(", ");
   const directions = place
@@ -71,6 +75,7 @@ export function TrialPage({ trialId }: { trialId: string }) {
         <h1 className="text-3xl font-extrabold" style={{ color: "var(--text)" }}>{data.class.name ?? t("trialTitle")}</h1>
         <p className="text-sm font-semibold first-letter:uppercase" style={{ color: "var(--text-soft)" }}>
           {when} · {clock}
+          <YourTime at={start} zone={zone} format="day-time" />
           {data.class.duration_minutes ? ` · ${t("minutes", { count: data.class.duration_minutes })}` : ""}
         </p>
         <StatusPill status={data.status} />

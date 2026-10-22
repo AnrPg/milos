@@ -93,6 +93,7 @@ defmodule Palee.Application.EventPresenter do
     clubs = clubs(by_org, viewer)
     boxes = boxes(Map.keys(by_org), viewer)
     covers = BoxPhotoCovers.urls(events)
+    zones = Organizations.timezone_statuses(Map.keys(by_org))
 
     Enum.map(events, fn event ->
       count = Map.get(counts, event.id, %{})
@@ -113,6 +114,8 @@ defmodule Palee.Application.EventPresenter do
         starts_at: event.starts_at,
         ends_at: event.ends_at,
         place: place(event, locations),
+        time_zone: time_zone(event, zones),
+        time_zone_confirmed: time_zone_confirmed?(event, zones),
         capacity: event.capacity,
         going_count: going,
         waitlist_count: Map.get(count, "waitlisted", 0),
@@ -137,6 +140,12 @@ defmodule Palee.Application.EventPresenter do
       }
     end)
   end
+
+  defp time_zone(event, zones),
+    do: Community.event_time_zone(event, zones[event.organization_id].timezone)
+
+  defp time_zone_confirmed?(event, zones),
+    do: is_binary(event.time_zone) or zones[event.organization_id].confirmed
 
   defp present_mine(attendee) do
     %{

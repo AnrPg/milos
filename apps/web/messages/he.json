@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "איות ויחידות",
     "assistantMark_assumption": "הנחות",
     "assistantMark_advice": "הצעות",
-    "assistantSuggestionsHere": "הצעות העוזר למילים האלה"
+    "assistantSuggestionsHere": "הצעות העוזר למילים האלה",
+    "zonedTimeYours": "{time} לפי השעה שלך",
+    "zonedTimeYoursTitle": "לפי השעון שלך ({zone})",
+    "zonedTimeGymClock": "השעות לפי שעון המכון ({zone})."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "אילו אירועים",
     "nearMe": "קרוב אליי",
     "fieldGoodForFriends": "מתאים לחברים",
-    "goodForFriendsHint": "מופיע ראשון כשחברים מזמינים חברים לאירוע."
+    "goodForFriendsHint": "מופיע ראשון כשחברים מזמינים חברים לאירוע.",
+    "zoneGym": "שעות לפי שעון המכון ({zone})",
+    "zoneAway": "שעות לפי שעון {zone}",
+    "zoneChange": "שינוי",
+    "zoneGymUnconfirmed": "המכון עדיין לא אישר את אזור הזמן שלו, לכן {zone} הוא הערכה. הצוות יכול להגדיר אותו בהגדרות המכון.",
+    "zoneAwayHint": "מתקיים באזור זמן אחר? שנו את השעון כדי שהשעות יהיו נכונות לכולם.",
+    "fieldTimeZone": "אזור זמן",
+    "zoneGymOption": "{zone} (של המכון)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "אין אירועים קרובים. צרו אחד עם «+ אירוע חדש».",

@@ -7,7 +7,8 @@ defmodule Palee.Application.EventNotices do
   notifications catalogs (12 locales).
   """
 
-  alias Palee.{Notifications, Organizations}
+  alias Palee.{Community, Notifications, Organizations}
+  alias Palee.TimeZones.ZonedTime
 
   def promoted(event, attendees),
     do:
@@ -59,7 +60,8 @@ defmodule Palee.Application.EventNotices do
       end)
 
   defp each(recipients, event, type, extra) do
-    event_when = event_when(event)
+    zone = time_zone(event)
+    event_when = ZonedTime.format(event.starts_at, zone)
 
     Enum.each(recipients, fn recipient ->
       Notifications.dispatch_event(
@@ -72,7 +74,8 @@ defmodule Palee.Application.EventNotices do
             event_id: event.id,
             event_title: event.title,
             event_starts_at: event.starts_at,
-            event_when: event_when
+            event_when: event_when,
+            time_zone: zone
           },
           extra.(recipient)
         )
@@ -83,13 +86,14 @@ defmodule Palee.Application.EventNotices do
   defp stamp(nil), do: "none"
   defp stamp(%DateTime{} = at), do: at |> DateTime.to_unix(:microsecond) |> Integer.to_string()
 
-  @doc "When the event starts, in the box's time zone («24/10 19:00»)."
-  def event_when(%{starts_at: starts_at, organization_id: organization_id}) do
-    zone = Organizations.organization_timezone(organization_id)
+  @doc """
+  When the event starts on the clock it is planned on («24/10 19:00»). Push
+  texts add each reader's own time when theirs differs (ADR-179).
+  """
+  def event_when(%{starts_at: starts_at} = event),
+    do: ZonedTime.format(starts_at, time_zone(event))
 
-    case DateTime.shift_zone(starts_at, zone) do
-      {:ok, local} -> Calendar.strftime(local, "%d/%m %H:%M")
-      {:error, _reason} -> Calendar.strftime(starts_at, "%d/%m %H:%M UTC")
-    end
-  end
+  @doc "ADR-179: the event's zone: its own when held away, else its gym's."
+  def time_zone(%{organization_id: organization_id} = event),
+    do: Community.event_time_zone(event, Organizations.organization_timezone(organization_id))
 end

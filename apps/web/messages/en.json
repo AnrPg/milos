@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "Spelling & units",
     "assistantMark_assumption": "Assumed",
     "assistantMark_advice": "Suggestions",
-    "assistantSuggestionsHere": "Assistant suggestions for these words"
+    "assistantSuggestionsHere": "Assistant suggestions for these words",
+    "zonedTimeYours": "{time} your time",
+    "zonedTimeYoursTitle": "On your clock ({zone})",
+    "zonedTimeGymClock": "Times are on the gym's clock ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "Which events",
     "nearMe": "Near me",
     "fieldGoodForFriends": "Good for friends",
-    "goodForFriendsHint": "Comes first when members invite friends to an event."
+    "goodForFriendsHint": "Comes first when members invite friends to an event.",
+    "zoneGym": "Times in the gym's time ({zone})",
+    "zoneAway": "Times in {zone} time",
+    "zoneChange": "Change",
+    "zoneGymUnconfirmed": "The gym hasn't confirmed its time zone yet, so {zone} is a guess. Staff can set it in the gym settings.",
+    "zoneAwayHint": "Happening in another time zone? Change the clock so times read right for everyone.",
+    "fieldTimeZone": "Time zone",
+    "zoneGymOption": "{zone} (the gym's)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "No upcoming events. Create one with «+ New event».",

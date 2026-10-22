@@ -599,3 +599,7 @@ msgstr "%{class} (%{when}) beginnt in einer Stunde und hat noch kein WOD."
 msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
 msgstr "%{class} (%{when}) hat noch kein WOD. Verknüpfe eines, bevor sie beginnt."
 
+
+# ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
+msgid "%{time} %{zone} · %{local} your time"
+msgstr "%{time} %{zone} · %{local} deine Zeit"

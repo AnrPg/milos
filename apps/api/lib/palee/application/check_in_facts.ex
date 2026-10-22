@@ -103,8 +103,9 @@ defmodule Palee.Application.CheckInFacts do
 
   defp entitlement(context, user_id), do: Finance.get_effective_entitlement(context, user_id)
 
-  defp timezone(context),
-    do: context |> Finance.get_finance_settings() |> Map.get(:entitlement_timezone)
+  # ADR-179: entitlement days follow the gym's own zone (one clock per gym).
+  defp timezone(%{organization_id: organization_id}),
+    do: Organizations.organization_timezone(organization_id)
 
   @doc "A class's display name: its type's name, else its own."
   def class_name(slot) do

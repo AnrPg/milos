@@ -20,15 +20,18 @@ function shift(isoDate: string, days: number) {
 /** The day view's week strip (plan §5a decision 7). */
 export function WeekStrip({
   selectedDate,
+  today: todayKey,
   onSelect,
 }: {
   selectedDate: string;
+  /** ADR-179: the gym's today ("YYYY-MM-DD"); the device's when absent. */
+  today?: string;
   onSelect: (isoDate: string) => void;
 }) {
   const t = useTranslations("BoxSchedule");
   const locale = useLocale();
   const start = weekStart(selectedDate);
-  const today = formatLocalIsoDate(new Date());
+  const today = todayKey ?? formatLocalIsoDate(new Date());
   const weekday = new Intl.DateTimeFormat(locale, { weekday: "short" });
   const full = new Intl.DateTimeFormat(locale, { weekday: "long", day: "numeric", month: "long" });
   const days = Array.from({ length: 7 }, (_, index) => shift(start, index));

@@ -1,3 +1,5 @@
+import { startOfDayInZone } from "@/lib/zoned-time";
+
 export type ScheduleDays = 3 | 7 | 30;
 
 export type ScheduleWindowBounds = {
@@ -13,11 +15,16 @@ const dayFormatter = new Intl.DateTimeFormat("en-US", {
   year: "numeric",
 });
 
-export function buildScheduleWindow(startDate: string, days: ScheduleDays): ScheduleWindowBounds {
+/**
+ * The days a schedule view shows and the window it asks for. ADR-179: the
+ * dates are the gym's, so the query runs from the gym's midnight (`zone`;
+ * the device's clock without one).
+ */
+export function buildScheduleWindow(startDate: string, days: ScheduleDays, zone: string | null = null): ScheduleWindowBounds {
   const anchor = parseLocalDate(startDate);
 
   if (days === 30) {
-    return buildMonthWindow(anchor);
+    return buildMonthWindow(anchor, zone);
   }
 
   const visibleDates = enumerateDates(anchor, days);
@@ -27,8 +34,8 @@ export function buildScheduleWindow(startDate: string, days: ScheduleDays): Sche
   return {
     currentMonthKey: monthKey(anchor),
     monthLabel: null,
-    queryStartAt: anchor.toISOString(),
-    queryEndAt: end.toISOString(),
+    queryStartAt: startOfDayInZone(formatLocalIsoDate(anchor), zone).toISOString(),
+    queryEndAt: startOfDayInZone(formatLocalIsoDate(end), zone).toISOString(),
     visibleDates,
   };
 }
@@ -53,7 +60,7 @@ export function parseLocalDate(isoDate: string) {
   return new Date(year, month - 1, day, 0, 0, 0, 0);
 }
 
-function buildMonthWindow(anchor: Date): ScheduleWindowBounds {
+function buildMonthWindow(anchor: Date, zone: string | null): ScheduleWindowBounds {
   const monthStart = new Date(anchor.getFullYear(), anchor.getMonth(), 1, 0, 0, 0, 0);
   const nextMonthStart = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 1, 0, 0, 0, 0);
   const monthEnd = new Date(anchor.getFullYear(), anchor.getMonth() + 1, 0, 0, 0, 0, 0);
@@ -66,8 +73,8 @@ function buildMonthWindow(anchor: Date): ScheduleWindowBounds {
   return {
     currentMonthKey: monthKey(anchor),
     monthLabel: dayFormatter.format(monthStart),
-    queryStartAt: monthStart.toISOString(),
-    queryEndAt: nextMonthStart.toISOString(),
+    queryStartAt: startOfDayInZone(formatLocalIsoDate(monthStart), zone).toISOString(),
+    queryEndAt: startOfDayInZone(formatLocalIsoDate(nextMonthStart), zone).toISOString(),
     visibleDates: enumerateDates(gridStart, differenceInDays(gridStart, gridEnd)),
   };
 }

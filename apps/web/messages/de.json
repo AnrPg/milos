@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "Schreibweise & Einheiten",
     "assistantMark_assumption": "Angenommen",
     "assistantMark_advice": "Vorschläge",
-    "assistantSuggestionsHere": "Vorschläge des Assistenten zu diesen Wörtern"
+    "assistantSuggestionsHere": "Vorschläge des Assistenten zu diesen Wörtern",
+    "zonedTimeYours": "{time} deine Zeit",
+    "zonedTimeYoursTitle": "Auf deiner Uhr ({zone})",
+    "zonedTimeGymClock": "Zeiten nach der Uhr des Gyms ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "Welche Events",
     "nearMe": "In meiner Nähe",
     "fieldGoodForFriends": "Gut für Freunde",
-    "goodForFriendsHint": "Steht oben, wenn Mitglieder Freunde zu einem Event einladen."
+    "goodForFriendsHint": "Steht oben, wenn Mitglieder Freunde zu einem Event einladen.",
+    "zoneGym": "Zeiten in Gym-Zeit ({zone})",
+    "zoneAway": "Zeiten in {zone}-Zeit",
+    "zoneChange": "Ändern",
+    "zoneGymUnconfirmed": "Das Gym hat seine Zeitzone noch nicht bestätigt, {zone} ist also geschätzt. Das Team kann sie in den Gym-Einstellungen festlegen.",
+    "zoneAwayHint": "Findet es in einer anderen Zeitzone statt? Ändere die Uhr, damit die Zeiten für alle stimmen.",
+    "fieldTimeZone": "Zeitzone",
+    "zoneGymOption": "{zone} (des Gyms)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Keine anstehenden Events. Erstelle eines mit «+ Neues Event».",

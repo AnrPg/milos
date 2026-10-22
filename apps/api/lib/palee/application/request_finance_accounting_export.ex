@@ -21,7 +21,7 @@ defmodule Palee.Application.RequestFinanceAccountingExport do
            AccountingExport.validate_range(
              value(params, "range_start", :range_start),
              value(params, "range_end", :range_end),
-             Date.utc_today()
+             Palee.Organizations.local_today(organization_id)
            ),
          {:ok, export} <-
            Finance.create_accounting_export(context, %{

@@ -8,7 +8,8 @@
 import {useUiTranslations} from "@/i18n/ui";
 import type { ScheduleLocation, ScheduleSlot } from "@/api/schedule";
 import { useLocale } from "next-intl";
-import { buildScheduleWindow, localDateKey, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
+import { buildScheduleWindow, monthKey, parseLocalDate, type ScheduleDays } from "@/components/schedule/calendar-window";
+import { dateKeyInZone, formatInZone } from "@/lib/zoned-time";
 import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 import { semanticLabel } from "@/i18n/presentation";
 import { isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
@@ -23,6 +24,8 @@ type CalendarViewProps = {
   locations?: ScheduleLocation[];
   onSelectSlot: (slot: ScheduleSlot) => void;
   onCreateSlot: (isoDate: string) => void;
+  /** ADR-179: the gym's zone; days and times are on its clock. */
+  timeZone?: string | null;
 };
 
 function formatDayLabel(locale: string, isoDate: string) {
@@ -38,8 +41,8 @@ function formatDayLabelCompact(locale: string, isoDate: string) {
   return { weekday, day };
 }
 
-function formatTime(locale: string, isoString: string) {
-  return new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(isoString));
+function formatTime(locale: string, isoString: string, zone: string | null = null) {
+  return formatInZone(isoString, zone, locale, { hour: "numeric", minute: "2-digit" });
 }
 
 function slotClassType(slot: ScheduleSlot) {
@@ -49,18 +52,18 @@ function slotClassType(slot: ScheduleSlot) {
   };
 }
 
-export function CalendarView({ days, startDate, slots, isAdmin, locations, onSelectSlot, onCreateSlot }: CalendarViewProps) {
+export function CalendarView({ days, startDate, slots, isAdmin, locations, onSelectSlot, onCreateSlot, timeZone = null }: CalendarViewProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
-  const todayKey = localDateKey(new Date());
-  const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days);
+  const todayKey = dateKeyInZone(new Date(), timeZone);
+  const { currentMonthKey, visibleDates, monthLabel } = buildScheduleWindow(startDate, days, timeZone);
   const slotMap = visibleDates.reduce<Record<string, ScheduleSlot[]>>((acc, date) => {
     acc[date] = [];
     return acc;
   }, {});
 
   slots.forEach((slot) => {
-    const dateKey = localDateKey(new Date(slot.scheduled_at));
+    const dateKey = dateKeyInZone(slot.scheduled_at, timeZone);
     slotMap[dateKey] = [...(slotMap[dateKey] ?? []), slot].sort((a, b) =>
       a.scheduled_at.localeCompare(b.scheduled_at),
     );
@@ -132,7 +135,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                       onClick={() => onSelectSlot(slot)}
                       type="button"
                     >
-                      {formatTime(locale, slot.scheduled_at)} {classType.name}
+                      {formatTime(locale, slot.scheduled_at, timeZone)} {classType.name}
                     </button>
                   );
                 })}
@@ -223,6 +226,7 @@ export function CalendarView({ days, startDate, slots, isAdmin, locations, onSel
                     isAdmin={isAdmin}
                     locationName={slotLocationName(slot, locations)}
                     onSelectSlot={onSelectSlot}
+                    timeZone={timeZone}
                   />
                 ))}
               </div>
@@ -240,8 +244,10 @@ function SlotCard({
   isAdmin,
   locationName,
   onSelectSlot,
+  timeZone,
 }: {
   slot: ScheduleSlot;
+  timeZone: string | null;
   compact: boolean;
   isAdmin: boolean;
   locationName: string | null;
@@ -291,7 +297,7 @@ function SlotCard({
         type="button"
       >
         <p className="text-xs font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
-          {new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
+          {formatTime(locale, slot.scheduled_at, timeZone)}
         </p>
         <p className="truncate text-[10px] uppercase tracking-[0.14em]" style={{ color: isUnavailable ? "var(--dim)" : typeColor }}>
           {classType.name}
@@ -319,7 +325,7 @@ function SlotCard({
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-semibold" style={{ color: isUnavailable ? "var(--dim)" : "var(--text)" }}>
-            {new Intl.DateTimeFormat(locale, { hour: "numeric", minute: "2-digit" }).format(new Date(slot.scheduled_at))}
+            {formatTime(locale, slot.scheduled_at, timeZone)}
           </p>
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
           {slot.workout?.title ?? i18n("workoutPreviewUnavailable473ec36")}

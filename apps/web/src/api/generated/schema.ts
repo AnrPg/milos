@@ -2938,6 +2938,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/time-zone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Report the zone this account's device is in (ADR-179)
+         * @description Server-written texts add the reader's own time beside the organiser's when the two zones read a moment differently. UTC aliases are ignored.
+         */
+        put: operations["PaleeWeb.MeController.update_time_zone"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/today": {
         parameters: {
             query?: never;
@@ -6769,7 +6789,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** What the workout editor may offer in this gym (ADR-179) */
+        /** What the workout editor may offer in this gym (ADR-180) */
         get: operations["PaleeWeb.AdminWorkoutFreeTextController.authoring_settings"];
         put?: never;
         post?: never;
@@ -11148,6 +11168,10 @@ export interface components {
                 spots_left?: number | null;
                 /** Format: date-time */
                 starts_at: string;
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 waitlist_count: number;
             };
@@ -11280,6 +11304,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 };
@@ -11493,6 +11521,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 };
@@ -11746,6 +11778,10 @@ export interface components {
                         spots_left?: number | null;
                         /** Format: date-time */
                         starts_at: string;
+                        /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                        time_zone: string;
+                        /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                        time_zone_confirmed?: boolean;
                         title: string;
                         waitlist_count: number;
                     } | null;
@@ -12101,6 +12137,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 } | null;
@@ -12313,6 +12353,10 @@ export interface components {
                         spots_left?: number | null;
                         /** Format: date-time */
                         starts_at: string;
+                        /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                        time_zone: string;
+                        /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                        time_zone_confirmed?: boolean;
                         title: string;
                         waitlist_count: number;
                     } | null;
@@ -12674,6 +12718,10 @@ export interface components {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         };
@@ -12855,6 +12903,10 @@ export interface components {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -13134,6 +13186,10 @@ export interface components {
                         spots_left?: number | null;
                         /** Format: date-time */
                         starts_at: string;
+                        /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                        time_zone: string;
+                        /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                        time_zone_confirmed?: boolean;
                         title: string;
                         waitlist_count: number;
                     };
@@ -13315,6 +13371,10 @@ export interface components {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         } | null;
@@ -16420,6 +16480,10 @@ export interface components {
             spots_left?: number | null;
             /** Format: date-time */
             starts_at: string;
+            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+            time_zone: string;
+            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+            time_zone_confirmed?: boolean;
             title: string;
             waitlist_count: number;
         };
@@ -16782,6 +16846,10 @@ export interface components {
                 spots_left?: number | null;
                 /** Format: date-time */
                 starts_at: string;
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 waitlist_count: number;
             };
@@ -16882,6 +16950,8 @@ export interface components {
             repeat_until?: string;
             /** Format: date-time */
             starts_at: string;
+            /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+            time_zone?: string | null;
             title: string;
         };
         /** CommunityEventResponse */
@@ -17009,6 +17079,10 @@ export interface components {
                 spots_left?: number | null;
                 /** Format: date-time */
                 starts_at: string;
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 waitlist_count: number;
             };
@@ -17083,6 +17157,8 @@ export interface components {
             scope?: "this" | "following";
             /** Format: date-time */
             starts_at?: string;
+            /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+            time_zone?: string | null;
             title?: string;
         };
         /** CommunityEventsResponse */
@@ -17209,6 +17285,10 @@ export interface components {
                 spots_left?: number | null;
                 /** Format: date-time */
                 starts_at: string;
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 waitlist_count: number;
             }[];
@@ -17381,6 +17461,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 } | null;
@@ -17583,6 +17667,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 } | null;
@@ -18285,6 +18373,10 @@ export interface components {
                 spots_left?: number | null;
                 /** Format: date-time */
                 starts_at: string;
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 waitlist_count: number;
             } | null;
@@ -18466,6 +18558,10 @@ export interface components {
             spots_left?: number | null;
             /** Format: date-time */
             starts_at: string;
+            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+            time_zone: string;
+            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+            time_zone_confirmed?: boolean;
             title: string;
             waitlist_count: number;
         } | null;
@@ -18652,6 +18748,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 } | null;
@@ -22382,6 +22482,8 @@ export interface components {
             scheduled_class_id?: string | null;
             /** @enum {string} */
             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+            /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+            time_zone?: string;
             /** Format: uuid */
             user_id?: string;
         };
@@ -22454,6 +22556,8 @@ export interface components {
                 scheduled_class_id?: string | null;
                 /** @enum {string} */
                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                time_zone?: string;
                 /** Format: uuid */
                 user_id?: string;
             };
@@ -22526,6 +22630,8 @@ export interface components {
                 scheduled_class_id?: string | null;
                 /** @enum {string} */
                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                time_zone?: string;
                 /** Format: uuid */
                 user_id?: string;
             }[];
@@ -23480,6 +23586,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 } | null;
@@ -24565,6 +24675,10 @@ export interface components {
                     spots_left?: number | null;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                    time_zone: string;
+                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                    time_zone_confirmed?: boolean;
                     title: string;
                     waitlist_count: number;
                 } | null;
@@ -24753,6 +24867,8 @@ export interface components {
             };
             /** Format: date-time */
             published_at?: string | null;
+            /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
+            time_zone?: string;
         };
         /** PublicBoxScheduleResponse */
         PublicBoxScheduleResponse: {
@@ -24797,6 +24913,8 @@ export interface components {
             }[];
             /** Format: date-time */
             start_at: string;
+            /** @description ADR-179: the gym's IANA zone; the classes show on this clock */
+            time_zone: string;
             /**
              * TrialOffer
              * @description What the box offers a visitor; null for members and when trials are off
@@ -26113,6 +26231,10 @@ export interface components {
                 trial_requests: number;
                 waitlisted: number;
             };
+            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+            time_zone: string;
+            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+            time_zone_confirmed?: boolean;
             title: string;
             /** CommunityEventTrialOffer */
             trial_offer: {
@@ -26421,6 +26543,10 @@ export interface components {
                     trial_requests: number;
                     waitlisted: number;
                 };
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 /** CommunityEventTrialOffer */
                 trial_offer: {
@@ -26475,6 +26601,8 @@ export interface components {
             repeat_until?: string;
             /** Format: date-time */
             starts_at: string;
+            /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+            time_zone?: string | null;
             title: string;
         };
         /** StaffCommunityEventResponse */
@@ -26774,6 +26902,10 @@ export interface components {
                     trial_requests: number;
                     waitlisted: number;
                 };
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 /** CommunityEventTrialOffer */
                 trial_offer: {
@@ -26925,6 +27057,10 @@ export interface components {
                 trial_requests: number;
                 waitlisted: number;
             };
+            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+            time_zone: string;
+            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+            time_zone_confirmed?: boolean;
             title: string;
             waitlist_count: number;
         };
@@ -27068,6 +27204,10 @@ export interface components {
                     trial_requests: number;
                     waitlisted: number;
                 };
+                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                time_zone: string;
+                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                time_zone_confirmed?: boolean;
                 title: string;
                 waitlist_count: number;
             }[];
@@ -28241,6 +28381,8 @@ export interface components {
                 scheduled_class_id?: string | null;
                 /** @enum {string} */
                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                time_zone?: string;
                 /** Format: uuid */
                 user_id?: string;
             };
@@ -29759,6 +29901,10 @@ export interface operations {
                                         spots_left?: number | null;
                                         /** Format: date-time */
                                         starts_at: string;
+                                        /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                        time_zone: string;
+                                        /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                        time_zone_confirmed?: boolean;
                                         title: string;
                                         waitlist_count: number;
                                     };
@@ -29940,6 +30086,10 @@ export interface operations {
                                             spots_left?: number | null;
                                             /** Format: date-time */
                                             starts_at: string;
+                                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                            time_zone: string;
+                                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                            time_zone_confirmed?: boolean;
                                             title: string;
                                             waitlist_count: number;
                                         } | null;
@@ -30192,6 +30342,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             };
@@ -30445,6 +30599,10 @@ export interface operations {
                                     spots_left?: number | null;
                                     /** Format: date-time */
                                     starts_at: string;
+                                    /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                    time_zone: string;
+                                    /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                    time_zone_confirmed?: boolean;
                                     title: string;
                                     waitlist_count: number;
                                 } | null;
@@ -30538,6 +30696,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         token?: string | null;
@@ -30571,6 +30733,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         /** @enum {string} */
                         role: "member" | "athlete";
@@ -30623,6 +30789,8 @@ export interface operations {
                              */
                             preferred_theme_slug?: "frost" | "graphite" | null;
                             role: string;
+                            /** @description ADR-179: the zone this account's device last reported */
+                            time_zone?: string | null;
                             vendor: boolean;
                         };
                     };
@@ -30728,6 +30896,8 @@ export interface operations {
                          */
                         preferred_theme_slug?: "frost" | "graphite" | null;
                         role: string;
+                        /** @description ADR-179: the zone this account's device last reported */
+                        time_zone?: string | null;
                         vendor: boolean;
                     };
                 };
@@ -30800,6 +30970,8 @@ export interface operations {
                              */
                             preferred_theme_slug?: "frost" | "graphite" | null;
                             role: string;
+                            /** @description ADR-179: the zone this account's device last reported */
+                            time_zone?: string | null;
                             vendor: boolean;
                         };
                     };
@@ -31497,6 +31669,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         }[];
@@ -31702,6 +31878,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -31807,6 +31987,8 @@ export interface operations {
                         }[];
                         /** Format: date-time */
                         start_at: string;
+                        /** @description ADR-179: the gym's IANA zone; the classes show on this clock */
+                        time_zone: string;
                         /**
                          * TrialOffer
                          * @description What the box offers a visitor; null for members and when trials are off
@@ -31940,6 +32122,8 @@ export interface operations {
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
                             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                            time_zone?: string;
                             /** Format: uuid */
                             user_id?: string;
                         };
@@ -32556,7 +32740,7 @@ export interface operations {
                     segment_cycle_counts?: {
                         [key: string]: number;
                     };
-                    /** @description ADR-179: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds). */
+                    /** @description ADR-180: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds). */
                     text_section_scores?: {
                         metric_key: string;
                         /** Format: uuid */
@@ -34222,6 +34406,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -36172,6 +36360,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         }[];
@@ -36229,6 +36421,8 @@ export interface operations {
                     repeat_until?: string;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+                    time_zone?: string | null;
                     title: string;
                 };
             };
@@ -36364,6 +36558,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         };
@@ -36686,6 +36884,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         }[];
@@ -36899,6 +37101,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -37249,6 +37455,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -37484,6 +37694,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -37719,6 +37933,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -39333,6 +39551,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         }[];
@@ -39485,6 +39707,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         };
@@ -39537,6 +39763,8 @@ export interface operations {
                     scope?: "this" | "following";
                     /** Format: date-time */
                     starts_at?: string;
+                    /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+                    time_zone?: string | null;
                     title?: string;
                 };
             };
@@ -39672,6 +39900,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         };
@@ -39832,6 +40064,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         };
@@ -40019,6 +40255,10 @@ export interface operations {
                             spots_left?: number | null;
                             /** Format: date-time */
                             starts_at: string;
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         };
@@ -40216,6 +40456,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -40418,6 +40662,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -43909,6 +44157,34 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MeController.update_time_zone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    time_zone: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Stored zone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        time_zone: string | null;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MyProvidersController.today": {
         parameters: {
             query?: {
@@ -44075,6 +44351,8 @@ export interface operations {
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
                             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                            time_zone?: string;
                             /** Format: uuid */
                             user_id?: string;
                         }[];
@@ -44168,6 +44446,8 @@ export interface operations {
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
                             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                            time_zone?: string;
                             /** Format: uuid */
                             user_id?: string;
                         };
@@ -44279,6 +44559,8 @@ export interface operations {
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
                             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                            time_zone?: string;
                             /** Format: uuid */
                             user_id?: string;
                         };
@@ -44444,6 +44726,8 @@ export interface operations {
                             scheduled_class_id?: string | null;
                             /** @enum {string} */
                             status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
+                            /** @description ADR-179: the gym's IANA zone; the class shows on this clock */
+                            time_zone?: string;
                             /** Format: uuid */
                             user_id?: string;
                         };
@@ -45626,6 +45910,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -45679,6 +45967,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -45719,6 +46011,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -45777,6 +46073,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         roles: string[];
@@ -48945,6 +49245,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             waitlist_count: number;
                         }[];
@@ -49002,6 +49306,8 @@ export interface operations {
                     repeat_until?: string;
                     /** Format: date-time */
                     starts_at: string;
+                    /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+                    time_zone?: string | null;
                     title: string;
                 };
             };
@@ -49309,6 +49615,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -49639,6 +49949,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -49699,6 +50013,8 @@ export interface operations {
                     scope?: "this" | "following";
                     /** Format: date-time */
                     starts_at?: string;
+                    /** @description ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's */
+                    time_zone?: string | null;
                     title?: string;
                 };
             };
@@ -50006,6 +50322,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -50336,6 +50656,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -50672,6 +50996,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -51009,6 +51337,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -51349,6 +51681,10 @@ export interface operations {
                                 trial_requests: number;
                                 waitlisted: number;
                             };
+                            /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                            time_zone: string;
+                            /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                            time_zone_confirmed?: boolean;
                             title: string;
                             /** CommunityEventTrialOffer */
                             trial_offer: {
@@ -59093,7 +59429,7 @@ export interface operations {
                         };
                         /** @description ADR-163: workout-authoring defaults */
                         workouts: {
-                            /** @description ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
+                            /** @description ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
                             wod_assistant_enabled: boolean;
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
@@ -59147,7 +59483,7 @@ export interface operations {
                         default_capacity?: number;
                     };
                     workouts?: {
-                        /** @description ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
+                        /** @description ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
                         wod_assistant_enabled?: boolean;
                         /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                         wod_goals_visible_by_default?: boolean;
@@ -59230,7 +59566,7 @@ export interface operations {
                         };
                         /** @description ADR-163: workout-authoring defaults */
                         workouts: {
-                            /** @description ADR-179: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
+                            /** @description ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
                             wod_assistant_enabled: boolean;
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
@@ -62562,7 +62898,7 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
-                                /** @description ADR-179: a text section's text (sectioned workouts) */
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
                                 free_text_body?: string | null;
                                 free_text_document?: {
                                     [key: string]: unknown;
@@ -62782,7 +63118,7 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
-                                    /** @description ADR-179: a text section's text (sectioned workouts) */
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
                                     free_text_body?: string | null;
                                     free_text_document?: {
                                         [key: string]: unknown;
@@ -63184,7 +63520,7 @@ export interface operations {
                                 sets?: number | null;
                             }[];
                         }[];
-                        /** @description ADR-179: a text section's text (sectioned workouts) */
+                        /** @description ADR-180: a text section's text (sectioned workouts) */
                         free_text_body?: string | null;
                         free_text_document?: {
                             [key: string]: unknown;
@@ -63404,7 +63740,7 @@ export interface operations {
                                     sets?: number | null;
                                 }[];
                             }[];
-                            /** @description ADR-179: a text section's text (sectioned workouts) */
+                            /** @description ADR-180: a text section's text (sectioned workouts) */
                             free_text_body?: string | null;
                             free_text_document?: {
                                 [key: string]: unknown;
@@ -64238,7 +64574,7 @@ export interface operations {
                                 sets?: number | null;
                             }[];
                         }[];
-                        /** @description ADR-179: a text section's text (sectioned workouts) */
+                        /** @description ADR-180: a text section's text (sectioned workouts) */
                         free_text_body?: string | null;
                         free_text_document?: {
                             [key: string]: unknown;
@@ -64458,7 +64794,7 @@ export interface operations {
                                     sets?: number | null;
                                 }[];
                             }[];
-                            /** @description ADR-179: a text section's text (sectioned workouts) */
+                            /** @description ADR-180: a text section's text (sectioned workouts) */
                             free_text_body?: string | null;
                             free_text_document?: {
                                 [key: string]: unknown;
@@ -64792,7 +65128,7 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
-                                /** @description ADR-179: a text section's text (sectioned workouts) */
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
                                 free_text_body?: string | null;
                                 free_text_document?: {
                                     [key: string]: unknown;
@@ -65012,7 +65348,7 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
-                                    /** @description ADR-179: a text section's text (sectioned workouts) */
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
                                     free_text_body?: string | null;
                                     free_text_document?: {
                                         [key: string]: unknown;
@@ -66843,6 +67179,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -67193,6 +67533,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -67428,6 +67772,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -67663,6 +68011,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -68530,6 +68882,10 @@ export interface operations {
                             /** @enum {string} */
                             provider_kind?: "gym" | "coach";
                             slug: string;
+                            /** @description ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock */
+                            timezone?: string;
+                            /** @description ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default) */
+                            timezone_confirmed?: boolean;
                         };
                         role: string;
                         token?: string | null;
@@ -75356,7 +75712,7 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
-                                /** @description ADR-179: a text section's text (sectioned workouts) */
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
                                 free_text_body?: string | null;
                                 free_text_document?: {
                                     [key: string]: unknown;
@@ -75576,7 +75932,7 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
-                                    /** @description ADR-179: a text section's text (sectioned workouts) */
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
                                     free_text_body?: string | null;
                                     free_text_document?: {
                                         [key: string]: unknown;
@@ -75991,7 +76347,7 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
-                                /** @description ADR-179: a text section's text (sectioned workouts) */
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
                                 free_text_body?: string | null;
                                 free_text_document?: {
                                     [key: string]: unknown;
@@ -76211,7 +76567,7 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
-                                    /** @description ADR-179: a text section's text (sectioned workouts) */
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
                                     free_text_body?: string | null;
                                     free_text_document?: {
                                         [key: string]: unknown;
@@ -76538,7 +76894,7 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
-                                /** @description ADR-179: a text section's text (sectioned workouts) */
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
                                 free_text_body?: string | null;
                                 free_text_document?: {
                                     [key: string]: unknown;
@@ -76758,7 +77114,7 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
-                                    /** @description ADR-179: a text section's text (sectioned workouts) */
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
                                     free_text_body?: string | null;
                                     free_text_document?: {
                                         [key: string]: unknown;
@@ -77129,6 +77485,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -79053,6 +79413,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -79403,6 +79767,10 @@ export interface operations {
                                 spots_left?: number | null;
                                 /** Format: date-time */
                                 starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
                                 title: string;
                                 waitlist_count: number;
                             } | null;
@@ -79858,6 +80226,8 @@ export interface operations {
                         };
                         /** Format: date-time */
                         published_at?: string | null;
+                        /** @description ADR-179: the gym's IANA zone; its classes show on this clock */
+                        time_zone?: string;
                     };
                 };
             };

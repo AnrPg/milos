@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "Spelling en eenheden",
     "assistantMark_assumption": "Aangenomen",
     "assistantMark_advice": "Suggesties",
-    "assistantSuggestionsHere": "Suggesties van de assistent voor deze woorden"
+    "assistantSuggestionsHere": "Suggesties van de assistent voor deze woorden",
+    "zonedTimeYours": "{time} jouw tijd",
+    "zonedTimeYoursTitle": "Op jouw klok ({zone})",
+    "zonedTimeGymClock": "Tijden volgen de klok van de gym ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "Welke events",
     "nearMe": "Dichtbij",
     "fieldGoodForFriends": "Leuk voor vrienden",
-    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event."
+    "goodForFriendsHint": "Staat bovenaan als leden vrienden uitnodigen voor een event.",
+    "zoneGym": "Tijden in gymtijd ({zone})",
+    "zoneAway": "Tijden in {zone}-tijd",
+    "zoneChange": "Wijzigen",
+    "zoneGymUnconfirmed": "De gym heeft zijn tijdzone nog niet bevestigd, dus {zone} is een schatting. Het team kan die instellen in de gyminstellingen.",
+    "zoneAwayHint": "Vindt het plaats in een andere tijdzone? Wijzig de klok zodat de tijden voor iedereen kloppen.",
+    "fieldTimeZone": "Tijdzone",
+    "zoneGymOption": "{zone} (van de gym)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",

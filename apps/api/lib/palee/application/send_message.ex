@@ -22,11 +22,11 @@ defmodule Palee.Application.SendMessage do
     end
   end
 
-  defp deliver({:coaching_message, clients}, _thread, _sender, params) do
+  defp deliver({:coaching_message, clients}, thread, _sender, params) do
     delivery_id = Map.get(params, :client_operation_id) || Ecto.UUID.generate()
     params = params |> Map.put(:message_type, :coaching_message) |> Map.delete(:topic)
 
-    with {:ok, reservations} <- reserve_touchpoints(clients, delivery_id),
+    with {:ok, reservations} <- reserve_touchpoints(clients, delivery_id, gym_today(thread)),
          {:ok, message} <- send_or_release(params, reservations, delivery_id) do
       TrackMessagingAnalytics.call({:ok, message})
     end
@@ -108,14 +108,20 @@ defmodule Palee.Application.SendMessage do
     end
   end
 
-  defp reserve_touchpoints(recipients, delivery_id) do
+  # ADR-179: the allowance day is the gym's.
+  defp gym_today(%{organization_id: organization_id}) when is_binary(organization_id),
+    do: Organizations.local_today(organization_id)
+
+  defp gym_today(_thread), do: Date.utc_today()
+
+  defp reserve_touchpoints(recipients, delivery_id, today) do
     Enum.reduce_while(recipients, {:ok, []}, fn recipient_id, {:ok, reservations} ->
       case Finance.reserve_entitlement(recipient_id, %{
              channel: :coach_messaging,
              capability: :receive_coaching_touchpoints,
              allowance: :coaching_touchpoints,
              quantity: 1,
-             occurred_on: Date.utc_today(),
+             occurred_on: today,
              source_context: "messaging",
              source_id: delivery_id,
              idempotency_key: "coach-check-in:#{delivery_id}:#{recipient_id}",

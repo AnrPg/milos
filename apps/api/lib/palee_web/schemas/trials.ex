@@ -142,6 +142,10 @@ defmodule PaleeWeb.Schemas.Trials do
           box: %Schema{allOf: [Social.box()], nullable: true},
           location: location(),
           bring_note: @maybe_string,
+          time_zone: %Schema{
+            type: :string,
+            description: "ADR-179: the gym's IANA zone; the class shows on this clock"
+          },
           follow_up: %Schema{
             type: :boolean,
             description: "Show «Πώς σου φάνηκε;» with «Θέλω να γραφτώ»"

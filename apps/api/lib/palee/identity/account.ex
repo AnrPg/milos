@@ -13,6 +13,8 @@ defmodule Palee.Identity.Account do
     :avatar_url,
     :preferred_locale,
     :preferred_theme_slug,
+    # ADR-179: the IANA zone the person's device last reported (nil: never).
+    :time_zone,
     # Nullable: accounts created before F-10 have none. Carried on the domain
     # struct so invitation email binding can be checked without reaching for
     # the Ecto schema.
@@ -32,6 +34,7 @@ defmodule Palee.Identity.Account do
           avatar_url: String.t() | nil,
           preferred_locale: String.t() | nil,
           preferred_theme_slug: String.t() | nil,
+          time_zone: String.t() | nil,
           email: String.t() | nil,
           inserted_at: DateTime.t() | NaiveDateTime.t() | nil
         }

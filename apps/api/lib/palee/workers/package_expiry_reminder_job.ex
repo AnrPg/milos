@@ -11,12 +11,12 @@ defmodule Palee.Workers.PackageExpiryReminderJob do
 
   @impl Oban.Worker
   def perform(_job) do
-    today = Date.utc_today()
-
+    # ADR-179: each gym's own "today" (the run is daily, so each gym's day
+    # still advances by exactly one per run).
     Organizations.list_active_organizations_for_system()
     |> Enum.each(fn %{organization: organization} ->
       %{organization_id: organization.id}
-      |> Finance.subscriptions_due_for_expiry_reminder(today)
+      |> Finance.subscriptions_due_for_expiry_reminder(Organizations.local_today(organization.id))
       |> Enum.each(&Notifications.process_event("package_expiring", &1))
     end)
 

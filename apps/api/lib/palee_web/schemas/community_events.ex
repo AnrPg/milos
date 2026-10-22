@@ -77,6 +77,16 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         starts_at: @datetime,
         ends_at: @datetime,
         place: place(),
+        time_zone:
+          string(
+            description:
+              "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock"
+          ),
+        time_zone_confirmed: %Schema{
+          type: :boolean,
+          description:
+            "The event or its gym has a confirmed zone (false: a guess, organisers are nudged)"
+        },
         capacity: integer(nullable: true, description: "Null: no limit"),
         going_count: integer(),
         waitlist_count: integer(),
@@ -151,6 +161,7 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         :starts_at,
         :ends_at,
         :place,
+        :time_zone,
         :going_count,
         :waitlist_count,
         :price_cents,
@@ -200,7 +211,14 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         type: :boolean,
         description: "«Καλό για φίλους»; only when friends can come (open or guest passes)"
       },
-      cover_media_id: %{@nullable_uuid | description: "A ready box photo upload"}
+      cover_media_id: %{@nullable_uuid | description: "A ready box photo upload"},
+      time_zone:
+        string(
+          maxLength: 100,
+          nullable: true,
+          description:
+            "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's"
+        )
     }
   end
 

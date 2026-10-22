@@ -1,3 +1,4 @@
+import { addDaysToKey, dateKeyInZone, dateTimeLocalInZone, dateTimeLocalToIso, startOfDayInZone } from "@/lib/zoned-time";
 import { ApiError } from "@/api/client";
 import { localizeError, type UiTranslator } from "@/i18n/presentation";
 
@@ -138,7 +139,14 @@ export function addDays(date: Date, days: number): Date {
 }
 
 /** The [from, to) range shown by the appointments page. */
-export function appointmentRange(anchor: Date, view: "week" | "day"): { from: Date; to: Date } {
+export function appointmentRange(anchor: Date, view: "week" | "day", zone: string | null = null): { from: Date; to: Date } {
+  // ADR-179: with the practice's zone, its own days (midnight on its clock).
+  if (zone) {
+    const day = dateKeyInZone(anchor, zone);
+    const weekday = (new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7;
+    const first = view === "day" ? day : addDaysToKey(day, -weekday);
+    return { from: startOfDayInZone(first, zone), to: startOfDayInZone(addDaysToKey(first, view === "day" ? 1 : 7), zone) };
+  }
   if (view === "day") {
     const from = new Date(anchor.getFullYear(), anchor.getMonth(), anchor.getDate());
     return { from, to: addDays(from, 1) };
@@ -148,12 +156,12 @@ export function appointmentRange(anchor: Date, view: "week" | "day"): { from: Da
 }
 
 /** Groups slots by local start day, keeping days and slots in time order. */
-export function groupSlotsByDay<T extends { starts_at: string }>(slots: T[]): Array<{ day: string; slots: T[] }> {
+export function groupSlotsByDay<T extends { starts_at: string }>(slots: T[], zone: string | null = null): Array<{ day: string; slots: T[] }> {
   const groups = new Map<string, T[]>();
   [...slots]
     .sort((a, b) => new Date(a.starts_at).getTime() - new Date(b.starts_at).getTime())
     .forEach((slot) => {
-      const key = localDateKey(new Date(slot.starts_at));
+      const key = zone ? dateKeyInZone(slot.starts_at, zone) : localDateKey(new Date(slot.starts_at));
       groups.set(key, [...(groups.get(key) ?? []), slot]);
     });
   return [...groups.entries()].map(([day, daySlots]) => ({ day, slots: daySlots }));
@@ -165,13 +173,15 @@ export function activeBookings<T extends { status: string }>(bookings: T[] | nul
 }
 
 /** Value for an <input type="datetime-local"> from a Date (local time). */
-export function toDateTimeLocal(date: Date): string {
+export function toDateTimeLocal(date: Date, zone: string | null = null): string {
+  if (zone) return dateTimeLocalInZone(date, zone);
   return `${localDateKey(date)}T${pad(date.getHours())}:${pad(date.getMinutes())}`;
 }
 
 /** ISO timestamp from an <input type="datetime-local"> value, or null when invalid. */
-export function fromDateTimeLocal(value: string): string | null {
+export function fromDateTimeLocal(value: string, zone: string | null = null): string | null {
   if (!value) return null;
+  if (zone && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(value)) return dateTimeLocalToIso(value, zone);
   const date = new Date(value);
   return Number.isNaN(date.getTime()) ? null : date.toISOString();
 }

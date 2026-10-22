@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "Ορθογραφία & μονάδες",
     "assistantMark_assumption": "Υποθέσεις",
     "assistantMark_advice": "Προτάσεις",
-    "assistantSuggestionsHere": "Προτάσεις του βοηθού για αυτές τις λέξεις"
+    "assistantSuggestionsHere": "Προτάσεις του βοηθού για αυτές τις λέξεις",
+    "zonedTimeYours": "{time} η ώρα σου",
+    "zonedTimeYoursTitle": "Στο ρολόι σου ({zone})",
+    "zonedTimeGymClock": "Οι ώρες είναι στο ρολόι του γυμναστηρίου ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "Ποια events",
     "nearMe": "Κοντά μου",
     "fieldGoodForFriends": "Καλό για φίλους",
-    "goodForFriendsHint": "Μπαίνει πρώτο όταν τα μέλη καλούν φίλους σε event."
+    "goodForFriendsHint": "Μπαίνει πρώτο όταν τα μέλη καλούν φίλους σε event.",
+    "zoneGym": "Ώρες στην ώρα του γυμναστηρίου ({zone})",
+    "zoneAway": "Ώρες σε ώρα {zone}",
+    "zoneChange": "Αλλαγή",
+    "zoneGymUnconfirmed": "Το γυμναστήριο δεν έχει επιβεβαιώσει ακόμη τη ζώνη ώρας του, οπότε το {zone} είναι εκτίμηση. Το προσωπικό μπορεί να την ορίσει στις ρυθμίσεις του γυμναστηρίου.",
+    "zoneAwayHint": "Γίνεται σε άλλη ζώνη ώρας; Άλλαξε το ρολόι ώστε οι ώρες να είναι σωστές για όλους.",
+    "fieldTimeZone": "Ζώνη ώρας",
+    "zoneGymOption": "{zone} (του γυμναστηρίου)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Κανένα επερχόμενο event. Φτιάξε ένα με «+ Νέο event».",

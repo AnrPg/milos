@@ -5,7 +5,7 @@ defmodule Palee.Application.RequestWorkoutAssignment do
     with :ok <- authorize_tenant_athlete(context, athlete),
          {:ok, requested_for} <-
            parse_requested_for(params["requested_for"] || params[:requested_for]),
-         :ok <- reject_past_date(requested_for),
+         :ok <- reject_past_date(requested_for, context),
          admin_ids when admin_ids != [] <-
            Organizations.list_staff_user_ids(context.organization_id),
          :ok <- notify_admins(context, athlete, requested_for, params, admin_ids) do
@@ -40,8 +40,9 @@ defmodule Palee.Application.RequestWorkoutAssignment do
   defp parse_requested_for(%Date{} = date), do: {:ok, date}
   defp parse_requested_for(_value), do: {:error, :bad_request}
 
-  defp reject_past_date(date) do
-    if Date.compare(date, Date.utc_today()) == :lt do
+  # ADR-179: "the past" is before the gym's today.
+  defp reject_past_date(date, context) do
+    if Date.compare(date, Organizations.local_today(context.organization_id)) == :lt do
       {:error, :past_date}
     else
       :ok

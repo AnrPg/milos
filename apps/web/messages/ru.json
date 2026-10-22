@@ -4384,7 +4384,7 @@
     "textSectionTimerRequired": "Выберите таймер для этой секции (секундомер тоже подходит).",
     "textSectionPlaceholder": "напр. 5 раундов: 10 подтягиваний, 15 отжиманий",
     "workoutEditorTabsLabel": "Настройки тренировки",
-    "sectionScoredByLabel": "Эта часть оценивается по:",
+    "sectionScoredByLabel": "Эта секция оценивается по:",
     "sectionScoredByPlaceholder": "напр. раунды, повторения, время",
     "addScoreMetric": "Добавить показатель",
     "addScoreMetricNamed": "+ Добавить «{label}»",
@@ -4397,7 +4397,7 @@
     "scoreKind_calories": "Калории",
     "scoreKind_distance": "Дистанция (м)",
     "scoreKind_custom": "Число",
-    "textSectionScoringInvalid": "У каждого показателя должно быть своё имя (до 40 символов, не больше 6 на часть).",
+    "textSectionScoringInvalid": "У каждого показателя должно быть своё имя (до 40 символов, не больше 6 на секцию).",
     "addSectionScoring": "Оценка…",
     "textSectionResultsHint": "Заполни, что можешь; все поля необязательны.",
     "assistantMarksLegend": "Отмечено в тексте:",
@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "Орфография и единицы",
     "assistantMark_assumption": "Предположения",
     "assistantMark_advice": "Советы",
-    "assistantSuggestionsHere": "Советы ассистента к этим словам"
+    "assistantSuggestionsHere": "Советы ассистента к этим словам",
+    "zonedTimeYours": "{time} по вашему времени",
+    "zonedTimeYoursTitle": "По вашим часам ({zone})",
+    "zonedTimeGymClock": "Время указано по часам зала ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "Какие события",
     "nearMe": "Рядом со мной",
     "fieldGoodForFriends": "Подходит для друзей",
-    "goodForFriendsHint": "Показывается первым, когда участники приглашают друзей на событие."
+    "goodForFriendsHint": "Показывается первым, когда участники приглашают друзей на событие.",
+    "zoneGym": "Время зала ({zone})",
+    "zoneAway": "Время по {zone}",
+    "zoneChange": "Изменить",
+    "zoneGymUnconfirmed": "Зал ещё не подтвердил часовой пояс, поэтому {zone} — предположение. Сотрудники могут указать его в настройках зала.",
+    "zoneAwayHint": "Проходит в другом часовом поясе? Смените часы, чтобы время было верным для всех.",
+    "fieldTimeZone": "Часовой пояс",
+    "zoneGymOption": "{zone} (пояс зала)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Нет предстоящих событий. Создайте через «+ Новое событие».",

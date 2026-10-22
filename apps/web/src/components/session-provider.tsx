@@ -7,6 +7,9 @@ import {useUiTranslations} from "@/i18n/ui";
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
+import { reportMyTimeZone } from "@/api/profile";
+import { deviceTimeZone } from "@/lib/zoned-time";
+
 import {
   fetchCurrentUser,
   loginUser,
@@ -81,6 +84,20 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     accessTokenRef.current = tokens?.access_token;
   }, [tokens?.access_token]);
+
+  // ADR-179: the API learns which zone this device is in (the latest device
+  // wins), so pushes can add the reader's own time beside the organiser's.
+  const storedTimeZone = (currentUser as { time_zone?: string | null } | null)?.time_zone ?? null;
+  const reportedTimeZone = useRef<string | null>(null);
+  const signedInUserId = currentUser?.id ?? null;
+  useEffect(() => {
+    const token = tokens?.access_token;
+    const zone = deviceTimeZone();
+    if (status !== "authenticated" || !token || !signedInUserId || !zone) return;
+    if (zone === storedTimeZone || reportedTimeZone.current === `${signedInUserId}:${zone}`) return;
+    reportedTimeZone.current = `${signedInUserId}:${zone}`;
+    void reportMyTimeZone(token, zone).catch(() => undefined);
+  }, [signedInUserId, status, storedTimeZone, tokens?.access_token]);
 
   function commitSession(
     nextTokens: AuthTokens,

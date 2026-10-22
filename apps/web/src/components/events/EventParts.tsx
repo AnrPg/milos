@@ -25,9 +25,9 @@ export function useEventError() {
 }
 
 /** The date block of the mockup's event rows: «ΣΑΒ» over «25». */
-export function DateBlock({ iso, size = "md" }: { iso: string; size?: "md" | "lg" }) {
+export function DateBlock({ iso, size = "md", timeZone = null }: { iso: string; size?: "md" | "lg"; timeZone?: string | null }) {
   const locale = useLocale();
-  const { weekday, day } = dateBlock(iso, locale);
+  const { weekday, day } = dateBlock(iso, locale, timeZone);
   return (
     <span
       aria-hidden="true"
@@ -72,14 +72,14 @@ export function EventRow({ event, lead }: { event: CommunityEvent; lead?: string
       : status === "waitlisted"
         ? t("pillWaitlisted")
         : price(event);
-  const line = [lead ?? event.group?.name ?? event.club.name, formatTime(event.starts_at, locale), placeName(event.place), going(event)]
+  const line = [lead ?? event.group?.name ?? event.club.name, formatTime(event.starts_at, locale, event.time_zone), placeName(event.place), going(event)]
     .filter(Boolean)
     .join(" · ");
 
   return (
     <li>
       <Link href={`/events/${event.id}`} className="grid min-h-16 grid-cols-[3rem_minmax(0,1fr)_auto] items-center gap-3 py-2">
-        <DateBlock iso={event.starts_at} />
+        <DateBlock iso={event.starts_at} timeZone={event.time_zone} />
         <span className="min-w-0">
           <span className="block truncate font-bold" style={{ color: "var(--text)", textDecoration: event.cancelled ? "line-through" : undefined }}>
             {event.title}

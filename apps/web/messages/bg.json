@@ -4405,7 +4405,10 @@
     "assistantMark_correction": "Правопис и мерни единици",
     "assistantMark_assumption": "Допускания",
     "assistantMark_advice": "Предложения",
-    "assistantSuggestionsHere": "Предложения на асистента за тези думи"
+    "assistantSuggestionsHere": "Предложения на асистента за тези думи",
+    "zonedTimeYours": "{time} твое време",
+    "zonedTimeYoursTitle": "По твоя часовник ({zone})",
+    "zonedTimeGymClock": "Часовете са по часовника на залата ({zone})."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -6536,7 +6539,14 @@
     "eventsSegments": "Кои събития",
     "nearMe": "Близо до мен",
     "fieldGoodForFriends": "Подходящо за приятели",
-    "goodForFriendsHint": "Излиза първо, когато членовете канят приятели на събитие."
+    "goodForFriendsHint": "Излиза първо, когато членовете канят приятели на събитие.",
+    "zoneGym": "Часове по времето на залата ({zone})",
+    "zoneAway": "Часове по времето в {zone}",
+    "zoneChange": "Промени",
+    "zoneGymUnconfirmed": "Залата още не е потвърдила часовата си зона, така че {zone} е предположение. Персоналът може да я зададе в настройките на залата.",
+    "zoneAwayHint": "Провежда се в друга часова зона? Смени часовника, за да са часовете верни за всички.",
+    "fieldTimeZone": "Часова зона",
+    "zoneGymOption": "{zone} (на залата)"
   },
   "EventsAdmin": {
     "emptyUpcoming": "Няма предстоящи събития. Създай едно с «+ Ново събитие».",

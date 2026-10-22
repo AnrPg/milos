@@ -44,28 +44,31 @@ import {
   slotLocationName,
   waitlistPositionLabel,
 } from "@/components/schedule/member-booking";
+import { zonedText } from "@/lib/zoned-time";
+import { YourTime } from "@/components/zoned-time";
 import { Dialog } from "@/components/ui/Dialog";
 
-function formatDateTime(locale: string, isoString: string) {
-  return new Intl.DateTimeFormat(locale, {
+// ADR-179: on the gym's clock (`zone`), its city added when the viewer's differs.
+function formatDateTime(locale: string, isoString: string, zone: string | null) {
+  return zonedText(isoString, zone, locale, {
     weekday: "long",
     month: "short",
     day: "numeric",
     hour: "numeric",
     minute: "2-digit",
-  }).format(new Date(isoString));
+  });
 }
 
-function formatDeadline(locale: string, scheduledAt: string, timeoutMinutes: number) {
+function formatDeadline(locale: string, scheduledAt: string, timeoutMinutes: number, zone: string | null) {
   const deadline = new Date(new Date(scheduledAt).getTime() - timeoutMinutes * 60 * 1000);
-  const exact = new Intl.DateTimeFormat(locale, {
+  const exact = zonedText(deadline, zone, locale, {
     weekday: "short",
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
-  }).format(deadline);
+  });
   return { exact };
 }
 
@@ -75,6 +78,8 @@ function timeoutMinutesLabel(timeoutMinutes: number) {
 
 type SlotPopupProps = {
   slot: ScheduleSlot;
+  /** ADR-179: the gym's zone; the class shows on its clock. */
+  timeZone?: string | null;
   isAdmin: boolean;
   accessToken: string;
   onClose: () => void;
@@ -96,6 +101,7 @@ type SlotPopupProps = {
 
 export function SlotPopup({
   slot,
+  timeZone = null,
   isAdmin,
   accessToken,
   onClose,
@@ -240,7 +246,7 @@ export function SlotPopup({
           ? i18n("thisClassIsCurrentlyFullfc75983")
           : i18n("bookingIsUnavailableForThisSlot8a07037");
 
-  const deadline = formatDeadline(locale, slot.scheduled_at, slot.booking_timeout_minutes);
+  const deadline = formatDeadline(locale, slot.scheduled_at, slot.booking_timeout_minutes, timeZone);
   const deadlineRelative = i18n("beforeStart", {
     duration: timeoutMinutesLabel(slot.booking_timeout_minutes),
   });
@@ -284,7 +290,8 @@ export function SlotPopup({
                 {slot.workout?.title ?? i18n("scheduledClass571cba0")}
               </h2>
               <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-                {formatDateTime(locale, slot.scheduled_at)}
+                {formatDateTime(locale, slot.scheduled_at, timeZone)}
+                <YourTime at={slot.scheduled_at} zone={timeZone} format="day-time" />
               </p>
             </div>
             <button

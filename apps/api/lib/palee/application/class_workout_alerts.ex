@@ -11,6 +11,7 @@ defmodule Palee.Application.ClassWorkoutAlerts do
   """
 
   alias Palee.{Notifications, Organizations, Scheduling}
+  alias Palee.TimeZones.ZonedTime
 
   def call(now \\ DateTime.utc_now()) do
     Organizations.list_active_organizations_for_system()
@@ -47,7 +48,8 @@ defmodule Palee.Application.ClassWorkoutAlerts do
       organization_id: slot.organization_id,
       scheduled_class_id: slot.id,
       class_name: slot.name,
-      class_when: class_when(slot.scheduled_at, zone),
+      class_starts_at: slot.scheduled_at,
+      class_when: ZonedTime.format(slot.scheduled_at, zone),
       alert: Atom.to_string(kind),
       published: Scheduling.class_published?(slot),
       dedupe_key:
@@ -57,12 +59,5 @@ defmodule Palee.Application.ClassWorkoutAlerts do
     Enum.each(recipients, fn user_id ->
       Notifications.dispatch_event(:class_workout_missing, Map.put(payload, :user_id, user_id))
     end)
-  end
-
-  defp class_when(starts_at, zone) do
-    case DateTime.shift_zone(starts_at, zone) do
-      {:ok, local} -> Calendar.strftime(local, "%d/%m %H:%M")
-      {:error, _reason} -> Calendar.strftime(starts_at, "%d/%m %H:%M UTC")
-    end
   end
 end
