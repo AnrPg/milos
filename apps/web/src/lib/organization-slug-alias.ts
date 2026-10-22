@@ -9,6 +9,7 @@ const ORGANIZATION_PATH = /^\/org\/([^/]+)(\/.*)?$/;
 const CACHE_TTL_MS = 60_000;
 const CACHE_MAX_ENTRIES = 500;
 const LOOKUP_TIMEOUT_MS = 1_500;
+const FAILURE_TTL_MS = 10_000;
 
 type CacheEntry = { canonicalSlug: string | null; expiresAt: number };
 
@@ -52,6 +53,9 @@ export async function lookupCanonicalOrganizationSlug(
     const response = await fetchImpl(`${apiOrigin}/api/organization-slug-aliases/${encodeURIComponent(slug)}`, {
       headers: { accept: "application/json" },
       cache: "no-store",
+      // A redirect here means the lookup is misrouted (e.g. an https upgrade on
+      // the cluster network); following it only adds latency to the page.
+      redirect: "manual",
       signal: AbortSignal.timeout(LOOKUP_TIMEOUT_MS),
     });
 
@@ -63,16 +67,23 @@ export async function lookupCanonicalOrganizationSlug(
       canonicalSlug =
         typeof candidate === "string" && SLUG_PATTERN.test(candidate) && candidate !== slug ? candidate : null;
     } else {
-      // Rate limited or unavailable: do not cache, do not redirect.
-      return null;
+      // Rate limited, unavailable or misrouted: no redirect, and remember
+      // that briefly so every page load does not wait on it again.
+      return rememberFailure(slug, cache, now);
     }
   } catch {
-    return null;
+    return rememberFailure(slug, cache, now);
   }
 
   if (cache.size >= CACHE_MAX_ENTRIES) cache.clear();
   cache.set(slug, { canonicalSlug, expiresAt: now() + CACHE_TTL_MS });
   return canonicalSlug;
+}
+
+function rememberFailure(slug: string, cache: Map<string, CacheEntry>, now: () => number): null {
+  if (cache.size >= CACHE_MAX_ENTRIES) cache.clear();
+  cache.set(slug, { canonicalSlug: null, expiresAt: now() + FAILURE_TTL_MS });
+  return null;
 }
 
 /** The 308 target for a retired-slug request, or null when no redirect applies. */

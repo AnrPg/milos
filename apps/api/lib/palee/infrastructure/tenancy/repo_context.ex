@@ -32,6 +32,10 @@ defmodule Palee.Infrastructure.Tenancy.RepoContext do
 
   def run(_context, _fun), do: {:error, :missing_ownership_scope}
 
+  # The settings this process holds on its checked-out connection while inside
+  # `run/2`, so reads and nested runs need no round trip to the database.
+  @active_settings {__MODULE__, :active_settings}
+
   def current_setting(name)
       when name in [
              "app.organization_id",
@@ -41,10 +45,15 @@ defmodule Palee.Infrastructure.Tenancy.RepoContext do
              "app.invitation_redemption",
              "app.slug_alias_lookup"
            ] do
-    case Ecto.Adapters.SQL.query(Repo, "SELECT current_setting($1, true)", [name]) do
-      {:ok, %{rows: [[value]]}} when value in [nil, ""] -> nil
-      {:ok, %{rows: [[value]]}} -> value
-      _error -> nil
+    case Process.get(@active_settings) do
+      %{^name => value} ->
+        blank_to_nil(value)
+
+      _unknown ->
+        case Ecto.Adapters.SQL.query(Repo, "SELECT current_setting($1, true)", [name]) do
+          {:ok, %{rows: [[value]]}} -> blank_to_nil(value)
+          _error -> nil
+        end
     end
   end
 
@@ -56,16 +65,73 @@ defmodule Palee.Infrastructure.Tenancy.RepoContext do
         &Repo.checkout/1
       end
 
+    # Every store call runs through here, so the settings are read, set and
+    # restored in one round trip each, not one per setting. Inside a run the
+    # values are also kept in the process, so nested runs and
+    # `current_setting/1` read them without a query, and a setting that
+    # already holds the wanted value is neither set nor restored.
     runner.(fn ->
-      previous = Map.new(settings, fn {name, _value} -> {name, current_setting(name)} end)
-      Enum.each(settings, fn {name, value} -> set_session(name, value) end)
+      active = Process.get(@active_settings)
+      previous = previous_settings(settings, active)
+      changed = Enum.reject(settings, fn setting -> setting in previous end)
+      set_sessions(changed)
+      Process.put(@active_settings, Map.merge(active || %{}, Map.new(settings)))
 
       try do
         fun.()
       after
-        Enum.each(previous, fn {name, value} -> set_session(name, value || "") end)
+        if active,
+          do: Process.put(@active_settings, active),
+          else: Process.delete(@active_settings)
+
+        changed
+        |> Enum.map(fn {name, _value} -> {name, previous |> List.keyfind(name, 0) |> elem(1)} end)
+        |> set_sessions()
       end
     end)
+  end
+
+  # Outside any run the connection is read once, since callers (and tests) may
+  # have set a value directly; inside a run the process already knows them.
+  defp previous_settings(settings, active) do
+    names = Enum.map(settings, &elem(&1, 0))
+
+    values =
+      if active && Enum.all?(names, &Map.has_key?(active, &1)) do
+        Enum.map(names, &Map.fetch!(active, &1))
+      else
+        read_settings(names)
+      end
+
+    Enum.zip(names, values)
+  end
+
+  defp read_settings(names) do
+    %{rows: rows} =
+      Ecto.Adapters.SQL.query!(
+        Repo,
+        "SELECT current_setting(name, true) FROM unnest($1::text[]) WITH ORDINALITY AS s(name, position) ORDER BY position",
+        [names]
+      )
+
+    Enum.map(rows, fn [value] -> value || "" end)
+  end
+
+  defp blank_to_nil(value) when value in [nil, ""], do: nil
+  defp blank_to_nil(value), do: value
+
+  defp set_sessions([]), do: :ok
+
+  defp set_sessions(settings) do
+    {names, values} = Enum.unzip(settings)
+
+    Ecto.Adapters.SQL.query!(
+      Repo,
+      "SELECT set_config(name, value, false) FROM unnest($1::text[], $2::text[]) AS s(name, value)",
+      [names, values]
+    )
+
+    :ok
   end
 
   defp contextual_settings(context) do
@@ -122,9 +188,4 @@ defmodule Palee.Infrastructure.Tenancy.RepoContext do
     do: [{"app.slug_alias_lookup", "true"} | settings]
 
   defp maybe_put_slug_alias_lookup(settings, _context), do: settings
-
-  defp set_session(name, value) do
-    Ecto.Adapters.SQL.query!(Repo, "SELECT set_config($1, $2, false)", [name, value])
-    :ok
-  end
 end
