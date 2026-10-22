@@ -93,8 +93,9 @@ export function CommunitySettingsLink() {
 
   return (
     <div className="flex flex-col gap-3">
-      {groups.data ? <MemberGroupsSetting current={groups.data.settings.member_groups} /> : null}
-      {groups.data ? <PartnersSetting current={groups.data.settings.partners_enabled} /> : null}
+      {/* An answer without settings shows only the link instead of crashing the hub. */}
+      {groups.data?.settings ? <MemberGroupsSetting current={groups.data.settings.member_groups} /> : null}
+      {groups.data?.settings ? <PartnersSetting current={groups.data.settings.partners_enabled} /> : null}
       <Link
         href={adminHref("/admin/community", slug)}
         className="flex items-center justify-between gap-3 rounded-2xl px-4 py-3"
