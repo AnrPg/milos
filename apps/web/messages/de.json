@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Wird gespeichert…",
     "apiErrorClassNotPublished": "Diese Stunde ist noch nicht buchbar.",
     "apiErrorInvalidTimeZone": "Wähle eine bekannte Zeitzone.",
-    "apiErrorTimeZoneRequired": "Lege zuerst die Zeitzone deines Gyms fest."
+    "apiErrorTimeZoneRequired": "Lege zuerst die Zeitzone deines Gyms fest.",
+    "notificationFilters": "Benachrichtigungsfilter"
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",

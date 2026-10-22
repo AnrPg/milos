@@ -34,6 +34,7 @@ import { PersonAvatar } from "@/components/social/PersonAvatar";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
 import { can } from "@/lib/role-navigation";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type ListTab = "going" | "waitlisted" | "cancelled" | "came";
 const LIST_TABS: ListTab[] = ["going", "waitlisted", "cancelled", "came"];
@@ -183,25 +184,13 @@ function StaffEventView({ event }: { event: StaffEvent }) {
         </Panel>
       ) : null}
 
-      <div role="tablist" aria-label={t("attendeesAria")} className="flex gap-2 overflow-x-auto">
-        {LIST_TABS.map((value) => (
-          <button
-            key={value}
-            type="button"
-            role="tab"
-            aria-selected={tab === value}
-            onClick={() => setTab(value)}
-            className="min-h-11 flex-1 shrink-0 whitespace-nowrap rounded-2xl px-3 text-sm font-semibold"
-            style={{
-              background: tab === value ? "var(--primary)" : "var(--panel)",
-              color: tab === value ? "var(--primary-contrast)" : "var(--text)",
-              border: "1px solid var(--border)",
-            }}
-          >
-            {t(["tab", value].join("_"), { count: lists[value].length })}
-          </button>
-        ))}
-      </div>
+      <SegmentPicker
+        ariaLabel={t("attendeesAria")}
+        stretch
+        value={tab}
+        onChange={setTab}
+        options={LIST_TABS.map((value) => ({ value, label: t(["tab", value].join("_"), { count: lists[value].length }) }))}
+      />
       <Panel>
         {lists[tab].length === 0 ? (
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t(["empty", tab].join("_"))}</p>

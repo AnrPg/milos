@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Enregistrement…",
     "apiErrorClassNotPublished": "Ce cours n'est pas encore ouvert aux réservations.",
     "apiErrorInvalidTimeZone": "Choisissez un fuseau horaire connu.",
-    "apiErrorTimeZoneRequired": "Définissez d'abord le fuseau horaire de votre salle."
+    "apiErrorTimeZoneRequired": "Définissez d'abord le fuseau horaire de votre salle.",
+    "notificationFilters": "Filtres des notifications"
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",

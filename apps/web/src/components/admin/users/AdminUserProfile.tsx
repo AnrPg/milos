@@ -69,6 +69,7 @@ import { TrainingHistory } from "@/components/history/TrainingHistory";
 import { defaultHistoryKind } from "@/lib/training-history";
 import { sortComments } from "@/lib/journal-comments";
 import { fetchUserTrainingHistory } from "@/api/training-history";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 function Panel({ id, title, children }: { id: string; title: string; children: React.ReactNode; href?: string; hrefLabel?: string }) {
   const i18n = useUiTranslations();
@@ -741,28 +742,15 @@ export function AdminUserProfile({ userId }: { userId: string }) {
           />
         ) : null}
 
-        <div
-          role="tablist"
-          aria-label={i18n("mpTabs")}
-          className="flex max-w-full gap-1 overflow-x-auto rounded-full p-0.5"
-          style={{ background: "var(--border)", width: "fit-content" }}
-        >
-          {tabs.map((item) => (
-            <button
-              key={item}
-              type="button"
-              role="tab"
-              id={`profile-tab-${item}`}
-              aria-selected={tab === item}
-              aria-controls="profile-tab-panel"
-              onClick={() => selectTab(item)}
-              className="shrink-0 rounded-full px-4 py-1.5 text-sm font-semibold"
-              style={tab === item ? { background: "var(--text)", color: "var(--bg)" } : { color: "var(--dim)" }}
-            >
-              {i18n(PROFILE_TAB_KEYS[item])}
-            </button>
-          ))}
-        </div>
+        <SegmentPicker
+          ariaLabel={i18n("mpTabs")}
+          variant="track"
+          idPrefix="profile"
+          panelId="profile-tab-panel"
+          value={tab}
+          onChange={selectTab}
+          options={tabs.map((item) => ({ value: item, label: i18n(PROFILE_TAB_KEYS[item]) }))}
+        />
 
         <section id="profile-tab-panel" role="tabpanel" aria-labelledby={`profile-tab-${tab}`} className="space-y-4">
           {tab === "overview" ? (
