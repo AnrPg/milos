@@ -621,6 +621,74 @@ defmodule PaleeWeb.ExecutionControllerTest do
              ]
     end
 
+    test "ADR-179: results for a text section's scores become section scores of their own",
+         %{conn: conn} do
+      admin = create_admin!("text_score_admin")
+      athlete_conn = authenticate_as_member(conn, "text_score_member")
+      workout = sectioned_scored_workout!(conn, admin)
+      [strength, metcon] = Enum.sort_by(workout["sections"], & &1["order"])
+
+      execution_id =
+        athlete_conn
+        |> post("/api/executions", %{
+          master_workout_id: workout["id"],
+          source: "self_selected"
+        })
+        |> json_response(201)
+        |> get_in(["execution", "id"])
+
+      complete = fn scores ->
+        athlete_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> patch(
+          "/api/executions/#{execution_id}/complete",
+          Jason.encode!(%{
+            section_scores: [],
+            text_section_scores: scores,
+            total_elapsed_ms: 900_000,
+            section_elapsed_ms: %{strength["id"] => 300_000, metcon["id"] => 600_000},
+            segment_cycle_counts: %{}
+          })
+        )
+      end
+
+      # A metric the coach did not set is refused.
+      complete.([%{section_id: metcon["id"], metric_key: "load", value: 100}])
+      |> json_response(400)
+
+      scores =
+        complete.([
+          %{section_id: strength["id"], metric_key: "top-set", value: "102.5"},
+          %{section_id: metcon["id"], metric_key: "rounds", value: 7},
+          %{section_id: metcon["id"], metric_key: "wall-balls", value: ""}
+        ])
+        |> json_response(200)
+        |> get_in(["execution", "section_scores"])
+
+      assert [
+               %{
+                 "section_id" => strength_id,
+                 "section_key" => strength_key,
+                 "section_name" => "Strength · Top set",
+                 "value" => 102.5,
+                 "unit" => "kg",
+                 "score_type" => "load",
+                 "source" => "user"
+               },
+               %{
+                 "section_key" => metcon_key,
+                 "section_name" => "#2 · Rounds",
+                 "value" => 7,
+                 "score_type" => "rounds"
+               }
+             ] = scores
+
+      assert strength_id == strength["id"]
+      assert strength_key == "#{strength["id"]}:top-set"
+      assert metcon_key == "#{metcon["id"]}:rounds"
+    end
+
     test "completion rejects scores for unknown or mismatched sections", %{conn: conn} do
       admin = create_admin!("score_validation_admin")
       athlete_conn = authenticate_as_member(conn, "score_validation_member")
@@ -951,6 +1019,52 @@ defmodule PaleeWeb.ExecutionControllerTest do
       })
 
     workout
+  end
+
+  # Published through the editor's own route, so the sections are prepared
+  # (and their scoring normalised) exactly as a coach's would be.
+  defp sectioned_scored_workout!(conn, admin) do
+    :ok = ensure_scale_level!(legacy_context!(admin), "scaled", "Scaled")
+    admin_conn = put_bearer_token(conn, admin)
+    base = "/api/org/#{Organizations.legacy_organization_slug()}/admin/workouts"
+    draft_id = admin_conn |> post(base) |> json_response(201) |> get_in(["draft", "id"])
+
+    sections = [
+      %{
+        name: "Strength",
+        order: 1,
+        exercises: [],
+        free_text_body: "Back squat 5x3",
+        timer_preset: %{format: "untimed"},
+        score_config: %{metrics: [%{label: "Top set", kind: "load"}]}
+      },
+      %{
+        name: "",
+        order: 2,
+        exercises: [],
+        free_text_body: "12 min AMRAP: 10 wall balls, 10 box jumps",
+        timer_preset: %{format: "amrap", duration_seconds: 720},
+        score_config: %{
+          metrics: [%{label: "Rounds", kind: "rounds"}, %{label: "Wall balls", kind: "reps"}]
+        }
+      }
+    ]
+
+    admin_conn
+    |> recycle()
+    |> put_req_header("content-type", "application/json")
+    |> post(
+      "#{base}/#{draft_id}/publish",
+      Jason.encode!(%{
+        expected_source_revision: 0,
+        title: "Sectioned and scored",
+        type: "crossfit",
+        authoring_mode: "sectioned_text",
+        sections: sections
+      })
+    )
+    |> json_response(200)
+    |> Map.fetch!("workout")
   end
 
   defp ensure_scale_level!(context, slug, label) do

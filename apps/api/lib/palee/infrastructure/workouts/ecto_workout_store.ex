@@ -1100,6 +1100,9 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
       tags: workout.tags,
       content: visible_content(workout.content, audience),
       workout_metadata: workout.workout_metadata,
+      # ADR-179: execution builds a sectioned workout's timers (and checks its
+      # athletes' section results) from the mode.
+      authoring_mode: workout.authoring_mode,
       created_by_id: workout.created_by_id,
       folder_id: workout.folder_id,
       source_workout_id: workout.source_workout_id,

@@ -18,6 +18,7 @@ defmodule Palee.Workouts.Domain.SectionedText do
   """
 
   alias Palee.Execution.Domain.TimerPresets
+  alias Palee.Workouts.Domain.SectionScoring
 
   @mode "sectioned_text"
   @max_sections 30
@@ -40,7 +41,8 @@ defmodule Palee.Workouts.Domain.SectionedText do
   Errors: `{:error, :no_sections}` or
   `{:error, {:invalid_text_sections, problems}}` where each problem is
   `%{section: index_from_1, problem: code}` and code is one of
-  `text_required`, `text_too_long`, `title_too_long`, `timer_required`.
+  `text_required`, `text_too_long`, `title_too_long`, `timer_required`,
+  `scoring_invalid`.
   """
   def prepare_publish(%{} = params) do
     case value(params, :sections) do
@@ -83,13 +85,15 @@ defmodule Palee.Workouts.Domain.SectionedText do
     title = section |> value(:name) |> trimmed()
     body = section |> value(:free_text_body) |> trimmed()
     preset = TimerPresets.parse(value(section, :timer_preset))
+    scoring = SectionScoring.normalize(value(section, :score_config))
 
     problems =
       [
         body == "" && "text_required",
         byte_size(body) > @max_body_bytes && "text_too_long",
         String.length(title) > @max_title_length && "title_too_long",
-        is_nil(preset) && "timer_required"
+        is_nil(preset) && "timer_required",
+        match?({:error, _reason}, scoring) && "scoring_invalid"
       ]
       |> Enum.filter(& &1)
       |> Enum.map(&%{section: index, problem: &1})
@@ -103,6 +107,8 @@ defmodule Palee.Workouts.Domain.SectionedText do
          "free_text_body" => body,
          "free_text_document" => document(value(section, :free_text_document), body),
          "timer_preset" => preset,
+         # ADR-179: what the section counts, if the coach said (optional).
+         "score_config" => elem(scoring, 1),
          "section_metadata" => %{"untitled" => title == ""},
          "exercises" => []
        }}

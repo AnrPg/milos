@@ -21,12 +21,13 @@ defmodule Palee.Application.CompleteWorkout do
   def call(execution_id, user_id, params) do
     with {:ok, current_execution} <- fetch_execution(execution_id, user_id),
          {:ok, segments, workout} <- timer_sequence_for_execution(current_execution),
+         {:ok, text_scores} <- text_section_scores(workout, params),
          {:ok, execution} <-
            Execution.complete_execution(
              execution_id,
              user_id,
              Map.put(params, :segments, segments),
-             completion_options(execution_id)
+             [{:text_section_scores, text_scores} | completion_options(execution_id)]
            ),
          :ok <- process_inline_if_needed(execution) do
       broadcast_completion(execution)
@@ -206,6 +207,17 @@ defmodule Palee.Application.CompleteWorkout do
       _missing -> {:ok, [], nil}
     end
   end
+
+  # ADR-179: the athlete's results for the scores the coach set on the
+  # sections of a workout written without the assistant.
+  defp text_section_scores(%{authoring_mode: "sectioned_text", sections: sections}, params),
+    do:
+      Execution.normalize_text_section_scores(
+        params[:text_section_scores] || params["text_section_scores"],
+        sections || []
+      )
+
+  defp text_section_scores(_workout, _params), do: {:ok, []}
 
   defp resolve_workout(context, workout_id, slug) when slug in [nil, ""],
     do: Workouts.get_workout(context, workout_id)

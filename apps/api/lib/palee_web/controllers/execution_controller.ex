@@ -136,6 +136,24 @@ defmodule PaleeWeb.ExecutionController do
                }
              }
            },
+           text_section_scores: %Schema{
+             type: :array,
+             maxItems: 180,
+             description:
+               "ADR-179: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds).",
+             items: %Schema{
+               type: :object,
+               required: [:section_id, :metric_key, :value],
+               properties: %{
+                 section_id: %Schema{type: :string, format: :uuid},
+                 metric_key: %Schema{type: :string, maxLength: 64},
+                 value: %Schema{
+                   oneOf: [%Schema{type: :number}, %Schema{type: :string, maxLength: 32}],
+                   nullable: true
+                 }
+               }
+             }
+           },
            total_elapsed_ms: %Schema{type: :integer, minimum: 0},
            section_elapsed_ms: %Schema{
              type: :object,
