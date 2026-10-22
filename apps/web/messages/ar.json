@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "مثال: 5 جولات: 10 عقلات، 15 ضغط",
     "workoutEditorTabsLabel": "إعدادات التمرين",
     "sectionScoredByLabel": "يُحتسب هذا القسم بحسب:",
-    "sectionScoredByPlaceholder": "مثل: جولات، تكرارات، وقت",
-    "addScoreMetric": "إضافة مقياس",
-    "addScoreMetricNamed": "+ إضافة «{label}»",
-    "removeScoreMetric": "إزالة {label}",
+    "sectionScoredByPlaceholder": "اختر أو اكتب: جولات، تكرارات، وقت…",
+    "addScoreMetric": "إضافة مقياس آخر",
     "scoreMetricKindLabel": "ما الذي يقيسه «{label}»",
     "scoreKind_rounds": "جولات",
     "scoreKind_reps": "تكرارات",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "اقتراحات المساعد لهذه الكلمات",
     "zonedTimeYours": "{time} بتوقيتك",
     "zonedTimeYoursTitle": "حسب ساعتك ({zone})",
-    "zonedTimeGymClock": "الأوقات حسب ساعة النادي ({zone})."
+    "zonedTimeGymClock": "الأوقات حسب ساعة النادي ({zone}).",
+    "scoreFieldLabel": "المقياس {number}",
+    "removeScoreField": "إزالة المقياس {number}"
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",

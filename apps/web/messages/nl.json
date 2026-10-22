@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "bijv. 5 rondes: 10 pull-ups, 15 push-ups",
     "workoutEditorTabsLabel": "Workoutinstellingen",
     "sectionScoredByLabel": "Dit onderdeel wordt gescoord op:",
-    "sectionScoredByPlaceholder": "bv. rondes, herhalingen, tijd",
-    "addScoreMetric": "Score toevoegen",
-    "addScoreMetricNamed": "+ ‘{label}’ toevoegen",
-    "removeScoreMetric": "{label} verwijderen",
+    "sectionScoredByPlaceholder": "Kies of typ: rondes, herhalingen, tijd…",
+    "addScoreMetric": "Nog een score",
     "scoreMetricKindLabel": "Wat ‘{label}’ telt",
     "scoreKind_rounds": "Rondes",
     "scoreKind_reps": "Herhalingen",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Suggesties van de assistent voor deze woorden",
     "zonedTimeYours": "{time} jouw tijd",
     "zonedTimeYoursTitle": "Op jouw klok ({zone})",
-    "zonedTimeGymClock": "Tijden volgen de klok van de gym ({zone})."
+    "zonedTimeGymClock": "Tijden volgen de klok van de gym ({zone}).",
+    "scoreFieldLabel": "Score {number}",
+    "removeScoreField": "Score {number} verwijderen"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

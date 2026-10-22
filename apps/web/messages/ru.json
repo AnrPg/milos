@@ -4385,10 +4385,8 @@
     "textSectionPlaceholder": "напр. 5 раундов: 10 подтягиваний, 15 отжиманий",
     "workoutEditorTabsLabel": "Настройки тренировки",
     "sectionScoredByLabel": "Эта секция оценивается по:",
-    "sectionScoredByPlaceholder": "напр. раунды, повторения, время",
+    "sectionScoredByPlaceholder": "Выберите или введите: раунды, повторения, время…",
     "addScoreMetric": "Добавить показатель",
-    "addScoreMetricNamed": "+ Добавить «{label}»",
-    "removeScoreMetric": "Удалить {label}",
     "scoreMetricKindLabel": "Что считает «{label}»",
     "scoreKind_rounds": "Раунды",
     "scoreKind_reps": "Повторения",
@@ -4408,7 +4406,9 @@
     "assistantSuggestionsHere": "Советы ассистента к этим словам",
     "zonedTimeYours": "{time} по вашему времени",
     "zonedTimeYoursTitle": "По вашим часам ({zone})",
-    "zonedTimeGymClock": "Время указано по часам зала ({zone})."
+    "zonedTimeGymClock": "Время указано по часам зала ({zone}).",
+    "scoreFieldLabel": "Показатель {number}",
+    "removeScoreField": "Удалить показатель {number}"
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",

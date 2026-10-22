@@ -34,8 +34,12 @@ so that results of such workouts still feed progress and analytics.
 5. **Section scoring.** A section may carry `score_config.metrics`
    (`SectionScoring`: up to 6, each a coach label plus a kind among rounds,
    reps, time (seconds), load (kg), calories, distance (m) or custom number;
-   keyed by the label's slug). The editor field offers fuzzy live suggestions
-   from that list and «+» for the coach's own name. After the workout the
+   keyed by the label's slug). In the editor each score is one field: a
+   dropdown of those paradigms, filtered fuzzily as the coach types (a name of
+   the coach's own is kept as a custom score, its kind guessed and
+   changeable); «+» adds one more score field, since one section may be
+   scored several ways (reps for one part, load for another). The same
+   paradigm chosen twice is numbered («Reps 2»). After the workout the
    finish screen asks one named field per metric; `text_section_scores`
    (`section_id`, `metric_key`, `value`) are checked against the workout
    (`TextSectionScores`) and stored as ordinary `section_scores` with
