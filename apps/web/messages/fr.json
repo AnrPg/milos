@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "Ton forfait n’a plus de place pour l’équipe. Libère une place ou demande-nous de changer de forfait.",
     "apiErrorUnknownPlan": "Ce forfait n’existe pas.",
     "apiErrorTrialEndRequired": "Un essai a besoin d’une date de fin.",
-    "apiErrorInvalidName": "Le nom doit comporter de 2 à 120 caractères."
+    "apiErrorInvalidName": "Le nom doit comporter de 2 à 120 caractères.",
+    "classNoWodYet": "Pas encore de WOD (à associer plus tard)",
+    "classDraftSavedNotice": "Enregistré sans WOD. Les membres ne verront pas ce cours tant que vous n'en associez pas un.",
+    "classSeriesWod": "WOD (facultatif)",
+    "classSeriesWodHint": "Laissez vide pour que chaque cours ait son propre WOD. Un cours encore sans WOD le jour même est signalé et l'équipe reçoit des rappels.",
+    "classDraftTitle": "Non publié : pas de WOD",
+    "classDraftBody": "Les membres ne peuvent ni voir ni réserver ce cours tant qu'un WOD n'est pas associé.",
+    "classWodMissingTitle": "WOD manquant aujourd'hui",
+    "classWodMissingBody": "Ce cours a lieu aujourd'hui et n'a pas de WOD. L'équipe reçoit des rappels à 07:00 et une heure avant le début.",
+    "classWodAwaitingTitle": "Pas encore de WOD",
+    "classWodAwaitingBody": "Les membres peuvent réserver ce cours. Associez son WOD avant le jour du cours.",
+    "classLinkWodLabel": "WOD à associer",
+    "classLinkWodPlaceholder": "Choisir un WOD",
+    "classLinkWod": "Associer le WOD",
+    "classLinkWodSaving": "Association…",
+    "classDraftBadge": "Brouillon · sans WOD",
+    "classWodMissingBadge": "Sans WOD",
+    "ntfClassWodMissingTitle": "Un cours n'a pas de WOD",
+    "ntfClassWodMissingDraftBody": "{className} ({when}) n'a pas de WOD : les membres ne peuvent ni le voir ni le réserver.",
+    "ntfClassWodMissingHourBody": "{className} ({when}) commence dans une heure et n'a toujours pas de WOD.",
+    "ntfClassWodMissingMorningBody": "{className} ({when}) n'a pas encore de WOD.",
+    "gymTimeZoneTitle": "Fuseau horaire",
+    "gymTimeZoneDescription": "Les jours des cours, les rappels de WOD, les jours de check-in et les heures des événements le suivent.",
+    "gymTimeZoneLabel": "Fuseau horaire de votre salle",
+    "gymTimeZoneHint": "Choisissez le fuseau où se trouve la salle, même si vous voyagez.",
+    "gymTimeZoneConfirmed": "Votre salle fonctionne sur {zone}.",
+    "gymTimeZoneInferred": "Nous avons déduit {zone} de votre appareil. Confirmez-le ou choisissez-en un autre.",
+    "gymTimeZoneUnset": "Pas encore défini. En attendant, Palee utilise {zone}.",
+    "gymTimeZoneConfirm": "Enregistrer le fuseau",
+    "gymTimeZoneSaving": "Enregistrement…",
+    "apiErrorClassNotPublished": "Ce cours n'est pas encore ouvert aux réservations.",
+    "apiErrorInvalidTimeZone": "Choisissez un fuseau horaire connu.",
+    "apiErrorTimeZoneRequired": "Définissez d'abord le fuseau horaire de votre salle."
   },
   "PrSharing": {
     "gymLabel": "Où as-tu réalisé ce PR ?",
@@ -4744,6 +4776,11 @@
         "title": "Organise un bootcamp ouvert",
         "body": "Une séance en plein air ou en ligne ouverte à tous. Un bon moyen de rencontrer de nouveaux clients.",
         "cta": "Créer un bootcamp"
+      },
+      "timezone": {
+        "title": "Définissez votre fuseau horaire",
+        "body": "Les jours des cours, les rappels de WOD et les jours de check-in le suivent. Nous l'avons déduit de votre appareil : confirmez-le ou choisissez-en un autre.",
+        "cta": "Définir le fuseau"
       }
     },
     "tour": {

@@ -346,6 +346,10 @@ const API_ERROR_KEYS: Record<string, string> = {
   slot_full: "mbErrSlotFull",
   slot_in_past: "mbErrSlotInPast",
   slot_not_full: "mbErrSlotNotFull",
+  // ADR-176
+  class_not_published: "apiErrorClassNotPublished",
+  invalid_time_zone: "apiErrorInvalidTimeZone",
+  time_zone_required: "apiErrorTimeZoneRequired",
   already_booked: "mbErrAlreadyBooked",
   invalid_guest_name: "mbErrInvalidGuestName",
   guest_already_booked: "mbErrGuestAlreadyBooked",

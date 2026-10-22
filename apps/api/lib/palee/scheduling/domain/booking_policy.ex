@@ -1,5 +1,6 @@
 defmodule Palee.Scheduling.Domain.BookingPolicy do
   alias Palee.Scheduling.Domain.ClassWorkoutReadiness
+
   def slot_full?(%{capacity: capacity, approved_booking_count: approved_booking_count})
       when is_integer(capacity) and is_integer(approved_booking_count) do
     approved_booking_count >= capacity

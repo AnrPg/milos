@@ -871,6 +871,7 @@
                 },
                 "id": {
                   "enum": [
+                    "timezone",
                     "settings",
                     "classes",
                     "packages",
@@ -130791,6 +130792,7 @@
                           },
                           "id": {
                             "enum": [
+                              "timezone",
                               "settings",
                               "classes",
                               "packages",
@@ -130874,6 +130876,7 @@
                   },
                   "step": {
                     "enum": [
+                      "timezone",
                       "settings",
                       "classes",
                       "packages",
@@ -130930,6 +130933,7 @@
                           },
                           "id": {
                             "enum": [
+                              "timezone",
                               "settings",
                               "classes",
                               "packages",
@@ -136732,6 +136736,7 @@
                   },
                   "master_workout_id": {
                     "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   },
                   "name": {
@@ -136745,7 +136750,6 @@
                   }
                 },
                 "required": [
-                  "master_workout_id",
                   "class_type_id",
                   "scheduled_at",
                   "capacity",
@@ -137004,6 +137008,7 @@
                   },
                   "master_workout_id": {
                     "format": "uuid",
+                    "nullable": true,
                     "type": "string"
                   },
                   "name": {
@@ -137017,7 +137022,6 @@
                   }
                 },
                 "required": [
-                  "master_workout_id",
                   "class_type_id",
                   "scheduled_at",
                   "capacity",
@@ -137415,6 +137419,92 @@
         "summary": "Injury safety warnings for the members booked into a class slot",
         "tags": [
           "Admin Wellbeing"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/workout": {
+      "put": {
+        "callbacks": {},
+        "description": "ADR-176: publishes a draft class (created without a WOD) or completes a series occurrence. The WOD is filed in the day's Classes folder.",
+        "operationId": "PaleeWeb.AdminScheduleController.link_workout",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "master_workout_id": {
+                    "format": "uuid",
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "master_workout_id"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "slot": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "slot"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Slot"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "code": {
+                      "type": "string"
+                    },
+                    "error": {
+                      "type": "string"
+                    }
+                  },
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Class or workout not found"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Link a WOD to a class",
+        "tags": [
+          "Admin Schedule"
         ]
       }
     },
@@ -139928,6 +140018,31 @@
                       ],
                       "type": "object"
                     },
+                    "time_zone": {
+                      "description": "ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), inferred (guessed from a staff device) or null (unknown; `timezone` is the default).",
+                      "properties": {
+                        "confirmed": {
+                          "type": "boolean"
+                        },
+                        "source": {
+                          "enum": [
+                            "confirmed",
+                            "inferred"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "timezone",
+                        "source",
+                        "confirmed"
+                      ],
+                      "type": "object"
+                    },
                     "workouts": {
                       "description": "ADR-163: workout-authoring defaults",
                       "properties": {
@@ -140321,6 +140436,31 @@
                       ],
                       "type": "object"
                     },
+                    "time_zone": {
+                      "description": "ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), inferred (guessed from a staff device) or null (unknown; `timezone` is the default).",
+                      "properties": {
+                        "confirmed": {
+                          "type": "boolean"
+                        },
+                        "source": {
+                          "enum": [
+                            "confirmed",
+                            "inferred"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "timezone",
+                        "source",
+                        "confirmed"
+                      ],
+                      "type": "object"
+                    },
                     "workouts": {
                       "description": "ADR-163: workout-authoring defaults",
                       "properties": {
@@ -140356,6 +140496,93 @@
           }
         ],
         "summary": "Update global admin settings",
+        "tags": [
+          "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/settings/time-zone": {
+      "put": {
+        "callbacks": {},
+        "description": "ADR-176: `confirmed` sets the zone. `inferred` is a guess (the device's zone, else an IP-derived zone from the edge) and never replaces a confirmed zone.",
+        "operationId": "PaleeWeb.AdminSettingsController.update_time_zone",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "additionalProperties": false,
+                "properties": {
+                  "source": {
+                    "enum": [
+                      "confirmed",
+                      "inferred"
+                    ],
+                    "type": "string"
+                  },
+                  "timezone": {
+                    "maxLength": 100,
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "source"
+                ],
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "time_zone": {
+                      "description": "ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), inferred (guessed from a staff device) or null (unknown; `timezone` is the default).",
+                      "properties": {
+                        "confirmed": {
+                          "type": "boolean"
+                        },
+                        "source": {
+                          "enum": [
+                            "confirmed",
+                            "inferred"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "timezone": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "timezone",
+                        "source",
+                        "confirmed"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "time_zone"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Time zone"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Confirm the gym's time zone, or report a guess from this device",
         "tags": [
           "Admin Settings"
         ]

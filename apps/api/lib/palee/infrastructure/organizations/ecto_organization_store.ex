@@ -39,17 +39,19 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
     |> Multi.insert(:organization, changeset)
     |> Multi.insert(:settings, fn %{organization: organization} ->
-      OrganizationSetting.changeset(without_unset_timezone(%{
-        organization_id: organization.id,
-        # ADR-176: a zone given at creation is confirmed; none leaves it unset.
-        timezone: value(params, :timezone),
-        default_locale: value(params, :default_locale) || "en",
-        invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
-        brand_name: value(params, :brand_name) || organization.name,
-        brand_logo_url: value(params, :brand_logo_url),
-        brand_primary_color: value(params, :brand_primary_color),
-        settings: value(params, :settings) || %{}
-      }))
+      OrganizationSetting.changeset(
+        without_unset_timezone(%{
+          organization_id: organization.id,
+          # ADR-176: a zone given at creation is confirmed; none leaves it unset.
+          timezone: value(params, :timezone),
+          default_locale: value(params, :default_locale) || "en",
+          invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
+          brand_name: value(params, :brand_name) || organization.name,
+          brand_logo_url: value(params, :brand_logo_url),
+          brand_primary_color: value(params, :brand_primary_color),
+          settings: value(params, :settings) || %{}
+        })
+      )
     end)
     |> Repo.transaction()
     |> case do
@@ -436,17 +438,19 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
     |> Multi.insert(:organization, changeset)
     |> Multi.insert(:settings, fn %{organization: organization} ->
-      OrganizationSetting.changeset(without_unset_timezone(%{
-        organization_id: organization.id,
-        timezone: value(organization_params, :timezone),
-        default_locale: value(organization_params, :default_locale) || "en",
-        invitation_lifetime_seconds:
-          value(organization_params, :invitation_lifetime_seconds) || 604_800,
-        brand_name: value(organization_params, :brand_name) || organization.name,
-        brand_logo_url: value(organization_params, :brand_logo_url),
-        brand_primary_color: value(organization_params, :brand_primary_color),
-        settings: value(organization_params, :settings) || %{}
-      }))
+      OrganizationSetting.changeset(
+        without_unset_timezone(%{
+          organization_id: organization.id,
+          timezone: value(organization_params, :timezone),
+          default_locale: value(organization_params, :default_locale) || "en",
+          invitation_lifetime_seconds:
+            value(organization_params, :invitation_lifetime_seconds) || 604_800,
+          brand_name: value(organization_params, :brand_name) || organization.name,
+          brand_logo_url: value(organization_params, :brand_logo_url),
+          brand_primary_color: value(organization_params, :brand_primary_color),
+          settings: value(organization_params, :settings) || %{}
+        })
+      )
     end)
     |> Multi.insert(:invitation, fn %{organization: organization} ->
       invitation_params

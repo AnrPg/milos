@@ -1,5 +1,11 @@
 defmodule Palee.Organizations do
-  alias Palee.Organizations.Domain.{BrandLogoPolicy, Provider, TenantAuthorization, TimeZonePolicy}
+  alias Palee.Organizations.Domain.{
+    BrandLogoPolicy,
+    Provider,
+    TenantAuthorization,
+    TimeZonePolicy
+  }
+
   alias Palee.Organizations.OrganizationStore
   alias Palee.Infrastructure.Tenancy.RepoContext
 

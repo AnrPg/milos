@@ -11,7 +11,10 @@ defmodule Palee.Organizations.Domain.TimeZonePolicyTest do
              "Europe/Berlin"
 
     assert Policy.resolve(%{timezone: "UTC", timezone_source: nil}) == Policy.default_zone()
-    assert Policy.resolve(%{timezone: "Not/AZone", timezone_source: "confirmed"}) == Policy.default_zone()
+
+    assert Policy.resolve(%{timezone: "Not/AZone", timezone_source: "confirmed"}) ==
+             Policy.default_zone()
+
     assert Policy.resolve(nil) == Policy.default_zone()
   end
 

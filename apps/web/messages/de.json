@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "Dein Tarif hat keine freien Mitarbeiterplätze. Gib einen Platz frei oder bitte uns um einen Tarifwechsel.",
     "apiErrorUnknownPlan": "Diesen Tarif gibt es nicht.",
     "apiErrorTrialEndRequired": "Eine Testphase braucht ein Enddatum.",
-    "apiErrorInvalidName": "Der Name muss 2 bis 120 Zeichen lang sein."
+    "apiErrorInvalidName": "Der Name muss 2 bis 120 Zeichen lang sein.",
+    "classNoWodYet": "Noch kein WOD (später verknüpfen)",
+    "classDraftSavedNotice": "Ohne WOD gespeichert. Mitglieder sehen diese Stunde erst, wenn du eines verknüpfst.",
+    "classSeriesWod": "WOD (optional)",
+    "classSeriesWodHint": "Leer lassen, damit jede Stunde ihr eigenes WOD bekommt. Eine Stunde, die an ihrem Tag noch keines hat, wird markiert, und das Team wird erinnert.",
+    "classDraftTitle": "Nicht veröffentlicht: kein WOD",
+    "classDraftBody": "Mitglieder können diese Stunde erst sehen und buchen, wenn ein WOD verknüpft ist.",
+    "classWodMissingTitle": "WOD fehlt heute",
+    "classWodMissingBody": "Diese Stunde findet heute statt und hat kein WOD. Das Team wird um 07:00 und eine Stunde vor Beginn erinnert.",
+    "classWodAwaitingTitle": "Noch kein WOD",
+    "classWodAwaitingBody": "Mitglieder können diese Stunde buchen. Verknüpfe das WOD vor dem Tag der Stunde.",
+    "classLinkWodLabel": "Zu verknüpfendes WOD",
+    "classLinkWodPlaceholder": "WOD wählen",
+    "classLinkWod": "WOD verknüpfen",
+    "classLinkWodSaving": "Wird verknüpft…",
+    "classDraftBadge": "Entwurf · kein WOD",
+    "classWodMissingBadge": "Kein WOD",
+    "ntfClassWodMissingTitle": "Eine Stunde hat kein WOD",
+    "ntfClassWodMissingDraftBody": "{className} ({when}) hat kein WOD, daher können Mitglieder sie weder sehen noch buchen.",
+    "ntfClassWodMissingHourBody": "{className} ({when}) beginnt in einer Stunde und hat noch kein WOD.",
+    "ntfClassWodMissingMorningBody": "{className} ({when}) hat noch kein WOD.",
+    "gymTimeZoneTitle": "Zeitzone",
+    "gymTimeZoneDescription": "Tage der Stunden, WOD-Erinnerungen, Check-in-Tage und Event-Zeiten richten sich danach.",
+    "gymTimeZoneLabel": "Zeitzone deines Gyms",
+    "gymTimeZoneHint": "Wähle die Zone, in der das Gym liegt, auch wenn du unterwegs bist.",
+    "gymTimeZoneConfirmed": "Dein Gym läuft auf {zone}.",
+    "gymTimeZoneInferred": "Wir haben {zone} von deinem Gerät übernommen. Bestätige sie oder wähle eine andere.",
+    "gymTimeZoneUnset": "Noch nicht festgelegt. Bis dahin verwendet Palee {zone}.",
+    "gymTimeZoneConfirm": "Zeitzone speichern",
+    "gymTimeZoneSaving": "Wird gespeichert…",
+    "apiErrorClassNotPublished": "Diese Stunde ist noch nicht buchbar.",
+    "apiErrorInvalidTimeZone": "Wähle eine bekannte Zeitzone.",
+    "apiErrorTimeZoneRequired": "Lege zuerst die Zeitzone deines Gyms fest."
   },
   "PrSharing": {
     "gymLabel": "Wo hast du diesen PR aufgestellt?",
@@ -4744,6 +4776,11 @@
         "title": "Starte ein offenes Bootcamp",
         "body": "Ein Outdoor- oder Online-Training für alle. Ein guter Weg, neue Kunden kennenzulernen.",
         "cta": "Bootcamp erstellen"
+      },
+      "timezone": {
+        "title": "Zeitzone festlegen",
+        "body": "Tage der Stunden, WOD-Erinnerungen und Check-in-Tage richten sich danach. Wir haben sie von deinem Gerät übernommen: bestätige sie oder wähle eine andere.",
+        "cta": "Zeitzone festlegen"
       }
     },
     "tour": {

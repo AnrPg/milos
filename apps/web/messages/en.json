@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "Your plan has no free staff seats. Free a seat or ask us to change the plan.",
     "apiErrorUnknownPlan": "This plan does not exist.",
     "apiErrorTrialEndRequired": "A trial needs an end date.",
-    "apiErrorInvalidName": "The name must be 2 to 120 characters."
+    "apiErrorInvalidName": "The name must be 2 to 120 characters.",
+    "classNoWodYet": "No WOD yet (link it later)",
+    "classDraftSavedNotice": "Saved without a WOD. Members won't see this class until you link one.",
+    "classSeriesWod": "WOD (optional)",
+    "classSeriesWodHint": "Leave it empty to give each class its own WOD. A class still without one on its day is flagged, and staff get reminders.",
+    "classDraftTitle": "Not published: no WOD",
+    "classDraftBody": "Members can't see or book this class until a WOD is linked.",
+    "classWodMissingTitle": "WOD missing today",
+    "classWodMissingBody": "This class runs today and has no WOD. Staff get reminders at 07:00 and an hour before it starts.",
+    "classWodAwaitingTitle": "No WOD yet",
+    "classWodAwaitingBody": "Members can book this class. Link its WOD before the class day.",
+    "classLinkWodLabel": "WOD to link",
+    "classLinkWodPlaceholder": "Choose a WOD",
+    "classLinkWod": "Link WOD",
+    "classLinkWodSaving": "Linking…",
+    "classDraftBadge": "Draft · no WOD",
+    "classWodMissingBadge": "No WOD",
+    "ntfClassWodMissingTitle": "A class has no WOD",
+    "ntfClassWodMissingDraftBody": "{className} ({when}) has no WOD, so members can't see or book it.",
+    "ntfClassWodMissingHourBody": "{className} ({when}) starts in an hour and still has no WOD.",
+    "ntfClassWodMissingMorningBody": "{className} ({when}) has no WOD yet.",
+    "gymTimeZoneTitle": "Time zone",
+    "gymTimeZoneDescription": "Class days, WOD reminders, check-in days and event times follow it.",
+    "gymTimeZoneLabel": "Your gym's time zone",
+    "gymTimeZoneHint": "Pick the zone where the gym is, even if you are travelling.",
+    "gymTimeZoneConfirmed": "Your gym runs on {zone}.",
+    "gymTimeZoneInferred": "We guessed {zone} from your device. Confirm it or pick another.",
+    "gymTimeZoneUnset": "Not set yet. Until then Palee uses {zone}.",
+    "gymTimeZoneConfirm": "Save time zone",
+    "gymTimeZoneSaving": "Saving…",
+    "apiErrorClassNotPublished": "This class isn't open for booking yet.",
+    "apiErrorInvalidTimeZone": "Choose a known time zone.",
+    "apiErrorTimeZoneRequired": "Set your gym's time zone first."
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",
@@ -4744,6 +4776,11 @@
         "title": "Run an open bootcamp",
         "body": "An outdoor or online session anyone can join. A good way to meet new clients.",
         "cta": "Create bootcamp"
+      },
+      "timezone": {
+        "title": "Set your time zone",
+        "body": "Class days, WOD reminders and check-in days follow it. We guessed it from your device: confirm it or pick another.",
+        "cta": "Set time zone"
       }
     },
     "tour": {

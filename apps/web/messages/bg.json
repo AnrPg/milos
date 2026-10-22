@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "Планът ти няма свободни места за персонал. Освободи място или ни помоли да сменим плана.",
     "apiErrorUnknownPlan": "Този план не съществува.",
     "apiErrorTrialEndRequired": "Пробният период се нуждае от крайна дата.",
-    "apiErrorInvalidName": "Името трябва да е от 2 до 120 знака."
+    "apiErrorInvalidName": "Името трябва да е от 2 до 120 знака.",
+    "classNoWodYet": "Все още без WOD (свържи го по-късно)",
+    "classDraftSavedNotice": "Запазено без WOD. Членовете няма да виждат тренировката, докато не свържеш WOD.",
+    "classSeriesWod": "WOD (по избор)",
+    "classSeriesWodHint": "Остави празно, за да има всяка тренировка свой WOD. Тренировка без WOD в деня си се отбелязва и екипът получава напомняния.",
+    "classDraftTitle": "Непубликувана: без WOD",
+    "classDraftBody": "Членовете не виждат тренировката и не могат да се запишат, докато не се свърже WOD.",
+    "classWodMissingTitle": "Липсва WOD днес",
+    "classWodMissingBody": "Тренировката е днес и няма WOD. Екипът получава напомняния в 07:00 и един час преди началото.",
+    "classWodAwaitingTitle": "Все още без WOD",
+    "classWodAwaitingBody": "Членовете могат да се запишат. Свържи WOD преди деня на тренировката.",
+    "classLinkWodLabel": "WOD за свързване",
+    "classLinkWodPlaceholder": "Избери WOD",
+    "classLinkWod": "Свържи WOD",
+    "classLinkWodSaving": "Свързване…",
+    "classDraftBadge": "Чернова · без WOD",
+    "classWodMissingBadge": "Без WOD",
+    "ntfClassWodMissingTitle": "Тренировка без WOD",
+    "ntfClassWodMissingDraftBody": "{className} ({when}) няма WOD, затова членовете не я виждат и не могат да се запишат.",
+    "ntfClassWodMissingHourBody": "{className} ({when}) започва след час и все още няма WOD.",
+    "ntfClassWodMissingMorningBody": "{className} ({when}) все още няма WOD.",
+    "gymTimeZoneTitle": "Часова зона",
+    "gymTimeZoneDescription": "Дните на тренировките, напомнянията за WOD, дните за check-in и часовете на събитията я следват.",
+    "gymTimeZoneLabel": "Часовата зона на залата",
+    "gymTimeZoneHint": "Избери зоната, в която е залата, дори да пътуваш.",
+    "gymTimeZoneConfirmed": "Залата ти работи по {zone}.",
+    "gymTimeZoneInferred": "Предположихме {zone} от устройството ти. Потвърди или избери друга.",
+    "gymTimeZoneUnset": "Още не е зададена. Дотогава Palee използва {zone}.",
+    "gymTimeZoneConfirm": "Запази часовата зона",
+    "gymTimeZoneSaving": "Запазване…",
+    "apiErrorClassNotPublished": "Тази тренировка още не е отворена за записване.",
+    "apiErrorInvalidTimeZone": "Избери позната часова зона.",
+    "apiErrorTimeZoneRequired": "Първо задай часовата зона на залата."
   },
   "PrSharing": {
     "gymLabel": "Къде постигна този рекорд?",
@@ -4744,6 +4776,11 @@
         "title": "Направи отворен буткемп",
         "body": "Тренировка навън или онлайн за всички. Добър начин да срещнеш нови клиенти.",
         "cta": "Създай буткемп"
+      },
+      "timezone": {
+        "title": "Задай часовата зона",
+        "body": "Дните на тренировките, напомнянията за WOD и дните за check-in я следват. Предположихме я от устройството ти: потвърди или избери друга.",
+        "cta": "Задай часова зона"
       }
     },
     "tour": {

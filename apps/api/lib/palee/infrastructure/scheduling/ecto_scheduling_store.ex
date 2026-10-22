@@ -1328,7 +1328,8 @@ defmodule Palee.Infrastructure.Scheduling.EctoSchedulingStore do
   defp maybe_include_drafts(query, true), do: query
 
   defp maybe_include_drafts(query, false),
-    do: where(query, [slot], not is_nil(slot.master_workout_id) or not is_nil(slot.class_series_id))
+    do:
+      where(query, [slot], not is_nil(slot.master_workout_id) or not is_nil(slot.class_series_id))
 
   defp maybe_include_archived(query, true), do: query
 

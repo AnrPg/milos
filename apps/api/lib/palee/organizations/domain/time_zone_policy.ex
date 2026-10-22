@@ -18,7 +18,8 @@ defmodule Palee.Organizations.Domain.TimeZonePolicy do
   def sources, do: @sources
 
   @doc "Palee's default zone, used only while a gym's zone is unknown."
-  def default_zone, do: Application.get_env(:palee, :default_organization_timezone, "Europe/Athens")
+  def default_zone,
+    do: Application.get_env(:palee, :default_organization_timezone, "Europe/Athens")
 
   @doc "An IANA zone the time zone database knows."
   def valid?(zone) when is_binary(zone) and zone != "",

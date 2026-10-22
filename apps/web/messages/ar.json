@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "لا توجد مقاعد فريق شاغرة في خطتك. حرّر مقعدًا أو اطلب منا تغيير الخطة.",
     "apiErrorUnknownPlan": "هذه الخطة غير موجودة.",
     "apiErrorTrialEndRequired": "تحتاج الفترة التجريبية إلى تاريخ انتهاء.",
-    "apiErrorInvalidName": "يجب أن يتكون الاسم من 2 إلى 120 حرفًا."
+    "apiErrorInvalidName": "يجب أن يتكون الاسم من 2 إلى 120 حرفًا.",
+    "classNoWodYet": "لا يوجد WOD بعد (اربطه لاحقًا)",
+    "classDraftSavedNotice": "حُفظت بلا WOD. لن يرى الأعضاء هذه الحصة حتى تربط WOD.",
+    "classSeriesWod": "WOD (اختياري)",
+    "classSeriesWodHint": "اتركه فارغًا ليحصل كل حصة على WOD خاص بها. تُعلَّم الحصة التي لا يزال ينقصها WOD في يومها ويتلقى الفريق تذكيرات.",
+    "classDraftTitle": "غير منشورة: لا يوجد WOD",
+    "classDraftBody": "لا يستطيع الأعضاء رؤية هذه الحصة أو حجزها حتى يُربط WOD.",
+    "classWodMissingTitle": "WOD مفقود اليوم",
+    "classWodMissingBody": "هذه الحصة اليوم وليس لها WOD. يتلقى الفريق تذكيرات في 07:00 وقبل ساعة من بدايتها.",
+    "classWodAwaitingTitle": "لا يوجد WOD بعد",
+    "classWodAwaitingBody": "يمكن للأعضاء حجز هذه الحصة. اربط WOD قبل يوم الحصة.",
+    "classLinkWodLabel": "WOD للربط",
+    "classLinkWodPlaceholder": "اختر WOD",
+    "classLinkWod": "ربط WOD",
+    "classLinkWodSaving": "جارٍ الربط…",
+    "classDraftBadge": "مسودة · بلا WOD",
+    "classWodMissingBadge": "بلا WOD",
+    "ntfClassWodMissingTitle": "حصة بلا WOD",
+    "ntfClassWodMissingDraftBody": "لا يوجد WOD لحصة {className} ({when})، لذلك لا يستطيع الأعضاء رؤيتها أو حجزها.",
+    "ntfClassWodMissingHourBody": "تبدأ حصة {className} ({when}) بعد ساعة ولا يزال لا يوجد WOD.",
+    "ntfClassWodMissingMorningBody": "لا يوجد WOD لحصة {className} ({when}) بعد.",
+    "gymTimeZoneTitle": "المنطقة الزمنية",
+    "gymTimeZoneDescription": "تتبعها أيام الحصص وتذكيرات WOD وأيام تسجيل الحضور وأوقات الفعاليات.",
+    "gymTimeZoneLabel": "المنطقة الزمنية لناديك",
+    "gymTimeZoneHint": "اختر المنطقة التي يقع فيها النادي حتى لو كنت مسافرًا.",
+    "gymTimeZoneConfirmed": "يعمل ناديك بتوقيت {zone}.",
+    "gymTimeZoneInferred": "استنتجنا {zone} من جهازك. أكّدها أو اختر غيرها.",
+    "gymTimeZoneUnset": "لم تُحدَّد بعد. حتى ذلك الحين يستخدم Palee {zone}.",
+    "gymTimeZoneConfirm": "حفظ المنطقة الزمنية",
+    "gymTimeZoneSaving": "جارٍ الحفظ…",
+    "apiErrorClassNotPublished": "هذه الحصة غير متاحة للحجز بعد.",
+    "apiErrorInvalidTimeZone": "اختر منطقة زمنية معروفة.",
+    "apiErrorTimeZoneRequired": "حدّد أولًا المنطقة الزمنية لناديك."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -4744,6 +4776,11 @@
         "title": "نظّم معسكرًا تدريبيًا مفتوحًا",
         "body": "حصة في الهواء الطلق أو عبر الإنترنت مفتوحة للجميع. طريقة جيدة للتعرف على عملاء جدد.",
         "cta": "إنشاء معسكر"
+      },
+      "timezone": {
+        "title": "حدّد المنطقة الزمنية",
+        "body": "تتبعها أيام الحصص وتذكيرات WOD وأيام تسجيل الحضور. استنتجناها من جهازك: أكّدها أو اختر غيرها.",
+        "cta": "تحديد المنطقة الزمنية"
       }
     },
     "tour": {

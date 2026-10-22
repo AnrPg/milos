@@ -405,6 +405,15 @@ function NotificationCard({
         return [i18n("stfNotifFormReviewCompletedBody"), text("exercise_name")].filter(Boolean).join(" · ");
       case "coaching_reply_overdue":
         return i18n("stfNotifReplyOverdueBody", { client: client(), time: when("due_at") || "—" });
+      // ADR-176: a class still without its WOD on its day.
+      case "class_workout_missing": {
+        const values = { className: text("class_name") || "—", when: text("class_when") || "—" };
+        const published = notification.payload.published !== false && notification.payload.published !== "false";
+        if (!published) return i18n("ntfClassWodMissingDraftBody", values);
+        return text("alert") === "hour_before"
+          ? i18n("ntfClassWodMissingHourBody", values)
+          : i18n("ntfClassWodMissingMorningBody", values);
+      }
       case "nutrition_plan_updated":
         return text("title") || i18n("stfNotifNutritionPlanBody");
       case "appointment_booked":
@@ -521,6 +530,8 @@ function NotificationCard({
         return i18n("stfNotifFormReviewCompletedTitle");
       case "coaching_reply_overdue":
         return i18n("stfNotifReplyOverdueTitle");
+      case "class_workout_missing":
+        return i18n("ntfClassWodMissingTitle");
       case "nutrition_plan_updated":
         return i18n("stfNotifNutritionPlanTitle");
       case "appointment_booked":

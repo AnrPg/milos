@@ -20,7 +20,9 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadinessTest do
       assert Readiness.published?(slot(%{master_workout_id: "w"}))
       assert Readiness.published?(slot())
       refute Readiness.published?(slot(%{class_series_id: nil}))
-      assert Readiness.ensure_published(slot(%{class_series_id: nil})) == {:error, :class_not_published}
+
+      assert Readiness.ensure_published(slot(%{class_series_id: nil})) ==
+               {:error, :class_not_published}
     end
 
     test "a projection without the WOD field is never judged a draft" do
@@ -35,7 +37,11 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadinessTest do
     end
 
     test "a draft is missing at once" do
-      assert Readiness.workout_status(slot(%{class_series_id: nil}), ~U[2026-11-01 08:00:00Z], @zone) ==
+      assert Readiness.workout_status(
+               slot(%{class_series_id: nil}),
+               ~U[2026-11-01 08:00:00Z],
+               @zone
+             ) ==
                :missing
     end
 
@@ -66,7 +72,9 @@ defmodule Palee.Scheduling.Domain.ClassWorkoutReadinessTest do
       assert {:morning, _at} = Readiness.alert_due(slot(), ~U[2026-11-03 05:02:00Z], @zone)
       assert {:hour_before, _at} = Readiness.alert_due(slot(), ~U[2026-11-03 15:20:00Z], @zone)
       assert Readiness.alert_due(slot(), @starts_at, @zone) == nil
-      assert Readiness.alert_due(slot(%{master_workout_id: "w"}), ~U[2026-11-03 15:20:00Z], @zone) == nil
+
+      assert Readiness.alert_due(slot(%{master_workout_id: "w"}), ~U[2026-11-03 15:20:00Z], @zone) ==
+               nil
     end
 
     test "summer time shifts the UTC moment" do

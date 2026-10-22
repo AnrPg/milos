@@ -267,7 +267,9 @@ defmodule Palee.Scheduling do
   def list_slots_missing_workout(%{organization_id: _} = context, from, to),
     do: Palee.Scheduling.SchedulingStore.list_slots_missing_workout(context, from, to)
 
-  defdelegate class_published?(slot), to: Palee.Scheduling.Domain.ClassWorkoutReadiness, as: :published?
+  defdelegate class_published?(slot),
+    to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
+    as: :published?
 
   defdelegate class_workout_status(slot, now, zone),
     to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
