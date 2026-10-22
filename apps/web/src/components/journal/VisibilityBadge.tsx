@@ -28,7 +28,6 @@ import {
 import { coachGroups, keysOf, refOf, sameKeys, within } from "@/lib/coach-audience";
 import { orderedChoices, needsQuestion, VISIBILITY_ICON } from "@/components/journal/visibility";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { Dialog } from "@/components/ui/Dialog";
 
 /**

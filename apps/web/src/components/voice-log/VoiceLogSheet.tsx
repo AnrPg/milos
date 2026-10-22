@@ -4,7 +4,6 @@ import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { createVoiceDraft, type VoiceDraftResponse } from "@/api/voice-log";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { createBrowserVoiceRecorder, type VoiceRecorder } from "@/lib/platform/voice-recorder";
 

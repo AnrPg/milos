@@ -2,7 +2,6 @@
 
 import { useId, useState } from "react";
 
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import {
   generateExportFile,
   renderText,

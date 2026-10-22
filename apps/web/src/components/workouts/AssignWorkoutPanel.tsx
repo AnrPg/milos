@@ -17,6 +17,7 @@ import { useSession } from "@/components/session-provider";
 import { formatLocalDate } from "@/lib/local-date";
 import { SemanticLabel } from "@/components/semantic-label";
 import { WorkoutPreviewDetail } from "@/components/workouts/WorkoutPreviewDetail";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   workoutId: string;
@@ -173,17 +174,16 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
 
   return (
     <>
-      {/* Backdrop */}
-      <div
-        className="fixed inset-0 z-40"
-        style={{ background: "var(--scrim)" }}
-        onClick={onClose}
-      />
-
       {/* Panel */}
-      <div
-        className="fixed inset-y-0 end-0 z-50 flex w-full flex-col overflow-hidden md:max-w-[480px]"
-        style={{ background: "var(--bg)", borderInlineStart: "1px solid var(--border)" }}
+      <Dialog
+        onClose={onClose}
+        bare
+        variant="drawer"
+        layer="drawer"
+        size="full"
+        ariaLabel={i18n("assignWorkout3e28a99")}
+        panelClassName="md:max-w-[480px]"
+        panelStyle={{ background: "var(--bg)" }}
       >
         {/* Sticky header */}
         <div
@@ -387,7 +387,7 @@ export function AssignWorkoutPanel({ workoutId, onClose, onAssigned }: Props) {
                   : i18n("assignToAthletes", {count: selectedIds.length})}
           </button>
         </div>
-      </div>
+      </Dialog>
     </>
   );
 }

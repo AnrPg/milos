@@ -5,7 +5,6 @@ import { useId, useRef, useState } from "react";
 import { createDirectThread, searchUsers, sendMessage } from "@/api/messaging";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
 

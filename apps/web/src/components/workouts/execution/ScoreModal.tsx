@@ -9,8 +9,8 @@ import React, { useId, useState } from "react";
 
 import type { SectionScore } from "@/api/executions";
 import type { TimerSegment } from "@/api/executions";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { SemanticLabel } from "@/components/semantic-label";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   segment: TimerSegment;
@@ -37,7 +37,6 @@ export function ScoreModal({
   const [value, setValue] = useState(
     existingScore?.value != null ? String(existingScore.value) : defaultValue,
   );
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const titleId = useId();
 
   function handleSave() {
@@ -60,29 +59,38 @@ export function ScoreModal({
           : i18n("eG4Rounds3Reps688d025");
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center">
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="absolute inset-0"
-        style={{ background: "var(--scrim)" }}
-      />
-      <div
-        className="relative z-10 w-full max-w-sm rounded-2xl p-6"
-        style={{ background: "var(--panel, var(--panel))", border: "1px solid var(--border)" }}
-      >
-        <div
-          className="mb-1 text-xs font-semibold uppercase tracking-widest"
-          style={{ color: "var(--muted)" }}
-        >
-          {segment.section_name}
+    <Dialog
+      onClose={onClose}
+      dismissible={!isSaving}
+      eyebrow={<span style={{ color: "var(--muted)" }}>{segment.section_name}</span>}
+      title={label}
+      titleId={titleId}
+      size="sm"
+      footer={
+        <div className="flex w-full gap-3">
+          <button
+            onClick={onClose}
+            disabled={isSaving}
+            className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
+            style={{
+              background: "var(--card, var(--panel-muted))",
+              border: "1px solid var(--border)",
+              color: "var(--muted)",
+            }}
+          >
+            {i18n("backb52b36b")}
+          </button>
+          <button
+            onClick={handleSave}
+            disabled={!value.trim() || isSaving}
+            className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-30"
+            style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
+          >
+            {isSaving ? i18n("saving56a2285") : i18n("saveefc007a")}
+          </button>
         </div>
-        <div id={titleId} className="mb-4 text-lg font-bold" style={{ color: "var(--text)" }}>
-          {label}
-        </div>
+      }
+    >
         <p className="mb-3 text-xs" style={{ color: "var(--muted)" }}>
           {i18n("theMeasuredScoreIsPrefilledChangeItOnly56e1bc0")}
         </p>
@@ -143,30 +151,6 @@ export function ScoreModal({
             )}
           </>
         )}
-
-        <div className="mt-4 flex gap-3">
-          <button
-            onClick={onClose}
-            disabled={isSaving}
-            className="flex-1 rounded-xl py-2.5 text-sm font-semibold"
-            style={{
-              background: "var(--card, var(--panel-muted))",
-              border: "1px solid var(--border)",
-              color: "var(--muted)",
-            }}
-          >
-            {i18n("backb52b36b")}
-          </button>
-          <button
-            onClick={handleSave}
-            disabled={!value.trim() || isSaving}
-            className="flex-1 rounded-xl py-2.5 text-sm font-semibold disabled:opacity-30"
-            style={{ background: "var(--accent, var(--primary))", color: "var(--primary-contrast)" }}
-          >
-            {isSaving ? i18n("saving56a2285") : i18n("saveefc007a")}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

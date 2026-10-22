@@ -32,7 +32,10 @@ export function useModalFocusTrap<T extends HTMLElement>(onClose: () => void) {
     const focusable = () => Array.from(dialog?.querySelectorAll<HTMLElement>(FOCUSABLE) ?? []);
     // A field marked data-autofocus (a picker's search box) wins over the
     // first focusable element (usually the close button).
-    (dialog?.querySelector<HTMLElement>("[data-autofocus]") ?? focusable()[0] ?? dialog)?.focus();
+    // A field that focused itself on mount (React autoFocus) keeps focus.
+    if (!dialog?.contains(document.activeElement)) {
+      (dialog?.querySelector<HTMLElement>("[data-autofocus]") ?? focusable()[0] ?? dialog)?.focus();
+    }
 
     const handleKeyDown = (event: KeyboardEvent) => {
       if (openDialogs[openDialogs.length - 1] !== id) return;

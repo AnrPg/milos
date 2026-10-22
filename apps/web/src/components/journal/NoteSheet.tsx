@@ -19,7 +19,6 @@ import { needsQuestion } from "@/components/journal/visibility";
 import { VisibilityChoices } from "@/components/journal/VisibilityBadge";
 import { PRGymField, prGymSlugForSubmit, usePRGymOptions } from "@/components/pantheon/PRGymField";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { Dialog } from "@/components/ui/Dialog";
 
 const BODY_MAX = 4000;

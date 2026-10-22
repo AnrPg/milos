@@ -5,6 +5,7 @@ import { useState } from "react";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { ICON_CHOICES } from "./library-folders";
+import { Dialog } from "@/components/ui/Dialog";
 
 /** Lets a coach pick a workout's icon, type any emoji, or go back to automatic. */
 export function LibraryIconDialog({
@@ -31,29 +32,48 @@ export function LibraryIconDialog({
   const choice = typed.trim() || selected;
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={onCancel} role="presentation">
-      <form
-        role="dialog"
-        aria-modal="true"
-        aria-label={i18n("featureChangeIconTitle", { name: workoutTitle })}
-        className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[var(--shadow-lg)]"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        onClick={(event) => event.stopPropagation()}
-        onSubmit={(event) => {
-          event.preventDefault();
-          onSave(choice);
-        }}
-      >
-        <div className="flex items-center gap-3">
+    <Dialog
+      onClose={onCancel}
+      ariaLabel={i18n("featureChangeIconTitle", { name: workoutTitle })}
+      title={
+        <span className="flex items-center gap-3">
           <span aria-hidden className="grid h-12 w-12 shrink-0 place-items-center rounded-xl text-3xl" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)" }}>
             {choice}
           </span>
-          <h2 className="min-w-0 text-lg font-semibold" style={{ color: "var(--text)" }}>
-            {i18n("featureChangeIconTitle", { name: workoutTitle })}
-          </h2>
+          <span className="min-w-0 text-lg">{i18n("featureChangeIconTitle", { name: workoutTitle })}</span>
+        </span>
+      }
+      size="md"
+      variant="center"
+      onSubmit={(event) => {
+          event.preventDefault();
+          onSave(choice);
+        }}
+      footer={
+        <div className="w-full flex flex-wrap items-center justify-between gap-2">
+          <button
+            type="button"
+            disabled={busy || !isCustom}
+            className="text-sm font-semibold underline-offset-2 hover:underline disabled:opacity-40"
+            style={{ color: "var(--text-soft)" }}
+            onClick={() => onSave(null)}
+          >
+            {i18n("featureAutomaticIcon", { icon: automaticIcon })}
+          </button>
+          <div className="flex gap-2">
+            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={onCancel}>
+              {i18n("cancel77dfd21")}
+            </button>
+            <button type="submit" disabled={busy || !choice} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+              {i18n("saveefc007a")}
+            </button>
+          </div>
         </div>
+      }
+    >
+        
 
-        <div role="radiogroup" aria-label={i18n("featureIconChoices")} className="mt-4 grid grid-cols-8 gap-1">
+        <div role="radiogroup" aria-label={i18n("featureIconChoices")} className="grid grid-cols-8 gap-1">
           {ICON_CHOICES.map((icon) => (
             <button
               key={icon}
@@ -83,27 +103,6 @@ export function LibraryIconDialog({
             onChange={(event) => setTyped(event.target.value)}
           />
         </label>
-
-        <div className="mt-5 flex flex-wrap items-center justify-between gap-2">
-          <button
-            type="button"
-            disabled={busy || !isCustom}
-            className="text-sm font-semibold underline-offset-2 hover:underline disabled:opacity-40"
-            style={{ color: "var(--text-soft)" }}
-            onClick={() => onSave(null)}
-          >
-            {i18n("featureAutomaticIcon", { icon: automaticIcon })}
-          </button>
-          <div className="flex gap-2">
-            <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={onCancel}>
-              {i18n("cancel77dfd21")}
-            </button>
-            <button type="submit" disabled={busy || !choice} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-              {i18n("saveefc007a")}
-            </button>
-          </div>
-        </div>
-      </form>
-    </div>
+    </Dialog>
   );
 }

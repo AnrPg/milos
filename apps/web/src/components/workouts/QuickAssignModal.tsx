@@ -14,9 +14,9 @@ import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { workoutTypeColor } from "@/lib/workout-colors";
 import { useWorkoutCreationStore } from "@/stores/workout-creation";
 import { WorkoutCreationCanvas } from "@/components/workouts/creation/WorkoutCreationCanvas";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { SemanticLabel } from "@/components/semantic-label";
 import { AthleteInjuryWarningsPanel } from "@/components/wellbeing/InjuryWarnings";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   accessToken: string;
@@ -28,7 +28,6 @@ type Props = {
 export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned }: Props) {
   const i18n = useUiTranslations();
   const titleId = useId();
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const [step, setStep] = useState<"workout" | "athletes">("workout");
   const [allWorkouts, setAllWorkouts] = useState<WorkoutRecord[]>([]);
   const [workoutsLoading, setWorkoutsLoading] = useState(true);
@@ -140,22 +139,13 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
 
   return (
     <>
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center p-4"
-        style={{ background: "var(--scrim)" }}
-        onClick={onClose}
-        role="presentation"
+      <Dialog
+        onClose={onClose}
+        bare
+        labelledBy={titleId}
+        size="lg"
+        variant="center"
       >
-        <div
-          ref={dialogRef}
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby={titleId}
-          tabIndex={-1}
-          className="flex w-full max-w-lg flex-col overflow-hidden rounded-[2rem] outline-none"
-          style={{ background: "var(--panel)", border: "1px solid var(--border)", maxHeight: "90vh" }}
-          onClick={(e) => e.stopPropagation()}
-        >
           {/* Header */}
           <div className="flex items-center justify-between px-6 py-5" style={{ borderBottom: "1px solid var(--border)" }}>
             <div>
@@ -399,27 +389,22 @@ export function QuickAssignModal({ accessToken, defaultDate, onClose, onAssigned
               </button>
             )}
           </div>
-        </div>
-      </div>
+      </Dialog>
       {creatingWorkout ? (
-        <div
-          className="fixed inset-0 z-[70] flex items-center justify-center p-2 sm:p-5"
-          style={{ background: "var(--scrim)" }}
-          role="dialog"
-          aria-modal="true"
-          aria-label={i18n("createWorkoutc7c6baa")}
+        <Dialog
+          onClose={closeWorkoutCreator}
+          bare
+          dismissible={false}
+          ariaLabel={i18n("createWorkoutc7c6baa")}
+          size="full"
+          variant="center"
         >
-          <div
-            className="w-full max-w-[96rem] overflow-hidden rounded-[1.5rem]"
-            style={{ border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}
-          >
             <WorkoutCreationCanvas
               embedded
               onCancel={closeWorkoutCreator}
               onPublished={handleWorkoutPublished}
             />
-          </div>
-        </div>
+        </Dialog>
       ) : null}
     </>
   );

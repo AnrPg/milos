@@ -170,6 +170,8 @@ export function Dialog({
         borderColor: "var(--border)",
         color: "var(--text)",
         boxShadow: "var(--shadow-lg)",
+        // A bare drawer covers the whole screen: keep its own header below the notch.
+        paddingTop: bare && isDrawer ? "env(safe-area-inset-top)" : undefined,
         ...panelStyle,
       }}
     >
