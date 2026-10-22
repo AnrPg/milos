@@ -30,7 +30,7 @@ export function MyTrialsCard() {
   const followUps = (trials.data ?? []).filter((trial) => trial.follow_up && trial.box);
   if (upcoming.length === 0 && followUps.length === 0) return null;
 
-  // ADR-177: on each gym's clock, its city added when the visitor's differs.
+  // ADR-179: on each gym's clock, its city added when the visitor's differs.
   const when = (iso: string, zone?: string | null) =>
     zonedText(iso, zone, locale, { weekday: "short", day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" });
 

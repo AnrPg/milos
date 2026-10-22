@@ -41,7 +41,7 @@ import { endLoginSession, startLoginSession } from "@/lib/login-session";
 import { resetRealtimeSocket } from "@/lib/realtime";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { isAppLocale, persistLocaleCookie } from "@/i18n/locales";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 type SessionStatus = "loading" | "guest" | "authenticated";
 
@@ -65,6 +65,12 @@ type SessionExpiredState = {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
+// ADR-178: login and refresh return the user with the tokens, so opening the
+// app needs no separate /auth/me round trip; registration still fetches it.
+function sessionUser(tokens: AuthTokens): Promise<CurrentUser> {
+  return tokens.user ? Promise.resolve(tokens.user) : fetchCurrentUser(tokens.access_token);
+}
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   
   const tSession = useTranslations("Session");
@@ -79,7 +85,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
     accessTokenRef.current = tokens?.access_token;
   }, [tokens?.access_token]);
 
-  // ADR-177: the API learns which zone this device is in (the latest device
+  // ADR-179: the API learns which zone this device is in (the latest device
   // wins), so pushes can add the reader's own time beside the organiser's.
   const storedTimeZone = (currentUser as { time_zone?: string | null } | null)?.time_zone ?? null;
   const reportedTimeZone = useRef<string | null>(null);
@@ -127,7 +133,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function establishSession(issuedTokens: AuthTokens) {
-    const user = await fetchCurrentUser(issuedTokens.access_token);
+    const user = await sessionUser(issuedTokens);
     // A fresh sign-in (not a restore): "until next login" UI shows again.
     startLoginSession();
     commitSession(issuedTokens, user);
@@ -162,7 +168,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       resetSession(tokens.access_token);
       return;
     }
-    const user = currentUser ?? (await fetchCurrentUser(refreshedTokens.access_token));
+    const user = refreshedTokens.user ?? currentUser ?? (await fetchCurrentUser(refreshedTokens.access_token));
     commitSession(refreshedTokens, user);
   }
 
@@ -194,7 +200,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           if (!cancelled) setStatus("guest");
           return;
         }
-        const user = await fetchCurrentUser(refreshedTokens.access_token);
+        const user = await sessionUser(refreshedTokens);
         if (cancelled) return;
         commitSession(refreshedTokens, user);
       } catch {
@@ -245,8 +251,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const user =
-          customEvent.detail.currentUser ??
-          (await fetchCurrentUser(customEvent.detail.tokens.access_token));
+          customEvent.detail.currentUser ?? (await sessionUser(customEvent.detail.tokens));
         commitSession(customEvent.detail.tokens, user);
       } catch {
         resetSession(accessTokenRef.current);
@@ -313,48 +318,18 @@ function SessionExpiredDialog({
   requiredLabel: string;
   openLoginLabel: string;
 }) {
-  
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onDismiss);
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-end justify-center p-4 sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      role="presentation"
-      onMouseDown={(event) => {
-        if (event.currentTarget === event.target) onDismiss();
-      }}
-    >
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="session-expired-title"
-        tabIndex={-1}
-        className="w-full max-w-lg rounded-[28px] border p-6 shadow-[var(--shadow-md)]"
-        style={{ background: "var(--panel)", borderColor: "var(--border-strong)", color: "var(--text)" }}
-      >
-            <div className="text-xs font-black uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>
-              {requiredLabel}
-            </div>
-            <h2 id="session-expired-title" className="mt-2 text-2xl font-bold">{state.title}</h2>
-            <p className="mt-3 text-sm leading-6" style={{ color: "var(--text-soft)" }}>
-              {state.message}
-            </p>
-
-            <div
-              className="mt-4 rounded-2xl border px-4 py-3 text-sm"
-              style={{ background: "var(--panel-muted)", borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
-            >
-              {state.instructions.map((instruction) => (
-                <div key={instruction} className="flex gap-2">
-                  <span style={{ color: "var(--warning)" }}>•</span>
-                  <span>{instruction}</span>
-                </div>
-              ))}
-            </div>
-
-            <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+    <Dialog
+      onClose={onDismiss}
+      layer="toast"
+      eyebrow={requiredLabel}
+      title={state.title}
+      titleId="session-expired-title"
+      closeLabel={dismissLabel}
+      size="lg"
+      footer={
+        <div className="w-full flex flex-col gap-3 sm:flex-row">
               <button
                 type="button"
                 onClick={() => window.open("/login", "_blank", "noopener,noreferrer")}
@@ -372,8 +347,24 @@ function SessionExpiredDialog({
                 {dismissLabel}
               </button>
             </div>
-      </div>
-    </div>
+      }
+    >
+            <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>
+              {state.message}
+            </p>
+
+            <div
+              className="mt-4 rounded-2xl border px-4 py-3 text-sm"
+              style={{ background: "var(--panel-muted)", borderColor: "var(--border-strong)", color: "var(--text-soft)" }}
+            >
+              {state.instructions.map((instruction) => (
+                <div key={instruction} className="flex gap-2">
+                  <span style={{ color: "var(--warning)" }}>•</span>
+                  <span>{instruction}</span>
+                </div>
+              ))}
+            </div>
+    </Dialog>
   );
 }
 

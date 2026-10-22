@@ -1,7 +1,9 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
+import { useMemo, useState, type ReactNode } from "react";
+
+import { Dialog } from "@/components/ui/Dialog";
 
 export type TagOption = { value: string; label: string; hint?: string; search?: string };
 /** `open`: starts expanded (a single group always does). */
@@ -62,26 +64,11 @@ export function TagPicker({
   footer?: (query: string) => ReactNode;
 }) {
   const t = useTranslations("AdminPublicPage");
-  const headingId = useId();
-  const panel = useRef<HTMLDivElement>(null);
   const [picked, setPicked] = useState<string[]>(selected);
   const [query, setQuery] = useState("");
   const [open, setOpen] = useState<Set<string>>(
     () => new Set(groups.filter((group) => group.open || groups.length === 1).map((group) => group.key)),
   );
-
-  useEffect(() => {
-    const previous = document.activeElement as HTMLElement | null;
-    panel.current?.querySelector<HTMLInputElement>("input")?.focus();
-    const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => {
-      document.removeEventListener("keydown", onKey);
-      previous?.focus();
-    };
-  }, [onClose]);
 
   const all = useMemo(() => groups.flatMap((group) => group.items.map((item) => ({ item, group }))), [groups]);
   const byValue = useMemo(() => new Map(all.map((entry) => [entry.item.value, entry])), [all]);
@@ -103,35 +90,42 @@ export function TagPicker({
       : [];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end md:items-stretch md:justify-end" role="presentation">
-      <button
-        type="button"
-        aria-label={t("close")}
-        tabIndex={-1}
-        onClick={onClose}
-        className="absolute inset-0"
-        style={{ background: "var(--scrim)" }}
-      />
-      <div
-        ref={panel}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={headingId}
-        className="relative flex h-[85%] w-full flex-col rounded-t-3xl md:h-full md:w-[30rem] md:rounded-none"
-        style={{ background: "var(--panel-raised)", borderLeft: "1px solid var(--border)" }}
-      >
-        <header className="flex items-center justify-between gap-3 px-5 pb-3 pt-5">
-          <h2 id={headingId} className="text-lg font-extrabold" style={{ color: "var(--text)" }}>
-            {title}
-          </h2>
-          {max !== undefined ? (
-            <span className="font-mono text-xs" style={{ color: full ? "var(--warning)" : "var(--dim)" }}>
-              {picked.length}/{max}
-            </span>
-          ) : null}
-        </header>
-        <div className="px-5 pb-3">
+    <Dialog
+      onClose={onClose}
+      title={title}
+      variant="panel"
+      size="lg"
+      headerActions={
+        max !== undefined ? (
+          <span className="font-mono text-xs" style={{ color: full ? "var(--warning)" : "var(--dim)" }}>
+            {picked.length}/{max}
+          </span>
+        ) : null
+      }
+      footer={
+        <>
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-11 rounded-full px-5 text-sm font-semibold"
+            style={{ background: "var(--border)", color: "var(--text-soft)" }}
+          >
+            {t("cancel")}
+          </button>
+          <button
+            type="button"
+            onClick={() => onDone(picked)}
+            className="min-h-11 rounded-full px-6 text-sm font-bold"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {t("done")}
+          </button>
+        </>
+      }
+    >
+        <div className="sticky top-0 z-(--z-raised) -mx-5 px-5 pb-3 sm:-mx-6 sm:px-6" style={{ background: "var(--panel)" }}>
           <input
+            data-autofocus
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
@@ -142,7 +136,7 @@ export function TagPicker({
           />
         </div>
 
-        <div className="flex-1 overflow-y-auto px-5 pb-4">
+        <div>
           {term ? (
             <div className="flex flex-col gap-3">
               <div className="flex flex-wrap gap-2">
@@ -248,28 +242,6 @@ export function TagPicker({
           )}
         </div>
 
-        <footer
-          className="flex items-center justify-end gap-3 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3"
-          style={{ borderTop: "1px solid var(--border)" }}
-        >
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 rounded-full px-5 text-sm font-semibold"
-            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-          >
-            {t("cancel")}
-          </button>
-          <button
-            type="button"
-            onClick={() => onDone(picked)}
-            className="min-h-11 rounded-full px-6 text-sm font-bold"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          >
-            {t("done")}
-          </button>
-        </footer>
-      </div>
-    </div>
+    </Dialog>
   );
 }

@@ -48,7 +48,7 @@ export function TrialPage({ trialId }: { trialId: string }) {
 
   const data = trial.data;
   const start = new Date(data.class.scheduled_at);
-  // ADR-177: on the gym's clock, with the visitor's own when it differs.
+  // ADR-179: on the gym's clock, with the visitor's own when it differs.
   const zone = (data as { time_zone?: string | null }).time_zone ?? null;
   const when = formatInZone(start, zone, locale, { weekday: "long", day: "numeric", month: "long" });
   const clock = zonedText(start, zone, locale, "time");

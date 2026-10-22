@@ -137,7 +137,7 @@ export function SessionPackageSummary({ entitlement }: { entitlement: EffectiveE
   );
 }
 
-// ADR-177: on the practice's clock (the coach's zone), its city added when the client's differs.
+// ADR-179: on the practice's clock (the coach's zone), its city added when the client's differs.
 function sessionWhen(iso: string, now: Date, locale: string, todayLabel: string, zone: string | null = null) {
   const time = zonedText(iso, zone, locale, "time");
   return dateKeyInZone(iso, zone) === dateKeyInZone(now, zone)

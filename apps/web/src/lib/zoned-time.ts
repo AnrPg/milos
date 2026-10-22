@@ -1,5 +1,5 @@
 /**
- * ADR-177: one canonical clock, converted on demand.
+ * ADR-179: one canonical clock, converted on demand.
  *
  * The API stores and sends every moment in UTC. A class or an event is
  * planned on its organiser's clock (the gym's zone, or an event's own zone

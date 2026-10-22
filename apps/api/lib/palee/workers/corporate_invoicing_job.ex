@@ -11,7 +11,7 @@ defmodule Palee.Workers.CorporateInvoicingJob do
 
   @impl Oban.Worker
   def perform(_job) do
-    # ADR-177: each gym's own "today".
+    # ADR-179: each gym's own "today".
     Organizations.list_active_organizations_for_system()
     |> Enum.each(&CorporateInvoicing.run(&1, Organizations.local_today(&1.organization.id)))
 

@@ -66,7 +66,7 @@ export function CastView({ seconds, phase, label, sectionName, roundText, nextTe
       aria-modal="true"
       aria-label={i18n("castModeLabel")}
       onClick={onExit}
-      className="fixed inset-0 z-[60] flex cursor-pointer flex-col items-center justify-center gap-[2vmin] p-[3vmin]"
+      className="fixed inset-0 z-(--z-fullscreen) flex cursor-pointer flex-col items-center justify-center gap-[2vmin] p-[3vmin]"
       style={{ background: `color-mix(in srgb, ${color} 22%, var(--bg))`, color: "var(--text)" }}
     >
       <div className="absolute start-[3vmin] top-[3vmin] max-w-[45vw] truncate font-semibold" style={{ fontSize: "clamp(1rem, 3.2vmin, 2.5rem)", color: "var(--text-soft)" }}>

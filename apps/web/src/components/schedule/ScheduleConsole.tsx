@@ -51,6 +51,7 @@ type ClassPayload = ScheduleSlotPayload & { coach_user_id?: string | null };
 import { PageHeader } from "@/components/PageHeader";
 import { dateTimeLocalInZone, dateTimeLocalToIso, zoneLabel, zonedText, zonedToInstant } from "@/lib/zoned-time";
 import { useOrganizationTimeZone } from "@/lib/organization-slug";
+import { Dialog } from "@/components/ui/Dialog";
 
 type SlotEditorState = {
   slotId: string | null;
@@ -67,7 +68,7 @@ type SeriesEditorState = {
   timezone: string;
 };
 
-// ADR-177: a class's date and time are typed on the gym's clock (`zone`),
+// ADR-179: a class's date and time are typed on the gym's clock (`zone`),
 // whatever the device's zone; without one, the device's clock.
 function formatDateTimeLocal(isoString: string, zone: string | null) {
   return dateTimeLocalInZone(isoString, zone);
@@ -132,7 +133,7 @@ export function ScheduleConsole({
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
   // ADR-176: series follow the gym's time zone, not the editing device's.
   const [gymTimeZone, setGymTimeZone] = useState<string | null>(null);
-  // ADR-177: the gym's clock (staff settings first, else the membership's).
+  // ADR-179: the gym's clock (staff settings first, else the membership's).
   const membershipZone = useOrganizationTimeZone();
   const gymZone = gymTimeZone ?? membershipZone;
   const appliedMobileDefault = useRef(false);
@@ -676,26 +677,47 @@ export function ScheduleConsole({
       ) : null}
 
       {editor ? (
-        <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "var(--scrim)" }}>
-          <div className="w-full max-w-2xl rounded-[2rem] p-6 shadow-[var(--shadow-lg)]" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("adminSlotEditor")}</p>
-                <h3 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>
-                  {editor.slotId ? t("editScheduledClass") : t("createScheduledClass")}
-                </h3>
-              </div>
-              <button
-                className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                onClick={() => setEditor(null)}
-                type="button"
-              >
-                {common("close")}
-              </button>
-            </div>
+        <Dialog
+          onClose={() => setEditor(null)}
+          eyebrow={t("adminSlotEditor")}
+          title={editor.slotId ? t("editScheduledClass") : t("createScheduledClass")}
+          size="2xl"
+          footer={
+            <div className="flex w-full flex-wrap justify-between gap-3">
+              {editor.slotId ? (
+                <button
+                  className="rounded-full px-4 py-2 text-sm font-semibold"
+                  style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
+                  onClick={() => void removeEditedSlot()}
+                  type="button"
+                >
+                  {t("deleteSlot")}
+                </button>
+              ) : <span />}
 
-            <div className="mt-6 grid gap-4 md:grid-cols-2">
+              <div className="flex gap-3">
+                <button
+                  className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
+                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
+                  onClick={() => setEditor(null)}
+                  type="button"
+                >
+                  {common("cancel")}
+                </button>
+                <button
+                  className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
+                  style={{ background: "var(--text)", color: "var(--bg)" }}
+                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim()}
+                  onClick={() => void saveSlot()}
+                  type="button"
+                >
+                  {busy ? common("saving") : editor.slotId ? t("saveChanges") : t("createSlot")}
+                </button>
+              </div>
+            </div>
+          }
+        >
+            <div className="grid gap-4 md:grid-cols-2">
               {[
                 { label: t("workout"), type: "select" as const },
                 { label: t("classType"), type: "select-type" as const },
@@ -851,47 +873,20 @@ export function ScheduleConsole({
               />
             ) : null}
 
-            <div className="mt-6 flex flex-wrap justify-between gap-3">
-              {editor.slotId ? (
-                <button
-                  className="rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "color-mix(in srgb, var(--primary) 12%, transparent)", border: "1px solid color-mix(in srgb, var(--primary) 25%, transparent)", color: "var(--primary)" }}
-                  onClick={() => void removeEditedSlot()}
-                  type="button"
-                >
-                  {t("deleteSlot")}
-                </button>
-              ) : <span />}
-
-              <div className="flex gap-3">
-                <button
-                  className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                  onClick={() => setEditor(null)}
-                  type="button"
-                >
-                  {common("cancel")}
-                </button>
-                <button
-                  className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
-                  style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim()}
-                  onClick={() => void saveSlot()}
-                  type="button"
-                >
-                  {busy ? common("saving") : editor.slotId ? t("saveChanges") : t("createSlot")}
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
+        </Dialog>
       ) : null}
 
       {seriesEditor ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--scrim)" }}>
-          <div className="w-full max-w-2xl rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <div className="flex items-center justify-between"><div><p className="text-xs font-semibold uppercase tracking-[.2em]" style={{ color: "var(--primary)" }}>{i18n("featureBatchScheduling")}</p><h3 className="mt-2 text-2xl font-semibold">{i18n("featureCreateClassSeries")}</h3></div><button type="button" onClick={() => setSeriesEditor(null)}>×</button></div>
-            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <Dialog
+          onClose={() => setSeriesEditor(null)}
+          eyebrow={i18n("featureBatchScheduling")}
+          title={i18n("featureCreateClassSeries")}
+          size="2xl"
+          footer={
+            <div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim()} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div>
+          }
+        >
+            <div className="grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
               <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
               <label className="text-sm font-semibold">{i18n("classSeriesWod")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.master_workout_id ?? ""} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: event.target.value || null } })}><option value="">{i18n("classNoWodYet")}</option>{workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}</select><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("classSeriesWodHint")}</span></label>
@@ -906,9 +901,7 @@ export function ScheduleConsole({
               <label className="text-sm font-semibold">{i18n("featureTimezone")}<input className="mt-2 w-full rounded-xl px-3 py-2" readOnly value={seriesEditor.timezone} /></label>
             </div>
             <details className="mt-5 rounded-2xl p-4" style={{ background: "var(--panel-muted)" }}><summary className="cursor-pointer text-sm font-semibold">{i18n("featureOptionalClassSettings")}</summary><div className="mt-4 grid gap-3 sm:grid-cols-3"><label className="text-xs">{i18n("featureCapacity")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.capacity} emptyValue={1} onValueChange={(capacity) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, capacity: capacity ?? 1 } })} /></label><label className="text-xs">{i18n("featureTimeoutMinutes")}<IntegerInput className="mt-1 w-full rounded-xl px-3 py-2" min={1} value={seriesEditor.values.booking_timeout_minutes} emptyValue={1} onValueChange={(timeoutMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, booking_timeout_minutes: timeoutMinutes ?? 1 } })} /></label><label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={seriesEditor.values.auto_approve} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, auto_approve: event.target.checked } })} />{i18n("featureAutoApprove")}</label></div></details>
-            <div className="mt-6 flex items-center justify-end"><div className="flex gap-2"><button type="button" className="rounded-full px-4 py-2" onClick={() => setSeriesEditor(null)}>{common("cancel")}</button><button type="button" disabled={busy || seriesEditor.weekdays.length === 0 || !seriesEditor.values.name.trim()} className="rounded-full px-5 py-2 font-semibold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }} onClick={() => void saveSeries()}>{busy ? i18n("featureCreating") : i18n("featureCreateSeries")}</button></div></div>
-          </div>
-        </div>
+        </Dialog>
       ) : null}
     </main>
   );

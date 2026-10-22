@@ -177,4 +177,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-174 | AI scaling suggestions with mandatory coach approval | Accepted |
 | ADR-175 | Voice logging: record, transcribe, parsed draft, confirm to save | Accepted |
 | ADR-176 | Classes without a WOD (drafts, missing-WOD alerts) and the gym's time zone | Accepted |
-| ADR-177 | One canonical clock (UTC), the organiser's zone and the viewer's "your time" | Accepted |
+| ADR-177 | One dialog shell, one popover primitive and a z-index scale | Accepted |
+| ADR-179 | One canonical clock (UTC), the organiser's zone and the viewer's "your time" | Accepted |

@@ -108,7 +108,7 @@ defmodule Palee.Application.SendMessage do
     end
   end
 
-  # ADR-177: the allowance day is the gym's.
+  # ADR-179: the allowance day is the gym's.
   defp gym_today(%{organization_id: organization_id}) when is_binary(organization_id),
     do: Organizations.local_today(organization_id)
 

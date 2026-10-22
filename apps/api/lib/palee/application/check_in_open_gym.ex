@@ -149,7 +149,7 @@ defmodule Palee.Application.CheckInOpenGym do
   defp reservation_id(%{id: id}), do: id
   defp reservation_id(_reservation), do: nil
 
-  # ADR-177: entitlement days follow the gym's own zone (one clock per gym).
+  # ADR-179: entitlement days follow the gym's own zone (one clock per gym).
   defp timezone(%{organization_id: organization_id}),
     do: Organizations.organization_timezone(organization_id)
 

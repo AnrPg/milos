@@ -55,7 +55,7 @@ defmodule PaleeWeb.MeController do
   end
 
   operation(:update_time_zone,
-    summary: "Report the zone this account's device is in (ADR-177)",
+    summary: "Report the zone this account's device is in (ADR-179)",
     description:
       "Server-written texts add the reader's own time beside the organiser's when the two zones read a moment differently. UTC aliases are ignored.",
     request_body: %RequestBody{

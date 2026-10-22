@@ -229,6 +229,10 @@ defmodule PaleeWeb.AuthControllerTest do
       assert json_response(conn, 200)["access_token"]
       refute Map.has_key?(json_response(conn, 200), "refresh_token")
       assert conn.resp_cookies["milos_refresh"].http_only
+
+      # ADR-178: the user comes with the tokens, so no /auth/me round trip.
+      assert %{"nickname" => "hermes", "role" => "member", "vendor" => false} =
+               json_response(conn, 200)["user"]
     end
 
     test "returns 401 on wrong password", %{conn: conn} do
@@ -390,7 +394,9 @@ defmodule PaleeWeb.AuthControllerTest do
         |> put_req_header("content-type", "application/json")
         |> post("/api/auth/refresh", %{})
 
-      assert %{"access_token" => _} = json_response(refresh_conn, 200)
+      assert %{"access_token" => _, "user" => %{"nickname" => "apollo"}} =
+               json_response(refresh_conn, 200)
+
       rotated_refresh_token = refresh_conn.resp_cookies["milos_refresh"].value
 
       refute rotated_refresh_token == refresh_token

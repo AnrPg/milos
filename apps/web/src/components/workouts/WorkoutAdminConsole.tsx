@@ -48,6 +48,8 @@ import { buildWorkoutDocument } from "@/lib/document-export";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader } from "@/components/PageHeader";
+import { Dialog } from "@/components/ui/Dialog";
+import { Popover } from "@/components/ui/Popover";
 
 type LibraryViewMode = "folders" | "tiles" | "list";
 
@@ -134,21 +136,6 @@ export function WorkoutAdminConsole() {
     return () => window.removeEventListener("keydown", handleKey);
   }, [previewWorkoutId]);
 
-  useEffect(() => {
-    if (!viewMenuOpen) return;
-    function handlePointerDown(event: PointerEvent) {
-      if (!viewMenuRef.current?.contains(event.target as Node)) setViewMenuOpen(false);
-    }
-    function handleKey(event: KeyboardEvent) {
-      if (event.key === "Escape") setViewMenuOpen(false);
-    }
-    document.addEventListener("pointerdown", handlePointerDown);
-    document.addEventListener("keydown", handleKey);
-    return () => {
-      document.removeEventListener("pointerdown", handlePointerDown);
-      document.removeEventListener("keydown", handleKey);
-    };
-  }, [viewMenuOpen]);
 
   useEffect(() => {
     function handleUserSync(event: Event) {
@@ -792,13 +779,17 @@ export function WorkoutAdminConsole() {
                         <span aria-hidden className="text-[10px]" style={{ color: "var(--dim)" }}>▾</span>
                       </button>
                     </HoverHint>
-                    {viewMenuOpen ? (
-                      <div
-                        role="menu"
-                        aria-label={i18n("featureViewLabel")}
-                        className="absolute end-0 top-full z-30 mt-2 w-44 overflow-hidden rounded-xl py-1 shadow-xl"
-                        style={{ background: "var(--panel-raised)", border: "1px solid var(--border-strong)" }}
-                      >
+                    <Popover
+                      anchorRef={viewMenuRef}
+                      open={viewMenuOpen}
+                      onClose={() => setViewMenuOpen(false)}
+                      align="end"
+                      width={176}
+                      role="menu"
+                      ariaLabel={i18n("featureViewLabel")}
+                      className="rounded-xl py-1 shadow-xl"
+                      style={{ background: "var(--panel-raised)", border: "1px solid var(--border-strong)" }}
+                    >
                         {LIBRARY_VIEW_MODES.map((mode) => (
                           <button
                             key={mode}
@@ -817,8 +808,7 @@ export function WorkoutAdminConsole() {
                             {viewMode === mode ? <span aria-hidden style={{ color: "var(--primary)" }}>✓</span> : null}
                           </button>
                         ))}
-                      </div>
-                    ) : null}
+                    </Popover>
                   </div>
 
                   <HoverHint hint={i18n("featureNewFolderHint")} align="end">
@@ -897,26 +887,30 @@ export function WorkoutAdminConsole() {
       </div>
 
       {folderModalOpen ? (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={() => setFolderModalOpen(false)} role="presentation">
-          <form
-            className="w-full max-w-md rounded-[1.5rem] p-5 shadow-[var(--shadow-lg)]"
-            style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-            onClick={(event) => event.stopPropagation()}
-            onSubmit={(event) => {
+        <Dialog
+          onClose={() => setFolderModalOpen(false)}
+          eyebrow={i18n("featureNewFolder")}
+          title={i18n("featureAddFolder")}
+          closeLabel={i18n("closebbfa773")}
+          size="md"
+          variant="center"
+          onSubmit={(event) => {
               event.preventDefault();
               void addFolder();
             }}
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>{i18n("featureNewFolder")}</p>
-                <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("featureAddFolder")}</h2>
-              </div>
-              <button type="button" className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }} onClick={() => setFolderModalOpen(false)}>
-                {i18n("closebbfa773")}
+          footer={
+            <div className="w-full flex justify-end gap-2">
+              <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={() => setFolderModalOpen(false)}>
+                {i18n("cancel77dfd21")}
+              </button>
+              <button type="submit" disabled={!folderName.trim() || busyAction === "create-folder"} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+                {i18n("featureAddFolder")}
               </button>
             </div>
-            <label className="mt-5 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
+          }
+        >
+            
+            <label className="block text-sm font-semibold" style={{ color: "var(--muted)" }}>
               {i18n("featureFolderName")}
               <input aria-label={i18n("featureNewFolderName")} className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }} value={folderName} onChange={(event) => setFolderName(event.target.value)} />
             </label>
@@ -927,16 +921,7 @@ export function WorkoutAdminConsole() {
                 {orderedFolders.map((folder) => <option key={folder.id} value={folder.id}>{folderLabel(folder)}</option>)}
               </select>
             </label>
-            <div className="mt-5 flex justify-end gap-2">
-              <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={() => setFolderModalOpen(false)}>
-                {i18n("cancel77dfd21")}
-              </button>
-              <button type="submit" disabled={!folderName.trim() || busyAction === "create-folder"} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-                {i18n("featureAddFolder")}
-              </button>
-            </div>
-          </form>
-        </div>
+        </Dialog>
       ) : null}
 
       {renderTransferDialog()}
@@ -981,39 +966,15 @@ export function WorkoutAdminConsole() {
         const pw = workouts.find((w) => w.id === previewWorkoutId);
         if (!pw) return null;
         return (
-          <>
-            <div
-              className="fixed inset-0 z-40"
-              style={{ background: "var(--scrim)" }}
-              onClick={() => setPreviewWorkoutId(null)}
-            />
-            <aside
-              className="fixed end-0 top-0 z-50 flex h-full flex-col overflow-hidden"
-              style={{
-                width: "min(480px, 90vw)",
-                background: "var(--panel)",
-                borderInlineStart: "1px solid var(--border)",
-                boxShadow: "var(--shadow-md)",
-              }}
-            >
-              <div className="flex shrink-0 items-start justify-between gap-4 border-b px-6 py-5" style={{ borderColor: "var(--border)" }}>
-                <div>
-                  <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}><SemanticLabel value={pw.type} /></p>
-                  <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pw.title || i18n("untitledWorkouta1885a5")}</h2>
-                  <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>
-                    {pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
-                  </p>
-                </div>
-                <button
-                  className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold"
-                  style={{ background: "var(--border)", color: "var(--text-soft)" }}
-                  onClick={() => setPreviewWorkoutId(null)}
-                  type="button"
-                >
-                  {i18n("closebbfa773")}
-                </button>
-              </div>
-              <div className="flex-1 overflow-y-auto px-6 py-5">
+          <Dialog
+            onClose={() => setPreviewWorkoutId(null)}
+            variant="drawer"
+            size="lg"
+            eyebrow={<SemanticLabel value={pw.type} />}
+            title={pw.title || i18n("untitledWorkouta1885a5")}
+            description={pw.available_scale_levels.length > 0 ? i18n("scaleLevelCount", {count: pw.available_scale_levels.length}) : i18n("baseOnly061c4ff")}
+            closeLabel={i18n("closebbfa773")}
+          >
                 <WorkoutPreviewDetail
                   sections={pw.sections}
                   content={pw.content}
@@ -1022,9 +983,7 @@ export function WorkoutAdminConsole() {
                   freeTextBody={pw.free_text_body}
                   freeTextDocument={pw.free_text_document}
                 />
-              </div>
-            </aside>
-          </>
+          </Dialog>
         );
       })() : null}
 

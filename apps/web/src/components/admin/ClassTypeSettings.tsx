@@ -22,6 +22,7 @@ import {
   type ClassTypePayload,
   type ClassTypeRecord,
 } from "@/api/schedule";
+import { Dialog } from "@/components/ui/Dialog";
 
 type ArchiveMapping = {
   source: ClassTypeRecord;
@@ -228,25 +229,14 @@ export function ClassTypeSettings({ token }: { token: string }) {
       {error ? <p className="text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
 
       {archiveMapping ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "var(--scrim)" }}>
-          <div className="w-full max-w-lg rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em]" style={{ color: "var(--danger)" }}>{i18n("replacementRequireda658534")}</p>
-            <h3 className="mt-2 text-xl font-semibold" style={{ color: "var(--text)" }}>{i18n("mapFutureClassesBeforeRemoval544f152")}</h3>
-            <p className="mt-3 text-sm leading-6" style={{ color: "var(--muted)" }}>
-              {archiveMapping.futureCount} {i18n("futureClass2a2682f")}{archiveMapping.futureCount === 1 ? "" : "es"} {i18n("use04489a1")} {archiveMapping.source.name}{i18n("pastAndCurrentClassesWillRetainItFor19acc8f")}
-            </p>
-            <select
-              className="mt-5 w-full rounded-2xl px-4 py-3 text-sm outline-none"
-              onChange={(event) => setArchiveMapping((current) => current ? { ...current, replacementId: event.target.value } : current)}
-              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              value={archiveMapping.replacementId}
-            >
-              <option value="">{i18n("chooseReplacementClassType8eef42c")}</option>
-              {activeTypes.filter((type) => type.id !== archiveMapping.source.id).map((type) => (
-                <option key={type.id} value={type.id}>{type.name}</option>
-              ))}
-            </select>
-            <div className="mt-6 flex justify-end gap-3">
+        <Dialog
+          onClose={() => setArchiveMapping(null)}
+          eyebrow={<span style={{ color: "var(--danger)" }}>{i18n("replacementRequireda658534")}</span>}
+          title={i18n("mapFutureClassesBeforeRemoval544f152")}
+          size="lg"
+          variant="center"
+          footer={
+            <div className="w-full flex justify-end gap-3">
               <button
                 className="rounded-full px-4 py-2 text-sm font-semibold"
                 onClick={() => setArchiveMapping(null)}
@@ -265,8 +255,23 @@ export function ClassTypeSettings({ token }: { token: string }) {
                 {archiveMutation.isPending ? i18n("mapping2712740") : i18n("mapAndRemove79dd58a")}
               </button>
             </div>
-          </div>
-        </div>
+          }
+        >
+            <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>
+              {archiveMapping.futureCount} {i18n("futureClass2a2682f")}{archiveMapping.futureCount === 1 ? "" : "es"} {i18n("use04489a1")} {archiveMapping.source.name}{i18n("pastAndCurrentClassesWillRetainItFor19acc8f")}
+            </p>
+            <select
+              className="mt-5 w-full rounded-2xl px-4 py-3 text-sm outline-none"
+              onChange={(event) => setArchiveMapping((current) => current ? { ...current, replacementId: event.target.value } : current)}
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              value={archiveMapping.replacementId}
+            >
+              <option value="">{i18n("chooseReplacementClassType8eef42c")}</option>
+              {activeTypes.filter((type) => type.id !== archiveMapping.source.id).map((type) => (
+                <option key={type.id} value={type.id}>{type.name}</option>
+              ))}
+            </select>
+        </Dialog>
       ) : null}
     </div>
   );

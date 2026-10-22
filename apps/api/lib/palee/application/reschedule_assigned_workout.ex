@@ -31,7 +31,7 @@ defmodule Palee.Application.RescheduleAssignedWorkout do
     end
   end
 
-  # ADR-177: "the past" is before the gym's today.
+  # ADR-179: "the past" is before the gym's today.
   defp guard_future_date(date, context) do
     if Date.compare(date, Palee.Organizations.local_today(context.organization_id)) == :lt do
       {:error, :past_date}

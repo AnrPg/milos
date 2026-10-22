@@ -1,4 +1,4 @@
-# ADR-177: One canonical clock, the organiser's zone and the viewer's zone
+# ADR-179: One canonical clock, the organiser's zone and the viewer's zone
 Date: 2026-10-22
 Status: Accepted
 

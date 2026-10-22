@@ -40,7 +40,7 @@ defmodule Palee.Application.RequestWorkoutAssignment do
   defp parse_requested_for(%Date{} = date), do: {:ok, date}
   defp parse_requested_for(_value), do: {:error, :bad_request}
 
-  # ADR-177: "the past" is before the gym's today.
+  # ADR-179: "the past" is before the gym's today.
   defp reject_past_date(date, context) do
     if Date.compare(date, Organizations.local_today(context.organization_id)) == :lt do
       {:error, :past_date}

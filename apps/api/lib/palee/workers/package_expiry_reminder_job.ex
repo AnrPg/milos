@@ -11,7 +11,7 @@ defmodule Palee.Workers.PackageExpiryReminderJob do
 
   @impl Oban.Worker
   def perform(_job) do
-    # ADR-177: each gym's own "today" (the run is daily, so each gym's day
+    # ADR-179: each gym's own "today" (the run is daily, so each gym's day
     # still advances by exactly one per run).
     Organizations.list_active_organizations_for_system()
     |> Enum.each(fn %{organization: organization} ->

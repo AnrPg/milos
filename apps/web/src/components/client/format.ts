@@ -14,7 +14,7 @@ export function formatDay(day: string, locale: string, options?: Intl.DateTimeFo
   });
 }
 
-/** «19:00»; with an organiser's zone (ADR-177), on its clock, its city added when the viewer's differs. */
+/** «19:00»; with an organiser's zone (ADR-179), on its clock, its city added when the viewer's differs. */
 export function formatTime(iso: string, locale: string, timeZone?: string | null): string {
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";

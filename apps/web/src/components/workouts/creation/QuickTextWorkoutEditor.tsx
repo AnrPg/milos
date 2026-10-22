@@ -46,6 +46,7 @@ import {
   type WorkoutDslSuggestion,
   type WorkoutDslVocabulary,
 } from "@/lib/workout-dsl-suggestions";
+import { Dialog } from "@/components/ui/Dialog";
 
 const EMPTY_VOCABULARY: WorkoutDslVocabulary = {
   version: 1,
@@ -545,7 +546,7 @@ export function QuickTextWorkoutEditor({
         </div>
 
         <div
-          className="sticky top-[3.25rem] z-50"
+          className="sticky top-[3.25rem] z-(--z-sticky)"
           style={{
             background: "color-mix(in srgb, var(--bg) 96%, transparent)",
             backdropFilter: "blur(12px)",
@@ -745,7 +746,7 @@ function SuggestionMenu({
 
   return (
     <div
-      className="z-50 overflow-y-auto rounded-lg border shadow-xl"
+      className="z-(--z-popover) overflow-y-auto rounded-lg border shadow-xl"
       style={{
         ...position,
         background: "var(--panel)",
@@ -910,30 +911,11 @@ function ManualDialog({ markdown, onClose }: { markdown: string; onClose: () => 
   const i18n = useUiTranslations();
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-[var(--scrim)] p-4" role="presentation">
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-label={i18n("quickTextManual")}
-        className="flex max-h-[90dvh] w-full max-w-4xl flex-col rounded-2xl shadow-2xl"
-        style={{ background: "var(--panel)" }}
-      >
-        <header className="flex items-center justify-between border-b p-4" style={{ borderColor: "var(--dim)" }}>
-          <h2 className="text-lg font-black" style={{ color: "var(--text)" }}>
-            {i18n("quickTextManual")}
-          </h2>
-          <button type="button" onClick={onClose} className="rounded-lg px-3 py-2" style={{ color: "var(--text)" }}>
-            {i18n("quickTextCloseManual")}
-          </button>
-        </header>
-        <pre
-          className="min-h-0 flex-1 overflow-auto whitespace-pre-wrap p-5 font-sans text-sm leading-6"
-          style={{ color: "var(--text)" }}
-        >
-          {markdown}
-        </pre>
-      </section>
-    </div>
+    <Dialog onClose={onClose} title={i18n("quickTextManual")} closeLabel={i18n("quickTextCloseManual")} size="5xl" variant="center">
+      <pre className="whitespace-pre-wrap font-sans text-sm leading-6" style={{ color: "var(--text)" }}>
+        {markdown}
+      </pre>
+    </Dialog>
   );
 }
 

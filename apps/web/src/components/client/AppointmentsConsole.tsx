@@ -170,7 +170,7 @@ function OfferedSlots({
 }) {
   const i18n = useUiTranslations();
   const locale = useUiLocale();
-  // ADR-177: the practice's days and clock, wherever the client is.
+  // ADR-179: the practice's days and clock, wherever the client is.
   const zone = useOrganizationTimeZone();
   const days = useMemo(() => groupSlotsByDay(slots, zone ?? undefined), [slots, zone]);
   if (days.length === 0) return <EmptyLine>{i18n("clApptNoSlots")}</EmptyLine>;

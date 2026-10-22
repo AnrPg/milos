@@ -80,7 +80,7 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
         time_zone:
           string(
             description:
-              "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock"
+              "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock"
           ),
         time_zone_confirmed: %Schema{
           type: :boolean,
@@ -217,7 +217,7 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
           maxLength: 100,
           nullable: true,
           description:
-            "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's"
+            "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's"
         )
     }
   end

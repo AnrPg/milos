@@ -16,7 +16,7 @@ const dayFormatter = new Intl.DateTimeFormat("en-US", {
 });
 
 /**
- * The days a schedule view shows and the window it asks for. ADR-177: the
+ * The days a schedule view shows and the window it asks for. ADR-179: the
  * dates are the gym's, so the query runs from the gym's midnight (`zone`;
  * the device's clock without one).
  */

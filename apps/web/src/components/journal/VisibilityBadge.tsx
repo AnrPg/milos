@@ -28,7 +28,7 @@ import {
 import { coachGroups, keysOf, refOf, sameKeys, within } from "@/lib/coach-audience";
 import { orderedChoices, needsQuestion, VISIBILITY_ICON } from "@/components/journal/visibility";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 /**
  * The visibility badge every journal entry carries (vision §7.7, ADR-139).
@@ -120,7 +120,6 @@ function VisibilityPicker({
   const t = useTranslations("MemberApp.journal");
   const tApp = useTranslations("MemberApp");
   const { tokens } = useSession();
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const [choice, setChoice] = useState<ChoosableVisibility>(
     (choices as string[]).includes(item.journal_visibility)
       ? (item.journal_visibility as ChoosableVisibility)
@@ -171,20 +170,32 @@ function VisibilityPicker({
   const errorCode = mutation.error instanceof ApiError ? mutation.error.payload.code : null;
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
+    <Dialog
+      onClose={onClose}
+      ariaLabel={t("whoSees")}
+      size="md"
+      footer={
+        <div className="w-full flex gap-2">
+          <button
+            type="button"
+            onClick={onClose}
+            className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
+            style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
+          >
+            {tApp("cancel")}
+          </button>
+          <button
+            type="button"
+            disabled={blocked || mutation.isPending}
+            onClick={() => mutation.mutate()}
+            className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
+            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+          >
+            {mutation.isPending ? t("saving") : needsQuestion(choice) ? t("askCoach") : t("save")}
+          </button>
+        </div>
+      }
     >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("whoSees")}
-        className="w-full max-w-md rounded-t-3xl p-5 sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(event) => event.stopPropagation()}
-      >
         <VisibilityChoices
           choices={choices}
           value={choice}
@@ -207,27 +218,7 @@ function VisibilityPicker({
             {errorCode === "no_active_coach" ? t("noCoach") : t("visibilityFailed")}
           </p>
         ) : null}
-        <div className="mt-4 flex gap-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
-            style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
-          >
-            {tApp("cancel")}
-          </button>
-          <button
-            type="button"
-            disabled={blocked || mutation.isPending}
-            onClick={() => mutation.mutate()}
-            className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          >
-            {mutation.isPending ? t("saving") : needsQuestion(choice) ? t("askCoach") : t("save")}
-          </button>
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 

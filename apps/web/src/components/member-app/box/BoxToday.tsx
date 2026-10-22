@@ -122,7 +122,7 @@ export function BoxToday({
     today.items.find((item) => item.key === selectedKey) ?? defaultTodayItem(today.items);
   const loading = schedule.isPending || assignments.isPending;
   const booking = nextBooking(schedule.data?.slots ?? [], now);
-  // ADR-177: class times on the gym's clock.
+  // ADR-179: class times on the gym's clock.
   const time = (iso: string) => zonedText(iso, gymZone, locale, "time");
   const day = (iso: string) =>
     dateKeyInZone(iso, gymZone) === dateKeyInZone(now, gymZone)

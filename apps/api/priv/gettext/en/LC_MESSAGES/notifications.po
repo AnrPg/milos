@@ -600,6 +600,6 @@ msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
 msgstr "%{class} (%{when}) has no WOD yet. Link one before it starts."
 
 
-# ADR-177: a moment on the organiser's clock, then on the reader's when theirs differs.
+# ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
 msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} your time"

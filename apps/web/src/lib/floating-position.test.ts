@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { floatingPosition } from "@/components/admin/finance/shared/floating-position";
+import { floatingPosition } from "@/lib/floating-position";
 
 describe("floatingPosition", () => {
   it("places a ledger overlay above its trigger when the table bottom has no room", () => {

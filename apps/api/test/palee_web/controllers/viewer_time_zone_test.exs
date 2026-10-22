@@ -1,6 +1,6 @@
 defmodule PaleeWeb.ViewerTimeZoneTest do
   @moduledoc """
-  ADR-177: one canonical clock (UTC), read on the organiser's zone and, when
+  ADR-179: one canonical clock (UTC), read on the organiser's zone and, when
   the reader's differs, on theirs too.
   """
 

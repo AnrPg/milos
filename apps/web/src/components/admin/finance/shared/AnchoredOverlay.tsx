@@ -1,10 +1,14 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
+import { useRef, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { createPortal } from "react-dom";
 
-import { floatingPosition } from "./floating-position";
+import { capHeight, useAnchoredPosition } from "@/components/ui/floating";
 
+/**
+ * A ledger dropdown placed next to its trigger on the popover layer. Callers
+ * own opening and dismissal; for a self-dismissing menu use ui/Popover.
+ */
 export function AnchoredOverlay({
   anchorRef,
   children,
@@ -24,36 +28,7 @@ export function AnchoredOverlay({
 }) {
   const internalRef = useRef<HTMLDivElement>(null);
   const targetRef = overlayRef ?? internalRef;
-  const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
-
-  useLayoutEffect(() => {
-    const update = () => {
-      const anchor = anchorRef.current;
-      const overlay = targetRef.current;
-      if (!anchor || !overlay) return;
-
-      const rect = anchor.getBoundingClientRect();
-      const overlayRect = overlay.getBoundingClientRect();
-      setPosition(
-        floatingPosition(
-          rect,
-          {
-            width: width ?? Math.max(minWidth, overlayRect.width),
-            height: overlayRect.height,
-          },
-          { width: window.innerWidth, height: window.innerHeight },
-        ),
-      );
-    };
-
-    update();
-    window.addEventListener("resize", update);
-    window.addEventListener("scroll", update, true);
-    return () => {
-      window.removeEventListener("resize", update);
-      window.removeEventListener("scroll", update, true);
-    };
-  }, [anchorRef, minWidth, targetRef, width]);
+  const position = useAnchoredPosition(anchorRef, targetRef, { width, minWidth });
 
   if (typeof document === "undefined") return null;
 
@@ -62,13 +37,15 @@ export function AnchoredOverlay({
       ref={targetRef}
       className={className}
       style={{
+        overflowY: "auto",
         ...style,
         position: "fixed",
         left: position?.left ?? -10_000,
         top: position?.top ?? -10_000,
+        maxHeight: capHeight(style?.maxHeight, position?.maxHeight),
         minWidth,
         width,
-        zIndex: 100,
+        zIndex: "var(--z-popover)",
       }}
     >
       {children}

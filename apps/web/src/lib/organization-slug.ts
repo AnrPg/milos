@@ -62,7 +62,7 @@ export function useOrganizationSlug(): string | null {
 }
 
 /**
- * ADR-177: the IANA zone of a gym the signed-in account belongs to (the
+ * ADR-179: the IANA zone of a gym the signed-in account belongs to (the
  * current one by default): the clock its classes and events are planned
  * on, and whether an admin confirmed it. `zone` is null while unknown, so
  * callers fall back to the device's clock.
@@ -85,7 +85,7 @@ export function useOrganizationTimeZoneStatus(slug?: string | null): { zone: str
   return { zone: organization?.timezone ?? null, confirmed: organization?.timezone_confirmed === true };
 }
 
-/** ADR-177: the zone of a gym the account belongs to (the current one by default), or null. */
+/** ADR-179: the zone of a gym the account belongs to (the current one by default), or null. */
 export function useOrganizationTimeZone(slug?: string | null): string | null {
   return useOrganizationTimeZoneStatus(slug).zone;
 }

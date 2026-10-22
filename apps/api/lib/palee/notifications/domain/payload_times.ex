@@ -1,6 +1,6 @@
 defmodule Palee.Notifications.Domain.PayloadTimes do
   @moduledoc """
-  ADR-177: the moments a notification mentions, written for its reader.
+  ADR-179: the moments a notification mentions, written for its reader.
 
   Producers put the UTC moment in the payload (`class_starts_at`,
   `event_starts_at`, `starts_at`, `scanned_at`) and, when it differs from

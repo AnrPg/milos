@@ -12,9 +12,9 @@ import { useSession } from "@/components/session-provider";
 import { clientErrorMessage } from "@/components/client/errors";
 import { formatDateTime } from "@/components/client/format";
 import { formatElapsed } from "@/components/client/vault";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { useUiTranslations } from "@/i18n/ui";
+import { Dialog } from "@/components/ui/Dialog";
 
 /** That day's result of one execution: time, section scores, changes and notes. */
 export function ExecutionPerformanceModal({
@@ -29,7 +29,6 @@ export function ExecutionPerformanceModal({
   const i18n = useUiTranslations();
   const locale = useUiLocale();
   const { tokens } = useSession();
-  const ref = useModalFocusTrap<HTMLDivElement>(onClose);
   const titleId = useId();
   const query = useQuery({
     queryKey: ["execution", executionId],
@@ -43,40 +42,15 @@ export function ExecutionPerformanceModal({
   const tileStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)" };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-3 sm:items-center sm:p-4"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-      role="presentation"
+    <Dialog
+      onClose={onClose}
+      eyebrow={<span style={{ color: "var(--dim)" }}>{i18n("clSeePerformance")}</span>}
+      title={<span className="break-words">{execution?.workout_title ?? workoutTitle ?? i18n("workout39463a5")}</span>}
+      titleId={titleId}
+      closeLabel={i18n("closebbfa773")}
+      size="2xl"
     >
-      <div
-        ref={ref}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={titleId}
-        tabIndex={-1}
-        className="max-h-[88vh] w-full max-w-2xl overflow-y-auto rounded-[2rem] p-5 outline-none sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
-              {i18n("clSeePerformance")}
-            </p>
-            <h2 id={titleId} className="mt-2 break-words text-xl font-semibold" style={{ color: "var(--text)" }}>
-              {execution?.workout_title ?? workoutTitle ?? i18n("workout39463a5")}
-            </h2>
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold"
-            style={{ background: "var(--border)", color: "var(--text-soft)" }}
-          >
-            {i18n("closebbfa773")}
-          </button>
-        </div>
+        
 
         {query.isPending ? (
           <p className="mt-6 text-sm" role="status" style={{ color: "var(--dim)" }}>
@@ -159,7 +133,6 @@ export function ExecutionPerformanceModal({
             </div>
           </div>
         )}
-      </div>
-    </div>
+    </Dialog>
   );
 }

@@ -6,6 +6,7 @@ import { fetchAdminUserSchedule, placeAdminUserInClass } from "@/api/admin-users
 import { fetchSchedule, type ScheduleSlot } from "@/api/schedule";
 import { localizeAdminAssignmentError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Props = {
   token: string;
@@ -101,30 +102,29 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
   const fieldStyle = { background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" };
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-center justify-center p-4" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
-      <form
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="member-class-placement-title"
-        className="w-full max-w-lg rounded-[1.5rem] p-5 shadow-[var(--shadow-lg)]"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-        onClick={(event) => event.stopPropagation()}
-        onSubmit={(event) => {
-          event.preventDefault();
-          void submit();
-        }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>{i18n("featureMoveToClassAction")}</p>
-            <h2 id="member-class-placement-title" className="mt-1 truncate text-xl font-semibold" style={{ color: "var(--text)" }}>{nickname}</h2>
-          </div>
-          <button type="button" className="rounded-full px-3 py-1.5 text-xs font-semibold" style={{ background: "var(--border)", color: "var(--muted)" }} onClick={onClose}>
-            {i18n("closebbfa773")}
+    <Dialog
+      onClose={onClose}
+      eyebrow={i18n("featureMoveToClassAction")}
+      title={<span className="block truncate">{nickname}</span>}
+      titleId="member-class-placement-title"
+      size="lg"
+      variant="center"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submit();
+      }}
+      footer={
+        <>
+          <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={onClose}>
+            {i18n("cancel77dfd21")}
           </button>
-        </div>
-
-        <label className="mt-5 block text-sm font-semibold" style={{ color: "var(--muted)" }}>
+          <button type="submit" disabled={!targetSlotId || saving || loading} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+            {saving ? i18n("featureMovePlacing") : i18n("featureConfirmMove")}
+          </button>
+        </>
+      }
+    >
+        <label className="block text-sm font-semibold" style={{ color: "var(--muted)" }}>
           {i18n("featureMoveFromBooking")}
           <select className="mt-2 w-full rounded-xl px-3 py-2 text-sm" style={fieldStyle} value={fromBookingId} disabled={loading} onChange={(event) => setFromBookingId(event.target.value)}>
             <option value="">{i18n("featureNoCurrentBooking")}</option>
@@ -149,15 +149,6 @@ export function MemberClassPlacementModal({ token, userId, nickname, onClose, on
         ) : null}
         {error ? <p className="mt-3 text-sm" style={{ color: "var(--danger)" }}>{error}</p> : null}
 
-        <div className="mt-5 flex justify-end gap-2">
-          <button type="button" className="rounded-full px-4 py-2 text-sm font-semibold" style={{ background: "var(--border)", color: "var(--text-soft)" }} onClick={onClose}>
-            {i18n("cancel77dfd21")}
-          </button>
-          <button type="submit" disabled={!targetSlotId || saving || loading} className="rounded-full px-4 py-2 text-sm font-semibold disabled:opacity-50" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-            {saving ? i18n("featureMovePlacing") : i18n("featureConfirmMove")}
-          </button>
-        </div>
-      </form>
-    </div>
+    </Dialog>
   );
 }

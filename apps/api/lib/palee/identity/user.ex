@@ -22,7 +22,7 @@ defmodule Palee.Identity.User do
     # Nullable: every account created before F-10 predates this column.
     field :email, :string
     field :completed_tours, {:array, :string}, default: []
-    # ADR-177: the zone the person's device last reported; nil until it does.
+    # ADR-179: the zone the person's device last reported; nil until it does.
     field :time_zone, :string
 
     timestamps()
@@ -97,7 +97,7 @@ defmodule Palee.Identity.User do
     |> validate_subset(:completed_tours, Palee.Identity.Domain.ProductTours.audiences())
   end
 
-  @doc "ADR-177: the zone the person's device reports (an IANA name)."
+  @doc "ADR-179: the zone the person's device reports (an IANA name)."
   def time_zone_changeset(user, time_zone) do
     user
     |> cast(%{time_zone: time_zone}, [:time_zone])

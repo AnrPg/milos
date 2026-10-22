@@ -18,6 +18,7 @@ import { NewPRFormModal, PRFormModal } from "./PRFormModal";
 import { SharedPRsSection } from "./SharedPRsSection";
 import { PRShareFlow } from "./PRShareFlow";
 import { PRShareModal } from "./PRShareModal";
+import { Dialog } from "@/components/ui/Dialog";
 
 export function PantheonPage() {
   const i18n = useUiTranslations();
@@ -130,17 +131,13 @@ export function PantheonPage() {
 
       {/* Delete confirmation */}
       {deleteConfirm && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
-          style={{ background: "var(--scrim)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) setDeleteConfirm(null); }}
-        >
-          <div className="w-full max-w-sm rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-            <h3 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{i18n("deletePr50a5f9b")}</h3>
-            <p className="mt-2 text-sm" style={{ color: "var(--muted)" }}>
-              &quot;{deleteConfirm.name}{i18n("willBePermanentlyRemovedIncludingItsHistory54afba1")}
-            </p>
-            <div className="mt-5 flex gap-3">
+        <Dialog
+          onClose={() => setDeleteConfirm(null)}
+          title={i18n("deletePr50a5f9b")}
+          size="sm"
+          variant="center"
+          footer={
+            <div className="w-full flex gap-3">
               <button
                 type="button"
                 disabled={deleteMutation.isPending}
@@ -159,8 +156,12 @@ export function PantheonPage() {
                 {i18n("cancel77dfd21")}
               </button>
             </div>
-          </div>
-        </div>
+          }
+        >
+            <p className="text-sm" style={{ color: "var(--muted)" }}>
+              &quot;{deleteConfirm.name}{i18n("willBePermanentlyRemovedIncludingItsHistory54afba1")}
+            </p>
+        </Dialog>
       )}
 
       {formPR === "new" ? (

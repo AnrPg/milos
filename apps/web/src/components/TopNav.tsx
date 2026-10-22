@@ -37,6 +37,7 @@ import { SemanticLabel } from "@/components/semantic-label";
 import { entitledFeatures } from "@/components/client/entitlement";
 import { useClientEntitlement } from "@/components/client/use-client-entitlement";
 import { OrganizationSelector } from "@/components/organization-selector";
+import { Popover } from "@/components/ui/Popover";
 
 export { adminHref } from "@/lib/organization-slug";
 
@@ -102,7 +103,7 @@ export function TopNav() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [msgOpen, setMsgOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const authenticated = status === "authenticated" && Boolean(tokens?.access_token) && Boolean(currentUser);
 
   const isVendor = Boolean(currentUser?.vendor);
@@ -184,16 +185,6 @@ export function TopNav() {
     });
   }, [tokens?.access_token, currentUser?.id, queryClient, selectedOrganizationSlug]);
 
-  useEffect(() => {
-    function handler(e: MouseEvent) {
-      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
-        setMenuOpen(false);
-      }
-    }
-    if (menuOpen) document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [menuOpen]);
-
   if (
     CANVAS_PATHS.some((p) => pathname === p || pathname.startsWith(p + "/")) ||
     CANVAS_PATTERNS.some((pattern) => pattern.test(stripOrganizationPrefix(pathname)))
@@ -205,7 +196,7 @@ export function TopNav() {
 
   return (
     <header
-      className="sticky top-0 z-50 flex flex-col overflow-x-clip"
+      className="sticky top-0 z-(--z-nav) flex flex-col overflow-x-clip"
       style={{
         // ADR-171: below the status bar inside the store apps (0 on the web).
         top: "var(--safe-top, 0px)",
@@ -291,8 +282,11 @@ export function TopNav() {
             </div>
           ) : null}
 
-          <div ref={menuRef} className="relative shrink-0">
+          <div className="relative shrink-0">
             <button
+              ref={menuButtonRef}
+              aria-haspopup="menu"
+              aria-expanded={menuOpen}
               className="relative flex items-center gap-2 rounded-full py-1 ps-1 pe-3 text-sm font-semibold transition-colors"
               style={{ background: "var(--panel)", color: "var(--text)" }}
               onClick={() => setMenuOpen((value) => !value)}
@@ -331,11 +325,15 @@ export function TopNav() {
               ) : null}
             </button>
 
-            {menuOpen ? (
-              <div
-                className="absolute end-0 top-full mt-2 w-44 overflow-hidden rounded-2xl py-1 shadow-[var(--shadow-lg)]"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-              >
+            <Popover
+              anchorRef={menuButtonRef}
+              open={menuOpen}
+              onClose={() => setMenuOpen(false)}
+              align="end"
+              width={176}
+              className="rounded-2xl py-1 shadow-[var(--shadow-lg)]"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+            >
                 <div className="border-b px-4 py-3" style={{ borderColor: "var(--border)" }}>
                   <p className="text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>
                     {i18n("signedInAsa02107c")}
@@ -465,8 +463,7 @@ export function TopNav() {
                 >
                   {i18n("signOutdc1649a")}
                 </button>
-              </div>
-            ) : null}
+            </Popover>
           </div>
         </div>
       </div>

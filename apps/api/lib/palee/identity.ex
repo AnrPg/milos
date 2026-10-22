@@ -20,13 +20,13 @@ defmodule Palee.Identity do
   defdelegate update_time_zone(user_id, time_zone), to: UserStore
 
   @doc """
-  ADR-177: the clock a person's own days follow (streaks, progress, "today"
+  ADR-179: the clock a person's own days follow (streaks, progress, "today"
   in their logs): the zone their device last reported, else the default.
   """
   def time_zone(%{time_zone: zone}), do: Palee.TimeZones.ZonedTime.or_default(zone)
   def time_zone(_account), do: Palee.TimeZones.ZonedTime.default_zone()
 
-  @doc "ADR-177: the person's local date now."
+  @doc "ADR-179: the person's local date now."
   def local_today(user_id, now \\ DateTime.utc_now())
 
   def local_today(user_id, now) when is_binary(user_id),

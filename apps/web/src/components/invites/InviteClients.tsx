@@ -16,10 +16,10 @@ import {
   type IssuedInvitation,
 } from "@/api/organizations";
 import { useSession } from "@/components/session-provider";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { localizeError } from "@/i18n/presentation";
 import { useOrganizationSlug } from "@/lib/organization-slug";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Tab = "link" | "public" | "pending";
 type Translate = ReturnType<typeof useTranslations>;
@@ -61,36 +61,21 @@ export function InviteClientsButton({
 
 export function InviteClientsDialog({ onClose, initialTab = "link" }: { onClose: () => void; initialTab?: Tab }) {
   const t = useTranslations("Invites");
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
   return (
-    <div className="fixed inset-0 z-[70] flex items-end justify-center p-0 sm:items-center sm:p-4" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
-      <div
-        ref={dialogRef}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="invite-clients-title"
-        tabIndex={-1}
-        onClick={(event) => event.stopPropagation()}
-        className="max-h-[92dvh] w-full max-w-xl overflow-y-auto rounded-t-[1.6rem] p-5 sm:rounded-[1.6rem] sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h2 id="invite-clients-title" className="text-xl font-semibold" style={{ color: "var(--text)" }}>
-              {t("inviteClients")}
-            </h2>
-            <p className="mt-1 text-sm" style={{ color: "var(--muted)" }}>{t("dialogIntro")}</p>
-          </div>
-          <button type="button" onClick={onClose} aria-label={t("close")} className="rounded-lg px-2 py-1 text-lg" style={{ color: "var(--muted)" }}>
-            ×
-          </button>
-        </div>
-        <div className="mt-4">
+    <Dialog
+      onClose={onClose}
+      title={t("inviteClients")}
+      titleId="invite-clients-title"
+      description={t("dialogIntro")}
+      closeLabel={t("close")}
+      size="xl"
+    >
+        
+        <div className="">
           <ClientAccessTabs initialTab={initialTab} />
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 

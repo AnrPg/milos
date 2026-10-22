@@ -60,12 +60,12 @@ defmodule PaleeWeb.OrganizationAccessController do
       timezone: %Schema{
         type: :string,
         description:
-          "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock"
+          "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock"
       },
       timezone_confirmed: %Schema{
         type: :boolean,
         description:
-          "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)"
+          "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)"
       }
     },
     required: [:id, :name, :slug]

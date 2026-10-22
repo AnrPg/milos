@@ -1,13 +1,12 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { createPortal } from "react-dom";
 
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 /**
- * A bottom sheet (a centred dialog on wide screens), portalled to the body so
- * no card's stacking context clips it. Escape and the backdrop close it.
+ * A bottom sheet (a centred dialog on wide screens): the shared dialog shell
+ * with a scrolling body and an always-visible footer.
  */
 export function Sheet({
   title,
@@ -24,41 +23,18 @@ export function Sheet({
   footer?: ReactNode;
   labelId: string;
 }) {
-  const dialog = useModalFocusTrap<HTMLElement>(onClose);
-  return createPortal(
-    <div
-      className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-      role="presentation"
+  return (
+    <Dialog
+      onClose={onClose}
+      title={title}
+      eyebrow={eyebrow}
+      titleId={labelId}
+      footer={footer ? <div className="flex w-full gap-2">{footer}</div> : undefined}
+      variant="sheet"
+      size="xl"
     >
-      <section
-        ref={dialog}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby={labelId}
-        onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[92dvh] w-full max-w-xl flex-col rounded-t-3xl sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <div className="flex justify-center pt-2.5 sm:hidden">
-          <span aria-hidden="true" className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
-        </div>
-        <header className="px-5 pb-2 pt-3">
-          {eyebrow ? (
-            <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{eyebrow}</p>
-          ) : null}
-          <h2 id={labelId} className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{title}</h2>
-        </header>
-        <div className="flex-1 overflow-y-auto px-5 pb-4">{children}</div>
-        {footer ? (
-          <footer className="flex gap-2 border-t px-5 py-3" style={{ borderColor: "var(--border)" }}>
-            {footer}
-          </footer>
-        ) : null}
-      </section>
-    </div>,
-    document.body,
+      {children}
+    </Dialog>
   );
 }
 

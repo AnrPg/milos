@@ -140,7 +140,7 @@ export function addDays(date: Date, days: number): Date {
 
 /** The [from, to) range shown by the appointments page. */
 export function appointmentRange(anchor: Date, view: "week" | "day", zone: string | null = null): { from: Date; to: Date } {
-  // ADR-177: with the practice's zone, its own days (midnight on its clock).
+  // ADR-179: with the practice's zone, its own days (midnight on its clock).
   if (zone) {
     const day = dateKeyInZone(anchor, zone);
     const weekday = (new Date(`${day}T12:00:00Z`).getUTCDay() + 6) % 7;

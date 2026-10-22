@@ -7,6 +7,7 @@ import type { PublicBoxPage } from "@/api/social";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 import { Icon } from "./Icon";
+import { Layer } from "@/components/ui/Layer";
 
 type Photo = PublicBoxPage["profile"]["photos"][number];
 
@@ -37,12 +38,13 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
   const button = "grid h-11 w-11 place-items-center rounded-full";
 
   return (
+    <Layer>
     <div
       ref={dialog}
       role="dialog"
       aria-modal="true"
       aria-label={t("photosTitle")}
-      className="fixed inset-0 z-[70] flex flex-col"
+      className="fixed inset-0 z-(--z-fullscreen) flex flex-col"
       style={{ background: "var(--scrim-strong)", color: "var(--on-media)" }}
       onTouchStart={(event) => {
         touch.current = { x: event.touches[0].clientX, y: event.touches[0].clientY };
@@ -112,5 +114,6 @@ export function PhotoViewer({ photos, start, onClose }: { photos: Photo[]; start
         </ol>
       ) : null}
     </div>
+    </Layer>
   );
 }

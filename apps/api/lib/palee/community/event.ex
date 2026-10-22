@@ -58,7 +58,7 @@ defmodule Palee.Community.Event do
     field :guests_per_member, :integer, default: 1
     field :good_for_friends, :boolean, default: false
     field :cover_media_id, :binary_id
-    # ADR-177: the zone of an event held away from its gym; nil: the gym's.
+    # ADR-179: the zone of an event held away from its gym; nil: the gym's.
     field :time_zone, :string
     field :series_id, :binary_id
     field :cancelled_at, :utc_datetime_usec
@@ -72,7 +72,7 @@ defmodule Palee.Community.Event do
 
   def editable_fields, do: @editable
 
-  @doc "ADR-177: the clock the event is planned on: its own zone, else its gym's."
+  @doc "ADR-179: the clock the event is planned on: its own zone, else its gym's."
   def time_zone(%{time_zone: zone}, _gym_zone) when is_binary(zone) and zone != "", do: zone
   def time_zone(_event, gym_zone), do: gym_zone
 

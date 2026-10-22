@@ -1,6 +1,6 @@
 defmodule Palee.Application.ReportTimeZone do
   @moduledoc """
-  ADR-177: a device reports the zone its person is in, so server-written
+  ADR-179: a device reports the zone its person is in, so server-written
   texts (push notifications, emails) can add "your time" beside the
   organiser's clock when the two read a moment differently. The latest
   report wins; a UTC alias says nothing about where someone is and leaves

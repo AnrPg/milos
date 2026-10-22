@@ -79,7 +79,7 @@ function CreateSlotForm({
   const queryClient = useQueryClient();
   const baseId = useId();
   const [coachId, setCoachId] = useState("");
-  // ADR-177: typed on the practice's clock, whatever the device's zone.
+  // ADR-179: typed on the practice's clock, whatever the device's zone.
   const zone = useOrganizationTimeZone();
   const [startsAt, setStartsAt] = useState(() => toDateTimeLocal(nextHour(), zone));
   const [duration, setDuration] = useState("60");

@@ -24,7 +24,7 @@ type CalendarViewProps = {
   locations?: ScheduleLocation[];
   onSelectSlot: (slot: ScheduleSlot) => void;
   onCreateSlot: (isoDate: string) => void;
-  /** ADR-177: the gym's zone; days and times are on its clock. */
+  /** ADR-179: the gym's zone; days and times are on its clock. */
   timeZone?: string | null;
 };
 

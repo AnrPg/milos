@@ -17,7 +17,7 @@ type ZonedTimeProps = {
 };
 
 /**
- * ADR-177: a moment on its organiser's clock. When the viewer's device reads
+ * ADR-179: a moment on its organiser's clock. When the viewer's device reads
  * it differently, the organiser's city is named and a small badge adds the
  * viewer's own time («18:00 your time»).
  */
@@ -36,7 +36,7 @@ export function ZonedTime({ at, zone, format = "time", className, showZone = fal
 }
 
 /**
- * ADR-177: only the "your time" badge, for a line that already shows the
+ * ADR-179: only the "your time" badge, for a line that already shows the
  * organiser's clock. Renders nothing when the viewer's clock agrees.
  */
 export function YourTime({ at, zone, format = "time" }: { at: string | Date; zone: string | null | undefined; format?: ZonedFormat }) {

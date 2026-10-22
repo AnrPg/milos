@@ -1,6 +1,6 @@
 defmodule Palee.Infrastructure.Tenancy.GymClock do
   @moduledoc """
-  ADR-177: "today" for the gym the current database session is scoped to.
+  ADR-179: "today" for the gym the current database session is scoped to.
 
   Store code that runs inside a tenant scope (`app.organization_id` set by
   `RepoContext.run/2`) asks this clock instead of `Date.utc_today/0`, so a

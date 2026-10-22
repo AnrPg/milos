@@ -2,16 +2,15 @@
 
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
-import { createPortal } from "react-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
 import { fetchBoxSchedule, type PublicBoxPage, type PublicBoxSchedule } from "@/api/social";
 import { MY_TRIALS_KEY, requestTrial, type MyTrial, type TrialOffer } from "@/api/trials";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 import { newOperationId, trialErrorKey } from "./trial-ui";
 import { dateKeyInZone, formatInZone, zonedText } from "@/lib/zoned-time";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Slot = PublicBoxSchedule["slots"][number];
 /** What the sheet needs of a class picked before it opens (the box schedule, or a door scan's offer). */
@@ -48,13 +47,12 @@ export function TrialSheet({
   const t = useTranslations("Trials");
   const locale = useLocale();
   const queryClient = useQueryClient();
-  const dialog = useModalFocusTrap<HTMLElement>(onClose);
   const [picked, setPicked] = useState<PickedSlot | null>(initialSlot ?? null);
   const [note, setNote] = useState("");
   const [phone, setPhone] = useState("");
   const [done, setDone] = useState<MyTrial | null>(null);
   const operation = useRef(newOperationId());
-  // ADR-177: the gym's days and clock, wherever the visitor is.
+  // ADR-179: the gym's days and clock, wherever the visitor is.
   const zone = (page as { time_zone?: string | null }).time_zone ?? null;
 
   const classes = useQuery({
@@ -100,29 +98,36 @@ export function TrialSheet({
   const manual = offer.approval === "manual";
   const phoneValid = phone.trim() === "" || /^\+?[0-9 ()-]{6,24}$/.test(phone.trim());
 
-  // Portalled: the box page's side card is its own stacking context.
-  return createPortal(
-    <div className="fixed inset-0 z-[70] flex items-end justify-center sm:items-center" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
-      <section
-        ref={dialog}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="trial-sheet-title"
-        onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[92dvh] w-full max-w-xl flex-col rounded-t-3xl sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <div className="flex justify-center pt-2.5 sm:hidden">
-          <span aria-hidden="true" className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
+  return (
+    <Dialog
+      onClose={onClose}
+      eyebrow={<span style={{ color: "var(--dim)" }}>{page.box.name}</span>}
+      title={done ? (done.status === "booked" ? t("doneBookedTitle") : t("doneRequestedTitle")) : t("sheetTitle")}
+      titleId="trial-sheet-title"
+      size="xl"
+      footer={
+        <div className="flex w-full flex-col gap-2">
+          {done ? (
+            <Link href={`/trials/${done.id}`} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+              {t("seeTrial")}
+            </Link>
+          ) : picked ? (
+            <button
+              type="button"
+              disabled={ask.isPending || !phoneValid}
+              onClick={() => ask.mutate()}
+              className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold disabled:opacity-60"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            >
+              {ask.isPending ? t("sending") : manual ? t("confirmManual") : t("confirmAuto")}
+            </button>
+          ) : null}
+          <button type="button" onClick={onClose} className="min-h-11 rounded-2xl text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
+            {done ? t("close") : t("cancel")}
+          </button>
         </div>
-        <header className="px-5 pb-2 pt-3">
-          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{page.box.name}</p>
-          <h2 id="trial-sheet-title" className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>
-            {done ? (done.status === "booked" ? t("doneBookedTitle") : t("doneRequestedTitle")) : t("sheetTitle")}
-          </h2>
-        </header>
-
-        <div className="flex-1 overflow-y-auto px-5 pb-4">
+      }
+    >
           {done ? (
             <div className="flex flex-col gap-3">
               <p className="text-sm" style={{ color: "var(--text-soft)" }}>
@@ -218,30 +223,6 @@ export function TrialSheet({
               ))}
             </div>
           )}
-        </div>
-
-        <footer className="flex flex-col gap-2 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3" style={{ borderTop: "1px solid var(--border)" }}>
-          {done ? (
-            <Link href={`/trials/${done.id}`} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-              {t("seeTrial")}
-            </Link>
-          ) : picked ? (
-            <button
-              type="button"
-              disabled={ask.isPending || !phoneValid}
-              onClick={() => ask.mutate()}
-              className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold disabled:opacity-60"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            >
-              {ask.isPending ? t("sending") : manual ? t("confirmManual") : t("confirmAuto")}
-            </button>
-          ) : null}
-          <button type="button" onClick={onClose} className="min-h-11 rounded-2xl text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
-            {done ? t("close") : t("cancel")}
-          </button>
-        </footer>
-      </section>
-    </div>,
-    document.body,
+    </Dialog>
   );
 }

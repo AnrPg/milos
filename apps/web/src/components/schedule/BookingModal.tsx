@@ -2,6 +2,7 @@
 
 
 import { useTranslations } from "next-intl";
+import { Dialog } from "@/components/ui/Dialog";
 
 type BookingModalProps = {
   title: string;
@@ -33,29 +34,15 @@ export function BookingModal({
   const common = useTranslations("Common");
 
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center px-4" style={{ background: "var(--scrim)" }}>
-      <div
-        className="w-full max-w-md rounded-[2rem] p-6 shadow-[var(--shadow-lg)]"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <p className="text-sm font-semibold uppercase tracking-[0.24em] text-[var(--primary)]">{t("confirm")}</p>
-        <h3 className="mt-3 text-2xl font-semibold" style={{ color: "var(--text)" }}>{title}</h3>
-        <p className="mt-3 text-sm leading-6" style={{ color: "var(--muted)" }}>{description}</p>
-
-        {onInputChange ? (
-          <label className="mt-5 block space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            <span>{inputLabel ?? t("message")}</span>
-            <textarea
-              className="min-h-28 w-full rounded-[1.2rem] px-4 py-3 text-sm outline-none"
-              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              onChange={(event) => onInputChange(event.target.value)}
-              placeholder={inputPlaceholder}
-              value={inputValue ?? ""}
-            />
-          </label>
-        ) : null}
-
-        <div className="mt-6 flex justify-end gap-3">
+    <Dialog
+      onClose={onCancel}
+      dismissible={!busy}
+      eyebrow={t("confirm")}
+      title={title}
+      size="md"
+      variant="center"
+      footer={
+        <div className="w-full flex justify-end gap-3">
           <button
             className="rounded-full px-4 py-2 text-sm font-semibold transition-colors"
             style={{ background: "var(--border)", color: "var(--text-soft)" }}
@@ -74,7 +61,22 @@ export function BookingModal({
             {busy ? t("working") : confirmLabel}
           </button>
         </div>
-      </div>
-    </div>
+      }
+    >
+        <p className="text-sm leading-6" style={{ color: "var(--muted)" }}>{description}</p>
+
+        {onInputChange ? (
+          <label className="mt-5 block space-y-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
+            <span>{inputLabel ?? t("message")}</span>
+            <textarea
+              className="min-h-28 w-full rounded-[1.2rem] px-4 py-3 text-sm outline-none"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+              onChange={(event) => onInputChange(event.target.value)}
+              placeholder={inputPlaceholder}
+              value={inputValue ?? ""}
+            />
+          </label>
+        ) : null}
+    </Dialog>
   );
 }

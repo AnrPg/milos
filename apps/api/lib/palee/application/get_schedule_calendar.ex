@@ -7,7 +7,7 @@ defmodule Palee.Application.GetScheduleCalendar do
   def call(%{organization_id: organization_id} = context, actor, params)
       when is_binary(organization_id) do
     with {:ok, window, days, class_type_ids} <- normalize_window(params) do
-      # ADR-177: a window given as dates covers the gym's own days.
+      # ADR-179: a window given as dates covers the gym's own days.
       zone = Organizations.organization_timezone(organization_id)
       {start_at, end_at} = window_bounds(window, days, zone)
 

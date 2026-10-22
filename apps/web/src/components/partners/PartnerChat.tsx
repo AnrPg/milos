@@ -27,6 +27,7 @@ import { PartnerPlanSheet } from "./PartnerPlanSheet";
 import { partnerErrorMessage } from "./errors";
 import { PARTNERS_FALLBACK_REFETCH_MS } from "./partners-realtime";
 import { usePartnerMatches, usePartnersToken } from "./use-partners";
+import { Popover } from "@/components/ui/Popover";
 
 type Confirm = "end" | "block" | null;
 
@@ -46,6 +47,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
   const matches = usePartnerMatches();
   const [draft, setDraft] = useState("");
   const [menu, setMenu] = useState(false);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [confirm, setConfirm] = useState<Confirm>(null);
   const [reporting, setReporting] = useState(false);
   const [planning, setPlanning] = useState(false);
@@ -137,6 +139,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
         {match ? (
           <div className="relative">
             <button
+              ref={menuButtonRef}
               type="button"
               aria-haspopup="menu"
               aria-expanded={menu}
@@ -147,12 +150,16 @@ export function PartnerChat({ matchId }: { matchId: string }) {
             >
               ⋯
             </button>
-            {menu ? (
-              <ul
-                role="menu"
-                className="absolute end-0 z-10 mt-1 flex w-56 flex-col overflow-hidden rounded-2xl"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-              >
+            <Popover
+              anchorRef={menuButtonRef}
+              open={menu}
+              onClose={() => setMenu(false)}
+              align="end"
+              width={224}
+              className="rounded-2xl"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+            >
+              <ul role="menu" aria-label={t("moreActions")} className="flex flex-col">
                 {match.status === "active" ? (
                   <MenuItem onClick={() => (setMenu(false), setConfirm("end"))}>{t("endMatch")}</MenuItem>
                 ) : null}
@@ -161,7 +168,7 @@ export function PartnerChat({ matchId }: { matchId: string }) {
                   <MenuItem danger onClick={() => (setMenu(false), setReporting(true))}>{t("report", { name })}</MenuItem>
                 ) : null}
               </ul>
-            ) : null}
+            </Popover>
           </div>
         ) : null}
       </div>

@@ -13,7 +13,7 @@ defmodule Palee.Identity.Account do
     :avatar_url,
     :preferred_locale,
     :preferred_theme_slug,
-    # ADR-177: the IANA zone the person's device last reported (nil: never).
+    # ADR-179: the IANA zone the person's device last reported (nil: never).
     :time_zone,
     # Nullable: accounts created before F-10 have none. Carried on the domain
     # struct so invitation email binding can be checked without reaching for

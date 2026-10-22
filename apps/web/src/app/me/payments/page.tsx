@@ -7,7 +7,7 @@
 
 import {useUiLocale} from "@/i18n/use-ui-locale";
 import {useUiTranslations} from "@/i18n/ui";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 
 import { fetchMyEntitlement, fetchMyFinance, getMyInvoiceDownloadUrl, type EffectiveEntitlement, type MyFinanceData } from "@/api/my-finance";
 import { useRouter } from "next/navigation";
@@ -23,6 +23,7 @@ import {
   formatDate,
   StatusBadge,
 } from "@/components/finance/MembershipEntitlement";
+import { Dialog } from "@/components/ui/Dialog";
 
 // ─── helpers ──────────────────────────────────────────────────────────────────
 
@@ -53,47 +54,17 @@ function PackageSidePanel({
 }) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
-  const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    function handleKey(e: KeyboardEvent) {
-      if (e.key === "Escape") onClose();
-    }
-    document.addEventListener("keydown", handleKey);
-    return () => document.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex justify-end"
-      style={{ background: "var(--scrim)" }}
-      onClick={(e) => {
-        if (e.target === e.currentTarget) onClose();
-      }}
+    <Dialog
+      onClose={onClose}
+      title={i18n("availablePackages48a5129")}
+      closeLabel={i18n("closebf5d9ce")}
+      variant="drawer"
+      size="sm"
+      panelStyle={{ background: "var(--panel-muted)" }}
+      bodyClassName="flex flex-col gap-5"
     >
-      <div
-        ref={ref}
-        className="flex flex-col h-full overflow-y-auto w-full max-w-sm"
-        style={{
-          background: "var(--panel-muted)",
-          borderInlineStart: "1px solid var(--border)",
-          padding: "2rem 1.5rem",
-          gap: "1.25rem",
-        }}
-      >
-        <div className="flex items-center justify-between">
-          <h2 className="text-base font-semibold" style={{ color: "var(--text)" }}>
-            {i18n("availablePackages48a5129")}
-          </h2>
-          <button
-            type="button"
-            onClick={onClose}
-            className="text-sm"
-            style={{ color: "var(--dim)" }}
-          >
-            {i18n("closebf5d9ce")}
-          </button>
-        </div>
+        
 
         {packages.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--dim)" }}>
@@ -150,8 +121,7 @@ function PackageSidePanel({
             );
           })
         )}
-      </div>
-    </div>
+    </Dialog>
   );
 }
 

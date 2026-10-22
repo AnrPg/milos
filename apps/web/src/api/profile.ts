@@ -51,7 +51,7 @@ export async function searchAllUsers(token: string, query: string) {
 }
 
 /**
- * ADR-177: tells the API which zone this device is in, so server-written
+ * ADR-179: tells the API which zone this device is in, so server-written
  * texts (push notifications) can add "your time" when it differs from the
  * organiser's clock. UTC aliases are ignored by the API.
  */

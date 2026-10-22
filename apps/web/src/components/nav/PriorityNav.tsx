@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
+import { Popover } from "@/components/ui/Popover";
+
 export type PriorityNavLink = { id: string; href: string; label: string };
 
 const GAP = 4;
@@ -22,7 +24,7 @@ export function PriorityNav({
 }) {
   const containerRef = useRef<HTMLDivElement>(null);
   const measureRef = useRef<HTMLDivElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
+  const moreButtonRef = useRef<HTMLButtonElement>(null);
   const [visibleCount, setVisibleCount] = useState(links.length);
   const [open, setOpen] = useState(false);
   const signature = links.map((link) => link.id + link.label).join("|");
@@ -57,22 +59,6 @@ export function PriorityNav({
     return () => observer.disconnect();
   }, [signature]);
 
-  useEffect(() => {
-    if (!open) return;
-    const close = (event: MouseEvent) => {
-      if (menuRef.current && !menuRef.current.contains(event.target as Node)) setOpen(false);
-    };
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", escape);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", escape);
-    };
-  }, [open]);
-
   const visible = links.slice(0, visibleCount);
   const overflow = links.slice(visibleCount);
   const overflowActive = overflow.some((link) => link.id === activeId);
@@ -94,9 +80,12 @@ export function PriorityNav({
         {visible.map((link) => {
           const active = link.id === activeId;
           return (
+            // Full prefetch: a click renders from the client cache with no
+            // server round trip (staleTimes in next.config.ts).
             <Link
               key={link.id}
               href={link.href}
+              prefetch
               aria-current={active ? "page" : undefined}
               className={pill}
               style={{ background: active ? "var(--border)" : "transparent", color: active ? "var(--text)" : "var(--dim)" }}
@@ -106,8 +95,9 @@ export function PriorityNav({
           );
         })}
         {overflow.length > 0 ? (
-          <div ref={menuRef} className="relative shrink-0">
+          <div className="relative shrink-0">
             <button
+              ref={moreButtonRef}
               type="button"
               aria-expanded={open}
               aria-haspopup="true"
@@ -120,15 +110,19 @@ export function PriorityNav({
             >
               {moreLabel} <span aria-hidden="true" className="text-xs">▾</span>
             </button>
-            {open ? (
-              <div
-                className="absolute start-0 top-full mt-1 w-52 max-w-[calc(100vw-1rem)] rounded-2xl py-1.5 shadow-[var(--shadow-lg)]"
-                style={{ background: "var(--panel)", border: "1px solid var(--border)", zIndex: 100 }}
-              >
+            <Popover
+              anchorRef={moreButtonRef}
+              open={open}
+              onClose={() => setOpen(false)}
+              width={208}
+              className="rounded-2xl py-1.5 shadow-[var(--shadow-lg)]"
+              style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
+            >
                 {overflow.map((link) => (
                   <Link
                     key={link.id}
                     href={link.href}
+                    prefetch
                     className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
                     style={{ color: link.id === activeId ? "var(--primary)" : "var(--text)" }}
                     onClick={() => setOpen(false)}
@@ -136,8 +130,7 @@ export function PriorityNav({
                     {link.label}
                   </Link>
                 ))}
-              </div>
-            ) : null}
+            </Popover>
           </div>
         ) : null}
       </div>

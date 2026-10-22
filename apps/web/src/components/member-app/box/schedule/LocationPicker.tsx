@@ -14,6 +14,7 @@ import { rememberSelectedOrganization } from "@/lib/organization-slug";
 
 import type { MapBounds } from "./PlacesMap";
 import { useRememberScheduleLocation } from "./use-schedule-preferences";
+import { Layer } from "@/components/ui/Layer";
 
 const PlacesMap = dynamic(() => import("./PlacesMap"), {
   ssr: false,
@@ -170,7 +171,8 @@ export function LocationPicker() {
   );
 
   return (
-    <main className="fixed inset-0 z-[60] flex flex-col" style={{ background: "var(--bg)" }}>
+    <Layer>
+    <main className="fixed inset-0 z-(--z-drawer) flex flex-col" style={{ background: "var(--bg)" }}>
       <header className="z-10 flex items-center gap-2 px-4 pb-2 pt-4" style={{ background: "var(--bg)" }}>
         <button
           type="button"
@@ -269,6 +271,7 @@ export function LocationPicker() {
         </section>
       </div>
     </main>
+    </Layer>
   );
 }
 

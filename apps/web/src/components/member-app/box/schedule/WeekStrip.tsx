@@ -24,7 +24,7 @@ export function WeekStrip({
   onSelect,
 }: {
   selectedDate: string;
-  /** ADR-177: the gym's today ("YYYY-MM-DD"); the device's when absent. */
+  /** ADR-179: the gym's today ("YYYY-MM-DD"); the device's when absent. */
   today?: string;
   onSelect: (isoDate: string) => void;
 }) {

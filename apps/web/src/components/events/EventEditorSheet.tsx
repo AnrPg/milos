@@ -113,7 +113,7 @@ export function EventEditorSheet({
   onClubChange?: (id: string) => void;
   /** The box whose photos the cover goes to; no cover without one. */
   coverSlug?: string | null;
-  /** ADR-177: the event's gym, whose clock the date and time are read on. */
+  /** ADR-179: the event's gym, whose clock the date and time are read on. */
   gymSlug?: string | null;
   onSubmit: (body: Body, scope: EventScope) => Promise<unknown>;
   onClose: () => void;
@@ -129,7 +129,7 @@ export function EventEditorSheet({
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [tried, setTried] = useState(false);
   const [zoneOpen, setZoneOpen] = useState(false);
-  // ADR-177: the date and time are on the event's clock: its own zone when
+  // ADR-179: the date and time are on the event's clock: its own zone when
   // it happens elsewhere, else the gym's (the device's while unknown).
   const gym = useOrganizationTimeZoneStatus(gymSlug);
   const clock = { ...form, timeZone: form.timeZone ?? gym.zone };

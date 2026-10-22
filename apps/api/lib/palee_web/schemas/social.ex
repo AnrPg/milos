@@ -114,7 +114,7 @@ defmodule PaleeWeb.Schemas.Social do
         followers_count: %Schema{type: :integer},
         time_zone: %Schema{
           type: :string,
-          description: "ADR-177: the gym's IANA zone; its classes show on this clock"
+          description: "ADR-179: the gym's IANA zone; its classes show on this clock"
         },
         locations: %Schema{type: :array, items: location()},
         open_clubs: %Schema{
@@ -169,7 +169,7 @@ defmodule PaleeWeb.Schemas.Social do
         end_at: @datetime,
         time_zone: %Schema{
           type: :string,
-          description: "ADR-177: the gym's IANA zone; the classes show on this clock"
+          description: "ADR-179: the gym's IANA zone; the classes show on this clock"
         },
         trial_offer: PaleeWeb.Schemas.Trials.offer(),
         slots: %Schema{type: :array, items: slot}

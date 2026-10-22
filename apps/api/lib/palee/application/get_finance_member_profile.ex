@@ -46,7 +46,7 @@ defmodule Palee.Application.GetFinanceMemberProfile do
     }
   end
 
-  # ADR-177: the gym's day inside a gym; the UTC day for the vendor's view.
+  # ADR-179: the gym's day inside a gym; the UTC day for the vendor's view.
   defp today(%{organization_id: organization_id}) when is_binary(organization_id),
     do: Palee.Organizations.local_today(organization_id)
 

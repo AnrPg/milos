@@ -143,6 +143,13 @@ describe("PRFormModal", () => {
   it("bounds the popup to the viewport and lets its contents scroll", () => {
     renderModal();
 
-    expect(screen.getByRole("dialog")).toHaveClass("max-h-[calc(100dvh-1rem)]", "overflow-y-auto");
+    // The shared dialog shell caps the panel to the viewport; only its body
+    // scrolls, so the save and cancel actions in the footer stay reachable.
+    const dialog = screen.getByRole("dialog");
+    expect(dialog).toHaveClass("max-h-full");
+    const footer = dialog.querySelector("footer")!;
+    expect(footer).toBeInTheDocument();
+    const body = dialog.querySelector(".overflow-y-auto")!;
+    expect(body).not.toContainElement(footer);
   });
 });

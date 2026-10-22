@@ -16,7 +16,7 @@ defmodule Palee.Notifications.Commands.DispatchNotification do
   # written inside the recipient's scope (TD-046). The outer organization
   # scope is preserved.
   #
-  # `reader` carries the recipient's `locale` and `time_zone` (ADR-177): the
+  # `reader` carries the recipient's `locale` and `time_zone` (ADR-179): the
   # texts are written in their language, and the times on the organiser's
   # clock plus theirs when it differs.
   def call(user_id, type, payload, reader \\ %{})

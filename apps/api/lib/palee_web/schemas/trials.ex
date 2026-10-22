@@ -144,7 +144,7 @@ defmodule PaleeWeb.Schemas.Trials do
           bring_note: @maybe_string,
           time_zone: %Schema{
             type: :string,
-            description: "ADR-177: the gym's IANA zone; the class shows on this clock"
+            description: "ADR-179: the gym's IANA zone; the class shows on this clock"
           },
           follow_up: %Schema{
             type: :boolean,

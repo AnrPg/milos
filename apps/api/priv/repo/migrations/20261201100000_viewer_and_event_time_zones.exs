@@ -1,6 +1,6 @@
 defmodule Palee.Repo.Migrations.ViewerAndEventTimeZones do
   @moduledoc """
-  ADR-177: the two clocks a stored UTC moment is read on besides the gym's.
+  ADR-179: the two clocks a stored UTC moment is read on besides the gym's.
 
     * `users.time_zone` - the IANA zone the person's device last reported,
       so push texts can add "your time" when it reads a moment differently.

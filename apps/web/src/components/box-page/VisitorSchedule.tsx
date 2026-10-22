@@ -10,10 +10,10 @@ import { fetchBoxSchedule, type PublicBoxPage, type PublicBoxSchedule } from "@/
 import { WeekStrip, weekStart } from "@/components/member-app/box/schedule/WeekStrip";
 import { TrialSheet } from "@/components/trials/TrialSheet";
 import type { TrialOffer } from "@/api/trials";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { addDaysToKey, dateKeyInZone, formatInZone, startOfDayInZone, zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
 import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Slot = PublicBoxSchedule["slots"][number];
 const ALL = "";
@@ -31,7 +31,7 @@ export function VisitorSchedule({ page, token, member }: { page: PublicBoxPage; 
   const tSchedule = useTranslations("BoxSchedule");
   const tTrials = useTranslations("Trials");
   const locale = useLocale();
-  // ADR-177: the gym's days and clock, wherever the visitor is.
+  // ADR-179: the gym's days and clock, wherever the visitor is.
   const zone = (page as { time_zone?: string | null }).time_zone ?? null;
   const [selectedDate, setSelectedDate] = useState(() => dateKeyInZone(new Date(), zone));
   const [type, setType] = useState(ALL);
@@ -270,7 +270,6 @@ function VisitorClassSheet({
   const tTrials = useTranslations("Trials");
   const tSchedule = useTranslations("BoxSchedule");
   const locale = useLocale();
-  const dialog = useModalFocusTrap<HTMLElement>(onClose);
   const start = new Date(slot.scheduled_at);
   const when = formatInZone(start, zone, locale, { weekday: "long", day: "numeric", month: "long" });
   const clock = zonedText(start, zone, locale, "time");
@@ -286,36 +285,21 @@ function VisitorClassSheet({
   ].filter(Boolean) as [string, string][];
 
   return (
-    <div className="fixed inset-0 z-[60] flex items-end justify-center" style={{ background: "var(--scrim)" }} onClick={onClose} role="presentation">
-      <section
-        ref={dialog}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="visitor-class-title"
-        onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[90dvh] w-full max-w-xl flex-col rounded-t-3xl"
-        style={{ background: "var(--panel)", borderTop: "1px solid var(--border)" }}
-      >
-        <div className="flex justify-center pt-2.5">
-          <span aria-hidden="true" className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
-        </div>
-        <div className="flex-1 overflow-y-auto px-5 pb-4 pt-2">
-          <h2 id="visitor-class-title" className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>{slot.name}</h2>
-          <p className="mt-1 text-sm font-semibold first-letter:uppercase" style={{ color: "var(--text-soft)" }}>
-            {when} · {clock}
-            <YourTime at={start} zone={zone} format="day-time" />
-            {slot.duration_minutes ? ` · ${tSchedule("minutes", { count: slot.duration_minutes })}` : ""}
-          </p>
-          <dl className="mt-4 grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
-            {facts.map(([term, value]) => (
-              <div key={term} className="contents">
-                <dt style={{ color: "var(--dim)" }}>{term}</dt>
-                <dd style={{ color: "var(--text)" }}>{value}</dd>
-              </div>
-            ))}
-          </dl>
-        </div>
-        <footer className="flex flex-col gap-2 px-5 pb-[max(1rem,env(safe-area-inset-bottom))] pt-3" style={{ borderTop: "1px solid var(--border)" }}>
+    <Dialog
+      onClose={onClose}
+      title={slot.name}
+      titleId="visitor-class-title"
+      description={
+        <span className="block font-semibold first-letter:uppercase">
+          {when} · {clock}
+          <YourTime at={start} zone={zone} format="day-time" />
+          {slot.duration_minutes ? ` · ${tSchedule("minutes", { count: slot.duration_minutes })}` : ""}
+        </span>
+      }
+      closeLabel={t("close")}
+      size="xl"
+      footer={
+        <div className="flex w-full flex-col gap-2">
           {memberHref ? (
             <Link href={memberHref} className="flex min-h-12 items-center justify-center rounded-2xl text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
               {t("bookAsMember")}
@@ -328,8 +312,17 @@ function VisitorClassSheet({
           <button type="button" onClick={onClose} className="min-h-11 rounded-2xl text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
             {t("close")}
           </button>
-        </footer>
-      </section>
-    </div>
+        </div>
+      }
+    >
+          <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm">
+            {facts.map(([term, value]) => (
+              <div key={term} className="contents">
+                <dt style={{ color: "var(--dim)" }}>{term}</dt>
+                <dd style={{ color: "var(--text)" }}>{value}</dd>
+              </div>
+            ))}
+          </dl>
+    </Dialog>
   );
 }

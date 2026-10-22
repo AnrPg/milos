@@ -1,6 +1,6 @@
 defmodule Palee.TimeZones.ZonedTime do
   @moduledoc """
-  One canonical clock, converted on demand (ADR-177).
+  One canonical clock, converted on demand (ADR-179).
 
   Every moment is stored once, in UTC. What a moment *means* to people
   depends on whose clock reads it:

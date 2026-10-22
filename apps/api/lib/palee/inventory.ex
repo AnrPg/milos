@@ -260,7 +260,7 @@ defmodule Palee.Inventory do
   def purge_tenant_data(context),
     do: Palee.TenantData.TableStore.purge(tenant_data_policy(), context)
 
-  # ADR-177: a machine's service date and the report's months follow the gym's day.
+  # ADR-179: a machine's service date and the report's months follow the gym's day.
   defp gym_today(%{organization_id: organization_id}) when is_binary(organization_id),
     do: Palee.Organizations.local_today(organization_id)
 

@@ -21,7 +21,7 @@ export function ClassRow({
   onOpen,
 }: {
   slot: ScheduleSlot;
-  /** ADR-177: the gym's zone; the class shows on its clock. */
+  /** ADR-179: the gym's zone; the class shows on its clock. */
   timeZone?: string | null;
   coachName: string | null;
   locationName: string | null;

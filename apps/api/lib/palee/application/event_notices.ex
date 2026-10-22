@@ -88,12 +88,12 @@ defmodule Palee.Application.EventNotices do
 
   @doc """
   When the event starts on the clock it is planned on («24/10 19:00»). Push
-  texts add each reader's own time when theirs differs (ADR-177).
+  texts add each reader's own time when theirs differs (ADR-179).
   """
   def event_when(%{starts_at: starts_at} = event),
     do: ZonedTime.format(starts_at, time_zone(event))
 
-  @doc "ADR-177: the event's zone: its own when held away, else its gym's."
+  @doc "ADR-179: the event's zone: its own when held away, else its gym's."
   def time_zone(%{organization_id: organization_id} = event),
     do: Community.event_time_zone(event, Organizations.organization_timezone(organization_id))
 end

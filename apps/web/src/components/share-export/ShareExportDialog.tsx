@@ -2,7 +2,6 @@
 
 import { useId, useState } from "react";
 
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import {
   generateExportFile,
   renderText,
@@ -10,6 +9,7 @@ import {
   type ExportFormat,
 } from "@/lib/document-export";
 import { openEmailAttachmentFallback } from "@/lib/share-export-delivery";
+import { Dialog } from "@/components/ui/Dialog";
 
 export type ShareExportCopy = {
   title: string;
@@ -111,7 +111,6 @@ export function ShareExportDialog({
   const [status, setStatus] = useState<string | null>(null);
   const titleId = useId();
   const formatHelpId = useId();
-  const dialogRef = useModalFocusTrap<HTMLDivElement>(onClose);
 
   async function prepareFile() {
     setStatus(copy.working);
@@ -168,43 +167,18 @@ export function ShareExportDialog({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-[80] flex items-end justify-center p-3 sm:items-center sm:p-6"
-      style={{ background: "var(--scrim)", backdropFilter: "blur(8px)" }}
-      onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
-      role="presentation"
+    <Dialog
+      onClose={onClose}
+      eyebrow={<>{document.icon} {document.category}</>}
+      title={copy.title}
+      titleId={titleId}
+      description={<span className="block truncate">{document.title}</span>}
+      closeLabel={copy.close}
+      size="lg"
     >
-      <div
-        ref={dialogRef}
-        aria-labelledby={titleId}
-        aria-modal="true"
-        className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-[1.5rem] p-5 outline-none sm:p-6"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", boxShadow: "var(--shadow-lg)" }}
-        role="dialog"
-        tabIndex={-1}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--primary)" }}>
-              {document.icon} {document.category}
-            </p>
-            <h2 id={titleId} className="mt-1 truncate text-2xl font-bold" style={{ color: "var(--text)" }}>
-              {copy.title}
-            </h2>
-            <p className="mt-1 truncate text-sm" style={{ color: "var(--muted)" }}>{document.title}</p>
-          </div>
-          <button
-            aria-label={copy.close}
-            className="shrink-0 rounded-full px-3 py-1.5 text-xs font-semibold"
-            style={{ background: "var(--border)", color: "var(--muted)" }}
-            onClick={onClose}
-            type="button"
-          >
-            {copy.close}
-          </button>
-        </div>
+        
 
-        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+        <div className="grid gap-4 sm:grid-cols-2">
           <label className="space-y-2 text-sm font-bold" style={{ color: "var(--text)" }}>
             <span>{copy.chooseFormat}</span>
             <select
@@ -245,7 +219,6 @@ export function ShareExportDialog({
         <p aria-live="polite" className="mt-4 min-h-5 text-center text-xs font-semibold" style={{ color: "var(--muted)" }}>
           {status}
         </p>
-      </div>
-    </div>
+    </Dialog>
   );
 }

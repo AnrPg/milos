@@ -46,8 +46,9 @@ import {
 } from "@/components/schedule/member-booking";
 import { zonedText } from "@/lib/zoned-time";
 import { YourTime } from "@/components/zoned-time";
+import { Dialog } from "@/components/ui/Dialog";
 
-// ADR-177: on the gym's clock (`zone`), its city added when the viewer's differs.
+// ADR-179: on the gym's clock (`zone`), its city added when the viewer's differs.
 function formatDateTime(locale: string, isoString: string, zone: string | null) {
   return zonedText(isoString, zone, locale, {
     weekday: "long",
@@ -77,7 +78,7 @@ function timeoutMinutesLabel(timeoutMinutes: number) {
 
 type SlotPopupProps = {
   slot: ScheduleSlot;
-  /** ADR-177: the gym's zone; the class shows on its clock. */
+  /** ADR-179: the gym's zone; the class shows on its clock. */
   timeZone?: string | null;
   isAdmin: boolean;
   accessToken: string;
@@ -252,18 +253,16 @@ export function SlotPopup({
   const typeColor = workoutTypeColor(slot.class_type.slug);
 
   return (
-    <div
-      className="fixed inset-0 z-30 flex justify-end"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-      role="presentation"
-    >
-      <div
-        className="h-full w-full max-w-xl overflow-y-auto"
-        style={{ background: "var(--panel)", borderInlineStart: "1px solid var(--border)", paddingTop: "3.25rem" }}
-        onClick={(e) => e.stopPropagation()}
+    <>
+      <Dialog
+        onClose={onClose}
+        bare
+        variant="drawer"
+        size="xl"
+        ariaLabel={slot.class_type.name}
+        panelClassName="overflow-y-auto"
       >
-        {/* Sticky header — clears the top nav bar */}
+        {/* Sticky header */}
         <div
           className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 py-4"
           style={{ background: "var(--panel)", borderBottom: "1px solid var(--border)" }}
@@ -807,7 +806,7 @@ export function SlotPopup({
             />
           ) : null}
         </div>
-      </div>
+      </Dialog>
 
       {editWorkoutOpen && slot.workout && isAdmin ? (
         <WorkoutEditModal
@@ -818,6 +817,6 @@ export function SlotPopup({
           onClose={() => setEditWorkoutOpen(false)}
         />
       ) : null}
-    </div>
+    </>
   );
 }

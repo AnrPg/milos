@@ -56,7 +56,7 @@ export function MemberSchedule({ initialOpenSlotId = null }: { initialOpenSlotId
   const token = tokens?.access_token ?? null;
   const { membership } = useSelectedMembershipRole();
   const organizationId = membership?.organization.id ?? null;
-  // ADR-177: days and times are the gym's own, wherever the member is.
+  // ADR-179: days and times are the gym's own, wherever the member is.
   const gymZone = (membership?.organization as { timezone?: string | null } | undefined)?.timezone ?? null;
   const localDay = useCallback((iso: string | Date) => dateKeyInZone(iso, gymZone), [gymZone]);
   const prefs = useSchedulePreferences(token, organizationId);

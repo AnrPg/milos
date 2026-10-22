@@ -37,7 +37,7 @@ defmodule Palee.Gamification.Commands.RecordWorkoutCompletion do
       )
 
     pr_scores = PRDetector.detect(current_scores, previous_scores)
-    # ADR-177: days are the person's own (their device's zone).
+    # ADR-179: days are the person's own (their device's zone).
     zone = person_zone(account)
 
     completed_dates =

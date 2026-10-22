@@ -49,7 +49,7 @@ export function MonthGrid({
   onSelect,
 }: {
   selectedDate: string;
-  /** ADR-177: the gym's today ("YYYY-MM-DD"); the device's when absent. */
+  /** ADR-179: the gym's today ("YYYY-MM-DD"); the device's when absent. */
   today?: string;
   counts: Map<string, DayCount>;
   onSelect: (isoDate: string) => void;

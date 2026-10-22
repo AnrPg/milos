@@ -28,9 +28,12 @@ export function SectionTabs({
       {group.tabs.map((tab) => {
         const current = tab.id === active;
         return (
+          // Full prefetch: switching tabs renders from the client cache with
+          // no server round trip (staleTimes in next.config.ts).
           <Link
             key={tab.id}
             href={hrefFor(tab.href, tab.scoped)}
+            prefetch
             aria-current={current ? "page" : undefined}
             className="shrink-0 whitespace-nowrap rounded-full px-3 py-1 text-xs font-semibold transition-colors"
             style={{

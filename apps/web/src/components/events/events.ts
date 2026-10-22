@@ -66,7 +66,7 @@ export function formatPrice(cents: number, currency: string, locale: string): st
 
 /**
  * The date block of a row: short weekday (upper case) over the day of the
- * month, on the event's own clock (ADR-177: `timeZone` is the event's zone).
+ * month, on the event's own clock (ADR-179: `timeZone` is the event's zone).
  */
 export function dateBlock(iso: string, locale: string, timeZone?: string | null) {
   const zone = isValidTimeZone(timeZone) ? timeZone : undefined;
@@ -81,7 +81,7 @@ export function dateBlock(iso: string, locale: string, timeZone?: string | null)
 
 /**
  * «19:00» on the event's clock; «19:00 Athens» when the viewer's clock reads
- * it differently (ADR-177). Without a zone, the device's clock.
+ * it differently (ADR-179). Without a zone, the device's clock.
  */
 export function formatTime(iso: string, locale: string, timeZone?: string | null) {
   return zonedText(iso, timeZone, locale, "time");
@@ -164,7 +164,7 @@ export type EventForm = {
   repeatUntil: string;
   coverMediaId: string | null;
   /**
-   * ADR-177: the clock the date and time are read on: the gym's, or the
+   * ADR-179: the clock the date and time are read on: the gym's, or the
    * event's own when it happens elsewhere. Null: this device's clock.
    */
   timeZone: string | null;
@@ -237,7 +237,7 @@ export function eventRequest(
     good_for_friends: !group && (form.openToAll || form.guestPass) && form.goodForFriends,
     cover_media_id: form.coverMediaId,
   };
-  // ADR-177: an event's own zone only when it differs from its gym's; while
+  // ADR-179: an event's own zone only when it differs from its gym's; while
   // the gym's zone is unknown here, the stored one is left as it is.
   if (gymTimeZone) body.time_zone = form.timeZone && form.timeZone !== gymTimeZone ? form.timeZone : null;
   if (!editing && form.repeatWeekly) body.repeat_until = form.repeatUntil;

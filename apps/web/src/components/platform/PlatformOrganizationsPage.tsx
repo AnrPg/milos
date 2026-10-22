@@ -35,6 +35,7 @@ import { platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purg
 import { platformOrganizationSlugCopy } from "@/i18n/platform-organization-slug";
 import { platformOrganizationsCopy } from "@/i18n/platform-organizations";
 import { membershipWorkspaceHref, rememberSelectedOrganization } from "@/lib/organization-slug";
+import { Dialog } from "@/components/ui/Dialog";
 
 const defaultForm: ProvisionOrganizationInput = {
   name: "",
@@ -575,7 +576,7 @@ function TextField({ label, value, onChange, type = "text", ...inputProps }: {
   );
 }
 
-/** ADR-177: a live gym whose clock is still a guess (inferred or default). */
+/** ADR-179: a live gym whose clock is still a guess (inferred or default). */
 function zoneUnconfirmed(entry: PlatformOrganization) {
   return entry.organization.status === "active" && entry.settings?.timezone_source !== "confirmed";
 }
@@ -664,16 +665,16 @@ function AccessDialog({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.accessTitle}>
-      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-[var(--text)]">{copy.accessTitle}</h2>
-            <p className="mt-1 text-sm text-[var(--text-soft)]">{organization.organization.name}</p>
-          </div>
-          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">{copy.cancel}</button>
-        </div>
-
+    <Dialog
+      onClose={onCancel}
+      title={copy.accessTitle}
+      ariaLabel={copy.accessTitle}
+      description={organization.organization.name}
+      size="3xl"
+      variant="center"
+      showClose={false}
+      headerActions={<button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">{copy.cancel}</button>}
+    >
         {error ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{error}</p> : null}
         {accessQuery.isError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.accessError}</p> : null}
 
@@ -738,8 +739,7 @@ function AccessDialog({
             </div>
           ))}
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 
@@ -808,13 +808,24 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
   onSubmit: (event: React.FormEvent<HTMLFormElement>) => Promise<void>;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.create}>
-      <form
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto bg-[var(--surface)] p-6 shadow-xl"
-        onSubmit={onSubmit}
-      >
-        <h2 className="text-xl font-semibold text-[var(--text)]">{copy.create}</h2>
-        <div className="mt-5 space-y-4">
+    <Dialog
+      onClose={onCancel}
+      title={copy.create}
+      closeLabel={copy.cancel}
+      ariaLabel={copy.create}
+      size="lg"
+      variant="center"
+      onSubmit={onSubmit}
+      footer={
+        <div className="w-full flex justify-end gap-3">
+          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
+          <button type="submit" disabled={submitting} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
+            {submitting ? copy.provisioning : copy.provision}
+          </button>
+        </div>
+      }
+    >
+        <div className="space-y-4">
           <TextField label={copy.name} value={form.name} required onChange={(name) => onChange({ ...form, name })} />
           <TextField label={copy.slug} value={form.slug ?? ""} onChange={(slug) => onChange({ ...form, slug })} />
           <TextField label={copy.timezone} value={form.timezone} required onChange={(timezone) => onChange({ ...form, timezone })} />
@@ -831,14 +842,7 @@ function ProvisionDialog({ copy, form, submitting, onCancel, onChange, onSubmit 
           <TextField label={copy.brandName} value={form.brand_name ?? ""} onChange={(brand_name) => onChange({ ...form, brand_name })} />
           <TextField label={copy.brandLogo} type="url" value={form.brand_logo_url ?? ""} onChange={(brand_logo_url) => onChange({ ...form, brand_logo_url })} />
         </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="submit" disabled={submitting} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">
-            {submitting ? copy.provisioning : copy.provision}
-          </button>
-        </div>
-      </form>
-    </div>
+    </Dialog>
   );
 }
 
@@ -850,19 +854,25 @@ function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: 
   onConfirm: () => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.archiveTitle}>
-      <div className="w-full max-w-md bg-[var(--surface)] p-6 shadow-xl">
-        <h2 className="text-xl font-semibold text-[var(--text)]">{copy.archiveTitle}</h2>
-        <p className="mt-2 font-semibold text-[var(--text)]">{organization.organization.name}</p>
-        <p className="mt-3 text-sm leading-6 text-[var(--text-soft)]">{copy.archiveBody}</p>
-        <div className="mt-6 flex justify-end gap-3">
+    <Dialog
+      onClose={onCancel}
+      title={copy.archiveTitle}
+      closeLabel={copy.cancel}
+      ariaLabel={copy.archiveTitle}
+      size="md"
+      variant="center"
+      footer={
+        <div className="w-full flex justify-end gap-3">
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
           <button type="button" disabled={submitting} onClick={onConfirm} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
             {copy.archiveConfirm}
           </button>
         </div>
-      </div>
-    </div>
+      }
+    >
+        <p className="font-semibold text-[var(--text)]">{organization.organization.name}</p>
+        <p className="mt-3 text-sm leading-6 text-[var(--text-soft)]">{copy.archiveBody}</p>
+    </Dialog>
   );
 }
 
@@ -883,18 +893,27 @@ function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onL
   );
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.settings}>
-      <form
-        className="max-h-[90vh] w-full max-w-lg overflow-y-auto bg-[var(--surface)] p-6 shadow-xl"
-        onSubmit={async (event) => {
+    <Dialog
+      onClose={onCancel}
+      title={organization.organization.name}
+      closeLabel={copy.cancel}
+      ariaLabel={copy.settings}
+      size="lg"
+      variant="center"
+      onSubmit={async (event) => {
           event.preventDefault();
           setSaving(true);
           await onSave(name, settings);
           setSaving(false);
         }}
-      >
-        <h2 className="text-xl font-semibold text-[var(--text)]">{organization.organization.name}</h2>
-        <div className="mt-5 space-y-4">
+      footer={
+        <div className="w-full flex justify-end gap-3">
+          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
+          <button type="submit" disabled={saving} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">{saving ? copy.saving : copy.saveSettings}</button>
+        </div>
+      }
+    >
+        <div className="space-y-4">
           <TextField label={copy.name} value={name} required onChange={setName} />
           <TextField label={copy.timezone} value={settings.timezone} required onChange={(timezone) => setSettings({ ...settings, timezone })} />
           <TextField label={copy.locale} value={settings.default_locale} required onChange={(default_locale) => setSettings({ ...settings, default_locale })} />
@@ -921,11 +940,6 @@ function SettingsDialog({ accessToken, copy, organization, onCancel, onSave, onL
             </div>
           ) : null}
         </div>
-        <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="submit" disabled={saving} className="bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-[var(--primary-contrast)] disabled:opacity-50">{saving ? copy.saving : copy.saveSettings}</button>
-        </div>
-      </form>
-    </div>
+    </Dialog>
   );
 }

@@ -2363,7 +2363,7 @@
                 "type": "string"
               },
               "time_zone": {
-                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                 "type": "string"
               },
               "time_zone_confirmed": {
@@ -2747,7 +2747,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                       "type": "string"
                     },
                     "time_zone_confirmed": {
@@ -3421,7 +3421,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -4221,7 +4221,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -5386,7 +5386,7 @@
                     "type": "string"
                   },
                   "time_zone": {
-                    "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                    "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                     "type": "string"
                   },
                   "time_zone_confirmed": {
@@ -6029,7 +6029,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -7245,7 +7245,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -7774,7 +7774,7 @@
                                   "type": "string"
                                 },
                                 "time_zone": {
-                                  "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                  "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                   "type": "string"
                                 },
                                 "time_zone_confirmed": {
@@ -8705,7 +8705,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -9234,7 +9234,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -19656,7 +19656,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
             "type": "string"
           },
           "time_zone_confirmed": {
@@ -20733,7 +20733,7 @@
                 "type": "string"
               },
               "time_zone": {
-                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                 "type": "string"
               },
               "time_zone_confirmed": {
@@ -21036,7 +21036,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+            "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
             "maxLength": 100,
             "nullable": true,
             "type": "string"
@@ -21382,7 +21382,7 @@
                 "type": "string"
               },
               "time_zone": {
-                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                 "type": "string"
               },
               "time_zone_confirmed": {
@@ -21619,7 +21619,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+            "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
             "maxLength": 100,
             "nullable": true,
             "type": "string"
@@ -21961,7 +21961,7 @@
                   "type": "string"
                 },
                 "time_zone": {
-                  "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                  "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                   "type": "string"
                 },
                 "time_zone_confirmed": {
@@ -22469,7 +22469,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                       "type": "string"
                     },
                     "time_zone_confirmed": {
@@ -23096,7 +23096,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                       "type": "string"
                     },
                     "time_zone_confirmed": {
@@ -25398,7 +25398,7 @@
                 "type": "string"
               },
               "time_zone": {
-                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                 "type": "string"
               },
               "time_zone_confirmed": {
@@ -25947,7 +25947,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
             "type": "string"
           },
           "time_zone_confirmed": {
@@ -26477,7 +26477,7 @@
                     "type": "string"
                   },
                   "time_zone": {
-                    "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                    "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                     "type": "string"
                   },
                   "time_zone_confirmed": {
@@ -38793,7 +38793,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+            "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
             "type": "string"
           },
           "user_id": {
@@ -39017,7 +39017,7 @@
                 "type": "string"
               },
               "time_zone": {
-                "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                 "type": "string"
               },
               "user_id": {
@@ -39249,7 +39249,7 @@
                   "type": "string"
                 },
                 "time_zone": {
-                  "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                  "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                   "type": "string"
                 },
                 "user_id": {
@@ -42736,7 +42736,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                       "type": "string"
                     },
                     "time_zone_confirmed": {
@@ -46039,7 +46039,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                      "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                       "type": "string"
                     },
                     "time_zone_confirmed": {
@@ -46788,7 +46788,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: the gym's IANA zone; its classes show on this clock",
+            "description": "ADR-179: the gym's IANA zone; its classes show on this clock",
             "type": "string"
           }
         },
@@ -46944,7 +46944,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: the gym's IANA zone; the classes show on this clock",
+            "description": "ADR-179: the gym's IANA zone; the classes show on this clock",
             "type": "string"
           },
           "trial_offer": {
@@ -50898,7 +50898,7 @@
             "type": "object"
           },
           "time_zone": {
-            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
             "type": "string"
           },
           "time_zone_confirmed": {
@@ -51824,7 +51824,7 @@
                 "type": "object"
               },
               "time_zone": {
-                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                 "type": "string"
               },
               "time_zone_confirmed": {
@@ -51995,7 +51995,7 @@
             "type": "string"
           },
           "time_zone": {
-            "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+            "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
             "maxLength": 100,
             "nullable": true,
             "type": "string"
@@ -52875,7 +52875,7 @@
                 "type": "object"
               },
               "time_zone": {
-                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                 "type": "string"
               },
               "time_zone_confirmed": {
@@ -53321,7 +53321,7 @@
             "type": "object"
           },
           "time_zone": {
-            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
             "type": "string"
           },
           "time_zone_confirmed": {
@@ -53738,7 +53738,7 @@
                   "type": "object"
                 },
                 "time_zone": {
-                  "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                  "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                   "type": "string"
                 },
                 "time_zone_confirmed": {
@@ -57732,7 +57732,7 @@
                 "type": "string"
               },
               "time_zone": {
-                "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                 "type": "string"
               },
               "user_id": {
@@ -62633,7 +62633,7 @@
                                         "type": "string"
                                       },
                                       "time_zone": {
-                                        "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                        "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                         "type": "string"
                                       },
                                       "time_zone_confirmed": {
@@ -63162,7 +63162,7 @@
                                             "type": "string"
                                           },
                                           "time_zone": {
-                                            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                             "type": "string"
                                           },
                                           "time_zone_confirmed": {
@@ -63953,7 +63953,7 @@
                                     "type": "string"
                                   },
                                   "time_zone": {
-                                    "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                    "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                     "type": "string"
                                   },
                                   "time_zone_confirmed": {
@@ -64753,7 +64753,7 @@
                                         "type": "string"
                                       },
                                       "time_zone": {
-                                        "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                        "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                         "type": "string"
                                       },
                                       "time_zone_confirmed": {
@@ -65084,11 +65084,11 @@
                           "type": "string"
                         },
                         "timezone": {
-                          "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
                         },
                         "timezone_confirmed": {
-                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                           "type": "boolean"
                         }
                       },
@@ -65165,11 +65165,11 @@
                           "type": "string"
                         },
                         "timezone": {
-                          "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
                         },
                         "timezone_confirmed": {
-                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                           "type": "boolean"
                         }
                       },
@@ -65260,6 +65260,79 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
+                    },
+                    "user": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_tours": {
+                          "items": {
+                            "enum": [
+                              "admin",
+                              "member",
+                              "athlete"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        },
+                        "preferred_locale": {
+                          "enum": [
+                            "en",
+                            "el",
+                            "ar",
+                            "ru",
+                            "de",
+                            "es",
+                            "pt-PT",
+                            "he",
+                            "it",
+                            "bg",
+                            "nl",
+                            "fr"
+                          ],
+                          "type": "string"
+                        },
+                        "preferred_theme_slug": {
+                          "description": "The member's own theme: graphite (dark) or frost (light); null is frost",
+                          "enum": [
+                            "frost",
+                            "graphite",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the zone this account's device last reported",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vendor": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "role",
+                        "vendor",
+                        "preferred_locale",
+                        "completed_tours"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -65433,7 +65506,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the zone this account's device last reported",
+                      "description": "ADR-179: the zone this account's device last reported",
                       "nullable": true,
                       "type": "string"
                     },
@@ -65538,6 +65611,79 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
+                    },
+                    "user": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_tours": {
+                          "items": {
+                            "enum": [
+                              "admin",
+                              "member",
+                              "athlete"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        },
+                        "preferred_locale": {
+                          "enum": [
+                            "en",
+                            "el",
+                            "ar",
+                            "ru",
+                            "de",
+                            "es",
+                            "pt-PT",
+                            "he",
+                            "it",
+                            "bg",
+                            "nl",
+                            "fr"
+                          ],
+                          "type": "string"
+                        },
+                        "preferred_theme_slug": {
+                          "description": "The member's own theme: graphite (dark) or frost (light); null is frost",
+                          "enum": [
+                            "frost",
+                            "graphite",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "time_zone": {
+                          "description": "ADR-179: the zone this account's device last reported",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "vendor": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "role",
+                        "vendor",
+                        "preferred_locale",
+                        "completed_tours"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -67140,7 +67286,7 @@
                             "type": "string"
                           },
                           "time_zone": {
-                            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                             "type": "string"
                           },
                           "time_zone_confirmed": {
@@ -67722,7 +67868,7 @@
                                 "type": "string"
                               },
                               "time_zone": {
-                                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                 "type": "string"
                               },
                               "time_zone_confirmed": {
@@ -68095,7 +68241,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the gym's IANA zone; the classes show on this clock",
+                      "description": "ADR-179: the gym's IANA zone; the classes show on this clock",
                       "type": "string"
                     },
                     "trial_offer": {
@@ -68467,7 +68613,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -73942,7 +74088,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -79441,7 +79587,7 @@
                             "type": "string"
                           },
                           "time_zone": {
-                            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                             "type": "string"
                           },
                           "time_zone_confirmed": {
@@ -79612,7 +79758,7 @@
                     "type": "string"
                   },
                   "time_zone": {
-                    "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
                     "maxLength": 100,
                     "nullable": true,
                     "type": "string"
@@ -79966,7 +80112,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -80862,7 +81008,7 @@
                             "type": "string"
                           },
                           "time_zone": {
-                            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                             "type": "string"
                           },
                           "time_zone_confirmed": {
@@ -81447,7 +81593,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -82406,7 +82552,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -83093,7 +83239,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -83780,7 +83926,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -87716,7 +87862,7 @@
                             "type": "string"
                           },
                           "time_zone": {
-                            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                             "type": "string"
                           },
                           "time_zone_confirmed": {
@@ -88137,7 +88283,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -88304,7 +88450,7 @@
                     "type": "string"
                   },
                   "time_zone": {
-                    "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
                     "maxLength": 100,
                     "nullable": true,
                     "type": "string"
@@ -88653,7 +88799,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -89088,7 +89234,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -89583,7 +89729,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -90160,7 +90306,7 @@
                                 "type": "string"
                               },
                               "time_zone": {
-                                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                 "type": "string"
                               },
                               "time_zone_confirmed": {
@@ -90787,7 +90933,7 @@
                                 "type": "string"
                               },
                               "time_zone": {
-                                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                 "type": "string"
                               },
                               "time_zone_confirmed": {
@@ -100298,7 +100444,7 @@
             "bearerAuth": []
           }
         ],
-        "summary": "Report the zone this account's device is in (ADR-177)",
+        "summary": "Report the zone this account's device is in (ADR-179)",
         "tags": [
           "Me"
         ]
@@ -100738,7 +100884,7 @@
                             "type": "string"
                           },
                           "time_zone": {
-                            "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                            "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                             "type": "string"
                           },
                           "user_id": {
@@ -101006,7 +101152,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -101292,7 +101438,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -101759,7 +101905,7 @@
                           "type": "string"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the gym's IANA zone; the class shows on this clock",
+                          "description": "ADR-179: the gym's IANA zone; the class shows on this clock",
                           "type": "string"
                         },
                         "user_id": {
@@ -104751,11 +104897,11 @@
                             "type": "string"
                           },
                           "timezone": {
-                            "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                            "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                             "type": "string"
                           },
                           "timezone_confirmed": {
-                            "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                            "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                             "type": "boolean"
                           }
                         },
@@ -104889,11 +105035,11 @@
                           "type": "string"
                         },
                         "timezone": {
-                          "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
                         },
                         "timezone_confirmed": {
-                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                           "type": "boolean"
                         }
                       },
@@ -104998,11 +105144,11 @@
                           "type": "string"
                         },
                         "timezone": {
-                          "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
                         },
                         "timezone_confirmed": {
-                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                           "type": "boolean"
                         }
                       },
@@ -105146,11 +105292,11 @@
                           "type": "string"
                         },
                         "timezone": {
-                          "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
                         },
                         "timezone_confirmed": {
-                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                           "type": "boolean"
                         }
                       },
@@ -112990,7 +113136,7 @@
                             "type": "object"
                           },
                           "time_zone": {
-                            "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                            "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                             "type": "string"
                           },
                           "time_zone_confirmed": {
@@ -113156,7 +113302,7 @@
                     "type": "string"
                   },
                   "time_zone": {
-                    "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
                     "maxLength": 100,
                     "nullable": true,
                     "type": "string"
@@ -114044,7 +114190,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -115016,7 +115162,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -115209,7 +115355,7 @@
                     "type": "string"
                   },
                   "time_zone": {
-                    "description": "ADR-177: an IANA zone for an event held away from its gym; null keeps the gym's",
+                    "description": "ADR-179: an IANA zone for an event held away from its gym; null keeps the gym's",
                     "maxLength": 100,
                     "nullable": true,
                     "type": "string"
@@ -116091,7 +116237,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -117068,7 +117214,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -118064,7 +118210,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -119066,7 +119212,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -120060,7 +120206,7 @@
                           "type": "object"
                         },
                         "time_zone": {
-                          "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                          "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                           "type": "string"
                         },
                         "time_zone_confirmed": {
@@ -161898,7 +162044,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -162857,7 +163003,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -163544,7 +163690,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -164231,7 +164377,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -166735,11 +166881,11 @@
                           "type": "string"
                         },
                         "timezone": {
-                          "description": "ADR-177 (memberships only): the gym's IANA zone; its classes and events show on this clock",
+                          "description": "ADR-179 (memberships only): the gym's IANA zone; its classes and events show on this clock",
                           "type": "string"
                         },
                         "timezone_confirmed": {
-                          "description": "ADR-177 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
+                          "description": "ADR-179 (memberships only): an admin confirmed the zone (else it is a guess or the default)",
                           "type": "boolean"
                         }
                       },
@@ -190089,7 +190235,7 @@
                                 "type": "string"
                               },
                               "time_zone": {
-                                "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                                "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                                 "type": "string"
                               },
                               "time_zone_confirmed": {
@@ -194821,7 +194967,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -195780,7 +195926,7 @@
                               "type": "string"
                             },
                             "time_zone": {
-                              "description": "ADR-177: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
+                              "description": "ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock",
                               "type": "string"
                             },
                             "time_zone_confirmed": {
@@ -196913,7 +197059,7 @@
                       "type": "string"
                     },
                     "time_zone": {
-                      "description": "ADR-177: the gym's IANA zone; its classes show on this clock",
+                      "description": "ADR-179: the gym's IANA zone; its classes show on this clock",
                       "type": "string"
                     }
                   },
