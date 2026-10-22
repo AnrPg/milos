@@ -21,9 +21,9 @@ defmodule Palee.Workouts.Domain.WorkoutAssistant.Contract do
   @exercise_keys ~w(name sets reps duration_seconds calories distance_meters load_kg load_percent_1rm bodyweight rest_seconds tempo note)
   @prescription_keys ~w(reps duration_seconds calories distance_meters)
   @load_keys ~w(load_kg load_percent_1rm bodyweight)
-  @issue_keys ~w(path severity message suggestion_label suggested_value find_text replace_text)
+  @issue_keys ~w(path severity message suggestion_label suggested_value find_text replace_text source_text)
   @missing_keys ~w(path reason suggested_value insert_text)
-  @assumption_keys ~w(path message)
+  @assumption_keys ~w(path message source_text)
   @max_violations 40
 
   @doc "Returns a list of `%{\"path\" => ..., \"problem\" => ...}` (empty when valid)."

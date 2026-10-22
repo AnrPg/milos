@@ -212,10 +212,10 @@ defmodule Palee.Infrastructure.Workouts.GeminiPrompts do
       (each section must also satisfy the JSON Schema of its format)
       "issues": [{"path": string, "severity": "error"|"warning", "message": string,
                   "suggestion_label": string, "suggested_value": string,
-                  "find_text": string, "replace_text": string}],
+                  "find_text": string, "replace_text": string, "source_text": string}],
       "missing_fields": [{"path": string, "reason": string, "suggested_value": string,
                           "insert_text": string}],
-      "assumptions": [{"path": string, "message": string}]
+      "assumptions": [{"path": string, "message": string, "source_text": string}]
     }
     Paths use dot notation with zero-based indexes: "workout.title",
     "sections.1.format", "sections.1.timer.interval_seconds",
@@ -230,6 +230,9 @@ defmodule Palee.Infrastructure.Workouts.GeminiPrompts do
     reason and an insert_text line in the coach's own style.
     assumptions: values you inferred; each path must point at the field that
     holds the inferred value.
+    source_text (issues and assumptions): the few words of the coach's text
+    the entry is about, copied character for character, so the editor can
+    mark them; leave it out when no words in the text are concerned.
 
     Write every message, label, reason, assumption and insert_text in
     #{language(locale)}.

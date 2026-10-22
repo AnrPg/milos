@@ -247,6 +247,90 @@ defmodule PaleeWeb.AdminWorkoutControllerTest do
       assert workout["available_scale_levels"] == []
     end
 
+    test "ADR-180: publishes a workout written in text sections, a timer each", %{conn: conn} do
+      {admin_conn, organization} = authenticate_as_admin(conn, "sectioned_text_author")
+      base = "/api/org/#{organization.slug}/admin/workouts"
+
+      draft_id =
+        admin_conn |> post(base) |> json_response(201) |> get_in(["draft", "id"])
+
+      sections = [
+        %{
+          name: "Strength",
+          order: 1,
+          exercises: [],
+          free_text_body: "Back squat 5x5 @ 75%",
+          timer_preset: %{format: "emom", interval_seconds: 120, rounds: 5}
+        },
+        %{
+          name: "",
+          order: 2,
+          exercises: [],
+          free_text_body: "21-15-9\nThrusters\nPull-ups",
+          timer_preset: nil
+        }
+      ]
+
+      draft_payload = %{
+        title: "Sectioned Friday",
+        type: "crossfit",
+        authoring_mode: "sectioned_text",
+        expected_source_revision: 0,
+        sections: sections
+      }
+
+      admin_conn
+      |> recycle()
+      |> put_req_header("content-type", "application/json")
+      |> patch("#{base}/#{draft_id}/draft", Jason.encode!(draft_payload))
+      |> json_response(200)
+
+      # The second section has no timer yet: publishing names it.
+      rejected =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post("#{base}/#{draft_id}/publish", Jason.encode!(%{expected_source_revision: 1}))
+        |> json_response(422)
+
+      assert rejected["code"] == "invalid_text_sections"
+      assert rejected["details"]["sections"] == [%{"section" => 2, "problem" => "timer_required"}]
+
+      timed =
+        List.update_at(
+          sections,
+          1,
+          &Map.put(&1, :timer_preset, %{format: "for_time", duration_seconds: 900})
+        )
+
+      workout =
+        admin_conn
+        |> recycle()
+        |> put_req_header("content-type", "application/json")
+        |> post(
+          "#{base}/#{draft_id}/publish",
+          Jason.encode!(%{expected_source_revision: 1, sections: timed})
+        )
+        |> json_response(200)
+        |> Map.fetch!("workout")
+
+      assert workout["authoring_mode"] == "sectioned_text"
+
+      assert workout["free_text_body"] ==
+               "Strength\nBack squat 5x5 @ 75%\n\n21-15-9\nThrusters\nPull-ups"
+
+      assert [
+               %{"name" => "Strength", "timer_preset" => %{"format" => "emom", "rounds" => 5}},
+               %{
+                 "name" => "2",
+                 "free_text_body" => "21-15-9\nThrusters\nPull-ups",
+                 "timer_preset" => %{"format" => "for_time", "duration_seconds" => 900},
+                 "section_metadata" => %{"untitled" => true},
+                 "exercises" => []
+               }
+             ] = workout["sections"]
+    end
+
     test "publishes a free-text workout with assistant-derived canonical sections", %{conn: conn} do
       {admin_conn, organization} = authenticate_as_admin(conn, "free_text_ai_publisher")
 

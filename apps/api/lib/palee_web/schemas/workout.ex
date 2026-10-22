@@ -158,11 +158,40 @@ defmodule PaleeWeb.Schemas.Workout do
         note: @nullable_string,
         content: %Schema{type: :array, items: content_entry_schema()},
         section_metadata: %Schema{type: :object, additionalProperties: true},
+        free_text_body: %Schema{
+          type: :string,
+          nullable: true,
+          maxLength: 20_000,
+          description: "ADR-180: a text section's text (sectioned workouts)"
+        },
+        free_text_document: %Schema{type: :object, additionalProperties: true, nullable: true},
+        timer_preset: section_timer_preset_schema(),
         exercises: %Schema{type: :array, items: workout_item_schema()},
         sections: %Schema{type: :array, items: child_schema}
       },
       required: [:name, :exercises],
       additionalProperties: false
+    }
+  end
+
+  @doc "ADR-180: the timer a coach picked for one text section (the free-text preset shape)."
+  def section_timer_preset_schema do
+    %Schema{
+      title: "SectionTimerPreset",
+      type: :object,
+      nullable: true,
+      properties: %{
+        format: %Schema{
+          type: :string,
+          enum: ~w(untimed for_time amrap emom tabata custom_hiit death_by)
+        },
+        duration_seconds: @nullable_integer,
+        rounds: @nullable_integer,
+        work_seconds: @nullable_integer,
+        rest_seconds: @nullable_integer,
+        interval_seconds: @nullable_integer
+      },
+      required: [:format]
     }
   end
 
@@ -194,7 +223,7 @@ defmodule PaleeWeb.Schemas.Workout do
         editor_session_id: @nullable_uuid,
         authoring_mode: %Schema{
           type: :string,
-          enum: ["structured", "quick_text", "free_text"],
+          enum: Palee.Workouts.authoring_modes(),
           nullable: true
         },
         dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
@@ -236,7 +265,7 @@ defmodule PaleeWeb.Schemas.Workout do
         available_scale_levels: %Schema{type: :array, items: scale_level_schema()},
         sections: %Schema{type: :array, items: section_schema()},
         draft_data: %Schema{type: :object, nullable: true, additionalProperties: true},
-        authoring_mode: %Schema{type: :string, enum: ["structured", "quick_text", "free_text"]},
+        authoring_mode: %Schema{type: :string, enum: Palee.Workouts.authoring_modes()},
         dsl_version: %Schema{type: :integer, enum: [1], nullable: true},
         dsl_source: %Schema{type: :string, nullable: true},
         dsl_document: %Schema{type: :object, additionalProperties: true, nullable: true},

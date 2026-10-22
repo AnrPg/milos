@@ -170,7 +170,7 @@ export function FreeTextAnalysisPanel(props: Props) {
   );
 }
 
-function IssueCard({
+export function IssueCard({
   t,
   issue,
   workout,
@@ -180,8 +180,8 @@ function IssueCard({
   t: Translate;
   issue: AnalysisIssue;
   workout: CanonicalWorkout;
-  onAccept: Props["onAccept"];
-  onReject: Props["onReject"];
+  onAccept: (issue: AnalysisIssue, value?: unknown) => void;
+  onReject: (issue: AnalysisIssue) => void;
 }) {
   const [draft, setDraft] = useState(() => formatFieldValue(issue.path, issue.suggestion?.value ?? getAtPath(workout, issue.path)));
   const [invalid, setInvalid] = useState(false);

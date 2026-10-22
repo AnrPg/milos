@@ -42,6 +42,14 @@ import {
   storeLastPreset,
 } from "@/lib/free-text-timer";
 import { segmentLabel } from "@/lib/segment-label";
+import {
+  describePreset,
+  readSectionProgress,
+  type SectionProgress,
+  storeSectionProgress,
+  type TextSection,
+  type TextSectionResult,
+} from "@/lib/text-sections";
 import { type CueMode, type CueSnapshot, nextCue, playCue, primeCueAudio, readCueMode } from "@/lib/timer-cues";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
 import { FreeTextTimerFields } from "../creation/FreeTextTimerFields";
@@ -85,6 +93,30 @@ export function FreeTextExecutionMode() {
   if (runExecutionId && runLoadedFor !== runExecutionId) {
     setRunLoadedFor(runExecutionId);
     setRun(readFreeTextRun(runExecutionId));
+  }
+
+  // ADR-180: a workout written in text sections runs each section's own timer,
+  // one section at a time; the athlete marks a section complete and starts the next.
+  const sections = useMemo(() => workout?.sections ?? [], [workout?.sections]);
+  const sectioned = sections.length > 0;
+  const [sectionProgress, setSectionProgress] = useState<SectionProgress>({ index: 0, banked: [] });
+  const [progressLoadedFor, setProgressLoadedFor] = useState<string | null>(null);
+  if (runExecutionId && progressLoadedFor !== runExecutionId) {
+    setProgressLoadedFor(runExecutionId);
+    setSectionProgress(readSectionProgress(runExecutionId));
+  }
+  const sectionIndex = Math.min(sectionProgress.index, Math.max(0, sections.length - 1));
+  const currentSection: TextSection | null = sectioned ? sections[sectionIndex] ?? null : null;
+  const lastSection = sectioned && sectionIndex === sections.length - 1;
+  const bankedMs = sectionProgress.banked.reduce((total, ms, index) => (index < sectionIndex ? total + ms : total), 0);
+  const bankedMsRef = useRef(0);
+  useEffect(() => {
+    bankedMsRef.current = bankedMs;
+  });
+
+  function updateSectionProgress(next: SectionProgress | null) {
+    setSectionProgress(next ?? { index: 0, banked: [] });
+    if (runExecutionId) storeSectionProgress(runExecutionId, next);
   }
 
   // The coach's preset arrives with the workout; use it until the athlete picks another.
@@ -131,9 +163,9 @@ export function FreeTextExecutionMode() {
       running: current?.startedAt != null,
       startedAt: current?.startedAt ?? null,
       carriedMs: current?.carriedMs ?? 0,
-      elapsedMs: current
-        ? freeTextPosition(buildFreeTextSegments(current.preset), runElapsedMs(current, now)).totalElapsedMs
-        : 0,
+      elapsedMs:
+        bankedMsRef.current +
+        (current ? freeTextPosition(buildFreeTextSegments(current.preset), runElapsedMs(current, now)).totalElapsedMs : 0),
       kpi: kpiPayload(currentKpiRef.current()),
     };
   }, []);
@@ -141,7 +173,10 @@ export function FreeTextExecutionMode() {
 
   const running = run?.startedAt != null;
   const [now, setNow] = useState(() => Date.now());
-  const segments = useMemo(() => buildFreeTextSegments(run?.preset ?? draftPreset), [draftPreset, run?.preset]);
+  // A section runs the coach's timer for it; a stopwatch when it has none.
+  const sectionPreset: FreeTextTimerPreset | null = currentSection ? currentSection.preset ?? STOPWATCH : null;
+  const effectivePreset = sectionPreset ?? draftPreset;
+  const segments = useMemo(() => buildFreeTextSegments(run?.preset ?? effectivePreset), [effectivePreset, run?.preset]);
   const position = freeTextPosition(segments, run ? runElapsedMs(run, Math.max(now, run.startedAt ?? 0)) : 0);
   // The run stops exactly at the end of its last segment: elapsed time is
   // capped there, so the clock simply stops ticking.
@@ -190,9 +225,9 @@ export function FreeTextExecutionMode() {
 
   function start() {
     primeCueAudio();
-    storeLastPreset(draftPreset);
+    if (!sectioned) storeLastPreset(draftPreset);
     const now = Date.now();
-    updateRun({ preset: draftPreset, startedAt: now, carriedMs: 0 });
+    updateRun({ preset: effectivePreset, startedAt: now, carriedMs: 0 });
     updateKpi((kpi) => (kpi.first_started_at_ms ? kpi : { ...kpi, first_started_at_ms: now }));
     void saveProgress();
   }
@@ -239,7 +274,7 @@ export function FreeTextExecutionMode() {
     async function recoverWorkout() {
       try {
         const record = await fetchWorkout(accessToken, workoutId!);
-        if (record.authoring_mode !== "free_text") {
+        if (record.authoring_mode !== "free_text" && record.authoring_mode !== "sectioned_text") {
           router.replace("/workouts");
           return;
         }
@@ -289,6 +324,21 @@ export function FreeTextExecutionMode() {
     };
   }, [tokens?.access_token, workout?.execution_id]);
 
+  /** Banks this section's time and moves on; the next timer waits for Start. */
+  function completeSection() {
+    if (!sectioned) return;
+    if (lastSection) {
+      beginFinish();
+      return;
+    }
+    const banked = [...sectionProgress.banked];
+    banked[sectionIndex] = run ? position.totalElapsedMs : 0;
+    bankedMsRef.current = banked.reduce((total, ms) => total + (ms ?? 0), 0);
+    updateSectionProgress({ index: sectionIndex + 1, banked });
+    updateRun(null);
+    void saveProgress();
+  }
+
   function beginFinish() {
     updateKpi((kpi) => ({ ...kpi, finish_wizard_opens: kpi.finish_wizard_opens + 1 }));
     pause();
@@ -297,7 +347,7 @@ export function FreeTextExecutionMode() {
     setShowFinishWizard(true);
   }
 
-  async function confirmFinish(editedScores: SectionScore[], finish: FinishComments) {
+  async function confirmFinish(editedScores: SectionScore[], finish: FinishComments, textResults: TextSectionResult[] = []) {
     if (!tokens?.access_token || !workout?.execution_id) {
       setCompletionFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
       return;
@@ -315,14 +365,16 @@ export function FreeTextExecutionMode() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         checked_exercise_ids: [],
         section_scores: editedScores,
-        total_elapsed_ms: Math.round(position.totalElapsedMs),
+        ...(textResults.length > 0 ? { text_section_scores: textResults } : {}),
+        total_elapsed_ms: Math.round(bankedMs + position.totalElapsedMs),
         kpi_counters: kpiPayload(currentKpi()),
-        section_elapsed_ms: {},
+        section_elapsed_ms: sectionElapsed(sections, sectionProgress.banked, sectionIndex, position.totalElapsedMs),
         segment_cycle_counts: {},
       });
       clearFreeTextExecutionWorkout(workout.id);
       storeFreeTextRun(workout.execution_id, null);
       storeFreeTextKpi(workout.execution_id, null);
+      storeSectionProgress(workout.execution_id, null);
       router.push("/");
     } catch (error) {
       setCompletionFeedback(
@@ -348,6 +400,7 @@ export function FreeTextExecutionMode() {
         segments={[]}
         comments={comments}
         freeText
+        textSections={sections}
         feltExecutionId={runExecutionId ?? executionId}
         isSaving={isSavingCompletion}
         feedback={completionFeedback}
@@ -376,13 +429,27 @@ export function FreeTextExecutionMode() {
 
       <main className="grid min-h-0 flex-1 grid-cols-1 lg:grid-cols-[minmax(0,0.9fr)_minmax(20rem,0.7fr)]">
         <section className="min-h-0 overflow-auto border-e p-5" style={{ borderColor: "var(--border)" }}>
-          <pre className="whitespace-pre-wrap font-sans text-base leading-7" style={{ color: "var(--text)" }}>
-            {workout.body}
-          </pre>
+          {sectioned ? (
+            <SectionList sections={sections} current={sectionIndex} formatLabels={formatLabels} />
+          ) : (
+            <pre className="whitespace-pre-wrap font-sans text-base leading-7" style={{ color: "var(--text)" }}>
+              {workout.body}
+            </pre>
+          )}
         </section>
 
         <section className="flex min-h-0 flex-col overflow-auto p-5">
-          {status === "setup" ? (
+          {sectioned && currentSection ? (
+            <SectionHeader
+              section={currentSection}
+              index={sectionIndex}
+              count={sections.length}
+              preset={sectionPreset!}
+              formatLabels={formatLabels}
+              upNext={status === "setup" && sectionIndex > 0}
+              onCast={status === "setup" ? null : () => setCastMode(true)}
+            />
+          ) : status === "setup" ? (
             <TimerSetup
               preset={draftPreset}
               coachPreset={coachPreset}
@@ -433,8 +500,13 @@ export function FreeTextExecutionMode() {
                 {i18n("pausecd21a1b")}
               </button>
             ) : status === "finished" ? (
-              <button type="button" onClick={beginFinish} className="col-span-2 min-h-14 rounded-full text-base font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
-                {i18n("finishb74bdee")}
+              <button
+                type="button"
+                onClick={sectioned ? completeSection : beginFinish}
+                className="col-span-2 min-h-14 rounded-full text-base font-bold"
+                style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+              >
+                {sectioned && !lastSection ? i18n("textSectionComplete") : i18n("finishb74bdee")}
               </button>
             ) : (
               <button
@@ -447,6 +519,17 @@ export function FreeTextExecutionMode() {
               </button>
             )}
           </div>
+          {/* The athlete may finish a section before its timer ends; the next never starts on its own. */}
+          {sectioned && status !== "setup" && status !== "finished" ? (
+            <button
+              type="button"
+              onClick={completeSection}
+              className="mt-3 min-h-12 w-full rounded-full text-sm font-bold"
+              style={{ border: "1px solid var(--border)", color: "var(--text)", background: "var(--card)" }}
+            >
+              {lastSection ? i18n("finishb74bdee") : i18n("textSectionComplete")}
+            </button>
+          ) : null}
         </section>
       </main>
 
@@ -455,7 +538,7 @@ export function FreeTextExecutionMode() {
           seconds={displaySeconds(position.segment, position.clock).seconds}
           phase={phase}
           label={segmentLabel(position.segment, i18n) || workout.title}
-          sectionName={workout.title}
+          sectionName={currentSection ? currentSection.title || i18n("textSectionNumber", { number: sectionIndex + 1 }) : workout.title}
           roundText={
             position.clock.window
               ? position.clock.window.count
@@ -516,6 +599,110 @@ function TimerSetup({
         ))}
       </div>
       <FreeTextTimerFields preset={preset} formatLabels={formatLabels} onChange={onChange} />
+    </div>
+  );
+}
+
+const STOPWATCH: FreeTextTimerPreset = { format: "untimed" };
+
+/** Time per section for the completion record: finished sections, then the current one. */
+function sectionElapsed(sections: TextSection[], banked: number[], current: number, currentMs: number) {
+  const elapsed: Record<string, number> = {};
+  sections.forEach((section, index) => {
+    if (index < current && banked[index] !== undefined) elapsed[section.id] = Math.round(banked[index]!);
+    if (index === current) elapsed[section.id] = Math.round(currentMs);
+  });
+  return elapsed;
+}
+
+function SectionList({
+  sections,
+  current,
+  formatLabels,
+}: {
+  sections: TextSection[];
+  current: number;
+  formatLabels: Record<SectionFormat, string>;
+}) {
+  const i18n = useUiTranslations();
+  return (
+    <ol className="space-y-3" aria-label={i18n("textSectionsLabel")}>
+      {sections.map((section, index) => {
+        const done = index < current;
+        const active = index === current;
+        return (
+          <li
+            key={section.id}
+            aria-current={active ? "step" : undefined}
+            className="rounded-2xl border p-4"
+            style={{
+              borderColor: active ? "var(--primary)" : "var(--border)",
+              background: active ? "var(--panel)" : "transparent",
+              opacity: done ? 0.6 : 1,
+            }}
+          >
+            <div className="flex flex-wrap items-baseline justify-between gap-2">
+              <span className="text-sm font-black" style={{ color: "var(--text)" }}>
+                {done ? "✓ " : ""}
+                {section.title || i18n("textSectionNumber", { number: index + 1 })}
+              </span>
+              <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
+                {describePreset(section.preset ?? STOPWATCH, formatLabels[(section.preset ?? STOPWATCH).format])}
+              </span>
+            </div>
+            <p className="mt-2 whitespace-pre-wrap text-base leading-7" style={{ color: "var(--text)" }}>
+              {section.body}
+            </p>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+function SectionHeader({
+  section,
+  index,
+  count,
+  preset,
+  formatLabels,
+  upNext,
+  onCast,
+}: {
+  section: TextSection;
+  index: number;
+  count: number;
+  preset: FreeTextTimerPreset;
+  formatLabels: Record<SectionFormat, string>;
+  upNext: boolean;
+  onCast: (() => void) | null;
+}) {
+  const i18n = useUiTranslations();
+  return (
+    <div className="flex items-start justify-between gap-3">
+      <div className="min-w-0">
+        <div className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+          {upNext
+            ? i18n("textSectionUpNext", { number: index + 1, count })
+            : i18n("textSectionProgress", { number: index + 1, count })}
+        </div>
+        <div className="truncate text-base font-black" style={{ color: "var(--text)" }}>
+          {section.title || i18n("textSectionNumber", { number: index + 1 })}
+        </div>
+        <div className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
+          {describePreset(preset, formatLabels[preset.format])}
+        </div>
+      </div>
+      {onCast ? (
+        <button
+          type="button"
+          onClick={onCast}
+          className="min-h-11 shrink-0 rounded-xl px-3 text-sm font-semibold"
+          style={{ border: "1px solid var(--border)", color: "var(--text-soft)" }}
+        >
+          {i18n("castModeLabel")}
+        </button>
+      ) : null}
     </div>
   );
 }

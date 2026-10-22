@@ -16,8 +16,10 @@ defmodule Palee.Execution.Domain.ScoreRanking do
   wants kept. Returns them best first, each with `:rank` (nil when unranked)
   and `:score` (the section's raw score map or nil).
   """
-  def rank(results, %{id: section_id, score_type: score_type}) do
+  def rank(results, %{id: section_id, score_type: score_type} = section) do
     lower? = lower_is_better?(score_type)
+    # ADR-180: a text section may count several things; rank by one of them.
+    section_id = Map.get(section, :section_key) || section_id
 
     {ranked, unranked} =
       results
@@ -76,7 +78,10 @@ defmodule Palee.Execution.Domain.ScoreRanking do
 
   defp section_score(result, section_id) do
     Enum.find(result.section_scores || [], fn score ->
-      to_string(score["section_id"] || score[:section_id]) == to_string(section_id)
+      key =
+        score["section_key"] || score[:section_key] || score["section_id"] || score[:section_id]
+
+      to_string(key) == to_string(section_id)
     end)
   end
 

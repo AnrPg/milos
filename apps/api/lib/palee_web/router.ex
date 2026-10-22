@@ -787,6 +787,8 @@ defmodule PaleeWeb.Router do
     post("/workouts/dsl/parse", AdminWorkoutDslController, :parse)
     post("/workouts/timer-preview", AdminWorkoutTimerPreviewController, :create)
     post("/workouts/free-text/analyze", AdminWorkoutFreeTextController, :analyze)
+    # ADR-180: whether the editor offers the assistant or text sections.
+    get("/workouts/authoring-settings", AdminWorkoutFreeTextController, :authoring_settings)
     get("/workouts/dsl/manual", AdminWorkoutDslController, :manual)
     get("/workouts/:id/dsl", AdminWorkoutDslController, :show_authoring)
     post("/workouts/:id/dsl/publish", AdminWorkoutDslController, :publish)

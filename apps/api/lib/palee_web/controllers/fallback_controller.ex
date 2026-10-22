@@ -1620,6 +1620,17 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "already_published", error: "Workout is already published"})
   end
 
+  # ADR-180: which text sections stop a sectioned workout from publishing.
+  def call(conn, {:error, {:invalid_text_sections, problems}}) do
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{
+      code: "invalid_text_sections",
+      error: "Every section needs its text and a timer",
+      details: %{sections: problems}
+    })
+  end
+
   def call(conn, {:error, :no_sections}) do
     conn
     |> put_status(:unprocessable_entity)

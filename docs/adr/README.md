@@ -179,3 +179,5 @@ must have an ADR. See `template.md` for the format.
 | ADR-176 | Classes without a WOD (drafts, missing-WOD alerts) and the gym's time zone | Accepted |
 | ADR-177 | One dialog shell, one popover primitive and a z-index scale | Accepted |
 | ADR-179 | One canonical clock (UTC), the organiser's zone and the viewer's "your time" | Accepted |
+| ADR-180 | Workouts in text sections, the WOD-assistant switch and per-section scoring | Accepted |
+| ADR-181 | Tabbed WOD editor and in-place, colour-coded assistant suggestions | Accepted |

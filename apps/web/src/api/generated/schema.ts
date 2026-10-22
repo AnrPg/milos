@@ -6782,6 +6782,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/workouts/authoring-settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** What the workout editor may offer in this gym (ADR-180) */
+        get: operations["PaleeWeb.AdminWorkoutFreeTextController.authoring_settings"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/workouts/dsl/manual": {
         parameters: {
             query?: never;
@@ -20749,6 +20766,8 @@ export interface components {
         /** FreeTextWorkoutAnalysis */
         FreeTextWorkoutAnalysis: {
             issues: {
+                /** @description The words of the coach's text the issue is about, exactly as written; the editor marks them in place (nil: the panel only) */
+                anchor?: string | null;
                 /** @description assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
                 code: string;
                 current_value?: unknown;
@@ -25863,6 +25882,16 @@ export interface components {
             weeks?: number;
             welcome_message?: string | null;
         };
+        /** SectionTimerPreset */
+        SectionTimerPreset: {
+            duration_seconds?: number | null;
+            /** @enum {string} */
+            format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+            interval_seconds?: number | null;
+            rest_seconds?: number | null;
+            rounds?: number | null;
+            work_seconds?: number | null;
+        } | null;
         /** SelectProviderRequest */
         SelectProviderRequest: {
             /** Format: uuid */
@@ -29199,6 +29228,11 @@ export interface components {
                 title: string;
                 type?: string | null;
             } | null;
+        };
+        /** WorkoutAuthoringSettings */
+        WorkoutAuthoringSettings: {
+            /** @description Off: no assistant; workouts are written in text sections with a timer each */
+            wod_assistant_enabled: boolean;
         };
         /** WorkoutDslAuthoringResponse */
         WorkoutDslAuthoringResponse: {
@@ -32706,6 +32740,13 @@ export interface operations {
                     segment_cycle_counts?: {
                         [key: string]: number;
                     };
+                    /** @description ADR-180: results for the scores a coach set on the text sections of a workout written without the assistant (time in seconds). */
+                    text_section_scores?: {
+                        metric_key: string;
+                        /** Format: uuid */
+                        section_id: string;
+                        value: (number | string) | null;
+                    }[];
                     /** @default UTC */
                     timezone?: string;
                     total_elapsed_ms?: number;
@@ -59388,6 +59429,8 @@ export interface operations {
                         };
                         /** @description ADR-163: workout-authoring defaults */
                         workouts: {
+                            /** @description ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
+                            wod_assistant_enabled: boolean;
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
                         };
@@ -59440,6 +59483,8 @@ export interface operations {
                         default_capacity?: number;
                     };
                     workouts?: {
+                        /** @description ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
+                        wod_assistant_enabled?: boolean;
                         /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                         wod_goals_visible_by_default?: boolean;
                     };
@@ -59521,6 +59566,8 @@ export interface operations {
                         };
                         /** @description ADR-163: workout-authoring defaults */
                         workouts: {
+                            /** @description ADR-180: whether coaches may use the WOD assistant; off, workouts are written in text sections with a timer each */
+                            wod_assistant_enabled: boolean;
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
                         };
@@ -62163,6 +62210,29 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminWorkoutFreeTextController.authoring_settings": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Authoring settings */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Off: no assistant; workouts are written in text sections with a timer each */
+                        wod_assistant_enabled: boolean;
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminWorkoutDslController.manual": {
         parameters: {
             query?: never;
@@ -62355,6 +62425,8 @@ export interface operations {
                 content: {
                     "application/json": {
                         issues: {
+                            /** @description The words of the coach's text the issue is about, exactly as written; the editor marks them in place (nil: the panel only) */
+                            anchor?: string | null;
                             /** @description assistant | text_correction | assumption (severity info: a value the assistant inferred; Keep or Reject) | missing_title | missing_type | missing_section_name | missing_exercise_name | too_short | invalid_value | invalid_timer | unknown_format */
                             code: string;
                             current_value?: unknown;
@@ -62412,6 +62484,18 @@ export interface operations {
                         workout: {
                             [key: string]: unknown;
                         };
+                    };
+                };
+            };
+            /** @description The gym switched the assistant off */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code: string;
+                        error: string;
                     };
                 };
             };
@@ -62555,7 +62639,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -62814,6 +62898,11 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
+                                free_text_body?: string | null;
+                                free_text_document?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 /** Format: uuid */
                                 id?: string | null;
                                 name: string;
@@ -63029,6 +63118,11 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
+                                    free_text_body?: string | null;
+                                    free_text_document?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     /** Format: uuid */
                                     id?: string | null;
                                     name: string;
@@ -63052,10 +63146,30 @@ export interface operations {
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
+                                    /** SectionTimerPreset */
+                                    timer_preset?: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
                                 }[];
                                 subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
+                                } | null;
+                                /** SectionTimerPreset */
+                                timer_preset?: {
+                                    duration_seconds?: number | null;
+                                    /** @enum {string} */
+                                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                    interval_seconds?: number | null;
+                                    rest_seconds?: number | null;
+                                    rounds?: number | null;
+                                    work_seconds?: number | null;
                                 } | null;
                             }[];
                             /** @enum {string} */
@@ -63166,7 +63280,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | "free_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | null;
                     content?: {
                         body: string;
                         document?: {
@@ -63406,6 +63520,11 @@ export interface operations {
                                 sets?: number | null;
                             }[];
                         }[];
+                        /** @description ADR-180: a text section's text (sectioned workouts) */
+                        free_text_body?: string | null;
+                        free_text_document?: {
+                            [key: string]: unknown;
+                        } | null;
                         /** Format: uuid */
                         id?: string | null;
                         name: string;
@@ -63621,6 +63740,11 @@ export interface operations {
                                     sets?: number | null;
                                 }[];
                             }[];
+                            /** @description ADR-180: a text section's text (sectioned workouts) */
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id?: string | null;
                             name: string;
@@ -63644,10 +63768,30 @@ export interface operations {
                             timer_config?: {
                                 [key: string]: unknown;
                             } | null;
+                            /** SectionTimerPreset */
+                            timer_preset?: {
+                                duration_seconds?: number | null;
+                                /** @enum {string} */
+                                format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                interval_seconds?: number | null;
+                                rest_seconds?: number | null;
+                                rounds?: number | null;
+                                work_seconds?: number | null;
+                            } | null;
                         }[];
                         subtitle?: string | null;
                         timer_config?: {
                             [key: string]: unknown;
+                        } | null;
+                        /** SectionTimerPreset */
+                        timer_preset?: {
+                            duration_seconds?: number | null;
+                            /** @enum {string} */
+                            format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                            interval_seconds?: number | null;
+                            rest_seconds?: number | null;
+                            rounds?: number | null;
+                            work_seconds?: number | null;
                         } | null;
                     }[];
                     subtitle?: string | null;
@@ -64190,7 +64334,7 @@ export interface operations {
             content: {
                 "application/json": {
                     /** @enum {string|null} */
-                    authoring_mode?: "structured" | "quick_text" | "free_text" | null;
+                    authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text" | null;
                     content?: {
                         body: string;
                         document?: {
@@ -64430,6 +64574,11 @@ export interface operations {
                                 sets?: number | null;
                             }[];
                         }[];
+                        /** @description ADR-180: a text section's text (sectioned workouts) */
+                        free_text_body?: string | null;
+                        free_text_document?: {
+                            [key: string]: unknown;
+                        } | null;
                         /** Format: uuid */
                         id?: string | null;
                         name: string;
@@ -64645,6 +64794,11 @@ export interface operations {
                                     sets?: number | null;
                                 }[];
                             }[];
+                            /** @description ADR-180: a text section's text (sectioned workouts) */
+                            free_text_body?: string | null;
+                            free_text_document?: {
+                                [key: string]: unknown;
+                            } | null;
                             /** Format: uuid */
                             id?: string | null;
                             name: string;
@@ -64668,10 +64822,30 @@ export interface operations {
                             timer_config?: {
                                 [key: string]: unknown;
                             } | null;
+                            /** SectionTimerPreset */
+                            timer_preset?: {
+                                duration_seconds?: number | null;
+                                /** @enum {string} */
+                                format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                interval_seconds?: number | null;
+                                rest_seconds?: number | null;
+                                rounds?: number | null;
+                                work_seconds?: number | null;
+                            } | null;
                         }[];
                         subtitle?: string | null;
                         timer_config?: {
                             [key: string]: unknown;
+                        } | null;
+                        /** SectionTimerPreset */
+                        timer_preset?: {
+                            duration_seconds?: number | null;
+                            /** @enum {string} */
+                            format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                            interval_seconds?: number | null;
+                            rest_seconds?: number | null;
+                            rounds?: number | null;
+                            work_seconds?: number | null;
                         } | null;
                     }[];
                     subtitle?: string | null;
@@ -64695,7 +64869,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -64954,6 +65128,11 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
+                                free_text_body?: string | null;
+                                free_text_document?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 /** Format: uuid */
                                 id?: string | null;
                                 name: string;
@@ -65169,6 +65348,11 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
+                                    free_text_body?: string | null;
+                                    free_text_document?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     /** Format: uuid */
                                     id?: string | null;
                                     name: string;
@@ -65192,10 +65376,30 @@ export interface operations {
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
+                                    /** SectionTimerPreset */
+                                    timer_preset?: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
                                 }[];
                                 subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
+                                } | null;
+                                /** SectionTimerPreset */
+                                timer_preset?: {
+                                    duration_seconds?: number | null;
+                                    /** @enum {string} */
+                                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                    interval_seconds?: number | null;
+                                    rest_seconds?: number | null;
+                                    rounds?: number | null;
+                                    work_seconds?: number | null;
                                 } | null;
                             }[];
                             /** @enum {string} */
@@ -75249,7 +75453,7 @@ export interface operations {
                     "application/json": {
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -75508,6 +75712,11 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
+                                free_text_body?: string | null;
+                                free_text_document?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 /** Format: uuid */
                                 id?: string | null;
                                 name: string;
@@ -75723,6 +75932,11 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
+                                    free_text_body?: string | null;
+                                    free_text_document?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     /** Format: uuid */
                                     id?: string | null;
                                     name: string;
@@ -75746,10 +75960,30 @@ export interface operations {
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
+                                    /** SectionTimerPreset */
+                                    timer_preset?: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
                                 }[];
                                 subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
+                                } | null;
+                                /** SectionTimerPreset */
+                                timer_preset?: {
+                                    duration_seconds?: number | null;
+                                    /** @enum {string} */
+                                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                    interval_seconds?: number | null;
+                                    rest_seconds?: number | null;
+                                    rounds?: number | null;
+                                    work_seconds?: number | null;
                                 } | null;
                             }[];
                             /** @enum {string} */
@@ -75854,7 +76088,7 @@ export interface operations {
                     "application/json": {
                         scales: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -76113,6 +76347,11 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
+                                free_text_body?: string | null;
+                                free_text_document?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 /** Format: uuid */
                                 id?: string | null;
                                 name: string;
@@ -76328,6 +76567,11 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
+                                    free_text_body?: string | null;
+                                    free_text_document?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     /** Format: uuid */
                                     id?: string | null;
                                     name: string;
@@ -76351,10 +76595,30 @@ export interface operations {
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
+                                    /** SectionTimerPreset */
+                                    timer_preset?: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
                                 }[];
                                 subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
+                                } | null;
+                                /** SectionTimerPreset */
+                                timer_preset?: {
+                                    duration_seconds?: number | null;
+                                    /** @enum {string} */
+                                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                    interval_seconds?: number | null;
+                                    rest_seconds?: number | null;
+                                    rounds?: number | null;
+                                    work_seconds?: number | null;
                                 } | null;
                             }[];
                             /** @enum {string} */
@@ -76371,7 +76635,7 @@ export interface operations {
                         }[];
                         workout: {
                             /** @enum {string} */
-                            authoring_mode?: "structured" | "quick_text" | "free_text";
+                            authoring_mode?: "structured" | "quick_text" | "free_text" | "sectioned_text";
                             available_scale_levels?: ({
                                 /** Format: uuid */
                                 id?: string | null;
@@ -76630,6 +76894,11 @@ export interface operations {
                                         sets?: number | null;
                                     }[];
                                 }[];
+                                /** @description ADR-180: a text section's text (sectioned workouts) */
+                                free_text_body?: string | null;
+                                free_text_document?: {
+                                    [key: string]: unknown;
+                                } | null;
                                 /** Format: uuid */
                                 id?: string | null;
                                 name: string;
@@ -76845,6 +77114,11 @@ export interface operations {
                                             sets?: number | null;
                                         }[];
                                     }[];
+                                    /** @description ADR-180: a text section's text (sectioned workouts) */
+                                    free_text_body?: string | null;
+                                    free_text_document?: {
+                                        [key: string]: unknown;
+                                    } | null;
                                     /** Format: uuid */
                                     id?: string | null;
                                     name: string;
@@ -76868,10 +77142,30 @@ export interface operations {
                                     timer_config?: {
                                         [key: string]: unknown;
                                     } | null;
+                                    /** SectionTimerPreset */
+                                    timer_preset?: {
+                                        duration_seconds?: number | null;
+                                        /** @enum {string} */
+                                        format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                        interval_seconds?: number | null;
+                                        rest_seconds?: number | null;
+                                        rounds?: number | null;
+                                        work_seconds?: number | null;
+                                    } | null;
                                 }[];
                                 subtitle?: string | null;
                                 timer_config?: {
                                     [key: string]: unknown;
+                                } | null;
+                                /** SectionTimerPreset */
+                                timer_preset?: {
+                                    duration_seconds?: number | null;
+                                    /** @enum {string} */
+                                    format: "untimed" | "for_time" | "amrap" | "emom" | "tabata" | "custom_hiit" | "death_by";
+                                    interval_seconds?: number | null;
+                                    rest_seconds?: number | null;
+                                    rounds?: number | null;
+                                    work_seconds?: number | null;
                                 } | null;
                             }[];
                             /** @enum {string} */

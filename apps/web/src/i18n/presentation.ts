@@ -477,8 +477,18 @@ export function formatScore(
   }
 
   if (scoreType === "pass_fail") return semanticLabel(text, translate);
+  // ADR-180: section results store time as seconds.
+  if (scoreType === "time" && unit === "s" && typeof value === "number" && value >= 0) return clockFromSeconds(value);
   const localizedUnit = semanticLabel(unit, translate);
   return localizedUnit ? `${text} ${localizedUnit}` : text;
+}
+
+function clockFromSeconds(total: number) {
+  const seconds = Math.round(total);
+  const h = Math.floor(seconds / 3600);
+  const m = Math.floor((seconds % 3600) / 60);
+  const s = String(seconds % 60).padStart(2, "0");
+  return h > 0 ? `${h}:${String(m).padStart(2, "0")}:${s}` : `${m}:${s}`;
 }
 
 function normalizeParams(params: Record<string, unknown> | undefined, translate: UiTranslator) {

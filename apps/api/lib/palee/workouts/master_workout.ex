@@ -85,6 +85,9 @@ defmodule Palee.Workouts.MasterWorkout do
     |> cast_assoc(:sections, required: true, with: &WorkoutSection.changeset/2)
   end
 
+  @doc "ADR-180: `sectioned_text` is free text in sections, written without the assistant."
+  def authoring_modes, do: ["structured", "quick_text", "free_text", "sectioned_text"]
+
   def types, do: @types
   def statuses, do: @statuses
 
@@ -123,7 +126,7 @@ defmodule Palee.Workouts.MasterWorkout do
     )
     |> validate_bounded_map(:workout_metadata, :workout)
     |> validate_content()
-    |> validate_inclusion(:authoring_mode, ["structured", "quick_text", "free_text"])
+    |> validate_inclusion(:authoring_mode, authoring_modes())
     |> validate_inclusion(:dsl_version, [1])
     |> validate_length(:dsl_source, max: 200_000)
     |> validate_length(:free_text_body, max: 200_000)

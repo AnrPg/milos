@@ -2,7 +2,15 @@ defmodule Palee.Workouts.WorkoutSection do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Palee.Workouts.Domain.{TimerConfig, WorkoutAuthoringMetadata, WorkoutContent}
+  alias Palee.Execution.Domain.TimerPresets
+
+  alias Palee.Workouts.Domain.{
+    SectionedText,
+    TimerConfig,
+    WorkoutAuthoringMetadata,
+    WorkoutContent
+  }
+
   alias Palee.Workouts.{MasterWorkout, WorkoutExercise}
 
   @primary_key {:id, :binary_id, autogenerate: true}
@@ -20,6 +28,10 @@ defmodule Palee.Workouts.WorkoutSection do
     field :rest_before_next_section_seconds, :integer
     field :content, {:array, :map}, default: []
     field :section_metadata, :map, default: %{}
+    # ADR-180: a text section of a workout written without the assistant.
+    field :free_text_body, :string
+    field :free_text_document, :map
+    field :timer_preset, :map
 
     belongs_to :master_workout, MasterWorkout
     belongs_to :parent_section, __MODULE__
@@ -53,13 +65,18 @@ defmodule Palee.Workouts.WorkoutSection do
       :subtitle,
       :rest_before_next_section_seconds,
       :content,
-      :section_metadata
+      :section_metadata,
+      :free_text_body,
+      :free_text_document,
+      :timer_preset
     ])
     |> update_change(:name, &normalize_name/1)
     |> validate_required([:name, :order])
     |> validate_number(:order, greater_than_or_equal_to: 1)
     |> validate_length(:subtitle, max: 240)
     |> validate_number(:rest_before_next_section_seconds, greater_than_or_equal_to: 0)
+    |> validate_length(:free_text_body, max: SectionedText.max_body_bytes(), count: :bytes)
+    |> normalize_timer_preset()
     |> validate_bounded_metadata()
     |> validate_content()
     |> normalize_timer_config()
@@ -80,6 +97,22 @@ defmodule Palee.Workouts.WorkoutSection do
         case TimerConfig.normalize(timer_config) do
           {:ok, normalized} -> put_change(changeset, :timer_config, normalized)
           {:error, reason} -> add_error(changeset, :timer_config, reason)
+        end
+
+      :error ->
+        changeset
+    end
+  end
+
+  defp normalize_timer_preset(changeset) do
+    case fetch_change(changeset, :timer_preset) do
+      {:ok, nil} ->
+        changeset
+
+      {:ok, preset} ->
+        case TimerPresets.parse(preset) do
+          nil -> add_error(changeset, :timer_preset, "has an unsupported format")
+          parsed -> put_change(changeset, :timer_preset, parsed)
         end
 
       :error ->

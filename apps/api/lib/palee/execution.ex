@@ -12,6 +12,8 @@ defmodule Palee.Execution do
     ExecutionAnalytics,
     ExecutionKpis,
     ModificationPatchValidator,
+    TextSectionScores,
+    TimerPresets,
     TimerSequenceBuilder,
     TrainingLogPolicy
   }
@@ -68,7 +70,22 @@ defmodule Palee.Execution do
   def save_class_timer(context, scheduled_class_id, attrs, expected_version),
     do: ClassTimerStore.save_class_timer(context, scheduled_class_id, attrs, expected_version)
 
-  defdelegate build_timer_sequence(workout), to: TimerSequenceBuilder, as: :build
+  @doc """
+  The segments an execution of this workout runs. ADR-180: a workout written
+  in text sections runs each section's own timer preset.
+  """
+  def build_timer_sequence(%{authoring_mode: "sectioned_text"} = workout),
+    do: TimerPresets.build_sections(Map.get(workout, :sections) || [])
+
+  def build_timer_sequence(workout), do: TimerSequenceBuilder.build(workout)
+
+  @doc "ADR-180: the athlete's results for the scores a coach set on text sections."
+  defdelegate normalize_text_section_scores(entries, sections),
+    to: TextSectionScores,
+    as: :normalize
+
+  defdelegate text_section_metrics(workout), to: TextSectionScores, as: :section_metrics
+
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 
   # -- Analytics facts (ADR-123) ----------------------------------------------

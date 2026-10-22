@@ -2,6 +2,7 @@ import { apiRequest } from "@/api/client";
 import type { components } from "@/api/generated/schema";
 import type { WorkoutContentEntry } from "@/components/workouts/WorkoutContent";
 import type { WorkoutDslVocabulary } from "@/lib/workout-dsl-suggestions";
+import type { FreeTextTimerPreset } from "@/lib/free-text-timer";
 import type { LoadMode, LoadProgression, PrescriptionUnit, WorkoutType } from "@/types/workout";
 
 export type ScaleLevel = {
@@ -139,8 +140,17 @@ export type WorkoutSectionRecord = {
   } | null;
   timer_config?: Record<string, unknown> | null;
   note?: string | null;
+  section_metadata?: Record<string, unknown> | null;
+  /** ADR-180: a text section of a workout written without the assistant. */
+  free_text_body?: string | null;
+  free_text_document?: Record<string, unknown> | null;
+  /** ADR-180: the timer the coach picked for this text section. */
+  timer_preset?: FreeTextTimerPreset | null;
   exercises: WorkoutExerciseRecord[];
 };
+
+/** How a workout was written; `sectioned_text` = text sections without the assistant (ADR-180). */
+export type WorkoutAuthoringMode = "structured" | "quick_text" | "free_text" | "sectioned_text";
 
 export type WorkoutRecord = {
   id: string;
@@ -160,7 +170,7 @@ export type WorkoutRecord = {
   available_scale_levels: ScaleLevel[];
   sections: WorkoutSectionRecord[];
   draft_data?: unknown;
-  authoring_mode?: "structured" | "quick_text" | "free_text";
+  authoring_mode?: WorkoutAuthoringMode;
   dsl_version?: number | null;
   dsl_source?: string | null;
   dsl_document?: Record<string, unknown> | null;
@@ -239,6 +249,15 @@ export async function listScaleLevels(token: string) {
 }
 
 export type FreeTextWorkoutAnalysis = components["schemas"]["FreeTextWorkoutAnalysis"];
+
+/** ADR-180: what the workout editor may offer in this gym. */
+export type WodAssistantAvailability = { wod_assistant_enabled: boolean };
+
+export const WOD_ASSISTANT_AVAILABILITY_KEY = ["admin", "workouts", "authoring-settings"] as const;
+
+export function fetchWorkoutAuthoringSettings(token: string) {
+  return apiRequest<WodAssistantAvailability>("/admin/workouts/authoring-settings", { token });
+}
 
 export function analyzeFreeTextWorkout(token: string, text: string, locale: string) {
   return apiRequest<FreeTextWorkoutAnalysis>("/admin/workouts/free-text/analyze", {

@@ -18,9 +18,13 @@ import { LocalizedScore } from "@/components/localized-score";
 import { semanticLabel } from "@/i18n/presentation";
 import { FeltStep } from "@/components/wod-goals/FeltStep";
 import { buildSegmentStepDefinitions } from "./progress";
+import { TextSectionScoreStep, type TextSectionScoreView } from "./TextSectionScoreStep";
+import type { TextSection, TextSectionResult } from "@/lib/text-sections";
 
 type SectionScore = {
   section_id: string;
+  /** One series per section and metric (ADR-180); the section id otherwise. */
+  section_key?: string;
   section_name?: string | null;
   value: number | string;
   unit?: string;
@@ -828,7 +832,7 @@ function ConfirmStep({
             <div className="space-y-2">
               {scores.map((score) => (
                 <div
-                  key={score.section_id}
+                  key={score.section_key ?? score.section_id}
                   className="flex justify-between items-center rounded-xl px-4 py-2.5"
                   style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
                 >
@@ -942,6 +946,7 @@ export function FinishWizard({
   pendingCommentIds = [],
   clockAdjustments,
   freeText = false,
+  textSections = [],
   feltExecutionId = null,
   isSaving,
   feedback,
@@ -955,11 +960,13 @@ export function FinishWizard({
   pendingCommentIds?: string[];
   clockAdjustments?: ClockAdjustmentSummary[];
   freeText?: boolean;
+  /** ADR-180: a workout written in text sections; the scores its coach set are asked for here. */
+  textSections?: TextSection[];
   /** Offers «Τι ένιωσες;» (WOD goals feedback) on this execution before the confirm step. */
   feltExecutionId?: string | null;
   isSaving: boolean;
   feedback: string | null;
-  onConfirm: (editedScores: SectionScore[], finish: FinishComments) => void;
+  onConfirm: (editedScores: SectionScore[], finish: FinishComments, textResults: TextSectionResult[]) => void;
   /** Leaves the wizard and returns to the (paused) workout. */
   onCancel?: () => void;
 }) {
@@ -972,6 +979,9 @@ export function FinishWizard({
     changeComments(comments).map((comment) => comment.change!),
   );
   const [text, setText] = useState("");
+  const [textResults, setTextResults] = useState<TextSectionResult[]>([]);
+  const [textScoreViews, setTextScoreViews] = useState<TextSectionScoreView[]>([]);
+  const textScored = textSections.some((section) => section.metrics.length > 0);
 
   function handleScoresNext(edited: SectionScore[]) {
     setConfirmedScores(edited);
@@ -984,7 +994,24 @@ export function FinishWizard({
   }
 
   function handleSave() {
-    onConfirm(confirmedScores, { changes: confirmedMods, text: text.trim() || null });
+    onConfirm(confirmedScores, { changes: confirmedMods, text: text.trim() || null }, textResults);
+  }
+
+  if (step === 1 && textScored) {
+    return (
+      <TextSectionScoreStep
+        sections={textSections}
+        initial={textResults}
+        onBack={onCancel ?? null}
+        backLabel={i18n("backToWorkoutLabel")}
+        onNext={(results, views) => {
+          setTextResults(results);
+          setTextScoreViews(views);
+          setStep(2);
+        }}
+        onSkip={() => setStep(2)}
+      />
+    );
   }
 
   if (step === 1) {
@@ -1036,7 +1063,7 @@ export function FinishWizard({
 
   return (
     <ConfirmStep
-      scores={confirmedScores}
+      scores={[...confirmedScores, ...textScoreViews]}
       modifications={confirmedMods}
       text={text}
       segments={segments}

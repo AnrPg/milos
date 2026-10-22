@@ -49,6 +49,9 @@ defmodule Palee.Execution.Commands.CompleteExecution do
               },
               manual_scores
             )
+            # ADR-180: results for the scores a coach set on text sections,
+            # already checked against the workout by the caller.
+            |> Kernel.++(Keyword.get(opts, :text_section_scores, []))
 
           completed_params = %{
             completed_at_utc: DateTime.utc_now(),

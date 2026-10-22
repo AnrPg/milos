@@ -51,7 +51,10 @@ function ExecutePageContent() {
           return;
         }
 
-        if (execution.workout?.authoring_mode === "free_text") {
+        if (
+          execution.workout &&
+          (execution.workout.authoring_mode === "free_text" || execution.workout.authoring_mode === "sectioned_text")
+        ) {
           storeFreeTextExecutionWorkout(execution.workout, execution);
           const params = new URLSearchParams({
             workout: execution.master_workout_id,

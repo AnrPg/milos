@@ -1,4 +1,5 @@
 import { FREE_TEXT_TIMER_METADATA_KEY, type FreeTextTimerPreset, parseFreeTextTimerPreset } from "@/lib/free-text-timer";
+import { readTextSections, type TextSection, type TextSectionSource } from "@/lib/text-sections";
 
 export type FreeTextExecutionWorkout = {
   id: string;
@@ -10,6 +11,8 @@ export type FreeTextExecutionWorkout = {
   source_reference_id?: string | null;
   /** Timer the coach attached to the workout, if any. */
   timer_preset?: FreeTextTimerPreset | null;
+  /** ADR-180: the workout's text sections, each with its own timer ([] for plain free text). */
+  sections?: TextSection[];
 };
 
 const STORAGE_KEY = "palee:free-text-execution";
@@ -20,6 +23,8 @@ export function storeFreeTextExecutionWorkout(workout: {
   type?: string | null;
   free_text_body?: string | null;
   workout_metadata?: Record<string, unknown> | null;
+  authoring_mode?: string | null;
+  sections?: TextSectionSource[] | null;
 }, execution?: {
   id?: string | null;
   source?: string | null;
@@ -36,6 +41,7 @@ export function storeFreeTextExecutionWorkout(workout: {
     source: execution?.source ?? null,
     source_reference_id: execution?.source_reference_id ?? null,
     timer_preset: parseFreeTextTimerPreset(workout.workout_metadata?.[FREE_TEXT_TIMER_METADATA_KEY]),
+    sections: readTextSections(workout),
   };
 
   window.sessionStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
