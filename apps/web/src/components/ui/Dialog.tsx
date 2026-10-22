@@ -164,7 +164,7 @@ export function Dialog({
       data-testid={testId}
       onSubmit={onSubmit}
       onClick={(event) => event.stopPropagation()}
-      className={`relative flex min-h-0 w-full flex-col overflow-hidden outline-none ${panelShape} ${panelClassName}`}
+      className={`relative flex min-h-0 w-full flex-col outline-none ${/\boverflow-/.test(panelClassName) ? "" : "overflow-hidden"} ${panelShape} ${panelClassName}`}
       style={{
         background: "var(--panel)",
         borderColor: "var(--border)",

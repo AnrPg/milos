@@ -46,6 +46,8 @@ import { ProviderKindSetting } from "@/components/providers/ProviderKindSetting"
 import { WodGoalsDefaultSetting } from "@/components/wod-goals/WodGoalsDefaultSetting";
 import { AiScalingSettings } from "@/components/scaling/AiScalingSettings";
 import { PlanCard, PlanNotice } from "@/components/solo-coach/PlanCard";
+import { Dialog } from "@/components/ui/Dialog";
+import { Popover } from "@/components/ui/Popover";
 
 // ── Shared sub-components ────────────────────────────────────────────────────
 
@@ -105,20 +107,12 @@ function FieldInfo({
   children: React.ReactNode;
 }) {
   const i18n = useUiTranslations();
-  const ref = useRef<HTMLSpanElement>(null);
-
-  useEffect(() => {
-    if (!active) return;
-    function handleClick(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) onToggle();
-    }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
-  }, [active, onToggle]);
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   return (
-    <span ref={ref} className="relative inline-flex shrink-0">
+    <span className="relative inline-flex shrink-0">
       <button
+        ref={buttonRef}
         aria-label={label}
         aria-expanded={active}
         className="flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold transition-colors"
@@ -132,20 +126,21 @@ function FieldInfo({
       >
         {i18n("i042dc45")}
       </button>
-      {active && (
-        <span
-          className="absolute end-0 top-9 z-50 w-[min(22rem,calc(100vw-3rem))] rounded-2xl shadow-[var(--shadow-lg)]"
-          style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
-        >
-          <span
-            className="absolute -top-[7px] end-2.5 h-3 w-3 rotate-45"
-            style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)", borderBottom: "none", borderInlineEnd: "none" }}
-          />
-          <span className="block space-y-2 p-4 text-start text-xs normal-case leading-5 tracking-normal [&_p]:m-0" style={{ color: "var(--text-soft)" }}>
-            {children}
-          </span>
-        </span>
-      )}
+      <Popover
+        anchorRef={buttonRef}
+        open={active}
+        onClose={onToggle}
+        align="end"
+        width={352}
+        role="dialog"
+        ariaLabel={label}
+        className="rounded-2xl shadow-[var(--shadow-lg)]"
+        style={{ background: "var(--panel-muted)", border: "1px solid var(--border-strong)" }}
+      >
+        <div className="space-y-2 p-4 text-start text-xs normal-case leading-5 tracking-normal [&_p]:m-0" style={{ color: "var(--text-soft)" }}>
+          {children}
+        </div>
+      </Popover>
     </span>
   );
 }
@@ -794,37 +789,15 @@ function FinanceCleanupSection({ token }: { token: string }) {
       </div>
 
       {open ? (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-8">
-          <button
-            aria-label={i18n("featureFinanceCleanupCloseAria")}
-            className="absolute inset-0 bg-[var(--scrim)]"
-            type="button"
-            onClick={() => setOpen(false)}
-          />
-          <div
-            className="relative flex max-h-[86vh] w-full max-w-4xl flex-col overflow-hidden rounded-[1.6rem] shadow-2xl"
-            style={{ background: "var(--panel)", border: "1px solid var(--border-strong)" }}
-          >
-            <div className="flex flex-wrap items-start justify-between gap-4 border-b p-5" style={{ borderColor: "var(--border)" }}>
-              <div>
-                <p className="text-lg font-semibold" style={{ color: "var(--text)" }}>
-                  {i18n("featureFinanceCleanupModalTitle")}
-                </p>
-                <p className="mt-1 max-w-2xl text-xs leading-5" style={{ color: "var(--dim)" }}>
-                  {i18n("featureFinanceCleanupModalDescription")}
-                </p>
-              </div>
-              <button
-                className="rounded-full px-4 py-2 text-sm font-semibold"
-                style={{ background: "var(--panel-muted)", color: "var(--muted)" }}
-                type="button"
-                onClick={() => setOpen(false)}
-              >
-                {i18n("featureFinanceCleanupClose")}
-              </button>
-            </div>
-
-            <div className="grid min-h-0 flex-1 gap-4 overflow-auto p-5 lg:grid-cols-[1.35fr_0.85fr]">
+        <Dialog
+          onClose={() => setOpen(false)}
+          title={i18n("featureFinanceCleanupModalTitle")}
+          description={<span className="block max-w-2xl text-xs leading-5" style={{ color: "var(--dim)" }}>{i18n("featureFinanceCleanupModalDescription")}</span>}
+          closeLabel={i18n("featureFinanceCleanupClose")}
+          size="5xl"
+          variant="center"
+        >
+            <div className="grid gap-4 lg:grid-cols-[1.35fr_0.85fr]">
               <div className="space-y-3">
                 <input
                   className="w-full rounded-2xl border px-4 py-3 text-sm outline-none"
@@ -922,8 +895,7 @@ function FinanceCleanupSection({ token }: { token: string }) {
                 </button>
               </div>
             </div>
-          </div>
-        </div>
+        </Dialog>
       ) : null}
     </div>
   );
