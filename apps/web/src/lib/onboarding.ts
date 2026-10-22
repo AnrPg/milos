@@ -1,3 +1,5 @@
+import { currentLoginSession } from "@/lib/login-session";
+
 export type TourAudience = "admin" | "member" | "athlete";
 export type TourStep = { id: string; icon: string; href?: string };
 
@@ -28,6 +30,22 @@ export const TOUR_STEPS: Record<TourAudience, TourStep[]> = {
 };
 
 export const checklistLaterKey = (slug: string) => ["palee", "onboarding-later", slug].join(":");
+
+/**
+ * The admin setup checklist pops up on every login until every step is done
+ * or skipped. "Remind me later" snoozes it for the rest of this login only:
+ * the snooze records the login it was made in, so the next sign-in shows the
+ * checklist again even in the same tab.
+ */
+export function checklistSnoozed(slug: string) {
+  const login = currentLoginSession();
+  return login !== null && readStorage("local", checklistLaterKey(slug)) === login;
+}
+
+export function snoozeChecklist(slug: string) {
+  const login = currentLoginSession();
+  if (login) writeStorage("local", checklistLaterKey(slug), login);
+}
 
 type StorageKind = "local" | "session";
 

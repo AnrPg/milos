@@ -14,28 +14,32 @@ import {
   type OnboardingAction,
   type OnboardingStepId,
 } from "@/api/onboarding";
+import { gymClubFor } from "@/components/community/community";
+import { useMyClubs } from "@/components/community/use-community";
 import { InviteClientsDialog } from "@/components/invites/InviteClients";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { useReportGymTimeZone } from "@/hooks/useReportGymTimeZone";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
-import { TOUR_STEPS, checklistLaterKey, readStorage, writeStorage, type TourAudience } from "@/lib/onboarding";
+import { TOUR_STEPS, checklistSnoozed, snoozeChecklist, type TourAudience } from "@/lib/onboarding";
+import { setView } from "@/lib/view-mode";
 
 const OPEN_TOUR_EVENT = "palee:open-tour";
 const OPEN_CHECKLIST_EVENT = "palee:open-onboarding";
 const HIDDEN_PATHS = /^\/(?:login|register|set-admin|join)(?:\/|$)/;
 
+// Staff pages, opened under /org/:slug. `team` links to the club itself (see
+// useTeamClubHref), so it is not here.
 const STEP_LINKS: Partial<Record<OnboardingStepId, string>> = {
   timezone: "/admin/settings#time-zone",
   settings: "/admin/settings",
   classes: "/admin/class-schedule",
-  packages: "/admin/finance/packages",
+  packages: "/admin/finance?tab=packages",
   workout: "/admin/workouts/new",
   // ADR-170: an independent coach's practice.
   profile: "/admin/public-page",
   sessions: "/admin/appointments",
-  team: "/clubs",
   bootcamp: "/admin/community?tab=events",
 };
 
@@ -46,6 +50,23 @@ export function openProductTour() {
 
 export function openOnboardingChecklist() {
   window.dispatchEvent(new Event(OPEN_CHECKLIST_EVENT));
+}
+
+/**
+ * Setup and tour links open staff pages. An owner who also trains may be in
+ * "My training" (ADR-103), where the staff pages' guard sends them back home,
+ * so following one switches back to the staff view first.
+ */
+function enterStaffView() {
+  setView("staff");
+}
+
+/** ADR-170: the coach's «Team» is their gym club; the clubs list until it loads. */
+function useTeamClubHref(enabled: boolean) {
+  const clubs = useMyClubs();
+  const { membership } = useSelectedMembershipRole();
+  const club = enabled ? gymClubFor(clubs.data ?? [], membership?.organization.id) : null;
+  return club ? `/clubs/${encodeURIComponent(club.id)}` : "/me/clubs";
 }
 
 /** Real navigation labels, so instructions always match what users see. */
@@ -90,8 +111,9 @@ function useAdminOnboarding(enabled: boolean) {
 
 /**
  * Mounted once in the root layout. Owners/admins get the setup checklist as a
- * popup until they finish or dismiss it; every role gets the product tour on
- * its first visit.
+ * popup on every login until every step is done or skipped ("Remind me later"
+ * hides it for the rest of that login); every other role gets the product
+ * tour on its first visit.
  */
 export function OnboardingHost() {
   const pathname = usePathname();
@@ -105,27 +127,28 @@ export function OnboardingHost() {
   const [tourOpen, setTourOpen] = useState(false);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
-  const laterKey = checklistLaterKey(slug ?? "");
   // Completed tours live on the account (/auth/me), so a tour seen on one
   // device is not shown again on another. `finishedNow` covers this session.
   const [finishedNow, setFinishedNow] = useState<TourAudience[]>([]);
   const tourDone = Boolean(currentUser?.completed_tours?.includes(audience)) || finishedNow.includes(audience);
   const hidden = HIDDEN_PATHS.test(pathname);
 
-  // First visit: admins see the checklist popup, clients see the tour.
+  // Admins see the checklist popup until setup is finished, clients see the
+  // tour once. The stored `dismissed` flag is no longer honoured: setup that
+  // is not finished keeps coming back at each login.
   useEffect(() => {
     if (!ready || hidden) return;
 
     if (isOwnerOrAdmin) {
       const checklist = query.data;
-      if (!checklist || checklist.dismissed || checklist.finished) return;
-      if (readStorage("session", laterKey)) return;
+      if (!slug || !checklist || checklist.finished) return;
+      if (checklistSnoozed(slug)) return;
       queueMicrotask(() => setChecklistOpen(true));
       return;
     }
 
     if (!tourDone) queueMicrotask(() => setTourOpen(true));
-  }, [hidden, isOwnerOrAdmin, laterKey, query.data, ready, tourDone]);
+  }, [hidden, isOwnerOrAdmin, query.data, ready, slug, tourDone]);
 
   useEffect(() => {
     const openTour = () => setTourOpen(true);
@@ -139,9 +162,9 @@ export function OnboardingHost() {
   }, []);
 
   const closeChecklistForSession = useCallback(() => {
-    writeStorage("session", laterKey, "1");
+    if (slug) snoozeChecklist(slug);
     setChecklistOpen(false);
-  }, [laterKey]);
+  }, [slug]);
 
   function finishTour() {
     setFinishedNow((current) => [...current, audience]);
@@ -161,10 +184,6 @@ export function OnboardingHost() {
           busy={mutation.isPending}
           onAction={(action, step) => mutation.mutate({ action, step })}
           onLater={closeChecklistForSession}
-          onDismiss={() => {
-            mutation.mutate({ action: "dismiss" });
-            setChecklistOpen(false);
-          }}
           onTour={() => {
             closeChecklistForSession();
             setTourOpen(true);
@@ -187,7 +206,6 @@ function AdminChecklistDialog({
   busy,
   onAction,
   onLater,
-  onDismiss,
   onTour,
   onInvite,
 }: {
@@ -196,7 +214,6 @@ function AdminChecklistDialog({
   busy: boolean;
   onAction: (action: OnboardingAction, step?: OnboardingStepId) => void;
   onLater: () => void;
-  onDismiss: () => void;
   onTour: () => void;
   onInvite: () => void;
 }) {
@@ -226,10 +243,7 @@ function AdminChecklistDialog({
         <div className="mt-4">
           <ChecklistView checklist={checklist} slug={slug} busy={busy} onAction={onAction} onNavigate={onLater} onTour={onTour} onInvite={onInvite} />
         </div>
-        <div className="sticky bottom-0 -mx-5 -mb-5 mt-5 flex flex-col-reverse gap-2 px-5 pb-5 pt-3 sm:static sm:m-0 sm:mt-5 sm:flex-row sm:justify-between sm:p-0" style={{ background: "var(--panel)" }}>
-          <button type="button" onClick={onDismiss} className="rounded-xl px-4 py-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
-            {t("dontShow")}
-          </button>
+        <div className="sticky bottom-0 -mx-5 -mb-5 mt-5 flex flex-col-reverse gap-2 px-5 pb-5 pt-3 sm:static sm:m-0 sm:mt-5 sm:flex-row sm:justify-end sm:p-0" style={{ background: "var(--panel)" }}>
           <button type="button" onClick={onLater} className="rounded-xl px-4 py-2 text-sm font-semibold" style={{ background: "var(--text)", color: "var(--bg)" }}>
             {t("later")}
           </button>
@@ -259,6 +273,8 @@ function ChecklistView({
   const t = useTranslations("Onboarding");
   const percent = Math.round((checklist.completed_count / Math.max(checklist.total, 1)) * 100);
   const nextStep = checklist.steps.find((step) => !step.done && !step.skipped)?.id;
+  const teamHref = useTeamClubHref(checklist.steps.some((step) => step.id === "team"));
+  const pathname = usePathname();
 
   return (
     <div>
@@ -284,7 +300,7 @@ function ChecklistView({
         {checklist.steps.map((step, index) => {
           const open = !step.done && !step.skipped;
           const isNext = step.id === nextStep;
-          const href = STEP_LINKS[step.id];
+          const href = step.id === "team" ? teamHref : STEP_LINKS[step.id] ? adminHref(STEP_LINKS[step.id]!, slug) : undefined;
           const ctaStyle = isNext ? { background: "var(--primary)", color: "var(--primary-contrast, var(--bg))" } : { border: "1px solid var(--border)", color: "var(--text)" };
 
           return (
@@ -320,7 +336,15 @@ function ChecklistView({
                         ) : step.id === "tour" ? (
                           <button type="button" onClick={onTour} className="inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold" style={ctaStyle}>{t(`steps.${step.id}.cta`)}</button>
                         ) : href ? (
-                          <Link href={adminHref(href, slug)} onClick={onNavigate} className="inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold" style={ctaStyle}>
+                          <Link
+                            href={href}
+                            onClick={() => {
+                              enterStaffView();
+                              onNavigate?.();
+                              // Already on that page (the popup opened over it): show its top.
+                              if (href.split("?")[0] === pathname) window.scrollTo({ top: 0 });
+                            }}
+                            className="inline-flex rounded-lg px-3 py-1.5 text-xs font-semibold" style={ctaStyle}>
                             {t(`steps.${step.id}.cta`)}
                           </Link>
                         ) : null}
@@ -376,11 +400,6 @@ export function AdminOnboardingPanel() {
           <button type="button" onClick={openProductTour} className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
             {t("takeTour")}
           </button>
-          {checklist.dismissed ? (
-            <button type="button" disabled={mutation.isPending} onClick={() => mutation.mutate({ action: "restore" })} className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ border: "1px solid var(--border)", color: "var(--text)" }}>
-              {t("showPopupAgain")}
-            </button>
-          ) : null}
           <button type="button" onClick={() => setCollapsed(!isCollapsed)} aria-expanded={!isCollapsed} className="rounded-xl px-3 py-2 text-sm font-semibold" style={{ color: "var(--muted)" }}>
             {isCollapsed ? t("showSteps") : t("hideSteps")}
           </button>
@@ -457,6 +476,7 @@ export function ProductTour({ audience, slug, onClose }: { audience: TourAudienc
           <button
             type="button"
             onClick={() => {
+              if (audience === "admin") enterStaffView();
               onClose();
               router.push(href);
             }}

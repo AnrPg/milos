@@ -31,3 +31,34 @@ describe("onboarding copy", () => {
     expect(checklistLaterKey("acme")).toBe("palee:onboarding-later:acme");
   });
 });
+
+describe("checklist snooze", () => {
+  it("lasts for the current login only", async () => {
+    const { checklistSnoozed, snoozeChecklist } = await import("./onboarding");
+    const { endLoginSession, startLoginSession } = await import("./login-session");
+    window.localStorage.clear();
+    startLoginSession();
+
+    expect(checklistSnoozed("acme")).toBe(false);
+    snoozeChecklist("acme");
+    expect(checklistSnoozed("acme")).toBe(true);
+    // Another gym of the same admin is not snoozed by it.
+    expect(checklistSnoozed("other")).toBe(false);
+
+    // A reload or new tab keeps the login, so the snooze holds.
+    expect(checklistSnoozed("acme")).toBe(true);
+
+    // Signing out and in again shows the checklist again.
+    endLoginSession();
+    startLoginSession();
+    expect(checklistSnoozed("acme")).toBe(false);
+  });
+
+  it("treats a restored session without a login id as a new login", async () => {
+    const { checklistSnoozed, snoozeChecklist } = await import("./onboarding");
+    window.localStorage.clear();
+    expect(checklistSnoozed("acme")).toBe(false);
+    snoozeChecklist("acme");
+    expect(checklistSnoozed("acme")).toBe(true);
+  });
+});
