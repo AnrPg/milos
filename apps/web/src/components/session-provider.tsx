@@ -34,6 +34,7 @@ import {
   clearBrowserPushSubscription,
   setWorkoutCacheUser,
 } from "@/lib/push-subscription";
+import { endLoginSession, startLoginSession } from "@/lib/login-session";
 import { resetRealtimeSocket } from "@/lib/realtime";
 import { USER_SYNC_EVENT, type UserSyncDetail } from "@/lib/user-sync";
 import { isAppLocale, persistLocaleCookie } from "@/i18n/locales";
@@ -94,6 +95,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }
 
   function resetSession(accessTokenForCleanup?: string | null) {
+    endLoginSession();
     resetRealtimeSocket();
     void setWorkoutCacheUser(null);
     try {
@@ -109,6 +111,8 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   async function establishSession(issuedTokens: AuthTokens) {
     const user = await fetchCurrentUser(issuedTokens.access_token);
+    // A fresh sign-in (not a restore): "until next login" UI shows again.
+    startLoginSession();
     commitSession(issuedTokens, user);
     return user;
   }
