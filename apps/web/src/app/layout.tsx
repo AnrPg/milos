@@ -2,8 +2,8 @@
 import {getUiTranslations} from "@/i18n/ui-server";
 import type { Metadata, Viewport } from "next";
 import { headers } from "next/headers";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getTimeZone } from "next-intl/server";
+import { ClientMessagesProvider } from "@/i18n/client-messages-provider";
 import { QueryProvider } from "@/components/query-provider";
 import { BuddyRealtimeBridge } from "@/components/buddy/BuddyRealtimeBridge";
 import { RealtimeSyncBridge } from "@/components/realtime-sync-bridge";
@@ -14,6 +14,7 @@ import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
 import { PersonalThemeBridge, ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/TopNav";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
+import { ScreenPreloader } from "@/components/nav/ScreenPreloader";
 import { OnboardingHost } from "@/components/onboarding/Onboarding";
 import { ReferralClaimBridge } from "@/components/referrals/ReferralClaimBridge";
 import { NativeAppBridge } from "@/components/platform/NativeAppBridge";
@@ -87,7 +88,7 @@ export default async function RootLayout({
   const nonce = (await headers()).get("x-nonce") ?? undefined;
   const resolvedLocale = await getLocale();
   const locale = isAppLocale(resolvedLocale) ? resolvedLocale : "en";
-  const messages = await getMessages();
+  const timeZone = await getTimeZone();
 
   return (
     <html
@@ -105,7 +106,7 @@ export default async function RootLayout({
         />
       </head>
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider locale={locale} messages={messages}>
+        <ClientMessagesProvider locale={locale} timeZone={timeZone}>
           <QueryProvider>
             <ThemeProvider>
               <SessionProvider>
@@ -122,11 +123,12 @@ export default async function RootLayout({
                 <TopNav />
                 {children}
                 <BottomTabBar />
+                <ScreenPreloader />
                 <OnboardingHost />
               </SessionProvider>
             </ThemeProvider>
           </QueryProvider>
-        </NextIntlClientProvider>
+        </ClientMessagesProvider>
       </body>
     </html>
   );

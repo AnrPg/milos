@@ -18,6 +18,34 @@ defmodule PaleeWeb.AuthController do
 
   action_fallback PaleeWeb.FallbackController
 
+  # ADR-177: returned by /auth/me, and with the tokens from login and refresh
+  # so opening the app needs no separate /auth/me round trip.
+  @current_user_schema %Schema{
+    type: :object,
+    properties: %{
+      id: %Schema{type: :string, format: :uuid},
+      nickname: %Schema{type: :string},
+      role: %Schema{type: :string},
+      avatar_url: %Schema{type: :string, nullable: true},
+      vendor: %Schema{type: :boolean},
+      preferred_locale: %Schema{
+        type: :string,
+        enum: Palee.Identity.supported_locales()
+      },
+      preferred_theme_slug: %Schema{
+        type: :string,
+        nullable: true,
+        enum: Palee.Themes.slugs() ++ [nil],
+        description: "The member's own theme: graphite (dark) or frost (light); null is frost"
+      },
+      completed_tours: %Schema{
+        type: :array,
+        items: %Schema{type: :string, enum: ~w(admin member athlete)}
+      }
+    },
+    required: [:id, :nickname, :role, :vendor, :preferred_locale, :completed_tours]
+  }
+
   tags(["Authentication"])
 
   plug OpenApiSpex.Plug.CastAndValidate,
@@ -118,7 +146,7 @@ defmodule PaleeWeb.AuthController do
         {"Access session", "application/json",
          %Schema{
            type: :object,
-           properties: %{access_token: %Schema{type: :string}},
+           properties: %{access_token: %Schema{type: :string}, user: @current_user_schema},
            required: [:access_token]
          }},
       no_content: {"No refresh session", nil, nil},
@@ -251,7 +279,7 @@ defmodule PaleeWeb.AuthController do
         {"Access session", "application/json",
          %Schema{
            type: :object,
-           properties: %{access_token: %Schema{type: :string}},
+           properties: %{access_token: %Schema{type: :string}, user: @current_user_schema},
            required: [:access_token]
          }},
       unauthorized:
@@ -321,34 +349,7 @@ defmodule PaleeWeb.AuthController do
     summary: "Return the authenticated user",
     security: [%{"bearerAuth" => []}],
     responses: [
-      ok:
-        {"Current user", "application/json",
-         %Schema{
-           type: :object,
-           properties: %{
-             id: %Schema{type: :string, format: :uuid},
-             nickname: %Schema{type: :string},
-             role: %Schema{type: :string},
-             avatar_url: %Schema{type: :string, nullable: true},
-             vendor: %Schema{type: :boolean},
-             preferred_locale: %Schema{
-               type: :string,
-               enum: Palee.Identity.supported_locales()
-             },
-             preferred_theme_slug: %Schema{
-               type: :string,
-               nullable: true,
-               enum: Palee.Themes.slugs() ++ [nil],
-               description:
-                 "The member's own theme: graphite (dark) or frost (light); null is frost"
-             },
-             completed_tours: %Schema{
-               type: :array,
-               items: %Schema{type: :string, enum: ~w(admin member athlete)}
-             }
-           },
-           required: [:id, :nickname, :role, :vendor, :preferred_locale, :completed_tours]
-         }},
+      ok: {"Current user", "application/json", @current_user_schema},
       unauthorized:
         {"Unauthorized", "application/json",
          %Schema{
@@ -401,10 +402,10 @@ defmodule PaleeWeb.AuthController do
 
   def login(conn, _params) do
     case LoginUser.call(conn.body_params) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user}} ->
         conn
         |> put_refresh_cookie(refresh_token)
-        |> json(%{access_token: access_token})
+        |> json(%{access_token: access_token, user: current_user_json(user)})
 
       error ->
         error
@@ -424,10 +425,10 @@ defmodule PaleeWeb.AuthController do
 
   defp refresh_with_cookie(conn, refresh_token) do
     case RefreshToken.call(%{refresh_token: refresh_token}) do
-      {:ok, %{access_token: access_token, refresh_token: refresh_token}} ->
+      {:ok, %{access_token: access_token, refresh_token: refresh_token, user: user}} ->
         conn
         |> put_refresh_cookie(refresh_token)
-        |> json(%{access_token: access_token})
+        |> json(%{access_token: access_token, user: current_user_json(user)})
 
       error ->
         error
@@ -454,9 +455,11 @@ defmodule PaleeWeb.AuthController do
   end
 
   def me(conn, _params) do
-    user = GuardianPlug.current_resource(conn)
+    json(conn, current_user_json(GuardianPlug.current_resource(conn)))
+  end
 
-    json(conn, %{
+  defp current_user_json(user) do
+    %{
       id: user.id,
       nickname: user.nickname,
       role: to_string(user.role),
@@ -465,7 +468,7 @@ defmodule PaleeWeb.AuthController do
       preferred_locale: user.preferred_locale,
       preferred_theme_slug: Map.get(user, :preferred_theme_slug),
       completed_tours: Map.get(user, :completed_tours) || []
-    })
+    }
   end
 
   defp vendor?(user) do

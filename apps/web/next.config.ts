@@ -19,6 +19,13 @@ const nextConfig: NextConfig = {
     // Dev-only /api rewrite: the workout assistant can take longer than the
     // 30 s default. Production routes /api straight to Phoenix via Caddy.
     proxyTimeout: 90_000,
+    // Pages are client shells that fetch their own data, so a page's RSC
+    // payload carries no user data and can be reused across navigations:
+    // revisiting a page needs no server round trip (one less wait per tap
+    // on high-latency mobile networks).
+    staleTimes: {
+      dynamic: 300,
+    },
   },
   // ADR-164: the dev-only anatomy preview (`page.dev.tsx`) is a route in `next dev` only.
   pageExtensions: process.env.NODE_ENV === "production" ? ["tsx", "ts", "jsx", "js"] : ["dev.tsx", "tsx", "ts", "jsx", "js"],

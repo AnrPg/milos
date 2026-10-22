@@ -94,9 +94,12 @@ export function PriorityNav({
         {visible.map((link) => {
           const active = link.id === activeId;
           return (
+            // Full prefetch: a click renders from the client cache with no
+            // server round trip (staleTimes in next.config.ts).
             <Link
               key={link.id}
               href={link.href}
+              prefetch
               aria-current={active ? "page" : undefined}
               className={pill}
               style={{ background: active ? "var(--border)" : "transparent", color: active ? "var(--text)" : "var(--dim)" }}
@@ -129,6 +132,7 @@ export function PriorityNav({
                   <Link
                     key={link.id}
                     href={link.href}
+                    prefetch
                     className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
                     style={{ color: link.id === activeId ? "var(--primary)" : "var(--text)" }}
                     onClick={() => setOpen(false)}

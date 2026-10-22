@@ -4,6 +4,7 @@ import {
   activeItemId,
   clientExtraLinks,
   clientNavItems,
+  likelyScreens,
   sectionGroupFor,
   showsBottomBar,
   staffNavItems,
@@ -137,5 +138,27 @@ describe("sectionGroupFor", () => {
     const on = sectionGroupFor("/journal/body/new", { surface: "member", staffItems: [], features: [], journalSections: { body: true } });
     expect(on?.id).toBe("journal");
     expect(activeItemId("/journal/body/new", on!.tabs)).toBe("body");
+  });
+});
+
+describe("likelyScreens", () => {
+  const hrefs = (surface: "admin" | "member" | "athlete", capabilities: Record<string, string> = {}) =>
+    likelyScreens(surface, surface === "admin" ? staffNavItems({ role: "admin", capabilities }) : []).map((item) => item.href);
+
+  it("preloads at least six distinct screens for owners and members", () => {
+    for (const screens of [hrefs("admin", ADMIN), hrefs("member"), hrefs("athlete")]) {
+      expect(screens.length).toBeGreaterThanOrEqual(6);
+      expect(new Set(screens).size).toBe(screens.length);
+    }
+  });
+
+  it("starts with the bar links, then the most used sub-pages", () => {
+    expect(hrefs("member").slice(0, 4)).toEqual(clientNavItems().map((item) => item.href));
+    expect(hrefs("admin", ADMIN)).toEqual(expect.arrayContaining(["/admin", "/admin/class-schedule", "/admin/coaching-assignments", "/admin/workouts", "/admin/settings"]));
+  });
+
+  it("only preloads what a staff role can open", () => {
+    expect(hrefs("admin", JANITOR)).toEqual(["/admin/cleaning"]);
+    expect(hrefs("admin", COACH)).not.toContain("/admin/settings");
   });
 });

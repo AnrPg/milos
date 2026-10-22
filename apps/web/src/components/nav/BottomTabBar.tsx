@@ -95,9 +95,12 @@ export function BottomTabBar() {
         {items.map((item) => {
           const current = item.id === active;
           return (
+            // Full prefetch: a tap renders from the client cache with no
+            // server round trip (staleTimes in next.config.ts).
             <Link
               key={item.id}
               href={item.href}
+              prefetch
               aria-current={current ? "page" : undefined}
               className="flex min-h-[4.25rem] flex-col items-center justify-center gap-1 text-xs font-semibold"
               style={{ color: current ? "var(--primary-strong)" : "var(--dim)" }}
