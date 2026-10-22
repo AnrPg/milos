@@ -585,3 +585,17 @@ msgstr "Πρόσκληση σε squad"
 
 msgid "%{nickname} invited you to the squad «%{group}»."
 msgstr "Ο/Η %{nickname} σε προσκάλεσε στο squad «%{group}»."
+
+# ADR-176: a class without its WOD.
+msgid "A class has no WOD"
+msgstr "Μάθημα χωρίς WOD"
+
+msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
+msgstr "Το %{class} (%{when}) δεν έχει WOD, οπότε τα μέλη δεν το βλέπουν και δεν μπορούν να κλείσουν θέση. Σύνδεσε ένα για να δημοσιευτεί."
+
+msgid "%{class} (%{when}) starts in an hour and still has no WOD."
+msgstr "Το %{class} (%{when}) ξεκινά σε μία ώρα και ακόμη δεν έχει WOD."
+
+msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
+msgstr "Το %{class} (%{when}) δεν έχει ακόμη WOD. Σύνδεσε ένα πριν ξεκινήσει."
+

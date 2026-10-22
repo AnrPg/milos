@@ -20,6 +20,7 @@ import { InviteClientsDialog } from "@/components/invites/InviteClients";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
+import { useReportGymTimeZone } from "@/hooks/useReportGymTimeZone";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { TOUR_STEPS, checklistSnoozed, snoozeChecklist, type TourAudience } from "@/lib/onboarding";
 import { setView } from "@/lib/view-mode";
@@ -31,6 +32,7 @@ const HIDDEN_PATHS = /^\/(?:login|register|set-admin|join)(?:\/|$)/;
 // Staff pages, opened under /org/:slug. `team` links to the club itself (see
 // useTeamClubHref), so it is not here.
 const STEP_LINKS: Partial<Record<OnboardingStepId, string>> = {
+  timezone: "/admin/settings#time-zone",
   settings: "/admin/settings",
   classes: "/admin/class-schedule",
   packages: "/admin/finance?tab=packages",
@@ -121,6 +123,7 @@ export function OnboardingHost() {
   const isOwnerOrAdmin = membershipRole === "owner" || membershipRole === "admin";
   const audience: TourAudience = membershipRole === "athlete" ? "athlete" : membershipRole === "member" ? "member" : "admin";
   const { query, mutation, slug } = useAdminOnboarding(ready && isOwnerOrAdmin);
+  useReportGymTimeZone(ready && isOwnerOrAdmin, tokens?.access_token, slug);
   const [tourOpen, setTourOpen] = useState(false);
   const [checklistOpen, setChecklistOpen] = useState(false);
   const [inviteOpen, setInviteOpen] = useState(false);
@@ -348,9 +351,12 @@ function ChecklistView({
                         <button type="button" disabled={busy} onClick={() => onAction("complete", step.id)} className="text-xs font-semibold underline disabled:opacity-50" style={{ color: "var(--muted)" }}>
                           {t("markDone")}
                         </button>
-                        <button type="button" disabled={busy} onClick={() => onAction("skip", step.id)} className="text-xs font-semibold underline disabled:opacity-50" style={{ color: "var(--muted)" }}>
-                          {t("skip")}
-                        </button>
+                        {/* ADR-176: the gym's time zone must be set, so it cannot be skipped. */}
+                        {step.id === "timezone" ? null : (
+                          <button type="button" disabled={busy} onClick={() => onAction("skip", step.id)} className="text-xs font-semibold underline disabled:opacity-50" style={{ color: "var(--muted)" }}>
+                            {t("skip")}
+                          </button>
+                        )}
                       </>
                     ) : step.auto ? null : (
                       <button type="button" disabled={busy} onClick={() => onAction("reopen", step.id)} className="text-xs font-semibold underline disabled:opacity-50" style={{ color: "var(--muted)" }}>

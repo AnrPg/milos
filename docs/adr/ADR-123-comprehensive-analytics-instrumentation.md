@@ -187,6 +187,7 @@ subject id.
 | `class_booking_timed_out` | `TimeoutBooking` (job) | scheduled_class_id | per booking |
 | `class_attendance_recorded` | `AdminRecordAttendance` | scheduled_class_id, booking_id, status, member_id | - |
 | `class_slot_created` | `CreateScheduledSlot` | class_type_id, master_workout_id, capacity, auto_approve, series_id | - |
+| `class_workout_linked` | `LinkClassWorkout` (ADR-176) | class_type_id, master_workout_id, class_series_id, was_published | - |
 | `class_series_created` | `CreateRecurringClassSeries` | class_type_id, master_workout_id | - |
 | `class_slot_cancelled` | `DeleteScheduledSlot` | - | - |
 

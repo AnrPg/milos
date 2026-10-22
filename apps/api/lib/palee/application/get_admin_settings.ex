@@ -13,7 +13,9 @@ defmodule Palee.Application.GetAdminSettings do
        scheduling: Scheduling.get_settings(context),
        # ADR-163: workout-authoring defaults (the WOD-goals toggle).
        workouts: Organizations.get_workout_settings(context),
-       provider: provider(context)
+       provider: provider(context),
+       # ADR-176: the gym's zone and whether an admin confirmed it.
+       time_zone: Organizations.timezone_status(context.organization_id)
      }}
   end
 

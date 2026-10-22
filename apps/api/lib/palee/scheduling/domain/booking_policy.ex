@@ -1,4 +1,6 @@
 defmodule Palee.Scheduling.Domain.BookingPolicy do
+  alias Palee.Scheduling.Domain.ClassWorkoutReadiness
+
   def slot_full?(%{capacity: capacity, approved_booking_count: approved_booking_count})
       when is_integer(capacity) and is_integer(approved_booking_count) do
     approved_booking_count >= capacity
@@ -9,6 +11,10 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
     now = Keyword.fetch!(opts, :now)
 
     cond do
+      # ADR-176: a draft class (no WOD, not in a series) is not published.
+      not ClassWorkoutReadiness.published?(slot) ->
+        {:error, :class_not_published}
+
       slot_full?(slot) ->
         {:error, :slot_full}
 
@@ -69,6 +75,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
     now = Keyword.fetch!(opts, :now)
 
     cond do
+      not ClassWorkoutReadiness.published?(slot) -> {:error, :class_not_published}
       DateTime.compare(slot.scheduled_at, now) != :gt -> {:error, :slot_in_past}
       not slot_full?(slot) -> {:error, :slot_not_full}
       already_has_booking?(slot, user_id) -> {:error, :already_booked}
@@ -82,6 +89,7 @@ defmodule Palee.Scheduling.Domain.BookingPolicy do
   """
   def can_book_guest?(slot, user_id, now) do
     cond do
+      not ClassWorkoutReadiness.published?(slot) -> {:error, :class_not_published}
       DateTime.compare(slot.scheduled_at, now) != :gt -> {:error, :slot_in_past}
       has_guest?(slot, user_id) -> {:error, :guest_already_booked}
       slot_full?(slot) -> {:error, :slot_full}

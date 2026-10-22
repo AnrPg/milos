@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "Το πλάνο σου δεν έχει ελεύθερες θέσεις προσωπικού. Ελευθέρωσε μία ή ζήτα μας αλλαγή πλάνου.",
     "apiErrorUnknownPlan": "Αυτό το πλάνο δεν υπάρχει.",
     "apiErrorTrialEndRequired": "Η δοκιμαστική περίοδος χρειάζεται ημερομηνία λήξης.",
-    "apiErrorInvalidName": "Το όνομα πρέπει να έχει από 2 έως 120 χαρακτήρες."
+    "apiErrorInvalidName": "Το όνομα πρέπει να έχει από 2 έως 120 χαρακτήρες.",
+    "classNoWodYet": "Χωρίς WOD ακόμη (σύνδεσέ το αργότερα)",
+    "classDraftSavedNotice": "Αποθηκεύτηκε χωρίς WOD. Τα μέλη δεν θα βλέπουν το μάθημα μέχρι να συνδέσεις ένα.",
+    "classSeriesWod": "WOD (προαιρετικό)",
+    "classSeriesWodHint": "Άφησέ το κενό για να πάρει κάθε μάθημα το δικό του WOD. Ένα μάθημα που την ημέρα του δεν έχει ακόμη WOD επισημαίνεται και το προσωπικό λαμβάνει υπενθυμίσεις.",
+    "classDraftTitle": "Μη δημοσιευμένο: χωρίς WOD",
+    "classDraftBody": "Τα μέλη δεν βλέπουν το μάθημα και δεν μπορούν να κλείσουν θέση μέχρι να συνδεθεί WOD.",
+    "classWodMissingTitle": "Λείπει το WOD σήμερα",
+    "classWodMissingBody": "Το μάθημα γίνεται σήμερα και δεν έχει WOD. Το προσωπικό λαμβάνει υπενθυμίσεις στις 07:00 και μία ώρα πριν ξεκινήσει.",
+    "classWodAwaitingTitle": "Χωρίς WOD ακόμη",
+    "classWodAwaitingBody": "Τα μέλη μπορούν να κλείσουν θέση. Σύνδεσε το WOD πριν από την ημέρα του μαθήματος.",
+    "classLinkWodLabel": "WOD για σύνδεση",
+    "classLinkWodPlaceholder": "Διάλεξε WOD",
+    "classLinkWod": "Σύνδεση WOD",
+    "classLinkWodSaving": "Σύνδεση…",
+    "classDraftBadge": "Πρόχειρο · χωρίς WOD",
+    "classWodMissingBadge": "Χωρίς WOD",
+    "ntfClassWodMissingTitle": "Μάθημα χωρίς WOD",
+    "ntfClassWodMissingDraftBody": "Το {className} ({when}) δεν έχει WOD, οπότε τα μέλη δεν το βλέπουν και δεν μπορούν να κλείσουν θέση.",
+    "ntfClassWodMissingHourBody": "Το {className} ({when}) ξεκινά σε μία ώρα και ακόμη δεν έχει WOD.",
+    "ntfClassWodMissingMorningBody": "Το {className} ({when}) δεν έχει ακόμη WOD.",
+    "gymTimeZoneTitle": "Ζώνη ώρας",
+    "gymTimeZoneDescription": "Οι ημέρες των μαθημάτων, οι υπενθυμίσεις WOD, οι ημέρες check-in και οι ώρες των events την ακολουθούν.",
+    "gymTimeZoneLabel": "Η ζώνη ώρας του γυμναστηρίου σου",
+    "gymTimeZoneHint": "Διάλεξε τη ζώνη όπου βρίσκεται το γυμναστήριο, ακόμη κι αν ταξιδεύεις.",
+    "gymTimeZoneConfirmed": "Το γυμναστήριό σου λειτουργεί σε ώρα {zone}.",
+    "gymTimeZoneInferred": "Υποθέσαμε {zone} από τη συσκευή σου. Επιβεβαίωσέ το ή διάλεξε άλλη.",
+    "gymTimeZoneUnset": "Δεν έχει οριστεί ακόμη. Μέχρι τότε το Palee χρησιμοποιεί {zone}.",
+    "gymTimeZoneConfirm": "Αποθήκευση ζώνης ώρας",
+    "gymTimeZoneSaving": "Αποθήκευση…",
+    "apiErrorClassNotPublished": "Το μάθημα δεν είναι ακόμη ανοιχτό για κρατήσεις.",
+    "apiErrorInvalidTimeZone": "Διάλεξε μια γνωστή ζώνη ώρας.",
+    "apiErrorTimeZoneRequired": "Όρισε πρώτα τη ζώνη ώρας του γυμναστηρίου."
   },
   "PrSharing": {
     "gymLabel": "Πού πέτυχες αυτό το PR;",
@@ -4744,6 +4776,11 @@
         "title": "Κάνε ένα ανοιχτό bootcamp",
         "body": "Μια υπαίθρια ή online προπόνηση για όλους. Καλός τρόπος να γνωρίσεις νέους πελάτες.",
         "cta": "Νέο bootcamp"
+      },
+      "timezone": {
+        "title": "Όρισε τη ζώνη ώρας",
+        "body": "Οι ημέρες μαθημάτων, οι υπενθυμίσεις WOD και οι ημέρες check-in την ακολουθούν. Την υποθέσαμε από τη συσκευή σου: επιβεβαίωσέ την ή διάλεξε άλλη.",
+        "cta": "Ορισμός ζώνης ώρας"
       }
     },
     "tour": {

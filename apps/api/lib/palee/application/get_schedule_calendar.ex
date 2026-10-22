@@ -1,5 +1,5 @@
 defmodule Palee.Application.GetScheduleCalendar do
-  alias Palee.{Community, Facility, Finance, Identity, Scheduling, Workouts}
+  alias Palee.{Community, Facility, Finance, Identity, Organizations, Scheduling, Workouts}
   alias Palee.Application.BookingTerms
   alias Palee.Scheduling.Domain.BookingPolicy
 
@@ -9,9 +9,12 @@ defmodule Palee.Application.GetScheduleCalendar do
         get_calendar_week(context, %{
           start_at: start_at,
           end_at: end_at,
-          class_type_ids: class_type_ids
+          class_type_ids: class_type_ids,
+          # ADR-176: only staff see draft classes (no WOD yet).
+          include_drafts: admin_role?(context, actor)
         })
         |> enrich_slots(context, actor)
+        |> put_workout_status(context)
         |> put_package_coverage(context, actor)
         |> put_cancel_free_until(context, actor)
         |> put_friends_going(context, actor)
@@ -34,6 +37,22 @@ defmodule Palee.Application.GetScheduleCalendar do
   def call(_actor, _params), do: {:error, :organization_context_required}
 
   defp get_calendar_week(context, params), do: Scheduling.get_calendar_week(context, params)
+
+  # ADR-176: `published` and `workout_status` (linked | awaiting | missing,
+  # the incomplete badge), with days read in the gym's time zone.
+  defp put_workout_status([], _context), do: []
+
+  defp put_workout_status(slots, context) do
+    now = DateTime.utc_now()
+    zone = Organizations.organization_timezone(context.organization_id)
+
+    Enum.map(slots, fn slot ->
+      Map.merge(slot, %{
+        published: Scheduling.class_published?(slot),
+        workout_status: Scheduling.class_workout_status(slot, now, zone)
+      })
+    end)
+  end
 
   defp enrich_slots(slots, context, actor) do
     nickname_cache = booking_nickname_cache(slots, admin_role?(context, actor))

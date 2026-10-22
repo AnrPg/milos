@@ -13,6 +13,7 @@ import { WORKOUT_TYPE_COLORS } from "@/lib/workout-colors";
 import { semanticLabel } from "@/i18n/presentation";
 import { isEventSlot, memberSlotState, slotLocationName, waitlistPositionLabel } from "@/components/schedule/member-booking";
 import { SPARK_CREATE_STYLE } from "@/lib/spark";
+import { classWorkoutNoticeKind } from "@/components/schedule/ClassWorkoutNotice";
 
 type CalendarViewProps = {
   days: ScheduleDays;
@@ -265,6 +266,18 @@ function SlotCard({
   const details = [isEventSlot(slot) ? i18n("mbEventMarker") : null, locationName].filter(Boolean).join(" · ");
   const classType = slotClassType(slot);
   const typeColor = WORKOUT_TYPE_COLORS[classType.slug] ?? "var(--primary)";
+  // ADR-176: staff see a class without its WOD as incomplete (a draft, or a
+  // series class from 00:00 on its day).
+  const workoutNotice = isAdmin && !isPast ? classWorkoutNoticeKind(slot) : null;
+  const incompleteBadge =
+    workoutNotice === "draft" || workoutNotice === "missing" ? (
+      <span
+        className="inline-block rounded-full px-2 py-0.5 text-[10px] font-bold"
+        style={{ background: "color-mix(in srgb, var(--danger) 14%, transparent)", color: "var(--danger)" }}
+      >
+        {workoutNotice === "draft" ? i18n("classDraftBadge") : i18n("classWodMissingBadge")}
+      </span>
+    ) : null;
 
   if (compact) {
     return (
@@ -288,6 +301,7 @@ function SlotCard({
             {i18n("memberProgrammingYourVersion")}
           </p>
         ) : null}
+        {incompleteBadge ? <div className="mt-1 truncate">{incompleteBadge}</div> : null}
       </button>
     );
   }
@@ -310,6 +324,7 @@ function SlotCard({
           <p className="mt-1 text-sm" style={{ color: isUnavailable ? "var(--border-strong)" : "var(--muted)" }}>
           {slot.workout?.title ?? i18n("workoutPreviewUnavailable473ec36")}
           </p>
+          {incompleteBadge ? <div className="mt-2">{incompleteBadge}</div> : null}
           {slot.my_version ? (
             <span
               className="mt-2 inline-block rounded-full px-2 py-0.5 text-[10px] font-bold"

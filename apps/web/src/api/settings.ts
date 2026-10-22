@@ -49,7 +49,19 @@ export type SchedulingSettings = {
 export type ProviderKind = "gym" | "coach";
 export type ProviderSettings = { kind: ProviderKind; editable: boolean };
 
+/**
+ * ADR-176: the gym's time zone. `source` is "confirmed" (an admin set it),
+ * "inferred" (guessed from a staff device) or null (unknown, default zone).
+ */
+export type TimeZoneStatus = {
+  timezone: string;
+  source: "confirmed" | "inferred" | null;
+  confirmed: boolean;
+};
+
 export type AdminSettingsPayload = {
+  /** ADR-176: the gym's time zone. */
+  time_zone?: TimeZoneStatus;
   gamification: GamificationSettings;
   finance: FinanceSettings;
   notifications: NotificationPushSettings;
@@ -104,4 +116,17 @@ export async function updateAdminSettings(token: string, payload: AdminSettingsU
     token,
     body: payload,
   });
+}
+
+/** ADR-176: confirm the gym's zone, or report this device's zone as a guess. */
+export async function updateTimeZone(
+  token: string,
+  payload: { timezone: string | null; source: "confirmed" | "inferred" },
+) {
+  const response = await apiRequest<{ time_zone: TimeZoneStatus }>("/admin/settings/time-zone", {
+    method: "PUT",
+    token,
+    body: payload,
+  });
+  return response.time_zone;
 }

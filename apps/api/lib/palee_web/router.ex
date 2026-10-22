@@ -815,6 +815,7 @@ defmodule PaleeWeb.Router do
     get("/plan", AdminPlanController, :show)
     patch("/onboarding", AdminOnboardingController, :update)
     patch("/settings", AdminSettingsController, :update)
+    put("/settings/time-zone", AdminSettingsController, :update_time_zone)
     # ADR-174: the gym's AI settings (own key, scaling switch, usage).
     get("/ai-settings", AdminAiSettingsController, :show)
     put("/ai-settings", AdminAiSettingsController, :update)
@@ -881,6 +882,7 @@ defmodule PaleeWeb.Router do
     post("/schedule/slots", AdminScheduleController, :create_slot)
     post("/schedule/slots/series", AdminScheduleController, :create_series)
     patch("/schedule/slots/:id", AdminScheduleController, :update_slot)
+    put("/schedule/slots/:id/workout", AdminScheduleController, :link_workout)
     delete("/schedule/slots/:id", AdminScheduleController, :delete_slot)
 
     get(

@@ -263,6 +263,25 @@ defmodule Palee.Scheduling do
   def list_member_slots(user_id, start_at, end_at),
     do: Palee.Scheduling.SchedulingStore.list_member_slots(user_id, start_at, end_at)
 
+  @doc "ADR-176: classes still without a WOD that start in [from, to)."
+  def list_slots_missing_workout(%{organization_id: _} = context, from, to),
+    do: Palee.Scheduling.SchedulingStore.list_slots_missing_workout(context, from, to)
+
+  defdelegate class_published?(slot),
+    to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
+    as: :published?
+
+  defdelegate class_workout_status(slot, now, zone),
+    to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
+    as: :workout_status
+
+  defdelegate class_workout_alert_due(slot, now, zone),
+    to: Palee.Scheduling.Domain.ClassWorkoutReadiness,
+    as: :alert_due
+
+  def class_workout_alert_horizon_hours,
+    do: Palee.Scheduling.Domain.ClassWorkoutReadiness.alert_horizon_hours()
+
   @doc "Classes of the box in scope among `ids` (any order; missing ids are skipped)."
   def list_slots_by_ids(%{organization_id: _} = context, ids),
     do: Palee.Scheduling.SchedulingStore.list_slots_by_ids(context, ids)

@@ -29,6 +29,10 @@ function preferredUrl(notification: LinkableNotification) {
   ) {
     return `/events/${encodeURIComponent(eventId)}`;
   }
+  // ADR-176: a class without its WOD opens it in the staff schedule.
+  if (notification.type === "class_workout_missing" && typeof slotId === "string" && slotId) {
+    return `/admin/schedule?open_slot=${encodeURIComponent(slotId)}`;
+  }
   // ADR-155: a visitor at the door opens the desk on that visitor.
   if (notification.type === "check_in_visitor") {
     const scanId = notification.payload.scan_id;

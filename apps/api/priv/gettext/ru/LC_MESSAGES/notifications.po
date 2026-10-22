@@ -585,3 +585,17 @@ msgstr "Приглашение в сквад"
 
 msgid "%{nickname} invited you to the squad «%{group}»."
 msgstr "%{nickname} пригласил(а) тебя в сквад «%{group}»."
+
+# ADR-176: a class without its WOD.
+msgid "A class has no WOD"
+msgstr "У занятия нет WOD"
+
+msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
+msgstr "У занятия %{class} (%{when}) нет WOD, поэтому участники не видят его и не могут записаться. Привяжите WOD, чтобы опубликовать его."
+
+msgid "%{class} (%{when}) starts in an hour and still has no WOD."
+msgstr "Занятие %{class} (%{when}) начнётся через час, а WOD всё ещё нет."
+
+msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
+msgstr "У занятия %{class} (%{when}) ещё нет WOD. Привяжите его до начала."
+

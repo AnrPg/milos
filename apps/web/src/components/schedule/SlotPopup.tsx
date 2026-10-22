@@ -22,6 +22,8 @@ import { downloadIcsEvent } from "@/lib/ics";
 import { WorkoutPreviewDetail, type PreviewSection } from "@/components/workouts/WorkoutPreviewDetail";
 import { WorkoutEditModal } from "@/components/workouts/WorkoutEditModal";
 import { workoutTypeColor } from "@/lib/workout-colors";
+import type { WorkoutRecord } from "@/api/workouts";
+import { ClassWorkoutNotice } from "@/components/schedule/ClassWorkoutNotice";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import Link from "next/link";
 import {
@@ -87,6 +89,8 @@ type SlotPopupProps = {
   locations?: ScheduleLocation[];
   /** The member's package includes guest passes (ADR-097). */
   guestsIncluded?: boolean;
+  /** ADR-176: WODs staff may link to a class that has none. */
+  linkableWorkouts?: WorkoutRecord[];
 };
 
 export function SlotPopup({
@@ -103,6 +107,7 @@ export function SlotPopup({
   onSlotChanged,
   locations,
   guestsIncluded = false,
+  linkableWorkouts = [],
 }: SlotPopupProps) {
   const i18n = useUiTranslations();
   const locale = useLocale();
@@ -303,6 +308,10 @@ export function SlotPopup({
               {i18n("addToCalendar33cead7")}
             </button>
           </div>
+
+          {isAdmin ? (
+            <ClassWorkoutNotice slot={slot} accessToken={accessToken} workouts={linkableWorkouts} onLinked={onSlotChanged} />
+          ) : null}
 
           {/* Compact info strip (admin sees full detail; members get a summary) */}
           {isAdmin ? (

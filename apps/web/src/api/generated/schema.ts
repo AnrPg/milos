@@ -5884,6 +5884,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/schedule/slots/{id}/workout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Link a WOD to a class
+         * @description ADR-176: publishes a draft class (created without a WOD) or completes a series occurrence. The WOD is filed in the day's Classes folder.
+         */
+        put: operations["PaleeWeb.AdminScheduleController.link_workout"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/schedule/slots/{slot_id}/attendance/{user_id}": {
         parameters: {
             query?: never;
@@ -6024,6 +6044,26 @@ export interface paths {
         head?: never;
         /** Update global admin settings */
         patch: operations["PaleeWeb.AdminSettingsController.update"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/settings/time-zone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Confirm the gym's time zone, or report a guess from this device
+         * @description ADR-176: `confirmed` sets the zone. `inferred` is a guess (the device's zone, else an IP-derived zone from the edge) and never replaces a confirmed zone.
+         */
+        put: operations["PaleeWeb.AdminSettingsController.update_time_zone"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/api/org/{organization_slug}/admin/trial-policy": {
@@ -10649,7 +10689,7 @@ export interface components {
                 auto: boolean;
                 done: boolean;
                 /** @enum {string} */
-                id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 skipped: boolean;
             }[];
             total: number;
@@ -55737,7 +55777,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -55760,7 +55800,7 @@ export interface operations {
                     /** @enum {string} */
                     action: "complete" | "skip" | "reopen" | "dismiss" | "restore" | "tour_completed";
                     /** @enum {string} */
-                    step?: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                    step?: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                 };
             };
         };
@@ -55781,7 +55821,7 @@ export interface operations {
                             auto: boolean;
                             done: boolean;
                             /** @enum {string} */
-                            id: "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
+                            id: "timezone" | "settings" | "classes" | "packages" | "workout" | "invite" | "tour" | "profile" | "sessions" | "team" | "bootcamp";
                             skipped: boolean;
                         }[];
                         total: number;
@@ -57739,7 +57779,7 @@ export interface operations {
                     /** Format: uuid */
                     location_id?: string | null;
                     /** Format: uuid */
-                    master_workout_id: string;
+                    master_workout_id?: string | null;
                     name?: string;
                     /** Format: date-time */
                     scheduled_at: string;
@@ -57856,7 +57896,7 @@ export interface operations {
                     /** Format: uuid */
                     location_id?: string | null;
                     /** Format: uuid */
-                    master_workout_id: string;
+                    master_workout_id?: string | null;
                     name?: string;
                     /** Format: date-time */
                     scheduled_at: string;
@@ -57991,6 +58031,51 @@ export interface operations {
                         slot_id: string;
                         /** Format: uuid */
                         workout_id?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminScheduleController.link_workout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** Format: uuid */
+                    master_workout_id: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Slot */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        slot: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+            /** @description Class or workout not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        code?: string;
+                        error?: string;
                     };
                 };
             };
@@ -58926,6 +59011,13 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
+                        /** @description ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), inferred (guessed from a staff device) or null (unknown; `timezone` is the default). */
+                        time_zone?: {
+                            confirmed: boolean;
+                            /** @enum {string|null} */
+                            source: "confirmed" | "inferred" | null;
+                            timezone: string;
+                        };
                         /** @description ADR-163: workout-authoring defaults */
                         workouts: {
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
@@ -59052,10 +59144,53 @@ export interface operations {
                             /** Format: date-time */
                             updated_at?: string | null;
                         };
+                        /** @description ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), inferred (guessed from a staff device) or null (unknown; `timezone` is the default). */
+                        time_zone?: {
+                            confirmed: boolean;
+                            /** @enum {string|null} */
+                            source: "confirmed" | "inferred" | null;
+                            timezone: string;
+                        };
                         /** @description ADR-163: workout-authoring defaults */
                         workouts: {
                             /** @description ADR-163: starting value of «Εμφάνιση στόχων στα μέλη» for a workout without goals of its own */
                             wod_goals_visible_by_default: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminSettingsController.update_time_zone": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    source: "confirmed" | "inferred";
+                    timezone?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Time zone */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), inferred (guessed from a staff device) or null (unknown; `timezone` is the default). */
+                        time_zone: {
+                            confirmed: boolean;
+                            /** @enum {string|null} */
+                            source: "confirmed" | "inferred" | null;
+                            timezone: string;
                         };
                     };
                 };

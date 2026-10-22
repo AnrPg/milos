@@ -18,7 +18,13 @@ defmodule Palee.Application.StartCoachPractice do
          {:ok, team_name} <- team_name(value(params, :team_name), name) do
       Organizations.create_coach_practice(
         account,
-        %{name: name, timezone: timezone, default_locale: locale},
+        %{
+          name: name,
+          timezone: timezone,
+          # ADR-176: the sign-up device's zone is a guess until confirmed.
+          timezone_source: timezone && "inferred",
+          default_locale: locale
+        },
         seed_defaults: TenantDefaults.coach_practice(team_name)
       )
     end
@@ -47,7 +53,8 @@ defmodule Palee.Application.StartCoachPractice do
 
   defp team_name(_value, _name), do: {:error, :invalid_name}
 
-  defp timezone(zone) when zone in [nil, ""], do: {:ok, "Europe/Athens"}
+  # ADR-176: no zone leaves it unset; onboarding asks for it.
+  defp timezone(zone) when zone in [nil, ""], do: {:ok, nil}
 
   defp timezone(zone) when is_binary(zone) do
     case DateTime.now(zone) do

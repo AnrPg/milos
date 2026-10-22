@@ -583,6 +583,21 @@ defmodule Palee.Notifications do
         url: "/coaching"
       })
 
+  # ADR-176: a class still without its WOD on its day. The use case fans out
+  # to the staff who can link one; each event names one recipient.
+  def process_event("class_workout_missing", payload),
+    do:
+      enqueue_simple(:class_workout_missing, payload, %{
+        organization_id: field(payload, :organization_id),
+        scheduled_class_id: field(payload, :scheduled_class_id),
+        class_name: field(payload, :class_name),
+        class_when: field(payload, :class_when),
+        alert: field(payload, :alert),
+        published: field(payload, :published),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/admin/schedule?open_slot=#{field(payload, :scheduled_class_id)}"
+      })
+
   def process_event("coaching_reply_overdue", payload),
     do:
       enqueue_simple(:coaching_reply_overdue, payload, %{

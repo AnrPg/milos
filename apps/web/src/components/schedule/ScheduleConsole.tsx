@@ -56,7 +56,7 @@ type SlotEditorState = {
 };
 
 type SeriesEditorState = {
-  values: Omit<ClassPayload, "scheduled_at" | "master_workout_id">;
+  values: Omit<ClassPayload, "scheduled_at">;
   startDate: string;
   endDate: string;
   time: string;
@@ -78,14 +78,14 @@ function toIsoDateTime(localValue: string) {
 
 function defaultSlotValues(
   isoDate: string,
-  workouts: WorkoutRecord[],
   classTypes: ClassTypeRecord[],
   defaults?: SchedulingSettings,
 ): ScheduleSlotPayload {
   const date = new Date(`${isoDate}T09:00:00`);
 
   return {
-    master_workout_id: workouts[0]?.id ?? "",
+    // ADR-176: the WOD can be linked later; until then the class is a draft.
+    master_workout_id: null,
     class_type_id: classTypes.find((type) => !type.archived_at)?.id ?? "",
     name: classTypes.find((type) => !type.archived_at)?.name ?? "",
     duration_minutes: 60,
@@ -128,6 +128,8 @@ export function ScheduleConsole({
   const [editor, setEditor] = useState<SlotEditorState | null>(null);
   const [seriesEditor, setSeriesEditor] = useState<SeriesEditorState | null>(null);
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
+  // ADR-176: series follow the gym's time zone, not the editing device's.
+  const [gymTimeZone, setGymTimeZone] = useState<string | null>(null);
   const appliedMobileDefault = useRef(false);
   const initialOpenHandledRef = useRef(false);
   const { role, isLoading: roleLoading, membership } = useSelectedMembershipRole();
@@ -229,6 +231,7 @@ export function ScheduleConsole({
         if (!cancelled) {
           setWorkouts(nextWorkouts.filter((workout) => workout.status === "published"));
           setSchedulingDefaults(settings.scheduling);
+          setGymTimeZone(settings.time_zone?.timezone ?? null);
         }
       })
       .catch(() => {
@@ -360,12 +363,12 @@ export function ScheduleConsole({
     setBusy(true);
 
     try {
-      if (editor.slotId) {
-        await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values);
-      } else {
-        await createScheduleSlot(tokens.access_token, editor.values);
-      }
+      const saved = editor.slotId
+        ? await updateScheduleSlot(tokens.access_token, editor.slotId, editor.values)
+        : await createScheduleSlot(tokens.access_token, editor.values);
 
+      // ADR-176: say plainly that a class without a WOD stays hidden.
+      setNotice(!saved.master_workout_id && !saved.class_series_id ? i18n("classDraftSavedNotice") : null);
       setEditor(null);
       await loadSchedule();
     } catch (requestError) {
@@ -420,21 +423,22 @@ export function ScheduleConsole({
   }
 
   function openCreateEditor(isoDate: string) {
-    if (!workouts.length || !classTypes.some((type) => !type.archived_at)) {
+    if (!classTypes.some((type) => !type.archived_at)) {
       setError(t("createPrerequisites"));
       return;
     }
 
     setEditor({
       slotId: null,
-      values: defaultSlotValues(isoDate, workouts, classTypes, schedulingDefaults),
+      values: defaultSlotValues(isoDate, classTypes, schedulingDefaults),
     });
   }
 
   function openSeriesEditor() {
-    const base = defaultSlotValues(startDate, workouts, classTypes, schedulingDefaults);
+    const base = defaultSlotValues(startDate, classTypes, schedulingDefaults);
     setSeriesEditor({
       values: {
+        master_workout_id: null,
         class_type_id: base.class_type_id,
         name: base.name,
         duration_minutes: base.duration_minutes,
@@ -447,7 +451,7 @@ export function ScheduleConsole({
       time: "09:00",
       weekdays: [new Date(`${startDate}T12:00:00`).getDay() || 7],
       excludedDates: "",
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC",
+      timezone: gymTimeZone ?? (Intl.DateTimeFormat().resolvedOptions().timeZone || "Etc/UTC"),
     });
   }
 
@@ -605,6 +609,7 @@ export function ScheduleConsole({
           }}
           onBook={() => setBookingTarget(selectedSlot)}
           guestsIncluded={includesGuestPasses(entitlement)}
+          linkableWorkouts={workouts}
           locations={locations}
           onCancelBooking={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
@@ -701,11 +706,12 @@ export function ScheduleConsole({
                       style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
                       onChange={(event) =>
                         setEditor((current) =>
-                          current ? { ...current, values: { ...current.values, master_workout_id: event.target.value } } : current,
+                          current ? { ...current, values: { ...current.values, master_workout_id: event.target.value || null } } : current,
                         )
                       }
-                      value={editor.values.master_workout_id}
+                      value={editor.values.master_workout_id ?? ""}
                     >
+                      <option value="">{i18n("classNoWodYet")}</option>
                       {workouts.map((workout) => (
                         <option key={workout.id} value={workout.id}>{workout.title}</option>
                       ))}
@@ -857,7 +863,7 @@ export function ScheduleConsole({
                 <button
                   className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                   style={{ background: "var(--text)", color: "var(--bg)" }}
-                  disabled={busy || !editor.values.master_workout_id || !editor.values.class_type_id || !editor.values.name.trim()}
+                  disabled={busy || !editor.values.class_type_id || !editor.values.name.trim()}
                   onClick={() => void saveSlot()}
                   type="button"
                 >
@@ -876,6 +882,7 @@ export function ScheduleConsole({
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               <label className="text-sm font-semibold">{i18n("featureClassName")}<input className="mt-2 w-full rounded-xl px-3 py-2" maxLength={120} value={seriesEditor.values.name} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, name: event.target.value } })} /></label>
               <label className="text-sm font-semibold">{i18n("featureDurationMinutes")}<IntegerInput className="mt-2 w-full rounded-xl px-3 py-2" min={1} max={1440} value={seriesEditor.values.duration_minutes} emptyValue={1} onValueChange={(durationMinutes) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, duration_minutes: durationMinutes ?? 1 } })} /></label>
+              <label className="text-sm font-semibold">{i18n("classSeriesWod")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.master_workout_id ?? ""} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: event.target.value || null } })}><option value="">{i18n("classNoWodYet")}</option>{workouts.map((workout) => <option key={workout.id} value={workout.id}>{workout.title}</option>)}</select><span className="mt-1 block text-xs font-normal" style={{ color: "var(--dim)" }}>{i18n("classSeriesWodHint")}</span></label>
               <label className="text-sm font-semibold">{i18n("featureClassType")}<select className="mt-2 w-full rounded-xl px-3 py-2" value={seriesEditor.values.class_type_id} onChange={(event) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, class_type_id: event.target.value } })}>{classTypes.filter((item) => !item.archived_at).map((item) => <option key={item.id} value={item.id}>{item.name}</option>)}</select></label>
               <label className="text-sm font-semibold">{i18n("featureStarts")}<input className="mt-2 w-full rounded-xl px-3 py-2" type="date" value={seriesEditor.startDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, startDate: event.target.value })} /></label>
               <label className="text-sm font-semibold">{i18n("featureEndsOptional")}<input className="mt-2 w-full rounded-xl px-3 py-2" min={seriesEditor.startDate} type="date" value={seriesEditor.endDate} onChange={(event) => setSeriesEditor({ ...seriesEditor, endDate: event.target.value })} /></label>

@@ -9,7 +9,8 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     BrandLogoPolicy,
     InvitationPolicy,
     MembershipPolicy,
-    SlugRenamePolicy
+    SlugRenamePolicy,
+    TimeZonePolicy
   }
 
   alias Palee.Organizations.{
@@ -38,16 +39,20 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
     |> Multi.insert(:organization, changeset)
     |> Multi.insert(:settings, fn %{organization: organization} ->
-      OrganizationSetting.changeset(%{
-        organization_id: organization.id,
-        timezone: value(params, :timezone) || "UTC",
-        default_locale: value(params, :default_locale) || "en",
-        invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
-        brand_name: value(params, :brand_name) || organization.name,
-        brand_logo_url: value(params, :brand_logo_url),
-        brand_primary_color: value(params, :brand_primary_color),
-        settings: value(params, :settings) || %{}
-      })
+      OrganizationSetting.changeset(
+        without_unset_timezone(%{
+          organization_id: organization.id,
+          # ADR-176: a zone given at creation is confirmed; none leaves it unset.
+          timezone: value(params, :timezone),
+          timezone_source: value(params, :timezone_source),
+          default_locale: value(params, :default_locale) || "en",
+          invitation_lifetime_seconds: value(params, :invitation_lifetime_seconds) || 604_800,
+          brand_name: value(params, :brand_name) || organization.name,
+          brand_logo_url: value(params, :brand_logo_url),
+          brand_primary_color: value(params, :brand_primary_color),
+          settings: value(params, :settings) || %{}
+        })
+      )
     end)
     |> Repo.transaction()
     |> case do
@@ -434,17 +439,20 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
     |> Multi.run(:slug_reservation, fn _repo, _changes -> reserve_new_slug(changeset) end)
     |> Multi.insert(:organization, changeset)
     |> Multi.insert(:settings, fn %{organization: organization} ->
-      OrganizationSetting.changeset(%{
-        organization_id: organization.id,
-        timezone: value(organization_params, :timezone) || "UTC",
-        default_locale: value(organization_params, :default_locale) || "en",
-        invitation_lifetime_seconds:
-          value(organization_params, :invitation_lifetime_seconds) || 604_800,
-        brand_name: value(organization_params, :brand_name) || organization.name,
-        brand_logo_url: value(organization_params, :brand_logo_url),
-        brand_primary_color: value(organization_params, :brand_primary_color),
-        settings: value(organization_params, :settings) || %{}
-      })
+      OrganizationSetting.changeset(
+        without_unset_timezone(%{
+          organization_id: organization.id,
+          timezone: value(organization_params, :timezone),
+          timezone_source: value(organization_params, :timezone_source),
+          default_locale: value(organization_params, :default_locale) || "en",
+          invitation_lifetime_seconds:
+            value(organization_params, :invitation_lifetime_seconds) || 604_800,
+          brand_name: value(organization_params, :brand_name) || organization.name,
+          brand_logo_url: value(organization_params, :brand_logo_url),
+          brand_primary_color: value(organization_params, :brand_primary_color),
+          settings: value(organization_params, :settings) || %{}
+        })
+      )
     end)
     |> Multi.insert(:invitation, fn %{organization: organization} ->
       invitation_params
@@ -758,6 +766,33 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
       |> OrganizationSetting.changeset(%{settings: Map.put(settings.settings || %{}, key, value)})
       |> Repo.update()
       |> unwrap_or_rollback()
+    end)
+    |> flatten_transaction()
+  end
+
+  # ADR-176: a guess never replaces a confirmed zone (decided under the lock).
+  @impl true
+  def put_organization_timezone(organization_id, zone, source) do
+    Repo.transaction(fn ->
+      settings =
+        OrganizationSetting
+        |> where([setting], setting.organization_id == ^organization_id)
+        |> lock("FOR UPDATE")
+        |> Repo.one()
+
+      cond do
+        is_nil(settings) ->
+          Repo.rollback(:not_found)
+
+        not TimeZonePolicy.accept?(settings.timezone_source, source) ->
+          settings
+
+        true ->
+          settings
+          |> OrganizationSetting.time_zone_changeset(zone, source)
+          |> Repo.update()
+          |> unwrap_or_rollback()
+      end
     end)
     |> flatten_transaction()
   end
@@ -1162,6 +1197,12 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
   defp normalize_host(_host), do: ""
 
   defp value(params, key), do: Map.get(params, key) || Map.get(params, Atom.to_string(key))
+
+  # ADR-176: without a zone the settings keep the default and no source.
+  defp without_unset_timezone(%{timezone: zone} = attrs) when zone in [nil, ""],
+    do: Map.drop(attrs, [:timezone, :timezone_source])
+
+  defp without_unset_timezone(attrs), do: attrs
 
   # ADR-162: one definer lookup answers the caller's memberships of any
   # status with the organization's name and brand, which a former member's

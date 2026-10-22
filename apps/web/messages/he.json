@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "אין בתוכנית שלך מקומות פנויים לצוות. פנה מקום או בקש מאיתנו לשנות תוכנית.",
     "apiErrorUnknownPlan": "התוכנית הזו לא קיימת.",
     "apiErrorTrialEndRequired": "תקופת ניסיון צריכה תאריך סיום.",
-    "apiErrorInvalidName": "השם חייב להכיל 2 עד 120 תווים."
+    "apiErrorInvalidName": "השם חייב להכיל 2 עד 120 תווים.",
+    "classNoWodYet": "עדיין אין WOD (אפשר לקשר אחר כך)",
+    "classDraftSavedNotice": "נשמר ללא WOD. המתאמנים לא יראו את השיעור עד שתקשרו WOD.",
+    "classSeriesWod": "WOD (רשות)",
+    "classSeriesWodHint": "השאירו ריק כדי שלכל שיעור יהיה WOD משלו. שיעור שביום שלו עדיין אין לו WOD מסומן, והצוות מקבל תזכורות.",
+    "classDraftTitle": "לא פורסם: אין WOD",
+    "classDraftBody": "המתאמנים לא רואים את השיעור ולא יכולים להירשם עד שיקושר WOD.",
+    "classWodMissingTitle": "חסר WOD היום",
+    "classWodMissingBody": "השיעור מתקיים היום ואין לו WOD. הצוות מקבל תזכורות ב־07:00 ושעה לפני תחילתו.",
+    "classWodAwaitingTitle": "עדיין אין WOD",
+    "classWodAwaitingBody": "המתאמנים יכולים להירשם לשיעור. קשרו את ה־WOD לפני יום השיעור.",
+    "classLinkWodLabel": "WOD לקישור",
+    "classLinkWodPlaceholder": "בחרו WOD",
+    "classLinkWod": "קישור WOD",
+    "classLinkWodSaving": "מקשר…",
+    "classDraftBadge": "טיוטה · אין WOD",
+    "classWodMissingBadge": "אין WOD",
+    "ntfClassWodMissingTitle": "לשיעור אין WOD",
+    "ntfClassWodMissingDraftBody": "ל־{className} ({when}) אין WOD, ולכן המתאמנים לא רואים אותו ולא יכולים להירשם.",
+    "ntfClassWodMissingHourBody": "{className} ({when}) מתחיל בעוד שעה ועדיין אין לו WOD.",
+    "ntfClassWodMissingMorningBody": "ל־{className} ({when}) עדיין אין WOD.",
+    "gymTimeZoneTitle": "אזור זמן",
+    "gymTimeZoneDescription": "ימי השיעורים, תזכורות ה־WOD, ימי הצ'ק־אין ושעות האירועים מחושבים לפיו.",
+    "gymTimeZoneLabel": "אזור הזמן של המכון",
+    "gymTimeZoneHint": "בחרו את האזור שבו נמצא המכון, גם אם אתם בנסיעה.",
+    "gymTimeZoneConfirmed": "המכון שלכם פועל לפי {zone}.",
+    "gymTimeZoneInferred": "הנחנו {zone} לפי המכשיר שלכם. אשרו או בחרו אחר.",
+    "gymTimeZoneUnset": "עדיין לא הוגדר. עד אז Palee משתמש ב־{zone}.",
+    "gymTimeZoneConfirm": "שמירת אזור הזמן",
+    "gymTimeZoneSaving": "שומר…",
+    "apiErrorClassNotPublished": "עדיין אי אפשר להירשם לשיעור הזה.",
+    "apiErrorInvalidTimeZone": "בחרו אזור זמן מוכר.",
+    "apiErrorTimeZoneRequired": "הגדירו קודם את אזור הזמן של המכון."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -4744,6 +4776,11 @@
         "title": "הפעל בוטקאמפ פתוח",
         "body": "אימון בחוץ או אונליין פתוח לכולם. דרך טובה להכיר לקוחות חדשים.",
         "cta": "יצירת בוטקאמפ"
+      },
+      "timezone": {
+        "title": "הגדירו אזור זמן",
+        "body": "ימי השיעורים, תזכורות ה־WOD וימי הצ'ק־אין מחושבים לפיו. הנחנו אותו לפי המכשיר שלכם: אשרו או בחרו אחר.",
+        "cta": "הגדרת אזור זמן"
       }
     },
     "tour": {

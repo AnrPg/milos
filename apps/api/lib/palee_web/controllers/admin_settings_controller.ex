@@ -125,9 +125,23 @@ defmodule PaleeWeb.AdminSettingsController do
     required: [:wod_goals_visible_by_default]
   }
 
+  @time_zone_schema %Schema{
+    type: :object,
+    description:
+      "ADR-176: the gym's IANA time zone. `source` is confirmed (an admin set it), " <>
+        "inferred (guessed from a staff device) or null (unknown; `timezone` is the default).",
+    properties: %{
+      timezone: %Schema{type: :string},
+      source: %Schema{type: :string, enum: ["confirmed", "inferred"], nullable: true},
+      confirmed: %Schema{type: :boolean}
+    },
+    required: [:timezone, :source, :confirmed]
+  }
+
   @admin_settings_response_schema %Schema{
     type: :object,
     properties: %{
+      time_zone: @time_zone_schema,
       gamification: @gamification_settings_schema,
       finance: @finance_settings_schema,
       notifications: @notification_push_settings_schema,
@@ -226,6 +240,67 @@ defmodule PaleeWeb.AdminSettingsController do
       ok: {"Admin settings", "application/json", @admin_settings_response_schema}
     ]
   )
+
+  operation(:update_time_zone,
+    summary: "Confirm the gym's time zone, or report a guess from this device",
+    description:
+      "ADR-176: `confirmed` sets the zone. `inferred` is a guess (the device's zone, else an " <>
+        "IP-derived zone from the edge) and never replaces a confirmed zone.",
+    request_body: %RequestBody{
+      required: true,
+      content: %{
+        "application/json" => %MediaType{
+          schema: %Schema{
+            type: :object,
+            additionalProperties: false,
+            properties: %{
+              timezone: %Schema{type: :string, nullable: true, maxLength: 100},
+              source: %Schema{type: :string, enum: ["confirmed", "inferred"]}
+            },
+            required: [:source]
+          }
+        }
+      }
+    },
+    responses: [
+      ok:
+        {"Time zone", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{time_zone: @time_zone_schema},
+           required: [:time_zone]
+         }}
+    ]
+  )
+
+  def update_time_zone(conn, _params) do
+    context = conn.assigns.tenant_context
+    body = conn.body_params
+    source = body["source"]
+
+    zone =
+      if source == "inferred",
+        do: Palee.Organizations.infer_timezone([body["timezone"] | ip_time_zones(conn)]),
+        else: body["timezone"]
+
+    with :ok <- apply_time_zone(context, zone, source) do
+      json(conn, %{time_zone: Palee.Organizations.timezone_status(context.organization_id)})
+    end
+  end
+
+  # Nothing to guess from (a UTC device behind a plain ingress) changes nothing.
+  defp apply_time_zone(_context, nil, "inferred"), do: :ok
+
+  defp apply_time_zone(context, zone, source) do
+    with {:ok, _settings} <- Palee.Organizations.set_timezone(context, zone, source), do: :ok
+  end
+
+  # Zones some edges derive from the client IP (Cloudflare visitor location,
+  # Vercel, CloudFront); absent behind a plain ingress.
+  @ip_time_zone_headers ~w(cf-timezone x-vercel-ip-timezone cloudfront-viewer-time-zone)
+
+  defp ip_time_zones(conn),
+    do: Enum.flat_map(@ip_time_zone_headers, &Plug.Conn.get_req_header(conn, &1))
 
   def show(conn, _params) do
     with {:ok, payload} <- GetAdminSettings.call(conn.assigns.tenant_context) do

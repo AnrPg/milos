@@ -4325,7 +4325,39 @@
     "apiErrorPlanLimitReached": "Je abonnement heeft geen vrije personeelsplaatsen. Maak een plaats vrij of vraag ons het abonnement te wijzigen.",
     "apiErrorUnknownPlan": "Dit abonnement bestaat niet.",
     "apiErrorTrialEndRequired": "Een proefperiode heeft een einddatum nodig.",
-    "apiErrorInvalidName": "De naam moet 2 tot 120 tekens lang zijn."
+    "apiErrorInvalidName": "De naam moet 2 tot 120 tekens lang zijn.",
+    "classNoWodYet": "Nog geen WOD (later koppelen)",
+    "classDraftSavedNotice": "Opgeslagen zonder WOD. Leden zien deze les pas als je er een koppelt.",
+    "classSeriesWod": "WOD (optioneel)",
+    "classSeriesWodHint": "Laat leeg om elke les een eigen WOD te geven. Een les die op haar dag nog geen WOD heeft, wordt gemarkeerd en het team krijgt herinneringen.",
+    "classDraftTitle": "Niet gepubliceerd: geen WOD",
+    "classDraftBody": "Leden kunnen deze les pas zien en boeken als er een WOD is gekoppeld.",
+    "classWodMissingTitle": "WOD ontbreekt vandaag",
+    "classWodMissingBody": "Deze les is vandaag en heeft geen WOD. Het team krijgt herinneringen om 07:00 en een uur voor de start.",
+    "classWodAwaitingTitle": "Nog geen WOD",
+    "classWodAwaitingBody": "Leden kunnen deze les boeken. Koppel de WOD vóór de dag van de les.",
+    "classLinkWodLabel": "Te koppelen WOD",
+    "classLinkWodPlaceholder": "Kies een WOD",
+    "classLinkWod": "WOD koppelen",
+    "classLinkWodSaving": "Koppelen…",
+    "classDraftBadge": "Concept · geen WOD",
+    "classWodMissingBadge": "Geen WOD",
+    "ntfClassWodMissingTitle": "Een les heeft geen WOD",
+    "ntfClassWodMissingDraftBody": "{className} ({when}) heeft geen WOD, dus leden kunnen de les niet zien of boeken.",
+    "ntfClassWodMissingHourBody": "{className} ({when}) begint over een uur en heeft nog geen WOD.",
+    "ntfClassWodMissingMorningBody": "{className} ({when}) heeft nog geen WOD.",
+    "gymTimeZoneTitle": "Tijdzone",
+    "gymTimeZoneDescription": "Lesdagen, WOD-herinneringen, check-indagen en eventtijden volgen deze zone.",
+    "gymTimeZoneLabel": "Tijdzone van je gym",
+    "gymTimeZoneHint": "Kies de zone waar de gym is, ook als je op reis bent.",
+    "gymTimeZoneConfirmed": "Je gym draait op {zone}.",
+    "gymTimeZoneInferred": "We hebben {zone} van je apparaat afgeleid. Bevestig het of kies een andere.",
+    "gymTimeZoneUnset": "Nog niet ingesteld. Tot dan gebruikt Palee {zone}.",
+    "gymTimeZoneConfirm": "Tijdzone opslaan",
+    "gymTimeZoneSaving": "Opslaan…",
+    "apiErrorClassNotPublished": "Deze les is nog niet te boeken.",
+    "apiErrorInvalidTimeZone": "Kies een bekende tijdzone.",
+    "apiErrorTimeZoneRequired": "Stel eerst de tijdzone van je gym in."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -4744,6 +4776,11 @@
         "title": "Organiseer een open bootcamp",
         "body": "Een buiten- of onlinetraining voor iedereen. Een goede manier om nieuwe klanten te leren kennen.",
         "cta": "Bootcamp maken"
+      },
+      "timezone": {
+        "title": "Stel je tijdzone in",
+        "body": "Lesdagen, WOD-herinneringen en check-indagen volgen deze zone. We hebben hem van je apparaat afgeleid: bevestig hem of kies een andere.",
+        "cta": "Tijdzone instellen"
       }
     },
     "tour": {

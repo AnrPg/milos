@@ -2,7 +2,7 @@ defmodule Palee.Organizations.OrganizationSetting do
   use Ecto.Schema
   import Ecto.Changeset
 
-  alias Palee.Organizations.Domain.InvitationPolicy
+  alias Palee.Organizations.Domain.{InvitationPolicy, TimeZonePolicy}
 
   @primary_key {:id, :binary_id, autogenerate: true}
   @foreign_key_type :binary_id
@@ -10,6 +10,8 @@ defmodule Palee.Organizations.OrganizationSetting do
   schema "organization_settings" do
     field :organization_id, :binary_id
     field :timezone, :string, default: "UTC"
+    # ADR-176: "confirmed" | "inferred" | nil (never set; see TimeZonePolicy).
+    field :timezone_source, :string
     field :default_locale, :string, default: "en"
     field :invitation_lifetime_seconds, :integer, default: 604_800
     field :brand_name, :string
@@ -30,6 +32,7 @@ defmodule Palee.Organizations.OrganizationSetting do
     |> cast(params, [
       :organization_id,
       :timezone,
+      :timezone_source,
       :default_locale,
       :invitation_lifetime_seconds,
       :brand_name,
@@ -45,6 +48,8 @@ defmodule Palee.Organizations.OrganizationSetting do
       :settings
     ])
     |> validate_length(:timezone, min: 1, max: 100)
+    |> validate_time_zone()
+    |> confirm_set_time_zone()
     |> validate_length(:default_locale, min: 2, max: 20)
     |> validate_length(:brand_name, max: 120)
     |> validate_format(:brand_primary_color, ~r/^#[0-9A-Fa-f]{6}$/)
@@ -60,6 +65,34 @@ defmodule Palee.Organizations.OrganizationSetting do
     end)
     |> unique_constraint(:organization_id)
     |> foreign_key_constraint(:organization_id)
+  end
+
+  @doc """
+  ADR-176: the gym's time zone with how it was learnt. Whether a guess may
+  replace the current zone is `TimeZonePolicy.accept?/2`'s call, made by the
+  store under a row lock.
+  """
+  def time_zone_changeset(%__MODULE__{} = setting, zone, source) do
+    setting
+    |> cast(%{timezone: zone, timezone_source: source}, [:timezone, :timezone_source])
+    |> validate_required([:timezone, :timezone_source])
+    |> validate_time_zone()
+  end
+
+  defp validate_time_zone(changeset) do
+    changeset
+    |> validate_inclusion(:timezone_source, TimeZonePolicy.sources())
+    |> validate_change(:timezone, fn field, zone ->
+      if TimeZonePolicy.valid?(zone), do: [], else: [{field, "is not a known time zone"}]
+    end)
+  end
+
+  # A zone written by an admin or the vendor (settings, provisioning) without
+  # a source is a deliberate choice.
+  defp confirm_set_time_zone(changeset) do
+    if get_change(changeset, :timezone) && is_nil(get_change(changeset, :timezone_source)),
+      do: put_change(changeset, :timezone_source, "confirmed"),
+      else: changeset
   end
 
   @doc """

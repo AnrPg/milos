@@ -585,3 +585,17 @@ msgstr "Squad invitation"
 
 msgid "%{nickname} invited you to the squad «%{group}»."
 msgstr "%{nickname} invited you to the squad «%{group}»."
+
+# ADR-176: a class without its WOD.
+msgid "A class has no WOD"
+msgstr "A class has no WOD"
+
+msgid "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
+msgstr "%{class} (%{when}) has no WOD, so members can't see or book it. Link one to publish it."
+
+msgid "%{class} (%{when}) starts in an hour and still has no WOD."
+msgstr "%{class} (%{when}) starts in an hour and still has no WOD."
+
+msgid "%{class} (%{when}) has no WOD yet. Link one before it starts."
+msgstr "%{class} (%{when}) has no WOD yet. Link one before it starts."
+

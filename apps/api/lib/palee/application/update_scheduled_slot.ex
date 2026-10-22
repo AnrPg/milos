@@ -43,6 +43,10 @@ defmodule Palee.Application.UpdateScheduledSlot do
     end
   end
 
+  # ADR-176: a class may be saved before its WOD exists.
+  defp fetch_workout(_context, nil), do: {:ok, nil}
+  defp fetch_workout(_context, ""), do: {:ok, nil}
+
   defp fetch_workout(context, id) do
     case Workouts.get_workout(context, id) do
       nil -> {:error, :workout_not_found}
