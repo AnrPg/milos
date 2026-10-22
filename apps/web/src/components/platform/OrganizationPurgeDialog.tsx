@@ -14,6 +14,7 @@ import {
   type PlatformOrganization,
 } from "@/api/platform-organizations";
 import { formatPurgeCopy, platformOrganizationPurgeCopy } from "@/i18n/platform-organization-purge";
+import { Dialog } from "@/components/ui/Dialog";
 
 const cancellableStatuses = new Set<OrganizationPurge["status"]>(["requested", "exported"]);
 const workingStatuses = new Set<OrganizationPurge["status"]>(["requested", "exporting", "approved", "purging"]);
@@ -111,24 +112,26 @@ export function OrganizationPurgeDialog({
   const keptBlockers = Object.entries(identityStep?.kept_accounts_blocked_by ?? {});
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
-      <div className="max-h-[90vh] w-full max-w-3xl overflow-y-auto bg-[var(--surface)] p-6 shadow-xl">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <h2 className="text-xl font-semibold text-[var(--text)]">{copy.title}</h2>
-            <p className="mt-1 text-sm text-[var(--text-soft)]">{organization.organization.name}</p>
-          </div>
-          <div className="flex shrink-0 gap-2">
+    <Dialog
+      onClose={onClose}
+      title={copy.title}
+      ariaLabel={copy.title}
+      description={organization.organization.name}
+      size="3xl"
+      variant="center"
+      showClose={false}
+      headerActions={
+          <>
             <button type="button" onClick={() => void purgeQuery.refetch()} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
               {copy.refresh}
             </button>
             <button type="button" onClick={onClose} className="border border-[var(--border-strong)] px-3 py-2 text-sm font-semibold">
               {copy.close}
             </button>
-          </div>
-        </div>
-
-        <p className="mt-4 text-sm leading-6 text-[var(--text-soft)]">{copy.intro}</p>
+          </>
+        }
+    >
+        <p className="text-sm leading-6 text-[var(--text-soft)]">{copy.intro}</p>
         <ol className="mt-3 space-y-2 text-sm leading-6" data-testid="purge-steps">
           {[copy.step1, copy.step2, copy.step3, copy.step4].map((text, index) => {
             const number = index + 1;
@@ -300,7 +303,6 @@ export function OrganizationPurgeDialog({
             ) : null}
           </div>
         ) : null}
-      </div>
-    </div>
+    </Dialog>
   );
 }

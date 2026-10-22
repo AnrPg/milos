@@ -76,6 +76,7 @@ export function Dialog({
   layer = "modal",
   dismissible = true,
   showClose = true,
+  closeLabel,
   bare = false,
   plainBody = false,
   onSubmit,
@@ -90,7 +91,7 @@ export function Dialog({
   title?: ReactNode;
   eyebrow?: ReactNode;
   description?: ReactNode;
-  /** Accessible name when there is no visible title. */
+  /** Accessible name; overrides the visible title as the dialog's name. */
   ariaLabel?: string;
   /** Extra controls next to the close button. */
   headerActions?: ReactNode;
@@ -105,6 +106,8 @@ export function Dialog({
   /** False while saving: the backdrop and Escape no longer close it. */
   dismissible?: boolean;
   showClose?: boolean;
+  /** The close button's accessible name; defaults to Common.close. */
+  closeLabel?: string;
   /** The children own the panel's layout and scrolling (no header/body/footer). */
   bare?: boolean;
   /** Keep the header and footer but let the children own the body's scrolling. */
@@ -119,7 +122,6 @@ export function Dialog({
   titleId?: string;
   testId?: string;
 }) {
-  const common = useTranslations("Common");
   const generatedId = useId();
   const titleId = titleIdProp ?? `${generatedId}-title`;
   const descriptionId = `${generatedId}-description`;
@@ -155,8 +157,8 @@ export function Dialog({
       ref={panelRef as never}
       role="dialog"
       aria-modal="true"
-      aria-label={title ? undefined : ariaLabel}
-      aria-labelledby={title ? titleId : labelledBy}
+      aria-label={ariaLabel}
+      aria-labelledby={ariaLabel ? undefined : title ? titleId : labelledBy}
       aria-describedby={description ? descriptionId : undefined}
       tabIndex={-1}
       data-testid={testId}
@@ -206,16 +208,11 @@ export function Dialog({
                 <div className="flex shrink-0 items-center gap-1">
                   {headerActions}
                   {showClose ? (
-                    <button
-                      type="button"
-                      onClick={onClose}
-                      disabled={!dismissible}
-                      aria-label={common("close")}
-                      className="-me-2 -mt-1 grid h-11 w-11 place-items-center rounded-full text-2xl leading-none transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] disabled:opacity-40"
-                      style={{ color: "var(--text-soft)" }}
-                    >
-                      <span aria-hidden="true">×</span>
-                    </button>
+                    closeLabel ? (
+                      <CloseButton label={closeLabel} onClick={onClose} disabled={!dismissible} />
+                    ) : (
+                      <TranslatedCloseButton onClick={onClose} disabled={!dismissible} />
+                    )
                   ) : null}
                 </div>
               ) : null}
@@ -270,6 +267,26 @@ export function Dialog({
       {panel}
     </div>,
     document.body,
+  );
+}
+
+function TranslatedCloseButton(props: { onClick: () => void; disabled: boolean }) {
+  const common = useTranslations("Common");
+  return <CloseButton label={common("close")} {...props} />;
+}
+
+function CloseButton({ label, onClick, disabled }: { label: string; onClick: () => void; disabled: boolean }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={label}
+      className="-me-2 -mt-1 grid h-11 w-11 place-items-center rounded-full text-2xl leading-none transition-colors hover:bg-[color-mix(in_srgb,var(--text)_8%,transparent)] disabled:opacity-40"
+      style={{ color: "var(--text-soft)" }}
+    >
+      <span aria-hidden="true">×</span>
+    </button>
   );
 }
 

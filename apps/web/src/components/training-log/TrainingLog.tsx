@@ -32,6 +32,7 @@ import {
   type TrainingLogForm,
   type TrainingLogFormError,
 } from "@/lib/training-log";
+import { Dialog } from "@/components/ui/Dialog";
 
 export const TRAINING_LOG_ENTRIES_KEY = ["training-log", "entries"] as const;
 export const TRAINING_LOG_SOURCES_KEY = ["training-log", "sources"] as const;
@@ -215,30 +216,7 @@ export function TrainingLogDialog({
         : i18n("trainingLogLogWorkout");
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center sm:p-4"
-      style={{ background: "var(--scrim)" }}
-      role="dialog"
-      aria-modal="true"
-      aria-label={heading}
-    >
-      <div
-        className="flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-3xl sm:max-w-lg sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <div className="flex items-center justify-between gap-3 border-b px-5 py-4" style={{ borderColor: "var(--border)" }}>
-          <p className="text-base font-semibold" style={{ color: "var(--text)" }}>{heading}</p>
-          <button
-            type="button"
-            aria-label={i18n("trainingLogClose")}
-            className="text-lg leading-none"
-            style={{ color: "var(--dim)" }}
-            onClick={onClose}
-          >
-            ✕
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto px-5 py-4">
+    <Dialog onClose={onClose} title={heading} size="lg">
           {state.mode === "pick" ? (
             <SourcePicker token={token} onSelect={(source) => onNavigate({ mode: "create", source })} />
           ) : state.mode === "void" ? (
@@ -251,9 +229,7 @@ export function TrainingLogDialog({
               onDone={onClose}
             />
           )}
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }
 
