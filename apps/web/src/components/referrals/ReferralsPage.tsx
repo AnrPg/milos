@@ -14,7 +14,7 @@ import {
   type ReferralInvite,
   type ReferralOverview,
 } from "@/api/referrals";
-import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
+import { ErrorLine, Sheet, SheetButton } from "@/components/community/Sheet";
 import { formatPrice, formatWhen } from "@/components/events/events";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
@@ -25,6 +25,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 import { giftText, invitePill, inviteUrl, qualifyingText, rewardText, stageText, type Tone } from "./referrals";
 import { QrCode } from "./QrCode";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type ReferralsTab = "invite" | "invites";
 
@@ -70,13 +71,13 @@ export function ReferralsPage() {
   return (
     <HubPage title={t("title")}>
       {boxes.length > 1 ? (
-        <div role="radiogroup" aria-label={t("pickBox")} className="flex gap-2 overflow-x-auto">
-          {boxes.map((box) => (
-            <ChoicePill key={box.slug} selected={box.slug === slug} onSelect={() => setParam("box", box.slug)}>
-              {box.name}
-            </ChoicePill>
-          ))}
-        </div>
+        <SegmentPicker
+          ariaLabel={t("pickBox")}
+          semantics="radiogroup"
+          value={slug ?? ""}
+          onChange={(value) => setParam("box", value)}
+          options={boxes.map((box) => ({ value: box.slug, label: box.name }))}
+        />
       ) : null}
 
       {!isLoading && !slug ? (

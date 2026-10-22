@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Opslaan…",
     "apiErrorClassNotPublished": "Deze les is nog niet te boeken.",
     "apiErrorInvalidTimeZone": "Kies een bekende tijdzone.",
-    "apiErrorTimeZoneRequired": "Stel eerst de tijdzone van je gym in."
+    "apiErrorTimeZoneRequired": "Stel eerst de tijdzone van je gym in.",
+    "notificationFilters": "Meldingsfilters"
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",

@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Salvataggio…",
     "apiErrorClassNotPublished": "Questa lezione non è ancora prenotabile.",
     "apiErrorInvalidTimeZone": "Scegli un fuso orario noto.",
-    "apiErrorTimeZoneRequired": "Imposta prima il fuso orario della palestra."
+    "apiErrorTimeZoneRequired": "Imposta prima il fuso orario della palestra.",
+    "notificationFilters": "Filtri delle notifiche"
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",

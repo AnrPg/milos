@@ -7,6 +7,8 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useDeferredValue, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 
 import { fetchAdminUsers, type AdminUserDirectoryEntry } from "@/api/admin-users";
+import { CollapsibleFilterBar } from "@/components/filters/CollapsibleFilterBar";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { InviteClientsButton } from "@/components/invites/InviteClients";
 import { PageHeader } from "@/components/PageHeader";
 import { SemanticLabel } from "@/components/semantic-label";
@@ -130,81 +132,65 @@ export function AdminUsersDirectory() {
           actions={<InviteClientsButton />}
         />
 
-        <section className="space-y-3 rounded-[1.6rem] p-3 sm:p-4" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} aria-label={t("filters")}>
-          <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-            <div className="relative min-w-0 flex-1">
-              <span aria-hidden="true" className="pointer-events-none absolute inset-y-0 start-3 flex items-center text-sm" style={{ color: "var(--dim)" }}>⌕</span>
-              <input
-                ref={searchRef}
-                type="search"
-                aria-label={t("searchLabel")}
-                placeholder={t("searchPlaceholder")}
-                value={filters.query}
-                onChange={(event) => update({ query: event.target.value })}
-                className="w-full rounded-xl py-2.5 pe-16 ps-9 text-sm outline-none"
-                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              />
-              <kbd className="pointer-events-none absolute inset-y-0 end-3 my-auto hidden h-6 items-center rounded-md px-2 text-[11px] sm:flex" style={{ border: "1px solid var(--border)", color: "var(--dim)" }}>/</kbd>
-            </div>
-            <div className="grid grid-cols-2 gap-2 sm:flex">
-              <label className="sr-only" htmlFor="users-finance-filter">{t("financeFilter")}</label>
-              <select
-                id="users-finance-filter"
-                value={filters.finance}
-                onChange={(event) => update({ finance: event.target.value })}
-                className="rounded-xl px-3 py-2.5 text-sm"
-                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              >
-                <option value="all">{t("financeAll")}</option>
-                {financeStatuses.map((status) => (
-                  <option key={status} value={status}>
-                    {status === "none" ? i18n("noFinanceProfilef804f44") : status.replaceAll("_", " ")}
-                  </option>
-                ))}
-              </select>
-              <label className="sr-only" htmlFor="users-sort">{t("sortLabel")}</label>
-              <select
-                id="users-sort"
-                value={filters.sort}
-                onChange={(event) => update({ sort: event.target.value as DirectorySort })}
-                className="rounded-xl px-3 py-2.5 text-sm"
-                style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
-              >
-                {SORTS.map((sort) => (
-                  <option key={sort} value={sort}>{t(`sort.${sort}`)}</option>
-                ))}
-              </select>
-            </div>
+        <CollapsibleFilterBar
+          ariaLabel={t("filters")}
+          search={{
+            value: filters.query,
+            onChange: (query) => update({ query }),
+            placeholder: t("searchPlaceholder"),
+            ariaLabel: t("searchLabel"),
+            shortcut: "/",
+          }}
+          searchRef={searchRef}
+          activeCount={(filters.role !== "all" ? 1 : 0) + (filters.finance !== "all" ? 1 : 0)}
+          summary={
+            filtersActive && usersQuery.data ? (
+              <div className="flex flex-wrap items-center justify-between gap-2 text-sm" style={{ color: "var(--muted)" }}>
+                <p aria-live="polite">{t("showing", { shown: users.length, total: allUsers.length })}</p>
+                <button type="button" onClick={clearFilters} className="font-semibold underline" style={{ color: "var(--primary)" }}>
+                  {t("clearFilters")}
+                </button>
+              </div>
+            ) : null
+          }
+        >
+          <SegmentPicker
+            ariaLabel={t("roleFilter")}
+            semantics="radiogroup"
+            value={filters.role}
+            onChange={(role) => update({ role })}
+            options={ROLES.map((role) => ({ value: role, label: t(`roles.${role}`), count: counts[role] }))}
+          />
+          <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
+            <label className="sr-only" htmlFor="users-finance-filter">{t("financeFilter")}</label>
+            <select
+              id="users-finance-filter"
+              value={filters.finance}
+              onChange={(event) => update({ finance: event.target.value })}
+              className="min-h-11 min-w-0 rounded-xl px-3 text-sm"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+            >
+              <option value="all">{t("financeAll")}</option>
+              {financeStatuses.map((status) => (
+                <option key={status} value={status}>
+                  {status === "none" ? i18n("noFinanceProfilef804f44") : status.replaceAll("_", " ")}
+                </option>
+              ))}
+            </select>
+            <label className="sr-only" htmlFor="users-sort">{t("sortLabel")}</label>
+            <select
+              id="users-sort"
+              value={filters.sort}
+              onChange={(event) => update({ sort: event.target.value as DirectorySort })}
+              className="min-h-11 min-w-0 rounded-xl px-3 text-sm"
+              style={{ background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" }}
+            >
+              {SORTS.map((sort) => (
+                <option key={sort} value={sort}>{t(`sort.${sort}`)}</option>
+              ))}
+            </select>
           </div>
-
-          <div role="tablist" aria-label={t("roleFilter")} className="flex gap-1 overflow-x-auto">
-            {ROLES.map((role) => (
-              <button
-                key={role}
-                type="button"
-                role="tab"
-                aria-selected={filters.role === role}
-                onClick={() => update({ role })}
-                className="inline-flex shrink-0 items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold"
-                style={filters.role === role ? { background: "var(--text)", color: "var(--bg)" } : { color: "var(--muted)" }}
-              >
-                {t(`roles.${role}`)}
-                <span className="rounded-full px-1.5 text-[11px] font-bold" style={{ background: filters.role === role ? "color-mix(in srgb, var(--bg) 25%, transparent)" : "var(--panel-muted)" }}>
-                  {counts[role]}
-                </span>
-              </button>
-            ))}
-          </div>
-
-          {filtersActive && usersQuery.data ? (
-            <div className="flex flex-wrap items-center justify-between gap-2 text-sm" style={{ color: "var(--muted)" }}>
-              <p aria-live="polite">{t("showing", { shown: users.length, total: allUsers.length })}</p>
-              <button type="button" onClick={clearFilters} className="font-semibold underline" style={{ color: "var(--primary)" }}>
-                {t("clearFilters")}
-              </button>
-            </div>
-          ) : null}
-        </section>
+        </CollapsibleFilterBar>
 
         {usersQuery.isLoading ? <SkeletonRows /> : null}
 

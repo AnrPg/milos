@@ -202,6 +202,7 @@ test.describe("public box page", () => {
     await page.goto(`/b/${box.slug}#schedule`);
 
     await expect(page.getByRole("button", { name: /Yoga 40\+/ })).toBeVisible();
+    await page.getByRole("button", { name: "Filters", exact: true }).click();
     await page.getByLabel("Level").selectOption("beginner");
     await expect(page.getByRole("button", { name: /CrossFit.*Stelios/ })).toBeHidden();
     await page.getByRole("button", { name: /Yoga 40\+/ }).click();
