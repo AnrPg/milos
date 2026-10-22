@@ -122,8 +122,11 @@ test.describe("Solo coach", () => {
 
     await page.getByLabel("Practice name").fill("Maria Coaching");
     await expect(page.getByLabel("Team club name")).toHaveValue("Team Maria");
+    // The stub has no membership for the new gym, so its admin may bounce on;
+    // what matters is that the app went there.
+    const opened = page.waitForURL(/\/org\/maria-coaching\/admin/, { waitUntil: "commit" });
     await page.getByRole("button", { name: "Start my practice" }).click();
-    await expect(page).toHaveURL(/\/org\/maria-coaching\/admin/);
+    await opened;
     expect(created).toMatchObject({ name: "Maria Coaching", team_name: "Team Maria" });
   });
 });

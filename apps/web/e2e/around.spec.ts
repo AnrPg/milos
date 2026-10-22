@@ -298,7 +298,8 @@ test.describe("Γύρω μου", () => {
 
     await expect.poll(() => calls.areaSaves).toEqual([[patisia.id, kypseli.id]]);
     await expect(page.getByRole("heading", { name: "Events" })).toBeVisible();
-    await expect(page.getByText("Open WOD για όλους")).toBeVisible();
+    // The map also labels the event, so check the list entry.
+    await expect(page.getByRole("link", { name: /Open WOD για όλους/ })).toBeVisible();
   });
 
   test("«Χρήση τοποθεσίας τώρα» searches from the rounded position without saving it", async ({ page, context, baseURL }) => {
@@ -361,7 +362,8 @@ test.describe("Γύρω μου", () => {
   test("the filter sheet applies as you tap, saves «ΣΚ κοντά» and turns its alert on", async ({ page }) => {
     const calls = await stub(page);
     await page.goto("/around");
-    await expect(page.getByText("Open WOD για όλους")).toBeVisible();
+    // The map also labels the event, so check the list entry.
+    await expect(page.getByRole("link", { name: /Open WOD για όλους/ })).toBeVisible();
 
     await page.getByRole("button", { name: "Φίλτρα", exact: true }).click();
     const sheet = page.getByRole("dialog", { name: "Φίλτρα" });
