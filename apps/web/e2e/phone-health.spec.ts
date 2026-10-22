@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Phase 3 M10 (ADR-172): Apple Health and Health Connect inside the store
 // apps. The native shell is simulated with the bridge Capacitor injects plus

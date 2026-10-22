@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request, type Route } from "@playwright/test";
+import { expect, test, type Page, type Request, type Route } from "./support/test";
 
 // P3-M13 voice logging (ADR-175): «Με φωνή» in Νέα καταχώρηση records with
 // the real browser recorder (Chromium's fake microphone), sends a 16 kHz

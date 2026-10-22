@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Redesign Phase 3 M6 (ADR-168): PT squads. A client answers an invitation
 // from Box and from the club's Channels, opens the squad and leaves it; the

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 2 M1: an admin edits the gym's public «Σχετικά» step by step
 // (text, photos, what it offers, who it's for, amenities), picks tags from the

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 1 (ADR-137): the member app is four fixed tabs, and Box
 // opens on today's workout. The API is stubbed; every route not listed here

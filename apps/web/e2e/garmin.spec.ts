@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Redesign Phase 2 M13 (ADR-161, plan board 16 A): Garmin on Εγώ ›
 // Συνδεδεμένες συσκευές («Σύντομα» without credentials, the connect sheet,

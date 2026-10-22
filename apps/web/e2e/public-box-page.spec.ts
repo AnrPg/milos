@@ -1,6 +1,6 @@
 import { createServer, type Server } from "node:http";
 
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 import { stubApiPort } from "../playwright.config";
 

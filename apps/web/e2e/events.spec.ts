@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 2 M5 (ADR-153, plan board 8): club events. The club's
 // Events tab with «+ New event», «I'm in» turning into the waitlist when

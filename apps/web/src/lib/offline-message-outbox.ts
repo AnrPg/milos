@@ -59,8 +59,6 @@ export async function queueMessageOperation(
   messageType: MessageType,
   topic: MessageTopic | null = null,
 ) {
-  await requestPersistentStorage();
-
   const operation: QueuedMessageOperation = {
     operationId: crypto.randomUUID(),
     ownerUserId,
@@ -73,7 +71,10 @@ export async function queueMessageOperation(
     attempts: 0,
   };
 
+  // Write first: persist() can take a while, and a tab closed right after
+  // Send must not lose the message waiting on it.
   await putOperation(operation);
+  void requestPersistentStorage();
   return operation;
 }
 

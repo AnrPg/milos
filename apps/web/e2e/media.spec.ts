@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Route } from "@playwright/test";
+import { expect, test, type Page, type Route } from "./support/test";
 
 // P2-M9 (ADR-157, board 12): photos and video in posts. Compose uploads each
 // picked file at once (presigned PUT stubbed here too), alt text with a

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 2 M1: the member Πρόγραμμα is a day view with filter chips,
 // a filter page and a location picker over a street map. The API is stubbed;

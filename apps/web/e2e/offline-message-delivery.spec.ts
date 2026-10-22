@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Route } from "@playwright/test";
+import { expect, test, type Page, type Route } from "./support/test";
 
 const user = {
   id: "11111111-1111-4111-8111-111111111111",
@@ -56,6 +56,9 @@ test("an offline message survives page close and synchronizes exactly once", asy
   await context.setOffline(true);
   await page.getByRole("textbox", { name: "Write a message" }).fill("Queued while offline");
   await page.getByRole("button", { name: "Send", exact: true }).click();
+  // The composer clears once the message is stored on the device; the
+  // button's own "Sending…" shows earlier, before the write.
+  await expect(page.getByRole("textbox", { name: "Write a message" })).toHaveValue("");
 
   await expect(page.getByText("Queued while offline")).toBeVisible();
   await expect(page.getByText(/Sending/)).toBeVisible();

@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Route } from "@playwright/test";
+import { expect, test, type Page, type Route } from "./support/test";
 
 // P3-M12 AI scaling suggestions (ADR-174): the owner switches the feature on
 // with the gym's own key, a coach approves a suggestion with an edit, and a

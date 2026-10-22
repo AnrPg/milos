@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Route } from "@playwright/test";
+import { expect, test, type Page, type Route } from "./support/test";
 
 // P2-M10 (ADR-158, board 13): Ημερολόγιο › Σώμα. The empty state, a new
 // measurement with the first-weight question, «Μόνο τάση» showing no

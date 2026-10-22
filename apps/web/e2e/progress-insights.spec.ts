@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // P3-M4 (ADR-166): Πρόοδος › Insights. One fixed slot after the depth
 // sections: findings labelled as indicators, each can be hidden (the next

@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Redesign Phase 2 M14 (ADR-162, plan board 17): one journal across a gym and
 // an independent coach. Box ▾ switches provider and remembers it on the

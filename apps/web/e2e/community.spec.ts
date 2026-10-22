@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 2 M4 (ADR-143, plan §5a board 7): the club page's four tabs
 // with «Μέλη», member groups and «Πρότεινε ομάδα», reporting a post, «+ Βρες»

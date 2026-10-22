@@ -1,4 +1,4 @@
-import { expect, test, type BrowserContext, type Route } from "@playwright/test";
+import { expect, test, type BrowserContext, type Route } from "./support/test";
 
 const draftId = "11111111-1111-4111-8111-111111111111";
 const admin = {

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Phase 3 M9 (ADR-171): the store apps wrap this same web app. In a browser
 // nothing changes; inside the app (simulated here with the bridge the native

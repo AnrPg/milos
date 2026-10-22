@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // ADR-142 (P2-M2): follow requests with the one-time booking-sharing offer
 // (board 5 Q6), the connections screen and a person's profile. The API is

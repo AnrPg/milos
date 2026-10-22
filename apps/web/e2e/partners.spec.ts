@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // P3-M7 Partners (ADR-169): opting in from a club's Members tab, the deck
 // with filters, undo and a mutual match, the match's conversation with

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 2 M7 (ADR-155, plan board 10): QR check-in. The door kiosk
 // walking through its batch of codes, the phone landing after a door or

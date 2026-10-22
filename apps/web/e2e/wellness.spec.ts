@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Redesign Phase 2 M11 (ADR-159, plan board 14): Ημερολόγιο › Ευεξία. The
 // first visit asks for the health-data consent and which items to show, one

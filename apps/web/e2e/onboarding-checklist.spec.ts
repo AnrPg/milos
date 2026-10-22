@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // The gym owner's setup checklist: every step opens its page, also from
 // "My training", and the popup comes back at each login until setup is done.

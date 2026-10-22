@@ -236,8 +236,9 @@ export async function submitOutboxCommand<Result, Payload = unknown>({
 
 async function persist(store: CommandOutboxStore, operation: QueuedCommandOperation) {
   try {
-    await requestPersistentStorage();
+    // Write first: persist() can be slow, and a closed tab must not lose the command.
     await store.put(operation);
+    void requestPersistentStorage();
     return true;
   } catch {
     // A blocked browser database must not block an online command.

@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Phase 3 P3-M8 (ADR-170): an independent coach's Box speaks in the coach's
 // words (next session with the online call link, Sessions · Messages, the

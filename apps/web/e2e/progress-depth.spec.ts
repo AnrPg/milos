@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // P3-M3 (ADR-165): Πρόοδος › Μυϊκή κάλυψη, Ποιότητες, Φορτίο. The member
 // reads the three fixed slots under the page's range chip, a muscle opens the

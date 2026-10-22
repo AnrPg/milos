@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./support/test";
 
 // Redesign Phase 2 M6 (ADR-154, plan board 9): Γύρω μου. The first-visit area
 // picker, the sections with «Δες όλα», the filter sheet with a saved filter and

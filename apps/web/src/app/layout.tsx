@@ -24,6 +24,7 @@ import { APP_THEMES, DEFAULT_THEME_SLUG, THEME_SLUGS, THEME_STORAGE_KEY, themeSt
 import { isAppLocale, localeDirection } from "@/i18n/locales";
 import "@fontsource-variable/commissioner";
 import "./globals.css";
+import { HydrationMarker } from "@/components/HydrationMarker";
 
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
@@ -128,6 +129,7 @@ export default async function RootLayout({
                 <BottomTabBar />
                 <ScreenPreloader />
                 <OnboardingHost />
+                <HydrationMarker />
               </SessionProvider>
             </ThemeProvider>
           </QueryProvider>

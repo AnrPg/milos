@@ -1,4 +1,4 @@
-import { expect, test, type Page, type Request } from "@playwright/test";
+import { expect, test, type Page, type Request } from "./support/test";
 
 // Redesign Phase 2 M12 (ADR-160): Buddy για στήριξη. An invite link is
 // accepted from its landing page, a buddy is invited from Εγώ › Buddy,
