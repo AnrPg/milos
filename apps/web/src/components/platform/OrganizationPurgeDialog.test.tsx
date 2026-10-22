@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { ApiError } from "@/api/client";
@@ -111,11 +111,37 @@ describe("OrganizationPurgeDialog", () => {
 
     const { onChanged } = renderDialog();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Request export & purge" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Step 1: export the data" }));
 
     await waitFor(() => expect(requestOrganizationPurge).toHaveBeenCalledWith("token", "org-1"));
     expect(await screen.findByTestId("purge-status")).toHaveTextContent("Requested");
     expect(onChanged).toHaveBeenCalled();
+  });
+
+  it("shows what each area deleted and which records kept an account", async () => {
+    vi.mocked(fetchOrganizationPurge).mockResolvedValue({
+      purge: {
+        ...exportedPurge,
+        status: "completed",
+        steps: {
+          workouts: { status: "completed", deleted: { master_workouts: 4, workout_sections: 3 } },
+          identity: {
+            status: "completed",
+            deleted_accounts: 2,
+            kept_accounts: 1,
+            kept_accounts_blocked_by: { finance_entitlement_usage_entries_membership_id: 1 },
+          },
+        },
+      },
+      export_download_url: null,
+    });
+
+    renderDialog();
+
+    const workouts = (await screen.findByText("workouts")).closest("tr")!;
+    expect(within(workouts).getByText("7")).toBeInTheDocument();
+    expect(screen.getByText(/1 account\(s\) kept/)).toBeInTheDocument();
+    expect(screen.getByTestId("kept-blockers")).toHaveTextContent("finance_entitlement_usage_entries_membership_id · 1");
   });
 
   it("shows the export link and retention review, and approves only after the typed slug", async () => {
@@ -137,13 +163,16 @@ describe("OrganizationPurgeDialog", () => {
     expect(screen.getByText("Retain")).toBeInTheDocument();
     expect(screen.getByText("2036-10-12")).toBeInTheDocument();
 
-    const approve = screen.getByRole("button", { name: "Approve and purge" });
+    const approve = screen.getByRole("button", { name: "Delete permanently" });
     expect(approve).toBeDisabled();
 
     fireEvent.change(screen.getByLabelText("Type north-harbor to confirm"), { target: { value: "north" } });
     expect(approve).toBeDisabled();
 
+    // The slug alone is not enough: the vendor must also confirm the backup is saved.
     fireEvent.change(screen.getByLabelText("Type north-harbor to confirm"), { target: { value: "north-harbor" } });
+    expect(approve).toBeDisabled();
+    fireEvent.click(screen.getByLabelText("I downloaded the export and saved it somewhere safe."));
     expect(approve).toBeEnabled();
     fireEvent.click(approve);
 
@@ -166,7 +195,7 @@ describe("OrganizationPurgeDialog", () => {
     fireEvent.click(screen.getByRole("button", { name: "Retry" }));
     await waitFor(() => expect(resumeOrganizationPurge).toHaveBeenCalledWith("token", "org-1"));
 
-    fireEvent.click(screen.getByRole("button", { name: "Cancel purge" }));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel and keep the organization" }));
     await waitFor(() => expect(cancelOrganizationPurge).toHaveBeenCalledWith("token", "org-1"));
   });
 
@@ -178,7 +207,7 @@ describe("OrganizationPurgeDialog", () => {
 
     renderDialog();
 
-    fireEvent.click(await screen.findByRole("button", { name: "Cancel purge" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Cancel and keep the organization" }));
     expect(await screen.findByText("Not allowed now")).toBeInTheDocument();
   });
 });

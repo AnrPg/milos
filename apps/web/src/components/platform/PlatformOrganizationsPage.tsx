@@ -8,7 +8,6 @@ import { useQuery } from "@tanstack/react-query";
 import {
   changePlatformOrganizationLifecycle,
   changePlatformOrganizationSettings,
-  deletePlatformOrganization,
   fetchPlatformOrganizationAccess,
   issuePlatformOrganizationInvitation,
   listPlatformOrganizations,
@@ -75,11 +74,9 @@ export function PlatformOrganizationsPage() {
   const [managingAccess, setManagingAccess] = useState<PlatformOrganization | null>(null);
   const [provisioningOpen, setProvisioningOpen] = useState(false);
   const [confirmingArchive, setConfirmingArchive] = useState<PlatformOrganization | null>(null);
-  const [confirmingDelete, setConfirmingDelete] = useState<PlatformOrganization | null>(null);
   const [reviewingPurge, setReviewingPurge] = useState<PlatformOrganization | null>(null);
   const [renamingSlug, setRenamingSlug] = useState<PlatformOrganization | null>(null);
   const [lifecycleSubmitting, setLifecycleSubmitting] = useState<string | null>(null);
-  const [deleteSubmitting, setDeleteSubmitting] = useState<string | null>(null);
   const [generatedInvitationsByOrg, setGeneratedInvitationsByOrg] = useState<
     Record<string, GeneratedInvitation[]>
   >({});
@@ -202,22 +199,6 @@ export function PlatformOrganizationsPage() {
       setEditing(null);
     } catch {
       setError(copy.settingsError);
-    }
-  }
-
-  async function deleteOrganization(organizationId: string) {
-    if (!accessToken) return;
-    setError(null);
-    setDeleteSubmitting(organizationId);
-
-    try {
-      await deletePlatformOrganization(accessToken, organizationId);
-      await organizationsQuery.refetch();
-      setConfirmingDelete(null);
-    } catch (error) {
-      setError(error instanceof ApiError ? error.message : copy.deleteError);
-    } finally {
-      setDeleteSubmitting(null);
     }
   }
 
@@ -447,19 +428,13 @@ export function PlatformOrganizationsPage() {
                         {copy.archive}
                       </button>
                     ) : null}
+                    {/* Deleting always goes through export, backup and purge (the dialog explains each step). */}
                     <button
                       type="button"
                       onClick={() => setReviewingPurge(entry)}
-                      className="border border-[var(--danger)] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
-                    >
-                      {purgeCopy.open}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setConfirmingDelete(entry)}
                       className="border border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-3 py-2 text-sm font-semibold text-[var(--danger)]"
                     >
-                      {copy.delete}
+                      {purgeCopy.open}
                     </button>
                   </div>
                   <GeneratedInvitationsList
@@ -541,15 +516,6 @@ export function PlatformOrganizationsPage() {
             void organizationsQuery.refetch();
             void myMembershipsQuery.refetch();
           }}
-        />
-      ) : null}
-      {confirmingDelete ? (
-        <DeleteDialog
-          copy={copy}
-          organization={confirmingDelete}
-          submitting={deleteSubmitting === confirmingDelete.organization.id}
-          onCancel={() => setConfirmingDelete(null)}
-          onConfirm={() => void deleteOrganization(confirmingDelete.organization.id)}
         />
       ) : null}
     </main>
@@ -875,30 +841,6 @@ function ArchiveDialog({ copy, organization, submitting, onCancel, onConfirm }: 
           <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
           <button type="button" disabled={submitting} onClick={onConfirm} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
             {copy.archiveConfirm}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function DeleteDialog({ copy, organization, submitting, onCancel, onConfirm }: {
-  copy: ReturnType<typeof platformOrganizationsCopy>;
-  organization: PlatformOrganization;
-  submitting: boolean;
-  onCancel: () => void;
-  onConfirm: () => void;
-}) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.deleteTitle}>
-      <div className="w-full max-w-md bg-[var(--surface)] p-6 shadow-xl">
-        <h2 className="text-xl font-semibold text-[var(--text)]">{copy.deleteTitle}</h2>
-        <p className="mt-2 font-semibold text-[var(--text)]">{organization.organization.name}</p>
-        <p className="mt-3 text-sm leading-6 text-[var(--text-soft)]">{copy.deleteBody}</p>
-        <div className="mt-6 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="border border-[var(--border-strong)] px-4 py-2 text-sm font-semibold">{copy.cancel}</button>
-          <button type="button" disabled={submitting} onClick={onConfirm} className="bg-[var(--danger)] px-4 py-2 text-sm font-semibold text-[var(--danger-contrast)] disabled:opacity-50">
-            {copy.deleteConfirm}
           </button>
         </div>
       </div>

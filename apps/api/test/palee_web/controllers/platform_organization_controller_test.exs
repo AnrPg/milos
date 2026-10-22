@@ -130,6 +130,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
       ]
     })
 
+    exported!(context, organization)
+
     conn =
       context.conn
       |> put_bearer_token(context.platform_user)
@@ -339,6 +341,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
         joined_at: DateTime.utc_now()
       })
 
+    exported!(context, organization)
+
     conn =
       context.conn
       |> put_bearer_token(context.platform_user)
@@ -371,6 +375,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
         status: :active,
         joined_at: DateTime.utc_now()
       })
+
+    exported!(context, organization)
 
     conn =
       context.conn
@@ -411,6 +417,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
         joined_at: DateTime.utc_now()
       })
 
+    exported!(context, organization)
+
     conn =
       context.conn
       |> put_bearer_token(context.platform_user)
@@ -446,6 +454,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
         status: :active,
         joined_at: DateTime.utc_now()
       })
+
+    exported!(context, doomed_organization)
 
     conn =
       context.conn
@@ -487,6 +497,8 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
         leaderboard_enabled: true
       })
       |> Repo.insert()
+
+    exported!(context, organization)
 
     conn =
       context.conn
@@ -676,5 +688,61 @@ defmodule PaleeWeb.PlatformOrganizationControllerTest do
                  event.organization_id == ^organization.id and
                    event.event == "organization_archived"
            )
+  end
+
+  test "permanent delete is refused until the organization's data is exported", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Unexported Gym"})
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert %{"code" => "organization_export_required"} = json_response(conn, 409)
+    assert Repo.get(Organization, organization.id)
+  end
+
+  test "permanent delete removes an owner whose own logo change is in the audit log", context do
+    {:ok, organization} = Organizations.create_organization(%{name: "Logo Owner Gym"})
+    owner = admin_fixture(%{nickname: "logo_owner"})
+
+    {:ok, _membership} =
+      Organizations.add_membership(%{
+        organization_id: organization.id,
+        user_id: owner.id,
+        role: :owner,
+        status: :active,
+        joined_at: DateTime.utc_now()
+      })
+
+    # A tenant logo change records the owner as the event's actor.
+    Repo.insert!(%Palee.Organizations.OrganizationProvisioningEvent{
+      organization_id: organization.id,
+      vendor_user_id: owner.id,
+      event: "organization_logo_uploaded",
+      metadata: %{"actor_scope" => "tenant"}
+    })
+
+    exported!(context, organization)
+
+    conn =
+      context.conn
+      |> put_bearer_token(context.platform_user)
+      |> delete("/api/platform/organizations/#{organization.id}")
+
+    assert response(conn, 204) == ""
+    refute Repo.get(Organization, organization.id)
+    refute Identity.find_by_id(owner.id)
+  end
+
+  defp exported!(context, organization) do
+    start_supervised!(
+      {Oban, Keyword.put(Application.fetch_env!(:palee, Oban), :testing, :manual)}
+    )
+
+    {:ok, platform} = Organizations.resolve_platform_context(context.platform_user)
+    {:ok, purge} = Palee.Application.RequestOrganizationPurge.call(platform, organization.id)
+    {:ok, _purge} = Palee.Application.ExportOrganizationTenantData.call(platform, purge.id)
+    :ok
   end
 end

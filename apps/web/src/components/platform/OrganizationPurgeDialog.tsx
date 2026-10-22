@@ -18,6 +18,36 @@ import { formatPurgeCopy, platformOrganizationPurgeCopy } from "@/i18n/platform-
 const cancellableStatuses = new Set<OrganizationPurge["status"]>(["requested", "exported"]);
 const workingStatuses = new Set<OrganizationPurge["status"]>(["requested", "exporting", "approved", "purging"]);
 
+/** Which of the four steps (export, back up, confirm, delete) the vendor is on; 5 is done. */
+function currentStep(purge: OrganizationPurge | null, backupSaved: boolean): number {
+  if (!purge || purge.status === "cancelled") return 1;
+  switch (purge.status) {
+    case "requested":
+    case "exporting":
+      return 1;
+    case "exported":
+      return backupSaved ? 3 : 2;
+    case "failed":
+      return purge.failed_stage === "export" ? 1 : 4;
+    case "completed":
+      return 5;
+    default:
+      return 4;
+  }
+}
+
+/** Rows a finished purge step removed, for the retention table's "Deleted" column. */
+function deletedCount(step: unknown): string {
+  if (!step || typeof step !== "object") return "-";
+  const record = step as { status?: string; deleted?: Record<string, number>; deleted_accounts?: number };
+  if (record.status !== "completed") return "-";
+  if (typeof record.deleted_accounts === "number") return String(record.deleted_accounts);
+  if (record.deleted && typeof record.deleted === "object") {
+    return String(Object.values(record.deleted).reduce((sum, count) => sum + (typeof count === "number" ? count : 0), 0));
+  }
+  return "✓";
+}
+
 export function OrganizationPurgeDialog({
   accessToken,
   locale,
@@ -34,6 +64,7 @@ export function OrganizationPurgeDialog({
   const copy = platformOrganizationPurgeCopy(locale);
   const organizationId = organization.organization.id;
   const [confirmation, setConfirmation] = useState("");
+  const [backupSaved, setBackupSaved] = useState(false);
   const [pending, setPending] = useState<"request" | "approve" | "cancel" | "resume" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
 
@@ -73,7 +104,11 @@ export function OrganizationPurgeDialog({
   }
 
   const slug = purge?.organization_slug ?? organization.organization.slug;
-  const canApprove = purge?.status === "exported" && confirmation.trim() === slug;
+  const canApprove = purge?.status === "exported" && backupSaved && confirmation.trim() === slug;
+  const step = currentStep(purge, backupSaved);
+  const identityStep = purge?.steps?.identity as { kept_accounts?: number; kept_accounts_blocked_by?: Record<string, number> } | undefined;
+  const keptAccounts = identityStep?.kept_accounts ?? 0;
+  const keptBlockers = Object.entries(identityStep?.kept_accounts_blocked_by ?? {});
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[var(--scrim)] p-4" role="dialog" aria-modal="true" aria-label={copy.title}>
@@ -94,6 +129,20 @@ export function OrganizationPurgeDialog({
         </div>
 
         <p className="mt-4 text-sm leading-6 text-[var(--text-soft)]">{copy.intro}</p>
+        <ol className="mt-3 space-y-2 text-sm leading-6" data-testid="purge-steps">
+          {[copy.step1, copy.step2, copy.step3, copy.step4].map((text, index) => {
+            const number = index + 1;
+            return (
+              <li
+                key={number}
+                aria-current={number === step ? "step" : undefined}
+                className={number === step ? "font-semibold text-[var(--text)]" : number < step ? "text-[var(--dim)] line-through" : "text-[var(--text-soft)]"}
+              >
+                {number}. {text}
+              </li>
+            );
+          })}
+        </ol>
 
         {actionError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{actionError}</p> : null}
         {purgeQuery.isError ? <p className="mt-4 border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm font-semibold text-[var(--danger)]">{copy.loadError}</p> : null}
@@ -135,6 +184,20 @@ export function OrganizationPurgeDialog({
 
             {workingStatuses.has(purge.status) ? <p className="text-sm text-[var(--text-soft)]">{copy.workingBody}</p> : null}
             {purge.status === "completed" ? <p className="text-sm font-semibold text-[var(--text)]">{copy.completedBody}</p> : null}
+            {keptAccounts > 0 ? (
+              <div className="text-sm text-[var(--text-soft)]">
+                <p>{formatPurgeCopy(copy.keptAccounts, { count: String(keptAccounts) })}</p>
+                {keptBlockers.length > 0 ? (
+                  <ul className="mt-1 list-disc ps-5" data-testid="kept-blockers">
+                    {keptBlockers.map(([record, count]) => (
+                      <li key={record}>
+                        <code className="font-[family-name:var(--font-code)]">{record}</code> · {count}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ) : null}
             {purge.status === "cancelled" ? <p className="text-sm text-[var(--text)]">{copy.cancelledBody}</p> : null}
             {purge.status === "failed" ? (
               <div className="border-l-4 border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] px-4 py-3 text-sm text-[var(--danger)]">
@@ -144,6 +207,7 @@ export function OrganizationPurgeDialog({
                     reason: purge.failure_reason ?? "-",
                   })}
                 </p>
+                <p className="mt-2 text-[var(--text-soft)]">{copy.failedHint}</p>
                 <button
                   type="button"
                   disabled={pending !== null}
@@ -177,6 +241,7 @@ export function OrganizationPurgeDialog({
                       <th className="py-2 pr-3">{copy.retentionContext}</th>
                       <th className="py-2 pr-3">{copy.retentionPolicy}</th>
                       <th className="py-2 pr-3">{copy.retentionRecords}</th>
+                      <th className="py-2 pr-3">{copy.retentionDeleted}</th>
                       <th className="py-2">{copy.retentionUntil}</th>
                     </tr>
                   </thead>
@@ -186,6 +251,7 @@ export function OrganizationPurgeDialog({
                         <td className="py-2 pr-3 font-semibold text-[var(--text)]">{entry.context}</td>
                         <td className="py-2 pr-3 text-[var(--text)]">{copy.dispositions[entry.disposition]}</td>
                         <td className="py-2 pr-3 text-[var(--text)]">{entry.record_count}</td>
+                        <td className="py-2 pr-3 text-[var(--text)]">{deletedCount(purge.steps?.[entry.context])}</td>
                         <td className="py-2 text-[var(--text)]">{entry.retained_until ?? "-"}</td>
                       </tr>
                     ))}
@@ -198,6 +264,10 @@ export function OrganizationPurgeDialog({
               <section className="border border-[var(--danger)] bg-[color-mix(in_srgb,var(--danger)_10%,var(--panel))] p-4 text-[var(--text)]">
                 <h3 className="text-base font-semibold">{copy.approveTitle}</h3>
                 <p className="mt-2 text-sm leading-6">{copy.approveBody}</p>
+                <label className="mt-3 flex items-start gap-2 text-sm font-medium">
+                  <input type="checkbox" checked={backupSaved} onChange={(event) => setBackupSaved(event.target.checked)} className="mt-1" />
+                  <span>{copy.backupSaved}</span>
+                </label>
                 <label className="mt-3 block text-sm font-medium">
                   <span className="mb-1.5 block">{formatPurgeCopy(copy.confirmationLabel, { slug })}</span>
                   <input

@@ -8,7 +8,7 @@ import { ApiError } from "@/api/client";
 import {
   changePlatformOrganizationLifecycle,
   changePlatformOrganizationSettings,
-  deletePlatformOrganization,
+  fetchOrganizationPurge,
   fetchPlatformOrganizationAccess,
   issuePlatformOrganizationInvitation,
   listPlatformOrganizations,
@@ -45,7 +45,7 @@ vi.mock("@/api/platform-organizations", async (importOriginal) => {
   return {
     ...actual,
     changePlatformOrganizationLifecycle: vi.fn(),
-    deletePlatformOrganization: vi.fn(),
+    fetchOrganizationPurge: vi.fn(),
     fetchPlatformOrganizationAccess: vi.fn(),
     issuePlatformOrganizationInvitation: vi.fn(),
     listPlatformOrganizations: vi.fn(),
@@ -101,7 +101,6 @@ describe("PlatformOrganizationsPage", () => {
     vi.mocked(changePlatformOrganizationLifecycle).mockResolvedValue({
       organization: { ...organization.organization, status: "archived" },
     });
-    vi.mocked(deletePlatformOrganization).mockResolvedValue(undefined);
     vi.mocked(sendOwnerInvitationEmail).mockResolvedValue(undefined);
     vi.mocked(renamePlatformOrganization).mockResolvedValue({
       organization: { ...organization.organization, name: "North Harbor Strength" },
@@ -290,46 +289,19 @@ describe("PlatformOrganizationsPage", () => {
     expect(window.localStorage.getItem("palee:selected-organization-slug")).toBe("north-harbor");
   });
 
-  it("permanently deletes an organization only after explicit confirmation", async () => {
+  it("deletes an organization only through the export, backup and purge flow", async () => {
+    vi.mocked(fetchOrganizationPurge).mockRejectedValue(new ApiError(404, "Not found", { error: "Not found" }));
     renderPage();
 
     const article = await screen.findByText("North Harbor Strength");
     const row = article.closest("article");
     expect(row).not.toBeNull();
 
-    fireEvent.click(within(row!).getByRole("button", { name: "Delete permanently" }));
-    expect(deletePlatformOrganization).not.toHaveBeenCalled();
+    fireEvent.click(within(row!).getByRole("button", { name: "Delete permanently…" }));
 
-    const dialog = screen.getByRole("dialog", { name: "Permanently delete organization" });
-    fireEvent.click(within(dialog).getByRole("button", { name: "Delete permanently" }));
-
-    await waitFor(() => {
-      expect(deletePlatformOrganization).toHaveBeenCalledWith("token", "org-1");
-    });
-  });
-
-  it("surfaces the backend reason when permanent delete is blocked", async () => {
-    vi.mocked(deletePlatformOrganization).mockRejectedValueOnce(
-      new ApiError(409, "At least one admin account must remain", {
-        code: "last_admin",
-        error: "At least one admin account must remain",
-      }),
-    );
-
-    renderPage();
-
-    const article = await screen.findByText("North Harbor Strength");
-    const row = article.closest("article");
-    expect(row).not.toBeNull();
-
-    fireEvent.click(within(row!).getByRole("button", { name: "Delete permanently" }));
-    fireEvent.click(
-      within(screen.getByRole("dialog", { name: "Permanently delete organization" })).getByRole("button", {
-        name: "Delete permanently",
-      }),
-    );
-
-    expect(await screen.findByText("At least one admin account must remain")).toBeInTheDocument();
+    const dialog = screen.getByRole("dialog", { name: "Delete organization permanently" });
+    expect(within(dialog).getByTestId("purge-steps")).toHaveTextContent("Back up. Download the ZIP");
+    expect(await within(dialog).findByRole("button", { name: "Step 1: export the data" })).toBeInTheDocument();
   });
 
   it("renames an organization from the settings dialog only when the name actually changed", async () => {
