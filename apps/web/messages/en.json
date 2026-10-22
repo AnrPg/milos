@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Saving…",
     "apiErrorClassNotPublished": "This class isn't open for booking yet.",
     "apiErrorInvalidTimeZone": "Choose a known time zone.",
-    "apiErrorTimeZoneRequired": "Set your gym's time zone first."
+    "apiErrorTimeZoneRequired": "Set your gym's time zone first.",
+    "notificationFilters": "Notification filters"
   },
   "PrSharing": {
     "gymLabel": "Where did you set this PR?",

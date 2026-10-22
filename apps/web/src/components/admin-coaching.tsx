@@ -23,6 +23,7 @@ import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import { SemanticLabel } from "@/components/semantic-label";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 function asRecord(v: unknown): Record<string, unknown> {
   return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
@@ -181,26 +182,13 @@ export function AdminCoaching() {
           }
         />
 
-        <div
-          aria-label={i18n("stfCoachingSections")}
-          className="flex max-w-full gap-1 overflow-x-auto rounded-full p-0.5 self-start"
-          role="tablist"
-          style={{ background: "var(--border)" }}
-        >
-          {COACHING_TABS.map((tab) => (
-            <button
-              key={tab}
-              aria-selected={activeTab === tab}
-              className="shrink-0 rounded-full px-4 py-2 text-sm font-semibold transition-colors"
-              onClick={() => setTab(tab)}
-              role="tab"
-              style={activeTab === tab ? { background: "var(--text)", color: "var(--bg)" } : { color: "var(--dim)" }}
-              type="button"
-            >
-              {tabLabels[tab]}
-            </button>
-          ))}
-        </div>
+        <SegmentPicker
+          ariaLabel={i18n("stfCoachingSections")}
+          variant="track"
+          value={activeTab}
+          onChange={setTab}
+          options={COACHING_TABS.map((tab) => ({ value: tab, label: tabLabels[tab] }))}
+        />
 
         {activeTab === "form-reviews" ? <FormReviewQueue /> : null}
         {activeTab === "replies" ? <ReplyQueue /> : null}

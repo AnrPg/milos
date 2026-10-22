@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Guardando…",
     "apiErrorClassNotPublished": "Esta clase aún no admite reservas.",
     "apiErrorInvalidTimeZone": "Elige una zona horaria conocida.",
-    "apiErrorTimeZoneRequired": "Define primero la zona horaria de tu gimnasio."
+    "apiErrorTimeZoneRequired": "Define primero la zona horaria de tu gimnasio.",
+    "notificationFilters": "Filtros de notificaciones"
   },
   "PrSharing": {
     "gymLabel": "¿Dónde conseguiste este PR?",

@@ -4357,7 +4357,8 @@
     "gymTimeZoneSaving": "Сохранение…",
     "apiErrorClassNotPublished": "Запись на это занятие ещё не открыта.",
     "apiErrorInvalidTimeZone": "Выберите известный часовой пояс.",
-    "apiErrorTimeZoneRequired": "Сначала задайте часовой пояс зала."
+    "apiErrorTimeZoneRequired": "Сначала задайте часовой пояс зала.",
+    "notificationFilters": "Фильтры уведомлений"
   },
   "PrSharing": {
     "gymLabel": "Где вы установили этот рекорд?",
