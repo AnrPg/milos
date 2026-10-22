@@ -17,7 +17,7 @@ import { NewPRFormModal } from "@/components/pantheon/PRFormModal";
 import { useSession } from "@/components/session-provider";
 import { TrainingLogDialog, type TrainingLogDialogState } from "@/components/training-log/TrainingLog";
 import { VoiceLogSheet } from "@/components/voice-log/VoiceLogSheet";
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 import { canRecordAudio } from "@/lib/platform/voice-recorder";
 import { formFromVoiceDraft } from "@/lib/voice-draft";
 
@@ -192,23 +192,22 @@ function EntryMenu({
   onClose: () => void;
 }) {
   const t = useTranslations("MemberApp");
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
+    <Dialog
+      onClose={onClose}
+      title={t("newEntry")}
+      size="md"
+      footer={
+        <button
+          type="button"
+          onClick={onClose}
+          className="min-h-11 w-full rounded-2xl text-sm font-semibold"
+          style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
+        >
+          {t("cancel")}
+        </button>
+      }
     >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("newEntry")}
-        className="w-full max-w-md rounded-t-3xl p-5 sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 className="mb-4 text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("newEntry")}</h2>
         <div className="flex flex-col gap-4">
           {groups.map(({ group, kinds }) => (
             <section key={group} aria-labelledby={`entry-group-${group}`}>
@@ -237,15 +236,6 @@ function EntryMenu({
             </section>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="mt-4 min-h-11 w-full rounded-2xl text-sm font-semibold"
-          style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
-        >
-          {t("cancel")}
-        </button>
-      </div>
-    </div>
+    </Dialog>
   );
 }

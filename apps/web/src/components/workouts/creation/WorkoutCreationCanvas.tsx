@@ -549,7 +549,7 @@ export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null,
 
   return (
     <div
-      className={embedded ? "relative flex h-[min(88vh,54rem)] min-w-0 flex-col overflow-hidden overflow-x-clip" : "relative flex h-[calc(100dvh-3.25rem)] min-w-0 flex-col overflow-hidden overflow-x-clip"}
+      className={embedded ? "relative flex h-[min(88dvh,54rem)] max-h-full min-w-0 flex-col overflow-hidden overflow-x-clip" : "relative flex h-[calc(100dvh-3.25rem)] min-w-0 flex-col overflow-hidden overflow-x-clip"}
       style={{
         background: "var(--bg)",
         color: "var(--text)",

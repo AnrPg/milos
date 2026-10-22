@@ -28,6 +28,7 @@ import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { downloadIcsEvent } from "@/lib/ics";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { Dialog } from "@/components/ui/Dialog";
 
 /** The WOD as the sheet shows it (board 2, Q7): each part with its movement names. */
 export function wodOutline(workout: WorkoutPreview) {
@@ -223,64 +224,46 @@ export function ClassSheet({
   const shownError = error ?? actionError;
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-      role="presentation"
-    >
-      <section
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="class-sheet-title"
-        onClick={(event) => event.stopPropagation()}
-        className="flex max-h-[90dvh] w-full max-w-xl flex-col rounded-t-3xl"
-        style={{ background: "var(--panel)", borderTop: "1px solid var(--border)" }}
-      >
-        <div className="flex justify-center pt-2.5">
-          <span aria-hidden="true" className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
+    <Dialog
+      onClose={onClose}
+      title={slot.name}
+      titleId="class-sheet-title"
+      description={
+        <span className="block font-semibold first-letter:uppercase">
+          {when} · {clock.format(start)} · {t("minutes", { count: slot.duration_minutes })}
+        </span>
+      }
+      size="xl"
+      headerActions={
+        <button
+          type="button"
+          onClick={() =>
+            downloadIcsEvent({
+              title: slot.name,
+              date: slot.scheduled_at.slice(0, 10),
+              datetime: slot.scheduled_at,
+              durationMinutes: slot.duration_minutes,
+            })
+          }
+          aria-label={i18n("addToCalendar33cead7")}
+          className="grid h-10 w-10 place-items-center rounded-full"
+          style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}
+        >
+          <span aria-hidden="true">📅</span>
+        </button>
+      }
+      footer={
+        <div className="flex w-full flex-col gap-2">
+          {shownError ? (
+            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
+              {shownError}
+            </p>
+          ) : null}
+          {footer}
         </div>
-
-        <div className="flex-1 overflow-y-auto px-5 pb-4 pt-2">
-          <header className="flex items-start justify-between gap-3">
-            <div className="min-w-0">
-              <h2 id="class-sheet-title" className="text-2xl font-extrabold" style={{ color: "var(--text)" }}>
-                {slot.name}
-              </h2>
-              <p className="mt-1 text-sm font-semibold first-letter:uppercase" style={{ color: "var(--text-soft)" }}>
-                {when} · {clock.format(start)} · {t("minutes", { count: slot.duration_minutes })}
-              </p>
-            </div>
-            <span className="flex shrink-0 gap-1">
-              <button
-                type="button"
-                onClick={() =>
-                  downloadIcsEvent({
-                    title: slot.name,
-                    date: slot.scheduled_at.slice(0, 10),
-                    datetime: slot.scheduled_at,
-                    durationMinutes: slot.duration_minutes,
-                  })
-                }
-                aria-label={i18n("addToCalendar33cead7")}
-                className="grid h-10 w-10 place-items-center rounded-full"
-                style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}
-              >
-                <span aria-hidden="true">📅</span>
-              </button>
-              <button
-                type="button"
-                onClick={onClose}
-                aria-label={i18n("closefeb3e25")}
-                className="grid h-10 w-10 place-items-center rounded-full"
-                style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}
-              >
-                <span aria-hidden="true">✕</span>
-              </button>
-            </span>
-          </header>
-
-          <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+      }
+    >
+          <dl className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
             {coachName ? <Fact label={t("coach")}>{coachName}</Fact> : null}
             {slot.friends_going && slot.friends_going.length > 0 ? (
               <Fact label={t("friendsLabel")}>{slot.friends_going.map((friend) => friend.nickname ?? "?").join(", ")}</Fact>
@@ -418,24 +401,7 @@ export function ClassSheet({
               </button>
             )}
           </section>
-        </div>
-
-        <footer
-          className="flex flex-col gap-2 px-5 pt-3"
-          style={{
-            borderTop: "1px solid var(--border)",
-            paddingBottom: "max(1rem, env(safe-area-inset-bottom))",
-          }}
-        >
-          {shownError ? (
-            <p role="alert" className="text-sm" style={{ color: "var(--danger)" }}>
-              {shownError}
-            </p>
-          ) : null}
-          {footer}
-        </footer>
-      </section>
-    </div>
+    </Dialog>
   );
 }
 

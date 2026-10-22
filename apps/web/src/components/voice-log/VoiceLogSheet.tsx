@@ -9,6 +9,7 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { createBrowserVoiceRecorder, type VoiceRecorder } from "@/lib/platform/voice-recorder";
 
 import { elapsedLabel, voiceErrorKey, type VoiceErrorKey } from "./voice-log-model";
+import { Dialog } from "@/components/ui/Dialog";
 
 type Phase = { name: "idle" } | { name: "recording"; startedAt: number } | { name: "working" } | { name: "error"; key: VoiceErrorKey };
 
@@ -36,7 +37,6 @@ export function VoiceLogSheet({
 }) {
   const t = useTranslations("VoiceLog");
   const locale = useUiLocale();
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const recorderRef = useRef<VoiceRecorder | null>(null);
   const [phase, setPhase] = useState<Phase>({ name: "idle" });
   const [now, setNow] = useState(() => Date.now());
@@ -91,29 +91,37 @@ export function VoiceLogSheet({
     }
   }
 
+  function cancelAndClose() {
+    recorderRef.current?.cancel();
+    recorderRef.current = null;
+    onClose();
+  }
+
   const elapsed = recording ? now - startedAt : 0;
   // These cannot be fixed by trying again from here.
   const blocked = phase.name === "error" && ["unsupported", "off", "dailyLimit"].includes(phase.key);
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={recording || phase.name === "working" ? undefined : onClose}
+    <Dialog
+      onClose={cancelAndClose}
+      dismissible={!recording && phase.name !== "working"}
+      title={t("title")}
+      description={t("hint", { seconds: maxSeconds })}
+      size="md"
+      testId="voice-log-sheet"
+      bodyClassName="text-center"
+      footer={
+        <button
+          type="button"
+          onClick={cancelAndClose}
+          disabled={phase.name === "working"}
+          className="min-h-11 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
+          style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
+        >
+          {t("cancel")}
+        </button>
+      }
     >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={t("title")}
-        className="w-full max-w-md rounded-t-3xl p-5 text-center sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(event) => event.stopPropagation()}
-        data-testid="voice-log-sheet"
-      >
-        <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>{t("title")}</h2>
-        <p className="mt-1 text-sm" style={{ color: "var(--dim)" }}>{t("hint", { seconds: maxSeconds })}</p>
-
         <div className="my-6 flex flex-col items-center gap-3">
           <button
             type="button"
@@ -155,20 +163,6 @@ export function VoiceLogSheet({
 
         <p className="text-xs" style={{ color: "var(--dim)" }}>{t("privacy")}</p>
 
-        <button
-          type="button"
-          onClick={() => {
-            recorderRef.current?.cancel();
-            recorderRef.current = null;
-            onClose();
-          }}
-          disabled={phase.name === "working"}
-          className="mt-4 min-h-11 w-full rounded-2xl text-sm font-semibold disabled:opacity-60"
-          style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
-        >
-          {t("cancel")}
-        </button>
-      </div>
-    </div>
+    </Dialog>
   );
 }

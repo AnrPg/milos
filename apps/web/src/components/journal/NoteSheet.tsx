@@ -20,6 +20,7 @@ import { VisibilityChoices } from "@/components/journal/VisibilityBadge";
 import { PRGymField, prGymSlugForSubmit, usePRGymOptions } from "@/components/pantheon/PRGymField";
 import { useSession } from "@/components/session-provider";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 const BODY_MAX = 4000;
 const GYM_RUNGS: ChoosableVisibility[] = ["private", "coach_can_view", "coach_reply_requested"];
@@ -44,7 +45,6 @@ export function NoteSheet({
   const tApp = useTranslations("MemberApp");
   const { tokens } = useSession();
   const token = tokens?.access_token ?? null;
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   const { gyms, defaultGymSlug } = usePRGymOptions();
   const [topic, setTopic] = useState<JournalNoteTopic>(note?.topic ?? "thought");
   const [body, setBody] = useState(note?.body ?? "");
@@ -102,24 +102,46 @@ export function NoteSheet({
     !token || body.trim() === "" || (!note && needsQuestion(chosen) && question.trim() === "") || Boolean(moveError);
 
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
+    <Dialog
+      onClose={onClose}
+      title={note ? t("note.editTitle") : t("note.newTitle")}
+      size="md"
+      bodyClassName="flex flex-col gap-4"
+      footer={
+        <div className="w-full flex gap-2">
+          {note ? (
+            <button
+              type="button"
+              disabled={busy}
+              onClick={() => remove.mutate()}
+              className="min-h-11 rounded-2xl px-4 text-sm font-semibold disabled:opacity-50"
+              style={{ color: "var(--danger)", border: "1px solid var(--border)" }}
+            >
+              {t("note.delete")}
+            </button>
+          ) : null}
+          <button
+            type="button"
+            onClick={moveError ? onSaved : onClose}
+            className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
+            style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
+          >
+            {moveError ? t("note.close") : tApp("cancel")}
+          </button>
+          {moveError ? null : (
+            <button
+              type="button"
+              disabled={blocked || busy}
+              onClick={() => save.mutate()}
+              className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            >
+              {save.isPending ? t("saving") : !note && needsQuestion(chosen) ? t("askCoach") : t("save")}
+            </button>
+          )}
+        </div>
+      }
     >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={note ? t("note.editTitle") : t("note.newTitle")}
-        className="flex max-h-[90vh] w-full max-w-md flex-col gap-4 overflow-y-auto rounded-t-3xl p-5 sm:rounded-3xl"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))" }}
-        onClick={(event) => event.stopPropagation()}
-      >
-        <h2 className="text-lg font-bold" style={{ color: "var(--text)" }}>
-          {note ? t("note.editTitle") : t("note.newTitle")}
-        </h2>
-
         <div role="radiogroup" aria-label={t("note.topicLabel")} className="flex flex-wrap gap-2">
           {NOTE_TOPICS.map((option) => (
             <button
@@ -179,40 +201,6 @@ export function NoteSheet({
             {t("note.saveFailed")}
           </p>
         ) : null}
-
-        <div className="flex gap-2">
-          {note ? (
-            <button
-              type="button"
-              disabled={busy}
-              onClick={() => remove.mutate()}
-              className="min-h-11 rounded-2xl px-4 text-sm font-semibold disabled:opacity-50"
-              style={{ color: "var(--danger)", border: "1px solid var(--border)" }}
-            >
-              {t("note.delete")}
-            </button>
-          ) : null}
-          <button
-            type="button"
-            onClick={moveError ? onSaved : onClose}
-            className="min-h-11 flex-1 rounded-2xl text-sm font-semibold"
-            style={{ color: "var(--dim)", border: "1px solid var(--border)" }}
-          >
-            {moveError ? t("note.close") : tApp("cancel")}
-          </button>
-          {moveError ? null : (
-            <button
-              type="button"
-              disabled={blocked || busy}
-              onClick={() => save.mutate()}
-              className="min-h-11 flex-1 rounded-2xl text-sm font-bold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            >
-              {save.isPending ? t("saving") : !note && needsQuestion(chosen) ? t("askCoach") : t("save")}
-            </button>
-          )}
-        </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

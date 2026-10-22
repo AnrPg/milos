@@ -13,8 +13,9 @@ export type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "5xl" | "fu
  * - "center": a card in the middle, on phones too.
  * - "sheet": a bottom sheet on phones, a centred card from `sm` up.
  * - "drawer": a full-height panel on the end edge (full screen on phones).
+ * - "panel": a bottom sheet on phones, a full-height end drawer from `md` up.
  */
-export type DialogVariant = "center" | "sheet" | "drawer";
+export type DialogVariant = "center" | "sheet" | "drawer" | "panel";
 
 export type DialogLayer = "drawer" | "modal" | "fullscreen" | "toast";
 
@@ -37,7 +38,7 @@ const DRAWER_SIZE: Record<DialogSize, string> = {
   "2xl": "md:max-w-2xl",
   "3xl": "md:max-w-3xl",
   "5xl": "md:max-w-5xl",
-  full: "md:max-w-full",
+  full: "",
 };
 
 const LAYER: Record<DialogLayer, string> = {
@@ -76,12 +77,14 @@ export function Dialog({
   dismissible = true,
   showClose = true,
   bare = false,
+  plainBody = false,
   onSubmit,
   panelClassName = "",
   bodyClassName = "",
   panelStyle,
   labelledBy,
   titleId: titleIdProp,
+  testId,
 }: {
   onClose: () => void;
   title?: ReactNode;
@@ -104,6 +107,8 @@ export function Dialog({
   showClose?: boolean;
   /** The children own the panel's layout and scrolling (no header/body/footer). */
   bare?: boolean;
+  /** Keep the header and footer but let the children own the body's scrolling. */
+  plainBody?: boolean;
   onSubmit?: (event: FormEvent<HTMLFormElement>) => void;
   panelClassName?: string;
   bodyClassName?: string;
@@ -112,6 +117,7 @@ export function Dialog({
   labelledBy?: string;
   /** A fixed id for the title element (tests and aria references). */
   titleId?: string;
+  testId?: string;
 }) {
   const common = useTranslations("Common");
   const generatedId = useId();
@@ -127,15 +133,19 @@ export function Dialog({
   const isDrawer = variant === "drawer";
   const rootLayout = isDrawer
     ? "items-stretch justify-end"
-    : variant === "sheet"
+    : variant === "panel"
+      ? "items-end justify-center pt-[max(0.75rem,env(safe-area-inset-top))] md:items-stretch md:justify-end md:pt-0"
+      : variant === "sheet"
       ? "items-end justify-center pt-[max(0.75rem,env(safe-area-inset-top))] sm:items-center sm:p-6"
       : "items-center justify-center p-3 pt-[max(0.75rem,env(safe-area-inset-top))] sm:p-6";
   const panelShape = isDrawer
     ? `h-full ${DRAWER_SIZE[size]} border-s`
-    : variant === "sheet"
+    : variant === "panel"
+      ? `max-h-full rounded-t-[1.75rem] border md:h-full md:rounded-none md:border-0 md:border-s ${DRAWER_SIZE[size]}`
+      : variant === "sheet"
       ? `max-h-full rounded-t-[1.75rem] sm:rounded-[1.75rem] border ${SIZE[size]}`
       : `max-h-full rounded-[1.75rem] border ${SIZE[size]}`;
-  const padsBottomSafeArea = isDrawer || variant === "sheet";
+  const padsBottomSafeArea = variant !== "center";
 
   const hasHeader = !bare && (title || eyebrow || description || showClose || headerActions);
   const PanelTag = onSubmit ? "form" : "section";
@@ -149,6 +159,7 @@ export function Dialog({
       aria-labelledby={title ? titleId : labelledBy}
       aria-describedby={description ? descriptionId : undefined}
       tabIndex={-1}
+      data-testid={testId}
       onSubmit={onSubmit}
       onClick={(event) => event.stopPropagation()}
       className={`relative flex min-h-0 w-full flex-col overflow-hidden outline-none ${panelShape} ${panelClassName}`}
@@ -164,8 +175,8 @@ export function Dialog({
         children
       ) : (
         <>
-          {variant === "sheet" ? (
-            <div className="flex shrink-0 justify-center pt-2.5 sm:hidden" aria-hidden="true">
+          {variant === "sheet" || variant === "panel" ? (
+            <div className={`flex shrink-0 justify-center pt-2.5 ${variant === "panel" ? "md:hidden" : "sm:hidden"}`} aria-hidden="true">
               <span className="h-1 w-10 rounded-full" style={{ background: "var(--border)" }} />
             </div>
           ) : null}
@@ -210,18 +221,22 @@ export function Dialog({
               ) : null}
             </header>
           ) : null}
-          <div
-            className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 ${footer || footerStart ? "pb-4" : "pb-5"} ${hasHeader ? "" : "pt-5"} ${bodyClassName}`}
-            style={!footer && !footerStart && padsBottomSafeArea ? { paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" } : undefined}
-          >
-            {children}
-          </div>
+          {plainBody ? (
+            <div className={`flex min-h-0 flex-1 flex-col ${bodyClassName}`}>{children}</div>
+          ) : (
+            <div
+              className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 ${footer || footerStart ? "pb-4" : "pb-5"} ${hasHeader ? "" : "pt-5"} ${bodyClassName}`}
+              style={!footer && !footerStart && padsBottomSafeArea ? { paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" } : undefined}
+            >
+              {children}
+            </div>
+          )}
           {footer || footerStart ? (
             <footer
               className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 pt-3 sm:px-6"
               style={{
                 borderColor: "var(--border)",
-                background: "var(--panel)",
+                background: "inherit",
                 paddingBottom: padsBottomSafeArea ? "max(0.75rem, env(safe-area-inset-bottom))" : "0.75rem",
               }}
             >

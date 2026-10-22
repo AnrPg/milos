@@ -4,13 +4,13 @@
 
 import {useUiTranslations} from "@/i18n/ui";
 import {useUiLocale} from "@/i18n/use-ui-locale";
-import { useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getPRHistory, type PRRecord, type PRSupportingMetrics, type PRUnit } from "@/api/gamification";
 import { useSession } from "@/components/session-provider";
 import { CommentList } from "@/components/journal/CommentList";
 import { SemanticLabel } from "@/components/semantic-label";
 import { sortComments } from "@/lib/journal-comments";
+import { Dialog } from "@/components/ui/Dialog";
 
 function formatScore(score: number, unit: PRUnit): string {
   if (unit === "mins_secs") {
@@ -60,30 +60,13 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
     ...(historyQuery.data ?? []),
   ];
 
-  useEffect(() => {
-    const handleKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", handleKey);
-    return () => window.removeEventListener("keydown", handleKey);
-  }, [onClose]);
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-end justify-center p-4 sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+    <Dialog
+      onClose={onClose}
+      eyebrow={<span style={{ color: "var(--dim)" }}>{i18n("prHistoryf17c6df")}</span>}
+      title={pr.name}
+      size="md"
     >
-      <div
-        className="max-h-[calc(100dvh-2rem)] w-full max-w-md overflow-y-auto rounded-[2rem] p-6"
-        style={{ background: "var(--panel)", border: "1px solid var(--border)" }}
-      >
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.22em]" style={{ color: "var(--dim)" }}>{i18n("prHistoryf17c6df")}</p>
-            <h2 className="mt-1 text-xl font-semibold" style={{ color: "var(--text)" }}>{pr.name}</h2>
-          </div>
-          <button type="button" onClick={onClose} className="text-xl font-light shrink-0" style={{ color: "var(--dim)" }}>✕</button>
-        </div>
-
         {pr.comments?.length ? (
           <div className="mt-5">
             <CommentList comments={sortComments(pr.comments)} />
@@ -117,7 +100,6 @@ export function PRHistoryModal({ pr, onClose }: { pr: PRRecord; onClose: () => v
             ))
           )}
         </div>
-      </div>
-    </div>
+    </Dialog>
   );
 }

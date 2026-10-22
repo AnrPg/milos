@@ -1,9 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import { useTranslations } from "next-intl";
-
-import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { Dialog } from "@/components/ui/Dialog";
 
 /** The bottom sheet every Ευεξία form opens in (centered on wider screens). */
 export function WellnessSheet({
@@ -17,45 +15,10 @@ export function WellnessSheet({
   onClose: () => void;
   children: ReactNode;
 }) {
-  const t = useTranslations("MemberApp.wellness");
-  const trapRef = useModalFocusTrap<HTMLDivElement>(onClose);
   return (
-    <div
-      className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center"
-      style={{ background: "var(--scrim)" }}
-      onClick={onClose}
-    >
-      <div
-        ref={trapRef}
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        className="max-h-[92vh] w-full max-w-md overflow-y-auto rounded-t-3xl p-5 sm:rounded-3xl"
-        style={{
-          background: "var(--panel)",
-          border: "1px solid var(--border)",
-          paddingBottom: "calc(1.25rem + env(safe-area-inset-bottom))",
-        }}
-        onClick={(event) => event.stopPropagation()}
-      >
-        <div className="mb-4 flex items-start justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="text-lg font-extrabold" style={{ color: "var(--text)" }}>{title}</h2>
-            {subtitle ? <p className="text-xs" style={{ color: "var(--dim)" }}>{subtitle}</p> : null}
-          </div>
-          <button
-            type="button"
-            onClick={onClose}
-            aria-label={t("close")}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-lg"
-            style={{ background: "var(--panel-raised)", color: "var(--dim)" }}
-          >
-            ×
-          </button>
-        </div>
-        <div className="flex flex-col gap-4">{children}</div>
-      </div>
-    </div>
+    <Dialog onClose={onClose} title={title} description={subtitle} size="md">
+      <div className="flex flex-col gap-4">{children}</div>
+    </Dialog>
   );
 }
 
