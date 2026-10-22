@@ -62,6 +62,12 @@ type SessionExpiredState = {
 
 const SessionContext = createContext<SessionContextValue | null>(null);
 
+// ADR-177: login and refresh return the user with the tokens, so opening the
+// app needs no separate /auth/me round trip; registration still fetches it.
+function sessionUser(tokens: AuthTokens): Promise<CurrentUser> {
+  return tokens.user ? Promise.resolve(tokens.user) : fetchCurrentUser(tokens.access_token);
+}
+
 export function SessionProvider({ children }: { children: React.ReactNode }) {
   
   const tSession = useTranslations("Session");
@@ -110,7 +116,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function establishSession(issuedTokens: AuthTokens) {
-    const user = await fetchCurrentUser(issuedTokens.access_token);
+    const user = await sessionUser(issuedTokens);
     // A fresh sign-in (not a restore): "until next login" UI shows again.
     startLoginSession();
     commitSession(issuedTokens, user);
@@ -145,7 +151,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
       resetSession(tokens.access_token);
       return;
     }
-    const user = currentUser ?? (await fetchCurrentUser(refreshedTokens.access_token));
+    const user = refreshedTokens.user ?? currentUser ?? (await fetchCurrentUser(refreshedTokens.access_token));
     commitSession(refreshedTokens, user);
   }
 
@@ -177,7 +183,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
           if (!cancelled) setStatus("guest");
           return;
         }
-        const user = await fetchCurrentUser(refreshedTokens.access_token);
+        const user = await sessionUser(refreshedTokens);
         if (cancelled) return;
         commitSession(refreshedTokens, user);
       } catch {
@@ -228,8 +234,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
       try {
         const user =
-          customEvent.detail.currentUser ??
-          (await fetchCurrentUser(customEvent.detail.tokens.access_token));
+          customEvent.detail.currentUser ?? (await sessionUser(customEvent.detail.tokens));
         commitSession(customEvent.detail.tokens, user);
       } catch {
         resetSession(accessTokenRef.current);

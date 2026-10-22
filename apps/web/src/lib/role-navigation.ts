@@ -260,3 +260,34 @@ export function sectionGroupFor(
   }
   return best?.group ?? null;
 }
+
+/**
+ * ADR-177: the screens a role most likely opens next, preloaded once the app
+ * is idle so a tap renders without a server round trip. Bar links first, then
+ * the sub-pages each role opens most; never fewer than six where the role has
+ * that many pages.
+ */
+export function likelyScreens(surface: "admin" | "member" | "athlete", staffItems: NavItem[]): NavItem[] {
+  const screens =
+    surface === "admin"
+      ? [
+          ...staffItems,
+          ...(staffItems.some((item) => item.id === "coaching")
+            ? [
+                { id: "personalTraining", href: "/admin/coaching-assignments", labelKey: "personalTraining", match: [], scoped: true },
+                { id: "wodsVault", href: "/admin/workouts", labelKey: "wodsVault", match: [], scoped: true },
+              ]
+            : []),
+          ...(staffItems.some((item) => item.id === "users")
+            ? [{ id: "settings", href: "/admin/settings", labelKey: "settings", match: [], scoped: true }]
+            : []),
+        ]
+      : [
+          ...clientNavItems(),
+          { id: "myWorkouts", href: "/box/workouts", labelKey: "myWorkouts", match: [] },
+          { id: "classes", href: "/box/schedule", labelKey: "schedule", match: [] },
+          { id: "progress", href: "/journal/progress", labelKey: "progress", match: [] },
+          { id: "settings", href: "/me/settings", labelKey: "settings", match: [] },
+        ];
+  return [...new Map(screens.map((item) => [item.href, item])).values()];
+}

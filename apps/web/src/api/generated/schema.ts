@@ -30575,6 +30575,22 @@ export interface operations {
                 content: {
                     "application/json": {
                         access_token: string;
+                        user?: {
+                            avatar_url?: string | null;
+                            completed_tours: ("admin" | "member" | "athlete")[];
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                            /** @enum {string} */
+                            preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                            /**
+                             * @description The member's own theme: graphite (dark) or frost (light); null is frost
+                             * @enum {string|null}
+                             */
+                            preferred_theme_slug?: "frost" | "graphite" | null;
+                            role: string;
+                            vendor: boolean;
+                        };
                     };
                 };
             };
@@ -30736,6 +30752,22 @@ export interface operations {
                 content: {
                     "application/json": {
                         access_token: string;
+                        user?: {
+                            avatar_url?: string | null;
+                            completed_tours: ("admin" | "member" | "athlete")[];
+                            /** Format: uuid */
+                            id: string;
+                            nickname: string;
+                            /** @enum {string} */
+                            preferred_locale: "en" | "el" | "ar" | "ru" | "de" | "es" | "pt-PT" | "he" | "it" | "bg" | "nl" | "fr";
+                            /**
+                             * @description The member's own theme: graphite (dark) or frost (light); null is frost
+                             * @enum {string|null}
+                             */
+                            preferred_theme_slug?: "frost" | "graphite" | null;
+                            role: string;
+                            vendor: boolean;
+                        };
                     };
                 };
             };

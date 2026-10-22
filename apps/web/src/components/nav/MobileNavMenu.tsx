@@ -49,9 +49,12 @@ export function MobileNavMenu({
           {links.map((link) => {
             const active = link.id === activeId;
             return (
+              // Full prefetch while the menu is open, so a tap needs no server
+              // round trip (staleTimes in next.config.ts).
               <Link
                 key={link.id}
                 href={link.href}
+                prefetch
                 aria-current={active ? "page" : undefined}
                 className="block px-4 py-3 text-sm font-semibold transition-colors hover:bg-[color-mix(in_srgb,var(--text)_4%,transparent)]"
                 style={{ color: active ? "var(--primary)" : "var(--text)" }}

@@ -10,7 +10,7 @@ defmodule Palee.Application.RefreshToken do
          {:ok, user} <- TokenVerifier.user_from_claims(claims),
          {:ok, tokens} <- TokenIssuer.issue_pair(user),
          {:ok, true} <- TokenStore.consume(claims["jti"], ttl_ms(claims["exp"])) do
-      {:ok, tokens}
+      {:ok, Map.put(tokens, :user, user)}
     else
       {:ok, false} ->
         {:error, :invalid_refresh_token}

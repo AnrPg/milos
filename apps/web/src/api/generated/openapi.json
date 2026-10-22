@@ -64931,6 +64931,74 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
+                    },
+                    "user": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_tours": {
+                          "items": {
+                            "enum": [
+                              "admin",
+                              "member",
+                              "athlete"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        },
+                        "preferred_locale": {
+                          "enum": [
+                            "en",
+                            "el",
+                            "ar",
+                            "ru",
+                            "de",
+                            "es",
+                            "pt-PT",
+                            "he",
+                            "it",
+                            "bg",
+                            "nl",
+                            "fr"
+                          ],
+                          "type": "string"
+                        },
+                        "preferred_theme_slug": {
+                          "description": "The member's own theme: graphite (dark) or frost (light); null is frost",
+                          "enum": [
+                            "frost",
+                            "graphite",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "vendor": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "role",
+                        "vendor",
+                        "preferred_locale",
+                        "completed_tours"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
@@ -65204,6 +65272,74 @@
                   "properties": {
                     "access_token": {
                       "type": "string"
+                    },
+                    "user": {
+                      "properties": {
+                        "avatar_url": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "completed_tours": {
+                          "items": {
+                            "enum": [
+                              "admin",
+                              "member",
+                              "athlete"
+                            ],
+                            "type": "string"
+                          },
+                          "type": "array"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "nickname": {
+                          "type": "string"
+                        },
+                        "preferred_locale": {
+                          "enum": [
+                            "en",
+                            "el",
+                            "ar",
+                            "ru",
+                            "de",
+                            "es",
+                            "pt-PT",
+                            "he",
+                            "it",
+                            "bg",
+                            "nl",
+                            "fr"
+                          ],
+                          "type": "string"
+                        },
+                        "preferred_theme_slug": {
+                          "description": "The member's own theme: graphite (dark) or frost (light); null is frost",
+                          "enum": [
+                            "frost",
+                            "graphite",
+                            null
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "role": {
+                          "type": "string"
+                        },
+                        "vendor": {
+                          "type": "boolean"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "nickname",
+                        "role",
+                        "vendor",
+                        "preferred_locale",
+                        "completed_tours"
+                      ],
+                      "type": "object"
                     }
                   },
                   "required": [
