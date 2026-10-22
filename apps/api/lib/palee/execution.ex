@@ -84,6 +84,8 @@ defmodule Palee.Execution do
     to: TextSectionScores,
     as: :normalize
 
+  defdelegate text_section_metrics(workout), to: TextSectionScores, as: :section_metrics
+
   defdelegate preview_timer_sequence(workout), to: TimerSequenceBuilder, as: :preview
 
   # -- Analytics facts (ADR-123) ----------------------------------------------

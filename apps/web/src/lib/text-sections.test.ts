@@ -4,10 +4,14 @@ import {
   describePreset,
   editorSectionsFrom,
   emptySection,
+  inferScoreKind,
+  metricKey,
+  parseMetricValue,
   readTextSections,
   sectionProblems,
   sectionsPayload,
   sectionsToFreeText,
+  suggestScoreKinds,
 } from "./text-sections";
 
 describe("text sections (ADR-179)", () => {
@@ -60,3 +64,53 @@ describe("text sections (ADR-179)", () => {
     expect(describePreset({ format: "untimed" }, "Stopwatch")).toBe("Stopwatch");
   });
 });
+
+describe("section scoring (ADR-179)", () => {
+  const labels = {
+    rounds: "Rounds",
+    reps: "Reps",
+    time: "Time",
+    load: "Load (kg)",
+    calories: "Calories",
+    distance: "Distance (m)",
+    custom: "Number",
+  } as const;
+
+  it("keys a metric like the API does", () => {
+    expect(metricKey(" Pull-ups ", "reps")).toBe("pull-ups");
+    expect(metricKey("Χρόνος", "time")).toBe("χρόνος");
+    expect(metricKey("!!", "time")).toBe("time");
+  });
+
+  it("suggests the common paradigms fuzzily, best match first", () => {
+    expect(suggestScoreKinds("ro", labels)[0]).toBe("rounds");
+    expect(suggestScoreKinds("kcal", labels)[0]).toBe("calories");
+    expect(suggestScoreKinds("γύρ", labels)[0]).toBe("rounds");
+    expect(suggestScoreKinds("dstnc", labels)).toContain("distance");
+    expect(suggestScoreKinds("", labels)).toHaveLength(6);
+  });
+
+  it("guesses what a typed name counts", () => {
+    expect(inferScoreKind("Total time", labels)).toBe("time");
+    expect(inferScoreKind("Row calories", labels)).toBe("calories");
+    expect(inferScoreKind("Thrusters", labels)).toBe("reps");
+  });
+
+  it("reads results as numbers, time as m:ss", () => {
+    expect(parseMetricValue("5:30", "time")).toBe(330);
+    expect(parseMetricValue("1:02:03", "time")).toBe(3723);
+    expect(parseMetricValue("102,5", "load")).toBe(102.5);
+    expect(parseMetricValue("", "reps")).toBeNull();
+    expect(parseMetricValue("-1", "reps")).toBeNull();
+  });
+
+  it("sends a section's scoring and flags duplicate names", () => {
+    const section = { ...emptySection(), body: "x", preset: { format: "untimed" as const } };
+    const scored = { ...section, metrics: [{ key: "reps", label: "Reps", kind: "reps" as const }] };
+    expect(sectionsPayload([scored])[0]!.score_config).toEqual({ metrics: [{ label: "Reps", kind: "reps" }] });
+    expect(sectionsPayload([section])[0]!.score_config).toBeNull();
+    const duplicate = { ...scored, metrics: [...scored.metrics, { key: "reps", label: "reps", kind: "reps" as const }] };
+    expect(sectionProblems([duplicate])).toEqual([{ section: 1, problem: "scoring_invalid" }]);
+  });
+});
+

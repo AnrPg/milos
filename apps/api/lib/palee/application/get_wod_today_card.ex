@@ -26,7 +26,7 @@ defmodule Palee.Application.GetWodTodayCard do
 
         workout_id ->
           workout = Workouts.get_workout(context, workout_id)
-          section = workout |> Execution.training_log_scoreable_sections() |> List.first()
+          section = ranked_section(workout)
 
           {:ok,
            %{
@@ -98,6 +98,15 @@ defmodule Palee.Application.GetWodTodayCard do
         opted_in: MapSet.member?(opted_in, row.user_id)
       }
     end)
+  end
+
+  # The WOD's scored section; for a workout written in text sections
+  # (ADR-179), the first score its coach set.
+  defp ranked_section(workout) do
+    case Execution.training_log_scoreable_sections(workout) do
+      [section | _rest] -> section
+      [] -> workout |> Execution.text_section_metrics() |> List.first()
+    end
   end
 
   defp logged?(context, workout_id, from, to, user_id) do

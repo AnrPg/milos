@@ -42,6 +42,33 @@ defmodule Palee.Execution.Domain.TextSectionScores do
   def normalize(nil, _sections), do: {:ok, []}
   def normalize(_entries, _sections), do: {:error, :bad_request}
 
+  @doc """
+  The scores a coach set on a sectioned workout, in order, each shaped like
+  a scored section (`id`, `section_key`, `name`, `score_type`, `unit`) so
+  rankings can use one.
+  """
+  def section_metrics(%{authoring_mode: "sectioned_text", sections: sections})
+      when is_list(sections) do
+    sections
+    |> Enum.sort_by(&(value(&1, :order) || 0))
+    |> Enum.flat_map(fn section ->
+      section
+      |> value(:score_config)
+      |> metrics()
+      |> Enum.map(fn metric ->
+        %{
+          id: value(section, :id),
+          section_key: "#{value(section, :id)}:#{value(metric, :key)}",
+          name: "#{section_title(section)} · #{value(metric, :label)}",
+          score_type: value(metric, :kind),
+          unit: value(metric, :unit)
+        }
+      end)
+    end)
+  end
+
+  def section_metrics(_workout), do: []
+
   defp metrics_by_key(sections) do
     for section <- sections,
         metric <- metrics(value(section, :score_config)),

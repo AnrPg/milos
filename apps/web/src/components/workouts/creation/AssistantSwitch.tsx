@@ -1,5 +1,7 @@
 "use client";
 
+import { useId } from "react";
+
 import { useUiTranslations } from "@/i18n/ui";
 
 /**
@@ -18,24 +20,27 @@ export function AssistantSwitch({
   onChange: (enabled: boolean) => void;
 }) {
   const i18n = useUiTranslations();
+  const hintId = useId();
+  const hint = !available
+    ? i18n("workoutAssistantSwitchGymOff")
+    : enabled
+      ? i18n("workoutAssistantSwitchOnHint")
+      : i18n("workoutAssistantSwitchOffHint");
+  // One line beside the editor's tabs; what on and off mean is the tooltip.
   return (
-    <label className="flex min-h-11 items-center gap-3" data-testid="assistant-switch">
-      <span className="flex flex-col text-end">
-        <span className="text-sm font-bold" style={{ color: "var(--text)" }}>
-          {i18n("workoutAssistantSwitchLabel")}
-        </span>
-        <span className="text-xs" style={{ color: "var(--dim)" }}>
-          {!available
-            ? i18n("workoutAssistantSwitchGymOff")
-            : enabled
-              ? i18n("workoutAssistantSwitchOnHint")
-              : i18n("workoutAssistantSwitchOffHint")}
-        </span>
+    <label className="flex min-h-9 items-center gap-2 whitespace-nowrap" title={hint} data-testid="assistant-switch">
+      <span className="text-xs font-bold" style={{ color: "var(--text)" }}>
+        <span aria-hidden="true">✨ </span>
+        {i18n("workoutAssistantSwitchLabel")}
+      </span>
+      <span id={hintId} className="sr-only">
+        {hint}
       </span>
       <input
         type="checkbox"
         role="switch"
         aria-label={i18n("workoutAssistantSwitchLabel")}
+        aria-describedby={hintId}
         checked={enabled && available}
         disabled={!available}
         onChange={(event) => onChange(event.target.checked)}

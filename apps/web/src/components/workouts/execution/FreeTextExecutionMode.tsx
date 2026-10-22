@@ -48,6 +48,7 @@ import {
   type SectionProgress,
   storeSectionProgress,
   type TextSection,
+  type TextSectionResult,
 } from "@/lib/text-sections";
 import { type CueMode, type CueSnapshot, nextCue, playCue, primeCueAudio, readCueMode } from "@/lib/timer-cues";
 import { getFormatLabels, type SectionFormat } from "@/types/workout";
@@ -346,7 +347,7 @@ export function FreeTextExecutionMode() {
     setShowFinishWizard(true);
   }
 
-  async function confirmFinish(editedScores: SectionScore[], finish: FinishComments) {
+  async function confirmFinish(editedScores: SectionScore[], finish: FinishComments, textResults: TextSectionResult[] = []) {
     if (!tokens?.access_token || !workout?.execution_id) {
       setCompletionFeedback(i18n("workoutCompletionCouldNotBeSavedTryAgaindce610c"));
       return;
@@ -364,6 +365,7 @@ export function FreeTextExecutionMode() {
         timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         checked_exercise_ids: [],
         section_scores: editedScores,
+        ...(textResults.length > 0 ? { text_section_scores: textResults } : {}),
         total_elapsed_ms: Math.round(bankedMs + position.totalElapsedMs),
         kpi_counters: kpiPayload(currentKpi()),
         section_elapsed_ms: sectionElapsed(sections, sectionProgress.banked, sectionIndex, position.totalElapsedMs),
@@ -398,6 +400,7 @@ export function FreeTextExecutionMode() {
         segments={[]}
         comments={comments}
         freeText
+        textSections={sections}
         feltExecutionId={runExecutionId ?? executionId}
         isSaving={isSavingCompletion}
         feedback={completionFeedback}

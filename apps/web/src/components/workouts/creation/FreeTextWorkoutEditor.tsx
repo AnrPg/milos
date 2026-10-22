@@ -14,7 +14,7 @@ import { EditorContent, useEditor, type Editor, type JSONContent } from "@tiptap
 import StarterKit from "@tiptap/starter-kit";
 import { useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { ApiError } from "@/api/client";
 import {
@@ -57,6 +57,7 @@ import { WodGoalsEditorPanel } from "@/components/wod-goals/WodGoalsEditorPanel"
 import { editorSectionsFrom, SECTIONED_TEXT_MODE, sectionsToFreeText } from "@/lib/text-sections";
 
 import { AssistantSwitch } from "./AssistantSwitch";
+import { EditorTabs } from "./EditorTabs";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 import { FreeTextAnalysisPanel, type AnalysisStatus } from "./FreeTextAnalysisPanel";
@@ -72,7 +73,7 @@ type Props = {
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
 type AsideTab = "assistant" | "preview";
-type RibbonKey = "overview" | "details" | "timer" | "goals" | "tools";
+type EditorTabKey = "details" | "timer" | "goals" | "tools";
 
 const WORKOUT_TYPES: WorkoutType[] = [
   "crossfit",
@@ -107,23 +108,14 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [showBlocking, setShowBlocking] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
-  const [collapsedRibbons, setCollapsedRibbons] = useState<Record<RibbonKey, boolean>>({
-    overview: false,
-    details: false,
-    timer: true,
-    goals: true,
-    tools: false,
-  });
+  /** The settings tab that is open over the text (none: all the room for writing). */
+  const [openTab, setOpenTab] = useState<EditorTabKey | null>("details");
   /** Optional timer the athlete gets pre-selected; kept in `workout_metadata`. */
   const [timerPreset, setTimerPreset] = useState<FreeTextTimerPreset | null>(null);
   const metadataRef = useRef<Record<string, unknown>>({});
   const formatLabels = useMemo(() => getFormatLabels(i18n), [i18n]);
   const loadedDraftRef = useRef<string | null>(null);
   const revisionRef = useRef<number | null>(null);
-
-  function toggleRibbon(key: RibbonKey) {
-    setCollapsedRibbons((current) => ({ ...current, [key]: !current[key] }));
-  }
 
   const editor = useEditor({
     extensions: [
@@ -397,130 +389,104 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
   return (
     <div className={previewOpen ? "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_26rem]" : "grid min-h-[calc(100dvh-6.5rem)] min-w-0 grid-cols-1 overflow-x-clip lg:grid-cols-[minmax(0,1fr)_4rem]"}>
       <section className="flex min-h-0 min-w-0 flex-col border-e" style={{ borderColor: "var(--dim)" }}>
-        <CollapsibleRibbon
-          label={i18n("freeTextTitle")}
-          collapsed={collapsedRibbons.overview}
-          onToggle={() => toggleRibbon("overview")}
-        >
-          <header className="px-5 py-4">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <h1 className="text-xl font-black" style={{ color: "var(--text)" }}>
-                  {i18n("freeTextTitle")}
-                </h1>
-                <p className="mt-1 max-w-2xl text-sm" style={{ color: "var(--muted)" }}>
-                  {i18n("freeTextDescription")}
-                </p>
-              </div>
-              <div className="flex flex-col items-end gap-1">
-                {onUseSections ? (
-                  <AssistantSwitch
-                    enabled
-                    available
-                    onChange={(enabled) => {
-                      if (enabled) return;
-                      void saveDraft().then(onUseSections);
-                    }}
-                  />
-                ) : null}
-                <div className="text-end text-xs font-semibold" style={{ color: "var(--muted)" }}>
-                  {saveStatusText(saveStatus, i18n)}
-                </div>
-              </div>
-            </div>
-          </header>
-        </CollapsibleRibbon>
-
-        <CollapsibleRibbon
-          label={i18n("workoutDetails9366821")}
-          collapsed={collapsedRibbons.details}
-          onToggle={() => toggleRibbon("details")}
-        >
-          <div className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_12rem]">
-            <label className="block">
-              <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                {i18n("title768e0c1")}
+        <EditorTabs
+          label={i18n("workoutEditorTabsLabel")}
+          tabs={[
+            { key: "details", icon: "📝", label: i18n("workoutDetails9366821") },
+            { key: "timer", icon: "⏱️", label: i18n("freeTextTimerRibbonLabel") },
+            { key: "goals", icon: "🎯", label: goalsT("title") },
+            { key: "tools", icon: "🔤", label: i18n("editorFormatting") },
+          ]}
+          active={openTab}
+          onSelect={setOpenTab}
+          trailing={
+            <>
+              <span className="hidden text-xs font-semibold sm:inline" role="status" style={{ color: "var(--muted)" }}>
+                {saveStatusText(saveStatus, i18n)}
               </span>
-              <input
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
-                value={title}
-                onChange={(event) => setTitle(event.target.value)}
-                maxLength={160}
-                placeholder={assistantT("titlePlaceholder")}
-                aria-invalid={showBlocking && title.trim().length < 3}
-              />
-            </label>
-            <label className="block">
-              <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-                {i18n("workoutType34a530c")}
-              </span>
-              <select
-                className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
-                style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
-                value={type}
-                onChange={(event) => setType(event.target.value as WorkoutType)}
-                aria-invalid={showBlocking && !type}
-              >
-                <option value="" disabled>
-                  {assistantT("chooseType")}
-                </option>
-                {WORKOUT_TYPES.map((item) => (
-                  <option key={item} value={item}>
-                    {item.replaceAll("_", " ")}
+              {onUseSections ? (
+                <AssistantSwitch
+                  enabled
+                  available
+                  onChange={(enabled) => {
+                    if (enabled) return;
+                    void saveDraft().then(onUseSections);
+                  }}
+                />
+              ) : null}
+            </>
+          }
+        >
+          {openTab === "details" ? (
+            <div className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_12rem]">
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("title768e0c1")}
+                </span>
+                <input
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  maxLength={160}
+                  placeholder={assistantT("titlePlaceholder")}
+                  aria-invalid={showBlocking && title.trim().length < 3}
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("workoutType34a530c")}
+                </span>
+                <select
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  style={{ background: "var(--card)", borderColor: "var(--dim)", color: "var(--text)" }}
+                  value={type}
+                  onChange={(event) => setType(event.target.value as WorkoutType)}
+                  aria-invalid={showBlocking && !type}
+                >
+                  <option value="" disabled>
+                    {assistantT("chooseType")}
                   </option>
-                ))}
-              </select>
-            </label>
-          </div>
-        </CollapsibleRibbon>
-
-        <CollapsibleRibbon
-          label={i18n("freeTextTimerRibbonLabel")}
-          collapsed={collapsedRibbons.timer}
-          onToggle={() => toggleRibbon("timer")}
-        >
-          <div className="p-4">
-            <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
-              <input
-                type="checkbox"
-                checked={timerPreset !== null}
-                onChange={(event) =>
-                  setTimerPreset(event.target.checked ? { format: "for_time", duration_seconds: 720 } : null)
-                }
+                  {WORKOUT_TYPES.map((item) => (
+                    <option key={item} value={item}>
+                      {item.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : null}
+          {openTab === "timer" ? (
+            <div className="p-4">
+              <label className="flex items-center gap-2 text-sm font-semibold" style={{ color: "var(--text)" }}>
+                <input
+                  type="checkbox"
+                  checked={timerPreset !== null}
+                  onChange={(event) =>
+                    setTimerPreset(event.target.checked ? { format: "for_time", duration_seconds: 720 } : null)
+                  }
+                />
+                {i18n("attachTimerLabel")}
+              </label>
+              <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
+                {i18n("attachTimerHint")}
+              </p>
+              {timerPreset ? (
+                <FreeTextTimerFields preset={timerPreset} formatLabels={formatLabels} onChange={setTimerPreset} />
+              ) : null}
+            </div>
+          ) : null}
+          {openTab === "goals" ? (
+            <div className="max-h-[55vh] overflow-y-auto">
+              <WodGoalsEditorPanel
+                workoutId={draftId}
+                refreshKey={draftSaves}
+                timeDomainSeconds={timerPreset?.duration_seconds ?? null}
               />
-              {i18n("attachTimerLabel")}
-            </label>
-            <p className="mt-1 text-xs" style={{ color: "var(--muted)" }}>
-              {i18n("attachTimerHint")}
-            </p>
-            {timerPreset ? (
-              <FreeTextTimerFields preset={timerPreset} formatLabels={formatLabels} onChange={setTimerPreset} />
-            ) : null}
-          </div>
-        </CollapsibleRibbon>
-
-        <CollapsibleRibbon
-          label={goalsT("title")}
-          collapsed={collapsedRibbons.goals}
-          onToggle={() => toggleRibbon("goals")}
-        >
-          <div className="max-h-[55vh] overflow-y-auto">
-            <WodGoalsEditorPanel
-              workoutId={draftId}
-              refreshKey={draftSaves}
-              timeDomainSeconds={timerPreset?.duration_seconds ?? null}
-            />
-          </div>
-        </CollapsibleRibbon>
-
-        <CollapsibleRibbon
-          label={i18n("editorFormatting")}
-          collapsed={collapsedRibbons.tools}
-          onToggle={() => toggleRibbon("tools")}
-        >
-          <FreeTextToolbar editor={editor} />
-        </CollapsibleRibbon>
+            </div>
+          ) : null}
+          {openTab === "tools" ? <FreeTextToolbar editor={editor} /> : null}
+        </EditorTabs>
 
         <div className="min-h-0 min-w-0 flex-1 overflow-auto overflow-x-clip">
           <EditorContent editor={editor} />
@@ -626,40 +592,6 @@ export function FreeTextWorkoutEditor({ draftId, folderId = null, onDraftReady, 
         ) : null}
       </aside>
     </div>
-  );
-}
-
-function CollapsibleRibbon({
-  label,
-  collapsed,
-  onToggle,
-  children,
-}: {
-  label: string;
-  collapsed: boolean;
-  onToggle: () => void;
-  children: ReactNode;
-}) {
-  return (
-    <section className="min-w-0 border-b" style={{ borderColor: "var(--dim)" }}>
-      <button
-        type="button"
-        className="flex w-full min-w-0 items-center justify-between gap-3 px-4 py-2 text-start text-xs font-black uppercase tracking-[0.18em]"
-        style={{ background: "var(--bg)", color: "var(--muted)" }}
-        aria-expanded={!collapsed}
-        onClick={onToggle}
-      >
-        <span className="min-w-0 truncate">{label}</span>
-        <span aria-hidden="true" className="text-base leading-none" style={{ color: "var(--primary)" }}>
-          {collapsed ? "+" : "−"}
-        </span>
-      </button>
-      {collapsed ? null : (
-        <div className="min-w-0 border-t overflow-x-clip" style={{ borderColor: "color-mix(in srgb, var(--dim) 70%, transparent)" }}>
-          {children}
-        </div>
-      )}
-    </section>
   );
 }
 

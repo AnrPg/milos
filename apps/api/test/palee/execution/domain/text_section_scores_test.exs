@@ -1,7 +1,7 @@
 defmodule Palee.Execution.Domain.TextSectionScoresTest do
   use ExUnit.Case, async: true
 
-  alias Palee.Execution.Domain.{ProgressValidator, TextSectionScores, TimerPresets}
+  alias Palee.Execution.Domain.{ProgressValidator, ScoreRanking, TextSectionScores, TimerPresets}
 
   @sections [
     %{
@@ -90,5 +90,34 @@ defmodule Palee.Execution.Domain.TextSectionScoresTest do
     }
 
     assert ProgressValidator.validate(progress, segments, %{total_elapsed_ms: 60_000}) == :ok
+  end
+
+  test "a sectioned WOD ranks by the first score its coach set" do
+    assert [first | _rest] =
+             TextSectionScores.section_metrics(%{
+               authoring_mode: "sectioned_text",
+               sections: @sections
+             })
+
+    assert first == %{
+             id: "s1",
+             section_key: "s1:top-set",
+             name: "Strength · Top set",
+             score_type: "load",
+             unit: "kg"
+           }
+
+    result = fn user, load ->
+      {:ok, scores} =
+        TextSectionScores.normalize(
+          [%{section_id: "s1", metric_key: "top-set", value: load}],
+          @sections
+        )
+
+      %{user_id: user, section_scores: scores}
+    end
+
+    assert [%{user_id: "b", rank: 1}, %{user_id: "a", rank: 2}] =
+             ScoreRanking.rank([result.("a", 90), result.("b", 100)], first)
   end
 end

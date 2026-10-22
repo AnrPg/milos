@@ -42,6 +42,8 @@ import { FREE_TEXT_EDITOR_CLASS, sanitizeWorkoutDslPaste } from "@/lib/workout-d
 import { getFormatLabels, type SectionFormat, type WorkoutType } from "@/types/workout";
 
 import { AssistantSwitch } from "./AssistantSwitch";
+import { EditorTabs } from "./EditorTabs";
+import { SectionScoringField } from "./SectionScoringField";
 import { FreeTextTimerFields } from "./FreeTextTimerFields";
 
 type Props = {
@@ -83,7 +85,8 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   const [showProblems, setShowProblems] = useState(false);
   const [serverProblems, setServerProblems] = useState<SectionProblem[] | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
-  const [goalsOpen, setGoalsOpen] = useState(false);
+  /** The settings tab open above the sections (none: all the room for writing). */
+  const [openTab, setOpenTab] = useState<"details" | "goals" | null>("details");
   const [focusKey, setFocusKey] = useState<string | null>(null);
   const metadataRef = useRef<Record<string, unknown>>({});
   const revisionRef = useRef<number | null>(null);
@@ -242,60 +245,78 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
   }
 
   return (
-    <div className="mx-auto flex min-h-[calc(100dvh-6.5rem)] w-full max-w-3xl min-w-0 flex-col gap-4 px-4 py-5 sm:px-6">
-      <header className="flex flex-wrap items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h1 className="text-xl font-black" style={{ color: "var(--text)" }}>
-            {i18n("sectionedEditorTitle")}
-          </h1>
-          <p className="mt-1 max-w-2xl text-sm" style={{ color: "var(--muted)" }}>
-            {i18n("sectionedEditorDescription")}
-          </p>
-        </div>
-        <div className="flex flex-col items-end gap-1">
-          <AssistantSwitch enabled={false} available={assistantAvailable} onChange={() => void switchToAssistant()} />
-          <span className="text-xs font-semibold" style={{ color: "var(--muted)" }}>
-            {saveStatusText(saveStatus, i18n)}
-          </span>
-        </div>
-      </header>
-
-      <div className="grid gap-3 md:grid-cols-[minmax(0,1fr)_12rem]">
-        <label className="block">
-          <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            {i18n("title768e0c1")}
-          </span>
-          <input
-            className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
-            style={{ background: "var(--card)", borderColor: showProblems && titleMissing ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            maxLength={160}
-            placeholder={assistantT("titlePlaceholder")}
-            aria-invalid={showProblems && titleMissing}
-          />
-        </label>
-        <label className="block">
-          <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-            {i18n("workoutType34a530c")}
-          </span>
-          <select
-            className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
-            style={{ background: "var(--card)", borderColor: showProblems && !type ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
-            value={type}
-            onChange={(event) => setType(event.target.value as WorkoutType)}
-            aria-invalid={showProblems && !type}
-          >
-            <option value="" disabled>
-              {assistantT("chooseType")}
-            </option>
-            {WORKOUT_TYPES.map((item) => (
-              <option key={item} value={item}>
-                {item.replaceAll("_", " ")}
-              </option>
-            ))}
-          </select>
-        </label>
+    <div className="mx-auto flex min-h-[calc(100dvh-6.5rem)] w-full max-w-3xl min-w-0 flex-col gap-4 px-4 pb-5 sm:px-6">
+      <div className="-mx-4 sm:-mx-6">
+        <EditorTabs
+          label={i18n("workoutEditorTabsLabel")}
+          tabs={[
+            {
+              key: "details",
+              icon: "📝",
+              label: i18n("workoutDetails9366821"),
+              badge:
+                showProblems && (titleMissing || !type) ? (
+                  <span aria-hidden="true" style={{ color: "var(--danger)" }}>●</span>
+                ) : undefined,
+            },
+            { key: "goals", icon: "🎯", label: goalsT("title") },
+          ]}
+          active={openTab}
+          onSelect={setOpenTab}
+          trailing={
+            <>
+              <span className="hidden text-xs font-semibold sm:inline" role="status" style={{ color: "var(--muted)" }}>
+                {saveStatusText(saveStatus, i18n)}
+              </span>
+              <AssistantSwitch enabled={false} available={assistantAvailable} onChange={() => void switchToAssistant()} />
+            </>
+          }
+        >
+          {openTab === "details" ? (
+            <div className="grid gap-3 p-4 md:grid-cols-[minmax(0,1fr)_12rem]">
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("title768e0c1")}
+                </span>
+                <input
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  style={{ background: "var(--card)", borderColor: showProblems && titleMissing ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
+                  value={title}
+                  onChange={(event) => setTitle(event.target.value)}
+                  maxLength={160}
+                  placeholder={assistantT("titlePlaceholder")}
+                  aria-invalid={showProblems && titleMissing}
+                />
+              </label>
+              <label className="block">
+                <span className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+                  {i18n("workoutType34a530c")}
+                </span>
+                <select
+                  className="mt-1 w-full rounded-xl border px-3 py-2 text-sm outline-none"
+                  style={{ background: "var(--card)", borderColor: showProblems && !type ? "var(--danger)" : "var(--dim)", color: "var(--text)" }}
+                  value={type}
+                  onChange={(event) => setType(event.target.value as WorkoutType)}
+                  aria-invalid={showProblems && !type}
+                >
+                  <option value="" disabled>
+                    {assistantT("chooseType")}
+                  </option>
+                  {WORKOUT_TYPES.map((item) => (
+                    <option key={item} value={item}>
+                      {item.replaceAll("_", " ")}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+          ) : null}
+          {openTab === "goals" ? (
+            <div className="max-h-[55vh] overflow-y-auto">
+              <WodGoalsEditorPanel workoutId={draftId} refreshKey={draftSaves} timeDomainSeconds={timeDomainSeconds} />
+            </div>
+          ) : null}
+        </EditorTabs>
       </div>
 
       <ol className="space-y-3" aria-label={i18n("textSectionsLabel")}>
@@ -325,24 +346,6 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
       >
         + {i18n("addTextSection")}
       </button>
-
-      <section className="rounded-2xl border" style={{ borderColor: "var(--dim)" }}>
-        <button
-          type="button"
-          className="flex w-full items-center justify-between gap-3 px-4 py-2 text-start text-xs font-black uppercase tracking-[0.18em]"
-          style={{ color: "var(--muted)" }}
-          aria-expanded={goalsOpen}
-          onClick={() => setGoalsOpen((open) => !open)}
-        >
-          <span>{goalsT("title")}</span>
-          <span aria-hidden="true" style={{ color: "var(--primary)" }}>{goalsOpen ? "−" : "+"}</span>
-        </button>
-        {goalsOpen ? (
-          <div className="max-h-[55vh] overflow-y-auto border-t" style={{ borderColor: "var(--dim)" }}>
-            <WodGoalsEditorPanel workoutId={draftId} refreshKey={draftSaves} timeDomainSeconds={timeDomainSeconds} />
-          </div>
-        ) : null}
-      </section>
 
       <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t py-3" style={{ borderColor: "var(--dim)", background: "var(--bg)" }}>
         <span className="text-xs" role={notice ? "alert" : undefined} style={{ color: notice ? "var(--danger)" : "var(--muted)" }}>
@@ -392,11 +395,13 @@ function SectionCard({
 }) {
   const i18n = useUiTranslations();
   const [timerOpen, setTimerOpen] = useState(false);
+  const [scoringOpen, setScoringOpen] = useState(section.metrics.length > 0);
   const [confirmRemove, setConfirmRemove] = useState(false);
   const titleRef = useRef<HTMLInputElement>(null);
   const number = index + 1;
   const textMissing = problems.includes("text_required") || problems.includes("text_too_long");
   const timerMissing = problems.includes("timer_required");
+  const scoringInvalid = problems.includes("scoring_invalid");
 
   useEffect(() => {
     if (autoFocus) titleRef.current?.focus();
@@ -466,20 +471,40 @@ function SectionCard({
       ) : null}
 
       <div className="mt-3">
-        <button
-          type="button"
-          aria-expanded={timerOpen}
-          onClick={() => setTimerOpen((open) => !open)}
-          className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-bold"
-          style={
-            section.preset
-              ? { background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }
-              : { color: timerMissing ? "var(--danger)" : "var(--primary)", border: `1px dashed ${timerMissing ? "var(--danger)" : "var(--primary)"}` }
-          }
-        >
-          <span aria-hidden="true">⏱</span>
-          {section.preset ? describePreset(section.preset, formatLabels[section.preset.format]) : i18n("chooseSectionTimer")}
-        </button>
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            aria-expanded={timerOpen}
+            onClick={() => setTimerOpen((open) => !open)}
+            className="inline-flex min-h-10 items-center gap-2 rounded-full px-3 text-sm font-bold"
+            style={
+              section.preset
+                ? { background: "var(--panel)", color: "var(--text)", border: "1px solid var(--border)" }
+                : { color: timerMissing ? "var(--danger)" : "var(--primary)", border: `1px dashed ${timerMissing ? "var(--danger)" : "var(--primary)"}` }
+            }
+          >
+            <span aria-hidden="true">⏱</span>
+            {section.preset ? describePreset(section.preset, formatLabels[section.preset.format]) : i18n("chooseSectionTimer")}
+          </button>
+          <button
+            type="button"
+            aria-expanded={scoringOpen}
+            onClick={() => setScoringOpen((open) => !open)}
+            className="inline-flex min-h-10 min-w-0 items-center gap-2 rounded-full px-3 text-sm font-bold"
+            style={
+              section.metrics.length > 0
+                ? { background: "var(--panel)", color: "var(--text)", border: `1px solid ${scoringInvalid ? "var(--danger)" : "var(--border)"}` }
+                : { color: "var(--muted)", border: "1px dashed var(--border)" }
+            }
+          >
+            <span aria-hidden="true">🏅</span>
+            <span className="truncate">
+              {section.metrics.length > 0
+                ? section.metrics.map((metric) => metric.label).join(" · ")
+                : i18n("addSectionScoring")}
+            </span>
+          </button>
+        </div>
         {timerMissing ? (
           <p className="mt-1 text-xs font-semibold" style={{ color: "var(--danger)" }}>
             {i18n("textSectionTimerRequired")}
@@ -508,6 +533,13 @@ function SectionCard({
               <FreeTextTimerFields preset={section.preset} formatLabels={formatLabels} onChange={(preset) => onChange({ preset })} />
             ) : null}
           </div>
+        ) : null}
+        {scoringOpen || scoringInvalid ? (
+          <SectionScoringField
+            metrics={section.metrics}
+            invalid={scoringInvalid}
+            onChange={(metrics) => onChange({ metrics })}
+          />
         ) : null}
       </div>
     </li>

@@ -15,6 +15,8 @@ export type TextSection = {
   title: string;
   body: string;
   preset: FreeTextTimerPreset | null;
+  /** What the section is scored by (empty: not scored). */
+  metrics: SectionMetric[];
 };
 
 export type TextSectionSource = {
@@ -22,8 +24,120 @@ export type TextSectionSource = {
   name?: string | null;
   free_text_body?: string | null;
   timer_preset?: unknown;
+  score_config?: unknown;
   section_metadata?: Record<string, unknown> | null;
 };
+
+/**
+ * What a section can be scored by («This section is scored by»), mirroring
+ * the API's `SectionScoring`: the common paradigms plus `custom` (a plain
+ * number). Every result is a number; time is in seconds.
+ */
+export const SCORE_KINDS = ["rounds", "reps", "time", "load", "calories", "distance", "custom"] as const;
+export type ScoreKind = (typeof SCORE_KINDS)[number];
+
+export const SCORE_KIND_UNITS: Record<ScoreKind, string | null> = {
+  rounds: "rounds",
+  reps: "reps",
+  time: "s",
+  load: "kg",
+  calories: "kcal",
+  distance: "m",
+  custom: null,
+};
+
+export const MAX_SECTION_METRICS = 6;
+export const MAX_METRIC_LABEL_LENGTH = 40;
+
+export type SectionMetric = {
+  /** Set by the API from the label; the client derives the same for checks. */
+  key: string;
+  label: string;
+  kind: ScoreKind;
+};
+
+/** The API's metric key: a slug of the coach's label (the kind when the label has no letters). */
+export function metricKey(label: string, kind: ScoreKind): string {
+  const slug = label
+    .trim()
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, "-")
+    .replace(/^-+|-+$/g, "");
+  return slug || kind;
+}
+
+export function readMetrics(scoreConfig: unknown): SectionMetric[] {
+  const metrics = (scoreConfig as { metrics?: unknown } | null | undefined)?.metrics;
+  if (!Array.isArray(metrics)) return [];
+  return metrics.flatMap((raw) => {
+    const metric = raw as { key?: unknown; label?: unknown; kind?: unknown };
+    if (typeof metric?.label !== "string" || !metric.label.trim()) return [];
+    const kind = SCORE_KINDS.includes(metric.kind as ScoreKind) ? (metric.kind as ScoreKind) : "custom";
+    const key = typeof metric.key === "string" && metric.key ? metric.key : metricKey(metric.label, kind);
+    return [{ key, label: metric.label.trim(), kind }];
+  });
+}
+
+/** Words that say what a typed scoring name counts, in the languages coaches write in. */
+const KIND_HINTS: Record<Exclude<ScoreKind, "custom">, string[]> = {
+  rounds: ["round", "rounds", "rds", "rnd", "γύρ", "rund", "ronda", "tour", "giri", "rondes", "voltas", "раунд", "кръг", "جول", "סבב"],
+  reps: ["rep", "reps", "repetition", "επαν", "wdh", "wiederholung", "repetici", "répétition", "ripetizion", "herhaling", "повтор", "تكرار", "חזר"],
+  time: ["time", "χρόν", "zeit", "tiempo", "temps", "tempo", "tijd", "время", "врем", "وقت", "זמן", "mm:ss"],
+  load: ["load", "weight", "kg", "lb", "βάρος", "φορτ", "gewicht", "peso", "poids", "carico", "вес", "тегло", "وزن", "משקל"],
+  calories: ["cal", "kcal", "θερμ", "kalor", "calor", "калор", "سعر", "קלור"],
+  distance: ["distance", "meter", "metre", "km", "απόστ", "μέτρ", "distanz", "distancia", "afstand", "дистанц", "разстоя", "مساف", "מרחק"],
+};
+
+const fold = (text: string) =>
+  text
+    .normalize("NFD")
+    .replace(/\p{M}/gu, "")
+    .toLowerCase()
+    .trim();
+
+/** The kind a typed scoring name most likely counts («Thrusters» counts reps). */
+export function inferScoreKind(label: string, kindLabels: Record<ScoreKind, string>): ScoreKind {
+  const text = fold(label);
+  if (!text) return "reps";
+  for (const kind of SCORE_KINDS) {
+    if (kind === "custom") continue;
+    if (fold(kindLabels[kind]) === text) return kind;
+    if (KIND_HINTS[kind].some((hint) => text.split(/[^\p{L}\p{N}:]+/u).some((word) => word.startsWith(fold(hint))))) return kind;
+  }
+  return "reps";
+}
+
+/**
+ * Fuzzy live suggestions for the «scored by» field: the common paradigms
+ * whose name (or a hint word) matches what the coach typed, best first —
+ * prefix, then substring, then letters in order.
+ */
+export function suggestScoreKinds(query: string, kindLabels: Record<ScoreKind, string>, taken: SectionMetric[] = []): ScoreKind[] {
+  const text = fold(query);
+  const takenKinds = new Set(taken.map((metric) => metric.kind));
+  const rank = (kind: ScoreKind) => {
+    if (!text) return 1;
+    const names = [fold(kindLabels[kind]), kind, ...(kind === "custom" ? [] : KIND_HINTS[kind].map(fold))];
+    let best = Infinity;
+    for (const name of names) {
+      if (name.startsWith(text) || text.startsWith(name)) best = Math.min(best, 0);
+      else if (name.includes(text)) best = Math.min(best, 1);
+      else if (isSubsequence(text, name)) best = Math.min(best, 2);
+    }
+    return best;
+  };
+  return SCORE_KINDS.filter((kind) => kind !== "custom")
+    .map((kind) => ({ kind, rank: rank(kind) + (takenKinds.has(kind) ? 0.5 : 0) }))
+    .filter((entry) => Number.isFinite(entry.rank))
+    .sort((a, b) => a.rank - b.rank)
+    .map((entry) => entry.kind);
+}
+
+function isSubsequence(needle: string, haystack: string) {
+  let at = 0;
+  for (const char of haystack) if (char === needle[at]) at += 1;
+  return at === needle.length;
+}
 
 /** The text sections of a sectioned workout, in order; [] for any other workout. */
 export function readTextSections(workout: {
@@ -36,6 +150,7 @@ export function readTextSections(workout: {
     title: section.section_metadata?.untitled === true ? "" : (section.name ?? "").trim(),
     body: section.free_text_body ?? "",
     preset: parseFreeTextTimerPreset(section.timer_preset),
+    metrics: readMetrics(section.score_config),
   }));
 }
 
@@ -106,12 +221,13 @@ export type EditorTextSection = {
   body: string;
   document: JSONContent;
   preset: FreeTextTimerPreset | null;
+  metrics: SectionMetric[];
 };
 
 /** Why a section cannot be published yet (same codes the API answers with). */
 export type SectionProblem = {
   section: number | null;
-  problem: "text_required" | "text_too_long" | "title_too_long" | "timer_required" | "too_many_sections" | string;
+  problem: "text_required" | "text_too_long" | "title_too_long" | "timer_required" | "too_many_sections" | "scoring_invalid" | string;
 };
 
 export const MAX_TEXT_SECTIONS = 30;
@@ -135,7 +251,7 @@ export function textToDocument(source: string): JSONContent {
 }
 
 export function emptySection(): EditorTextSection {
-  return { key: sectionKey(), title: "", body: "", document: emptyDocument(), preset: null };
+  return { key: sectionKey(), title: "", body: "", document: emptyDocument(), preset: null, metrics: [] };
 }
 
 const isDocument = (value: unknown): value is JSONContent =>
@@ -160,6 +276,7 @@ export function editorSectionsFrom(
         body,
         document: isDocument(raw.free_text_document) ? raw.free_text_document : textToDocument(body),
         preset: parseFreeTextTimerPreset(raw.timer_preset),
+        metrics: readMetrics(raw.score_config),
       };
     });
   }
@@ -173,6 +290,7 @@ export function editorSectionsFrom(
       body,
       document: isDocument(workout.free_text_document) ? workout.free_text_document : textToDocument(body),
       preset: wholeWorkoutPreset,
+      metrics: [],
     },
   ];
 }
@@ -209,6 +327,9 @@ export function sectionsPayload(sections: EditorTextSection[]) {
     free_text_body: section.body.trim(),
     free_text_document: section.document,
     timer_preset: section.preset,
+    score_config: section.metrics.length
+      ? { metrics: section.metrics.map((metric) => ({ label: metric.label.trim(), kind: metric.kind })) }
+      : null,
   }));
 }
 
@@ -224,6 +345,32 @@ export function sectionProblems(sections: EditorTextSection[]): SectionProblem[]
     if (encoder.encode(body).length > MAX_SECTION_BODY_BYTES) problems.push({ section: number, problem: "text_too_long" });
     if (section.title.trim().length > 120) problems.push({ section: number, problem: "title_too_long" });
     if (!section.preset) problems.push({ section: number, problem: "timer_required" });
+    const keys = section.metrics.map((metric) => metricKey(metric.label, metric.kind));
+    if (
+      section.metrics.length > MAX_SECTION_METRICS ||
+      new Set(keys).size !== keys.length ||
+      section.metrics.some((metric) => !metric.label.trim() || metric.label.trim().length > MAX_METRIC_LABEL_LENGTH)
+    )
+      problems.push({ section: number, problem: "scoring_invalid" });
     return problems;
   });
+}
+
+/** An athlete's result for one metric of a text section, as the API takes it. */
+export type TextSectionResult = { section_id: string; metric_key: string; value: number };
+
+/** «m:ss», «mm:ss» or «h:mm:ss» (or plain seconds) to seconds; null when not a time. */
+export function parseDuration(text: string): number | null {
+  const parts = text.trim().split(":");
+  if (parts.length > 3 || parts.some((part) => !/^\d+$/.test(part))) return null;
+  return parts.reduce((total, part) => total * 60 + Number(part), 0);
+}
+
+/** A result field's text to the number the API stores; null when blank or not a number. */
+export function parseMetricValue(text: string, kind: ScoreKind): number | null {
+  const trimmed = text.trim();
+  if (!trimmed) return null;
+  if (kind === "time") return parseDuration(trimmed);
+  const number = Number(trimmed.replace(",", "."));
+  return Number.isFinite(number) && number >= 0 ? number : null;
 }

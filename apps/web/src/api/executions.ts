@@ -180,6 +180,8 @@ export async function completeExecution(
     timezone?: string;
     checked_exercise_ids?: string[];
     section_scores?: SectionScore[];
+    /** ADR-179: results for the scores a coach set on text sections. */
+    text_section_scores?: { section_id: string; metric_key: string; value: number }[];
     total_elapsed_ms?: number;
     section_elapsed_ms?: Record<string, number>;
     segment_cycle_counts?: Record<string, number>;
