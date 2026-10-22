@@ -164,14 +164,15 @@ export function Dialog({
       data-testid={testId}
       onSubmit={onSubmit}
       onClick={(event) => event.stopPropagation()}
-      className={`relative flex min-h-0 w-full flex-col outline-none ${/\boverflow-/.test(panelClassName) ? "" : "overflow-hidden"} ${panelShape} ${panelClassName}`}
+      className={`relative flex min-h-0 w-full flex-col outline-none ${/\boverflow-/.test(panelClassName) ? "" : "overflow-hidden"} ${
+        // A bare drawer covers the whole screen: keep its own header below the notch.
+        bare && isDrawer ? "pt-[env(safe-area-inset-top)]" : ""
+      } ${panelShape} ${panelClassName}`}
       style={{
         background: "var(--panel)",
         borderColor: "var(--border)",
         color: "var(--text)",
         boxShadow: "var(--shadow-lg)",
-        // A bare drawer covers the whole screen: keep its own header below the notch.
-        paddingTop: bare && isDrawer ? "env(safe-area-inset-top)" : undefined,
         ...panelStyle,
       }}
     >
@@ -186,8 +187,7 @@ export function Dialog({
           ) : null}
           {hasHeader ? (
             <header
-              className="flex shrink-0 items-start justify-between gap-3 px-5 pb-3 pt-4 sm:px-6 sm:pt-5"
-              style={isDrawer ? { paddingTop: "max(1rem, env(safe-area-inset-top))" } : undefined}
+              className={`flex shrink-0 items-start justify-between gap-3 px-5 pb-3 sm:px-6 ${isDrawer ? "pt-[max(1rem,env(safe-area-inset-top))]" : "pt-4 sm:pt-5"}`}
             >
               <div className="min-w-0 flex-1">
                 {eyebrow ? (
@@ -224,20 +224,15 @@ export function Dialog({
             <div className={`flex min-h-0 flex-1 flex-col ${bodyClassName}`}>{children}</div>
           ) : (
             <div
-              className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 ${footer || footerStart ? "pb-4" : "pb-5"} ${hasHeader ? "" : "pt-5"} ${bodyClassName}`}
-              style={!footer && !footerStart && padsBottomSafeArea ? { paddingBottom: "max(1.25rem, env(safe-area-inset-bottom))" } : undefined}
+              className={`min-h-0 flex-1 overflow-y-auto overscroll-contain px-5 sm:px-6 ${footer || footerStart ? "pb-4" : padsBottomSafeArea ? "pb-[max(1.25rem,env(safe-area-inset-bottom))]" : "pb-5"} ${hasHeader ? "" : "pt-5"} ${bodyClassName}`}
             >
               {children}
             </div>
           )}
           {footer || footerStart ? (
             <footer
-              className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 pt-3 sm:px-6"
-              style={{
-                borderColor: "var(--border)",
-                background: "inherit",
-                paddingBottom: padsBottomSafeArea ? "max(0.75rem, env(safe-area-inset-bottom))" : "0.75rem",
-              }}
+              className={`flex shrink-0 flex-wrap items-center justify-end gap-2 border-t px-5 pt-3 sm:px-6 ${padsBottomSafeArea ? "pb-[max(0.75rem,env(safe-area-inset-bottom))]" : "pb-3"}`}
+              style={{ borderColor: "var(--border)", background: "inherit" }}
             >
               {footerStart ? <div className="me-auto flex min-w-0 items-center gap-2">{footerStart}</div> : null}
               {footer}
