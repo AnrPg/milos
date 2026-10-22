@@ -19,10 +19,7 @@ export function useAnchoredPosition(
   const [position, setPosition] = useState<FloatingStyle>(null);
 
   useLayoutEffect(() => {
-    if (!enabled) {
-      setPosition(null);
-      return;
-    }
+    if (!enabled) return;
     let frame = 0;
     const update = () => {
       const anchor = anchorRef.current;
@@ -67,7 +64,8 @@ export function useAnchoredPosition(
     };
   }, [anchorRef, floatingRef, align, width, minWidth, enabled]);
 
-  return position;
+  // A closed layer has no position; reopening measures again before paint.
+  return enabled ? position : null;
 }
 
 /** The caller's own max-height, but never taller than the room on screen. */

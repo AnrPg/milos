@@ -41,7 +41,7 @@ const technicalProperties = new Set([
   "inputMode", "inputType", "key", "kind", "localeMatcher", "manifest", "margin", "method", "minute", "month", "name",
   "padding", "pattern", "rel", "role", "scope", "second", "slug", "source", "status", "style",
   "step", "target", "timeStyle", "tone", "type", "unit", "value", "variant", "weekday", "width", "year",
-  "aria-current",
+  "aria-current", "panelClassName", "bodyClassName", "panelStyle", "paddingTop",
 ]);
 const technicalCalls = new Set([
   "addEventListener", "endsWith", "get", "getItem", "getPropertyValue", "includes", "join",
@@ -84,9 +84,9 @@ function isUtilityClassToken(token) {
     .replace(/^(?:sm|md|lg|xl|2xl|hover|focus|focus-visible|active|disabled|group-hover|group-focus-visible|dark|rtl|ltr|motion-safe|motion-reduce):/, "")
     .replace(/^\[[^\]]+\]:/, "");
 
-  return /^(?:-)?(?:flex|grid|block|inline|hidden|contents|relative|absolute|fixed|sticky|static|isolate|overflow|truncate|sr-only|not-sr-only|container)$/.test(normalized)
+  return /^(?:-)?(?:flex|grid|block|inline|hidden|contents|relative|absolute|fixed|sticky|static|isolate|overflow|truncate|sr-only|not-sr-only|container|border)$/.test(normalized)
     || /^(?:min-|max-)?(?:h|w|size)-[\w./[\]()%,-]+$/.test(normalized)
-    || /^(?:m|mx|my|ms|me|mt|mr|mb|ml|p|px|py|ps|pe|pt|pr|pb|pl|gap|space-[xy])-[-\w./[\]()%]+$/.test(normalized)
+    || /^(?:m|mx|my|ms|me|mt|mr|mb|ml|p|px|py|ps|pe|pt|pr|pb|pl|gap|space-[xy])-[-\w./[\]()%,]+$/.test(normalized)
     || /^(?:items|content|justify|place|self)-[\w-]+$/.test(normalized)
     || /^(?:flex|grid|shrink|grow|basis|order|col|row|auto-cols|auto-rows)-[\w./[\]%-]+$/.test(normalized)
     || /^(?:rounded|border|divide|outline|ring|shadow|opacity|z|object|aspect|cursor|select|pointer-events|resize|snap|scroll|overscroll)-[\w./[\]()%,-]+$/.test(normalized)

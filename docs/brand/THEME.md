@@ -62,6 +62,7 @@ Token names are camelCase in `theme.ts` and kebab-case as CSS variables
 | Hairlines, dividers, card borders, `<hr>` | `--border` |
 | Strong borders, input outlines | `--border-strong` |
 | Dialog and sheet backdrop (scrim) | `--scrim` |
+| Stacking order of fixed and floating layers (not colours) | `--z-sticky` < `--z-nav` < `--z-drawer` < `--z-modal` < `--z-fullscreen` < `--z-popover` < `--z-toast` (ADR-177) |
 | Full-screen media viewers' backdrop | `--scrim-strong` |
 | Shadows: chips and toggles / menus and popovers / dialogs and drawers | `--shadow-sm` / `--shadow-md` / `--shadow-lg` |
 
