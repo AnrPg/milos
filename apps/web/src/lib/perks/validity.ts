@@ -73,7 +73,7 @@ export function perkDraftProblems(draft: StaffPerkInput): PerkDraftProblem[] {
   if (!draft.partner.name.trim()) problems.push("partnerName");
   if (!draft.offer.text.trim()) problems.push("offerText");
   if (!validOfferValue(draft.offer.kind, draft.offer.value)) problems.push(draft.offer.kind === "percent" ? "percent" : "amount");
-  if (draft.code_mode === "shared" && !PERK_CODE_PATTERN.test(normalizePerkCode(draft.shared_code ?? ""))) problems.push("code");
+  if (draft.redemption === "partner_codes" && draft.code_mode === "shared" && !PERK_CODE_PATTERN.test(normalizePerkCode(draft.shared_code ?? ""))) problems.push("code");
   if (draft.starts_on && draft.ends_on && draft.ends_on < draft.starts_on) problems.push("dates");
   if (draft.audience === "packages" && draft.package_ids.length === 0) problems.push("packages");
   if (!draft.all_locations && draft.location_ids.length === 0) problems.push("branches");
@@ -82,7 +82,49 @@ export function perkDraftProblems(draft: StaffPerkInput): PerkDraftProblem[] {
   return problems;
 }
 
-/** Publishing: a demo business may draft but not go live (ADR-184). */
-export function canPublishPerk(draft: StaffPerkInput, activation: string | null | undefined) {
-  return activation !== "demo" && perkDraftProblems(draft).length === 0;
+/**
+ * Publishing: a demo business may draft but not go live (ADR-184), and a
+ * perk of unique partner codes needs at least one code (`codesAvailable` = what the
+ * box holds plus what the form is about to add).
+ */
+export function canPublishPerk(draft: StaffPerkInput, activation: string | null | undefined, codesAvailable = 0) {
+  if (activation === "demo" || perkDraftProblems(draft).length > 0) return false;
+  return draft.redemption !== "partner_codes" || draft.code_mode !== "unique" || codesAvailable > 0;
+}
+
+export const MAX_CODES_PER_UPLOAD = 5000;
+
+/**
+ * Reads the partner's unique codes from pasted text or a CSV/TXT file: one
+ * per line, or separated by commas, semicolons or tabs; a header such as
+ * «code» is skipped. Repeats are counted once, malformed ones reported.
+ */
+export function parsePerkCodes(text: string) {
+  const codes: string[] = [];
+  const seen = new Set<string>();
+  let duplicates = 0;
+  let invalid = 0;
+  const tokens = text.split(/[\r\n,;\t]+/).map((token) => token.replace(/^["']|["']$/g, ""));
+  for (const [index, token] of tokens.entries()) {
+    const code = normalizePerkCode(token);
+    if (!code) continue;
+    if (index === 0 && /^(CODE|CODES|ΚΩΔΙΚΟΣ|ΚΩΔΙΚΟΙ)$/u.test(code)) continue;
+    if (!PERK_CODE_PATTERN.test(code)) {
+      invalid += 1;
+      continue;
+    }
+    if (seen.has(code)) {
+      duplicates += 1;
+      continue;
+    }
+    seen.add(code);
+    codes.push(code);
+  }
+  const tooMany = codes.length > MAX_CODES_PER_UPLOAD;
+  return { codes: codes.slice(0, MAX_CODES_PER_UPLOAD), duplicates, invalid, tooMany };
+}
+
+/** What is left of a batch of unique codes. */
+export function codesLeft(perk: { codes_total: number; codes_claimed: number }) {
+  return Math.max(0, perk.codes_total - perk.codes_claimed);
 }

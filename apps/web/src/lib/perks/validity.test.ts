@@ -2,12 +2,24 @@ import { describe, expect, it } from "vitest";
 
 import type { StaffPerkInput } from "@/api/perks";
 
-import { canPublishPerk, isPerkLive, localToday, normalizePerkCode, perkDaysLeft, perkDraftProblems, perkPhase } from "./validity";
+import {
+  MAX_CODES_PER_UPLOAD,
+  canPublishPerk,
+  codesLeft,
+  isPerkLive,
+  localToday,
+  normalizePerkCode,
+  parsePerkCodes,
+  perkDaysLeft,
+  perkDraftProblems,
+  perkPhase,
+} from "./validity";
 
 const draft = (overrides: Partial<StaffPerkInput> = {}): StaffPerkInput => ({
   partner: { name: "Nutri Store Κυψέλη", category: "Συμπληρώματα", address: null, url: null, logo_media_id: null },
   offer: { kind: "percent", value: 10, text: "σε όλα τα συμπληρώματα", currency: "EUR" },
   terms: null,
+  redemption: "partner_codes",
   code_mode: "shared",
   shared_code: "ΚΥΨΕΛΗ10",
   show_qr: true,
@@ -82,5 +94,41 @@ describe("perk drafts", () => {
     expect(canPublishPerk(draft(), "demo")).toBe(false);
     expect(canPublishPerk(draft(), "active")).toBe(true);
     expect(canPublishPerk(draft({ shared_code: "" }), "active")).toBe(false);
+  });
+
+  it("needs unique codes before a perk of unique codes goes live", () => {
+    const unique = draft({ code_mode: "unique", shared_code: null });
+    expect(perkDraftProblems(unique)).toEqual([]);
+    expect(canPublishPerk(unique, "active", 0)).toBe(false);
+    expect(canPublishPerk(unique, "active", 12)).toBe(true);
+  });
+
+  it("needs no code for a Palee QR", () => {
+    const qr = draft({ redemption: "palee_qr", shared_code: null, code_mode: "unique" });
+    expect(perkDraftProblems(qr)).toEqual([]);
+    expect(canPublishPerk(qr, "active", 0)).toBe(true);
+  });
+});
+
+describe("unique code batches", () => {
+  it("reads pasted lines and CSV cells, skipping a header and repeats", () => {
+    expect(parsePerkCodes("code\nNS-001\nns-002, NS-003;NS-001\n\n\"NS-004\"\tx\n")).toEqual({
+      codes: ["NS-001", "NS-002", "NS-003", "NS-004"],
+      duplicates: 1,
+      invalid: 1,
+      tooMany: false,
+    });
+  });
+
+  it("caps one upload", () => {
+    const text = Array.from({ length: MAX_CODES_PER_UPLOAD + 2 }, (_, index) => `C${index}AA`).join("\n");
+    const parsed = parsePerkCodes(text);
+    expect(parsed.codes).toHaveLength(MAX_CODES_PER_UPLOAD);
+    expect(parsed.tooMany).toBe(true);
+  });
+
+  it("counts what is left to hand out", () => {
+    expect(codesLeft({ codes_total: 50, codes_claimed: 12 })).toBe(38);
+    expect(codesLeft({ codes_total: 5, codes_claimed: 9 })).toBe(0);
   });
 });
