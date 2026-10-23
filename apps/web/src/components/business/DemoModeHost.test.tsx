@@ -80,6 +80,12 @@ describe("DemoModeHost (ADR-184)", () => {
     expect(screen.queryByTestId("demo-mode-button")).toBeNull();
     unmount();
 
+    // Payloads without the field (older APIs, e2e stubs) are active businesses.
+    membership = { roles: ["owner"], organization: { slug: "box-a", provider_kind: "gym" } };
+    const noField = render(wrap(<DemoModeHost />));
+    expect(screen.queryByTestId("demo-mode-button")).toBeNull();
+    noField.unmount();
+
     membership = demoMembership(["member"]);
     const second = render(wrap(<DemoModeHost />));
     expect(screen.queryByTestId("demo-mode-button")).toBeNull();

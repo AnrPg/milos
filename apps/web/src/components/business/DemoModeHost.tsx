@@ -37,7 +37,8 @@ export function DemoModeHost() {
   const { membership } = useSelectedMembershipRole();
   const [noticeOpen, setNoticeOpen] = useState(false);
   const token = tokens?.access_token ?? null;
-  const demo = membership?.organization.activation === "demo";
+  // Only an explicit "demo" gates: a payload without the field is an active business.
+  const demo = membership?.organization?.activation === "demo";
   const roles = membership?.roles ?? [];
   const manages = roles.includes("owner") || roles.includes("admin");
   const enabled = Boolean(token && demo && manages);
