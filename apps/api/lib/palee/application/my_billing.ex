@@ -31,22 +31,32 @@ defmodule Palee.Application.MyBilling do
 
   @doc "`GET /api/me/billing`: the person's billing, one section per provider."
   def call(%{user_id: user_id} = context) when is_binary(user_id) do
-    {active, _former} =
-      context |> Organizations.list_my_providers() |> Organizations.split_providers()
-
-    clients = Enum.filter(active, &client?/1)
-    chat_slugs = chat_slugs(clients)
+    clients = client_tenants(context)
+    chat_slugs = clients |> Enum.map(&elem(&1, 0)) |> chat_slugs()
     trials = trials_by_provider(user_id)
 
-    sections =
-      clients
-      |> Enum.map(&section(context, &1, chat_slugs, trials))
-      |> Enum.reject(&is_nil/1)
-
-    {:ok, %{providers: sections}}
+    {:ok, %{providers: Enum.map(clients, &section(&1, chat_slugs, trials))}}
   end
 
   def call(_context), do: {:error, :account_required}
+
+  @doc """
+  The providers the person is a client of (not demo businesses), each with
+  `{:ok, tenant}` in that provider's context or the error resolving it.
+  `Συναλλαγές` (`MyTransactions`) reads the same set.
+  """
+  def client_tenants(%{user_id: user_id} = context) when is_binary(user_id) do
+    {active, _former} =
+      context |> Organizations.list_my_providers() |> Organizations.split_providers()
+
+    active
+    |> Enum.filter(&client?/1)
+    |> Enum.map(&{&1, MyProviders.tenant_context(context, &1.organization_id)})
+    |> Enum.reject(fn
+      {_provider, {:ok, tenant}} -> demo?(tenant)
+      _error -> false
+    end)
+  end
 
   @doc "Whether a provider row makes the person a client there (member or athlete)."
   def client?(%{roles: roles}) when is_list(roles),
@@ -60,10 +70,10 @@ defmodule Palee.Application.MyBilling do
 
   def demo?(_tenant), do: false
 
-  defp section(context, provider, chat_slugs, trials) do
-    case MyProviders.tenant_context(context, provider.organization_id) do
+  defp section({provider, resolved}, chat_slugs, trials) do
+    case resolved do
       {:ok, tenant} ->
-        if demo?(tenant), do: nil, else: build(tenant, provider, chat_slugs, trials)
+        build(tenant, provider, chat_slugs, trials)
 
       _error ->
         provider |> header(chat_slugs) |> Map.merge(empty_facts()) |> Map.put(:partial, true)
@@ -80,6 +90,7 @@ defmodule Palee.Application.MyBilling do
 
     {seasons, seasons_ok?} = safe(provider, :seasons, fn -> seasons(tenant, user_id) end)
     {invites, invites_ok?} = safe(provider, :referrals, fn -> invites(tenant, user_id) end)
+    {offers, offers_ok?} = safe(provider, :available_offers, fn -> available_offers(tenant) end)
 
     finance = finance || empty_finance()
 
@@ -91,7 +102,8 @@ defmodule Palee.Application.MyBilling do
       seasons: seasons || [],
       referrals: Map.merge(finance.referral_rewards, invites || empty_invites()),
       trials: Map.get(trials, provider.organization_id, []),
-      partial: not (finance_ok? and receipts_ok? and seasons_ok? and invites_ok?)
+      available_offers: offers || [],
+      partial: not (finance_ok? and receipts_ok? and seasons_ok? and invites_ok? and offers_ok?)
     })
     |> Map.delete(:referral_rewards)
   end
@@ -105,6 +117,9 @@ defmodule Palee.Application.MyBilling do
       self_service_cancel_auto_renew: false,
       download_invoices: true
     })
+    # Partner perks (outside-store deals) are post-MVP (TD): always empty
+    # until their context exists, so clients can already render the slot.
+    |> Map.put(:perks, [])
   end
 
   defp empty_facts do
@@ -113,7 +128,8 @@ defmodule Palee.Application.MyBilling do
       refund_receipts: [],
       seasons: [],
       referrals: Map.merge(empty_rewards(), empty_invites()),
-      trials: []
+      trials: [],
+      available_offers: []
     })
     |> Map.delete(:referral_rewards)
   end
@@ -274,6 +290,40 @@ defmodule Palee.Application.MyBilling do
         redeemed_at: redemption.redeemed_at
       }
     end)
+  end
+
+  # Codes of the box's running campaigns that it shows to members
+  # (`params.member_visible`), to use at the desk or when renewing.
+  defp available_offers(tenant) do
+    today = Date.utc_today()
+
+    campaigns =
+      tenant
+      |> Finance.list_promotion_campaigns()
+      |> Enum.filter(&offer_running?(&1, today))
+
+    Enum.flat_map(campaigns, fn campaign ->
+      tenant
+      |> Finance.list_promotion_codes(campaign.id)
+      |> Enum.filter(&(&1.active != false))
+      |> Enum.map(fn code ->
+        %{
+          id: code.id,
+          code: code.code,
+          campaign_name: campaign.name,
+          description: campaign.description,
+          discount_type: code.discount_type,
+          discount_value: code.discount_value,
+          ends_on: campaign.ends_on
+        }
+      end)
+    end)
+  end
+
+  defp offer_running?(campaign, today) do
+    campaign.active != false and (campaign.params || %{})["member_visible"] == true and
+      (is_nil(campaign.starts_on) or Date.compare(campaign.starts_on, today) != :gt) and
+      (is_nil(campaign.ends_on) or Date.compare(campaign.ends_on, today) != :lt)
   end
 
   # ── other contexts ─────────────────────────────────────────────────────────

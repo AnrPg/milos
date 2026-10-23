@@ -1060,6 +1060,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/billing/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your complete transaction history, newest first (cursor-paginated) */
+        get: operations["PaleeWeb.MyBillingController.transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/blocks": {
         parameters: {
             query?: never;
@@ -14741,10 +14758,31 @@ export interface components {
             self_service_cancel_auto_renew: boolean;
             self_service_purchase: boolean;
         };
+        /** BillingAvailableOffer */
+        BillingAvailableOffer: {
+            campaign_name?: string | null;
+            code: string;
+            description?: string | null;
+            discount_type?: string | null;
+            discount_value?: number | null;
+            /** Format: date */
+            ends_on?: string | null;
+            /** Format: uuid */
+            id: string;
+        };
         /** BillingContact */
         BillingContact: {
             /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
             box_chat_slug: string | null;
+        };
+        /** BillingCounterparty */
+        BillingCounterparty: {
+            /** @enum {string} */
+            kind: "gym" | "coach" | "organiser";
+            name?: string | null;
+            /** Format: uuid */
+            organization_id: string;
+            slug?: string | null;
         };
         /** BillingInvoice */
         BillingInvoice: {
@@ -14787,6 +14825,21 @@ export interface components {
             payment_method?: string | null;
             payment_status?: string | null;
         };
+        /**
+         * BillingPerk
+         * @description Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.
+         */
+        BillingPerk: {
+            code: string;
+            discount?: string | null;
+            /** Format: uuid */
+            id: string;
+            store: string;
+            terms?: string | null;
+            url?: string | null;
+            /** Format: date */
+            valid_until?: string | null;
+        };
         /** BillingPromotion */
         BillingPromotion: {
             campaign_name?: string | null;
@@ -14805,6 +14858,18 @@ export interface components {
                 self_service_cancel_auto_renew: boolean;
                 self_service_purchase: boolean;
             };
+            /** @description Codes of running campaigns the box shows to members. */
+            available_offers: {
+                campaign_name?: string | null;
+                code: string;
+                description?: string | null;
+                discount_type?: string | null;
+                discount_value?: number | null;
+                /** Format: date */
+                ends_on?: string | null;
+                /** Format: uuid */
+                id: string;
+            }[];
             /** BillingContact */
             contact: {
                 /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
@@ -14862,6 +14927,17 @@ export interface components {
                 paid_on?: string | null;
                 payment_method?: string | null;
                 payment_status?: string | null;
+            }[];
+            perks: {
+                code: string;
+                discount?: string | null;
+                /** Format: uuid */
+                id: string;
+                store: string;
+                terms?: string | null;
+                url?: string | null;
+                /** Format: date */
+                valid_until?: string | null;
             }[];
             primary_color?: string | null;
             promotions: {
@@ -15017,6 +15093,34 @@ export interface components {
             /** Format: date */
             starts_on?: string | null;
             status: string;
+        };
+        /** BillingTransaction */
+        BillingTransaction: {
+            /** @description Negative for money back. */
+            amount_cents: number;
+            /** BillingCounterparty */
+            counterparty: {
+                /** @enum {string} */
+                kind: "gym" | "coach" | "organiser";
+                name?: string | null;
+                /** Format: uuid */
+                organization_id: string;
+                slug?: string | null;
+            };
+            currency: string;
+            /** Format: date-time */
+            date?: string | null;
+            /** @description Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id. */
+            details: {
+                [key: string]: unknown;
+            };
+            /** @description `kind:source_id`, stable across pages. */
+            id: string;
+            /** @enum {string} */
+            kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+            source_id: string;
+            status?: string | null;
+            title?: string | null;
         };
         /** BillingTrial */
         BillingTrial: {
@@ -24799,6 +24903,18 @@ export interface components {
                     self_service_cancel_auto_renew: boolean;
                     self_service_purchase: boolean;
                 };
+                /** @description Codes of running campaigns the box shows to members. */
+                available_offers: {
+                    campaign_name?: string | null;
+                    code: string;
+                    description?: string | null;
+                    discount_type?: string | null;
+                    discount_value?: number | null;
+                    /** Format: date */
+                    ends_on?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                }[];
                 /** BillingContact */
                 contact: {
                     /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
@@ -24856,6 +24972,17 @@ export interface components {
                     paid_on?: string | null;
                     payment_method?: string | null;
                     payment_status?: string | null;
+                }[];
+                perks: {
+                    code: string;
+                    discount?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    store: string;
+                    terms?: string | null;
+                    url?: string | null;
+                    /** Format: date */
+                    valid_until?: string | null;
                 }[];
                 primary_color?: string | null;
                 promotions: {
@@ -24937,6 +25064,41 @@ export interface components {
                     id: string;
                     status: string;
                 }[];
+            }[];
+        };
+        /** MyBillingTransactions */
+        MyBillingTransactions: {
+            kinds: ("invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund")[];
+            next_cursor: string | null;
+            partial: boolean;
+            /** @description Entries in scope, before the kind filter. */
+            total: number;
+            transactions: {
+                /** @description Negative for money back. */
+                amount_cents: number;
+                /** BillingCounterparty */
+                counterparty: {
+                    /** @enum {string} */
+                    kind: "gym" | "coach" | "organiser";
+                    name?: string | null;
+                    /** Format: uuid */
+                    organization_id: string;
+                    slug?: string | null;
+                };
+                currency: string;
+                /** Format: date-time */
+                date?: string | null;
+                /** @description Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id. */
+                details: {
+                    [key: string]: unknown;
+                };
+                /** @description `kind:source_id`, stable across pages. */
+                id: string;
+                /** @enum {string} */
+                kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+                source_id: string;
+                status?: string | null;
+                title?: string | null;
             }[];
         };
         /** MyInjuryWarningsAcknowledged */
@@ -37507,6 +37669,18 @@ export interface operations {
                                 self_service_cancel_auto_renew: boolean;
                                 self_service_purchase: boolean;
                             };
+                            /** @description Codes of running campaigns the box shows to members. */
+                            available_offers: {
+                                campaign_name?: string | null;
+                                code: string;
+                                description?: string | null;
+                                discount_type?: string | null;
+                                discount_value?: number | null;
+                                /** Format: date */
+                                ends_on?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                            }[];
                             /** BillingContact */
                             contact: {
                                 /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
@@ -37564,6 +37738,17 @@ export interface operations {
                                 paid_on?: string | null;
                                 payment_method?: string | null;
                                 payment_status?: string | null;
+                            }[];
+                            perks: {
+                                code: string;
+                                discount?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                store: string;
+                                terms?: string | null;
+                                url?: string | null;
+                                /** Format: date */
+                                valid_until?: string | null;
                             }[];
                             primary_color?: string | null;
                             promotions: {
@@ -37647,6 +37832,74 @@ export interface operations {
                             }[];
                         }[];
                     };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyBillingController.transactions": {
+        parameters: {
+            query?: {
+                /** @description One provider; event entries of hosts that are not providers always stay. */
+                organization_id?: string;
+                kind?: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transactions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        kinds: ("invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund")[];
+                        next_cursor: string | null;
+                        partial: boolean;
+                        /** @description Entries in scope, before the kind filter. */
+                        total: number;
+                        transactions: {
+                            /** @description Negative for money back. */
+                            amount_cents: number;
+                            /** BillingCounterparty */
+                            counterparty: {
+                                /** @enum {string} */
+                                kind: "gym" | "coach" | "organiser";
+                                name?: string | null;
+                                /** Format: uuid */
+                                organization_id: string;
+                                slug?: string | null;
+                            };
+                            currency: string;
+                            /** Format: date-time */
+                            date?: string | null;
+                            /** @description Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id. */
+                            details: {
+                                [key: string]: unknown;
+                            };
+                            /** @description `kind:source_id`, stable across pages. */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "invoice" | "payment" | "refund" | "credit" | "event_payment" | "event_refund";
+                            source_id: string;
+                            status?: string | null;
+                            title?: string | null;
+                        }[];
+                    };
+                };
+            };
+            /** @description Invalid cursor */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": Record<string, never>;
                 };
             };
         };

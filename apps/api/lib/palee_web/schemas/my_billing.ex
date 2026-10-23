@@ -154,6 +154,37 @@ defmodule PaleeWeb.Schemas.MyBilling do
     })
   end
 
+  defp available_offer do
+    object("BillingAvailableOffer", [:id, :code], %{
+      id: @uuid,
+      code: @string,
+      campaign_name: @nullable_string,
+      description: @nullable_string,
+      discount_type: @nullable_string,
+      discount_value: @nullable_integer,
+      ends_on: @date
+    })
+  end
+
+  defp perk do
+    %Schema{
+      title: "BillingPerk",
+      type: :object,
+      description:
+        "Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.",
+      required: [:id, :store, :code],
+      properties: %{
+        id: @uuid,
+        store: @string,
+        discount: @nullable_string,
+        code: @string,
+        terms: @nullable_string,
+        valid_until: @date,
+        url: @nullable_string
+      }
+    }
+  end
+
   defp provider do
     object(
       "BillingProvider",
@@ -173,6 +204,8 @@ defmodule PaleeWeb.Schemas.MyBilling do
         :seasons,
         :referrals,
         :trials,
+        :available_offers,
+        :perks,
         :outstanding_cents,
         :credit_balance_cents
       ],
@@ -217,8 +250,62 @@ defmodule PaleeWeb.Schemas.MyBilling do
         seasons: list(season()),
         referrals: referrals(),
         trials: list(trial()),
+        available_offers: %Schema{
+          type: :array,
+          items: available_offer(),
+          description: "Codes of running campaigns the box shows to members."
+        },
+        perks: %Schema{type: :array, items: perk()},
         outstanding_cents: @integer,
         credit_balance_cents: @integer
+      }
+    )
+  end
+
+  @transaction_kinds ~w(invoice payment refund credit event_payment event_refund)
+
+  def transaction_kinds, do: @transaction_kinds
+
+  defp transaction do
+    object(
+      "BillingTransaction",
+      [:id, :kind, :source_id, :counterparty, :amount_cents, :currency, :details],
+      %{
+        id: %Schema{type: :string, description: "`kind:source_id`, stable across pages."},
+        kind: %Schema{type: :string, enum: @transaction_kinds},
+        source_id: %Schema{type: :string},
+        counterparty:
+          object("BillingCounterparty", [:organization_id, :kind], %{
+            organization_id: @uuid,
+            name: @nullable_string,
+            kind: %Schema{type: :string, enum: ["gym", "coach", "organiser"]},
+            slug: @nullable_string
+          }),
+        title: @nullable_string,
+        amount_cents: %Schema{type: :integer, description: "Negative for money back."},
+        currency: @string,
+        status: @nullable_string,
+        date: @datetime,
+        details: %Schema{
+          type: :object,
+          additionalProperties: true,
+          description:
+            "Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id."
+        }
+      }
+    )
+  end
+
+  def transactions_response do
+    object(
+      "MyBillingTransactions",
+      [:transactions, :next_cursor, :total, :kinds, :partial],
+      %{
+        transactions: list(transaction()),
+        next_cursor: @nullable_string,
+        total: %Schema{type: :integer, description: "Entries in scope, before the kind filter."},
+        kinds: %Schema{type: :array, items: %Schema{type: :string, enum: @transaction_kinds}},
+        partial: @boolean
       }
     )
   end
