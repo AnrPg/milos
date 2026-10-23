@@ -6,6 +6,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     scheduling_trial_policies scheduling_trial_requests
     season_offerings season_enrollments
     referral_codes referral_attributions
+    perks perk_versions perk_codes perk_claims
     class_attendance_records class_timers
     master_workouts workout_folders workout_sections workout_exercises
     exercise_variations assigned_workouts assigned_workout_athletes scale_levels
@@ -46,7 +47,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     inventory_supply_movements
     inventory_supply_reports
     shop_products shop_variants shop_stock_movements shop_stock_levels
-    shop_orders shop_order_lines
+    shop_orders shop_order_lines shop_promotion_codes shop_stock_alerts
     shop_variant_price_changes shop_pricing_targets
     review_questionnaires reviews review_answers
     messaging_threads

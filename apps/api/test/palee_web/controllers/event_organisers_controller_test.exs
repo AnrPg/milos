@@ -365,6 +365,162 @@ defmodule PaleeWeb.EventOrganisersControllerTest do
     end
   end
 
+  describe "co-hosts asked as the event is created (ADR-185)" do
+    test "a business's event and its co-host requests are made together; an unknown box is reported",
+         ctx do
+      third = published_box!("Third Box")
+
+      assert %{"event" => event, "occurrences" => 2, "cohost_failures" => failures} =
+               ctx.as.(ctx.host.owner)
+               |> send_json(:post, "/api/me/events", %{
+                 host: ctx.host.organization.id,
+                 title: "Open WOD",
+                 starts_at: at(2 * 24 * 60),
+                 ends_at: at(2 * 24 * 60 + 60),
+                 repeat_until: Date.to_iso8601(Date.add(Date.utc_today(), 9)),
+                 place_name: "Το box",
+                 audience: "open",
+                 cohost_slugs: [ctx.cohost.slug, "/b/#{third.slug}", "no-such-box"]
+               })
+               |> json_response(201)
+
+      assert failures == [%{"slug" => "no-such-box", "code" => "box_not_found"}]
+
+      # Every occurrence asks both boxes, pending.
+      rows =
+        Repo.all(
+          from c in Palee.Community.EventCohost,
+            join: e in Event,
+            on: e.id == c.event_id,
+            where: e.organization_id == ^ctx.host.organization.id,
+            select: {c.cohost_organization_id, c.status}
+        )
+
+      assert length(rows) == 4
+      assert Enum.all?(rows, fn {_box, status} -> status == "pending" end)
+
+      assert rows |> Enum.map(&elem(&1, 0)) |> Enum.uniq() |> Enum.sort() ==
+               Enum.sort([ctx.cohost.organization.id, third.organization.id])
+
+      assert %{"cohosts" => [_, _]} =
+               ctx.as.(ctx.host.owner)
+               |> get("#{ctx.host.admin}/events/#{event["id"]}/cohosts")
+               |> json_response(200)
+
+      # One request notice per box, as a later invite would send.
+      drain()
+      assert Enum.count(types(ctx.cohost.owner), &(&1 == "community_event_cohost_request")) == 1
+      assert "community_event_cohost_request" in types(third.owner)
+    end
+
+    test "a refused co-host list creates nothing", ctx do
+      count = fn ->
+        Repo.aggregate(
+          from(e in Event, where: e.organization_id == ^ctx.host.organization.id),
+          :count
+        )
+      end
+
+      body = fn slugs ->
+        %{
+          host: ctx.host.organization.id,
+          title: "Open WOD",
+          starts_at: at(2 * 24 * 60),
+          ends_at: at(2 * 24 * 60 + 60),
+          place_name: "Το box",
+          cohost_slugs: slugs
+        }
+      end
+
+      post = fn slugs ->
+        ctx.as.(ctx.host.owner) |> send_json(:post, "/api/me/events", body.(slugs))
+      end
+
+      assert %{"code" => "cannot_cohost_own_event"} =
+               post.([ctx.cohost.slug, ctx.host.slug]) |> json_response(422)
+
+      assert %{"code" => "duplicate_cohost"} =
+               post.([ctx.cohost.slug, "b/#{ctx.cohost.slug}"]) |> json_response(422)
+
+      assert %{"code" => "invalid_cohosts"} = post.(["not a slug"]) |> json_response(422)
+
+      assert count.() == 0
+    end
+
+    test "a person's own event and the staff route follow the same rules", ctx do
+      # The box's gym club exists once it has hosted.
+      box_event(ctx, ctx.host)
+
+      # A person's own event: their organiser organisation holds manage_events.
+      assert %{"cohost_failures" => []} =
+               own_event(ctx, ctx.person, %{cohost_slugs: [ctx.cohost.slug]})
+               |> json_response(201)
+
+      # The staff route runs the same rules.
+      assert %{"code" => "cannot_cohost_own_event"} =
+               ctx.as.(ctx.host.owner)
+               |> send_json(:post, "#{ctx.host.admin}/events", %{
+                 club_id: gym_club_id(ctx.host),
+                 title: "Open WOD",
+                 starts_at: at(2 * 24 * 60),
+                 ends_at: at(2 * 24 * 60 + 60),
+                 place_name: "Το box",
+                 cohost_slugs: [ctx.host.slug]
+               })
+               |> json_response(422)
+
+      assert %{"cohost_failures" => []} =
+               ctx.as.(ctx.host.owner)
+               |> send_json(:post, "#{ctx.host.admin}/events", %{
+                 club_id: gym_club_id(ctx.host),
+                 title: "Open WOD",
+                 starts_at: at(2 * 24 * 60),
+                 ends_at: at(2 * 24 * 60 + 60),
+                 place_name: "Το box",
+                 cohost_slugs: [ctx.cohost.slug]
+               })
+               |> json_response(201)
+    end
+  end
+
+  describe "the event store (ADR-185)" do
+    test "writes an event's occurrences and their co-host requests together, or neither", ctx do
+      row = Repo.get!(Event, box_event(ctx, ctx.host)["id"])
+
+      attrs =
+        row
+        |> Map.from_struct()
+        |> Map.take(Event.editable_fields() ++ [:organization_id, :club_id, :created_by_id])
+        |> Map.merge(%{title: "Rolled back", starts_at: row.starts_at, ends_at: row.ends_at})
+
+      # The host can't co-host its own event: the second insert fails, so the first goes too.
+      assert {:error, %Ecto.Changeset{}} =
+               Palee.Infrastructure.Community.EctoEventStore.insert_events_with_cohosts(
+                 %{},
+                 [attrs, attrs],
+                 %{cohost_organization_ids: [ctx.host.organization.id], invited_by_id: nil}
+               )
+
+      refute Repo.exists?(from e in Event, where: e.title == "Rolled back")
+
+      assert {:ok, %{events: [_, _], cohosts: [_, _]}} =
+               Palee.Infrastructure.Community.EctoEventStore.insert_events_with_cohosts(
+                 %{},
+                 [attrs, attrs],
+                 %{cohost_organization_ids: [ctx.cohost.organization.id], invited_by_id: nil}
+               )
+    end
+  end
+
+  defp gym_club_id(box) do
+    Repo.one!(
+      from c in Palee.Community.Club,
+        where: c.organization_id == ^box.organization.id and c.kind == "gym",
+        select: c.id,
+        limit: 1
+    )
+  end
+
   describe "co-hosting" do
     test "request, accept, show on the co-host's page and feed, then its own trial offer",
          ctx do

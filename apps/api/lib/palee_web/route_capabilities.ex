@@ -50,7 +50,9 @@ defmodule PaleeWeb.RouteCapabilities do
     W.StaffScalingController => [:manage_coaching],
     W.AdminAiSettingsController => [:manage_settings],
     # ADR-184: demo data and the activation request (owners and admins).
-    W.AdminBusinessController => [:manage_settings]
+    W.AdminBusinessController => [:manage_settings],
+    # ADR-191: partner perks.
+    W.AdminPerkController => [:manage_perks]
   }
 
   @actions %{
@@ -343,6 +345,7 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.ShopController, :pick_up} => [:manage_shop, :sell_shop],
     {W.ShopController, :cancel} => [:manage_shop, :sell_shop],
     {W.ShopController, :desk_sale} => [:manage_shop, :sell_shop],
+    {W.ShopController, :payment_methods} => [:manage_shop, :sell_shop],
     {W.ShopController, :ready_orders} => [:manage_shop, :sell_shop, :check_in],
     {W.ShopController, :set_fiscal_receipt} => [:manage_shop, :sell_shop],
     {W.ShopController, :lineage} => [:manage_shop, :view_finance_reports],

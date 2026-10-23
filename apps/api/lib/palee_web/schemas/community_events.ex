@@ -230,9 +230,30 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
   def created_response do
     object(
       "CommunityEventCreatedResponse",
-      %{event: event(), occurrences: integer(description: "Events made (weekly repeat)")},
+      %{
+        event: event(),
+        occurrences: integer(description: "Events made (weekly repeat)"),
+        cohost_failures: cohost_failures()
+      },
       [:event, :occurrences]
     )
+  end
+
+  defp cohost_failures do
+    %{
+      list(
+        object(
+          "CommunityEventCohostFailure",
+          %{
+            slug: string(),
+            code: string(description: "Why that box wasn't asked, e.g. box_not_found")
+          },
+          [:slug, :code]
+        )
+      )
+      | description:
+          "ADR-185: addresses in cohost_slugs that weren't asked (no published box there); the event was still created"
+    }
   end
 
   defp editable do
@@ -288,6 +309,13 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
           format: :date,
           description:
             "«Επανάληψη κάθε εβδομάδα» until this date (box time zone), at most #{Palee.Community.event_series_max()} weeks"
+        },
+        cohost_slugs: %Schema{
+          type: :array,
+          items: string(maxLength: 200),
+          maxItems: Palee.Community.cohost_max(),
+          description:
+            "ADR-185: business page addresses to ask as co-hosts on every occurrence, written with the event in one transaction. Needs manage_events at the host; not the host itself, none twice, not for a group-only event (any refuses the request). An address with no published box is skipped and reported in cohost_failures"
         }
       })
 
@@ -483,7 +511,7 @@ defmodule PaleeWeb.Schemas.CommunityEvents do
   def staff_created_response do
     object(
       "StaffCommunityEventCreatedResponse",
-      %{event: staff_event(), occurrences: integer()},
+      %{event: staff_event(), occurrences: integer(), cohost_failures: cohost_failures()},
       [:event, :occurrences]
     )
   end

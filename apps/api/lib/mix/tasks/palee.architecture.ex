@@ -111,6 +111,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     interests/interests_store
     wallet/wallet_store
     business_accounts/business_account_store
+    perks/perk_store
     shop/shop_report_store
   )
 

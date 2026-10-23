@@ -9,7 +9,7 @@ defmodule Palee.Community.Commands.Events do
   """
 
   alias Palee.Community.{Event, EventStore}
-  alias Palee.Community.Domain.{EventPolicy, EventSeries}
+  alias Palee.Community.Domain.{CohostPolicy, EventPolicy, EventSeries}
 
   @live ~w(going waitlisted)
 
@@ -20,7 +20,36 @@ defmodule Palee.Community.Commands.Events do
   in the box's zone) is given; every occurrence shares a `series_id`. With
   `channel_id` it is an event of that member group (checked by the caller).
   """
-  def create(%{organization_id: organization_id, user_id: user_id} = context, club, attrs, opts) do
+  def create(context, club, attrs, opts) do
+    with {:ok, occurrences} <- occurrence_attrs(context, club, attrs, opts),
+         do: EventStore.insert_events(context, occurrences)
+  end
+
+  @doc """
+  ADR-185: `create/4` with co-host requests to `cohost_organization_ids`
+  (resolved published boxes) on every occurrence, checked by
+  `CohostPolicy.create_check/3` on the first one and written with the
+  events in one transaction. `{:ok, %{events: _, cohosts: _}}`.
+  """
+  def create_with_cohosts(%{user_id: user_id} = context, club, attrs, cohost_ids, opts) do
+    with {:ok, [first | _] = occurrences} <- occurrence_attrs(context, club, attrs, opts),
+         :ok <- CohostPolicy.create_check(struct(Event, first), cohost_ids, now(opts)) do
+      EventStore.insert_events_with_cohosts(context, occurrences, %{
+        cohost_organization_ids: cohost_ids,
+        invited_by_id: user_id
+      })
+    end
+  end
+
+  defp now(opts), do: Keyword.get_lazy(opts, :now, &DateTime.utc_now/0)
+
+  # Every occurrence's attributes, validated, before anything is written.
+  defp occurrence_attrs(
+         %{organization_id: organization_id, user_id: user_id} = context,
+         club,
+         attrs,
+         opts
+       ) do
     channel_id = Keyword.get(opts, :channel_id)
 
     attrs =
@@ -38,11 +67,10 @@ defmodule Palee.Community.Commands.Events do
          {:ok, times} <- occurrences(changeset, opts) do
       series_id = if length(times) > 1, do: Ecto.UUID.generate()
 
-      times
-      |> Enum.map(fn {starts_at, ends_at} ->
-        Map.merge(attrs, %{starts_at: starts_at, ends_at: ends_at, series_id: series_id})
-      end)
-      |> then(&EventStore.insert_events(context, &1))
+      {:ok,
+       Enum.map(times, fn {starts_at, ends_at} ->
+         Map.merge(attrs, %{starts_at: starts_at, ends_at: ends_at, series_id: series_id})
+       end)}
     else
       %Ecto.Changeset{} = invalid -> {:error, invalid}
       error -> error

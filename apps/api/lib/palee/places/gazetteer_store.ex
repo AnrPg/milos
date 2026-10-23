@@ -16,4 +16,10 @@ defmodule Palee.Places.GazetteerStore do
   def nearest(point), do: adapter().nearest(point)
   @impl true
   def import(place), do: adapter().import(place)
+  @impl true
+  def upsert_many(source, places), do: adapter().upsert_many(source, places)
+  @impl true
+  def refreshed_at(source), do: adapter().refreshed_at(source)
+  @impl true
+  def list_source(source), do: adapter().list_source(source)
 end

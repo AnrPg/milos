@@ -52,6 +52,12 @@ export function PlaceOption({ place, busy = false }: { place: PlaceSuggestion; b
   );
 }
 
+/** OpenStreetMap (ODbL) and GeoNames (CC BY 4.0) ask for credit wherever their places are listed. */
+export function PlacesAttribution() {
+  const t = useTranslations("Around");
+  return <p className="text-[11px]" style={{ color: "var(--dim)" }}>{t("placesAttribution")}</p>;
+}
+
 /** Γύρω μου errors in words: offline, an unknown place, the geocoder down, else the shared map. */
 export function useAroundError() {
   const t = useTranslations("Around");
@@ -240,6 +246,7 @@ export function AreaPicker({
           </ul>
         ) : null}
         <ErrorLine message={aroundError(resolve.error)} />
+        {searching ? <PlacesAttribution /> : null}
       </div>
 
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("areaPrivacy")}</p>

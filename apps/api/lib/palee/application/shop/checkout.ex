@@ -38,14 +38,33 @@ defmodule Palee.Application.Shop.Checkout do
          {:ok, pickup} <-
            pickup_location(context, catalog, params[:pickup_location_id], :optional) do
       {:ok,
-       Map.merge(priced, %{
+       Map.merge(Map.delete(priced, :promotion), %{
          pickup_location_id: pickup,
          pickup_location_ids: pickup_options(context, catalog),
          payment_modes: payment_modes(context, terms),
-         online_payment: online_payment(context)
+         online_payment: online_payment(context),
+         member_discount: member_discount(terms),
+         promotion_code: priced_promotion(priced, params)
        })}
     end
   end
+
+  defp priced_promotion(%{promotion_code_id: nil}, _params), do: nil
+
+  defp priced_promotion(%{promotion_code_id: id}, params),
+    do: %{id: id, code: Shop.normalize_promotion_code(params[:promotion_code]), applied: true}
+
+  @doc """
+  The member discount a buyer gets (ADR-097, `member_discount_percent` of
+  their package when its scope includes products): `nil` or `%{percent,
+  source, applies_to}`. It applies to products marked
+  `member_discount_applies` and never stacks with a promotion code.
+  """
+  def member_discount(%{member_discount_percent: percent})
+      when is_integer(percent) and percent > 0,
+      do: %{percent: percent, source: :membership_package, applies_to: :marked_products}
+
+  def member_discount(_terms), do: nil
 
   @doc "The online-payment flag the basket shows: `%{available, reason, provider}`."
   def online_payment(context) do
@@ -87,31 +106,34 @@ defmodule Palee.Application.Shop.Checkout do
            pickup_location(context, catalog, params[:pickup_location_id], :required),
          {:ok, order} <-
            Shop.transaction(context, fn ->
-             create(context, %{
-               order: %{
-                 channel: :online,
-                 status: :placed,
-                 payment_status: :pending_payment,
-                 payment_mode: mode,
-                 user_id: buyer,
-                 membership_id: terms && terms.membership_id,
-                 pickup_location_id: pickup,
-                 currency: priced.currency,
-                 subtotal_cents: priced.subtotal_cents,
-                 discount_cents: priced.discount_cents,
-                 total_cents: priced.total_cents,
-                 source: Shop.order_source(params[:source]),
-                 source_ref_id: params[:source_ref_id],
-                 promotion_code: params[:promotion_code],
-                 note: params[:note],
-                 idempotency_key: key,
-                 placed_at: now,
-                 expires_at: Shop.hold_until(now),
-                 created_by_id: buyer
-               },
-               lines: priced.lines,
-               stock: :reserve
-             })
+             with :ok <- redeem(context, priced, now) do
+               create(context, %{
+                 order: %{
+                   channel: :online,
+                   status: :placed,
+                   payment_status: :pending_payment,
+                   payment_mode: mode,
+                   user_id: buyer,
+                   membership_id: terms && terms.membership_id,
+                   pickup_location_id: pickup,
+                   currency: priced.currency,
+                   subtotal_cents: priced.subtotal_cents,
+                   discount_cents: priced.discount_cents,
+                   total_cents: priced.total_cents,
+                   source: source(params, priced),
+                   source_ref_id: params[:source_ref_id],
+                   promotion_code: promotion_text(params, priced),
+                   promotion_code_id: priced.promotion_code_id,
+                   note: params[:note],
+                   idempotency_key: key,
+                   placed_at: now,
+                   expires_at: Shop.hold_until(now),
+                   created_by_id: buyer
+                 },
+                 lines: priced.lines,
+                 stock: :reserve
+               })
+             end
            end) do
       after_placed(context, order)
 
@@ -204,7 +226,8 @@ defmodule Palee.Application.Shop.Checkout do
          {:ok, location} <- desk_covers(catalog, location),
          {:ok, order} <-
            Shop.transaction(context, fn ->
-             with {:ok, order} <-
+             with :ok <- redeem(context, priced, now),
+                  {:ok, order} <-
                     create(context, %{
                       order: %{
                         channel: :pos,
@@ -220,7 +243,8 @@ defmodule Palee.Application.Shop.Checkout do
                         discount_cents: priced.discount_cents,
                         total_cents: priced.total_cents,
                         source: :desk,
-                        promotion_code: params[:promotion_code],
+                        promotion_code: promotion_text(params, priced),
+                        promotion_code_id: priced.promotion_code_id,
                         note: params[:note],
                         idempotency_key: key,
                         placed_at: now,
@@ -319,13 +343,57 @@ defmodule Palee.Application.Shop.Checkout do
         %{}
       end
 
-    with {:ok, priced} <-
+    with {:ok, promotion} <- promotion(context, params[:promotion_code], DateTime.utc_now()),
+         {:ok, priced} <-
            Shop.price_cart(items, catalog,
              channel: channel,
              member_discount_percent: terms && terms.member_discount_percent,
-             already: already
+             already: already,
+             promotion: promotion
            ) do
-      {:ok, priced, catalog, terms}
+      {:ok, Map.put(priced, :promotion, promotion), catalog, terms}
+    end
+  end
+
+  # A typed promotion code: one of this business's codes, redeemable now.
+  defp promotion(_context, code, _now) when code in [nil, ""], do: {:ok, nil}
+
+  defp promotion(context, code, now) do
+    with %{} = found <-
+           Shop.get_promotion_code(context, Shop.normalize_promotion_code(code)) ||
+             {:error, :promotion_code_invalid},
+         :ok <- Shop.promotion_redeemable(found, now) do
+      {:ok, found}
+    end
+  end
+
+  # Inside the order's transaction: the code's row lock serialises its
+  # redemptions, so the cap holds under concurrent checkouts; a code edited
+  # since it was priced is refused rather than silently repriced.
+  defp redeem(_context, %{promotion: nil}, _now), do: :ok
+
+  defp redeem(context, %{promotion: priced}, now) do
+    case Shop.get_promotion_code(context, priced.id, by: :id, lock: true) do
+      nil ->
+        {:error, :promotion_code_invalid}
+
+      locked ->
+        if Map.take(locked, [:discount_percent, :discount_cents, :product_id]) ==
+             Map.take(priced, [:discount_percent, :discount_cents, :product_id]),
+           do: Shop.promotion_redeemable(locked, now),
+           else: {:error, :promotion_code_changed}
+    end
+  end
+
+  defp promotion_text(_params, %{promotion: nil}), do: nil
+  defp promotion_text(_params, %{promotion: code}), do: code.code
+
+  # Attribution: what the client says brought the buyer (a club post's buy
+  # link sends `club_post` and the post id), else the code that was used.
+  defp source(params, priced) do
+    case {params[:source], priced.promotion} do
+      {nil, %{}} -> :promotion_code
+      {source, _code} -> Shop.order_source(source)
     end
   end
 

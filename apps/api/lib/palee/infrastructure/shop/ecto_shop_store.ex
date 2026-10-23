@@ -17,8 +17,18 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
 
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Repo
-  alias Palee.Shop.Domain.StockLedger
-  alias Palee.Shop.{Order, OrderLine, Product, StockLevel, StockMovement, Variant}
+  alias Palee.Shop.Domain.{PickupCode, StockLedger}
+
+  alias Palee.Shop.{
+    Order,
+    OrderLine,
+    Product,
+    PromotionCode,
+    StockAlert,
+    StockLevel,
+    StockMovement,
+    Variant
+  }
 
   # ── Transactions ─────────────────────────────────────────────────────────
 
@@ -68,7 +78,12 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
 
       {:q, term}, query when is_binary(term) and term != "" ->
         pattern = "%" <> String.replace(term, ~r/[\\%_]/, "\\\\\\0") <> "%"
-        where(query, [product], ilike(product.title, ^pattern))
+
+        where(
+          query,
+          [product],
+          ilike(product.title, ^pattern) or ilike(product.category, ^pattern)
+        )
 
       _other, query ->
         query
@@ -382,19 +397,46 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
     StockMovement
     |> tenant_scope()
     |> filter_movements(filters)
-    |> order_by([movement], desc: movement.occurred_at, desc: movement.inserted_at)
+    |> order_by([movement], desc: movement.occurred_at, desc: movement.id)
     |> limit(^Map.get(filters, :limit, 500))
     |> Repo.all()
   end
 
   defp filter_movements(query, filters) do
     Enum.reduce(filters, query, fn
-      {:variant_ids, ids}, query when is_list(ids) -> where(query, [m], m.variant_id in ^ids)
-      {:kinds, kinds}, query when is_list(kinds) -> where(query, [m], m.kind in ^kinds)
-      {:order_id, id}, query when is_binary(id) -> where(query, [m], m.order_id == ^id)
-      {:from, %DateTime{} = at}, query -> where(query, [m], m.occurred_at >= ^at)
-      {:location_ids, ids}, query when is_list(ids) -> where(query, [m], m.location_id in ^ids)
-      _other, query -> query
+      {:variant_ids, ids}, query when is_list(ids) ->
+        where(query, [m], m.variant_id in ^ids)
+
+      {:kinds, kinds}, query when is_list(kinds) ->
+        where(query, [m], m.kind in ^kinds)
+
+      {:order_id, id}, query when is_binary(id) ->
+        where(query, [m], m.order_id == ^id)
+
+      {:from, %DateTime{} = at}, query ->
+        where(query, [m], m.occurred_at >= ^at)
+
+      {:to, %DateTime{} = at}, query ->
+        where(query, [m], m.occurred_at < ^at)
+
+      {:location_ids, ids}, query when is_list(ids) ->
+        where(query, [m], m.location_id in ^ids)
+
+      # Keyset paging: rows strictly after the cursor's (occurred_at, id).
+      {:before, {%DateTime{} = at, id}}, query when is_binary(id) ->
+        where(query, [m], m.occurred_at < ^at or (m.occurred_at == ^at and m.id < ^id))
+
+      {:product_ids, ids}, query when is_list(ids) ->
+        where(
+          query,
+          [m],
+          m.variant_id in subquery(
+            from(variant in Variant, where: variant.product_id in ^ids, select: variant.id)
+          )
+        )
+
+      _other, query ->
+        query
     end)
   end
 
@@ -428,9 +470,11 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
     Repo.transaction(fn ->
       number = next_order_number(context)
 
+      # Drawn under the order-number lock, so a fresh code cannot race.
       order =
         attrs
         |> Map.put(:number, number)
+        |> Map.put(:pickup_code, free_pickup_code())
         |> Order.create_changeset()
         |> Ecto.Changeset.put_change(:organization_id, context.organization_id)
         |> Repo.insert()
@@ -527,9 +571,33 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
       {:number, number}, query when is_integer(number) ->
         where(query, [order], order.number == ^number)
 
+      {:pickup_code, code}, query when is_binary(code) ->
+        where(query, [order], order.pickup_code == ^code)
+
+      {:ready_before, %DateTime{} = at}, query ->
+        where(query, [order], order.ready_at <= ^at)
+
+      {:not_reminded, true}, query ->
+        where(query, [order], is_nil(order.reminded_at))
+
+      # Money kept: paid in full or in part, not refunded in full.
+      {:paid, true}, query ->
+        where(query, [order], order.payment_status in [:paid, :partially_refunded])
+
       _other, query ->
         query
     end)
+  end
+
+  @impl true
+  def order_counts(_context, filters) do
+    Order
+    |> tenant_scope()
+    |> filter_orders(Map.drop(filters, [:statuses, :limit]))
+    |> group_by([order], order.status)
+    |> select([order], {order.status, count(order.id)})
+    |> Repo.all()
+    |> Map.new()
   end
 
   @impl true
@@ -545,6 +613,151 @@ defmodule Palee.Infrastructure.Shop.EctoShopStore do
     |> tenant_scope_join()
     |> Repo.all()
     |> Map.new(fn {id, units} -> {id, to_integer(units)} end)
+  end
+
+  defp free_pickup_code(attempts \\ 8) do
+    code = PickupCode.generate()
+
+    taken? =
+      Order |> tenant_scope() |> where([order], order.pickup_code == ^code) |> Repo.exists?()
+
+    cond do
+      not taken? -> code
+      attempts > 1 -> free_pickup_code(attempts - 1)
+      true -> nil
+    end
+  end
+
+  # ── Stock alerts («Ειδοποίησέ με») ───────────────────────────────────────
+
+  @impl true
+  def subscribe_stock_alert(context, variant_id, user_id) do
+    %StockAlert{}
+    |> StockAlert.changeset(%{variant_id: variant_id, user_id: user_id})
+    |> Ecto.Changeset.put_change(:organization_id, context.organization_id)
+    |> Repo.insert(
+      on_conflict: [set: [notified_at: nil, updated_at: DateTime.utc_now()]],
+      conflict_target: [:variant_id, :user_id],
+      returning: true
+    )
+  end
+
+  @impl true
+  def unsubscribe_stock_alert(_context, variant_id, user_id) do
+    StockAlert
+    |> tenant_scope()
+    |> where([alert], alert.variant_id == ^variant_id and alert.user_id == ^user_id)
+    |> Repo.delete_all()
+
+    :ok
+  end
+
+  @impl true
+  def list_stock_alerts(_context, filters) do
+    StockAlert
+    |> tenant_scope()
+    |> then(fn query ->
+      Enum.reduce(filters, query, fn
+        {:user_id, id}, query when is_binary(id) -> where(query, [a], a.user_id == ^id)
+        {:variant_ids, ids}, query when is_list(ids) -> where(query, [a], a.variant_id in ^ids)
+        {:pending, true}, query -> where(query, [a], is_nil(a.notified_at))
+        _other, query -> query
+      end)
+    end)
+    |> order_by([alert], desc: alert.inserted_at)
+    |> Repo.all()
+  end
+
+  @impl true
+  def mark_stock_alerts_notified(_context, ids, at) do
+    {count, _rows} =
+      StockAlert
+      |> tenant_scope()
+      |> where([alert], alert.id in ^ids and is_nil(alert.notified_at))
+      |> Repo.update_all(set: [notified_at: at, updated_at: at])
+
+    {:ok, count}
+  end
+
+  # ── Promotion codes ──────────────────────────────────────────────────────
+
+  @impl true
+  def get_promotion_code(_context, value, opts) do
+    by = Keyword.get(opts, :by, :code)
+
+    query =
+      case by do
+        :id -> PromotionCode |> tenant_scope() |> where([code], code.id == ^value)
+        :code -> PromotionCode |> tenant_scope() |> where([code], code.code == ^value)
+      end
+
+    query = if Keyword.get(opts, :lock), do: lock(query, "FOR UPDATE"), else: query
+
+    case cast_lookup(by, value) && Repo.one(query) do
+      %PromotionCode{} = code -> code |> List.wrap() |> with_redemptions() |> hd()
+      _missing -> nil
+    end
+  end
+
+  defp cast_lookup(:id, value), do: match?({:ok, _}, Ecto.UUID.cast(value))
+  defp cast_lookup(:code, value), do: is_binary(value)
+
+  @impl true
+  def list_promotion_codes(_context, filters) do
+    PromotionCode
+    |> tenant_scope()
+    |> filter_by(:product_id, filters[:product_id])
+    |> filter_by(:post_id, filters[:post_id])
+    |> then(fn query ->
+      case filters[:ids] do
+        ids when is_list(ids) -> where(query, [code], code.id in ^ids)
+        _all -> query
+      end
+    end)
+    |> order_by([code], desc: code.inserted_at)
+    |> limit(^min(filters[:limit] || 200, 500))
+    |> Repo.all()
+    |> with_redemptions()
+  end
+
+  defp filter_by(query, _field, nil), do: query
+  defp filter_by(query, field, value), do: where(query, [row], field(row, ^field) == ^value)
+
+  @impl true
+  def save_promotion_code(context, nil, attrs) do
+    attrs
+    |> PromotionCode.create_changeset()
+    |> Ecto.Changeset.put_change(:organization_id, context.organization_id)
+    |> Repo.insert()
+    |> loaded_code()
+  end
+
+  def save_promotion_code(_context, id, attrs) do
+    case PromotionCode |> tenant_scope() |> lock("FOR UPDATE") |> Repo.get(id) do
+      nil -> {:error, :not_found}
+      code -> code |> PromotionCode.update_changeset(attrs) |> Repo.update() |> loaded_code()
+    end
+  end
+
+  defp loaded_code({:ok, code}), do: {:ok, code |> List.wrap() |> with_redemptions() |> hd()}
+  defp loaded_code(error), do: error
+
+  defp with_redemptions([]), do: []
+
+  defp with_redemptions(codes) do
+    ids = Enum.map(codes, & &1.id)
+
+    counts =
+      from(order in Order,
+        where: order.promotion_code_id in ^ids and order.status != :cancelled,
+        group_by: order.promotion_code_id,
+        select: {order.promotion_code_id, count(order.id)}
+      )
+      |> tenant_scope_join()
+      |> Repo.all()
+      |> Map.new()
+
+    Enum.map(codes, &%{&1 | redemptions: Map.get(counts, &1.id, 0)})
   end
 
   defp tenant_scope_join(query) do

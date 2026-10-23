@@ -24,6 +24,7 @@ import {
   AreaPicker,
   GeoMessage,
   PlaceOption,
+  PlacesAttribution,
   useAroundError,
   useDevicePosition,
   useNeighbourhoodName,
@@ -405,6 +406,7 @@ function ElsewhereSheet({ onClose }: { onClose: () => void }) {
           ) : null}
         </ul>
         <ErrorLine message={aroundError(resolve.error)} />
+        {trimmed.length >= 2 ? <PlacesAttribution /> : null}
         <label
           className="flex min-h-11 items-center gap-3 text-sm font-semibold"
           style={{ color: "var(--text)" }}

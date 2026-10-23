@@ -1,7 +1,15 @@
-# Self-hosted Photon geocoder (cluster-internal only). Guide: docs/operations/self-hosted-photon.md
-# Namespace-agnostic: apply into the tenant namespace from the gitops repo, e.g.
-#   kustomize: namespace: tenant-m4
-# No Ingress on purpose. The api reaches it at http://photon.<namespace>.svc.cluster.local:2322
+# Self-hosted Photon for Palee (ADR-188): Greece, Cyprus and France (with
+# Monaco), built from the official Photon JSON dumps, cluster-internal only.
+# Apply into the API's namespace from the gitops repo, then set on the API:
+#   PHOTON_BASE_URL=http://photon.<namespace>.svc.cluster.local:2322
+# Places outside these countries still come from the public Photon (capped
+# and cached by the API) and from the GeoNames towns in Postgres.
+#
+# Sizes measured 2026-10-23 (see docs/operations/self-hosted-photon.md):
+#   Greece + Cyprus: 93 MB download, 0.5 GB index, ~0.4 GB RAM serving.
+#   + France/Monaco: +1.6 GB download, index measured in the guide.
+# A rebuild keeps the old index until the new one is ready, so the volume
+# needs about twice the index size.
 ---
 apiVersion: v1
 kind: Service
@@ -9,16 +17,81 @@ metadata:
   name: photon
   labels:
     app.kubernetes.io/name: photon
-    app.kubernetes.io/part-of: palee
 spec:
   type: ClusterIP
   selector:
     app.kubernetes.io/name: photon
-    app.kubernetes.io/part-of: palee
   ports:
     - name: http
       port: 2322
       targetPort: http
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: photon-build
+  labels:
+    app.kubernetes.io/name: photon
+data:
+  # Region dump paths under DUMP_BASE_URL, in country-code order (the dumps
+  # are sorted by country; keep the combined stream sorted too).
+  REGIONS: "europe/cyprus europe/france-monacco europe/greece"
+  DUMP_BASE_URL: "https://download1.graphhopper.com/public"
+  PHOTON_VERSION: "1.3.0"
+  # Name translations kept in the index (and requestable with lang=).
+  LANGUAGES: "el,en,fr,de,it"
+  # The index is rebuilt at pod start when older than this.
+  MAX_AGE_DAYS: "30"
+  build.sh: |
+    #!/bin/sh
+    set -eu
+    DATA=/data
+    MARKER="$DATA/photon_data/.palee-built"
+    WANT="$PHOTON_VERSION $LANGUAGES $REGIONS"
+
+    if [ -f "$MARKER" ] && [ "$(cat "$MARKER")" = "$WANT" ]; then
+      age=$(( $(date +%s) - $(stat -c %Y "$MARKER") ))
+      if [ "$age" -lt $(( MAX_AGE_DAYS * 86400 )) ]; then
+        echo "index is fresh (${age}s old), nothing to build"
+        exit 0
+      fi
+    fi
+
+    apt-get update -qq
+    apt-get install -y -qq --no-install-recommends zstd curl ca-certificates >/dev/null
+
+    jar="$DATA/photon-$PHOTON_VERSION.jar"
+    if [ ! -s "$jar" ]; then
+      curl -fsSL -o "$jar.part" \
+        "https://github.com/komoot/photon/releases/download/$PHOTON_VERSION/photon-$PHOTON_VERSION.jar"
+      mv "$jar.part" "$jar"
+    fi
+    ln -sf "$(basename "$jar")" "$DATA/photon.jar"
+
+    rm -rf "$DATA/next" && mkdir -p "$DATA/next"
+    first=1
+    {
+      for region in $REGIONS; do
+        name=$(basename "$region")
+        url="$DUMP_BASE_URL/$region/photon-dump-$name-1.0-latest.jsonl.zst"
+        echo "downloading $url" >&2
+        if [ "$first" = 1 ]; then
+          curl -fsSL "$url" | zstd -dc
+          first=0
+        else
+          # Later dumps repeat the file header and country list: skip them.
+          curl -fsSL "$url" | zstd -dc | tail -n +3
+        fi
+      done
+    } | java $JAVA_OPTS -jar "$jar" import -import-file - -languages "$LANGUAGES" -data-dir "$DATA/next"
+
+    rm -rf "$DATA/old"
+    [ -d "$DATA/photon_data" ] && mv "$DATA/photon_data" "$DATA/old"
+    mv "$DATA/next/photon_data" "$DATA/photon_data"
+    echo "$WANT" > "$MARKER"
+    rm -rf "$DATA/old" "$DATA/next"
+    chown -R 1000:1000 "$DATA"
+    echo "index built"
 ---
 apiVersion: apps/v1
 kind: StatefulSet
@@ -26,95 +99,164 @@ metadata:
   name: photon
   labels:
     app.kubernetes.io/name: photon
-    app.kubernetes.io/part-of: palee
 spec:
   serviceName: photon
-  replicas: 1                      # one index per PVC; do not scale without a second PVC/index
-  podManagementPolicy: OrderedReady
-  updateStrategy:
-    type: RollingUpdate            # with 1 replica this is stop-then-start (like Recreate)
+  replicas: 1
   selector:
     matchLabels:
       app.kubernetes.io/name: photon
-      app.kubernetes.io/part-of: palee
   template:
     metadata:
       labels:
         app.kubernetes.io/name: photon
-        app.kubernetes.io/part-of: palee
     spec:
-      terminationGracePeriodSeconds: 60
-      enableServiceLinks: false
-      automountServiceAccountToken: false
       securityContext:
-        runAsNonRoot: true
-        runAsUser: 9011            # image's "photon" user; entrypoint skips its root-only chown/gosu path
-        runAsGroup: 9011
-        fsGroup: 9011
-        fsGroupChangePolicy: OnRootMismatch   # avoid a recursive chown of ~100 GB on every start
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
         seccompProfile:
           type: RuntimeDefault
-      containers:
-        - name: photon
-          # rtuszik/photon-docker 2.4.0 bundles Photon 1.3.0 on Temurin 21 JRE (multi-arch index digest).
-          image: docker.io/rtuszik/photon-docker:2.4.0@sha256:21549c60f9e6488fff3217e40429a652c4b445f374800333fe32859e47cec293
-          imagePullPolicy: IfNotPresent
-          ports:
-            - name: http
-              containerPort: 2322
+      initContainers:
+        # Builds (or refreshes) the index; root only for apt and chown.
+        - name: build-index
+          image: eclipse-temurin:21.0.12_8-jre-noble
+          command: ["/bin/sh", "/scripts/build.sh"]
+          envFrom:
+            - configMapRef:
+                name: photon-build
           env:
-            - name: REGION
-              value: planet        # "any country". Smaller: europe, or a country with a prebuilt DB index
-            - name: IMPORT_MODE
-              value: db            # download the prebuilt index (no in-cluster import)
-            - name: BASE_URL       # image default is a community mirror; use the official source
-              value: https://download1.graphhopper.com/public
-            - name: UPDATE_STRATEGY
-              value: PARALLEL      # build the new index beside the old one, swap, no downtime (~2x disk)
-            - name: UPDATE_INTERVAL
-              value: 30d
-            - name: ENABLE_METRICS
-              value: "TRUE"        # Prometheus at /metrics
-            - name: JAVA_PARAMS
-              value: "-Xms12g -Xmx12g"   # heap; the rest of the memory is page cache for the index
-            - name: LOG_LEVEL
-              value: INFO
+            - name: JAVA_OPTS
+              value: "-Xms1g -Xmx3g"
+          securityContext:
+            runAsUser: 0
+            allowPrivilegeEscalation: false
           resources:
             requests:
               cpu: "1"
-              memory: 24Gi
+              memory: 3Gi
             limits:
-              memory: 32Gi
-          securityContext:
-            allowPrivilegeEscalation: false
-            readOnlyRootFilesystem: false   # not verified that the process manager writes only to /photon/data
-            capabilities:
-              drop: ["ALL"]
+              memory: 5Gi
           volumeMounts:
             - name: data
-              mountPath: /photon/data
-          # First start downloads ~63 GB and unpacks it: allow up to 24 h before liveness applies.
+              mountPath: /data
+            - name: scripts
+              mountPath: /scripts
+      containers:
+        - name: photon
+          image: eclipse-temurin:21.0.12_8-jre-noble
+          command:
+            - /bin/sh
+            - -c
+            - exec java $JAVA_OPTS -jar /data/photon.jar serve -data-dir /data -listen-ip 0.0.0.0 -listen-port 2322
+          env:
+            - name: JAVA_OPTS
+              value: "-Xms512m -Xmx1536m"
+          ports:
+            - name: http
+              containerPort: 2322
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
+            runAsNonRoot: true
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests:
+              cpu: 250m
+              memory: 1536Mi
+            limits:
+              memory: 3Gi
           startupProbe:
-            httpGet: {path: /status, port: http}
-            periodSeconds: 60
-            timeoutSeconds: 10
-            failureThreshold: 1440
+            httpGet:
+              path: /status
+              port: http
+            periodSeconds: 10
+            failureThreshold: 60
           readinessProbe:
-            httpGet: {path: "/api?q=berlin&limit=1", port: http}
+            httpGet:
+              path: /api?q=athens&limit=1
+              port: http
             periodSeconds: 30
             timeoutSeconds: 5
-            failureThreshold: 3
           livenessProbe:
-            httpGet: {path: "/api?q=berlin&limit=1", port: http}
+            httpGet:
+              path: /status
+              port: http
             periodSeconds: 60
-            timeoutSeconds: 10
-            failureThreshold: 10   # tolerate the brief restart during an index swap
+            timeoutSeconds: 5
+            failureThreshold: 5
+          volumeMounts:
+            - name: data
+              mountPath: /data
+      volumes:
+        - name: scripts
+          configMap:
+            name: photon-build
+            items:
+              - key: build.sh
+                path: build.sh
   volumeClaimTemplates:
     - metadata:
         name: data
       spec:
         accessModes: ["ReadWriteOnce"]
-        # storageClassName: <fast-ssd-class>   # SSD/NVMe strongly recommended
         resources:
           requests:
-            storage: 320Gi
+            storage: 30Gi
+---
+# Monthly refresh: restarting the pod lets build-index fetch newer dumps
+# (while it rebuilds, the API falls back to the public Photon on its own).
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: photon-refresh
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: photon-refresh
+rules:
+  - apiGroups: [""]
+    resources: ["pods"]
+    resourceNames: ["photon-0"]
+    verbs: ["get", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: photon-refresh
+subjects:
+  - kind: ServiceAccount
+    name: photon-refresh
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: photon-refresh
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: photon-refresh
+spec:
+  schedule: "30 3 2 * *"
+  concurrencyPolicy: Forbid
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        spec:
+          serviceAccountName: photon-refresh
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 65534
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: restart
+              image: alpine/kubectl:1.37.1
+              args: ["delete", "pod", "photon-0", "--wait=false"]
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]

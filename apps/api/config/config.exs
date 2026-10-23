@@ -39,6 +39,7 @@ config :palee, Oban,
        {"23 * * * *", Palee.Workers.CoachingReplyOverdueJob},
        {"41 6 * * *", Palee.Workers.CorporateInvoicingJob},
        {"7 7 * * *", Palee.Workers.InventoryDigestJob},
+       {"11 * * * *", Palee.Workers.ShopOrderSweepJob},
        # ADR-192: shop orders == shop invoice lines == payments - refunds.
        {"25 3 * * *", Palee.Workers.ShopRevenueReconciliationJob},
        {"30 8 * * *", Palee.Workers.SubscriptionExpiryJob},
@@ -57,7 +58,8 @@ config :palee, Oban,
        {"*/15 * * * *", Palee.Workers.DeviceMaintenanceJob},
        {"10 1 * * *", Palee.Workers.SeasonSweepJob},
        {"40 2 * * *", Palee.Workers.NightlyInsightsJob},
-       {"27 * * * *", Palee.Workers.ScalingSuggestionScanJob}
+       {"27 * * * *", Palee.Workers.ScalingSuggestionScanJob},
+       {"47 * * * *", Palee.Workers.WorldGazetteerJob}
      ]}
   ],
   queues: [
@@ -78,7 +80,12 @@ config :palee,
        :workout_icon_suggester,
        Palee.Infrastructure.Ai.GeminiWorkoutIconSuggester
 
-config :palee, :geocoder, Palee.Infrastructure.Facility.PhotonGeocoder
+config :palee, :geocoder, Palee.Infrastructure.Facility.GovernedGeocoder
+
+config :palee, :geocoder_governor,
+  backend: Palee.Infrastructure.Facility.PhotonGeocoder,
+  tiers: [[base_url: "https://photon.komoot.io", max_per_minute: 60]],
+  cache_ttl_s: 86_400
 
 config :palee,
        :map_link_resolver,
@@ -176,6 +183,9 @@ config :palee,
        :referral_store,
        Palee.Infrastructure.Referrals.EctoReferralStore
 
+# ADR-191: partner perks.
+config :palee, :perk_store, Palee.Infrastructure.Perks.EctoPerkStore
+
 # ADR-144: reactions to facts other contexts announce (Palee.DomainEvents).
 config :palee, :domain_event_handlers, %{
   membership_activated: [
@@ -220,6 +230,7 @@ config :palee,
        Palee.Infrastructure.Places.EctoDiscoveryStore
 
 config :palee, :gazetteer_store, Palee.Infrastructure.Places.EctoGazetteerStore
+config :palee, :world_gazetteer_source, Palee.Infrastructure.Places.GeonamesSource
 config :palee, :home_area_store, Palee.Infrastructure.Places.EctoHomeAreaStore
 config :palee, :interests_store, Palee.Infrastructure.Interests.EctoInterestsStore
 
@@ -447,7 +458,16 @@ config :logger, :default_formatter,
     :product_id,
     :variant_id,
     :channel,
-    :amount_cents
+    :amount_cents,
+    # ADR-192 shop revenue reconciliation
+    :event,
+    :error,
+    :day,
+    :currency,
+    :orders_cents,
+    :invoice_lines_cents,
+    :payments_cents,
+    :drift_cents
   ]
 
 # Use Jason for JSON parsing in Phoenix

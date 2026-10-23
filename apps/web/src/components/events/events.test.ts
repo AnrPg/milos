@@ -10,6 +10,7 @@ import {
   eventRequest,
   formFromEvent,
   formProblem,
+  formProblems,
   formatPrice,
   hasEnded,
   isLateCancel,
@@ -220,6 +221,12 @@ describe("the create form", () => {
     expect(formProblem({ ...form, capacity: "0" }, NOW)).toBe("capacity");
     expect(formProblem({ ...form, price: "" }, NOW)).toBe("price");
     expect(formProblem({ ...form, repeatUntil: "2026-10-01" }, NOW)).toBe("repeat");
+  });
+
+  it("lists every problem at once, in the order the fields are asked", () => {
+    expect(formProblems(form, NOW)).toEqual([]);
+    expect(formProblems({ ...form, title: "", capacity: "0", price: "" }, NOW)).toEqual(["title", "capacity", "price"]);
+    expect(formProblems({ ...form, date: "x" }, NOW)).toEqual(["when", "repeat"]);
   });
 
   it("builds the request, with the end from the duration and weekly repeat", () => {

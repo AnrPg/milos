@@ -15,7 +15,11 @@ defmodule Palee.Places.Ports.GazetteerStore do
           radius_m: pos_integer()
         }
 
-  @doc "Places whose search key contains `normalized_query`; cities and prefix matches first."
+  @doc """
+  Places whose search key contains `normalized_query`, or resembles it
+  (typos, trigram word similarity); prefix and word matches first, then
+  bigger places.
+  """
   @callback search(normalized_query :: String.t(), limit :: pos_integer()) :: [place()]
   @callback get_many(ids :: [binary()]) :: [place()]
   @doc "The neighbourhood nearest to a point, within its reach (or a few kilometres)."
@@ -25,4 +29,10 @@ defmodule Palee.Places.Ports.GazetteerStore do
   stored one's names and shape; curated places are never touched.
   """
   @callback import(map()) :: {:ok, place()} | {:error, term()}
+  @doc "Upserts reference places of one source (ADR-188), by slug; returns how many."
+  @callback upsert_many(source :: String.t(), places :: [map()]) :: non_neg_integer()
+  @doc "When a source was last refreshed (its newest row), or nil when it has none."
+  @callback refreshed_at(source :: String.t()) :: DateTime.t() | nil
+  @doc "All places of one source (small sources only: curated, for de-duplication)."
+  @callback list_source(source :: String.t()) :: [place()]
 end

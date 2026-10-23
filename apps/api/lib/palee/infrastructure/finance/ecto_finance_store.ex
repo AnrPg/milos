@@ -5345,7 +5345,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     memberships =
       from(membership in Membership, where: membership.user_id in ^users, select: membership.id)
 
-    shop_location_ids = normalize_uuid_list(location_ids || [])
+    shop_location_ids = normalize_uuid_list(location_ids)
 
     where(
       query,

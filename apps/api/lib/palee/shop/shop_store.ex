@@ -52,6 +52,35 @@ defmodule Palee.Shop.ShopStore do
   @impl true
   def list_orders(context, filters), do: tenant_call(context, :list_orders, [filters])
   @impl true
+  def order_counts(context, filters), do: tenant_call(context, :order_counts, [filters])
+  @impl true
   def units_held(context, user_id, product_ids),
     do: tenant_call(context, :units_held, [user_id, product_ids])
+
+  @impl true
+  def subscribe_stock_alert(context, variant_id, user_id),
+    do: tenant_call(context, :subscribe_stock_alert, [variant_id, user_id])
+
+  @impl true
+  def unsubscribe_stock_alert(context, variant_id, user_id),
+    do: tenant_call(context, :unsubscribe_stock_alert, [variant_id, user_id])
+
+  @impl true
+  def list_stock_alerts(context, filters), do: tenant_call(context, :list_stock_alerts, [filters])
+
+  @impl true
+  def mark_stock_alerts_notified(context, ids, at),
+    do: tenant_call(context, :mark_stock_alerts_notified, [ids, at])
+
+  @impl true
+  def get_promotion_code(context, code, opts \\ []),
+    do: tenant_call(context, :get_promotion_code, [code, opts])
+
+  @impl true
+  def list_promotion_codes(context, filters),
+    do: tenant_call(context, :list_promotion_codes, [filters])
+
+  @impl true
+  def save_promotion_code(context, id, attrs),
+    do: tenant_call(context, :save_promotion_code, [id, attrs])
 end

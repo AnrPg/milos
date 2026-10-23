@@ -23,14 +23,27 @@ defmodule Palee.Application.Shop.Fulfilment do
   alias Palee.{Identity, Organizations, Shop}
 
   @doc "Orders for the staff console (`filters`: states, user_id, location_ids, from)."
-  def list(context, filters \\ %{}) do
-    filters =
-      case Organizations.location_scope(context) do
-        :all -> filters
-        ids -> Map.put(filters, :location_ids, restrict(filters[:location_ids], ids))
-      end
+  def list(context, filters \\ %{}), do: Shop.list_orders(context, scoped(context, filters))
 
-    Shop.list_orders(context, filters)
+  @doc """
+  The console's orders: one page (`limit`, at most 500) of the filter and
+  the count of every status under the same branch, buyer and `paid` filters.
+  """
+  def list_view(context, filters) do
+    filters = scoped(context, filters)
+    counts = Shop.order_counts(context, filters)
+
+    %{
+      orders: Shop.list_orders(context, filters),
+      counts: Map.new(Shop.order_statuses(), &{&1, Map.get(counts, &1, 0)})
+    }
+  end
+
+  defp scoped(context, filters) do
+    case Organizations.location_scope(context) do
+      :all -> filters
+      ids -> Map.put(filters, :location_ids, restrict(filters[:location_ids], ids))
+    end
   end
 
   defp restrict(nil, scope), do: scope
@@ -201,6 +214,17 @@ defmodule Palee.Application.Shop.Fulfilment do
            ) do
       Observability.order(:cancelled, context, order, %{metadata: %{reason: reason}})
       Observability.stock_moved(context, rows)
+
+      # The buyer hears of a cancellation they did not make themselves.
+      if order.user_id && order.user_id != Map.get(context, :user_id) do
+        Shop.notifier().order_cancelled(context, %{
+          user_id: order.user_id,
+          order_id: order.id,
+          order_number: order.number,
+          reason: reason
+        })
+      end
+
       refresh(context, order)
       {:ok, order}
     end
@@ -355,11 +379,61 @@ defmodule Palee.Application.Shop.Fulfilment do
     end)
   end
 
+  @reminder_after_hours 24
+
+  @doc """
+  Reminds buyers of orders ready for pickup for #{@reminder_after_hours}
+  hours or more (once per order, `shop_order_reminder` with the pickup
+  code). Returns the reminded orders.
+  """
+  def send_pickup_reminders(context, now \\ DateTime.utc_now()) do
+    context
+    |> Shop.list_orders(%{
+      statuses: [:ready_for_pickup],
+      ready_before: DateTime.add(now, -@reminder_after_hours * 3_600, :second),
+      not_reminded: true,
+      limit: 500
+    })
+    |> Enum.filter(&is_binary(&1.user_id))
+    |> Enum.flat_map(fn order ->
+      case Shop.update_order(context, order.id, %{reminded_at: now}) do
+        {:ok, reminded} ->
+          Shop.notifier().order_reminder(context, %{
+            user_id: order.user_id,
+            order_id: order.id,
+            order_number: order.number,
+            pickup_code: order.pickup_code,
+            pickup_location_id: order.pickup_location_id
+          })
+
+          [reminded]
+
+        {:error, _reason} ->
+          []
+      end
+    end)
+  end
+
   @doc """
   The member's orders ready for pickup, for the check-in desk («έχει
   παραγγελία έτοιμη · Παράδοση»). Narrowed to the desk's branch when given.
   """
-  def ready_for_member(context, user_id, location_id \\ nil) do
+  def ready_for_member(context, user_id, location_id \\ nil)
+
+  def ready_for_member(context, {:pickup_code, code}, location_id) do
+    case Shop.normalize_pickup_code(code) do
+      code when is_binary(code) and code != "" ->
+        context
+        |> Shop.list_orders(%{pickup_code: code, statuses: [:ready_for_pickup]})
+        |> Enum.filter(&(is_nil(location_id) or &1.pickup_location_id in [nil, location_id]))
+        |> Enum.filter(&(in_scope(context, &1) == :ok))
+
+      _blank ->
+        []
+    end
+  end
+
+  def ready_for_member(context, user_id, location_id) do
     context
     |> Shop.list_orders(%{user_id: user_id, statuses: [:ready_for_pickup]})
     |> Enum.filter(&(is_nil(location_id) or &1.pickup_location_id in [nil, location_id]))

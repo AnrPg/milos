@@ -137,6 +137,7 @@ boundaries are in `prometheus/tests/palee-alerts.test.yml`.
 | `PaleeUploadRejectionsSpike` | > 20 / 15m | Normal users trigger a handful of rejections; more points to a client bug or abuse |
 | `PaleeUploadVerificationFailing` | > 3 missing/unverified / 15m | Usually MinIO, bucket policy or CORS/public-endpoint misconfiguration |
 | `PaleeOtelCollectorDown` / `PaleeTracesNotArriving` | collector down 5m / no traces for 12h | Trace-derived alerts are blind (`OTEL_EXPORTER_OTLP_ENDPOINT` unset?) |
+| `PaleeShopRevenueDrift` (warning) | any drifted day reported by the nightly reconciliation in 26h | Shop orders, shop invoice lines and shop payments minus refunds must agree to the cent (ADR-192); any drift is a bookkeeping bug. 26h covers one nightly run. See `docs/operations/shop-revenue-reconciliation.md` |
 | `AlertmanagerNotificationsFailing`, `PrometheusRuleEvaluationFailing` | sustained failures | The alerting pipeline itself is broken |
 
 `invalid_token` and `unauthenticated` auth anomalies are mostly expired

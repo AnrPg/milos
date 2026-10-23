@@ -22,7 +22,9 @@ defmodule Palee.Organizations.Domain.GoLivePolicy do
     * `:take_payment` - an invoice or a payment for anyone but a mock
       person;
     * `:send_outside` - an email, push or message to anyone outside the
-      business's own staff.
+      business's own staff;
+    * `:publish_perk` - publishing a partner perk to members (ADR-191);
+      drafts stay possible.
 
   Discovery (Γύρω μου, the public box page, referral invites) is gated in
   the SQL lookups themselves, which answer only for active organizations.
@@ -36,7 +38,8 @@ defmodule Palee.Organizations.Domain.GoLivePolicy do
     :publish_profile,
     :take_booking,
     :take_payment,
-    :send_outside
+    :send_outside,
+    :publish_perk
   ]
 
   @type organization :: %{
@@ -52,6 +55,7 @@ defmodule Palee.Organizations.Domain.GoLivePolicy do
           | :take_booking
           | :take_payment
           | :send_outside
+          | :publish_perk
 
   @doc "The gated actions, for the web and for tests."
   @spec actions() :: [action()]

@@ -16,10 +16,13 @@ defmodule Palee.Places.Neighbourhood do
     field :longitude, :float
     field :radius_m, :integer
     field :search_key, :string
-    # ADR-188: "curated" (migrations) or "osm" (picked from the geocoder).
+    # ADR-188: "curated" (migrations), "osm" (picked from the geocoder) or
+    # "geonames" (towns worldwide, refreshed by a job).
     field :source, :string, default: "curated"
     field :context, :string
     field :context_en, :string
+    field :population, :integer
+    field :name_key, :string
 
     timestamps(type: :utc_datetime_usec)
   end
