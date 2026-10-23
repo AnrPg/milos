@@ -63,6 +63,48 @@ defmodule Palee.Community.EventHostingRulesTest do
     end
   end
 
+  describe "co-hosts asked as the event is created (ADR-185)" do
+    test "reads the addresses as invite does and refuses a bad list" do
+      assert {:ok, []} = CohostPolicy.create_slugs(nil)
+      assert {:ok, []} = CohostPolicy.create_slugs([])
+
+      assert {:ok, ["box-kypseli", "other"]} =
+               CohostPolicy.create_slugs([" /b/box-kypseli/ ", "other"])
+
+      assert {:error, :invalid_cohosts} = CohostPolicy.create_slugs("box-kypseli")
+      assert {:error, :invalid_cohosts} = CohostPolicy.create_slugs(["", "ok"])
+      assert {:error, :invalid_cohosts} = CohostPolicy.create_slugs(["two words"])
+      assert {:error, :invalid_cohosts} = CohostPolicy.create_slugs([42])
+      assert {:error, :duplicate_cohost} = CohostPolicy.create_slugs(["a", "b/a"])
+
+      assert {:error, :cohost_limit_reached} =
+               CohostPolicy.create_slugs(Enum.map(1..11, &"box-#{&1}"))
+    end
+
+    test "never the host, never one box twice, within the limit, and not a group's own event" do
+      assert :ok = CohostPolicy.create_check(event(), [], @now)
+      assert :ok = CohostPolicy.create_check(event(), ["a", "b"], @now)
+
+      assert {:error, :cannot_cohost_own_event} =
+               CohostPolicy.create_check(event(), ["a", "host"], @now)
+
+      assert {:error, :duplicate_cohost} = CohostPolicy.create_check(event(), ["a", "a"], @now)
+
+      assert {:error, :cohost_limit_reached} =
+               CohostPolicy.create_check(event(), Enum.map(1..11, &"box-#{&1}"), @now)
+
+      assert {:error, :group_event} =
+               CohostPolicy.create_check(
+                 event(%{audience: "group", channel_id: "g"}),
+                 ["a"],
+                 @now
+               )
+
+      assert {:error, :event_started} =
+               CohostPolicy.create_check(event(), ["a"], ~U[2026-10-24 19:00:00Z])
+    end
+  end
+
   describe "co-hosting" do
     test "the host invites another box to an upcoming event that isn't a group's own" do
       assert :ok = CohostPolicy.invite_check(event(), "box", 0, nil, @now)

@@ -61,9 +61,10 @@ defmodule Palee.Application.StaffCommunityEvents do
     with :ok <- authorize(context, [:manage_events]),
          {:ok, clubs} <- clubs(context),
          %{} = club <- Enum.find(clubs, &(&1.id == params[:club_id])) || {:error, :not_found},
-         {:ok, [first | _] = events} <- CommunityEvents.manage_create(context, club, params),
+         {:ok, [first | _] = events, cohosts} <-
+           CommunityEvents.manage_create(context, club, params),
          {:ok, shown} <- show(context, first.id) do
-      {:ok, %{event: shown, occurrences: length(events)}}
+      {:ok, %{event: shown, occurrences: length(events), cohost_failures: cohosts.failures}}
     end
   end
 
