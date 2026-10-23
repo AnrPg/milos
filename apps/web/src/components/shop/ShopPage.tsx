@@ -240,7 +240,7 @@ function FiltersDialog({ filters, onApply, onClose }: { filters: ShopFilters; on
         <div className="flex w-full gap-2">
           <DialogButton onClick={() => setDraft({ ...NO_FILTERS, category: draft.category })}>{t("clearFilters")}</DialogButton>
           <DialogButton
-            variant="primary"
+            tone="primary"
             onClick={() => {
               onApply(draft);
               onClose();

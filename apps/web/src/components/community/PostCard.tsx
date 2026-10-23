@@ -28,6 +28,7 @@ import { PostMediaView } from "@/components/media/PostMediaView";
 import { EventPostCard, EventSnapshotCard } from "@/components/events/EventPostCard";
 import { formatScore } from "@/components/pantheon/PantheonCard";
 import { SemanticLabel } from "@/components/semantic-label";
+import { ProductPostCard } from "@/components/shop/ProductPostCard";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
@@ -135,6 +136,9 @@ export function PostCard({ post }: { post: CommunityPost }) {
         ) : post.attachment ? (
           <EventSnapshotCard snapshot={post.attachment} />
         ) : null
+      ) : (post.attachment_type as string | null | undefined) === "product" && post.attachment ? (
+        // ADR-190: a product card from «Προώθηση»; TODO(ADR-190): drop the cast once the schema lists `product`.
+        <ProductPostCard snapshot={post.attachment} postId={post.id} organizationSlug={post.club?.organization_slug ?? null} />
       ) : post.attachment_type && post.attachment ? (
         <Attachment type={post.attachment_type} snapshot={post.attachment} />
       ) : null}

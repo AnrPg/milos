@@ -136,7 +136,8 @@ export type ShopQuote = {
 export type ShopOrderCreate = {
   lines: ShopCartItem[];
   pickup_location_id: string | null;
-  payment_mode: Exclude<ShopPaymentMode, "online">;
+  // "online" only once `online_payment.available` (TODO(ADR-190): the provider redirect).
+  payment_mode: ShopPaymentMode;
   promotion_code?: string | null;
   source: ShopOrderSource;
   source_ref_id?: string | null;
