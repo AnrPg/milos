@@ -429,7 +429,21 @@ config :palee, :mail_from, name: "Palee", address: "no-reply@example.com"
 # Configures Elixir's Logger
 config :logger, :default_formatter,
   format: "timestamp=$time level=$level $metadata message=\"$message\"\n",
-  metadata: [:request_id, :user_id, :user_role, :job_id, :oban_job_id]
+  metadata: [
+    :request_id,
+    :user_id,
+    :user_role,
+    :job_id,
+    :oban_job_id,
+    # ADR-190 shop structured logs
+    :organization_id,
+    :shop_event,
+    :order_id,
+    :product_id,
+    :variant_id,
+    :channel,
+    :amount_cents
+  ]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason
