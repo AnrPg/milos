@@ -47,9 +47,14 @@ defmodule Palee.Finance.PromotionCode do
     |> foreign_key_constraint(:promotion_campaign_id)
   end
 
-  defp normalize_code(nil), do: nil
+  @doc """
+  The canonical form of a discount code: trimmed, upper case, runs of other
+  characters folded into `-`. Partner perks (ADR-191) reuse it for their
+  shared and pool codes, so a code reads the same everywhere.
+  """
+  def normalize_code(nil), do: nil
 
-  defp normalize_code(code) do
+  def normalize_code(code) when is_binary(code) do
     code
     |> String.trim()
     |> String.upcase()

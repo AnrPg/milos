@@ -32,6 +32,8 @@ defmodule Palee.Organizations.Domain.AccessPolicy do
     manage_billing: :all,
     manage_promotions: :all,
     view_promotions: :all,
+    # ADR-191: partner perks (create, publish, pause, export claims).
+    manage_perks: :all,
     view_finance_reports: :all,
     manage_finance_settings: :all,
     manage_schedule: :all,
