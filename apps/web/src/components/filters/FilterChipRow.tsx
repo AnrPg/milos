@@ -32,7 +32,7 @@ const chipBase =
   "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full px-3.5 text-sm font-semibold";
 
 /** A chip sharing its line's width with the others (a `fit` row on two lines). */
-const stretched = "min-w-0 flex-1 justify-center";
+const stretched = "min-w-0 flex-auto justify-center";
 
 function chipStyle(active: boolean, strong = false) {
   if (active) {
@@ -188,7 +188,16 @@ export function FilterChipRow({
 }
 
 /** A chip with options: a tap opens a small menu right under it. */
-export function FilterMenuChip({ chip, className = "" }: { chip: Extract<FilterChip, { kind: "menu" }>; className?: string }) {
+export function FilterMenuChip({
+  chip,
+  active,
+  className = "",
+}: {
+  chip: Extract<FilterChip, { kind: "menu" }>;
+  /** Highlighted as a filter in use; by default when something is picked. */
+  active?: boolean;
+  className?: string;
+}) {
   const [anchor, setAnchor] = useState<HTMLElement | null>(null);
   return (
     <>
@@ -201,7 +210,7 @@ export function FilterMenuChip({ chip, className = "" }: { chip: Extract<FilterC
           setAnchor((current) => (current ? null : target));
         }}
         className={`${chipBase} ${className}`}
-        style={chipStyle(chip.selected.length > 0)}
+        style={chipStyle(active ?? chip.selected.length > 0)}
       >
         <span className="truncate">{menuChipLabel(chip)}</span>
         <span aria-hidden="true" className="text-xs" style={{ color: "var(--dim)" }}>

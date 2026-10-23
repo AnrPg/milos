@@ -19,6 +19,7 @@ import {
   CHIP_DISCIPLINES,
   DAY_TIMES,
   DEFAULT_FILTER,
+  DEFAULT_RADIUS_KM,
   KIND_ORDER,
   MAX_NEIGHBOURHOODS,
   PRICE_CAP_CENTS,
@@ -159,6 +160,8 @@ export function RadiusChip() {
   const chip = radiusChip(filter);
   return (
     <FilterMenuChip
+      // The radius always has a value: it reads as a filter in use only when it is not the default.
+      active={filter.radius_km !== DEFAULT_RADIUS_KM}
       chip={{
         key: chip.key,
         kind: "menu",
