@@ -50,7 +50,10 @@ defmodule Palee.Application.DemoData do
   """
   def wipe(context) do
     records = BusinessAccounts.list_demo_records(context)
-    people = for %{source: "users", record_id: id} <- records, do: id
+    recorded = for %{source: "users", record_id: id} <- records, do: id
+    # ADR-184: the mark is authoritative, so a mock person whose record went
+    # missing is still deleted.
+    people = Enum.uniq(recorded ++ Identity.demo_user_ids(context.organization_id))
 
     with :ok <- delete_people(people),
          :ok <- BusinessAccounts.delete_demo_rows(context, records),

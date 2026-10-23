@@ -5,8 +5,7 @@ defmodule Palee.Repo.Migrations.DemoPeopleMarker do
   - `users.demo_organization_id`: the demo business a mock person belongs to,
     set once by the members seeder and never changed (a trigger refuses it),
     so a real person can never become a mock one or the reverse. Existing
-    mock people are backfilled from `demo_records`. Deleting the business
-    deletes its mock people with it.
+    mock people are backfilled from `demo_records`.
   - `palee_demo_user_visible(user, viewer)`: true for every real person, and
     for a mock person only when the viewer is that person or active staff of
     its demo business.
@@ -21,9 +20,13 @@ defmodule Palee.Repo.Migrations.DemoPeopleMarker do
   @staff_roles "ARRAY['owner', 'admin', 'coach', 'front_desk', 'accountant', 'janitor']::varchar[]"
 
   def up do
+    # No foreign key on purpose: `users` outlives tenant data (the clean
+    # slate purge truncates organizations CASCADE and keeps users), and a
+    # deleted business's people are deleted with it by `DeleteOrganization`.
+    # A mark whose business is gone still hides the person: nobody is its
+    # staff any more.
     alter table(:users) do
-      add :demo_organization_id,
-          references(:organizations, type: :binary_id, on_delete: :delete_all)
+      add :demo_organization_id, :binary_id
     end
 
     create index(:users, [:demo_organization_id], where: "demo_organization_id IS NOT NULL")

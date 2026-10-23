@@ -90,6 +90,21 @@ defmodule Palee.Identity.DemoPeoplePrivacyTest do
       end
     end
 
+    test "removing the demo data deletes every marked person, recorded or not", ctx do
+      sql!("DELETE FROM demo_records WHERE source = 'users' AND record_id = $1", [
+        uuid(ctx.mock.id)
+      ])
+
+      ctx.as.(ctx.owner)
+      |> put_req_header("content-type", "application/json")
+      |> delete("/api/org/#{ctx.slug}/admin/business/demo-data")
+      |> json_response(200)
+
+      assert Identity.demo_user_ids(ctx.org_id) == []
+      assert Identity.find_by_id(ctx.mock.id) == nil
+      assert Identity.find_by_id(ctx.owner.id)
+    end
+
     test "mock people stay muted by the mark alone", ctx do
       assert Palee.BusinessAccounts.notification_suppressed?(nil, ctx.mock.id)
       refute Palee.BusinessAccounts.notification_suppressed?(nil, ctx.outsider.id)
