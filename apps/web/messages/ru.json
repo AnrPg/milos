@@ -6810,6 +6810,7 @@
     "placeAddress": "Район вокруг этого адреса",
     "placeAdding": "Добавляем…",
     "worldwideUnavailable": "Поиск по всему миру сейчас недоступен, поэтому показаны только уже известные нам места.",
+    "placesAttribution": "Места: © участники OpenStreetMap, GeoNames (CC BY 4.0)",
     "placeUnknown": "Район",
     "from": "Откуда: {place}",
     "searchingFrom": "Поиск от: {place}",

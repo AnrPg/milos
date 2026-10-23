@@ -48,6 +48,7 @@ config :palee, :image_processor, Palee.FakeImageProcessor
 config :palee, :video_transcoder, Palee.FakeVideoTranscoder
 config :palee, :image_describer, Palee.FakeImageDescriber
 config :palee, :geocoder, Palee.FakeGeocoder
+config :palee, :world_gazetteer_source, Palee.FakeWorldGazetteerSource
 config :palee, :map_link_resolver, Palee.FakeMapLinkResolver
 config :palee, :start_storage_reconciler, false
 config :palee, :rate_limiter, Palee.Infrastructure.Security.MemoryRateLimiter

@@ -13,7 +13,7 @@ import { HeartButton } from "@/components/social/HeartButton";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import { clearNarrowing, foundTotal, isOneOff, thinResults, withWhen, type OriginChoice } from "./around";
-import { AreaPicker, GeoMessage, PlaceOption, useAroundError, useDevicePosition, useNeighbourhoodName } from "./AreaPicker";
+import { AreaPicker, GeoMessage, PlaceOption, PlacesAttribution, useAroundError, useDevicePosition, useNeighbourhoodName } from "./AreaPicker";
 import { AroundChipRow } from "./AroundFilters";
 import { AroundMapPanel } from "./AroundMapPanel";
 import { AroundSections, ThinResultsCard } from "./AroundSections";
@@ -281,6 +281,7 @@ function ElsewhereSheet({ onClose }: { onClose: () => void }) {
           ) : null}
         </ul>
         <ErrorLine message={aroundError(resolve.error)} />
+        {trimmed.length >= 2 ? <PlacesAttribution /> : null}
         <label className="flex min-h-11 items-center gap-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
           <input type="checkbox" checked={weekend} onChange={(event) => setWeekend(event.target.checked)} className="h-5 w-5" />
           {t("thisWeekend")}

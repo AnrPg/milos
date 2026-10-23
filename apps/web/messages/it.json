@@ -6810,6 +6810,7 @@
     "placeAddress": "Zona intorno a questo indirizzo",
     "placeAdding": "Aggiunta in corso…",
     "worldwideUnavailable": "La ricerca mondiale non è disponibile ora, quindi vedi solo i luoghi che conosciamo già.",
+    "placesAttribution": "Luoghi: © collaboratori di OpenStreetMap, GeoNames (CC BY 4.0)",
     "placeUnknown": "Zona",
     "from": "Da: {place}",
     "searchingFrom": "Ricerca da: {place}",

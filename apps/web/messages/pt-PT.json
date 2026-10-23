@@ -6810,6 +6810,7 @@
     "placeAddress": "Zona à volta desta morada",
     "placeAdding": "A adicionar…",
     "worldwideUnavailable": "A pesquisa mundial não está disponível agora, por isso só mostramos locais que já conhecemos.",
+    "placesAttribution": "Locais: © contribuidores do OpenStreetMap, GeoNames (CC BY 4.0)",
     "placeUnknown": "Zona",
     "from": "A partir de: {place}",
     "searchingFrom": "A pesquisar a partir de: {place}",
