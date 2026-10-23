@@ -13,12 +13,12 @@ import { HeartButton } from "@/components/social/HeartButton";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import { clearNarrowing, foundTotal, isOneOff, thinResults, withWhen, type OriginChoice } from "./around";
-import { AreaPicker, GeoMessage, useAroundError, useDevicePosition, useNeighbourhoodName } from "./AreaPicker";
+import { AreaPicker, GeoMessage, PlaceOption, useAroundError, useDevicePosition, useNeighbourhoodName } from "./AreaPicker";
 import { AroundChipRow } from "./AroundFilters";
 import { AroundMapPanel } from "./AroundMapPanel";
 import { AroundSections, ThinResultsCard } from "./AroundSections";
 import { ScopeToggle } from "./ScopeToggle";
-import { needsOrigin, useAround, useAroundArea, useAroundSearch, useNeighbourhoodSearch } from "./use-around";
+import { needsOrigin, useAround, useAroundArea, useAroundSearch, useNeighbourhoodSearch, useResolvePlace } from "./use-around";
 
 /**
  * Αρχική › Γύρω μου (vision §6.2, §7.2; board 9): what is near you by kind,
@@ -219,6 +219,8 @@ function ElsewhereSheet({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("");
   const [weekend, setWeekend] = useState(false);
   const results = useNeighbourhoodSearch(useDebounced(query, 250));
+  const resolve = useResolvePlace();
+  const aroundError = useAroundError();
   const pick = (origin: OriginChoice) => {
     setOrigin(origin);
     if (weekend) setFilter(withWhen(filter, "weekend"));
@@ -251,18 +253,21 @@ function ElsewhereSheet({ onClose }: { onClose: () => void }) {
         />
         <ul aria-live="polite" className="flex flex-col">
           {trimmed.length >= 2
-            ? (results.data ?? []).slice(0, 6).map((place) => (
+            ? (results.data?.places ?? []).slice(0, 6).map((place) => (
                 <li key={place.id}>
                   <button
                     type="button"
-                    onClick={() => pick({ type: "place", neighbourhoodId: place.id, label: name(place) })}
-                    className="flex min-h-11 w-full items-center justify-between rounded-xl px-2 text-left text-sm font-semibold"
+                    disabled={resolve.isPending}
+                    aria-busy={resolve.isPending && resolve.variables?.id === place.id}
+                    onClick={() =>
+                      resolve.mutate(place, {
+                        onSuccess: (stored) => pick({ type: "place", neighbourhoodId: stored.id, label: name(stored) }),
+                      })
+                    }
+                    className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-2 py-1 text-left text-sm disabled:opacity-60"
                     style={{ color: "var(--text)" }}
                   >
-                    {name(place)}
-                    <span className="text-xs font-normal" style={{ color: "var(--dim)" }}>
-                      {place.kind === "city" ? t("placeCity") : t("placeNeighbourhood")}
-                    </span>
+                    <PlaceOption place={place} busy={resolve.isPending && resolve.variables?.id === place.id} />
                   </button>
                 </li>
               ))
@@ -275,6 +280,7 @@ function ElsewhereSheet({ onClose }: { onClose: () => void }) {
             </li>
           ) : null}
         </ul>
+        <ErrorLine message={aroundError(resolve.error)} />
         <label className="flex min-h-11 items-center gap-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
           <input type="checkbox" checked={weekend} onChange={(event) => setWeekend(event.target.checked)} className="h-5 w-5" />
           {t("thisWeekend")}

@@ -40,8 +40,8 @@ import {
 } from "./around";
 import { useMyInterests } from "@/components/interests/InterestsEditor";
 
-import { useAroundError, useNeighbourhoodName } from "./AreaPicker";
-import { useAround, useAroundArea, useNeighbourhoodSearch, useSavedFilterActions } from "./use-around";
+import { PlaceOption, useAroundError, useNeighbourhoodName } from "./AreaPicker";
+import { useAround, useAroundArea, useNeighbourhoodSearch, useResolvePlace, useSavedFilterActions } from "./use-around";
 
 /** «2,5 km» in the reader's numbers. */
 export function useKm() {
@@ -388,6 +388,8 @@ function AroundFilterSheet({
   const [allDisciplines, setAllDisciplines] = useState(false);
   const [placeQuery, setPlaceQuery] = useState("");
   const placeSearch = useNeighbourhoodSearch(useDebounced(placeQuery, 250));
+  const resolvePlace = useResolvePlace();
+  const aroundError = useAroundError();
   const [known, setKnown] = useState<Record<string, Neighbourhood>>({});
   const update = (patch: Partial<AroundFilter>) => setFilter({ ...filter, ...patch });
 
@@ -469,30 +471,37 @@ function AroundFilterSheet({
           className="min-h-11 w-full rounded-2xl px-3 text-sm"
           style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text)" }}
         />
-        {placeQuery.trim().length >= 2 && (placeSearch.data ?? []).length > 0 ? (
+        {placeQuery.trim().length >= 2 && (placeSearch.data?.places ?? []).length > 0 ? (
           <ul aria-live="polite" className="flex flex-col">
-            {(placeSearch.data ?? [])
+            {(placeSearch.data?.places ?? [])
               .filter((place) => !filter.neighbourhood_ids.includes(place.id))
               .slice(0, 6)
               .map((place) => (
                 <li key={place.id}>
                   <button
                     type="button"
-                    disabled={filter.neighbourhood_ids.length >= MAX_NEIGHBOURHOODS}
-                    onClick={() => {
-                      setKnown((current) => ({ ...current, [place.id]: place }));
-                      update({ neighbourhood_ids: [...filter.neighbourhood_ids, place.id] });
-                      setPlaceQuery("");
-                    }}
-                    className="min-h-11 w-full rounded-xl px-2 text-left text-sm font-semibold disabled:opacity-50"
+                    disabled={filter.neighbourhood_ids.length >= MAX_NEIGHBOURHOODS || resolvePlace.isPending}
+                    aria-busy={resolvePlace.isPending && resolvePlace.variables?.id === place.id}
+                    onClick={() =>
+                      resolvePlace.mutate(place, {
+                        onSuccess: (stored) => {
+                          setKnown((current) => ({ ...current, [stored.id]: stored }));
+                          if (!filter.neighbourhood_ids.includes(stored.id))
+                            update({ neighbourhood_ids: [...filter.neighbourhood_ids, stored.id] });
+                          setPlaceQuery("");
+                        },
+                      })
+                    }
+                    className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-2 py-1 text-left text-sm disabled:opacity-50"
                     style={{ color: "var(--text)" }}
                   >
-                    {placeName(place)}
+                    <PlaceOption place={place} busy={resolvePlace.isPending && resolvePlace.variables?.id === place.id} />
                   </button>
                 </li>
               ))}
           </ul>
         ) : null}
+        <ErrorLine message={aroundError(resolvePlace.error)} />
       </FilterSection>
 
       <FilterSection label={t("sectionWhat")}>
