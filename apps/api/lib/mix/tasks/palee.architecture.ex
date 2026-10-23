@@ -112,6 +112,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     wallet/wallet_store
     business_accounts/business_account_store
     perks/perk_store
+    shop/shop_report_store
   )
 
   defp tenant_scope_violations do

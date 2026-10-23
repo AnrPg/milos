@@ -48,14 +48,17 @@ defmodule Palee.Application.GetAdminAnalyticsSummary do
     activity = BranchReport.activity_by_branch(context, since(params))
 
     BranchReport.splits(context, report, fn users, location_id ->
-      finance = Finance.financial_summary(context, Map.put(params, "user_ids", users)).totals
+      finance =
+        Finance.financial_summary(context, BranchReport.split_params(params, users, location_id)).totals
+
       visits = Map.get(activity, location_id, %{check_ins: 0, attended: 0})
 
       %{
         check_ins: visits.check_ins,
         attended: visits.attended,
         active_memberships: finance.active_memberships,
-        paid_revenue_cents: finance.paid_revenue_cents
+        paid_revenue_cents: finance.paid_revenue_cents,
+        revenue_by_stream: finance.revenue_by_stream
       }
     end)
   end
@@ -87,6 +90,7 @@ defmodule Palee.Application.GetAdminAnalyticsSummary do
         active_memberships: get_in(finance, [:totals, :active_memberships]) || 0,
         expiring_memberships: get_in(finance, [:totals, :expiring_memberships]) || 0,
         paid_revenue_cents: get_in(finance, [:totals, :paid_revenue_cents]) || 0,
+        revenue_by_stream: get_in(finance, [:totals, :revenue_by_stream]) || %{},
         credit_balance_cents: get_in(finance, [:totals, :credit_balance_cents]) || 0,
         aggregate_status: finance[:aggregate_status] || "unknown"
       },

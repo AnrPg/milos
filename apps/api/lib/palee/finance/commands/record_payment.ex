@@ -1,5 +1,6 @@
 defmodule Palee.Finance.Commands.RecordPayment do
-  alias Palee.Finance.FinanceStore
+  alias Palee.Finance.{FinanceStore, RevenueTelemetry}
 
-  def call(membership_id, params), do: FinanceStore.record_payment(membership_id, params)
+  def call(membership_id, params),
+    do: membership_id |> FinanceStore.record_payment(params) |> RevenueTelemetry.observe_payment()
 end

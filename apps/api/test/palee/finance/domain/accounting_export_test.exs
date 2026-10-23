@@ -6,8 +6,8 @@ defmodule Palee.Finance.Domain.AccountingExportTest do
   @today ~D[2026-10-12]
 
   describe "column schemas" do
-    test "datasets and their column order are stable (schema version 1)" do
-      assert AccountingExport.schema_version() == 1
+    test "datasets and their column order are stable (schema version 2)" do
+      assert AccountingExport.schema_version() == 2
 
       assert AccountingExport.dataset_names() ==
                ["payments", "allocations", "reversals", "credits", "refund_receipts"]
@@ -15,7 +15,8 @@ defmodule Palee.Finance.Domain.AccountingExportTest do
       assert AccountingExport.csv("payments", []) ==
                "payment_id,paid_on,recorded_at,member_user_id,member_name,membership_id," <>
                  "invoice_id,invoice_number,package_subscription_id,payment_method," <>
-                 "payment_status,currency,amount_cents,reversed_cents,net_amount_cents\r\n"
+                 "payment_status,currency,amount_cents,reversed_cents,net_amount_cents," <>
+                 "revenue_stream,report_stream,source_type,source_id\r\n"
 
       assert AccountingExport.csv("refund_receipts", []) ==
                "receipt_id,receipt_number,sequence,issued_at,reversal_id,payment_id,invoice_id," <>
@@ -48,7 +49,7 @@ defmodule Palee.Finance.Domain.AccountingExportTest do
 
       assert line ==
                "rev-1,2026-10-02,2026-10-02T10:00:00Z,refund,,,,,'-Dash,EUR,1250," <>
-                 "\"'=HYPERLINK(\"\"x\"\"), \"\"quoted\"\"\nnext\",,RFD-000001"
+                 "\"'=HYPERLINK(\"\"x\"\"), \"\"quoted\"\"\nnext\",,RFD-000001,,,,"
     end
 
     test "negative integer amounts are not mistaken for formulas" do
@@ -64,7 +65,7 @@ defmodule Palee.Finance.Domain.AccountingExportTest do
       |> Jason.decode!(objects: :ordered_objects)
 
     assert document["dataset"] == "credits"
-    assert document["schema_version"] == 1
+    assert document["schema_version"] == 2
     [row] = document["rows"]
 
     assert Enum.map(row.values, &elem(&1, 0)) ==
@@ -133,7 +134,7 @@ defmodule Palee.Finance.Domain.AccountingExportTest do
 
     manifest = Jason.decode!(entries["manifest.json"])
     assert manifest["range_start"] == "2026-10-01"
-    assert manifest["schema_version"] == 1
+    assert manifest["schema_version"] == 2
     assert length(manifest["files"]) == 10
   end
 

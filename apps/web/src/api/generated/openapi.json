@@ -60570,6 +60570,231 @@
         ],
         "type": "object"
       },
+      "ShopAttributionReport": {
+        "additionalProperties": false,
+        "properties": {
+          "attributed": {
+            "properties": {
+              "average_order_value_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "gross_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "net_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "orders": {
+                "type": "integer"
+              },
+              "refunded_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gross_cents",
+              "refunded_cents",
+              "net_cents",
+              "orders",
+              "average_order_value_cents"
+            ],
+            "type": "object"
+          },
+          "by_campaign": {
+            "items": {
+              "properties": {
+                "average_order_value_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "campaign_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "gross_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "gross_cents",
+                "refunded_cents",
+                "net_cents",
+                "orders",
+                "average_order_value_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "by_promotion_code": {
+            "items": {
+              "properties": {
+                "average_order_value_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "gross_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "promotion_code": {
+                  "type": "string"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "gross_cents",
+                "refunded_cents",
+                "net_cents",
+                "orders",
+                "average_order_value_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "by_source": {
+            "items": {
+              "properties": {
+                "average_order_value_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "gross_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "source": {
+                  "description": "club_post, promotion_code, desk, public_page or other",
+                  "type": "string"
+                },
+                "source_ref_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "gross_cents",
+                "refunded_cents",
+                "net_cents",
+                "orders",
+                "average_order_value_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "unattributed": {
+            "properties": {
+              "average_order_value_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "gross_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "net_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "orders": {
+                "type": "integer"
+              },
+              "refunded_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gross_cents",
+              "refunded_cents",
+              "net_cents",
+              "orders",
+              "average_order_value_cents"
+            ],
+            "type": "object"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "by_source",
+          "unattributed",
+          "attributed",
+          "by_promotion_code",
+          "by_campaign"
+        ],
+        "title": "ShopAttributionReport",
+        "type": "object"
+      },
       "ShopCartBody": {
         "additionalProperties": false,
         "properties": {
@@ -60762,6 +60987,128 @@
         "title": "ShopCartPreview",
         "type": "object"
       },
+      "ShopChannelsReport": {
+        "additionalProperties": false,
+        "properties": {
+          "by_channel": {
+            "items": {
+              "properties": {
+                "average_order_value_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "channel": {
+                  "description": "online = online order for pickup; pos = desk",
+                  "enum": [
+                    "online",
+                    "pos"
+                  ],
+                  "type": "string"
+                },
+                "gross_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "gross_cents",
+                "refunded_cents",
+                "net_cents",
+                "orders",
+                "average_order_value_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "by_location": {
+            "items": {
+              "properties": {
+                "average_order_value_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "gross_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "net_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "gross_cents",
+                "refunded_cents",
+                "net_cents",
+                "orders",
+                "average_order_value_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "by_channel",
+          "by_location"
+        ],
+        "title": "ShopChannelsReport",
+        "type": "object"
+      },
       "ShopCheckoutBody": {
         "additionalProperties": false,
         "properties": {
@@ -60941,6 +61288,200 @@
           "fiscal_receipt_ref"
         ],
         "title": "ShopFiscalReceiptBody",
+        "type": "object"
+      },
+      "ShopInventoryReport": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "properties": {
+                "available": {
+                  "type": "integer"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "low_stock": {
+                  "type": "boolean"
+                },
+                "low_stock_threshold": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "on_hand": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "integer"
+                },
+                "sell_through_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "sold_units": {
+                  "type": "integer"
+                },
+                "stock_value_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "unit_cost_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "variant_name": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "low_stock": {
+            "items": {
+              "properties": {
+                "available": {
+                  "type": "integer"
+                },
+                "location_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "low_stock": {
+                  "type": "boolean"
+                },
+                "low_stock_threshold": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "on_hand": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reserved": {
+                  "type": "integer"
+                },
+                "sell_through_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "sold_units": {
+                  "type": "integer"
+                },
+                "stock_value_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "unit_cost_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "variant_name": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "totals": {
+            "properties": {
+              "low_stock_count": {
+                "type": "integer"
+              },
+              "on_hand": {
+                "type": "integer"
+              },
+              "reserved": {
+                "type": "integer"
+              },
+              "sell_through_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "sold_units": {
+                "type": "integer"
+              },
+              "stock_value_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "uncosted_variants": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "items",
+          "totals",
+          "low_stock"
+        ],
+        "title": "ShopInventoryReport",
         "type": "object"
       },
       "ShopLedgerMovement": {
@@ -61163,6 +61704,125 @@
           "movements"
         ],
         "title": "ShopLedgerPage",
+        "type": "object"
+      },
+      "ShopMarginReport": {
+        "additionalProperties": false,
+        "properties": {
+          "products": {
+            "items": {
+              "properties": {
+                "cost_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "cost_coverage_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "costed_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "margin_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "margin_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "net_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "uncosted_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "totals": {
+            "properties": {
+              "cost_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "cost_coverage_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "costed_revenue_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "margin_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "margin_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "net_revenue_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "uncosted_revenue_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "totals",
+          "products"
+        ],
+        "title": "ShopMarginReport",
         "type": "object"
       },
       "ShopMemberDiscount": {
@@ -62541,6 +63201,243 @@
         "title": "ShopPaymentMethod",
         "type": "object"
       },
+      "ShopPricingIndicators": {
+        "additionalProperties": false,
+        "properties": {
+          "categories": {
+            "items": {
+              "properties": {
+                "category": {
+                  "type": "string"
+                },
+                "items": {
+                  "type": "integer"
+                },
+                "max_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "median_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "median_velocity_per_week": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "min_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "p25_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "p75_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "target_margin_bp": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "variants": {
+            "items": {
+              "additionalProperties": true,
+              "description": "Per-variant pricing indicators. `suggested_price` is advisory and lists its inputs and reasoning.",
+              "properties": {
+                "band": {
+                  "additionalProperties": true,
+                  "nullable": true,
+                  "type": "object"
+                },
+                "category": {
+                  "type": "string"
+                },
+                "cost_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "days_of_stock_left": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "discount": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "elasticity": {
+                  "additionalProperties": true,
+                  "type": "object"
+                },
+                "margin_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "markup_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "price_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "price_changes": {
+                  "items": {
+                    "additionalProperties": true,
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "sell_through_percent": {
+                  "nullable": true,
+                  "type": "number"
+                },
+                "suggested_price": {
+                  "additionalProperties": true,
+                  "properties": {
+                    "advisory": {
+                      "type": "boolean"
+                    },
+                    "explanation": {
+                      "items": {
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "high_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    },
+                    "inputs": {
+                      "additionalProperties": true,
+                      "type": "object"
+                    },
+                    "low_cents": {
+                      "nullable": true,
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "velocity_per_week": {
+                  "nullable": true,
+                  "type": "number"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          },
+          "window_days": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "window",
+          "variants",
+          "window_days",
+          "categories"
+        ],
+        "title": "ShopPricingIndicators",
+        "type": "object"
+      },
+      "ShopPricingTargetRequest": {
+        "properties": {
+          "category": {
+            "maxLength": 80,
+            "nullable": true,
+            "type": "string"
+          },
+          "target_margin_bp": {
+            "maximum": 9500,
+            "minimum": 0,
+            "nullable": true,
+            "type": "integer"
+          },
+          "target_margin_percent": {
+            "description": "Alternative to basis points, e.g. \"37.5\"",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "title": "ShopPricingTargetRequest",
+        "type": "object"
+      },
+      "ShopPricingTargets": {
+        "properties": {
+          "targets": {
+            "items": {
+              "properties": {
+                "category": {
+                  "description": "null = box-wide default",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "implicit": {
+                  "description": "The built-in default, not yet set",
+                  "type": "boolean"
+                },
+                "target_margin_bp": {
+                  "maximum": 9500,
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "targets"
+        ],
+        "title": "ShopPricingTargets",
+        "type": "object"
+      },
       "ShopProduct": {
         "properties": {
           "all_locations": {
@@ -63724,6 +64621,237 @@
         "title": "ShopProductUpdateBody",
         "type": "object"
       },
+      "ShopProductsReport": {
+        "additionalProperties": false,
+        "properties": {
+          "products_by_revenue": {
+            "items": {
+              "properties": {
+                "net_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_units": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "refunded_units": {
+                  "type": "integer"
+                },
+                "revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "units": {
+                  "type": "integer"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "variant_name": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "products_by_units": {
+            "items": {
+              "properties": {
+                "net_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_units": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "refunded_units": {
+                  "type": "integer"
+                },
+                "revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "units": {
+                  "type": "integer"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "variant_name": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "variants_by_revenue": {
+            "items": {
+              "properties": {
+                "net_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_units": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "refunded_units": {
+                  "type": "integer"
+                },
+                "revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "units": {
+                  "type": "integer"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "variant_name": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "variants_by_units": {
+            "items": {
+              "properties": {
+                "net_revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_units": {
+                  "type": "integer"
+                },
+                "product_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "product_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "refunded_units": {
+                  "type": "integer"
+                },
+                "revenue_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "units": {
+                  "type": "integer"
+                },
+                "variant_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "variant_name": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "products_by_revenue",
+          "products_by_units",
+          "variants_by_revenue",
+          "variants_by_units"
+        ],
+        "title": "ShopProductsReport",
+        "type": "object"
+      },
       "ShopPromoteBody": {
         "additionalProperties": false,
         "properties": {
@@ -63957,6 +65085,338 @@
           "idempotency_key"
         ],
         "title": "ShopRefundBody",
+        "type": "object"
+      },
+      "ShopReportOverview": {
+        "additionalProperties": false,
+        "properties": {
+          "kpis": {
+            "properties": {
+              "average_order_value_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "cost_coverage_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "gross_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "low_stock_count": {
+                "type": "integer"
+              },
+              "margin_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "margin_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "net_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "orders": {
+                "type": "integer"
+              },
+              "refund_rate_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "refunded_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "sell_through_percent": {
+                "nullable": true,
+                "type": "number"
+              },
+              "stock_on_hand": {
+                "type": "integer"
+              },
+              "stock_value_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "units_per_order": {
+                "nullable": true,
+                "type": "number"
+              },
+              "units_sold": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gross_cents",
+              "refunded_cents",
+              "net_cents",
+              "orders",
+              "average_order_value_cents"
+            ],
+            "type": "object"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "kpis"
+        ],
+        "title": "ShopReportOverview",
+        "type": "object"
+      },
+      "ShopRevenueReconciliation": {
+        "properties": {
+          "days": {
+            "items": {
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "day": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "drift_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "invoice_lines_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "lines_vs_payments_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "orders_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders_vs_lines_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "payments_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "drift_cents": {
+            "description": "Integer minor units (cents)",
+            "type": "integer"
+          },
+          "drifted": {
+            "items": {
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "day": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "drift_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "invoice_lines_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "lines_vs_payments_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "ok": {
+                  "type": "boolean"
+                },
+                "orders_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders_vs_lines_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "payments_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "from": {
+            "format": "date",
+            "type": "string"
+          },
+          "ok": {
+            "type": "boolean"
+          },
+          "time_zone": {
+            "type": "string"
+          },
+          "to": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "ok",
+          "days",
+          "drifted",
+          "drift_cents"
+        ],
+        "title": "ShopRevenueReconciliation",
+        "type": "object"
+      },
+      "ShopSalesReport": {
+        "additionalProperties": false,
+        "properties": {
+          "series": {
+            "items": {
+              "properties": {
+                "average_order_value_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "day": {
+                  "format": "date",
+                  "type": "string"
+                },
+                "gross_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "net_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                },
+                "orders": {
+                  "type": "integer"
+                },
+                "refunded_cents": {
+                  "description": "Integer minor units (cents)",
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "gross_cents",
+                "refunded_cents",
+                "net_cents",
+                "orders",
+                "average_order_value_cents"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "totals": {
+            "properties": {
+              "average_order_value_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "gross_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "net_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              },
+              "orders": {
+                "type": "integer"
+              },
+              "refunded_cents": {
+                "description": "Integer minor units (cents)",
+                "type": "integer"
+              }
+            },
+            "required": [
+              "gross_cents",
+              "refunded_cents",
+              "net_cents",
+              "orders",
+              "average_order_value_cents"
+            ],
+            "type": "object"
+          },
+          "window": {
+            "properties": {
+              "from": {
+                "format": "date",
+                "type": "string"
+              },
+              "location_ids": {
+                "items": {
+                  "type": "string"
+                },
+                "nullable": true,
+                "type": "array"
+              },
+              "time_zone": {
+                "description": "The gym's zone the days follow",
+                "type": "string"
+              },
+              "to": {
+                "format": "date",
+                "type": "string"
+              }
+            },
+            "required": [
+              "from",
+              "to",
+              "time_zone"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "window",
+          "totals",
+          "series"
+        ],
+        "title": "ShopSalesReport",
         "type": "object"
       },
       "ShopStockAlert": {
@@ -171461,6 +172921,2157 @@
         "summary": "Confirm the gym's time zone, or report a guess from this device",
         "tags": [
           "Admin Settings"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/pricing-targets": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.pricing_targets",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "targets": {
+                      "items": {
+                        "properties": {
+                          "category": {
+                            "description": "null = box-wide default",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "implicit": {
+                            "description": "The built-in default, not yet set",
+                            "type": "boolean"
+                          },
+                          "target_margin_bp": {
+                            "maximum": 9500,
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "targets"
+                  ],
+                  "title": "ShopPricingTargets",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Pricing targets"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Target margin per product category (cost-plus input)",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.put_pricing_target",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "category": {
+                    "maxLength": 80,
+                    "nullable": true,
+                    "type": "string"
+                  },
+                  "target_margin_bp": {
+                    "maximum": 9500,
+                    "minimum": 0,
+                    "nullable": true,
+                    "type": "integer"
+                  },
+                  "target_margin_percent": {
+                    "description": "Alternative to basis points, e.g. \"37.5\"",
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "title": "ShopPricingTargetRequest",
+                "type": "object"
+              }
+            }
+          },
+          "description": "Pricing target",
+          "required": false
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "targets": {
+                      "items": {
+                        "properties": {
+                          "category": {
+                            "description": "null = box-wide default",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "implicit": {
+                            "description": "The built-in default, not yet set",
+                            "type": "boolean"
+                          },
+                          "target_margin_bp": {
+                            "maximum": 9500,
+                            "minimum": 0,
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "targets"
+                  ],
+                  "title": "ShopPricingTargets",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Pricing targets"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Set or clear the target margin of a category (or the default)",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/attribution": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.attribution",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attributed": {
+                      "properties": {
+                        "average_order_value_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "gross_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "net_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "orders": {
+                          "type": "integer"
+                        },
+                        "refunded_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "gross_cents",
+                        "refunded_cents",
+                        "net_cents",
+                        "orders",
+                        "average_order_value_cents"
+                      ],
+                      "type": "object"
+                    },
+                    "by_campaign": {
+                      "items": {
+                        "properties": {
+                          "average_order_value_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "campaign_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "gross_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "gross_cents",
+                          "refunded_cents",
+                          "net_cents",
+                          "orders",
+                          "average_order_value_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "by_promotion_code": {
+                      "items": {
+                        "properties": {
+                          "average_order_value_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "gross_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "promotion_code": {
+                            "type": "string"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "gross_cents",
+                          "refunded_cents",
+                          "net_cents",
+                          "orders",
+                          "average_order_value_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "by_source": {
+                      "items": {
+                        "properties": {
+                          "average_order_value_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "gross_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "source": {
+                            "description": "club_post, promotion_code, desk, public_page or other",
+                            "type": "string"
+                          },
+                          "source_ref_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "gross_cents",
+                          "refunded_cents",
+                          "net_cents",
+                          "orders",
+                          "average_order_value_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "unattributed": {
+                      "properties": {
+                        "average_order_value_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "gross_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "net_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "orders": {
+                          "type": "integer"
+                        },
+                        "refunded_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "gross_cents",
+                        "refunded_cents",
+                        "net_cents",
+                        "orders",
+                        "average_order_value_cents"
+                      ],
+                      "type": "object"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "by_source",
+                    "unattributed",
+                    "attributed",
+                    "by_promotion_code",
+                    "by_campaign"
+                  ],
+                  "title": "ShopAttributionReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Attribution"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Shop sales by promotion code, campaign and source (feed post, public page...)",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/channels": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.channels",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "by_channel": {
+                      "items": {
+                        "properties": {
+                          "average_order_value_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "channel": {
+                            "description": "online = online order for pickup; pos = desk",
+                            "enum": [
+                              "online",
+                              "pos"
+                            ],
+                            "type": "string"
+                          },
+                          "gross_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "gross_cents",
+                          "refunded_cents",
+                          "net_cents",
+                          "orders",
+                          "average_order_value_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "by_location": {
+                      "items": {
+                        "properties": {
+                          "average_order_value_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "gross_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "net_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "gross_cents",
+                          "refunded_cents",
+                          "net_cents",
+                          "orders",
+                          "average_order_value_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "by_channel",
+                    "by_location"
+                  ],
+                  "title": "ShopChannelsReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Channels"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Shop sales by channel (online pickup or desk) and by branch",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/inventory": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.inventory",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "items": {
+                      "items": {
+                        "properties": {
+                          "available": {
+                            "type": "integer"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "low_stock": {
+                            "type": "boolean"
+                          },
+                          "low_stock_threshold": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "on_hand": {
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reserved": {
+                            "type": "integer"
+                          },
+                          "sell_through_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "sold_units": {
+                            "type": "integer"
+                          },
+                          "stock_value_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "unit_cost_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "variant_name": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "low_stock": {
+                      "items": {
+                        "properties": {
+                          "available": {
+                            "type": "integer"
+                          },
+                          "location_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "low_stock": {
+                            "type": "boolean"
+                          },
+                          "low_stock_threshold": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "on_hand": {
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "reserved": {
+                            "type": "integer"
+                          },
+                          "sell_through_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "sold_units": {
+                            "type": "integer"
+                          },
+                          "stock_value_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "unit_cost_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "variant_name": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "totals": {
+                      "properties": {
+                        "low_stock_count": {
+                          "type": "integer"
+                        },
+                        "on_hand": {
+                          "type": "integer"
+                        },
+                        "reserved": {
+                          "type": "integer"
+                        },
+                        "sell_through_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "sold_units": {
+                          "type": "integer"
+                        },
+                        "stock_value_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "uncosted_variants": {
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "items",
+                    "totals",
+                    "low_stock"
+                  ],
+                  "title": "ShopInventoryReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Inventory"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Stock on hand, stock value, low stock and sell-through",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/margin": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.margin",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "products": {
+                      "items": {
+                        "properties": {
+                          "cost_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "cost_coverage_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "costed_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "margin_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "margin_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "net_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "uncosted_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "totals": {
+                      "properties": {
+                        "cost_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "cost_coverage_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "costed_revenue_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "margin_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "margin_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "net_revenue_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "uncosted_revenue_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        }
+                      },
+                      "type": "object"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "totals",
+                    "products"
+                  ],
+                  "title": "ShopMarginReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Margin"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Shop revenue, cost and margin where the cost price is known",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/overview": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.overview",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "kpis": {
+                      "properties": {
+                        "average_order_value_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "cost_coverage_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "gross_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "low_stock_count": {
+                          "type": "integer"
+                        },
+                        "margin_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "margin_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "net_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "orders": {
+                          "type": "integer"
+                        },
+                        "refund_rate_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "refunded_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "sell_through_percent": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "stock_on_hand": {
+                          "type": "integer"
+                        },
+                        "stock_value_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "units_per_order": {
+                          "nullable": true,
+                          "type": "number"
+                        },
+                        "units_sold": {
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "gross_cents",
+                        "refunded_cents",
+                        "net_cents",
+                        "orders",
+                        "average_order_value_cents"
+                      ],
+                      "type": "object"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "kpis"
+                  ],
+                  "title": "ShopReportOverview",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Shop KPIs"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Shop KPIs: net sales, orders, AOV, units, refunds, margin and stock",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/pricing": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.pricing",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "categories": {
+                      "items": {
+                        "properties": {
+                          "category": {
+                            "type": "string"
+                          },
+                          "items": {
+                            "type": "integer"
+                          },
+                          "max_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "median_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "median_velocity_per_week": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "min_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "p25_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "p75_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "target_margin_bp": {
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "variants": {
+                      "items": {
+                        "additionalProperties": true,
+                        "description": "Per-variant pricing indicators. `suggested_price` is advisory and lists its inputs and reasoning.",
+                        "properties": {
+                          "band": {
+                            "additionalProperties": true,
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "category": {
+                            "type": "string"
+                          },
+                          "cost_cents": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "days_of_stock_left": {
+                            "nullable": true,
+                            "type": "integer"
+                          },
+                          "discount": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "elasticity": {
+                            "additionalProperties": true,
+                            "type": "object"
+                          },
+                          "margin_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "markup_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "price_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "price_changes": {
+                            "items": {
+                              "additionalProperties": true,
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "sell_through_percent": {
+                            "nullable": true,
+                            "type": "number"
+                          },
+                          "suggested_price": {
+                            "additionalProperties": true,
+                            "properties": {
+                              "advisory": {
+                                "type": "boolean"
+                              },
+                              "explanation": {
+                                "items": {
+                                  "type": "string"
+                                },
+                                "type": "array"
+                              },
+                              "high_cents": {
+                                "nullable": true,
+                                "type": "integer"
+                              },
+                              "inputs": {
+                                "additionalProperties": true,
+                                "type": "object"
+                              },
+                              "low_cents": {
+                                "nullable": true,
+                                "type": "integer"
+                              }
+                            },
+                            "type": "object"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "velocity_per_week": {
+                            "nullable": true,
+                            "type": "number"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    },
+                    "window_days": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "variants",
+                    "window_days",
+                    "categories"
+                  ],
+                  "title": "ShopPricingIndicators",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Pricing indicators"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Advisory pricing indicators per variant (default window 90 days)",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/products": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.products",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          },
+          {
+            "description": "Rows per ranking (default 10)",
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 50,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "products_by_revenue": {
+                      "items": {
+                        "properties": {
+                          "net_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_units": {
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "refunded_units": {
+                            "type": "integer"
+                          },
+                          "revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "units": {
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "variant_name": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "products_by_units": {
+                      "items": {
+                        "properties": {
+                          "net_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_units": {
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "refunded_units": {
+                            "type": "integer"
+                          },
+                          "revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "units": {
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "variant_name": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "variants_by_revenue": {
+                      "items": {
+                        "properties": {
+                          "net_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_units": {
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "refunded_units": {
+                            "type": "integer"
+                          },
+                          "revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "units": {
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "variant_name": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "variants_by_units": {
+                      "items": {
+                        "properties": {
+                          "net_revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_units": {
+                            "type": "integer"
+                          },
+                          "product_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "product_name": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "refunded_units": {
+                            "type": "integer"
+                          },
+                          "revenue_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "units": {
+                            "type": "integer"
+                          },
+                          "variant_id": {
+                            "format": "uuid",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "variant_name": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "products_by_revenue",
+                    "products_by_units",
+                    "variants_by_revenue",
+                    "variants_by_units"
+                  ],
+                  "title": "ShopProductsReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Top products"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Top shop products and variants by revenue and by units",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/reconciliation": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.reconciliation",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "days": {
+                      "items": {
+                        "properties": {
+                          "currency": {
+                            "type": "string"
+                          },
+                          "day": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "drift_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "invoice_lines_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "lines_vs_payments_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "ok": {
+                            "type": "boolean"
+                          },
+                          "orders_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders_vs_lines_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "payments_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "drift_cents": {
+                      "description": "Integer minor units (cents)",
+                      "type": "integer"
+                    },
+                    "drifted": {
+                      "items": {
+                        "properties": {
+                          "currency": {
+                            "type": "string"
+                          },
+                          "day": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "drift_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "invoice_lines_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "lines_vs_payments_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "ok": {
+                            "type": "boolean"
+                          },
+                          "orders_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders_vs_lines_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "payments_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "from": {
+                      "format": "date",
+                      "type": "string"
+                    },
+                    "ok": {
+                      "type": "boolean"
+                    },
+                    "time_zone": {
+                      "type": "string"
+                    },
+                    "to": {
+                      "format": "date",
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "ok",
+                    "days",
+                    "drifted",
+                    "drift_cents"
+                  ],
+                  "title": "ShopRevenueReconciliation",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reconciliation"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Shop revenue reconciliation: orders == shop invoice lines == payments - refunds",
+        "tags": [
+          "Admin Shop Reports"
+        ]
+      }
+    },
+    "/api/org/{organization_slug}/admin/shop/reports/sales": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.AdminShopReportController.sales",
+        "parameters": [
+          {
+            "description": "Gym-local days ending today (default 30; pricing 90)",
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "maximum": 366,
+              "minimum": 1,
+              "type": "integer"
+            }
+          },
+          {
+            "description": "First gym-local day (with `to`), ISO 8601",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Last gym-local day (with `from`), ISO 8601",
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "format": "date",
+              "type": "string"
+            }
+          },
+          {
+            "description": "ADR-186: comma-separated branch ids to filter by",
+            "in": "query",
+            "name": "location_ids",
+            "required": false,
+            "schema": {
+              "maxLength": 7400,
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "series": {
+                      "items": {
+                        "properties": {
+                          "average_order_value_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "day": {
+                            "format": "date",
+                            "type": "string"
+                          },
+                          "gross_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "net_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          },
+                          "orders": {
+                            "type": "integer"
+                          },
+                          "refunded_cents": {
+                            "description": "Integer minor units (cents)",
+                            "type": "integer"
+                          }
+                        },
+                        "required": [
+                          "gross_cents",
+                          "refunded_cents",
+                          "net_cents",
+                          "orders",
+                          "average_order_value_cents"
+                        ],
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "totals": {
+                      "properties": {
+                        "average_order_value_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "gross_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "net_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        },
+                        "orders": {
+                          "type": "integer"
+                        },
+                        "refunded_cents": {
+                          "description": "Integer minor units (cents)",
+                          "type": "integer"
+                        }
+                      },
+                      "required": [
+                        "gross_cents",
+                        "refunded_cents",
+                        "net_cents",
+                        "orders",
+                        "average_order_value_cents"
+                      ],
+                      "type": "object"
+                    },
+                    "window": {
+                      "properties": {
+                        "from": {
+                          "format": "date",
+                          "type": "string"
+                        },
+                        "location_ids": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "nullable": true,
+                          "type": "array"
+                        },
+                        "time_zone": {
+                          "description": "The gym's zone the days follow",
+                          "type": "string"
+                        },
+                        "to": {
+                          "format": "date",
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "from",
+                        "to",
+                        "time_zone"
+                      ],
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "window",
+                    "totals",
+                    "series"
+                  ],
+                  "title": "ShopSalesReport",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Shop sales"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Shop sales per gym-local day: gross, refunds, net, orders and AOV",
+        "tags": [
+          "Admin Shop Reports"
         ]
       }
     },

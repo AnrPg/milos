@@ -92,6 +92,14 @@ defmodule Palee.Application.BranchReport do
     do: params |> Map.put("user_ids", users) |> Map.put("location_ids", ids)
 
   @doc """
+  Params for one branch's split row: its people and the branch itself, so
+  facts that carry a branch (shop orders, ADR-192) follow the branch while
+  the rest follow the people.
+  """
+  def split_params(params, users, location_id),
+    do: params |> Map.put("user_ids", users) |> Map.put("location_ids", [location_id])
+
+  @doc """
   One row per branch shown (the filter, or every branch the person sees) when
   there are at least two, with what `metrics` computes for its people:
   `metrics.(user_ids, location_id)` returns a map merged into the row.

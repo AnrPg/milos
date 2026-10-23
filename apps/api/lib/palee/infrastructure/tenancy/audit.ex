@@ -48,6 +48,7 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
     inventory_supply_reports
     shop_products shop_variants shop_stock_movements shop_stock_levels
     shop_orders shop_order_lines shop_promotion_codes shop_stock_alerts
+    shop_variant_price_changes shop_pricing_targets
     review_questionnaires reviews review_answers
     messaging_threads
     messaging_participants messaging_messages seasonal_challenges

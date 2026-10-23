@@ -6907,6 +6907,177 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/shop/pricing-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Target margin per product category (cost-plus input) */
+        get: operations["PaleeWeb.AdminShopReportController.pricing_targets"];
+        /** Set or clear the target margin of a category (or the default) */
+        put: operations["PaleeWeb.AdminShopReportController.put_pricing_target"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/attribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales by promotion code, campaign and source (feed post, public page...) */
+        get: operations["PaleeWeb.AdminShopReportController.attribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales by channel (online pickup or desk) and by branch */
+        get: operations["PaleeWeb.AdminShopReportController.channels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stock on hand, stock value, low stock and sell-through */
+        get: operations["PaleeWeb.AdminShopReportController.inventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/margin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop revenue, cost and margin where the cost price is known */
+        get: operations["PaleeWeb.AdminShopReportController.margin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop KPIs: net sales, orders, AOV, units, refunds, margin and stock */
+        get: operations["PaleeWeb.AdminShopReportController.overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Advisory pricing indicators per variant (default window 90 days) */
+        get: operations["PaleeWeb.AdminShopReportController.pricing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Top shop products and variants by revenue and by units */
+        get: operations["PaleeWeb.AdminShopReportController.products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop revenue reconciliation: orders == shop invoice lines == payments - refunds */
+        get: operations["PaleeWeb.AdminShopReportController.reconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales per gym-local day: gross, refunds, net, orders and AOV */
+        get: operations["PaleeWeb.AdminShopReportController.sales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/trial-policy": {
         parameters: {
             query?: never;
@@ -31055,6 +31226,80 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** ShopAttributionReport */
+        ShopAttributionReport: {
+            attributed: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            by_campaign: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** Format: uuid */
+                campaign_id?: string | null;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_promotion_code: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                promotion_code?: string;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_source: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+                /** @description club_post, promotion_code, desk, public_page or other */
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+            }[];
+            unattributed: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
         /** ShopCartBody */
         ShopCartBody: {
             lines: {
@@ -31116,6 +31361,47 @@ export interface components {
             subtotal_cents?: number;
             total_cents: number;
         };
+        /** ShopChannelsReport */
+        ShopChannelsReport: {
+            by_channel: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /**
+                 * @description online = online order for pickup; pos = desk
+                 * @enum {string}
+                 */
+                channel?: "online" | "pos";
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_location: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
         /** ShopCheckoutBody */
         ShopCheckoutBody: {
             idempotency_key: string;
@@ -31159,6 +31445,66 @@ export interface components {
         /** ShopFiscalReceiptBody */
         ShopFiscalReceiptBody: {
             fiscal_receipt_ref: string | null;
+        };
+        /** ShopInventoryReport */
+        ShopInventoryReport: {
+            items: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock?: boolean;
+                low_stock_threshold?: number | null;
+                on_hand?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                stock_value_cents?: number | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            low_stock: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock?: boolean;
+                low_stock_threshold?: number | null;
+                on_hand?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                stock_value_cents?: number | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            totals: {
+                low_stock_count?: number;
+                on_hand?: number;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                /** @description Integer minor units (cents) */
+                stock_value_cents?: number;
+                uncosted_variants?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
         };
         /** ShopLedgerMovement */
         ShopLedgerMovement: {
@@ -31226,6 +31572,49 @@ export interface components {
                 variant_title?: string | null;
             }[];
             next_cursor?: string | null;
+        };
+        /** ShopMarginReport */
+        ShopMarginReport: {
+            products: {
+                /** @description Integer minor units (cents) */
+                cost_cents?: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                costed_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                uncosted_revenue_cents?: number;
+            }[];
+            totals: {
+                /** @description Integer minor units (cents) */
+                cost_cents?: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                costed_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                uncosted_revenue_cents?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
         };
         /**
          * ShopMemberDiscount
@@ -31642,6 +32031,92 @@ export interface components {
             provider?: string | null;
             reason?: string | null;
         };
+        /** ShopPricingIndicators */
+        ShopPricingIndicators: {
+            categories: {
+                category?: string;
+                items?: number;
+                /** @description Integer minor units (cents) */
+                max_cents?: number;
+                /** @description Integer minor units (cents) */
+                median_cents?: number;
+                median_velocity_per_week?: number | null;
+                /** @description Integer minor units (cents) */
+                min_cents?: number;
+                /** @description Integer minor units (cents) */
+                p25_cents?: number;
+                /** @description Integer minor units (cents) */
+                p75_cents?: number;
+                target_margin_bp?: number;
+            }[];
+            variants: ({
+                band?: {
+                    [key: string]: unknown;
+                } | null;
+                category?: string;
+                cost_cents?: number | null;
+                days_of_stock_left?: number | null;
+                discount?: {
+                    [key: string]: unknown;
+                };
+                elasticity?: {
+                    [key: string]: unknown;
+                };
+                margin_percent?: number | null;
+                markup_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                price_cents?: number;
+                price_changes?: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                product_id?: string | null;
+                sell_through_percent?: number | null;
+                suggested_price?: {
+                    advisory?: boolean;
+                    explanation?: string[];
+                    high_cents?: number | null;
+                    inputs?: {
+                        [key: string]: unknown;
+                    };
+                    low_cents?: number | null;
+                } & {
+                    [key: string]: unknown;
+                };
+                /** Format: uuid */
+                variant_id?: string | null;
+                velocity_per_week?: number | null;
+            } & {
+                [key: string]: unknown;
+            })[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+            window_days: number;
+        };
+        /** ShopPricingTargetRequest */
+        ShopPricingTargetRequest: {
+            category?: string | null;
+            target_margin_bp?: number | null;
+            /** @description Alternative to basis points, e.g. "37.5" */
+            target_margin_percent?: string | null;
+        };
+        /** ShopPricingTargets */
+        ShopPricingTargets: {
+            targets: {
+                /** @description null = box-wide default */
+                category?: string | null;
+                /** @description The built-in default, not yet set */
+                implicit?: boolean;
+                target_margin_bp?: number;
+            }[];
+        };
         /** ShopProduct */
         ShopProduct: {
             all_locations?: boolean;
@@ -31953,6 +32428,86 @@ export interface components {
             /** @enum {string} */
             visibility?: "members_only" | "anyone";
         };
+        /** ShopProductsReport */
+        ShopProductsReport: {
+            products_by_revenue: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            products_by_units: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            variants_by_revenue: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            variants_by_units: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
         /** ShopPromoteBody */
         ShopPromoteBody: {
             body?: string | null;
@@ -32031,6 +32586,124 @@ export interface components {
                 restock?: boolean;
             }[];
             reason?: string | null;
+        };
+        /** ShopReportOverview */
+        ShopReportOverview: {
+            kpis: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                low_stock_count?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                refund_rate_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+                sell_through_percent?: number | null;
+                stock_on_hand?: number;
+                /** @description Integer minor units (cents) */
+                stock_value_cents?: number;
+                units_per_order?: number | null;
+                units_sold?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopRevenueReconciliation */
+        ShopRevenueReconciliation: {
+            days: {
+                currency?: string;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                drift_cents?: number;
+                /** @description Integer minor units (cents) */
+                invoice_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                lines_vs_payments_cents?: number;
+                ok?: boolean;
+                /** @description Integer minor units (cents) */
+                orders_cents?: number;
+                /** @description Integer minor units (cents) */
+                orders_vs_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                payments_cents?: number;
+            }[];
+            /** @description Integer minor units (cents) */
+            drift_cents: number;
+            drifted: {
+                currency?: string;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                drift_cents?: number;
+                /** @description Integer minor units (cents) */
+                invoice_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                lines_vs_payments_cents?: number;
+                ok?: boolean;
+                /** @description Integer minor units (cents) */
+                orders_cents?: number;
+                /** @description Integer minor units (cents) */
+                orders_vs_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                payments_cents?: number;
+            }[];
+            /** Format: date */
+            from?: string;
+            ok: boolean;
+            time_zone?: string;
+            /** Format: date */
+            to?: string;
+        };
+        /** ShopSalesReport */
+        ShopSalesReport: {
+            series: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            totals: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
         };
         /** ShopStockAlert */
         ShopStockAlert: {
@@ -71883,6 +72556,800 @@ export interface operations {
                             /** @enum {string|null} */
                             source: "confirmed" | "inferred" | null;
                             timezone: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.pricing_targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pricing targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        targets: {
+                            /** @description null = box-wide default */
+                            category?: string | null;
+                            /** @description The built-in default, not yet set */
+                            implicit?: boolean;
+                            target_margin_bp?: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.put_pricing_target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Pricing target */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    category?: string | null;
+                    target_margin_bp?: number | null;
+                    /** @description Alternative to basis points, e.g. "37.5" */
+                    target_margin_percent?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Pricing targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        targets: {
+                            /** @description null = box-wide default */
+                            category?: string | null;
+                            /** @description The built-in default, not yet set */
+                            implicit?: boolean;
+                            target_margin_bp?: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.attribution": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attribution */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attributed: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        by_campaign: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** Format: uuid */
+                            campaign_id?: string | null;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_promotion_code: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            promotion_code?: string;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_source: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                            /** @description club_post, promotion_code, desk, public_page or other */
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                        }[];
+                        unattributed: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.channels": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channels */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        by_channel: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /**
+                             * @description online = online order for pickup; pos = desk
+                             * @enum {string}
+                             */
+                            channel?: "online" | "pos";
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_location: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.inventory": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            low_stock?: boolean;
+                            low_stock_threshold?: number | null;
+                            on_hand?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            stock_value_cents?: number | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        low_stock: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            low_stock?: boolean;
+                            low_stock_threshold?: number | null;
+                            on_hand?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            stock_value_cents?: number | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        totals: {
+                            low_stock_count?: number;
+                            on_hand?: number;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            /** @description Integer minor units (cents) */
+                            stock_value_cents?: number;
+                            uncosted_variants?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.margin": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Margin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            /** @description Integer minor units (cents) */
+                            cost_cents?: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            costed_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            uncosted_revenue_cents?: number;
+                        }[];
+                        totals: {
+                            /** @description Integer minor units (cents) */
+                            cost_cents?: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            costed_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            uncosted_revenue_cents?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.overview": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop KPIs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        kpis: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            low_stock_count?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            refund_rate_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                            sell_through_percent?: number | null;
+                            stock_on_hand?: number;
+                            /** @description Integer minor units (cents) */
+                            stock_value_cents?: number;
+                            units_per_order?: number | null;
+                            units_sold?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.pricing": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pricing indicators */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories: {
+                            category?: string;
+                            items?: number;
+                            /** @description Integer minor units (cents) */
+                            max_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            median_cents?: number;
+                            median_velocity_per_week?: number | null;
+                            /** @description Integer minor units (cents) */
+                            min_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            p25_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            p75_cents?: number;
+                            target_margin_bp?: number;
+                        }[];
+                        variants: ({
+                            band?: {
+                                [key: string]: unknown;
+                            } | null;
+                            category?: string;
+                            cost_cents?: number | null;
+                            days_of_stock_left?: number | null;
+                            discount?: {
+                                [key: string]: unknown;
+                            };
+                            elasticity?: {
+                                [key: string]: unknown;
+                            };
+                            margin_percent?: number | null;
+                            markup_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            price_cents?: number;
+                            price_changes?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            sell_through_percent?: number | null;
+                            suggested_price?: {
+                                advisory?: boolean;
+                                explanation?: string[];
+                                high_cents?: number | null;
+                                inputs?: {
+                                    [key: string]: unknown;
+                                };
+                                low_cents?: number | null;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            velocity_per_week?: number | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                        window_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.products": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+                /** @description Rows per ranking (default 10) */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Top products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products_by_revenue: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        products_by_units: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        variants_by_revenue: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        variants_by_units: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.reconciliation": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reconciliation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        days: {
+                            currency?: string;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            drift_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            invoice_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            lines_vs_payments_cents?: number;
+                            ok?: boolean;
+                            /** @description Integer minor units (cents) */
+                            orders_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            orders_vs_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            payments_cents?: number;
+                        }[];
+                        /** @description Integer minor units (cents) */
+                        drift_cents: number;
+                        drifted: {
+                            currency?: string;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            drift_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            invoice_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            lines_vs_payments_cents?: number;
+                            ok?: boolean;
+                            /** @description Integer minor units (cents) */
+                            orders_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            orders_vs_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            payments_cents?: number;
+                        }[];
+                        /** Format: date */
+                        from?: string;
+                        ok: boolean;
+                        time_zone?: string;
+                        /** Format: date */
+                        to?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.sales": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop sales */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        series: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        totals: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
                         };
                     };
                 };

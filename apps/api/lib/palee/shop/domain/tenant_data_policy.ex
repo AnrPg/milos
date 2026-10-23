@@ -23,6 +23,9 @@ defmodule Palee.Shop.Domain.TenantDataPolicy do
               %{table: "shop_stock_alerts"},
               %{table: "shop_stock_movements"},
               %{table: "shop_stock_levels"},
+              # ADR-192: the price ledger and the pricing targets.
+              %{table: "shop_variant_price_changes"},
+              %{table: "shop_pricing_targets"},
               %{table: "shop_variants"},
               %{table: "shop_products"}
             ]

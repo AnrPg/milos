@@ -8,6 +8,7 @@ defmodule PaleeWeb.Telemetry do
     MetricsPlug,
     OutboxProbe,
     PrometheusExporter,
+    RevenueStreamBridge,
     TelemetryLogReporter
   }
 
@@ -21,6 +22,8 @@ defmodule PaleeWeb.Telemetry do
   def init(_arg) do
     prometheus = Application.get_env(:palee, :prometheus_metrics, enabled: false)
     start_oban = Application.get_env(:palee, :start_oban, true)
+    # ADR-192: shop order events feed the revenue-by-stream counters.
+    RevenueStreamBridge.attach()
 
     prometheus
     |> children(start_oban: start_oban)
@@ -149,7 +152,126 @@ defmodule PaleeWeb.Telemetry do
     http_metrics() ++
       readiness_metrics() ++
       outbox_metrics() ++
-      security_and_cache_metrics() ++ job_metrics() ++ runtime_metrics()
+      security_and_cache_metrics() ++
+      job_metrics() ++ runtime_metrics() ++ revenue_metrics() ++ shop_metrics()
+  end
+
+  # ADR-192: money in and out per revenue stream. `stream` and `currency`
+  # are closed lists (Palee.Finance.RevenueTelemetry folds anything else).
+  # Event-level counters: the exact per-business figures are the reports
+  # and the reconciliation.
+  defp revenue_metrics do
+    [
+      sum("palee.finance.revenue.recorded.amount_cents",
+        tags: [:stream, :currency],
+        description: "Paid payment amounts recorded, in cents, by revenue stream",
+        reporter_options: [prometheus_name: "palee_revenue_recorded_cents_total"]
+      ),
+      sum("palee.finance.revenue.refunded.amount_cents",
+        tags: [:stream, :currency],
+        description: "Refunded amounts recorded, in cents, by revenue stream",
+        reporter_options: [prometheus_name: "palee_revenue_refunded_cents_total"]
+      ),
+      counter("palee.finance.revenue.recorded.count",
+        tags: [:stream],
+        description: "Paid payments recorded, by revenue stream",
+        reporter_options: [prometheus_name: "palee_revenue_payments_total"]
+      ),
+      counter("palee.finance.revenue.refunded.count",
+        tags: [:stream],
+        description: "Refunds recorded, by revenue stream",
+        reporter_options: [prometheus_name: "palee_revenue_refunds_total"]
+      )
+    ]
+  end
+
+  # ADR-192: the shop's orders, stock and revenue reconciliation, from the
+  # events of `Palee.Application.Shop.Observability` (ADR-190). Those events
+  # carry ids in their metadata; `shop_tags/1` keeps only closed-list values
+  # (anything else becomes "other"), so no label carries an id.
+  defp shop_metrics do
+    order_counters =
+      for event <- ~w(placed paid ready picked_up cancelled refunded)a do
+        counter("palee.shop.order.#{event}.count",
+          tags: [:channel],
+          tag_values: &shop_tags/1,
+          description: "Shop orders #{event}, by channel (online = pickup order, pos = desk)",
+          reporter_options: [prometheus_name: "palee_shop_orders_#{event}_total"]
+        )
+      end
+
+    order_counters ++
+      [
+        sum("palee.shop.order.paid.amount_cents",
+          tags: [:channel, :payment_mode],
+          tag_values: &shop_tags/1,
+          description: "Shop order amounts paid, in cents",
+          reporter_options: [prometheus_name: "palee_shop_paid_cents_total"]
+        ),
+        sum("palee.shop.order.refunded.amount_cents",
+          tags: [:channel],
+          tag_values: &shop_tags/1,
+          description: "Shop order amounts refunded, in cents",
+          reporter_options: [prometheus_name: "palee_shop_refunded_cents_total"]
+        ),
+        counter("palee.shop.stock.moved.count",
+          tags: [:kind],
+          tag_values: &shop_tags/1,
+          description: "Stock ledger movements, by kind",
+          reporter_options: [prometheus_name: "palee_shop_stock_movements_total"]
+        ),
+        sum("palee.shop.stock.moved.quantity",
+          tags: [:kind],
+          tag_values: &shop_tags/1,
+          measurement: &abs(&1.quantity),
+          description: "Units moved through the stock ledger, by kind",
+          reporter_options: [prometheus_name: "palee_shop_stock_units_moved_total"]
+        ),
+        counter("palee.shop.stock.status_changed.count",
+          tags: [:status],
+          tag_values: &shop_tags/1,
+          keep: &(shop_tags(&1).status in ["low", "critical", "out"]),
+          description: "Low-stock alerts: variants that moved into low, critical or out of stock",
+          reporter_options: [prometheus_name: "palee_shop_low_stock_alerts_total"]
+        ),
+        counter("palee.shop.variant.price_changed.count",
+          description: "Variant price, compare-at or cost changes",
+          reporter_options: [prometheus_name: "palee_shop_price_changes_total"]
+        ),
+        counter("palee.shop.reconciliation.checked.count",
+          tags: [:result],
+          description: "Shop revenue reconciliation runs, by result (ok or drift)",
+          reporter_options: [prometheus_name: "palee_shop_reconciliation_runs_total"]
+        ),
+        sum("palee.shop.reconciliation.checked.drifted_days",
+          description: "Business days found drifting by the shop revenue reconciliation",
+          reporter_options: [prometheus_name: "palee_shop_reconciliation_drifted_days_total"]
+        ),
+        last_value("palee.shop.reconciliation.checked.drift_cents",
+          description: "Drift, in cents, found by the latest reconciliation run of a business",
+          reporter_options: [prometheus_name: "palee_shop_reconciliation_drift_cents"]
+        )
+      ]
+  end
+
+  @shop_label_values %{
+    channel: ~w(online pos),
+    payment_mode: ~w(at_pickup on_account online cash card_manual bank_transfer other),
+    kind: ~w(receive sale refund_restock adjustment transfer reserve release),
+    status: ~w(ok low critical out)
+  }
+
+  @doc false
+  def shop_tags(metadata) do
+    Map.new(@shop_label_values, fn {key, allowed} ->
+      value =
+        case Map.get(metadata, key) do
+          atom when is_atom(atom) and not is_nil(atom) -> Atom.to_string(atom)
+          other -> other
+        end
+
+      {key, if(value in allowed, do: value, else: "other")}
+    end)
   end
 
   defp http_metrics do
