@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 
 import { fetchPublicPlans, startCoachPractice } from "@/api/platform-plans";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
@@ -61,7 +62,7 @@ export function StartCoachPractice() {
 
   if (ownsCoachPractice(memberships)) {
     return (
-      <HubPage title={t("start.title")}>
+      <HubPage back={<BackToMe />} title={t("start.title")}>
         <HubCard>
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("start.alreadyOpen")}</p>
         </HubCard>
@@ -70,7 +71,7 @@ export function StartCoachPractice() {
   }
 
   return (
-    <HubPage title={t("start.title")}>
+    <HubPage back={<BackToMe />} title={t("start.title")}>
       <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("start.intro")}</p>
 
       <HubCard eyebrow={t("start.includes")}>
