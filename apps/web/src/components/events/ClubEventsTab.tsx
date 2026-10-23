@@ -11,9 +11,12 @@ import { useSession } from "@/components/session-provider";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { can } from "@/lib/role-navigation";
 
-import { blankEventForm, EventEditorSheet, useEventLocations } from "./EventEditorSheet";
+import { inviteCohost } from "@/api/admin-events";
+
+import { blankEventForm, useEventLocations } from "./EventFormParts";
 import { EventList } from "./EventParts";
 import { invalidateEvents, useClubEvents } from "./use-events";
+import { EventWizard } from "./wizard/EventWizard";
 
 const SCOPES: EventListScope[] = ["upcoming", "past"];
 
@@ -84,7 +87,7 @@ export function ClubEventsTab({ club, group = null }: { club: CommunityClub; gro
         )}
       </HubCard>
       {creating ? (
-        <EventEditorSheet
+        <EventWizard
           title={t("newEventTitle")}
           eyebrow={group?.name ?? club.name}
           initial={blankEventForm(locations.data ?? [])}
@@ -92,10 +95,18 @@ export function ClubEventsTab({ club, group = null }: { club: CommunityClub; gro
           locations={locations.data ?? []}
           coverSlug={runsEvents && can(membership, "manage_settings") ? club.organization_slug : null}
           gymSlug={club.organization_slug}
+          draftKey={["club", club.id, group?.id ?? "club"].join(":")}
+          // ADR-185: the box's staff who run events can ask co-hosts as they publish; a group's admins cannot.
+          cohosts={
+            runsEvents && club.organization_slug
+              ? { ownSlug: club.organization_slug, invite: (eventId, slug) => inviteCohost(tokens!.access_token, eventId, slug, club.organization_slug) }
+              : null
+          }
           onSubmit={async (body) => {
-            await createClubEvent(tokens!.access_token, club.id, group ? { ...body, channel_id: group.id } : body);
+            const created = await createClubEvent(tokens!.access_token, club.id, group ? { ...body, channel_id: group.id } : body);
             setScope("upcoming");
             await invalidateEvents(queryClient);
+            return { id: created.event.id };
           }}
           onClose={() => setCreating(false)}
         />

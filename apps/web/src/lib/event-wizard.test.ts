@@ -183,6 +183,12 @@ describe("event wizard state", () => {
     expect(chosen.form.openToAll).toBe(false);
   });
 
+  it("drops another host's branch when switching to «Ως εγώ» or to a box without it", () => {
+    const state = run(initialWizardState(filled, context()), { type: "set", patch: { place: { kind: "location", locationId: "loc-1" } } });
+    expect(run(state, { type: "modeChanged", mode: "self" }).form.place).toEqual({ kind: "address", name: "", address: "" });
+    expect(run(state, { type: "locationsArrived", locationIds: ["other"], editing: false }).form.place).toEqual({ kind: "location", locationId: "other" });
+  });
+
   it("puts the event at the box's first branch once the branches load, unless they chose a place", () => {
     const state = initialWizardState(blank, context());
     const arrived = run(state, { type: "locationsArrived", locationIds: ["loc-1"], editing: false });

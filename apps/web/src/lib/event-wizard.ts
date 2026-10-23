@@ -177,6 +177,8 @@ export type EventWizardState = {
   cohosts: string[];
   /** A weekly event's edit: this one, or this and the following. */
   scope: EventScope;
+  /** The cover's picture for the preview (the form keeps its media id). */
+  coverUrl: string | null;
   /** They chose a place or audience themselves, so a late default never overrides it. */
   placeTouched: boolean;
   audienceTouched: boolean;
@@ -192,13 +194,18 @@ export type EventWizardAction =
   | { type: "addCohost"; raw: string; ownSlug?: string | null }
   | { type: "removeCohost"; slug: string }
   | { type: "scope"; scope: EventScope }
+  | { type: "cover"; mediaId: string | null; url: string | null }
   | { type: "restore"; draft: EventWizardDraft; context: EventWizardContext };
 
 /** Where the wizard opens: the first step to create; the review (or the field's step) to edit. */
 export function initialWizardState(
   form: EventForm,
   context: EventWizardContext,
-  { startStep = null, cohosts = [] }: { startStep?: EventWizardStep | null; cohosts?: string[] } = {},
+  {
+    startStep = null,
+    cohosts = [],
+    coverUrl = null,
+  }: { startStep?: EventWizardStep | null; cohosts?: string[]; coverUrl?: string | null } = {},
 ): EventWizardState {
   const steps = activeSteps(context);
   const fallback = context.editing ? "review" : steps[0];
@@ -210,6 +217,7 @@ export function initialWizardState(
     returnToReview: context.editing && step !== "review",
     cohosts,
     scope: "this",
+    coverUrl,
     placeTouched: false,
     audienceTouched: false,
   };
@@ -276,15 +284,20 @@ export function eventWizardReducer(state: EventWizardState, action: EventWizardA
     }
     case "modeChanged": {
       // A new host sets the audience's default («Ως εγώ» is for everyone)
-      // until they pick one themselves.
-      if (state.audienceTouched) return state;
-      return { ...state, form: { ...state.form, openToAll: action.mode === "self", groupOnly: true } };
+      // until they pick one themselves. A person's own event has no
+      // branches, so a branch of the business picked before cannot stay.
+      const place: EventForm["place"] =
+        action.mode === "self" && state.form.place.kind === "location" ? { kind: "address", name: "", address: "" } : state.form.place;
+      const audience = state.audienceTouched ? {} : { openToAll: action.mode === "self", groupOnly: true };
+      return { ...state, form: { ...state.form, ...audience, place } };
     }
     case "locationsArrived": {
+      // The default branch once they load, unless they chose a place; a
+      // branch that is not this box's (another host's) never stays.
       const [first] = action.locationIds;
-      if (!first || state.placeTouched || action.editing) return state;
+      if (!first || action.editing) return state;
       const place = state.form.place;
-      const blankAddress = place.kind === "address" && !place.name.trim() && !place.address.trim();
+      const blankAddress = !state.placeTouched && place.kind === "address" && !place.name.trim() && !place.address.trim();
       const goneLocation = place.kind === "location" && !action.locationIds.includes(place.locationId);
       if (!blankAddress && !goneLocation) return state;
       return { ...state, form: { ...state.form, place: { kind: "location", locationId: first } } };
@@ -297,6 +310,8 @@ export function eventWizardReducer(state: EventWizardState, action: EventWizardA
       return { ...state, cohosts: state.cohosts.filter((slug) => slug !== action.slug) };
     case "scope":
       return { ...state, scope: action.scope };
+    case "cover":
+      return { ...state, form: { ...state.form, coverMediaId: action.mediaId }, coverUrl: action.mediaId ? action.url : null };
     case "restore": {
       const steps = activeSteps(action.context);
       const visited = action.draft.visited.filter((step) => steps.includes(step));
@@ -305,6 +320,7 @@ export function eventWizardReducer(state: EventWizardState, action: EventWizardA
         ...state,
         form: action.draft.form,
         cohosts: action.draft.cohosts,
+        coverUrl: action.draft.coverUrl,
         step,
         visited: visited.includes(step) ? visited : [...visited, step],
         returnToReview: false,
@@ -328,6 +344,7 @@ export type EventWizardDraft = {
   step: EventWizardStep;
   visited: EventWizardStep[];
   cohosts: string[];
+  coverUrl: string | null;
 };
 
 export const EVENT_WIZARD_DRAFT_VERSION = 1;
@@ -346,6 +363,7 @@ export function draftFromState(state: EventWizardState, now: Date): EventWizardD
     step: state.step,
     visited: state.visited,
     cohosts: state.cohosts,
+    coverUrl: state.coverUrl,
   };
 }
 
@@ -353,7 +371,7 @@ export function draftFromState(state: EventWizardState, now: Date): EventWizardD
 export function draftWorthKeeping(state: EventWizardState, blank: EventForm): boolean {
   if (state.cohosts.length > 0) return true;
   // The place counts only once they chose it: a default branch arriving late is not theirs.
-  const rest = ({ place: _place, ...form }: EventForm) => JSON.stringify(form);
+  const rest = (form: EventForm) => JSON.stringify({ ...form, place: null });
   if (state.placeTouched && JSON.stringify(state.form.place) !== JSON.stringify(blank.place)) return true;
   return rest(state.form) !== rest(blank);
 }
@@ -405,6 +423,7 @@ export function parseEventWizardDraft(raw: string | null, now: Date, maxAgeMs = 
     form,
     step: draft.step,
     visited: draft.visited.filter(isStep),
+    coverUrl: isString(draft.coverUrl) && form.coverMediaId ? draft.coverUrl : null,
     cohosts: draft.cohosts.filter(isString).map(normalizeCohostSlug).filter((slug): slug is string => Boolean(slug)).slice(0, MAX_COHOSTS),
   };
 }

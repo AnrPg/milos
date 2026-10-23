@@ -5,10 +5,11 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
-import { createStaffEvent, fetchStaffEvents, staffEventsKey, type StaffEventRow } from "@/api/admin-events";
+import { createStaffEvent, fetchStaffEvents, inviteCohost, staffEventsKey, type StaffEventRow } from "@/api/admin-events";
 import type { EventListScope } from "@/api/events";
 import { useMyClubs } from "@/components/community/use-community";
-import { blankEventForm, EventEditorSheet, useEventLocations } from "@/components/events/EventEditorSheet";
+import { blankEventForm, useEventLocations } from "@/components/events/EventFormParts";
+import { EventWizard } from "@/components/events/wizard/EventWizard";
 import { DateBlock, useGoingLabel, usePriceLabel } from "@/components/events/EventParts";
 import { formatTime, placeName } from "@/components/events/events";
 import { invalidateEvents } from "@/components/events/use-events";
@@ -83,19 +84,20 @@ export function EventsTab() {
         )}
       </section>
       {creating && chosenClub ? (
-        <EventEditorSheet
+        <EventWizard
           title={tEvents("newEventTitle")}
           initial={blankEventForm(locations.data ?? [])}
           locations={locations.data ?? []}
-          clubs={boxClubs.map((club) => ({ id: club.id, name: club.name }))}
-          clubId={chosenClub}
-          onClubChange={setClubId}
+          clubs={{ options: boxClubs.map((club) => ({ id: club.id, name: club.name })), value: chosenClub ?? undefined, onChange: setClubId }}
           coverSlug={can(membership, "manage_settings") ? selectedOrganizationSlug : null}
           gymSlug={selectedOrganizationSlug}
+          draftKey={["staff", selectedOrganizationSlug ?? "box"].join(":")}
+          cohosts={{ ownSlug: selectedOrganizationSlug ?? null, invite: (eventId, slug) => inviteCohost(token, eventId, slug, selectedOrganizationSlug) }}
           onSubmit={async (body) => {
-            await createStaffEvent(token, { ...body, club_id: chosenClub });
+            const created = await createStaffEvent(token, { ...body, club_id: chosenClub });
             setScope("upcoming");
             await invalidateEvents(queryClient);
+            return { id: created.event.id };
           }}
           onClose={() => setCreating(false)}
         />
