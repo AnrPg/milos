@@ -71,17 +71,18 @@ function Notice({ tone, children }: { tone: "error" | "info"; children: ReactNod
   );
 }
 
-export function AccountingTab() {
+/** `locationIds`: the page branch filter (ADR-186 §7); refund receipts follow their people. */
+export function AccountingTab({ locationIds }: { locationIds?: string } = {}) {
   return (
     <div className="space-y-6">
-      <RefundReceiptsSection />
+      <RefundReceiptsSection locationIds={locationIds} />
       <ReconciliationSection />
       <ExportsSection />
     </div>
   );
 }
 
-function RefundReceiptsSection() {
+function RefundReceiptsSection({ locationIds }: { locationIds?: string }) {
   const t = useTranslations("FinanceAccounting");
   const locale = useUiLocale();
   const { tokens } = useSession();
@@ -91,9 +92,9 @@ function RefundReceiptsSection() {
   const [error, setError] = useState<string | null>(null);
 
   const receiptsQuery = useQuery({
-    queryKey: ["admin", "finance", "refund-receipts", search],
+    queryKey: ["admin", "finance", "refund-receipts", search, locationIds ?? "all"],
     enabled: Boolean(token),
-    queryFn: () => listRefundReceipts(token!, { q: search.trim() || undefined }),
+    queryFn: () => listRefundReceipts(token!, { q: search.trim() || undefined, location_ids: locationIds }),
   });
 
   const openDocument = async (id: string, number: string) => {

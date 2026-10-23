@@ -22863,6 +22863,11 @@ export interface components {
         };
         /** FinanceRefundReceiptCollection */
         FinanceRefundReceiptCollection: {
+            /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+            branch_filter?: {
+                all_locations: boolean;
+                location_ids: string[];
+            };
             refund_receipts: {
                 amount_cents: number;
                 currency: string;
@@ -59621,7 +59626,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.members": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -60224,7 +60232,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.packages": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -60589,7 +60600,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.promotions": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -61331,7 +61345,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.referral_rewards": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -61383,7 +61400,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.referrals": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -61516,6 +61536,8 @@ export interface operations {
                 from?: string;
                 to?: string;
                 limit?: number;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
             };
             header?: never;
             path?: never;
@@ -61530,6 +61552,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        branch_filter?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         refund_receipts: {
                             amount_cents: number;
                             currency: string;
@@ -76778,6 +76805,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        branch_filter?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         refund_receipts: {
                             amount_cents: number;
                             currency: string;

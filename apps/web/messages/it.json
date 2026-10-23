@@ -9698,6 +9698,11 @@
     "appliesToCoveringHelp": "Un solo elemento, valido nelle sedi che scegli.",
     "createdClasses": "{count, plural, one {Creata # lezione:} other {Create # lezioni:}}",
     "createdSeries": "{count, plural, one {Creata # serie di lezioni:} other {Create # serie di lezioni:}}",
-    "createdAppointmentSlots": "{count, plural, one {Creata # disponibilità per appuntamenti.} other {Create # disponibilità per appuntamenti, una per sede.}}"
+    "createdAppointmentSlots": "{count, plural, one {Creata # disponibilità per appuntamenti.} other {Create # disponibilità per appuntamenti, una per sede.}}",
+    "filterNoteMembers": "Ogni socio compare nella sua sede principale. Chi non ne ha una compare solo in «Tutte».",
+    "filterNoteCovering": "Mostra ciò che vale in una delle sedi scelte o in tutte.",
+    "filterNoteReferrals": "Segnalazioni e premi seguono la sede principale delle loro persone. I programmi valgono per tutta l'attività.",
+    "filterNoteAccounting": "Le ricevute di rimborso seguono la sede principale del socio. Riconciliazione ed esportazioni riguardano tutta l'attività.",
+    "filterNoteBusinessWide": "Questa scheda riguarda tutta l'attività; il filtro delle sedi qui non si applica."
   }
 }

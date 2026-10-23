@@ -9698,6 +9698,11 @@
     "appliesToCoveringHelp": "Ein Element, gültig an den gewählten Standorten.",
     "createdClasses": "{count, plural, one {# Kurs erstellt:} other {# Kurse erstellt:}}",
     "createdSeries": "{count, plural, one {# Kursreihe erstellt:} other {# Kursreihen erstellt:}}",
-    "createdAppointmentSlots": "{count, plural, one {# Terminfenster erstellt.} other {# Terminfenster erstellt, eines pro Standort.}}"
+    "createdAppointmentSlots": "{count, plural, one {# Terminfenster erstellt.} other {# Terminfenster erstellt, eines pro Standort.}}",
+    "filterNoteMembers": "Jedes Mitglied erscheint an seinem Stammstandort. Personen ohne Stammstandort erscheinen nur unter «Alle».",
+    "filterNoteCovering": "Angezeigt wird, was an einem der gewählten Standorte oder an allen gilt.",
+    "filterNoteReferrals": "Empfehlungen und Prämien folgen dem Stammstandort ihrer Personen. Programme gelten für das ganze Unternehmen.",
+    "filterNoteAccounting": "Erstattungsbelege folgen dem Stammstandort des Mitglieds. Abgleich und Exporte betreffen das ganze Unternehmen.",
+    "filterNoteBusinessWide": "Dieser Tab betrifft das ganze Unternehmen; der Standortfilter gilt hier nicht."
   }
 }

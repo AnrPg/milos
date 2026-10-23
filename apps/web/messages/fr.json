@@ -9698,6 +9698,11 @@
     "appliesToCoveringHelp": "Un seul élément, valable dans les sites choisis.",
     "createdClasses": "{count, plural, one {# cours créé :} other {# cours créés :}}",
     "createdSeries": "{count, plural, one {# série de cours créée :} other {# séries de cours créées :}}",
-    "createdAppointmentSlots": "{count, plural, one {# créneau de rendez-vous créé.} other {# créneaux de rendez-vous créés, un par site.}}"
+    "createdAppointmentSlots": "{count, plural, one {# créneau de rendez-vous créé.} other {# créneaux de rendez-vous créés, un par site.}}",
+    "filterNoteMembers": "Chaque membre apparaît dans son site principal. Les personnes sans site principal n'apparaissent que sous «Tous».",
+    "filterNoteCovering": "Affiche ce qui est valable dans l'un des sites choisis ou dans tous.",
+    "filterNoteReferrals": "Les parrainages et les récompenses suivent le site principal de leurs personnes. Les programmes valent pour toute l'entreprise.",
+    "filterNoteAccounting": "Les reçus de remboursement suivent le site principal du membre. Le rapprochement et les exports couvrent toute l'entreprise.",
+    "filterNoteBusinessWide": "Cet onglet couvre toute l'entreprise ; le filtre de sites ne s'applique pas ici."
   }
 }

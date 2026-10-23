@@ -142,6 +142,22 @@ in the browser. It shows only to staff who see at least two active branches.
   row per branch (finance: active memberships, paid revenue, open invoices;
   statistics: check-ins, attended classes, active memberships, paid revenue).
   `branch_filter` echoes what was applied.
+- Every tab of the finance operations page follows the page filter
+  (2026-10-23). The list endpoints accept `location_ids` the same way and
+  echo `branch_filter` (`BranchReport.resolve_list/2`), but a list names no
+  branch by default: without `location_ids` it stays as before, since
+  people roam (§3) and covering items are already scoped (§8).
+  - Members (`/finance/members`): the people whose home branch is in the
+    filter, through the same attribution.
+  - Packages and promotions: the ones valid at one of the chosen branches
+    or everywhere (`BranchReport.covering_only/3`); each row shows a branch
+    badge.
+  - Queues tab: the same read as the attention summary.
+  - Referral events (referrer or referred) and rewards (recipient), and
+    refund receipts (their person), by home branch as the queues count them.
+  - Business-wide, with a note under the tabs: seasons and referral
+    programmes (§8), corporate clients, payment reconciliation and
+    accounting exports.
 - `view_finance_reports`, `view_business_analytics`, `manage_packages` and
   `manage_promotions` leave `organization_wide/0`. Gym settings, finance
   settings, clubs, lifecycle, platform subscription and granting admin stay

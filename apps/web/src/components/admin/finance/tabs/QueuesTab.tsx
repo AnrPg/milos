@@ -32,7 +32,8 @@ function dateText(value: unknown) {
   return String(value).slice(0, 10);
 }
 
-export function QueuesTab() {
+/** `locationIds`: the page branch filter (ADR-186 §7). */
+export function QueuesTab({ locationIds }: { locationIds?: string } = {}) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const CHIPS: Array<{ id: QueueKey; label: string }> = [
@@ -46,10 +47,12 @@ export function QueuesTab() {
   const token = tokens?.access_token;
   const [active, setActive] = useState<QueueKey>("expiring");
 
+  // Same key and params as the page's attention summary, so both share one read.
   const queuesQuery = useQuery({
-    queryKey: ["admin", "finance", "queues"],
+    queryKey: ["admin", "finance", "queues", locationIds ?? "all"],
     enabled: Boolean(token),
-    queryFn: () => fetchFinanceQueues(token!, { expires_within_days: "30" }),
+    queryFn: () =>
+      fetchFinanceQueues(token!, { expires_within_days: "30", ...(locationIds ? { location_ids: locationIds } : {}) }),
   });
 
   const queues = (queuesQuery.data?.queues ?? {}) as Record<string, FinanceRecord[]>;

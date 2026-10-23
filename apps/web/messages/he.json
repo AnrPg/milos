@@ -9698,6 +9698,11 @@
     "appliesToCoveringHelp": "פריט אחד, תקף בסניפים שתבחר.",
     "createdClasses": "{count, plural, one {נוצר שיעור אחד:} other {נוצרו # שיעורים:}}",
     "createdSeries": "{count, plural, one {נוצרה סדרת שיעורים אחת:} other {נוצרו # סדרות שיעורים:}}",
-    "createdAppointmentSlots": "{count, plural, one {נוצר מועד פגישה אחד.} other {נוצרו # מועדי פגישה, אחד לכל סניף.}}"
+    "createdAppointmentSlots": "{count, plural, one {נוצר מועד פגישה אחד.} other {נוצרו # מועדי פגישה, אחד לכל סניף.}}",
+    "filterNoteMembers": "כל מנוי מופיע בסניף הבית שלו. מי שאין לו סניף בית מופיע רק תחת «הכול».",
+    "filterNoteCovering": "מוצג מה שתקף באחד הסניפים שנבחרו או בכולם.",
+    "filterNoteReferrals": "הפניות ותגמולים עוקבים אחר סניף הבית של האנשים שלהם. התוכניות חלות על כל העסק.",
+    "filterNoteAccounting": "קבלות החזר עוקבות אחר סניף הבית של המנוי. ההתאמה והייצוא חלים על כל העסק.",
+    "filterNoteBusinessWide": "לשונית זו חלה על כל העסק; מסנן הסניפים אינו חל כאן."
   }
 }

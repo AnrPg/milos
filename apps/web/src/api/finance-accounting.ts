@@ -13,7 +13,14 @@ export type ReconciliationLineRequest = Schemas["FinanceReconciliationLineReques
 export type AccountingExport = Schemas["FinanceAccountingExport"];
 export type AccountingExportDownload = Schemas["FinanceAccountingExportDownload"];
 
-export type RefundReceiptFilters = { q?: string; from?: string; to?: string; user_id?: string };
+export type RefundReceiptFilters = {
+  q?: string;
+  from?: string;
+  to?: string;
+  user_id?: string;
+  /** ADR-186 §7: the page branch filter, comma-separated. */
+  location_ids?: string;
+};
 
 function query(params: Record<string, string | undefined>) {
   const search = new URLSearchParams();
