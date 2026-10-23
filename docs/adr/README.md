@@ -188,4 +188,6 @@ must have an ADR. See `template.md` for the format.
 | ADR-186 | Branch-scoped staff and the branch manager | Accepted |
 | ADR-187 | Logins with up to three profiles, @handle + display name, and mail-free password recovery | Accepted |
 | ADR-188 | Worldwide area and address search: GeoNames towns, our own Photon, the public Photon | Accepted |
+| ADR-190 | E-shop: catalog, inventory, orders and revenue lineage | Accepted |
 | ADR-191 | Partner perks: redemption methods, an open policy model and versioned terms | Accepted |
+| ADR-192 | Shop analytics, revenue by stream and revenue lineage reporting | Accepted |

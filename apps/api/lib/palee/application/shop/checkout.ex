@@ -43,6 +43,7 @@ defmodule Palee.Application.Shop.Checkout do
          pickup_location_ids: pickup_options(context, catalog),
          payment_modes: payment_modes(context, terms),
          online_payment: online_payment(context),
+         member_discount: member_discount(terms),
          promotion_code: priced_promotion(priced, params)
        })}
     end
@@ -52,6 +53,18 @@ defmodule Palee.Application.Shop.Checkout do
 
   defp priced_promotion(%{promotion_code_id: id}, params),
     do: %{id: id, code: Shop.normalize_promotion_code(params[:promotion_code]), applied: true}
+
+  @doc """
+  The member discount a buyer gets (ADR-097, `member_discount_percent` of
+  their package when its scope includes products): `nil` or `%{percent,
+  source, applies_to}`. It applies to products marked
+  `member_discount_applies` and never stacks with a promotion code.
+  """
+  def member_discount(%{member_discount_percent: percent})
+      when is_integer(percent) and percent > 0,
+      do: %{percent: percent, source: :membership_package, applies_to: :marked_products}
+
+  def member_discount(_terms), do: nil
 
   @doc "The online-payment flag the basket shows: `%{available, reason, provider}`."
   def online_payment(context) do

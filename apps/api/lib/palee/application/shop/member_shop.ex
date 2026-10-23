@@ -15,7 +15,9 @@ defmodule Palee.Application.Shop.MemberShop do
       its Finance invoice, payments and refunds, all `revenue_stream: "shop"`.
   """
 
-  alias Palee.{Finance, Organizations, Shop}
+  alias Palee.Application.GoLive
+  alias Palee.Application.Shop.Checkout
+  alias Palee.{Facility, Finance, Organizations, Shop}
 
   @public_variant_fields [
     :id,
@@ -29,6 +31,95 @@ defmodule Palee.Application.Shop.MemberShop do
     :position,
     :archived_at
   ]
+
+  @doc """
+  The member's storefront of the box: whether the shop is open (it has
+  products on sale and the business may take this member's money: a demo
+  business is closed to real people, ADR-184), its products, categories and
+  pickup branches, the member discount that applies to them, and whether
+  online payment is offered.
+  """
+  def storefront(context) do
+    products = catalog(context)
+    terms = Finance.member_shop_terms(context, context.user_id)
+
+    closed_reason =
+      cond do
+        products == [] -> :no_products
+        GoLive.check_payment(context, context.user_id) != :ok -> :business_not_activated
+        true -> nil
+      end
+
+    %{
+      open: is_nil(closed_reason),
+      closed_reason: closed_reason,
+      products: products,
+      categories:
+        products |> Enum.map(& &1.category) |> Enum.reject(&(&1 in [nil, ""])) |> Enum.uniq(),
+      pickup_locations:
+        context
+        |> Facility.list_locations()
+        |> Enum.map(&%{id: &1.id, name: &1.name, address: Map.get(&1, :address)}),
+      member_discount: Checkout.member_discount(terms),
+      online_payment: Checkout.online_payment(context)
+    }
+  end
+
+  @doc """
+  «Ειδοποίησέ με»: the member asks to hear when a variant of a product they
+  can buy is back in stock (asking again re-arms a sent alert).
+  """
+  def subscribe_back_in_stock(context, variant_id) do
+    with {:ok, variant} <- buyable_variant(context, variant_id),
+         {:ok, alert} <- Shop.subscribe_stock_alert(context, variant.id, context.user_id) do
+      {:ok, alert_view(alert, variant)}
+    end
+  end
+
+  def unsubscribe_back_in_stock(context, variant_id) do
+    with {:ok, variant} <- buyable_variant(context, variant_id),
+         do: Shop.unsubscribe_stock_alert(context, variant.id, context.user_id)
+  end
+
+  @doc "The member's stock alerts, newest first."
+  def back_in_stock_alerts(context) do
+    alerts = Shop.list_stock_alerts(context, %{user_id: context.user_id})
+
+    variants =
+      case alerts do
+        [] ->
+          %{}
+
+        _some ->
+          context
+          |> Shop.list_variants(%{ids: Enum.map(alerts, & &1.variant_id)})
+          |> Map.new(&{&1.id, &1})
+      end
+
+    Enum.map(alerts, &alert_view(&1, variants[&1.variant_id]))
+  end
+
+  defp alert_view(alert, variant) do
+    %{
+      id: alert.id,
+      variant_id: alert.variant_id,
+      product_id: variant && variant.product_id,
+      notified_at: alert.notified_at,
+      inserted_at: alert.inserted_at,
+      available: variant && availability(variant) != "sold_out"
+    }
+  end
+
+  defp buyable_variant(context, variant_id) do
+    with %{archived_at: nil} = variant <-
+           Shop.get_variant(context, variant_id) || {:error, :not_found},
+         {:ok, _product} <- product(context, variant.product_id) do
+      {:ok, variant}
+    else
+      %{} -> {:error, :not_found}
+      error -> error
+    end
+  end
 
   @doc "The member's catalog of the box in `context`."
   def catalog(context, filters \\ %{}) do

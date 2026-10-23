@@ -192,3 +192,21 @@ tests:
       - eval_time: 25m
         alertname: PaleeHttpLatencyP95Critical
         exp_alerts: []
+
+  - name: shop revenue reconciliation drift (ADR-192)
+    interval: 1h
+    input_series:
+      # The nightly job reports one drifted day at the 3h mark.
+      - series: 'palee_shop_reconciliation_drifted_days_total{job="palee-api",instance="api:9568"}'
+        values: "0 0 0 1 1 1"
+    alert_rule_test:
+      - eval_time: 2h
+        alertname: PaleeShopRevenueDrift
+        exp_alerts: []
+      - eval_time: 5h
+        alertname: PaleeShopRevenueDrift
+        exp_alerts:
+          - exp_labels: { severity: warning }
+            exp_annotations:
+              summary: "Shop revenue does not reconcile"
+              description: "At least one business day drifted in the last nightly reconciliation: shop order totals, shop-stream invoice lines and shop payments minus refunds disagree. Search the logs for shop_revenue_drift (organization_id, day, the three figures) and follow docs/operations/shop-revenue-reconciliation.md."

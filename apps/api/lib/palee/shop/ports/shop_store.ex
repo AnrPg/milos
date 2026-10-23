@@ -38,7 +38,18 @@ defmodule Palee.Shop.Ports.ShopStore do
   @callback update_order(context(), id(), map()) :: result(map())
   @callback update_order_line(context(), id(), map()) :: result(map())
   @callback list_orders(context(), map()) :: [map()]
+  @doc "Orders per `status` under the same filters as `list_orders/2` (its `statuses` ignored)."
+  @callback order_counts(context(), map()) :: %{optional(atom()) => non_neg_integer()}
   @callback units_held(context(), id(), [id()]) :: %{optional(id()) => non_neg_integer()}
+
+  # Stock alerts («Ειδοποίησέ με»): one per member and variant; subscribing
+  # again clears `notified_at`. `list_stock_alerts/2` filters: user_id,
+  # variant_ids, pending.
+  @callback subscribe_stock_alert(context(), id(), id()) :: result(map())
+  @callback unsubscribe_stock_alert(context(), id(), id()) :: :ok
+  @callback list_stock_alerts(context(), map()) :: [map()]
+  @callback mark_stock_alerts_notified(context(), [id()], DateTime.t()) ::
+              result(non_neg_integer())
 
   # Promotion codes («Προώθηση»). `get_promotion_code/3` finds a code by its
   # text or id (`by: :code | :id`); `lock: true` takes its row lock, so

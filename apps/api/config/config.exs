@@ -39,6 +39,9 @@ config :palee, Oban,
        {"23 * * * *", Palee.Workers.CoachingReplyOverdueJob},
        {"41 6 * * *", Palee.Workers.CorporateInvoicingJob},
        {"7 7 * * *", Palee.Workers.InventoryDigestJob},
+       {"11 * * * *", Palee.Workers.ShopOrderSweepJob},
+       # ADR-192: shop orders == shop invoice lines == payments - refunds.
+       {"25 3 * * *", Palee.Workers.ShopRevenueReconciliationJob},
        {"30 8 * * *", Palee.Workers.SubscriptionExpiryJob},
        {"13 * * * *", Palee.Workers.ProvisionGymClubsJob},
        {"52 * * * *", Palee.Workers.SweepOrphanMediaJob},
@@ -265,6 +268,9 @@ config :palee,
 
 config :palee, :finance_store, Palee.Infrastructure.Finance.EctoFinanceStore
 
+# ADR-192: the shop's report read model.
+config :palee, :shop_report_store, Palee.Infrastructure.Shop.EctoShopReportStore
+
 config :palee,
        :finance_accounting_store,
        Palee.Infrastructure.Finance.EctoFinanceAccountingStore
@@ -452,7 +458,16 @@ config :logger, :default_formatter,
     :product_id,
     :variant_id,
     :channel,
-    :amount_cents
+    :amount_cents,
+    # ADR-192 shop revenue reconciliation
+    :event,
+    :error,
+    :day,
+    :currency,
+    :orders_cents,
+    :invoice_lines_cents,
+    :payments_cents,
+    :drift_cents
   ]
 
 # Use Jason for JSON parsing in Phoenix

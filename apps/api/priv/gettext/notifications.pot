@@ -637,3 +637,36 @@ msgstr ""
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr ""
+
+msgid "Shop stock running low"
+msgstr ""
+
+msgid "New shop order"
+msgstr ""
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr ""
+
+msgid "Your order is ready"
+msgstr ""
+
+msgid "Order #%{number} is ready for pickup."
+msgstr ""
+
+msgid "Your order is waiting for you"
+msgstr ""
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr ""
+
+msgid "Your order was cancelled"
+msgstr ""
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr ""
+
+msgid "Back in stock"
+msgstr ""
+
+msgid "%{item} is available again."
+msgstr ""

@@ -19,11 +19,21 @@ defmodule Palee.Infrastructure.Shop.NotificationsShopNotifier do
   def order_placed(context, payload), do: to_staff(context, "shop_order_placed", payload)
 
   @impl true
-  def order_ready(context, %{user_id: user_id} = payload) when is_binary(user_id) do
-    deliver("shop_order_ready", Map.put(payload, :organization_id, context.organization_id))
-  end
+  def order_ready(context, payload), do: to_buyer(context, "shop_order_ready", payload)
 
-  def order_ready(_context, _payload), do: :ok
+  @impl true
+  def order_reminder(context, payload), do: to_buyer(context, "shop_order_reminder", payload)
+
+  @impl true
+  def order_cancelled(context, payload), do: to_buyer(context, "shop_order_cancelled", payload)
+
+  @impl true
+  def back_in_stock(context, payload), do: to_buyer(context, "shop_back_in_stock", payload)
+
+  defp to_buyer(context, type, %{user_id: user_id} = payload) when is_binary(user_id),
+    do: deliver(type, Map.put(payload, :organization_id, context.organization_id))
+
+  defp to_buyer(_context, _type, _payload), do: :ok
 
   defp to_staff(context, type, payload) do
     context.organization_id

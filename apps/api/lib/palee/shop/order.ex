@@ -39,6 +39,9 @@ defmodule Palee.Shop.Order do
     field :source_ref_id, :binary_id
     field :promotion_code, :string
     field :promotion_code_id, :binary_id
+    # The short code the buyer shows at the desk (`Domain.PickupCode`).
+    field :pickup_code, :string
+    field :reminded_at, :utc_datetime_usec
     field :finance_invoice_id, :binary_id
     field :fiscal_receipt_ref, :string
     field :payment_provider, :string
@@ -79,6 +82,7 @@ defmodule Palee.Shop.Order do
     :source_ref_id,
     :promotion_code,
     :promotion_code_id,
+    :pickup_code,
     :note,
     :idempotency_key,
     :placed_at,
@@ -102,7 +106,8 @@ defmodule Palee.Shop.Order do
     :cancelled_at,
     :cancel_reason,
     :handled_by_id,
-    :payment_mode
+    :payment_mode,
+    :reminded_at
   ]
 
   def create_changeset(attrs) do
@@ -123,6 +128,7 @@ defmodule Palee.Shop.Order do
     |> validate_number(:total_cents, greater_than_or_equal_to: 0)
     |> unique_constraint(:idempotency_key, name: :shop_orders_idempotency_index)
     |> unique_constraint(:number, name: :shop_orders_organization_number_index)
+    |> unique_constraint(:pickup_code, name: :shop_orders_pickup_code_index)
     |> check_constraint(:user_id, name: :shop_orders_online_buyer_check)
   end
 

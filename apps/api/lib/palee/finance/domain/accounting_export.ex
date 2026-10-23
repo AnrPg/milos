@@ -15,10 +15,15 @@ defmodule Palee.Finance.Domain.AccountingExport do
   Range semantics (business date): payments by `paid_on`, allocations by
   the payment `paid_on` or credit `occurred_on`, reversals and credits by
   `occurred_on`, refund receipts by the UTC date of `issued_at`.
-  Soft-deleted facts (ADR-084) are excluded.
+  Soft-deleted facts (ADR-084) are excluded. Payments and reversals carry
+  their revenue lineage (ADR-192): walk-in shop payments have no member.
   """
 
-  @schema_version 1
+  # 2 (ADR-192): `payments` and `reversals` gain the revenue lineage
+  # columns `revenue_stream` (as stored, ADR-190), `report_stream` (the
+  # stream the finance summary reports it under, `RevenueBreakdown`),
+  # `source_type` and `source_id`, appended after the version 1 columns.
+  @schema_version 2
   @inline_max_days 31
   @max_range_days 1830
 
@@ -39,7 +44,11 @@ defmodule Palee.Finance.Domain.AccountingExport do
        {"currency", :string},
        {"amount_cents", :integer},
        {"reversed_cents", :integer},
-       {"net_amount_cents", :integer}
+       {"net_amount_cents", :integer},
+       {"revenue_stream", :string},
+       {"report_stream", :string},
+       {"source_type", :string},
+       {"source_id", :string}
      ]},
     {"allocations",
      [
@@ -72,7 +81,11 @@ defmodule Palee.Finance.Domain.AccountingExport do
        {"amount_cents", :integer},
        {"reason", :string},
        {"recorded_by_id", :string},
-       {"refund_receipt_number", :string}
+       {"refund_receipt_number", :string},
+       {"revenue_stream", :string},
+       {"report_stream", :string},
+       {"source_type", :string},
+       {"source_id", :string}
      ]},
     {"credits",
      [

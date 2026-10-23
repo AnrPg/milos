@@ -43,6 +43,75 @@ defmodule PaleeWeb.TelemetryTest do
     end
   end
 
+  describe "ADR-192 revenue and shop metrics" do
+    setup do
+      name = Module.concat(__MODULE__, "ShopExporter#{System.unique_integer([:positive])}")
+      start_supervised!({PrometheusExporter, name: name, metrics: Telemetry.prometheus_metrics()})
+      {:ok, exporter: name}
+    end
+
+    test "count revenue by stream and shop activity with folded labels", %{exporter: exporter} do
+      alias Palee.Finance.RevenueTelemetry
+      alias Palee.Infrastructure.Observability.RevenueStreamBridge
+
+      RevenueStreamBridge.attach()
+      RevenueTelemetry.payment_recorded("package", 9_000)
+      RevenueTelemetry.payment_recorded("not-a-stream", 100, "euros")
+
+      order = %{organization_id: "org", order_id: "id", channel: :pos, payment_mode: :cash}
+
+      :telemetry.execute([:palee, :shop, :order, :placed], %{count: 1}, %{
+        order
+        | channel: :online
+      })
+
+      :telemetry.execute([:palee, :shop, :order, :paid], %{count: 1, amount_cents: 2_500}, order)
+
+      :telemetry.execute(
+        [:palee, :shop, :order, :refunded],
+        %{count: 1, amount_cents: 500},
+        order
+      )
+
+      :telemetry.execute([:palee, :shop, :stock, :moved], %{count: 1, quantity: -2}, %{
+        kind: :sale,
+        variant_id: "v"
+      })
+
+      :telemetry.execute([:palee, :shop, :stock, :status_changed], %{count: 1}, %{status: :low})
+      :telemetry.execute([:palee, :shop, :stock, :status_changed], %{count: 1}, %{status: :ok})
+
+      :telemetry.execute(
+        [:palee, :shop, :reconciliation, :checked],
+        %{days: 2, drifted_days: 1, drift_cents: 7},
+        %{result: "drift"}
+      )
+
+      output = exporter |> PrometheusExporter.scrape() |> IO.iodata_to_binary()
+
+      for expected <- [
+            ~s(palee_revenue_recorded_cents_total{stream="package",currency="EUR"} 9000),
+            ~s(palee_revenue_recorded_cents_total{stream="shop",currency="EUR"} 2500),
+            ~s(palee_revenue_refunded_cents_total{stream="shop",currency="EUR"} 500),
+            ~s(palee_revenue_recorded_cents_total{stream="other",currency="XXX"} 100),
+            ~s(palee_revenue_payments_total{stream="shop"} 1),
+            ~s(palee_shop_orders_placed_total{channel="online"} 1),
+            ~s(palee_shop_orders_paid_total{channel="pos"} 1),
+            ~s(palee_shop_paid_cents_total{channel="pos",payment_mode="cash"} 2500),
+            ~s(palee_shop_refunded_cents_total{channel="pos"} 500),
+            ~s(palee_shop_stock_units_moved_total{kind="sale"} 2),
+            ~s(palee_shop_low_stock_alerts_total{status="low"} 1),
+            ~s(palee_shop_reconciliation_runs_total{result="drift"} 1),
+            ~s(palee_shop_reconciliation_drift_cents 7)
+          ] do
+        assert output =~ expected, "missing #{expected} in:\n#{output}"
+      end
+
+      refute output =~ ~s(status="ok")
+      refute output =~ ~s(="org")
+    end
+  end
+
   describe "emit_readiness_measurements/0" do
     setup do
       previous = Application.fetch_env!(:palee, :readiness_checker)
