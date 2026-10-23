@@ -1369,6 +1369,8 @@ defmodule PaleeWeb.Router do
     get("/me/providers", MyProvidersController, :index)
     put("/me/providers/selected", MyProvidersController, :select)
     get("/me/today", MyProvidersController, :today)
+    # Εγώ › Πληρωμές: billing at every provider the person is a client of.
+    get("/me/billing", MyBillingController, :index)
     get("/me/history", AccountTrainingController, :history)
     get("/me/progress", AccountTrainingController, :progress)
     # ADR-165: coverage summary, qualities radar and training load.

@@ -1043,6 +1043,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your billing at every gym or coach you are a client of */
+        get: operations["PaleeWeb.MyBillingController.index"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/blocks": {
         parameters: {
             query?: never;
@@ -14718,6 +14735,298 @@ export interface components {
             label: string;
             sets: number;
         };
+        /** BillingActions */
+        BillingActions: {
+            download_invoices: boolean;
+            self_service_cancel_auto_renew: boolean;
+            self_service_purchase: boolean;
+        };
+        /** BillingContact */
+        BillingContact: {
+            /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+            box_chat_slug: string | null;
+        };
+        /** BillingInvoice */
+        BillingInvoice: {
+            balance_due_cents: number;
+            currency: string;
+            /** @enum {string} */
+            document_kind: "invoice" | "receipt";
+            /** @description A PDF is on file to download. */
+            downloadable: boolean;
+            /** Format: date */
+            due_date?: string | null;
+            /** Format: uuid */
+            id: string;
+            invoice_number?: string | null;
+            /** Format: date */
+            issue_date?: string | null;
+            status: string;
+            total_cents: number;
+        };
+        /** BillingMembership */
+        BillingMembership: {
+            entitlement_status?: string | null;
+            /** Format: date */
+            expires_on?: string | null;
+            /** Format: date */
+            starts_on?: string | null;
+            status: string;
+        } | null;
+        /** BillingPayment */
+        BillingPayment: {
+            amount_cents?: number | null;
+            currency: string;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            net_amount_cents?: number | null;
+            /** Format: date */
+            paid_on?: string | null;
+            payment_method?: string | null;
+            payment_status?: string | null;
+        };
+        /** BillingPromotion */
+        BillingPromotion: {
+            campaign_name?: string | null;
+            discount_type?: string | null;
+            discount_value?: number | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            redeemed_at?: string | null;
+        };
+        /** BillingProvider */
+        BillingProvider: {
+            /** BillingActions */
+            actions: {
+                download_invoices: boolean;
+                self_service_cancel_auto_renew: boolean;
+                self_service_purchase: boolean;
+            };
+            /** BillingContact */
+            contact: {
+                /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+                box_chat_slug: string | null;
+            };
+            credit_balance_cents: number;
+            /** @description The effective entitlement (remaining allowances), without usage entries. */
+            entitlement?: {
+                [key: string]: unknown;
+            } | null;
+            invoices: {
+                balance_due_cents: number;
+                currency: string;
+                /** @enum {string} */
+                document_kind: "invoice" | "receipt";
+                /** @description A PDF is on file to download. */
+                downloadable: boolean;
+                /** Format: date */
+                due_date?: string | null;
+                /** Format: uuid */
+                id: string;
+                invoice_number?: string | null;
+                /** Format: date */
+                issue_date?: string | null;
+                status: string;
+                total_cents: number;
+            }[];
+            /** @enum {string} */
+            kind: "gym" | "coach";
+            logo_url?: string | null;
+            /** BillingMembership */
+            membership?: {
+                entitlement_status?: string | null;
+                /** Format: date */
+                expires_on?: string | null;
+                /** Format: date */
+                starts_on?: string | null;
+                status: string;
+            } | null;
+            name: string;
+            /** Format: uuid */
+            organization_id: string;
+            outstanding_cents: number;
+            /** @description Some sections could not be read. */
+            partial: boolean;
+            payments: {
+                amount_cents?: number | null;
+                currency: string;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                net_amount_cents?: number | null;
+                /** Format: date */
+                paid_on?: string | null;
+                payment_method?: string | null;
+                payment_status?: string | null;
+            }[];
+            primary_color?: string | null;
+            promotions: {
+                campaign_name?: string | null;
+                discount_type?: string | null;
+                discount_value?: number | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                redeemed_at?: string | null;
+            }[];
+            /** BillingReferrals */
+            referrals: {
+                credit_total_cents: number;
+                credits: {
+                    amount_cents: number;
+                    currency: string;
+                    description?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date */
+                    occurred_on?: string | null;
+                }[];
+                invited: number;
+                paid: number;
+                trials: number;
+            };
+            refund_receipts: {
+                amount_cents: number;
+                currency: string;
+                /** Format: uuid */
+                id: string;
+                invoice_number?: string | null;
+                /** Format: date-time */
+                issued_at?: string | null;
+                reason?: string | null;
+                receipt_number: string;
+                reversal_type?: string;
+            }[];
+            seasons: {
+                currency?: string;
+                /** Format: date */
+                ends_on?: string | null;
+                /** Format: uuid */
+                id: string;
+                price_cents?: number;
+                /** Format: uuid */
+                season_id: string;
+                /** Format: date */
+                starts_on?: string | null;
+                status: string;
+                title: string;
+            }[];
+            slug: string;
+            subscriptions: {
+                auto_renew?: boolean | null;
+                billing_period?: string | null;
+                /** Format: date */
+                commitment_ends_on?: string | null;
+                corporate?: boolean;
+                /** @description The package in force today. */
+                current: boolean;
+                /** Format: date */
+                ends_on?: string | null;
+                /** Format: uuid */
+                id: string;
+                package_name?: string | null;
+                package_type?: string | null;
+                price_cents?: number | null;
+                /** Format: date */
+                starts_on?: string | null;
+                status: string;
+            }[];
+            trials: {
+                class_name?: string | null;
+                /** Format: date-time */
+                class_starts_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                status: string;
+            }[];
+        };
+        /** BillingReferralCredit */
+        BillingReferralCredit: {
+            amount_cents: number;
+            currency: string;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            occurred_on?: string | null;
+        };
+        /** BillingReferrals */
+        BillingReferrals: {
+            credit_total_cents: number;
+            credits: {
+                amount_cents: number;
+                currency: string;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date */
+                occurred_on?: string | null;
+            }[];
+            invited: number;
+            paid: number;
+            trials: number;
+        };
+        /** BillingRefundReceipt */
+        BillingRefundReceipt: {
+            amount_cents: number;
+            currency: string;
+            /** Format: uuid */
+            id: string;
+            invoice_number?: string | null;
+            /** Format: date-time */
+            issued_at?: string | null;
+            reason?: string | null;
+            receipt_number: string;
+            reversal_type?: string;
+        };
+        /** BillingSeason */
+        BillingSeason: {
+            currency?: string;
+            /** Format: date */
+            ends_on?: string | null;
+            /** Format: uuid */
+            id: string;
+            price_cents?: number;
+            /** Format: uuid */
+            season_id: string;
+            /** Format: date */
+            starts_on?: string | null;
+            status: string;
+            title: string;
+        };
+        /** BillingSubscription */
+        BillingSubscription: {
+            auto_renew?: boolean | null;
+            billing_period?: string | null;
+            /** Format: date */
+            commitment_ends_on?: string | null;
+            corporate?: boolean;
+            /** @description The package in force today. */
+            current: boolean;
+            /** Format: date */
+            ends_on?: string | null;
+            /** Format: uuid */
+            id: string;
+            package_name?: string | null;
+            package_type?: string | null;
+            price_cents?: number | null;
+            /** Format: date */
+            starts_on?: string | null;
+            status: string;
+        };
+        /** BillingTrial */
+        BillingTrial: {
+            class_name?: string | null;
+            /** Format: date-time */
+            class_starts_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            status: string;
+        };
         /** BlockPersonRequest */
         BlockPersonRequest: {
             /** Format: uuid */
@@ -24480,6 +24789,155 @@ export interface components {
             /** Format: date */
             to: string;
             weeks: number;
+        };
+        /** MyBilling */
+        MyBilling: {
+            providers: {
+                /** BillingActions */
+                actions: {
+                    download_invoices: boolean;
+                    self_service_cancel_auto_renew: boolean;
+                    self_service_purchase: boolean;
+                };
+                /** BillingContact */
+                contact: {
+                    /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+                    box_chat_slug: string | null;
+                };
+                credit_balance_cents: number;
+                /** @description The effective entitlement (remaining allowances), without usage entries. */
+                entitlement?: {
+                    [key: string]: unknown;
+                } | null;
+                invoices: {
+                    balance_due_cents: number;
+                    currency: string;
+                    /** @enum {string} */
+                    document_kind: "invoice" | "receipt";
+                    /** @description A PDF is on file to download. */
+                    downloadable: boolean;
+                    /** Format: date */
+                    due_date?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    invoice_number?: string | null;
+                    /** Format: date */
+                    issue_date?: string | null;
+                    status: string;
+                    total_cents: number;
+                }[];
+                /** @enum {string} */
+                kind: "gym" | "coach";
+                logo_url?: string | null;
+                /** BillingMembership */
+                membership?: {
+                    entitlement_status?: string | null;
+                    /** Format: date */
+                    expires_on?: string | null;
+                    /** Format: date */
+                    starts_on?: string | null;
+                    status: string;
+                } | null;
+                name: string;
+                /** Format: uuid */
+                organization_id: string;
+                outstanding_cents: number;
+                /** @description Some sections could not be read. */
+                partial: boolean;
+                payments: {
+                    amount_cents?: number | null;
+                    currency: string;
+                    /** Format: uuid */
+                    finance_invoice_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    net_amount_cents?: number | null;
+                    /** Format: date */
+                    paid_on?: string | null;
+                    payment_method?: string | null;
+                    payment_status?: string | null;
+                }[];
+                primary_color?: string | null;
+                promotions: {
+                    campaign_name?: string | null;
+                    discount_type?: string | null;
+                    discount_value?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: date-time */
+                    redeemed_at?: string | null;
+                }[];
+                /** BillingReferrals */
+                referrals: {
+                    credit_total_cents: number;
+                    credits: {
+                        amount_cents: number;
+                        currency: string;
+                        description?: string | null;
+                        /** Format: uuid */
+                        id: string;
+                        /** Format: date */
+                        occurred_on?: string | null;
+                    }[];
+                    invited: number;
+                    paid: number;
+                    trials: number;
+                };
+                refund_receipts: {
+                    amount_cents: number;
+                    currency: string;
+                    /** Format: uuid */
+                    id: string;
+                    invoice_number?: string | null;
+                    /** Format: date-time */
+                    issued_at?: string | null;
+                    reason?: string | null;
+                    receipt_number: string;
+                    reversal_type?: string;
+                }[];
+                seasons: {
+                    currency?: string;
+                    /** Format: date */
+                    ends_on?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    price_cents?: number;
+                    /** Format: uuid */
+                    season_id: string;
+                    /** Format: date */
+                    starts_on?: string | null;
+                    status: string;
+                    title: string;
+                }[];
+                slug: string;
+                subscriptions: {
+                    auto_renew?: boolean | null;
+                    billing_period?: string | null;
+                    /** Format: date */
+                    commitment_ends_on?: string | null;
+                    corporate?: boolean;
+                    /** @description The package in force today. */
+                    current: boolean;
+                    /** Format: date */
+                    ends_on?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    package_name?: string | null;
+                    package_type?: string | null;
+                    price_cents?: number | null;
+                    /** Format: date */
+                    starts_on?: string | null;
+                    status: string;
+                }[];
+                trials: {
+                    class_name?: string | null;
+                    /** Format: date-time */
+                    class_starts_at?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    status: string;
+                }[];
+            }[];
         };
         /** MyInjuryWarningsAcknowledged */
         MyInjuryWarningsAcknowledged: {
@@ -37021,6 +37479,173 @@ export interface operations {
                         max_bytes?: number;
                         required_headers?: Record<string, never>;
                         upload_url?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyBillingController.index": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Billing */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        providers: {
+                            /** BillingActions */
+                            actions: {
+                                download_invoices: boolean;
+                                self_service_cancel_auto_renew: boolean;
+                                self_service_purchase: boolean;
+                            };
+                            /** BillingContact */
+                            contact: {
+                                /** @description The published box page whose chat reaches the box (`/b/{slug}/chat`). */
+                                box_chat_slug: string | null;
+                            };
+                            credit_balance_cents: number;
+                            /** @description The effective entitlement (remaining allowances), without usage entries. */
+                            entitlement?: {
+                                [key: string]: unknown;
+                            } | null;
+                            invoices: {
+                                balance_due_cents: number;
+                                currency: string;
+                                /** @enum {string} */
+                                document_kind: "invoice" | "receipt";
+                                /** @description A PDF is on file to download. */
+                                downloadable: boolean;
+                                /** Format: date */
+                                due_date?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                invoice_number?: string | null;
+                                /** Format: date */
+                                issue_date?: string | null;
+                                status: string;
+                                total_cents: number;
+                            }[];
+                            /** @enum {string} */
+                            kind: "gym" | "coach";
+                            logo_url?: string | null;
+                            /** BillingMembership */
+                            membership?: {
+                                entitlement_status?: string | null;
+                                /** Format: date */
+                                expires_on?: string | null;
+                                /** Format: date */
+                                starts_on?: string | null;
+                                status: string;
+                            } | null;
+                            name: string;
+                            /** Format: uuid */
+                            organization_id: string;
+                            outstanding_cents: number;
+                            /** @description Some sections could not be read. */
+                            partial: boolean;
+                            payments: {
+                                amount_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                finance_invoice_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                net_amount_cents?: number | null;
+                                /** Format: date */
+                                paid_on?: string | null;
+                                payment_method?: string | null;
+                                payment_status?: string | null;
+                            }[];
+                            primary_color?: string | null;
+                            promotions: {
+                                campaign_name?: string | null;
+                                discount_type?: string | null;
+                                discount_value?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: date-time */
+                                redeemed_at?: string | null;
+                            }[];
+                            /** BillingReferrals */
+                            referrals: {
+                                credit_total_cents: number;
+                                credits: {
+                                    amount_cents: number;
+                                    currency: string;
+                                    description?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    /** Format: date */
+                                    occurred_on?: string | null;
+                                }[];
+                                invited: number;
+                                paid: number;
+                                trials: number;
+                            };
+                            refund_receipts: {
+                                amount_cents: number;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                invoice_number?: string | null;
+                                /** Format: date-time */
+                                issued_at?: string | null;
+                                reason?: string | null;
+                                receipt_number: string;
+                                reversal_type?: string;
+                            }[];
+                            seasons: {
+                                currency?: string;
+                                /** Format: date */
+                                ends_on?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                price_cents?: number;
+                                /** Format: uuid */
+                                season_id: string;
+                                /** Format: date */
+                                starts_on?: string | null;
+                                status: string;
+                                title: string;
+                            }[];
+                            slug: string;
+                            subscriptions: {
+                                auto_renew?: boolean | null;
+                                billing_period?: string | null;
+                                /** Format: date */
+                                commitment_ends_on?: string | null;
+                                corporate?: boolean;
+                                /** @description The package in force today. */
+                                current: boolean;
+                                /** Format: date */
+                                ends_on?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                package_name?: string | null;
+                                package_type?: string | null;
+                                price_cents?: number | null;
+                                /** Format: date */
+                                starts_on?: string | null;
+                                status: string;
+                            }[];
+                            trials: {
+                                class_name?: string | null;
+                                /** Format: date-time */
+                                class_starts_at?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                status: string;
+                            }[];
+                        }[];
                     };
                 };
             };
