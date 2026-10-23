@@ -32,7 +32,7 @@ defmodule PaleeWeb.MeController do
         name: :audience,
         in: :path,
         required: true,
-        schema: %Schema{type: :string, enum: ~w(admin member athlete)}
+        schema: %Schema{type: :string, enum: Palee.Identity.tour_audiences()}
       }
     ],
     responses: [

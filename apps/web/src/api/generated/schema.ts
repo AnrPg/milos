@@ -2402,6 +2402,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/interests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Your disciplines and level (empty until you say) */
+        get: operations["PaleeWeb.MyInterestsController.show"];
+        /** Replace your disciplines and level */
+        put: operations["PaleeWeb.MyInterestsController.update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/journal": {
         parameters: {
             query?: never;
@@ -10796,6 +10814,27 @@ export interface components {
             next_offset: number | null;
             offset: number;
             total: number;
+        };
+        /**
+         * AccountInterests
+         * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+         */
+        AccountInterests: {
+            disciplines: string[];
+            /** @enum {string|null} */
+            level: "beginner" | "intermediate" | "advanced" | null;
+        };
+        /** AccountInterestsResponse */
+        AccountInterestsResponse: {
+            /**
+             * AccountInterests
+             * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+             */
+            interests: {
+                disciplines: string[];
+                /** @enum {string|null} */
+                level: "beginner" | "intermediate" | "advanced" | null;
+            };
         };
         /** AccountProgress */
         AccountProgress: {
@@ -31160,7 +31199,7 @@ export interface operations {
                         access_token: string;
                         user?: {
                             avatar_url?: string | null;
-                            completed_tours: ("admin" | "member" | "athlete")[];
+                            completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
@@ -31275,7 +31314,7 @@ export interface operations {
                 content: {
                     "application/json": {
                         avatar_url?: string | null;
-                        completed_tours: ("admin" | "member" | "athlete")[];
+                        completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
                         display_name: string;
                         /** @description The login's email, shared by its profiles */
                         email?: string;
@@ -31603,7 +31642,7 @@ export interface operations {
                         access_token: string;
                         user?: {
                             avatar_url?: string | null;
-                            completed_tours: ("admin" | "member" | "athlete")[];
+                            completed_tours: ("admin" | "member" | "athlete" | "first_run")[];
                             display_name: string;
                             /** @description The login's email, shared by its profiles */
                             email?: string;
@@ -42292,6 +42331,74 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyInterestsController.show": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Interests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * AccountInterests
+                         * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+                         */
+                        interests: {
+                            disciplines: string[];
+                            /** @enum {string|null} */
+                            level: "beginner" | "intermediate" | "advanced" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyInterestsController.update": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    disciplines: string[];
+                    /** @enum {string|null} */
+                    level: "beginner" | "intermediate" | "advanced" | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Interests */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * AccountInterests
+                         * @description Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null
+                         */
+                        interests: {
+                            disciplines: string[];
+                            /** @enum {string|null} */
+                            level: "beginner" | "intermediate" | "advanced" | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.JournalController.index": {
         parameters: {
             query?: {
@@ -44979,7 +45086,7 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
-                audience: "admin" | "member" | "athlete";
+                audience: "admin" | "member" | "athlete" | "first_run";
             };
             cookie?: never;
         };

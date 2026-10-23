@@ -17,7 +17,7 @@ export function updateAdminOnboarding(token: string, action: OnboardingAction, s
   });
 }
 
-export type TourAudience = "admin" | "member" | "athlete";
+export type TourAudience = "admin" | "member" | "athlete" | "first_run";
 
 /** Stores tour completion on the account so it follows the user across devices. */
 export function completeProductTour(token: string, audience: TourAudience) {

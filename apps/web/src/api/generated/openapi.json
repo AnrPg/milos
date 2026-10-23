@@ -186,6 +186,69 @@
         "title": "AccountHistoryPage",
         "type": "object"
       },
+      "AccountInterests": {
+        "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+        "properties": {
+          "disciplines": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "type": "array"
+          },
+          "level": {
+            "enum": [
+              "beginner",
+              "intermediate",
+              "advanced"
+            ],
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "disciplines",
+          "level"
+        ],
+        "title": "AccountInterests",
+        "type": "object"
+      },
+      "AccountInterestsResponse": {
+        "properties": {
+          "interests": {
+            "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+            "properties": {
+              "disciplines": {
+                "items": {
+                  "type": "string"
+                },
+                "maxItems": 12,
+                "type": "array"
+              },
+              "level": {
+                "enum": [
+                  "beginner",
+                  "intermediate",
+                  "advanced"
+                ],
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "disciplines",
+              "level"
+            ],
+            "title": "AccountInterests",
+            "type": "object"
+          }
+        },
+        "required": [
+          "interests"
+        ],
+        "title": "AccountInterestsResponse",
+        "type": "object"
+      },
       "AccountProgress": {
         "properties": {
           "active_filter_count": {
@@ -65477,7 +65540,8 @@
                             "enum": [
                               "admin",
                               "member",
-                              "athlete"
+                              "athlete",
+                              "first_run"
                             ],
                             "type": "string"
                           },
@@ -65687,7 +65751,8 @@
                         "enum": [
                           "admin",
                           "member",
-                          "athlete"
+                          "athlete",
+                          "first_run"
                         ],
                         "type": "string"
                       },
@@ -66313,7 +66378,8 @@
                             "enum": [
                               "admin",
                               "member",
-                              "athlete"
+                              "athlete",
+                              "first_run"
                             ],
                             "type": "string"
                           },
@@ -94346,6 +94412,160 @@
         ]
       }
     },
+    "/api/me/interests": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyInterestsController.show",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "interests": {
+                      "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                      "properties": {
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "level"
+                      ],
+                      "title": "AccountInterests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "interests"
+                  ],
+                  "title": "AccountInterestsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Interests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your disciplines and level (empty until you say)",
+        "tags": [
+          "Interests"
+        ]
+      },
+      "put": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyInterestsController.update",
+        "parameters": [],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                "properties": {
+                  "disciplines": {
+                    "items": {
+                      "type": "string"
+                    },
+                    "maxItems": 12,
+                    "type": "array"
+                  },
+                  "level": {
+                    "enum": [
+                      "beginner",
+                      "intermediate",
+                      "advanced"
+                    ],
+                    "nullable": true,
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "disciplines",
+                  "level"
+                ],
+                "title": "AccountInterests",
+                "type": "object"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "interests": {
+                      "description": "Disciplines are keys of the box vocabulary (GET /box-vocabulary); level is a Partners level or null",
+                      "properties": {
+                        "disciplines": {
+                          "items": {
+                            "type": "string"
+                          },
+                          "maxItems": 12,
+                          "type": "array"
+                        },
+                        "level": {
+                          "enum": [
+                            "beginner",
+                            "intermediate",
+                            "advanced"
+                          ],
+                          "nullable": true,
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "disciplines",
+                        "level"
+                      ],
+                      "title": "AccountInterests",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "interests"
+                  ],
+                  "title": "AccountInterestsResponse",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Interests"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Replace your disciplines and level",
+        "tags": [
+          "Interests"
+        ]
+      }
+    },
     "/api/me/journal": {
       "get": {
         "callbacks": {},
@@ -101521,7 +101741,8 @@
               "enum": [
                 "admin",
                 "member",
-                "athlete"
+                "athlete",
+                "first_run"
               ],
               "type": "string"
             }

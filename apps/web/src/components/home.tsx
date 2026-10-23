@@ -1,10 +1,12 @@
 "use client";
 
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 import { useSession } from "@/components/session-provider";
 import { HomeHub } from "@/components/member-app/HomeHub";
 import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganizationsPage";
+import { needsFirstRun } from "@/lib/first-run";
 
 // Vendors (SaaS operators) have no tenant homepage to speak of by default -
 // the platform console *is* their home. "/platform/organizations" stays
@@ -21,9 +23,17 @@ import { PlatformOrganizationsPage } from "@/components/platform/PlatformOrganiz
 // /admin by the route), so "/" is the Αρχική hub (ADR-137).
 export function Home() {
   const pathname = usePathname();
+  const router = useRouter();
   const { currentUser } = useSession();
   const inOrganizationContext = pathname.startsWith("/org/");
+  // ADR-183: a new account's first stop is the first-run, once.
+  const firstRun = needsFirstRun(currentUser);
 
+  useEffect(() => {
+    if (firstRun) router.replace("/welcome");
+  }, [firstRun, router]);
+
+  if (firstRun) return null;
   if (currentUser?.vendor && !inOrganizationContext) return <PlatformOrganizationsPage />;
 
   return <HomeHub />;

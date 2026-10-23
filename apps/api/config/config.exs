@@ -199,6 +199,7 @@ config :palee,
 
 config :palee, :gazetteer_store, Palee.Infrastructure.Places.EctoGazetteerStore
 config :palee, :home_area_store, Palee.Infrastructure.Places.EctoHomeAreaStore
+config :palee, :interests_store, Palee.Infrastructure.Interests.EctoInterestsStore
 
 config :palee,
        :public_profile_store,
