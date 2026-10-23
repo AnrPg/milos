@@ -16805,6 +16805,86 @@
         "title": "BusinessActivationResult",
         "type": "object"
       },
+      "BusinessArchivedDemo": {
+        "properties": {
+          "demo_archived_at": {
+            "format": "date_time",
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "provider_kind": {
+            "enum": [
+              "gym",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "slug",
+          "name",
+          "provider_kind",
+          "demo_archived_at"
+        ],
+        "title": "BusinessArchivedDemo",
+        "type": "object"
+      },
+      "BusinessArchivedDemos": {
+        "properties": {
+          "businesses": {
+            "items": {
+              "properties": {
+                "demo_archived_at": {
+                  "format": "date_time",
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "provider_kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "slug": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "slug",
+                "name",
+                "provider_kind",
+                "demo_archived_at"
+              ],
+              "title": "BusinessArchivedDemo",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "businesses"
+        ],
+        "title": "BusinessArchivedDemos",
+        "type": "object"
+      },
       "BusinessDemoStatus": {
         "properties": {
           "activation": {
@@ -16975,6 +17055,139 @@
           "activation"
         ],
         "title": "BusinessOrganization",
+        "type": "object"
+      },
+      "BusinessReopenedDemo": {
+        "properties": {
+          "organization": {
+            "properties": {
+              "activated_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "activation": {
+                "enum": [
+                  "demo",
+                  "active"
+                ],
+                "type": "string"
+              },
+              "demo_started_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "provider_kind": {
+                "type": "string"
+              },
+              "slug": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "slug",
+              "name",
+              "provider_kind",
+              "activation"
+            ],
+            "title": "BusinessOrganization",
+            "type": "object"
+          },
+          "request": {
+            "properties": {
+              "business_kind": {
+                "enum": [
+                  "gym",
+                  "coach"
+                ],
+                "type": "string"
+              },
+              "business_name": {
+                "type": "string"
+              },
+              "city": {
+                "nullable": true,
+                "type": "string"
+              },
+              "decided_at": {
+                "format": "date_time",
+                "nullable": true,
+                "type": "string"
+              },
+              "decision_note": {
+                "nullable": true,
+                "type": "string"
+              },
+              "id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "inserted_at": {
+                "format": "date_time",
+                "type": "string"
+              },
+              "kind": {
+                "enum": [
+                  "conversion",
+                  "activation"
+                ],
+                "type": "string"
+              },
+              "message": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "nullable": true,
+                "type": "string"
+              },
+              "phone": {
+                "nullable": true,
+                "type": "string"
+              },
+              "requested_by": {
+                "description": "Vendors: nickname",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "enum": [
+                  "pending",
+                  "approved",
+                  "declined",
+                  "cancelled",
+                  "completed"
+                ],
+                "type": "string"
+              }
+            },
+            "required": [
+              "id",
+              "kind",
+              "business_kind",
+              "business_name",
+              "status",
+              "inserted_at"
+            ],
+            "title": "BusinessRequest",
+            "type": "object"
+          }
+        },
+        "required": [
+          "organization",
+          "request"
+        ],
+        "title": "BusinessReopenedDemo",
         "type": "object"
       },
       "BusinessRequest": {
@@ -78281,6 +78494,245 @@
         "summary": "Write or edit a comment on one of your entries",
         "tags": [
           "Journal"
+        ]
+      }
+    },
+    "/api/me/archived-demos": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.archived_demos",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "businesses": {
+                      "items": {
+                        "properties": {
+                          "demo_archived_at": {
+                            "format": "date_time",
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "provider_kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "slug": {
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "slug",
+                          "name",
+                          "provider_kind",
+                          "demo_archived_at"
+                        ],
+                        "title": "BusinessArchivedDemo",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "businesses"
+                  ],
+                  "title": "BusinessArchivedDemos",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Archived demos"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "The person's demo businesses archived for inactivity",
+        "tags": [
+          "Business accounts"
+        ]
+      }
+    },
+    "/api/me/archived-demos/{id}/reopen": {
+      "post": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.BusinessAccountController.reopen_demo",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "organization": {
+                      "properties": {
+                        "activated_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "activation": {
+                          "enum": [
+                            "demo",
+                            "active"
+                          ],
+                          "type": "string"
+                        },
+                        "demo_started_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "name": {
+                          "type": "string"
+                        },
+                        "provider_kind": {
+                          "type": "string"
+                        },
+                        "slug": {
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "slug",
+                        "name",
+                        "provider_kind",
+                        "activation"
+                      ],
+                      "title": "BusinessOrganization",
+                      "type": "object"
+                    },
+                    "request": {
+                      "properties": {
+                        "business_kind": {
+                          "enum": [
+                            "gym",
+                            "coach"
+                          ],
+                          "type": "string"
+                        },
+                        "business_name": {
+                          "type": "string"
+                        },
+                        "city": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decided_at": {
+                          "format": "date_time",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "decision_note": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "id": {
+                          "format": "uuid",
+                          "type": "string"
+                        },
+                        "inserted_at": {
+                          "format": "date_time",
+                          "type": "string"
+                        },
+                        "kind": {
+                          "enum": [
+                            "conversion",
+                            "activation"
+                          ],
+                          "type": "string"
+                        },
+                        "message": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "organization_id": {
+                          "format": "uuid",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "phone": {
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "requested_by": {
+                          "description": "Vendors: nickname",
+                          "nullable": true,
+                          "type": "string"
+                        },
+                        "status": {
+                          "enum": [
+                            "pending",
+                            "approved",
+                            "declined",
+                            "cancelled",
+                            "completed"
+                          ],
+                          "type": "string"
+                        }
+                      },
+                      "required": [
+                        "id",
+                        "kind",
+                        "business_kind",
+                        "business_name",
+                        "status",
+                        "inserted_at"
+                      ],
+                      "title": "BusinessRequest",
+                      "type": "object"
+                    }
+                  },
+                  "required": [
+                    "organization",
+                    "request"
+                  ],
+                  "title": "BusinessReopenedDemo",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Reopened"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Reopen an archived demo business: empty, in demo mode, activation requested",
+        "tags": [
+          "Business accounts"
         ]
       }
     },
