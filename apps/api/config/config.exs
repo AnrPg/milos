@@ -127,6 +127,19 @@ config :palee,
        :inventory_store,
        Palee.Infrastructure.Inventory.EctoInventoryStore
 
+# ADR-190: the e-shop and Finance's revenue streams.
+config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
+config :palee, :shop_notifier, Palee.Infrastructure.Shop.NotificationsShopNotifier
+
+config :palee,
+       :finance_revenue_stream_store,
+       Palee.Infrastructure.Finance.EctoRevenueStreamStore
+
+# No card vendor yet (ADR-190): the mock provider reports online payment as
+# unavailable. Dev and test switch it to `:simulate` to exercise the paid flow.
+config :palee, :shop_payment_provider, Palee.Infrastructure.Shop.MockPaymentProvider
+config :palee, Palee.Infrastructure.Shop.MockPaymentProvider, mode: :unavailable
+
 config :palee,
        :community_store,
        Palee.Infrastructure.Community.EctoCommunityStore

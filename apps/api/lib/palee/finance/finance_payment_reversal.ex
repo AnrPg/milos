@@ -23,6 +23,10 @@ defmodule Palee.Finance.FinancePaymentReversal do
     field :deleted_by_id, :binary_id
     field :deletion_reason, :string
     field :params, :map, default: %{}
+    # ADR-190: inherited from the reversed payment (database trigger).
+    field :revenue_stream, :string, default: "membership", read_after_writes: true
+    field :source_type, :string, read_after_writes: true
+    field :source_id, :binary_id, read_after_writes: true
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -66,5 +70,42 @@ defmodule Palee.Finance.FinancePaymentReversal do
     |> foreign_key_constraint(:membership_payment_id)
     |> foreign_key_constraint(:finance_invoice_id)
     |> foreign_key_constraint(:created_by_id)
+  end
+
+  @doc """
+  ADR-190: a reversal of a revenue-stream payment. The stream and source
+  are copied from the payment by the database, whatever is passed here.
+  """
+  def stream_changeset(reversal \\ %__MODULE__{}, params) do
+    reversal
+    |> cast(params, [
+      :membership_id,
+      :user_id,
+      :membership_payment_id,
+      :finance_invoice_id,
+      :reversal_type,
+      :amount_cents,
+      :currency,
+      :occurred_on,
+      :occurred_at,
+      :reason,
+      :created_by_id,
+      :idempotency_key,
+      :params
+    ])
+    |> validate_required([
+      :membership_payment_id,
+      :reversal_type,
+      :amount_cents,
+      :currency,
+      :occurred_on,
+      :occurred_at,
+      :idempotency_key
+    ])
+    |> validate_inclusion(:reversal_type, ["refund", "payment_reversal"])
+    |> validate_number(:amount_cents, greater_than: 0)
+    |> check_constraint(:membership_id, name: :finance_payment_reversals_member_or_shop_check)
+    |> unique_constraint(:idempotency_key)
+    |> foreign_key_constraint(:membership_payment_id)
   end
 end

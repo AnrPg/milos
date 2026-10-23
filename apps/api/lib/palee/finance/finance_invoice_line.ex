@@ -20,6 +20,10 @@ defmodule Palee.Finance.FinanceInvoiceLine do
     field :package_code_snapshot, :string
     field :package_family_snapshot, :string
     field :params, :map, default: %{}
+    # ADR-190: revenue stream and the row that caused the line.
+    field :revenue_stream, :string, default: "membership"
+    field :source_type, :string
+    field :source_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -78,5 +82,42 @@ defmodule Palee.Finance.FinanceInvoiceLine do
     else
       changeset
     end
+  end
+
+  @doc "ADR-190: a line written by a revenue stream, with its source row."
+  def stream_changeset(line \\ %__MODULE__{}, params) do
+    line
+    |> cast(params, [
+      :finance_invoice_id,
+      :line_type,
+      :description,
+      :quantity,
+      :unit_amount_cents,
+      :discount_cents,
+      :total_cents,
+      :charge_category,
+      :params,
+      :revenue_stream,
+      :source_type,
+      :source_id
+    ])
+    |> validate_required([
+      :finance_invoice_id,
+      :line_type,
+      :description,
+      :quantity,
+      :unit_amount_cents,
+      :discount_cents,
+      :total_cents,
+      :revenue_stream,
+      :source_type,
+      :source_id
+    ])
+    |> validate_inclusion(:line_type, ["shop_item", "manual_charge", "discount", "adjustment"])
+    |> validate_inclusion(:revenue_stream, Palee.Finance.Domain.RevenueStream.keys())
+    |> validate_number(:quantity, greater_than: 0)
+    |> validate_number(:total_cents, greater_than_or_equal_to: 0)
+    |> validate_discount_not_above_subtotal()
+    |> foreign_key_constraint(:finance_invoice_id)
   end
 end

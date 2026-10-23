@@ -25,6 +25,8 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def get_member_profile(user_id), do: adapter().get_member_profile(user_id)
   @impl true
+  def member_shop_terms(user_id), do: adapter().member_shop_terms(user_id)
+  @impl true
   def search_member_summaries(params), do: adapter().search_member_summaries(params)
   @impl true
   def assign_package(membership_id, package_id, params),

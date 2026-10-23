@@ -129,6 +129,8 @@ admin is logged and the coach is notified with who read which note and when
 | Cleaning log: review, set areas and tasks | ✔ | ✔ | — | 👁 | — | own entries | — |
 | Inventory: add and edit items, prices, shops; restock, use, recount; service, repair, retire; inventory report (`manage_inventory`) | ✔ | ✔ | — | ✔ | — | — | — |
 | Inventory: see machines and consumables without prices or shops; log notes, issues, outages; report running low (`report_inventory`) ³ | ✔ | ✔ | ✔ | ✔ | — | ✔ | — |
+| Shop: products, variants, prices, publishing, stock movements, «Προώθηση» (`manage_shop`, ADR-190) ⁶ | ✔ | ✔ | — | unlockable | — | — | — |
+| Shop: prepare and hand over orders, desk sale (Ταμείο), record the payment, cancel an unpaid order (`sell_shop`, ADR-190) | ✔ | ✔ | — | ✔ | — | — | — |
 | Community: answer group proposals, handle reports, let people into open clubs (`moderate_community`) ⁴ | ✔ | ✔ | ✔ | — | — | — | — |
 | Community: the group rule; create, edit and archive open clubs (`manage_community`) | ✔ | ✔ | — | — | — | — | — |
 | Events: create, edit and cancel club events; attendees, «Πλήρωσε», free a place, message everyone going, the trial offer (`manage_events`) ⁵ | ✔ | ✔ | ✔ | — | — | — | — |
@@ -144,6 +146,11 @@ in it; a member group's admins do the same inside their group (ADR-143).
 ⁵ The door of an event is open to the desk too: «Ήρθε» needs `manage_events`
 or `check_in`, «Πλήρωσε» `manage_events` or `take_payments`, and reading
 the attendee list any of the three (ADR-153).
+
+⁶ Refunds of shop orders need `manage_shop` plus `take_payments`. Branch-
+scoped staff (ADR-186) see orders picked up at their branches and products
+valid at them. A demo business (ADR-184) builds its catalog but cannot
+publish for visitors (`anyone`) or sell to real people.
 
 ## 4. Rules that are easy to get wrong
 
