@@ -377,7 +377,15 @@ defmodule PaleeWeb.EventOrganisersControllerTest do
                  title: "Open WOD",
                  starts_at: at(2 * 24 * 60),
                  ends_at: at(2 * 24 * 60 + 60),
-                 repeat_until: Date.to_iso8601(Date.add(Date.utc_today(), 9)),
+                 # The last day is gym-local (ADR-176): the box's date of the 2nd start,
+                 # so the run does not lose it late in the UTC evening.
+                 repeat_until:
+                   DateTime.utc_now()
+                   |> DateTime.add(9, :day)
+                   |> Palee.TimeZones.ZonedTime.local_date(
+                     Palee.TimeZones.ZonedTime.default_zone()
+                   )
+                   |> Date.to_iso8601(),
                  place_name: "Το box",
                  audience: "open",
                  cohost_slugs: [ctx.cohost.slug, "/b/#{third.slug}", "no-such-box"]
