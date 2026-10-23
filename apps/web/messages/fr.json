@@ -6638,7 +6638,9 @@
     "err_not_pending": "Cette demande a déjà reçu une réponse.",
     "err_not_paid": "Cette personne n'a pas payé, il n'y a donc rien à rembourser.",
     "err_already_refunded": "Ce paiement a déjà été remboursé.",
-    "err_invalid_refund": "Rembourse un montant supérieur à zéro et pas plus que ce qui a été payé."
+    "err_invalid_refund": "Rembourse un montant supérieur à zéro et pas plus que ce qui a été payé.",
+    "err_invalid_cohosts": "Ces adresses de co-organisateurs sont illisibles. Vérifie chaque adresse de page.",
+    "err_duplicate_cohost": "La même entreprise est sollicitée deux fois."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Aucun événement à venir. Crée-en un avec «+ Nouvel événement».",

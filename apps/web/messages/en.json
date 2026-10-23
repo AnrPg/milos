@@ -6638,7 +6638,9 @@
     "err_not_pending": "This request has already been answered.",
     "err_not_paid": "This person hasn't paid, so there's nothing to refund.",
     "err_already_refunded": "This payment has already been refunded.",
-    "err_invalid_refund": "Refund an amount above zero and no more than they paid."
+    "err_invalid_refund": "Refund an amount above zero and no more than they paid.",
+    "err_invalid_cohosts": "Those co-host addresses can't be read. Check each page address.",
+    "err_duplicate_cohost": "The same business is asked twice."
   },
   "EventsAdmin": {
     "emptyUpcoming": "No upcoming events. Create one with «+ New event».",

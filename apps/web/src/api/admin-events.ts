@@ -50,7 +50,10 @@ export async function fetchStaffEvent(token: string, eventId: string, slug: Slug
 }
 
 export function createStaffEvent(token: string, draft: StaffEventDraft) {
-  return apiRequest<{ event: StaffEvent; occurrences: number }>(events(null), { method: "POST", token, body: draft });
+  return apiRequest<{ event: StaffEvent; occurrences: number; cohost_failures?: components["schemas"]["CommunityEventCohostFailure"][] }>(
+    events(null),
+    { method: "POST", token, body: draft },
+  );
 }
 
 export async function updateStaffEvent(

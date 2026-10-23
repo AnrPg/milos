@@ -6638,7 +6638,9 @@
     "err_not_pending": "A questa richiesta è già stata data risposta.",
     "err_not_paid": "Questa persona non ha pagato, quindi non c'è nulla da rimborsare.",
     "err_already_refunded": "Questo pagamento è già stato rimborsato.",
-    "err_invalid_refund": "Rimborsa un importo superiore a zero e non oltre quanto pagato."
+    "err_invalid_refund": "Rimborsa un importo superiore a zero e non oltre quanto pagato.",
+    "err_invalid_cohosts": "Questi indirizzi dei co-organizzatori non si leggono. Controlla ogni indirizzo di pagina.",
+    "err_duplicate_cohost": "La stessa attività è invitata due volte."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Nessun evento in arrivo. Creane uno con «+ Nuovo evento».",

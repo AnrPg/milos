@@ -5,7 +5,6 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { createHostedEvent, EVENT_HOSTS_KEY, fetchEventHosts, type CommunityEvent, type EventHostChoice } from "@/api/events";
-import { inviteCohost } from "@/api/admin-events";
 import { useSession } from "@/components/session-provider";
 
 import { blankEventForm, useEventLocations } from "./EventFormParts";
@@ -83,7 +82,7 @@ export function HostedEventSheet({
       locations={locations.data ?? []}
       gymSlug={businessSlug}
       draftKey={["hosted", self ? "self" : (host?.id ?? "self")].join(":")}
-      cohosts={businessSlug ? { ownSlug: businessSlug, invite: (eventId, slug) => inviteCohost(token, eventId, slug, businessSlug) } : null}
+      cohosts={businessSlug ? { ownSlug: businessSlug } : null}
       onSubmit={async (body) => {
         const created = await createHostedEvent(token, {
           ...body,
@@ -92,7 +91,7 @@ export function HostedEventSheet({
         });
         await Promise.all([invalidateEvents(queryClient), queryClient.invalidateQueries({ queryKey: EVENT_HOSTS_KEY })]);
         onCreated?.(created.event);
-        return { id: created.event.id };
+        return { cohostFailures: created.cohost_failures ?? [] };
       }}
       onClose={onClose}
     />

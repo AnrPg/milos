@@ -6638,7 +6638,9 @@
     "err_not_pending": "Diese Anfrage wurde schon beantwortet.",
     "err_not_paid": "Diese Person hat nicht bezahlt, also gibt es nichts zu erstatten.",
     "err_already_refunded": "Diese Zahlung wurde schon erstattet.",
-    "err_invalid_refund": "Erstatte einen Betrag über null und nicht mehr als bezahlt wurde."
+    "err_invalid_refund": "Erstatte einen Betrag über null und nicht mehr als bezahlt wurde.",
+    "err_invalid_cohosts": "Diese Adressen der Mitveranstalter lassen sich nicht lesen. Prüfe jede Seitenadresse.",
+    "err_duplicate_cohost": "Dasselbe Unternehmen wird zweimal angefragt."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Keine anstehenden Events. Erstelle eines mit «+ Neues Event».",

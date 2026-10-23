@@ -15,11 +15,13 @@ export type EventWizardClubs = {
   onChange: (id: string) => void;
 };
 
-/** ADR-185 co-hosts invited as the event is published (business or club hosts only). */
+/**
+ * ADR-185 co-hosts asked as the event is published (business or club hosts
+ * whose caller runs events there): the create request carries them.
+ */
 export type EventWizardCohosts = {
   /** The host's own page address: it cannot co-host its own event. */
   ownSlug: string | null;
-  invite: (eventId: string, slug: string) => Promise<unknown>;
 };
 
 /** What every step gets. */

@@ -6638,7 +6638,9 @@
     "err_not_pending": "Op dit verzoek is al geantwoord.",
     "err_not_paid": "Deze persoon heeft niet betaald, dus er valt niets terug te betalen.",
     "err_already_refunded": "Deze betaling is al terugbetaald.",
-    "err_invalid_refund": "Betaal een bedrag terug boven nul en niet meer dan er betaald is."
+    "err_invalid_refund": "Betaal een bedrag terug boven nul en niet meer dan er betaald is.",
+    "err_invalid_cohosts": "Die adressen van co-organisatoren zijn niet te lezen. Controleer elk pagina-adres.",
+    "err_duplicate_cohost": "Hetzelfde bedrijf wordt twee keer gevraagd."
   },
   "EventsAdmin": {
     "emptyUpcoming": "Geen komende events. Maak er een met «+ Nieuw event».",

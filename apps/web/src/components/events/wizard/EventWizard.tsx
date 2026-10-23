@@ -4,7 +4,7 @@ import { useEffect, useId, useMemo, useReducer, useRef, useState, type FormEvent
 import { useMutation } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
-import type { EventScope } from "@/api/events";
+import type { EventCohostFailure, EventScope } from "@/api/events";
 import { ErrorLine } from "@/components/community/Sheet";
 import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import {
@@ -24,7 +24,7 @@ import { formatInZone } from "@/lib/zoned-time";
 
 import type { EventLocation } from "../EventFormParts";
 import { useEventError } from "../EventParts";
-import { eventRequest, type EventForm, type EventHostMode } from "../events";
+import { EVENT_ERROR_CODES, eventRequest, type EventForm, type EventHostMode } from "../events";
 import { BasicsStep } from "./BasicsStep";
 import { CapacityStep } from "./CapacityStep";
 import { HostStep } from "./HostStep";
@@ -36,8 +36,9 @@ import { WhereStep } from "./WhereStep";
 import { WhoStep } from "./WhoStep";
 import { WizardStepBar } from "./WizardStepBar";
 
-export type EventRequestBody = ReturnType<typeof eventRequest>;
-type CohostFailure = { slug: string; error: unknown };
+/** The create or edit body; a new event may carry the co-hosts to ask with it (ADR-185). */
+export type EventRequestBody = ReturnType<typeof eventRequest> & { cohost_slugs?: string[] };
+export type { EventCohostFailure };
 
 /**
  * «Νέο event» and editing as a wizard, one decision per screen (owner
@@ -54,7 +55,10 @@ type CohostFailure = { slug: string; error: unknown };
  * - Full screen on a phone, a dialog from `sm` up (ui/Dialog «screen»);
  *   the member app's bottom bar steps aside while it is open.
  * - `cohosts` lets a business or club host ask co-hosts as it publishes
- *   (ADR-185); `onSubmit` then returns the new event's id.
+ *   (ADR-185): the addresses go with the create request as
+ *   `cohost_slugs`, and the API writes the event and every request in one
+ *   transaction (ADR-185). `onSubmit` returns the addresses it could not
+ *   ask, which the wizard lists once the event is out.
  */
 export function EventWizard({
   title,
@@ -97,7 +101,7 @@ export function EventWizard({
   /** Editing: open on this step instead of the review. */
   startStep?: EventWizardStep | null;
   cohosts?: EventWizardCohosts | null;
-  onSubmit: (body: EventRequestBody, scope: EventScope) => Promise<{ id: string } | void>;
+  onSubmit: (body: EventRequestBody, scope: EventScope) => Promise<{ cohostFailures?: EventCohostFailure[] } | void>;
   onClose: () => void;
 }) {
   const t = useTranslations("Events");
@@ -142,7 +146,7 @@ export function EventWizard({
   const reason = problems.length ? t(["problem", problems[0]].join("_")) : null;
   const previous = previousStep({ ...state, step }, context);
   const [uploading, setUploading] = useState(false);
-  const [failures, setFailures] = useState<CohostFailure[] | null>(null);
+  const [failures, setFailures] = useState<EventCohostFailure[] | null>(null);
   const [nudged, setNudged] = useState(false);
   const headingRef = useRef<HTMLHeadingElement>(null);
   const reasonId = useId();
@@ -160,21 +164,11 @@ export function EventWizard({
 
   const save = useMutation({
     mutationFn: async () => {
-      const body = eventRequest(clockForm(state.form, context), { mode, editing: isEditing, gymTimeZone: gym.zone });
+      const body: EventRequestBody = eventRequest(clockForm(state.form, context), { mode, editing: isEditing, gymTimeZone: gym.zone });
+      // One request: the event and its co-host requests are written together, or neither.
+      if (cohostApi && asksCohosts(state.form, context) && state.cohosts.length > 0) body.cohost_slugs = state.cohosts;
       const created = await onSubmit(body, state.scope);
-      const failed: CohostFailure[] = [];
-      if (cohostApi && asksCohosts(state.form, context)) {
-        // One at a time: the API counts the co-hosts already asked against its limit.
-        for (const slug of state.cohosts) {
-          try {
-            if (!created?.id) throw new Error("event_without_id");
-            await cohostApi.invite(created.id, slug);
-          } catch (error) {
-            failed.push({ slug, error });
-          }
-        }
-      }
-      return failed;
+      return (created && created.cohostFailures) || [];
     },
     onSuccess: (failed) => {
       draft.clear();
@@ -280,7 +274,7 @@ export function EventWizard({
                 <li key={failure.slug} className="rounded-2xl px-4 py-3 text-sm" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}>
                   <span className="font-semibold">{failure.slug}</span>
                   <span className="block" style={{ color: "var(--danger)" }}>
-                    {eventError(failure.error) ?? tw("cohostNotSent")}
+                    {(EVENT_ERROR_CODES as readonly string[]).includes(failure.code) ? t(["err", failure.code].join("_")) : tw("cohostNotSent")}
                   </span>
                 </li>
               ))}

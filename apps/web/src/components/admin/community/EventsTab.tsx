@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useLocale, useTranslations } from "next-intl";
 
-import { createStaffEvent, fetchStaffEvents, inviteCohost, staffEventsKey, type StaffEventRow } from "@/api/admin-events";
+import { createStaffEvent, fetchStaffEvents, staffEventsKey, type StaffEventRow } from "@/api/admin-events";
 import type { EventListScope } from "@/api/events";
 import { useMyClubs } from "@/components/community/use-community";
 import { blankEventForm, useEventLocations } from "@/components/events/EventFormParts";
@@ -92,12 +92,12 @@ export function EventsTab() {
           coverSlug={can(membership, "manage_settings") ? selectedOrganizationSlug : null}
           gymSlug={selectedOrganizationSlug}
           draftKey={["staff", selectedOrganizationSlug ?? "box"].join(":")}
-          cohosts={{ ownSlug: selectedOrganizationSlug ?? null, invite: (eventId, slug) => inviteCohost(token, eventId, slug, selectedOrganizationSlug) }}
+          cohosts={{ ownSlug: selectedOrganizationSlug ?? null }}
           onSubmit={async (body) => {
             const created = await createStaffEvent(token, { ...body, club_id: chosenClub });
             setScope("upcoming");
             await invalidateEvents(queryClient);
-            return { id: created.event.id };
+            return { cohostFailures: created.cohost_failures ?? [] };
           }}
           onClose={() => setCreating(false)}
         />

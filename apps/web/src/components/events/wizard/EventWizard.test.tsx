@@ -38,9 +38,8 @@ describe("EventWizard", () => {
     window.localStorage.clear();
   });
 
-  it("walks a new event step by step, says why Next waits, and invites co-hosts after publishing", async () => {
-    const onSubmit = vi.fn().mockResolvedValue({ id: "event-9" });
-    const invite = vi.fn().mockResolvedValue([]);
+  it("walks a new event step by step, says why Next waits, and sends its co-hosts with it", async () => {
+    const onSubmit = vi.fn().mockResolvedValue({ cohostFailures: [] });
     const onClose = vi.fn();
     wrap(
       <EventWizard
@@ -48,7 +47,7 @@ describe("EventWizard", () => {
         initial={blankEventForm(LOCATIONS)}
         locations={LOCATIONS}
         gymSlug="box"
-        cohosts={{ ownSlug: "box", invite }}
+        cohosts={{ ownSlug: "box" }}
         onSubmit={onSubmit}
         onClose={onClose}
       />,
@@ -104,11 +103,17 @@ describe("EventWizard", () => {
     fireEvent.click(screen.getByRole("button", { name: e.publish }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(onSubmit).toHaveBeenCalledTimes(1);
-    expect(onSubmit.mock.calls[0][0]).toMatchObject({ title: "Run up Lycabettus", location_id: null, place_name: "Lycabettus Hill", capacity: 20, price_cents: 1500 });
-    expect(invite).toHaveBeenCalledWith("event-9", "box-kypseli");
+    expect(onSubmit.mock.calls[0][0]).toMatchObject({
+      title: "Run up Lycabettus",
+      location_id: null,
+      place_name: "Lycabettus Hill",
+      capacity: 20,
+      price_cents: 1500,
+      cohost_slugs: ["box-kypseli"],
+    });
   });
 
-  it("keeps the published event and lists co-hosts whose request did not go out", async () => {
+  it("keeps the published event and lists the co-hosts the API could not ask", async () => {
     const onClose = vi.fn();
     const form: EventForm = { ...blankEventForm(LOCATIONS), title: "Partner WOD" };
     wrap(
@@ -116,8 +121,8 @@ describe("EventWizard", () => {
         title="New event"
         initial={form}
         locations={LOCATIONS}
-        cohosts={{ ownSlug: null, invite: vi.fn().mockRejectedValue(new Error("nope")) }}
-        onSubmit={vi.fn().mockResolvedValue({ id: "event-9" })}
+        cohosts={{ ownSlug: null }}
+        onSubmit={vi.fn().mockResolvedValue({ cohostFailures: [{ slug: "other-box", code: "box_not_found" }] })}
         onClose={onClose}
       />,
     );
@@ -130,6 +135,7 @@ describe("EventWizard", () => {
 
     expect(await screen.findByRole("heading", { name: w.publishedTitle })).toBeInTheDocument();
     expect(screen.getByText("other-box")).toBeInTheDocument();
+    expect(screen.getByText(e.err_box_not_found)).toBeInTheDocument();
     expect(onClose).not.toHaveBeenCalled();
     fireEvent.click(screen.getByRole("button", { name: w.done }));
     expect(onClose).toHaveBeenCalled();
@@ -154,6 +160,24 @@ describe("EventWizard", () => {
     expect(offer).toHaveTextContent("Saturday WOD");
     await act(async () => fireEvent.click(within(offer).getByRole("button", { name: w.draftResume })));
     expect(screen.getByLabelText(e.fieldTitle)).toHaveValue("Saturday WOD");
+  });
+
+  it("sends no co-hosts for an event without any", async () => {
+    const onSubmit = vi.fn().mockResolvedValue(undefined);
+    wrap(
+      <EventWizard
+        title="Edit"
+        initial={{ ...blankEventForm(LOCATIONS), title: "Partner WOD" }}
+        editing={{ seriesId: null }}
+        locations={LOCATIONS}
+        cohosts={{ ownSlug: "box" }}
+        onSubmit={onSubmit}
+        onClose={vi.fn()}
+      />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: e.save }));
+    await waitFor(() => expect(onSubmit).toHaveBeenCalled());
+    expect(onSubmit.mock.calls[0][0]).not.toHaveProperty("cohost_slugs");
   });
 
   it("opens an edit on the review, keeps the series scope, and jumps to a step from «Edit»", async () => {

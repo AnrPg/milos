@@ -342,6 +342,9 @@ export const EVENT_ERROR_CODES = [
   "not_paid",
   "already_refunded",
   "invalid_refund",
+  // ADR-185: co-hosts asked with the create request.
+  "invalid_cohosts",
+  "duplicate_cohost",
 ] as const;
 
 export function eventErrorKey(error: unknown): string | null {
