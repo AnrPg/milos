@@ -6,13 +6,13 @@ defmodule Palee.Community.EventViewDay do
 
   use Ecto.Schema
 
-  @primary_key false
+  @primary_key {:id, :binary_id, read_after_writes: true}
   @foreign_key_type :binary_id
 
   schema "community_event_view_days" do
     field :organization_id, :binary_id
-    field :event_id, :binary_id, primary_key: true
-    field :day, :date, primary_key: true
+    field :event_id, :binary_id
+    field :day, :date
     field :views, :integer, default: 0
     field :viewers, :integer, default: 0
   end
@@ -27,13 +27,13 @@ defmodule Palee.Community.EventViewMark do
 
   use Ecto.Schema
 
-  @primary_key false
+  @primary_key {:id, :binary_id, read_after_writes: true}
   @foreign_key_type :binary_id
 
   schema "community_event_view_marks" do
     field :organization_id, :binary_id
-    field :event_id, :binary_id, primary_key: true
-    field :day, :date, primary_key: true
-    field :viewer_key, :binary, primary_key: true
+    field :event_id, :binary_id
+    field :day, :date
+    field :viewer_key, :binary
   end
 end

@@ -524,26 +524,36 @@ defmodule Palee.Repo.Migrations.EventOrganisersAndCohosts do
   # ------------------------------------------------------------------ views
 
   defp views do
+    # A surrogate `id` lets tenant export and purge (ADR-117) treat them like
+    # every other table; the natural keys stay unique.
     create table(:community_event_view_days, primary_key: false) do
+      add :id, :binary_id, primary_key: true, default: fragment("gen_random_uuid()")
+
       add :organization_id, references(:organizations, type: :binary_id, on_delete: :delete_all),
         null: false
 
-      add :event_id, :binary_id, null: false, primary_key: true
-      add :day, :date, null: false, primary_key: true
+      add :event_id, :binary_id, null: false
+      add :day, :date, null: false
       add :views, :integer, null: false, default: 0
       add :viewers, :integer, null: false, default: 0
     end
 
+    create unique_index(:community_event_view_days, [:event_id, :day])
+
     create table(:community_event_view_marks, primary_key: false) do
+      add :id, :binary_id, primary_key: true, default: fragment("gen_random_uuid()")
+
       add :organization_id, references(:organizations, type: :binary_id, on_delete: :delete_all),
         null: false
 
-      add :event_id, :binary_id, null: false, primary_key: true
-      add :day, :date, null: false, primary_key: true
+      add :event_id, :binary_id, null: false
+      add :day, :date, null: false
       # HMAC of (event, day, viewer) with a server key: unlinkable across
       # events and days, and dropped once the day is over.
-      add :viewer_key, :binary, null: false, primary_key: true
+      add :viewer_key, :binary, null: false
     end
+
+    create unique_index(:community_event_view_marks, [:event_id, :day, :viewer_key])
 
     for table <- ~w(community_event_view_days community_event_view_marks) do
       execute("""
