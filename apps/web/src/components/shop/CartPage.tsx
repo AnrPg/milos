@@ -11,7 +11,8 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { EMPTY_CART, cartItems, cartTotals, removeLine, setLineQuantity } from "@/lib/shop/cart";
 import { orderableUnits } from "@/lib/shop/variants";
 
-import { ErrorNotice, Eyebrow, LoadingLine, Money, Panel, ProductPhoto, ShopHeader, Stepper } from "./ShopParts";
+import { ErrorNotice, Eyebrow, LoadingLine, Money, Panel, ShopHeader } from "./ShopParts";
+import { ProductThumb, QuantityStepper } from "./shared/ShopBits";
 import { shopHref, useCart, useCartPreview, usePlaceOrder, usePricedCatalog, useShopBox, useShopProducts, useStorefront } from "./use-shop";
 
 const ORDER_ERRORS: Record<string, string> = {
@@ -167,13 +168,14 @@ export function CartPage() {
             const max = entry ? orderableUnits(entry.variant, entry.product.per_person_limit) : null;
             return (
               <li key={line.variantId} className="grid grid-cols-[3.5rem_1fr_auto] items-center gap-3 py-3" style={{ borderTop: index === 0 ? "none" : "1px solid var(--border)" }}>
-                <ProductPhoto photo={entry?.product.photos[0]} title={entry?.product.title ?? "?"} />
+                <ProductThumb src={entry?.product.photos[0]?.url} alt={entry?.product.title ?? ""} size={56} />
                 <div className="flex min-w-0 flex-col gap-1">
                   <span className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>{entry?.product.title ?? t("unavailableItem")}</span>
                   {entry?.variant.title ? <span className="truncate text-xs" style={{ color: "var(--text-soft)" }}>{entry.variant.title}</span> : null}
                   {entry && priced ? (
                     <div className="flex items-center gap-2">
-                      <Stepper
+                      <QuantityStepper
+                        min={1}
                         value={line.quantity}
                         max={max ?? 99}
                         label={t("quantityOf", { item: entry.product.title })}

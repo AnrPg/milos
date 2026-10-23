@@ -9863,8 +9863,6 @@
     "lastUnits": "{count, plural, one {Ultimo} other {Ultimi #}}",
     "new": "Nuovo",
     "cartWithCount": "{count, plural, =0 {Carrello, vuoto} one {Carrello, # articolo} other {Carrello, # articoli}}",
-    "less": "Uno in meno",
-    "more": "Uno in più",
     "loading": "Caricamento…",
     "boxCardTitle": "Negozio del box",
     "newCount": "{count, plural, one {# nuovo} other {# nuovi}}",

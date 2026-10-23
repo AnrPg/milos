@@ -9863,8 +9863,6 @@
     "lastUnits": "{count, plural, one {Laatste} other {Laatste #}}",
     "new": "Nieuw",
     "cartWithCount": "{count, plural, =0 {Winkelmand, leeg} one {Winkelmand, # artikel} other {Winkelmand, # artikelen}}",
-    "less": "Eén minder",
-    "more": "Eén meer",
     "loading": "Laden…",
     "boxCardTitle": "Winkel van de box",
     "newCount": "{count, plural, one {# nieuw} other {# nieuw}}",

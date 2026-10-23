@@ -9863,8 +9863,6 @@
     "lastUnits": "{count, plural, one {Τελευταίο} other {Τελευταία #}}",
     "new": "Νέο",
     "cartWithCount": "{count, plural, =0 {Καλάθι, άδειο} one {Καλάθι, # τεμάχιο} other {Καλάθι, # τεμάχια}}",
-    "less": "Ένα λιγότερο",
-    "more": "Ένα ακόμη",
     "loading": "Φόρτωση…",
     "boxCardTitle": "Κατάστημα του box",
     "newCount": "{count, plural, one {# νέο} other {# νέα}}",

@@ -9863,8 +9863,6 @@
     "lastUnits": "{count, plural, one {Последен} other {Последни #}}",
     "new": "Ново",
     "cartWithCount": "{count, plural, =0 {Количка, празна} one {Количка, # артикул} other {Количка, # артикула}}",
-    "less": "Един по-малко",
-    "more": "Един повече",
     "loading": "Зареждане…",
     "boxCardTitle": "Магазин на бокса",
     "newCount": "{count, plural, one {# ново} other {# нови}}",

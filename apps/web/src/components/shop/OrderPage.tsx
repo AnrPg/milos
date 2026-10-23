@@ -10,7 +10,8 @@ import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { orderReference, orderTimeline } from "@/lib/shop/catalog";
 
-import { ErrorNotice, LoadingLine, Money, Panel, ProductPhoto, ShopHeader } from "./ShopParts";
+import { ErrorNotice, LoadingLine, Money, Panel, ShopHeader } from "./ShopParts";
+import { ProductThumb } from "./shared/ShopBits";
 import { shopHref, useCancelOrder, useShopBox, useShopOrder } from "./use-shop";
 
 function time(locale: string, value: string | null) {
@@ -110,7 +111,7 @@ function OrderBody({ order, slug, locale }: { order: ShopOrder; slug: string; lo
         <ul className="flex flex-col">
           {order.lines.map((line, index) => (
             <li key={line.id} className="grid grid-cols-[3rem_1fr_auto] items-center gap-3 py-2" style={{ borderTop: index === 0 ? "none" : "1px solid var(--border)" }}>
-              <ProductPhoto photo={{ url: line.photo_url }} title={line.product_title} />
+              <ProductThumb src={line.photo_url} alt={line.product_title} size={48} />
               <span className="flex min-w-0 flex-col">
                 <span className="truncate text-sm font-bold" style={{ color: "var(--text)" }}>{line.product_title}</span>
                 <span className="truncate text-xs" style={{ color: "var(--text-soft)" }}>

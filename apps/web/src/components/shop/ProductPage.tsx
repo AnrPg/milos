@@ -10,7 +10,8 @@ import { useUiLocale } from "@/i18n/use-ui-locale";
 import { addToCart, cartUnits, memberUnitPriceCents } from "@/lib/shop/cart";
 import { choose, initialSelection, isColourAxis, isSoldOut, orderableUnits, selectedVariant, valueStates, type Selection } from "@/lib/shop/variants";
 
-import { CartButton, ErrorNotice, Eyebrow, LoadingLine, Money, Panel, ProductPhoto, ShopHeader, Stepper } from "./ShopParts";
+import { CartButton, ErrorNotice, Eyebrow, LoadingLine, Panel, ProductPhoto, ShopHeader } from "./ShopParts";
+import { PriceTag, QuantityStepper } from "./shared/ShopBits";
 import { shopHref, useBackInStock, useCart, useShopBox, useShopProduct, useStockAlerts, useStorefront } from "./use-shop";
 
 /**
@@ -117,7 +118,9 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
 
       <div className="flex items-end justify-between gap-3">
         <div className="flex flex-col">
-          <Money cents={price} currency={currency} locale={locale} className="text-2xl font-extrabold" />
+          <span className="text-2xl font-extrabold">
+            <PriceTag cents={price} compareAtCents={variant?.compare_at_price_cents} currency={currency} locale={locale} />
+          </span>
           {memberPrice < price ? (
             <span className="text-sm" style={{ color: "var(--success)" }}>
               {t("memberPrice", { price: new Intl.NumberFormat(locale, { style: "currency", currency }).format(memberPrice / 100) })}
@@ -181,7 +184,7 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
       ) : null}
 
       <div className="flex items-center gap-3">
-        <Stepper value={quantity} max={max ?? 99} onChange={(value) => { setQuantity(value); setAdded(false); }} label={t("quantity")} />
+        <QuantityStepper value={quantity} min={1} max={max ?? 99} onChange={(value) => { setQuantity(value); setAdded(false); }} label={t("quantity")} />
         <button
           type="button"
           onClick={add}

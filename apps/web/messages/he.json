@@ -9863,8 +9863,6 @@
     "lastUnits": "{count, plural, one {אחרון} other {# אחרונים}}",
     "new": "חדש",
     "cartWithCount": "{count, plural, =0 {עגלה, ריקה} one {עגלה, פריט אחד} other {עגלה, # פריטים}}",
-    "less": "אחד פחות",
-    "more": "אחד יותר",
     "loading": "טוען…",
     "boxCardTitle": "החנות של הבוקס",
     "newCount": "{count, plural, one {חדש אחד} other {# חדשים}}",

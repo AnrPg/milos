@@ -140,36 +140,6 @@ export function Eyebrow({ children }: { children: ReactNode }) {
   );
 }
 
-export function Stepper({
-  value,
-  min = 1,
-  max,
-  onChange,
-  label,
-}: {
-  value: number;
-  min?: number;
-  max: number | null;
-  onChange: (value: number) => void;
-  label: string;
-}) {
-  const t = useTranslations("Shop");
-  const atMax = max !== null && value >= max;
-  return (
-    <div role="group" aria-label={label} className="inline-flex min-h-11 items-center rounded-2xl" style={{ border: "1px solid var(--border)", background: "var(--panel-raised)" }}>
-      <button type="button" aria-label={t("less")} disabled={value <= min} onClick={() => onChange(value - 1)} className="min-h-11 min-w-11 text-lg font-bold disabled:opacity-40" style={{ color: "var(--text)" }}>
-        −
-      </button>
-      <span className="min-w-8 text-center font-bold tabular-nums" style={{ color: "var(--text)" }} aria-live="polite">
-        {value}
-      </span>
-      <button type="button" aria-label={t("more")} disabled={atMax} onClick={() => onChange(value + 1)} className="min-h-11 min-w-11 text-lg font-bold disabled:opacity-40" style={{ color: "var(--text)" }}>
-        +
-      </button>
-    </div>
-  );
-}
-
 export function LoadingLine() {
   const t = useTranslations("Shop");
   return (
