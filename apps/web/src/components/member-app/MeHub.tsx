@@ -16,6 +16,7 @@ import { useBuddies } from "@/components/buddy/use-buddies";
 import { HubCard, HubList, HubListRow, HubPage } from "@/components/member-app/HubParts";
 import { useSession } from "@/components/session-provider";
 import { useSocialSummary } from "@/components/social/use-social";
+import { useHasBillingProviders } from "@/lib/billing-providers";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref } from "@/lib/organization-slug";
 import { ownsBusiness, ownsCoachPractice } from "@/lib/solo-coach";
@@ -49,6 +50,7 @@ export function MeHub() {
   const tResets = useTranslations("passwordResets");
   const { currentUser, tokens, signOut } = useSession();
   const { membership, memberships, selectedOrganizationSlug } = useSelectedMembershipRole();
+  const { hasBillingProviders } = useHasBillingProviders();
   const nickname = currentUser?.nickname ?? "";
   const initials = nickname.slice(0, 2).toUpperCase() || "?";
   const clubs = memberships.map((entry) => entry.settings?.brand_name?.trim() || entry.organization.name);
@@ -120,7 +122,10 @@ export function MeHub() {
         <HubListRow href="/journal/pantheon" label={t("meSharedPrs")} detail={t("meSharedPrsHint")} />
         <HubListRow href="/me/sharing" label={t("meSharing")} detail={t("meSharingHint")} />
         <HubListRow href="/me/devices" label={tCheckIn("devicesTitle")} detail={tCheckIn("devicesNavHint")} />
-        <HubListRow href="/me/payments" label={t("mePayments")} detail={t("mePaymentsHint")} />
+        {/* Only for clients of a gym or coach; staff use the console. */}
+        {hasBillingProviders ? (
+          <HubListRow href="/me/payments" label={t("mePayments")} detail={t("mePaymentsHint")} />
+        ) : null}
         <HubListRow href="/me/activity/chats" label={t("meChats")} />
         <HubListRow href="/me/settings" label={t("meSettings")} detail={t("meSettingsHint")} />
         <HubListRow href="/me/settings/interests" label={tFirstRun("interestsTitle")} detail={tFirstRun("interestsHubHint")} />
