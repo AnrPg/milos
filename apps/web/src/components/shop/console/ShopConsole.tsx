@@ -41,7 +41,7 @@ export function ShopConsole() {
   const branchFilter = useBranchFilter("shop");
   const locationIds = branchFilter.param;
 
-  const tabs = TABS.filter((tab) => (tab === "analytics" ? access.analytics : access.manage));
+  const tabs = TABS.filter((tab) => (tab === "analytics" ? access.analytics : tab === "orders" ? access.sell : access.manage));
   const requested = searchParams.get("tab") as ShopTab | null;
   const activeTab: ShopTab = requested && tabs.includes(requested) ? requested : tabs[0] ?? "products";
 

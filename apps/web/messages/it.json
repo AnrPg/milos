@@ -10163,9 +10163,7 @@
       "history": "Movimenti",
       "adjust": "Rettifica",
       "policyNote": "Lo stato deriva dai giorni di scorta rimasti al ritmo attuale: critico sotto i 7 giorni, basso sotto i 21. Gli avvisi partono solo quando peggiora, e il magazzino entra nel riepilogo giornaliero.",
-      "recent": "Movimenti recenti",
       "historyOf": "Movimenti · {item}",
-      "allMovements": "Tutti i movimenti",
       "noMovements": "Ancora nessun movimento.",
       "kinds": {
         "receive": "Arrivo merce",

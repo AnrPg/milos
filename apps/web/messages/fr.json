@@ -10163,9 +10163,7 @@
       "history": "Mouvements",
       "adjust": "Ajuster",
       "policyNote": "L'état vient des jours de stock restants au rythme actuel : critique sous 7 jours, bas sous 21. Les alertes ne partent que quand il empire, et le stock entre dans le résumé quotidien.",
-      "recent": "Mouvements récents",
       "historyOf": "Mouvements · {item}",
-      "allMovements": "Tous les mouvements",
       "noMovements": "Aucun mouvement pour l'instant.",
       "kinds": {
         "receive": "Réception",

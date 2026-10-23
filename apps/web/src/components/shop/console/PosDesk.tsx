@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { DeskPaymentMethod, ShopOrder, ShopProduct, ShopVariant } from "@/api/shop";
+import { shopIdempotencyKey, type DeskPaymentMethod, type ShopOrder, type ShopProduct, type ShopVariant } from "@/api/shop";
 import { useBranchFilter } from "@/components/admin/BranchFilter";
 import { Segmented, Toggle } from "@/components/admin/finance/packages/package-ui";
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";
@@ -30,9 +30,6 @@ function availableAt(variant: ShopVariant, locationId: string | null) {
   return Math.max(onHand - reserved, 0);
 }
 
-function newKey() {
-  return typeof crypto !== "undefined" && "randomUUID" in crypto ? crypto.randomUUID() : [Date.now(), Math.random()].join(":");
-}
 
 /**
  * «Ταμείο» (proposal flow 4): big tiles, a variant quick-pick, the member or
@@ -65,7 +62,7 @@ export function PosDesk() {
   const [walkInName, setWalkInName] = useState("");
   const [method, setMethod] = useState<DeskPaymentMethod>("cash");
   const [done, setDone] = useState<ShopOrder | null>(null);
-  const idempotency = useRef(newKey());
+  const idempotency = useRef(shopIdempotencyKey());
   const member = useDeskMember(walkIn || !userId ? null : userId);
 
   const tiles = useMemo(() => {
@@ -123,7 +120,7 @@ export function PosDesk() {
             setUserId("");
             setUserName("");
             setWalkInName("");
-            idempotency.current = newKey();
+            idempotency.current = shopIdempotencyKey();
           },
         },
       ),

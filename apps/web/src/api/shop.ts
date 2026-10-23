@@ -5,11 +5,11 @@ import { apiRequest } from "@/api/client";
  * orders, the desk sale (Ταμείο) and «Προώθηση» posts (ADR-190), and the
  * shop reports (ADR-192 §4). Calls go through the selected gym (`/admin`).
  *
- * TODO(ADR-190): the shop controllers are not in the OpenAPI document yet
- * (origin/…-shop-api has the schema only). These types follow the shop
- * migration (`20261211100000_create_shop.exs`) and the proposal's contract;
- * once `npm run generate:api` carries `PaleeWeb.Admin.ShopController`, derive
- * them from `operations` like `api/inventory.ts` does and drop this note.
+ * The wire shapes follow `PaleeWeb.Schemas.Shop` and
+ * `PaleeWeb.Schemas.ShopReports`; the functions below map them to the
+ * console's types (stock per branch, option axes, report totals).
+ * TODO(ADR-190): derive the wire types from `operations` once
+ * `npm run generate:api` has run against the shop controllers.
  */
 
 export type ShopProductStatus = "draft" | "published" | "archived";
@@ -183,9 +183,10 @@ export type ShopStockMovement = {
 export type ShopMovementInput = {
   variant_id: string;
   location_id: string | null;
-  kind: "receive" | "adjustment";
-  /** Signed for an adjustment, positive for a delivery. */
-  quantity: number;
+  kind: "receive" | "adjustment" | "recount";
+  /** Signed for an adjustment, positive for a delivery; a recount sends `counted` instead. */
+  quantity?: number;
+  counted?: number;
   reason?: ShopAdjustReason;
   unit_cost_cents?: number | null;
   note?: string | null;
@@ -362,43 +363,239 @@ function query(params: Record<string, string | number | boolean | null | undefin
   return text ? `?${text}` : "";
 }
 
+/** A fresh idempotency key for a sale or a refund (ADR-190: 8 to 120 characters). */
+export function shopIdempotencyKey() {
+  if (typeof crypto !== "undefined" && "randomUUID" in crypto) return crypto.randomUUID();
+  return [Date.now().toString(36), Math.random().toString(36).slice(2), Math.random().toString(36).slice(2)].join("");
+}
+
 export const SHOP_KEY = ["admin", "shop"] as const;
 
-// ---- catalog (TODO(ADR-190): /admin/shop/products) ----
+// ---- wire shapes (PaleeWeb.Schemas.Shop) and their mapping to the console's types ----
 
-export function fetchShopProducts(token: string, params: { status?: ShopProductStatus | "low_stock"; q?: string; locationIds?: string } = {}) {
-  return apiRequest<{ products: ShopProduct[]; counts: ShopProductCounts }>(
-    `${BASE}/products${query({ status: params.status, q: params.q, location_ids: params.locationIds })}`,
-    { token },
-  );
+type WireStockLevel = { location_id: string | null; on_hand: number; reserved: number; available?: number };
+type WireVariant = Omit<ShopVariant, "stock" | "on_hand" | "reserved"> & {
+  product_id?: string;
+  stock?: { on_hand: number; reserved: number; available?: number; by_location?: WireStockLevel[] } | null;
+};
+type WireProduct = Omit<ShopProduct, "media" | "options" | "variants"> & {
+  media?: ShopMedia[];
+  media_ids?: string[];
+  options?: { axes?: ShopOption[] } | ShopOption[] | null;
+  variants?: WireVariant[];
+};
+
+export function variantFromWire(wire: WireVariant): ShopVariant {
+  const stock = wire.stock ?? null;
+  const levels = stock?.by_location?.map((level) => ({ location_id: level.location_id ?? null, on_hand: level.on_hand, reserved: level.reserved })) ?? [];
+  return {
+    ...wire,
+    option_values: wire.option_values ?? {},
+    track_inventory: wire.track_inventory ?? true,
+    stock: levels,
+    on_hand: stock?.on_hand ?? 0,
+    reserved: stock?.reserved ?? 0,
+    days_of_stock_left: wire.days_of_stock_left ?? null,
+  };
+}
+
+export function productFromWire(wire: WireProduct): ShopProduct {
+  const options = Array.isArray(wire.options) ? wire.options : (wire.options?.axes ?? []);
+  // TODO(ADR-190): the product JSON carries `media_ids` only; thumbnails show once it carries media URLs.
+  const media = wire.media ?? (wire.media_ids ?? []).map((mediaId) => ({ id: mediaId }));
+  return {
+    ...wire,
+    media,
+    options,
+    sell_in_app: wire.sell_in_app ?? true,
+    sell_at_desk: wire.sell_at_desk ?? true,
+    member_discount_applies: wire.member_discount_applies ?? false,
+    all_locations: wire.all_locations ?? true,
+    location_ids: wire.location_ids ?? [],
+    variants: (wire.variants ?? []).map(variantFromWire),
+  };
+}
+
+function sellsAt(product: ShopProduct, locationIds: string[] | null) {
+  return !locationIds || product.all_locations || product.location_ids.some((locationId) => locationIds.includes(locationId));
+}
+
+/** The list's filter counts and one filter's rows, from the active catalog and the archived one. */
+export function catalogView(
+  active: ShopProduct[],
+  archived: ShopProduct[],
+  params: { status?: ShopProductStatus | "low_stock"; q?: string; locationIds?: string } = {},
+): { products: ShopProduct[]; counts: ShopProductCounts } {
+  const locations = params.locationIds ? params.locationIds.split(",").filter(Boolean) : null;
+  const needle = params.q?.trim().toLocaleLowerCase() ?? "";
+  const scoped = (rows: ShopProduct[]) => rows.filter((product) => sellsAt(product, locations));
+  const live = scoped(active.filter((product) => product.status !== "archived"));
+  const gone = scoped(archived);
+  const low = (product: ShopProduct) =>
+    product.status === "published" &&
+    product.variants.some((variant) => !variant.archived_at && variant.track_inventory && variant.stock_status !== "ok");
+  const counts: ShopProductCounts = {
+    all: live.length,
+    published: live.filter((product) => product.status === "published").length,
+    draft: live.filter((product) => product.status === "draft").length,
+    archived: gone.length,
+    low_stock: live.filter(low).length,
+  };
+  const rows =
+    params.status === "archived"
+      ? gone
+      : params.status === "low_stock"
+        ? live.filter(low)
+        : params.status
+          ? live.filter((product) => product.status === params.status)
+          : live;
+  const matches = (product: ShopProduct) =>
+    !needle || [product.title, product.category ?? ""].some((text) => text.toLocaleLowerCase().includes(needle));
+  return { products: rows.filter(matches), counts };
+}
+
+/** Stock rows of the console: one per variant and branch, from the catalog's stock. */
+export function stockItemsFromCatalog(products: ShopProduct[], locationIds?: string): ShopStockItem[] {
+  const locations = locationIds ? locationIds.split(",").filter(Boolean) : null;
+  const items: ShopStockItem[] = [];
+  for (const product of products) {
+    if (product.status === "archived") continue;
+    for (const variant of product.variants) {
+      if (variant.archived_at || !variant.track_inventory) continue;
+      const levels = variant.stock.length > 0 ? variant.stock : [{ location_id: null, on_hand: variant.on_hand, reserved: variant.reserved }];
+      for (const level of levels) {
+        if (locations && level.location_id && !locations.includes(level.location_id)) continue;
+        items.push({
+          variant_id: variant.id,
+          product_id: product.id,
+          product_title: product.title,
+          variant_title: variant.title ?? (Object.values(variant.option_values).join(" / ") || null),
+          location_id: level.location_id,
+          on_hand: level.on_hand,
+          reserved: level.reserved,
+          stock_status: variant.stock_status,
+          days_of_stock_left: variant.days_of_stock_left ?? null,
+          velocity_per_week: null,
+          unit_cost_cents: variant.cost_price_cents ?? null,
+          thumb_url: product.media[0]?.thumb_url ?? null,
+        });
+      }
+    }
+  }
+  return items;
+}
+
+// ---- catalog (ShopController) ----
+
+async function listProducts(token: string, status?: ShopProductStatus) {
+  const data = await apiRequest<{ products: WireProduct[] }>(`${BASE}/products${query({ status })}`, { token });
+  return (data.products ?? []).map(productFromWire);
+}
+
+/** The catalog with its filter counts. The API filters by status only, so branches, search and «Χαμηλό απόθεμα» filter here. */
+export async function fetchShopProducts(token: string, params: { status?: ShopProductStatus | "low_stock"; q?: string; locationIds?: string } = {}) {
+  const [active, archived] = await Promise.all([listProducts(token), listProducts(token, "archived")]);
+  return catalogView(active, archived, params);
 }
 
 export async function fetchShopProduct(token: string, productId: string) {
-  const data = await apiRequest<{ product: ShopProduct }>(`${BASE}/products/${id(productId)}`, { token });
-  return data.product;
+  const data = await apiRequest<{ product: WireProduct }>(`${BASE}/products/${id(productId)}`, { token });
+  return productFromWire(data.product);
 }
 
-export async function createShopProduct(token: string, body: ShopProductInput) {
-  const data = await apiRequest<{ product: ShopProduct }>(`${BASE}/products`, { method: "POST", token, body });
-  return data.product;
+function variantBody(variant: ShopVariantInput) {
+  return {
+    option_values: variant.option_values,
+    sku: variant.sku ?? null,
+    price_cents: variant.price_cents,
+    compare_at_price_cents: variant.compare_at_price_cents ?? null,
+    cost_price_cents: variant.cost_price_cents ?? null,
+    low_stock_threshold: variant.low_stock_threshold ?? null,
+    track_inventory: variant.track_inventory ?? true,
+  };
 }
 
-export async function updateShopProduct(token: string, productId: string, body: Partial<ShopProductInput>) {
-  const data = await apiRequest<{ product: ShopProduct }>(`${BASE}/products/${id(productId)}`, { method: "PATCH", token, body });
-  return data.product;
+function productBody(input: ShopProductInput) {
+  return {
+    title: input.title,
+    description: input.description ?? null,
+    category: input.category ?? null,
+    media_ids: input.media_ids,
+    options: input.options,
+    visibility: input.visibility,
+    sell_in_app: input.sell_in_app,
+    sell_at_desk: input.sell_at_desk,
+    member_discount_applies: input.member_discount_applies,
+    per_person_limit: input.per_person_limit ?? null,
+    all_locations: input.all_locations,
+    location_ids: input.location_ids,
+  };
+}
+
+const sameValues = (left: Record<string, string>, right: Record<string, string>) =>
+  Object.keys(left).length === Object.keys(right).length && Object.entries(left).every(([key, value]) => right[key] === value);
+
+/** Opening stock beyond the first branch arrives as deliveries, so every unit has its ledger row. */
+async function receiveOpening(token: string, variantId: string, entries: { location_id: string | null; quantity: number }[]) {
+  for (const entry of entries) {
+    if (entry.quantity > 0) await recordShopMovement(token, { variant_id: variantId, location_id: entry.location_id, kind: "receive", quantity: entry.quantity });
+  }
+}
+
+/** A new product is always a draft (the create body has no status); its first opening stock rides on the create. */
+export async function createShopProduct(token: string, input: ShopProductInput) {
+  const data = await apiRequest<{ product: WireProduct }>(`${BASE}/products`, {
+    method: "POST",
+    token,
+    body: {
+      ...productBody(input),
+      variants: input.variants.map((variant) => {
+        const first = variant.initial_stock?.[0];
+        return { ...variantBody(variant), ...(first ? { initial_quantity: first.quantity, location_id: first.location_id } : {}) };
+      }),
+    },
+  });
+  const created = productFromWire(data.product);
+  const extra = input.variants.filter((variant) => (variant.initial_stock?.length ?? 0) > 1);
+  if (extra.length === 0) return created;
+  for (const variant of extra) {
+    const saved = created.variants.find((entry) => sameValues(entry.option_values, variant.option_values));
+    if (saved) await receiveOpening(token, saved.id, variant.initial_stock!.slice(1));
+  }
+  return fetchShopProduct(token, created.id);
+}
+
+/**
+ * Saves the product, then its variants one by one (the update body carries
+ * no variants): edits, additions with their opening stock, and archiving
+ * the combinations that were taken out.
+ */
+export async function updateShopProduct(token: string, productId: string, input: ShopProductInput, previous: ShopProduct | null = null) {
+  await apiRequest<{ product: WireProduct }>(`${BASE}/products/${id(productId)}`, { method: "PATCH", token, body: productBody(input) });
+  const kept = new Set(input.variants.map((variant) => variant.id).filter(Boolean));
+  for (const variant of input.variants) {
+    if (variant.id) {
+      await apiRequest(`${BASE}/products/${id(productId)}/variants/${id(variant.id)}`, { method: "PATCH", token, body: variantBody(variant) });
+    } else {
+      const created = await apiRequest<{ variant: WireVariant }>(`${BASE}/products/${id(productId)}/variants`, { method: "POST", token, body: variantBody(variant) });
+      await receiveOpening(token, created.variant.id, variant.initial_stock ?? []);
+    }
+  }
+  for (const variant of previous?.variants ?? []) {
+    if (!variant.archived_at && !kept.has(variant.id)) {
+      await apiRequest(`${BASE}/products/${id(productId)}/variants/${id(variant.id)}/archive`, { method: "POST", token });
+    }
+  }
+  return fetchShopProduct(token, productId);
 }
 
 /** Draft → published needs an activated business (ADR-184 answers 403 `business_not_activated`). */
 export async function setShopProductStatus(token: string, productId: string, status: ShopProductStatus) {
-  const data = await apiRequest<{ product: ShopProduct }>(`${BASE}/products/${id(productId)}/status`, {
-    method: "POST",
-    token,
-    body: { status },
-  });
-  return data.product;
+  const data = await apiRequest<{ product: WireProduct }>(`${BASE}/products/${id(productId)}/status`, { method: "PUT", token, body: { status } });
+  return productFromWire(data.product);
 }
 
-/** TODO(ADR-190): «Προώθηση» posts (`POST /admin/shop/products/:id/promote`). */
+/** TODO(ADR-190): «Προώθηση» posts have no endpoint yet (`POST /admin/shop/products/:id/promote` per the proposal). */
 export function promoteShopProduct(token: string, productId: string, body: PromoteInput) {
   return apiRequest<{ post_id: string; promotion_code_id?: string | null }>(`${BASE}/products/${id(productId)}/promote`, {
     method: "POST",
@@ -407,13 +604,35 @@ export function promoteShopProduct(token: string, productId: string, body: Promo
   });
 }
 
-// ---- orders (TODO(ADR-190): /admin/shop/orders) ----
+// ---- orders (ShopController) ----
 
-export function fetchShopOrders(token: string, params: { status?: ShopOrderStatus; locationIds?: string; limit?: number; paid?: boolean } = {}) {
-  return apiRequest<{ orders: ShopOrder[]; counts: ShopOrderCounts }>(
-    `${BASE}/orders${query({ status: params.status, location_ids: params.locationIds, limit: params.limit, paid: params.paid })}`,
-    { token },
-  );
+const EMPTY_ORDER_COUNTS: ShopOrderCounts = { placed: 0, ready_for_pickup: 0, picked_up: 0, cancelled: 0 };
+
+async function listOrders(token: string, status: ShopOrderStatus | undefined, locationIds: string | undefined) {
+  const data = await apiRequest<{ orders: ShopOrder[] }>(`${BASE}/orders${query({ status, location_ids: locationIds })}`, { token });
+  return data.orders ?? [];
+}
+
+/**
+ * One status's orders with the open counts («Προς ετοιμασία», «Έτοιμες»).
+ * TODO(ADR-190): the API returns no counts or `limit`; the open lists are
+ * small, so the counts come from them, and `paid` and `limit` apply here.
+ */
+export async function fetchShopOrders(token: string, params: { status?: ShopOrderStatus; locationIds?: string; limit?: number; paid?: boolean } = {}) {
+  const { status, locationIds } = params;
+  const [rows, placed, ready] = await Promise.all([
+    listOrders(token, status, locationIds),
+    status === "placed" ? null : listOrders(token, "placed", locationIds),
+    status === "ready_for_pickup" ? null : listOrders(token, "ready_for_pickup", locationIds),
+  ]);
+  const counts: ShopOrderCounts = {
+    ...EMPTY_ORDER_COUNTS,
+    placed: (placed ?? rows).length,
+    ready_for_pickup: (ready ?? rows).length,
+    ...(status === "picked_up" || status === "cancelled" ? { [status]: rows.length } : {}),
+  };
+  const paidOnly = params.paid ? rows.filter((order) => order.paid_cents - order.refunded_cents > 0) : rows;
+  return { orders: params.limit ? paidOnly.slice(0, params.limit) : paidOnly, counts };
 }
 
 export async function fetchShopOrder(token: string, orderId: string) {
@@ -425,48 +644,92 @@ export type OrderAction =
   | { action: "ready" }
   | { action: "pickup"; payment_method?: DeskPaymentMethod }
   | { action: "cancel"; reason?: string | null }
-  | { action: "refund"; lines: { line_id: string; quantity: number }[]; restock: boolean };
+  | { action: "refund"; lines: { line_id: string; quantity: number }[]; restock: boolean; reason?: string | null };
+
+/** The request of an order action: path and body as the API takes them. */
+export function orderActionRequest(change: OrderAction, idempotencyKey: string = shopIdempotencyKey()): { path: string; body: Record<string, unknown> } {
+  switch (change.action) {
+    case "ready":
+      return { path: "ready", body: {} };
+    case "pickup":
+      return { path: "pickup", body: change.payment_method ? { payment_method: change.payment_method } : {} };
+    case "cancel":
+      return { path: "cancel", body: { reason: change.reason ?? null } };
+    case "refund":
+      return {
+        path: "refund",
+        body: {
+          lines: change.lines.filter((line) => line.quantity > 0).map((line) => ({ order_line_id: line.line_id, quantity: line.quantity, restock: change.restock })),
+          reason: change.reason ?? null,
+          idempotency_key: idempotencyKey,
+        },
+      };
+  }
+}
 
 export async function actOnShopOrder(token: string, orderId: string, change: OrderAction) {
-  const { action, ...body } = change;
-  const data = await apiRequest<{ order: ShopOrder }>(`${BASE}/orders/${id(orderId)}/${action}`, { method: "POST", token, body });
+  const { path, body } = orderActionRequest(change);
+  const data = await apiRequest<{ order: ShopOrder }>(`${BASE}/orders/${id(orderId)}/${path}`, { method: "POST", token, body });
   return data.order;
 }
 
-// ---- stock (TODO(ADR-190): /admin/shop/stock) ----
+// ---- stock (ShopController) ----
 
-export function fetchShopStock(token: string, params: { locationIds?: string; attention?: boolean } = {}) {
-  return apiRequest<{ items: ShopStockItem[] }>(
-    `${BASE}/stock${query({ location_ids: params.locationIds, attention: params.attention })}`,
-    { token },
-  );
+/** Stock rows from the catalog; `attention` keeps the low, critical and sold-out ones. */
+export async function fetchShopStock(token: string, params: { locationIds?: string; attention?: boolean } = {}) {
+  const items = stockItemsFromCatalog(await listProducts(token), params.locationIds);
+  return { items: params.attention ? items.filter((item) => item.stock_status !== "ok") : items };
 }
 
-export function fetchShopMovements(token: string, params: { variantId?: string; locationIds?: string; limit?: number } = {}) {
-  return apiRequest<{ movements: ShopStockMovement[] }>(
-    `${BASE}/stock/movements${query({ variant_id: params.variantId, location_ids: params.locationIds, limit: params.limit })}`,
-    { token },
-  );
+/**
+ * A variant's ledger, newest first. TODO(ADR-190): there is no ledger
+ * across variants yet, so «Πρόσφατες κινήσεις» without a variant is empty.
+ */
+export async function fetchShopMovements(
+  token: string,
+  params: { variantId?: string; locationIds?: string; limit?: number; titles?: { product: string; variant?: string | null } } = {},
+) {
+  if (!params.variantId) return { movements: [] as ShopStockMovement[] };
+  const data = await apiRequest<{ movements: Omit<ShopStockMovement, "product_title">[] }>(`${BASE}/variants/${id(params.variantId)}/movements`, { token });
+  const locations = params.locationIds ? params.locationIds.split(",").filter(Boolean) : null;
+  const movements = (data.movements ?? [])
+    .filter((movement) => !locations || !movement.location_id || locations.includes(movement.location_id))
+    .slice(0, params.limit ?? undefined)
+    .map((movement) => ({ ...movement, product_title: params.titles?.product ?? "", variant_title: params.titles?.variant ?? null }));
+  return { movements };
 }
 
-export async function recordShopMovement(token: string, body: ShopMovementInput) {
-  const data = await apiRequest<{ movement: ShopStockMovement }>(`${BASE}/stock/movements`, { method: "POST", token, body });
-  return data.movement;
+export async function recordShopMovement(token: string, input: ShopMovementInput) {
+  const { variant_id: variantId, ...body } = input;
+  const data = await apiRequest<{ variant: WireVariant; movements: ShopStockMovement[] }>(`${BASE}/variants/${id(variantId)}/movements`, {
+    method: "POST",
+    token,
+    body,
+  });
+  return data.movements?.[0] ?? null;
 }
 
-// ---- desk sale (TODO(ADR-190): /admin/shop/pos/sales, /admin/shop/payment-methods) ----
+// ---- desk sale (ShopController) ----
 
 export async function createPosSale(token: string, body: PosSaleInput) {
-  const data = await apiRequest<{ order: ShopOrder }>(`${BASE}/pos/sales`, { method: "POST", token, body });
+  const data = await apiRequest<{ order: ShopOrder }>(`${BASE}/desk-sales`, { method: "POST", token, body });
   return data.order;
 }
 
-export async function fetchShopPaymentMethods(token: string) {
-  const data = await apiRequest<{ methods: ShopPaymentMethodInfo[] }>(`${BASE}/payment-methods`, { token });
-  return data.methods;
+/**
+ * Ways to pay at the desk. TODO(ADR-190): the staff API has no payment
+ * methods endpoint; the mock adapter offers no online card yet (the member
+ * cart preview says `online_payment.available: false`).
+ */
+export async function fetchShopPaymentMethods(): Promise<ShopPaymentMethodInfo[]> {
+  return [
+    { id: "cash", available: true },
+    { id: "card_manual", available: true },
+    { id: "card_online", available: false },
+  ];
 }
 
-// ---- reports (ADR-192 §4; TODO(ADR-192): endpoints pending on …-shop-analytics) ----
+// ---- reports (AdminShopReportController, ADR-192 §4) ----
 
 export type ShopReportName = "sales" | "products" | "margin" | "channels" | "inventory" | "attribution" | "pricing";
 type ReportOf = {
@@ -479,6 +742,60 @@ type ReportOf = {
   pricing: PricingReport;
 };
 
-export function fetchShopReport<Name extends ShopReportName>(token: string, name: Name, window: ReportWindow = {}) {
-  return apiRequest<ReportOf[Name]>(`${BASE}/reports/${name}${query({ days: window.days, location_ids: window.locationIds })}`, { token });
+/** The reports' widest window (`@max_days`). */
+const MAX_REPORT_DAYS = 366;
+
+type WireTotals = { gross_cents?: number; refunded_cents?: number; net_cents?: number; orders?: number; average_order_value_cents?: number | null };
+const group = <Row extends WireTotals>(row: Row) => ({ ...row, net_revenue_cents: row.net_cents ?? 0, orders: row.orders ?? 0 });
+
+/** The sales series for the window, and the window before it when both fit in one request. */
+export function salesFromWire(wire: { series?: (WireTotals & { day: string })[] }, days: number): SalesReport {
+  const series = (wire.series ?? []).map((row) => ({
+    date: row.day,
+    gross_cents: row.gross_cents ?? 0,
+    refunded_cents: row.refunded_cents ?? 0,
+    net_cents: row.net_cents ?? 0,
+    orders: row.orders ?? 0,
+  }));
+  const current = series.slice(-days);
+  const previous = series.length >= days * 2 ? series.slice(-days * 2, -days) : null;
+  const sum = (rows: SalesDay[]): SalesTotals => {
+    const gross = rows.reduce((total, row) => total + row.gross_cents, 0);
+    const refunded = rows.reduce((total, row) => total + row.refunded_cents, 0);
+    const orders = rows.reduce((total, row) => total + row.orders, 0);
+    return { gross_cents: gross, refunded_cents: refunded, net_cents: gross - refunded, orders, average_order_value_cents: orders > 0 ? Math.round((gross - refunded) / orders) : null };
+  };
+  return { days: current, totals: sum(current), previous_totals: previous ? sum(previous) : null };
+}
+
+export async function fetchShopReport<Name extends ShopReportName>(token: string, name: Name, window: ReportWindow = {}): Promise<ReportOf[Name]> {
+  const days = window.days ?? 30;
+  const span = name === "sales" && days * 2 <= MAX_REPORT_DAYS ? days * 2 : days;
+  const wire = await apiRequest<Record<string, unknown>>(`${BASE}/reports/${name}${query({ days: span, location_ids: window.locationIds })}`, { token });
+  switch (name) {
+    case "sales":
+      return salesFromWire(wire as { series?: (WireTotals & { day: string })[] }, days) as ReportOf[Name];
+    case "channels": {
+      const report = wire as { by_channel?: (WireTotals & { channel: ShopChannel })[]; by_location?: (WireTotals & { location_id: string | null })[] };
+      return { by_channel: (report.by_channel ?? []).map(group), by_location: (report.by_location ?? []).map(group) } as ReportOf[Name];
+    }
+    case "attribution": {
+      const report = wire as {
+        by_promotion_code?: (WireTotals & { promotion_code: string })[];
+        by_campaign?: (WireTotals & { campaign_id: string })[];
+        by_source?: (WireTotals & { source: AttributionSource; source_ref_id?: string | null })[];
+        attributed?: WireTotals;
+        unattributed?: WireTotals;
+      };
+      return {
+        by_promotion_code: (report.by_promotion_code ?? []).map(group),
+        by_campaign: (report.by_campaign ?? []).map(group),
+        by_source: (report.by_source ?? []).map(group),
+        attributed: group(report.attributed ?? {}),
+        unattributed: group(report.unattributed ?? {}),
+      } as ReportOf[Name];
+    }
+    default:
+      return wire as ReportOf[Name];
+  }
 }

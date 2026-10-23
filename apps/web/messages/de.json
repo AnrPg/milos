@@ -10163,9 +10163,7 @@
       "history": "Bewegungen",
       "adjust": "Buchen",
       "policyNote": "Der Status ergibt sich aus den Tagen Restbestand beim aktuellen Tempo: kritisch unter 7 Tagen, niedrig unter 21. Hinweise kommen nur, wenn es schlechter wird, und der Bestand steht in der täglichen Übersicht.",
-      "recent": "Letzte Bewegungen",
       "historyOf": "Bewegungen · {item}",
-      "allMovements": "Alle Bewegungen",
       "noMovements": "Noch keine Bewegungen.",
       "kinds": {
         "receive": "Wareneingang",

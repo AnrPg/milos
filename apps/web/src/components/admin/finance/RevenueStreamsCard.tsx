@@ -30,7 +30,7 @@ export function RevenueStreamsCard({ summary, locationIds }: { summary: FinanceR
   const organizationSlug = useOrganizationSlug();
   const access = useShopAccess();
   const rows = revenueStreamRows(summary);
-  const recent = useRecentShopSales(locationIds, Boolean(rows) && access.manage);
+  const recent = useRecentShopSales(locationIds, Boolean(rows) && access.sell);
 
   if (!rows) return null;
 

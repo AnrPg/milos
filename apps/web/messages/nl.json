@@ -10163,9 +10163,7 @@
       "history": "Mutaties",
       "adjust": "Boeken",
       "policyNote": "De status volgt uit de dagen voorraad die over zijn bij het huidige tempo: kritiek onder 7 dagen, laag onder 21. Meldingen komen alleen als het slechter wordt, en voorraad staat in het dagelijkse overzicht.",
-      "recent": "Recente mutaties",
       "historyOf": "Mutaties · {item}",
-      "allMovements": "Alle mutaties",
       "noMovements": "Nog geen mutaties.",
       "kinds": {
         "receive": "Levering",

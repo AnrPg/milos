@@ -18,7 +18,7 @@ import { Dialog, DialogButton } from "@/components/ui/Dialog";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
 import { useUiLocale } from "@/i18n/use-ui-locale";
-import { movementFor, type StockFormKind } from "@/lib/shop/console";
+import { movementFor, stockDelta, type StockFormKind } from "@/lib/shop/console";
 
 type View = "attention" | "all";
 type Kind = StockFormKind;
@@ -94,24 +94,45 @@ export function StockTab({ locationIds, branchFilter }: { locationIds?: string; 
       )}
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("policyNote")}</p>
 
-      <MovementList title={history ? t("historyOf", { item: itemName(history) }) : t("recent")} variantId={history?.variant_id ?? null} locationIds={locationIds} onClear={history ? () => setHistory(null) : undefined} />
+      {history ? (
+        <MovementList
+          title={t("historyOf", { item: itemName(history) })}
+          variantId={history.variant_id}
+          titles={{ product: history.product_title, variant: history.variant_title }}
+          locationIds={locationIds}
+          onClear={() => setHistory(null)}
+        />
+      ) : null}
 
       {adjusting ? <AdjustDialog item={adjusting} onClose={() => setAdjusting(null)} /> : null}
     </section>
   );
 }
 
-function MovementList({ title, variantId, locationIds, onClear }: { title: string; variantId: string | null; locationIds?: string; onClear?: () => void }) {
+function MovementList({
+  title,
+  variantId,
+  titles,
+  locationIds,
+  onClear,
+}: {
+  title: string;
+  variantId: string | null;
+  titles?: { product: string; variant?: string | null };
+  locationIds?: string;
+  onClear?: () => void;
+}) {
   const t = useTranslations("ShopConsole.stock");
   const locale = useUiLocale();
-  const movements = useShopMovements(variantId, locationIds);
+  const movements = useShopMovements(variantId, locationIds, titles);
+  const common = useTranslations("Common");
   return (
     <section className="flex flex-col gap-2 rounded-[2rem] p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }} aria-label={title}>
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{title}</h2>
         {onClear ? (
           <button type="button" className="text-xs font-semibold" style={{ color: "var(--primary)" }} onClick={onClear}>
-            {t("allMovements")}
+            {common("close")}
           </button>
         ) : null}
       </div>
@@ -159,7 +180,7 @@ function AdjustDialog({ item, onClose }: { item: ShopStockItem; onClose: () => v
   const [error, setError] = useState<string | null>(null);
   const parsed = amount.trim() === "" ? Number.NaN : Number.parseInt(amount, 10);
   const movement = Number.isNaN(parsed) ? null : movementFor(item, kind, parsed, cost.trim() ? parseMoneyToCents(cost) : null, note);
-  const after = movement ? item.on_hand + movement.quantity : null;
+  const after = movement ? item.on_hand + stockDelta(movement, item.on_hand) : null;
 
   const submit = () => {
     setError(null);
@@ -201,7 +222,7 @@ function AdjustDialog({ item, onClose }: { item: ShopStockItem; onClose: () => v
         </Field>
         <p className="text-sm tabular-nums" style={{ color: "var(--text-soft)" }} aria-live="polite">
           {after === null ? t("now", { count: item.on_hand }) : t("after", { from: item.on_hand, to: after })}
-          {kind === "receive" && movement && cost.trim() && parseMoneyToCents(cost) !== null ? ` · ${formatMoney((parseMoneyToCents(cost) ?? 0) * movement.quantity, locale)}` : ""}
+          {kind === "receive" && movement && cost.trim() && parseMoneyToCents(cost) !== null ? ` · ${formatMoney((parseMoneyToCents(cost) ?? 0) * stockDelta(movement, item.on_hand), locale)}` : ""}
         </p>
         {error ? <StatusText tone="error">{error}</StatusText> : null}
         {record.error ? <StatusText tone="error">{localizeError(record.error, i18n)}</StatusText> : null}

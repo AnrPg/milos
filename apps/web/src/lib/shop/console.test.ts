@@ -12,6 +12,7 @@ import {
   lastComparablePriceChange,
   memberDiscountPercent,
   movementFor,
+  stockDelta,
   orderActions,
   paceOf,
   pickupNeedsPayment,
@@ -135,7 +136,9 @@ describe("stock form", () => {
       quantity: 10,
       unit_cost_cents: 1100,
     });
-    expect(movementFor(item, "recount", 3, null, "")).toMatchObject({ kind: "adjustment", reason: "recount", quantity: -1, note: null });
+    expect(movementFor(item, "recount", 3, null, "")).toMatchObject({ kind: "recount", counted: 3, note: null });
+    expect(stockDelta(movementFor(item, "recount", 3, null, "")!, 4)).toBe(-1);
+    expect(stockDelta(movementFor(item, "damage", 2, null, "")!, 4)).toBe(-2);
     expect(movementFor(item, "damage", 2, null, "")).toMatchObject({ reason: "damage", quantity: -2 });
     expect(movementFor(item, "return", 1, null, "")).toMatchObject({ reason: "return", quantity: 1 });
   });

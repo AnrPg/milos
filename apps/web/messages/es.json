@@ -10163,9 +10163,7 @@
       "history": "Movimientos",
       "adjust": "Ajustar",
       "policyNote": "El estado sale de los días de stock que quedan al ritmo actual: crítico por debajo de 7 días, bajo por debajo de 21. Los avisos solo saltan cuando empeora, y el stock entra en el resumen diario.",
-      "recent": "Movimientos recientes",
       "historyOf": "Movimientos · {item}",
-      "allMovements": "Todos los movimientos",
       "noMovements": "Aún no hay movimientos.",
       "kinds": {
         "receive": "Recepción",

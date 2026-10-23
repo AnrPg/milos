@@ -181,9 +181,9 @@ export function OrderPanel({ orderId, onClose }: { orderId: string; onClose: () 
             {data.status !== "picked_up" && data.status !== "cancelled" && data.expires_at ? <li>{t("timelineExpires", { when: formatDateTime(data.expires_at, locale) })}</li> : null}
           </ol>
 
-          {!access.manage ? null : step === "pickup" ? (
+          {!access.sell ? null : step === "pickup" ? (
             <div className="flex flex-col gap-3 rounded-2xl p-3" style={{ background: "var(--panel-muted)" }}>
-              {pickupNeedsPayment(data) && access.sell ? (
+              {pickupNeedsPayment(data) ? (
                 <>
                   <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
                     {t("collect", { amount: formatMoney(data.total_cents - data.paid_cents, locale, data.currency) })}
@@ -267,7 +267,7 @@ export function OrderPanel({ orderId, onClose }: { orderId: string; onClose: () 
                   {t("cancel")}
                 </button>
               ) : null}
-              {actions.includes("refund") ? (
+              {actions.includes("refund") && access.refund ? (
                 <button type="button" className={secondaryButtonClass} style={dangerButtonStyle} onClick={() => setStep("refund")}>
                   {t("refund")}
                 </button>

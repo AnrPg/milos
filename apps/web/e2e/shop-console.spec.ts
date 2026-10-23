@@ -1,6 +1,6 @@
 import { expect, test, type Page, type Route } from "./support/test";
 
-// Shop console (shop proposal §2, option A; ADR-190): the «Shop» section with
+// Shop console (shop proposal §2, option A; ADR-190, `ShopController`): the «Shop» section with
 // its empty-state checklist, a new product saved as a draft, publishing
 // blocked for a demo business (ADR-184), an order marked ready, and a sale at
 // the till. The API is stubbed; every route not listed answers an empty object.
@@ -60,10 +60,7 @@ const variant = (extra: Record<string, unknown> = {}) => ({
   low_stock_threshold: null,
   track_inventory: true,
   stock_status: "ok",
-  stock: [{ location_id: null, on_hand: 12, reserved: 0 }],
-  on_hand: 12,
-  reserved: 0,
-  days_of_stock_left: 40,
+  stock: { on_hand: 12, reserved: 0, available: 12, by_location: [{ location_id: null, on_hand: 12, reserved: 0, available: 12 }] },
   archived_at: null,
   ...extra,
 });
@@ -73,8 +70,8 @@ const product = (extra: Record<string, unknown> = {}) => ({
   title: "Box T-shirt",
   description: null,
   category: "Apparel",
-  media: [],
-  options: [],
+  media_ids: [],
+  options: { axes: [] },
   status: "published",
   visibility: "members_only",
   sell_in_app: true,
@@ -128,19 +125,6 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
   const calls: Calls = { created: [], statusChanges: [], actions: [], sales: [] };
   const products = [...(initial.products ?? [])];
   const orders = [...(initial.orders ?? [])];
-  const counts = () => ({
-    all: products.length,
-    published: products.filter((entry) => entry.status === "published").length,
-    draft: products.filter((entry) => entry.status === "draft").length,
-    archived: products.filter((entry) => entry.status === "archived").length,
-    low_stock: 0,
-  });
-  const orderCounts = () => ({
-    placed: orders.filter((entry) => entry.status === "placed").length,
-    ready_for_pickup: orders.filter((entry) => entry.status === "ready_for_pickup").length,
-    picked_up: orders.filter((entry) => entry.status === "picked_up").length,
-    cancelled: orders.filter((entry) => entry.status === "cancelled").length,
-  });
 
   await page.route("**/api/org/kypseli/admin/shop/**", (route: Route) => {
     const request = route.request();
@@ -149,13 +133,14 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
     const method = request.method();
 
     if (path === "/products" && method === "GET") {
+      // As on the server: archived products only on request.
       const status = url.searchParams.get("status");
-      return route.fulfill(json({ products: products.filter((entry) => !status || entry.status === status), counts: counts() }));
+      return route.fulfill(json({ products: products.filter((entry) => (status ? entry.status === status : entry.status !== "archived")) }));
     }
     if (path === "/products" && method === "POST") {
       const body = request.postDataJSON() as Record<string, unknown>;
       calls.created.push(body);
-      const created = product({ id: "prod-new", title: body.title, status: body.status, published_at: null, variants: [variant({ id: "var-new", price_cents: 1800 })] });
+      const created = product({ id: "prod-new", title: body.title, status: "draft", published_at: null, variants: [variant({ id: "var-new", price_cents: 1800 })] });
       products.push(created);
       return route.fulfill(json({ product: created }, 201));
     }
@@ -163,12 +148,12 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
     if (productMatch) {
       const found = products.find((entry) => entry.id === productMatch[1]);
       if (!found) return route.fulfill(json({ error: "not found" }, 404));
-      if (productMatch[2]) calls.statusChanges.push(request.postDataJSON());
+      if (productMatch[2] && method === "PUT") calls.statusChanges.push(request.postDataJSON());
       return route.fulfill(json({ product: found }));
     }
     if (path === "/orders" && method === "GET") {
       const status = url.searchParams.get("status");
-      return route.fulfill(json({ orders: orders.filter((entry) => !status || entry.status === status), counts: orderCounts() }));
+      return route.fulfill(json({ orders: orders.filter((entry) => !status || entry.status === status) }));
     }
     const orderMatch = path.match(/^\/orders\/([^/]+)(?:\/(ready|pickup|cancel|refund))?$/);
     if (orderMatch) {
@@ -180,13 +165,11 @@ async function shopApi(page: Page, initial: { products?: ReturnType<typeof produ
       }
       return route.fulfill(json({ order: orders[index] }));
     }
-    if (path === "/pos/sales" && method === "POST") {
+    if (path === "/desk-sales" && method === "POST") {
       const body = request.postDataJSON();
       calls.sales.push(body);
       return route.fulfill(json({ order: order({ id: "ord-pos", number: 1043, channel: "pos", status: "picked_up", payment_status: "paid", payment_mode: "cash", paid_cents: 2500, user_id: null, customer_name: null }) }, 201));
     }
-    if (path === "/payment-methods") return route.fulfill(json({ methods: [{ id: "cash", available: true }, { id: "card_manual", available: true }, { id: "card_online", available: false }] }));
-    if (path.startsWith("/stock")) return route.fulfill(json({ items: [], movements: [] }));
     return route.fulfill(json({}));
   });
   return calls;
@@ -215,14 +198,15 @@ test.describe("shop console", () => {
     await page.getByRole("button", { name: "Create draft" }).click();
 
     await expect(page).toHaveURL(/\/admin\/shop\/products\/prod-new$/);
+    // The create body has no status: a new product is always a draft.
+    expect(calls.created[0]).not.toHaveProperty("status");
     expect(calls.created).toEqual([
       expect.objectContaining({
         title: "Box hoodie",
-        status: "draft",
         sell_in_app: true,
         sell_at_desk: true,
         visibility: "members_only",
-        variants: [expect.objectContaining({ price_cents: 1800, initial_stock: [{ location_id: null, quantity: 5 }] })],
+        variants: [expect.objectContaining({ price_cents: 1800, initial_quantity: 5, location_id: null })],
       }),
     ]);
   });

@@ -10163,9 +10163,7 @@
       "history": "Movements",
       "adjust": "Adjust",
       "policyNote": "The state comes from the days of stock left at the current pace: critical under 7 days, low under 21. Alerts fire only when it gets worse, and stock joins the daily digest.",
-      "recent": "Recent movements",
       "historyOf": "Movements · {item}",
-      "allMovements": "All movements",
       "noMovements": "No movements yet.",
       "kinds": {
         "receive": "Delivery",

@@ -144,12 +144,16 @@ export function movementFor(
   if (!Number.isInteger(amount) || amount < 0) return null;
   const base = { variant_id: item.variant_id, location_id: item.location_id, note: note.trim() || null };
   if (kind === "receive") return amount > 0 ? { ...base, kind: "receive", quantity: amount, unit_cost_cents: unitCostCents } : null;
-  if (kind === "recount") {
-    const delta = amount - item.on_hand;
-    return delta !== 0 ? { ...base, kind: "adjustment", reason: "recount", quantity: delta } : null;
-  }
+  // A recount sends what is on the shelf; the server books the difference.
+  if (kind === "recount") return amount !== item.on_hand ? { ...base, kind: "recount", counted: amount } : null;
   if (amount === 0) return null;
   return { ...base, kind: "adjustment", reason: kind, quantity: kind === "return" ? amount : -amount };
+}
+
+/** How much a movement changes the stock on hand. */
+export function stockDelta(movement: Pick<ShopMovementInput, "kind" | "quantity" | "counted">, onHand: number) {
+  if (movement.kind === "recount") return (movement.counted ?? onHand) - onHand;
+  return movement.quantity ?? 0;
 }
 
 // ---- orders ----

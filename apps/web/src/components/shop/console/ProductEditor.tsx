@@ -83,7 +83,7 @@ function ProductEditor({ product }: { product: ShopProduct | null }) {
   const organizationSlug = useOrganizationSlug();
   const gate = useDemoGate();
   const branches = useBranchFilter("shop").locations;
-  const save = useSaveProduct(product?.id ?? null);
+  const save = useSaveProduct(product);
   const status = useProductStatus(product?.id ?? null);
   const photos = useProductPhotos(product?.media);
   const fileRef = useRef<HTMLInputElement>(null);

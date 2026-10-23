@@ -29,6 +29,7 @@ import {
   type ReportWindow,
   type ShopMovementInput,
   type ShopOrderStatus,
+  type ShopProduct,
   type ShopProductInput,
   type ShopProductStatus,
   type ShopReportName,
@@ -47,21 +48,23 @@ function useToken() {
 }
 
 /**
- * Who may do what in «Κατάστημα». TODO(ADR-190): `manage_shop` is the
- * proposal's capability (owner, admin, front desk); the API branch has not
- * registered it yet. Recording a payment or running the Ταμείο also needs
- * `take_payments`; «Αναλυτικά» opens to `view_business_analytics` too (ADR-192 §4).
+ * Who may do what in «Κατάστημα» (`PaleeWeb.RouteCapabilities`):
+ * `manage_shop` runs the catalog, stock and refunds (refunds also need
+ * `take_payments`); `sell_shop` handles orders and the Ταμείο;
+ * «Αναλυτικά» opens to `view_business_analytics` too (ADR-192 §4).
  */
 export function useShopAccess() {
   const { membership, isLoading } = useSelectedMembershipRole();
   const manage = can(membership, "manage_shop");
+  const sell = manage || can(membership, "sell_shop");
   const analytics = manage || can(membership, "view_business_analytics");
   return {
     isLoading,
     manage,
     analytics,
-    sell: manage && can(membership, "take_payments"),
-    any: manage || analytics,
+    sell,
+    refund: manage && can(membership, "take_payments"),
+    any: sell || analytics,
     /** ADR-184: a demo business builds its catalog but cannot publish or sell. */
     demo: membership?.organization?.activation === "demo",
   };
@@ -115,11 +118,12 @@ function useInvalidateShop() {
   return useCallback(() => queryClient.invalidateQueries({ queryKey: SHOP_KEY }), [queryClient]);
 }
 
-export function useSaveProduct(productId: string | null) {
+/** Creates a draft, or saves the product and its variants against `previous` (what was loaded). */
+export function useSaveProduct(previous: ShopProduct | null | undefined) {
   const token = useToken();
   const invalidate = useInvalidateShop();
   return useMutation({
-    mutationFn: (input: ShopProductInput) => (productId ? updateShopProduct(token!, productId, input) : createShopProduct(token!, input)),
+    mutationFn: (input: ShopProductInput) => (previous ? updateShopProduct(token!, previous.id, input, previous) : createShopProduct(token!, input)),
     onSuccess: () => void invalidate(),
   });
 }
@@ -198,12 +202,12 @@ export function useShopStock(attention: boolean, locationIds?: string) {
   });
 }
 
-export function useShopMovements(variantId: string | null, locationIds?: string) {
+export function useShopMovements(variantId: string | null, locationIds?: string, titles?: { product: string; variant?: string | null }) {
   const token = useToken();
   return useQuery({
     queryKey: shopKeys.movements(variantId, locationIds),
     enabled: Boolean(token),
-    queryFn: () => fetchShopMovements(token!, { variantId: variantId ?? undefined, locationIds, limit: 30 }),
+    queryFn: () => fetchShopMovements(token!, { variantId: variantId ?? undefined, locationIds, limit: 30, titles }),
     select: (data) => data.movements,
   });
 }
@@ -232,7 +236,7 @@ export function useShopPaymentMethods() {
   return useQuery({
     queryKey: [...SHOP_KEY, "payment-methods"],
     enabled: Boolean(token),
-    queryFn: () => fetchShopPaymentMethods(token!),
+    queryFn: () => fetchShopPaymentMethods(),
     staleTime: 5 * 60_000,
     retry: false,
   });
