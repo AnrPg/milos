@@ -9707,5 +9707,18 @@
     "filterNoteReferrals": "Les parrainages et les récompenses suivent le site principal de leurs personnes. Les programmes valent pour toute l'entreprise.",
     "filterNoteAccounting": "Les reçus de remboursement suivent le site principal du membre. Le rapprochement et les exports couvrent toute l'entreprise.",
     "filterNoteBusinessWide": "Cet onglet couvre toute l'entreprise ; le filtre de sites ne s'applique pas ici."
+  },
+  "SiteInfo": {
+    "faqTitle": "Questions sur Palee",
+    "whatIsQuestion": "Qu'est-ce que Palee ?",
+    "whatIsAnswer": "Palee est une plateforme d'entraînement pour les salles de sport, les coachs et les athlètes. Elle réunit dans une seule application le planning et la réservation des cours, la programmation personnalisée, l'exécution des séances en direct, les échanges avec le coach et le suivi des progrès.",
+    "whoForQuestion": "À qui s'adresse Palee ?",
+    "whoForAnswer": "Aux gérants et au personnel des salles qui animent des cours, aux coachs qui conçoivent des programmes pour les athlètes et aux adhérents qui réservent des cours et consignent leur entraînement.",
+    "offlineQuestion": "Palee fonctionne-t-il hors ligne ?",
+    "offlineAnswer": "Oui. La séance continue sans connexion : les étapes validées sont enregistrées sur l'appareil et synchronisées dès que la connexion revient.",
+    "adsQuestion": "Palee affiche-t-il de la publicité ?",
+    "adsAnswer": "Non. Palee n'affiche aucune publicité et ne suit pas les adhérents à des fins publicitaires. Les progrès d'entraînement appartiennent à l'athlète.",
+    "languagesQuestion": "Quelles langues Palee prend-il en charge ?",
+    "languagesAnswer": "Anglais, grec, arabe, russe, allemand, espagnol, portugais, hébreu, italien, bulgare, néerlandais et français."
   }
 }

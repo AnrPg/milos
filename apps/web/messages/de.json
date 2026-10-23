@@ -9707,5 +9707,18 @@
     "filterNoteReferrals": "Empfehlungen und Prämien folgen dem Stammstandort ihrer Personen. Programme gelten für das ganze Unternehmen.",
     "filterNoteAccounting": "Erstattungsbelege folgen dem Stammstandort des Mitglieds. Abgleich und Exporte betreffen das ganze Unternehmen.",
     "filterNoteBusinessWide": "Dieser Tab betrifft das ganze Unternehmen; der Standortfilter gilt hier nicht."
+  },
+  "SiteInfo": {
+    "faqTitle": "Fragen zu Palee",
+    "whatIsQuestion": "Was ist Palee?",
+    "whatIsAnswer": "Palee ist eine Trainingsplattform für Fitnessstudios, Coaches und Athleten. Sie vereint Kursplanung und -buchung, persönliche Trainingsprogramme, Live-Workouts, Coaching-Gespräche und Fortschrittsverfolgung in einer App.",
+    "whoForQuestion": "Für wen ist Palee gedacht?",
+    "whoForAnswer": "Für Studiobetreiber und Personal, die Kurse leiten, für Coaches, die Programme für Athleten erstellen, und für Mitglieder, die Kurse buchen und ihr Training protokollieren.",
+    "offlineQuestion": "Funktioniert Palee offline?",
+    "offlineAnswer": "Ja. Ein Workout läuft auch ohne Verbindung weiter: Erledigte Schritte werden auf dem Gerät gespeichert und synchronisiert, sobald die Verbindung zurück ist.",
+    "adsQuestion": "Zeigt Palee Werbung?",
+    "adsAnswer": "Nein. Palee zeigt keine Werbung und verfolgt Mitglieder nicht zu Werbezwecken. Der Trainingsfortschritt gehört dem Athleten.",
+    "languagesQuestion": "Welche Sprachen unterstützt Palee?",
+    "languagesAnswer": "Englisch, Griechisch, Arabisch, Russisch, Deutsch, Spanisch, Portugiesisch, Hebräisch, Italienisch, Bulgarisch, Niederländisch und Französisch."
   }
 }
