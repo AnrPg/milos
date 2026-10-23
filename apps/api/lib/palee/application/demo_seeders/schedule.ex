@@ -5,6 +5,8 @@ defmodule Palee.Application.DemoSeeders.Schedule do
   bookings of the mock members. Bookings are written as approved rows
   (`Scheduling.submit_auto_approved_booking/3`), never through
   `SubmitBooking`, so nobody is notified and no entitlement is touched.
+  Every class carries one of the demo workouts as its WOD, since a class
+  without one is a draft nobody can book (ADR-176).
   """
 
   @behaviour Palee.Application.DemoSeeder
@@ -19,7 +21,7 @@ defmodule Palee.Application.DemoSeeders.Schedule do
   def section, do: "schedule"
 
   @impl true
-  def requires, do: ["members"]
+  def requires, do: ["members", "workouts"]
 
   @impl true
   def sources, do: ["class_types", "scheduled_classes", "bookings"]
@@ -27,9 +29,10 @@ defmodule Palee.Application.DemoSeeders.Schedule do
   @impl true
   def seed(context, seeded, now) do
     people = people(seeded)
+    workouts = workouts(seeded)
 
     with {:ok, types, type_rows} <- class_types(context),
-         {:ok, class_rows, booking_rows} <- classes(context, types, people, now) do
+         {:ok, class_rows, booking_rows} <- classes(context, types, {people, workouts}, now) do
       {:ok, type_rows ++ class_rows ++ booking_rows}
     end
   end
@@ -51,20 +54,23 @@ defmodule Palee.Application.DemoSeeders.Schedule do
     end)
   end
 
-  defp classes(context, types, people, now) do
+  defp classes(context, types, {people, workouts}, now) do
     today = DateTime.to_date(now)
 
     slots =
       for day <- @days, {{hour, minute}, index} <- Enum.with_index(@hours) do
         type = Enum.at(types, rem(day + index, length(types)))
+        workout = Enum.at(workouts, rem(day + index, max(length(workouts), 1)))
         {:ok, at} = DateTime.new(Date.add(today, day), Time.new!(hour, minute, 0), "Etc/UTC")
-        {type, at}
+        {type, workout, at}
       end
 
-    Enum.reduce_while(slots, {:ok, [], []}, fn {type, at}, {:ok, class_rows, booking_rows} ->
+    Enum.reduce_while(slots, {:ok, [], []}, fn {type, workout, at},
+                                               {:ok, class_rows, booking_rows} ->
       with {:ok, slot} <-
              Scheduling.create_slot(context, %{
                class_type_id: type.id,
+               master_workout_id: workout,
                name: type.name,
                scheduled_at: at,
                duration_minutes: 60,
@@ -93,4 +99,7 @@ defmodule Palee.Application.DemoSeeders.Schedule do
 
   defp people(seeded),
     do: for({"users", id} <- Map.get(seeded, "members", []), do: id)
+
+  defp workouts(seeded),
+    do: for({"master_workouts", id} <- Map.get(seeded, "workouts", []), do: id)
 end

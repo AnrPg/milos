@@ -69,7 +69,10 @@ defmodule Palee.Application.BusinessRequests do
   def queue(platform_context) do
     with {:ok, requests} <- BusinessAccounts.list_requests(platform_context),
          {:ok, organizations} <- Organizations.list_provisioned_organizations(platform_context) do
-      demo = Enum.filter(organizations, &Organizations.business_gated?/1)
+      demo =
+        organizations
+        |> Enum.map(&Map.get(&1, :organization, &1))
+        |> Enum.filter(&Organizations.business_gated?/1)
 
       {:ok, links} =
         BusinessAccounts.list_activation_links(platform_context, Enum.map(demo, & &1.id))

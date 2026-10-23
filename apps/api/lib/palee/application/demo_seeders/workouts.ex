@@ -13,7 +13,7 @@ defmodule Palee.Application.DemoSeeders.Workouts do
     {"Fran (demo)", :crossfit, [{"Thrusters", 21, "reps"}, {"Pull-ups", 21, "reps"}]},
     {"Back squat 5x5 (demo)", :strength, [{"Back squat", 5, "reps"}]},
     {"Engine builder (demo)", :crossfit,
-     [{"Row", 500, "m"}, {"Burpees", 15, "reps"}, {"Air squats", 20, "reps"}]}
+     [{"Row", 500, "meters"}, {"Burpees", 15, "reps"}, {"Air squats", 20, "reps"}]}
   ]
 
   @impl true

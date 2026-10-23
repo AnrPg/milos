@@ -23,6 +23,21 @@ defmodule Palee.TestFixtures do
     admin
   end
 
+  @doc """
+  ADR-184: lifts the demo gate of a business opened in demo mode (a coach
+  practice, a business sign-up) without the activation link, for tests that
+  exercise what an active business does. Runs outside any acting user, which
+  the activation guard trigger allows.
+  """
+  def activate_business!(organization_id) do
+    Palee.Repo.query!(
+      "UPDATE organizations SET activation = 'active', activated_at = now() WHERE id = $1",
+      [Ecto.UUID.dump!(organization_id)]
+    )
+
+    organization_id
+  end
+
   def workout_fixture(admin, attrs \\ %{}) do
     context =
       Map.get(attrs, :tenant_context) || ambient_tenant_context() || legacy_tenant_context()
