@@ -19,6 +19,7 @@ vi.mock("./use-around", () => ({
   useAround: () => ({ filter: state.filter, setFilter: state.setFilter, saved: state.saved }),
   useAroundArea: () => ({ data: [], isPending: false }),
   useNeighbourhoodSearch: () => ({ data: [] }),
+  useResolvePlace: () => ({ mutate: vi.fn(), isPending: false, error: null }),
   useSavedFilterActions: () => ({ save: {}, alert: {}, rename: {}, remove: {} }),
 }));
 

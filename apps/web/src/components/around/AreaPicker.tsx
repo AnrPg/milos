@@ -4,19 +4,52 @@ import { useId, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
 import { ApiError } from "@/api/client";
-import type { Neighbourhood } from "@/api/around";
+import type { Neighbourhood, PlaceSuggestion } from "@/api/around";
 import { clientErrorMessage } from "@/components/client/errors";
 import { ErrorLine } from "@/components/community/Sheet";
 import { useDebounced } from "@/hooks/useDebounced";
 import { useUiTranslations } from "@/i18n/ui";
 
 import { MAX_NEIGHBOURHOODS, pointOrigin, type OriginChoice } from "./around";
-import { useNeighbourhoodSearch, useSaveAroundArea } from "./use-around";
+import { useNeighbourhoodSearch, useResolvePlace, useSaveAroundArea } from "./use-around";
 
 /** A gazetteer place in the reader's language (Greek names for Greek, English otherwise). */
 export function useNeighbourhoodName() {
   const locale = useLocale();
   return (place: Pick<Neighbourhood, "name" | "name_en">) => (locale === "el" ? place.name : place.name_en || place.name);
+}
+
+/** What tells same-named places apart («Athens · Georgia, United States»), in the reader's language. */
+export function usePlaceContext() {
+  const locale = useLocale();
+  return (place: Pick<Neighbourhood, "context" | "context_en">) =>
+    (locale === "el" ? place.context : place.context_en || place.context) ?? null;
+}
+
+/** A search result as one tappable row: name, what tells it apart, and what kind of place it is. */
+export function PlaceOption({ place, busy = false }: { place: PlaceSuggestion; busy?: boolean }) {
+  const t = useTranslations("Around");
+  const name = useNeighbourhoodName();
+  const context = usePlaceContext();
+  const where = context(place);
+  const kind = busy
+    ? t("placeAdding")
+    : place.kind === "address"
+      ? t("placeAddress")
+      : place.kind === "city"
+        ? t("placeCity")
+        : t("placeNeighbourhood");
+  return (
+    <>
+      <span className="flex min-w-0 flex-col">
+        <span className="truncate font-semibold">{name(place)}</span>
+        {where ? (
+          <span className="truncate text-xs font-normal" style={{ color: "var(--text-soft)" }}>{where}</span>
+        ) : null}
+      </span>
+      <span className="shrink-0 text-xs font-normal" style={{ color: "var(--dim)" }}>{kind}</span>
+    </>
+  );
 }
 
 /** Γύρω μου errors in words: offline, an unknown place, the geocoder down, else the shared map. */
@@ -29,6 +62,7 @@ export function useAroundError() {
     if (error instanceof ApiError) {
       if (error.payload?.code === "place_not_found") return t("errorPlaceNotFound");
       if (error.payload?.code === "geocoder_unavailable") return t("errorGeocoder");
+      if (error.payload?.code === "invalid_place_ref") return t("errorLoad");
       return clientErrorMessage(error, tUi);
     }
     return t("errorLoad");
@@ -67,7 +101,8 @@ export function GeoMessage({ state }: { state: GeoState }) {
 
 /**
  * «Πού να ψάξουμε;» / «Η περιοχή μου» (ADR-154 §2): up to 5 neighbourhoods
- * or cities, the first is the main one. `onUsePoint` adds «Χρήση τοποθεσίας
+ * or cities anywhere, or the area around an address (ADR-188); the first is
+ * the main one. `onUsePoint` adds «Χρήση τοποθεσίας
  * τώρα» for a search from where the device is, without saving anything.
  */
 export function AreaPicker({
@@ -83,6 +118,7 @@ export function AreaPicker({
 }) {
   const t = useTranslations("Around");
   const name = useNeighbourhoodName();
+  const context = usePlaceContext();
   const aroundError = useAroundError();
   const inputId = useId();
   const resultsId = useId();
@@ -91,16 +127,25 @@ export function AreaPicker({
   const q = useDebounced(query, 250);
   const results = useNeighbourhoodSearch(q);
   const save = useSaveAroundArea();
+  const resolve = useResolvePlace();
+  const [adding, setAdding] = useState<string | null>(null);
   const geo = useDevicePosition((origin) => onUsePoint?.(origin));
   const full = picked.length >= MAX_NEIGHBOURHOODS;
-  const found = (results.data ?? []).filter((place) => !picked.some((entry) => entry.id === place.id));
+  const found = (results.data?.places ?? []).filter((place) => !picked.some((entry) => entry.id === place.id));
   const searching = q.trim().length >= 2;
 
-  const add = (place: Neighbourhood) => {
-    if (full) return;
-    setPicked((current) => [...current, place]);
-    setQuery("");
-    document.getElementById(inputId)?.focus();
+  const add = (place: PlaceSuggestion) => {
+    if (full || adding) return;
+    setAdding(place.id);
+    resolve.mutate(place, {
+      onSuccess: (stored) => {
+        // An address may resolve to a neighbourhood already picked.
+        setPicked((current) => (current.some((entry) => entry.id === stored.id) ? current : [...current, stored]));
+        setQuery("");
+        document.getElementById(inputId)?.focus();
+      },
+      onSettled: () => setAdding(null),
+    });
   };
   const remove = (id: string) => setPicked((current) => current.filter((entry) => entry.id !== id));
   const makeMain = (id: string) =>
@@ -123,7 +168,7 @@ export function AreaPicker({
                 color: "var(--text)",
               }}
             >
-              <span>{name(place)}</span>
+              <span title={context(place) ?? undefined}>{name(place)}</span>
               {index === 0 ? (
                 <span className="text-xs font-bold" style={{ color: "var(--primary-strong, var(--primary))" }}>
                   · {t("areaMain")}
@@ -173,6 +218,9 @@ export function AreaPicker({
         {searching && results.isSuccess && found.length === 0 ? (
           <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("areaNoMatch")}</p>
         ) : null}
+        {searching && results.data?.remote === "unavailable" ? (
+          <p className="text-xs" style={{ color: "var(--dim)" }}>{t("worldwideUnavailable")}</p>
+        ) : null}
         {searching && found.length > 0 ? (
           <ul className="flex flex-col">
             {found.slice(0, 8).map((place) => (
@@ -180,18 +228,18 @@ export function AreaPicker({
                 <button
                   type="button"
                   onClick={() => add(place)}
-                  className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-2 text-left text-sm"
+                  disabled={adding !== null}
+                  aria-busy={adding === place.id}
+                  className="flex min-h-11 w-full items-center justify-between gap-3 rounded-xl px-2 py-1 text-left text-sm disabled:opacity-60"
                   style={{ color: "var(--text)" }}
                 >
-                  <span className="font-semibold">{name(place)}</span>
-                  <span className="text-xs" style={{ color: "var(--dim)" }}>
-                    {place.kind === "city" ? t("placeCity") : t("placeNeighbourhood")}
-                  </span>
+                  <PlaceOption place={place} busy={adding === place.id} />
                 </button>
               </li>
             ))}
           </ul>
         ) : null}
+        <ErrorLine message={aroundError(resolve.error)} />
       </div>
 
       <p className="text-xs" style={{ color: "var(--dim)" }}>{t("areaPrivacy")}</p>

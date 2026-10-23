@@ -21,6 +21,8 @@ defmodule Palee.Infrastructure.Places.EctoHomeAreaStore do
       name: n.name,
       name_en: n.name_en,
       city_slug: n.city_slug,
+      context: n.context,
+      context_en: n.context_en,
       latitude: n.latitude,
       longitude: n.longitude,
       radius_m: n.radius_m
