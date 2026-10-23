@@ -11116,6 +11116,1244 @@
         "title": "AtlasTopExercise",
         "type": "object"
       },
+      "BillingActions": {
+        "properties": {
+          "download_invoices": {
+            "type": "boolean"
+          },
+          "self_service_cancel_auto_renew": {
+            "type": "boolean"
+          },
+          "self_service_purchase": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "self_service_purchase",
+          "self_service_cancel_auto_renew",
+          "download_invoices"
+        ],
+        "title": "BillingActions",
+        "type": "object"
+      },
+      "BillingAvailableOffer": {
+        "properties": {
+          "campaign_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "discount_type": {
+            "nullable": true,
+            "type": "string"
+          },
+          "discount_value": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "ends_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "code"
+        ],
+        "title": "BillingAvailableOffer",
+        "type": "object"
+      },
+      "BillingContact": {
+        "properties": {
+          "box_chat_slug": {
+            "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "box_chat_slug"
+        ],
+        "title": "BillingContact",
+        "type": "object"
+      },
+      "BillingCounterparty": {
+        "properties": {
+          "kind": {
+            "enum": [
+              "gym",
+              "coach",
+              "organiser"
+            ],
+            "type": "string"
+          },
+          "name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "slug": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "organization_id",
+          "kind"
+        ],
+        "title": "BillingCounterparty",
+        "type": "object"
+      },
+      "BillingInvoice": {
+        "properties": {
+          "balance_due_cents": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "document_kind": {
+            "enum": [
+              "invoice",
+              "receipt"
+            ],
+            "type": "string"
+          },
+          "downloadable": {
+            "description": "A PDF is on file to download.",
+            "type": "boolean"
+          },
+          "due_date": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "issue_date": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "total_cents": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "id",
+          "document_kind",
+          "status",
+          "total_cents",
+          "balance_due_cents",
+          "currency",
+          "downloadable"
+        ],
+        "title": "BillingInvoice",
+        "type": "object"
+      },
+      "BillingMembership": {
+        "nullable": true,
+        "properties": {
+          "entitlement_status": {
+            "nullable": true,
+            "type": "string"
+          },
+          "expires_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "BillingMembership",
+        "type": "object"
+      },
+      "BillingPayment": {
+        "properties": {
+          "amount_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "finance_invoice_id": {
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "net_amount_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "paid_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "payment_method": {
+            "nullable": true,
+            "type": "string"
+          },
+          "payment_status": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "currency"
+        ],
+        "title": "BillingPayment",
+        "type": "object"
+      },
+      "BillingPerk": {
+        "description": "Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "discount": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "store": {
+            "type": "string"
+          },
+          "terms": {
+            "nullable": true,
+            "type": "string"
+          },
+          "url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "valid_until": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "store",
+          "code"
+        ],
+        "title": "BillingPerk",
+        "type": "object"
+      },
+      "BillingPromotion": {
+        "properties": {
+          "campaign_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "discount_type": {
+            "nullable": true,
+            "type": "string"
+          },
+          "discount_value": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "redeemed_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "title": "BillingPromotion",
+        "type": "object"
+      },
+      "BillingProvider": {
+        "properties": {
+          "actions": {
+            "properties": {
+              "download_invoices": {
+                "type": "boolean"
+              },
+              "self_service_cancel_auto_renew": {
+                "type": "boolean"
+              },
+              "self_service_purchase": {
+                "type": "boolean"
+              }
+            },
+            "required": [
+              "self_service_purchase",
+              "self_service_cancel_auto_renew",
+              "download_invoices"
+            ],
+            "title": "BillingActions",
+            "type": "object"
+          },
+          "available_offers": {
+            "description": "Codes of running campaigns the box shows to members.",
+            "items": {
+              "properties": {
+                "campaign_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "code": {
+                  "type": "string"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "discount_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "discount_value": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "ends_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "code"
+              ],
+              "title": "BillingAvailableOffer",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "contact": {
+            "properties": {
+              "box_chat_slug": {
+                "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "box_chat_slug"
+            ],
+            "title": "BillingContact",
+            "type": "object"
+          },
+          "credit_balance_cents": {
+            "type": "integer"
+          },
+          "entitlement": {
+            "additionalProperties": true,
+            "description": "The effective entitlement (remaining allowances), without usage entries.",
+            "nullable": true,
+            "type": "object"
+          },
+          "invoices": {
+            "items": {
+              "properties": {
+                "balance_due_cents": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "document_kind": {
+                  "enum": [
+                    "invoice",
+                    "receipt"
+                  ],
+                  "type": "string"
+                },
+                "downloadable": {
+                  "description": "A PDF is on file to download.",
+                  "type": "boolean"
+                },
+                "due_date": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "invoice_number": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "issue_date": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "total_cents": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "id",
+                "document_kind",
+                "status",
+                "total_cents",
+                "balance_due_cents",
+                "currency",
+                "downloadable"
+              ],
+              "title": "BillingInvoice",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "kind": {
+            "enum": [
+              "gym",
+              "coach"
+            ],
+            "type": "string"
+          },
+          "logo_url": {
+            "nullable": true,
+            "type": "string"
+          },
+          "membership": {
+            "nullable": true,
+            "properties": {
+              "entitlement_status": {
+                "nullable": true,
+                "type": "string"
+              },
+              "expires_on": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "starts_on": {
+                "format": "date",
+                "nullable": true,
+                "type": "string"
+              },
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "status"
+            ],
+            "title": "BillingMembership",
+            "type": "object"
+          },
+          "name": {
+            "type": "string"
+          },
+          "organization_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "outstanding_cents": {
+            "type": "integer"
+          },
+          "partial": {
+            "description": "Some sections could not be read.",
+            "type": "boolean"
+          },
+          "payments": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "finance_invoice_id": {
+                  "format": "uuid",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "net_amount_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "paid_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "payment_method": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "payment_status": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "currency"
+              ],
+              "title": "BillingPayment",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "perks": {
+            "items": {
+              "description": "Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.",
+              "properties": {
+                "code": {
+                  "type": "string"
+                },
+                "discount": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "store": {
+                  "type": "string"
+                },
+                "terms": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "valid_until": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "store",
+                "code"
+              ],
+              "title": "BillingPerk",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "primary_color": {
+            "nullable": true,
+            "type": "string"
+          },
+          "promotions": {
+            "items": {
+              "properties": {
+                "campaign_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "discount_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "discount_value": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "redeemed_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id"
+              ],
+              "title": "BillingPromotion",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "referrals": {
+            "properties": {
+              "credit_total_cents": {
+                "type": "integer"
+              },
+              "credits": {
+                "items": {
+                  "properties": {
+                    "amount_cents": {
+                      "type": "integer"
+                    },
+                    "currency": {
+                      "type": "string"
+                    },
+                    "description": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "occurred_on": {
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "amount_cents",
+                    "currency"
+                  ],
+                  "title": "BillingReferralCredit",
+                  "type": "object"
+                },
+                "type": "array"
+              },
+              "invited": {
+                "type": "integer"
+              },
+              "paid": {
+                "type": "integer"
+              },
+              "trials": {
+                "type": "integer"
+              }
+            },
+            "required": [
+              "credits",
+              "credit_total_cents",
+              "invited",
+              "trials",
+              "paid"
+            ],
+            "title": "BillingReferrals",
+            "type": "object"
+          },
+          "refund_receipts": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "invoice_number": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "issued_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "reason": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "receipt_number": {
+                  "type": "string"
+                },
+                "reversal_type": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "receipt_number",
+                "amount_cents",
+                "currency"
+              ],
+              "title": "BillingRefundReceipt",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "seasons": {
+            "items": {
+              "properties": {
+                "currency": {
+                  "type": "string"
+                },
+                "ends_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "price_cents": {
+                  "type": "integer"
+                },
+                "season_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "starts_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "season_id",
+                "title",
+                "status"
+              ],
+              "title": "BillingSeason",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "subscriptions": {
+            "items": {
+              "properties": {
+                "auto_renew": {
+                  "nullable": true,
+                  "type": "boolean"
+                },
+                "billing_period": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "commitment_ends_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "corporate": {
+                  "type": "boolean"
+                },
+                "current": {
+                  "description": "The package in force today.",
+                  "type": "boolean"
+                },
+                "ends_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "package_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "package_type": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "price_cents": {
+                  "nullable": true,
+                  "type": "integer"
+                },
+                "starts_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status",
+                "current"
+              ],
+              "title": "BillingSubscription",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "trials": {
+            "items": {
+              "properties": {
+                "class_name": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "class_starts_at": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "status": {
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "status"
+              ],
+              "title": "BillingTrial",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "organization_id",
+          "name",
+          "slug",
+          "kind",
+          "partial",
+          "contact",
+          "actions",
+          "subscriptions",
+          "invoices",
+          "payments",
+          "refund_receipts",
+          "promotions",
+          "seasons",
+          "referrals",
+          "trials",
+          "available_offers",
+          "perks",
+          "outstanding_cents",
+          "credit_balance_cents"
+        ],
+        "title": "BillingProvider",
+        "type": "object"
+      },
+      "BillingReferralCredit": {
+        "properties": {
+          "amount_cents": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "description": {
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "occurred_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "amount_cents",
+          "currency"
+        ],
+        "title": "BillingReferralCredit",
+        "type": "object"
+      },
+      "BillingReferrals": {
+        "properties": {
+          "credit_total_cents": {
+            "type": "integer"
+          },
+          "credits": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "type": "integer"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "description": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "occurred_on": {
+                  "format": "date",
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "amount_cents",
+                "currency"
+              ],
+              "title": "BillingReferralCredit",
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "invited": {
+            "type": "integer"
+          },
+          "paid": {
+            "type": "integer"
+          },
+          "trials": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "credits",
+          "credit_total_cents",
+          "invited",
+          "trials",
+          "paid"
+        ],
+        "title": "BillingReferrals",
+        "type": "object"
+      },
+      "BillingRefundReceipt": {
+        "properties": {
+          "amount_cents": {
+            "type": "integer"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "invoice_number": {
+            "nullable": true,
+            "type": "string"
+          },
+          "issued_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "reason": {
+            "nullable": true,
+            "type": "string"
+          },
+          "receipt_number": {
+            "type": "string"
+          },
+          "reversal_type": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "receipt_number",
+          "amount_cents",
+          "currency"
+        ],
+        "title": "BillingRefundReceipt",
+        "type": "object"
+      },
+      "BillingSeason": {
+        "properties": {
+          "currency": {
+            "type": "string"
+          },
+          "ends_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "price_cents": {
+            "type": "integer"
+          },
+          "season_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "starts_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "season_id",
+          "title",
+          "status"
+        ],
+        "title": "BillingSeason",
+        "type": "object"
+      },
+      "BillingSubscription": {
+        "properties": {
+          "auto_renew": {
+            "nullable": true,
+            "type": "boolean"
+          },
+          "billing_period": {
+            "nullable": true,
+            "type": "string"
+          },
+          "commitment_ends_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "corporate": {
+            "type": "boolean"
+          },
+          "current": {
+            "description": "The package in force today.",
+            "type": "boolean"
+          },
+          "ends_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "package_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "package_type": {
+            "nullable": true,
+            "type": "string"
+          },
+          "price_cents": {
+            "nullable": true,
+            "type": "integer"
+          },
+          "starts_on": {
+            "format": "date",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status",
+          "current"
+        ],
+        "title": "BillingSubscription",
+        "type": "object"
+      },
+      "BillingTransaction": {
+        "properties": {
+          "amount_cents": {
+            "description": "Negative for money back.",
+            "type": "integer"
+          },
+          "counterparty": {
+            "properties": {
+              "kind": {
+                "enum": [
+                  "gym",
+                  "coach",
+                  "organiser"
+                ],
+                "type": "string"
+              },
+              "name": {
+                "nullable": true,
+                "type": "string"
+              },
+              "organization_id": {
+                "format": "uuid",
+                "type": "string"
+              },
+              "slug": {
+                "nullable": true,
+                "type": "string"
+              }
+            },
+            "required": [
+              "organization_id",
+              "kind"
+            ],
+            "title": "BillingCounterparty",
+            "type": "object"
+          },
+          "currency": {
+            "type": "string"
+          },
+          "date": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "details": {
+            "additionalProperties": true,
+            "description": "Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id.",
+            "type": "object"
+          },
+          "id": {
+            "description": "`kind:source_id`, stable across pages.",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "invoice",
+              "payment",
+              "refund",
+              "credit",
+              "event_payment",
+              "event_refund",
+              "shop_order"
+            ],
+            "type": "string"
+          },
+          "source_id": {
+            "type": "string"
+          },
+          "source_url": {
+            "description": "In-app path of the source's own page when it has one (e.g. a shop order).",
+            "nullable": true,
+            "type": "string"
+          },
+          "status": {
+            "nullable": true,
+            "type": "string"
+          },
+          "title": {
+            "nullable": true,
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "kind",
+          "source_id",
+          "counterparty",
+          "amount_cents",
+          "currency",
+          "details"
+        ],
+        "title": "BillingTransaction",
+        "type": "object"
+      },
+      "BillingTrial": {
+        "properties": {
+          "class_name": {
+            "nullable": true,
+            "type": "string"
+          },
+          "class_starts_at": {
+            "format": "date-time",
+            "nullable": true,
+            "type": "string"
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "status"
+        ],
+        "title": "BillingTrial",
+        "type": "object"
+      },
       "BlockPersonRequest": {
         "properties": {
           "user_id": {
@@ -42481,6 +43719,744 @@
           "nodes"
         ],
         "title": "MyAtlas",
+        "type": "object"
+      },
+      "MyBilling": {
+        "properties": {
+          "providers": {
+            "items": {
+              "properties": {
+                "actions": {
+                  "properties": {
+                    "download_invoices": {
+                      "type": "boolean"
+                    },
+                    "self_service_cancel_auto_renew": {
+                      "type": "boolean"
+                    },
+                    "self_service_purchase": {
+                      "type": "boolean"
+                    }
+                  },
+                  "required": [
+                    "self_service_purchase",
+                    "self_service_cancel_auto_renew",
+                    "download_invoices"
+                  ],
+                  "title": "BillingActions",
+                  "type": "object"
+                },
+                "available_offers": {
+                  "description": "Codes of running campaigns the box shows to members.",
+                  "items": {
+                    "properties": {
+                      "campaign_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "code": {
+                        "type": "string"
+                      },
+                      "description": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "discount_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "discount_value": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "ends_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "code"
+                    ],
+                    "title": "BillingAvailableOffer",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "contact": {
+                  "properties": {
+                    "box_chat_slug": {
+                      "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "box_chat_slug"
+                  ],
+                  "title": "BillingContact",
+                  "type": "object"
+                },
+                "credit_balance_cents": {
+                  "type": "integer"
+                },
+                "entitlement": {
+                  "additionalProperties": true,
+                  "description": "The effective entitlement (remaining allowances), without usage entries.",
+                  "nullable": true,
+                  "type": "object"
+                },
+                "invoices": {
+                  "items": {
+                    "properties": {
+                      "balance_due_cents": {
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string"
+                      },
+                      "document_kind": {
+                        "enum": [
+                          "invoice",
+                          "receipt"
+                        ],
+                        "type": "string"
+                      },
+                      "downloadable": {
+                        "description": "A PDF is on file to download.",
+                        "type": "boolean"
+                      },
+                      "due_date": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "invoice_number": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "issue_date": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "total_cents": {
+                        "type": "integer"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "document_kind",
+                      "status",
+                      "total_cents",
+                      "balance_due_cents",
+                      "currency",
+                      "downloadable"
+                    ],
+                    "title": "BillingInvoice",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "kind": {
+                  "enum": [
+                    "gym",
+                    "coach"
+                  ],
+                  "type": "string"
+                },
+                "logo_url": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "membership": {
+                  "nullable": true,
+                  "properties": {
+                    "entitlement_status": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "expires_on": {
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "starts_on": {
+                      "format": "date",
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "status": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "status"
+                  ],
+                  "title": "BillingMembership",
+                  "type": "object"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "organization_id": {
+                  "format": "uuid",
+                  "type": "string"
+                },
+                "outstanding_cents": {
+                  "type": "integer"
+                },
+                "partial": {
+                  "description": "Some sections could not be read.",
+                  "type": "boolean"
+                },
+                "payments": {
+                  "items": {
+                    "properties": {
+                      "amount_cents": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string"
+                      },
+                      "finance_invoice_id": {
+                        "format": "uuid",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "net_amount_cents": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "paid_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "payment_method": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "payment_status": {
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "currency"
+                    ],
+                    "title": "BillingPayment",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "perks": {
+                  "items": {
+                    "description": "Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.",
+                    "properties": {
+                      "code": {
+                        "type": "string"
+                      },
+                      "discount": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "store": {
+                        "type": "string"
+                      },
+                      "terms": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "url": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "valid_until": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "store",
+                      "code"
+                    ],
+                    "title": "BillingPerk",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "primary_color": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "promotions": {
+                  "items": {
+                    "properties": {
+                      "campaign_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "discount_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "discount_value": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "redeemed_at": {
+                        "format": "date-time",
+                        "nullable": true,
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ],
+                    "title": "BillingPromotion",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "referrals": {
+                  "properties": {
+                    "credit_total_cents": {
+                      "type": "integer"
+                    },
+                    "credits": {
+                      "items": {
+                        "properties": {
+                          "amount_cents": {
+                            "type": "integer"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "description": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "occurred_on": {
+                            "format": "date",
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "amount_cents",
+                          "currency"
+                        ],
+                        "title": "BillingReferralCredit",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    },
+                    "invited": {
+                      "type": "integer"
+                    },
+                    "paid": {
+                      "type": "integer"
+                    },
+                    "trials": {
+                      "type": "integer"
+                    }
+                  },
+                  "required": [
+                    "credits",
+                    "credit_total_cents",
+                    "invited",
+                    "trials",
+                    "paid"
+                  ],
+                  "title": "BillingReferrals",
+                  "type": "object"
+                },
+                "refund_receipts": {
+                  "items": {
+                    "properties": {
+                      "amount_cents": {
+                        "type": "integer"
+                      },
+                      "currency": {
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "invoice_number": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "issued_at": {
+                        "format": "date-time",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "reason": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "receipt_number": {
+                        "type": "string"
+                      },
+                      "reversal_type": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "receipt_number",
+                      "amount_cents",
+                      "currency"
+                    ],
+                    "title": "BillingRefundReceipt",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "seasons": {
+                  "items": {
+                    "properties": {
+                      "currency": {
+                        "type": "string"
+                      },
+                      "ends_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "price_cents": {
+                        "type": "integer"
+                      },
+                      "season_id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "starts_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      },
+                      "title": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "season_id",
+                      "title",
+                      "status"
+                    ],
+                    "title": "BillingSeason",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "slug": {
+                  "type": "string"
+                },
+                "subscriptions": {
+                  "items": {
+                    "properties": {
+                      "auto_renew": {
+                        "nullable": true,
+                        "type": "boolean"
+                      },
+                      "billing_period": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "commitment_ends_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "corporate": {
+                        "type": "boolean"
+                      },
+                      "current": {
+                        "description": "The package in force today.",
+                        "type": "boolean"
+                      },
+                      "ends_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "package_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "package_type": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "price_cents": {
+                        "nullable": true,
+                        "type": "integer"
+                      },
+                      "starts_on": {
+                        "format": "date",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "status",
+                      "current"
+                    ],
+                    "title": "BillingSubscription",
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "trials": {
+                  "items": {
+                    "properties": {
+                      "class_name": {
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "class_starts_at": {
+                        "format": "date-time",
+                        "nullable": true,
+                        "type": "string"
+                      },
+                      "id": {
+                        "format": "uuid",
+                        "type": "string"
+                      },
+                      "status": {
+                        "type": "string"
+                      }
+                    },
+                    "required": [
+                      "id",
+                      "status"
+                    ],
+                    "title": "BillingTrial",
+                    "type": "object"
+                  },
+                  "type": "array"
+                }
+              },
+              "required": [
+                "organization_id",
+                "name",
+                "slug",
+                "kind",
+                "partial",
+                "contact",
+                "actions",
+                "subscriptions",
+                "invoices",
+                "payments",
+                "refund_receipts",
+                "promotions",
+                "seasons",
+                "referrals",
+                "trials",
+                "available_offers",
+                "perks",
+                "outstanding_cents",
+                "credit_balance_cents"
+              ],
+              "title": "BillingProvider",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "providers"
+        ],
+        "title": "MyBilling",
+        "type": "object"
+      },
+      "MyBillingTransactions": {
+        "properties": {
+          "kinds": {
+            "items": {
+              "enum": [
+                "invoice",
+                "payment",
+                "refund",
+                "credit",
+                "event_payment",
+                "event_refund",
+                "shop_order"
+              ],
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "next_cursor": {
+            "nullable": true,
+            "type": "string"
+          },
+          "partial": {
+            "type": "boolean"
+          },
+          "total": {
+            "description": "Entries in scope, before the kind filter.",
+            "type": "integer"
+          },
+          "transactions": {
+            "items": {
+              "properties": {
+                "amount_cents": {
+                  "description": "Negative for money back.",
+                  "type": "integer"
+                },
+                "counterparty": {
+                  "properties": {
+                    "kind": {
+                      "enum": [
+                        "gym",
+                        "coach",
+                        "organiser"
+                      ],
+                      "type": "string"
+                    },
+                    "name": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "organization_id": {
+                      "format": "uuid",
+                      "type": "string"
+                    },
+                    "slug": {
+                      "nullable": true,
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "organization_id",
+                    "kind"
+                  ],
+                  "title": "BillingCounterparty",
+                  "type": "object"
+                },
+                "currency": {
+                  "type": "string"
+                },
+                "date": {
+                  "format": "date-time",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "details": {
+                  "additionalProperties": true,
+                  "description": "Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id.",
+                  "type": "object"
+                },
+                "id": {
+                  "description": "`kind:source_id`, stable across pages.",
+                  "type": "string"
+                },
+                "kind": {
+                  "enum": [
+                    "invoice",
+                    "payment",
+                    "refund",
+                    "credit",
+                    "event_payment",
+                    "event_refund",
+                    "shop_order"
+                  ],
+                  "type": "string"
+                },
+                "source_id": {
+                  "type": "string"
+                },
+                "source_url": {
+                  "description": "In-app path of the source's own page when it has one (e.g. a shop order).",
+                  "nullable": true,
+                  "type": "string"
+                },
+                "status": {
+                  "nullable": true,
+                  "type": "string"
+                },
+                "title": {
+                  "nullable": true,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "id",
+                "kind",
+                "source_id",
+                "counterparty",
+                "amount_cents",
+                "currency",
+                "details"
+              ],
+              "title": "BillingTransaction",
+              "type": "object"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "transactions",
+          "next_cursor",
+          "total",
+          "kinds",
+          "partial"
+        ],
+        "title": "MyBillingTransactions",
         "type": "object"
       },
       "MyInjuryWarningsAcknowledged": {
@@ -79524,6 +81500,850 @@
           }
         ],
         "summary": "Create a constrained presigned avatar upload",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/billing": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyBillingController.index",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "providers": {
+                      "items": {
+                        "properties": {
+                          "actions": {
+                            "properties": {
+                              "download_invoices": {
+                                "type": "boolean"
+                              },
+                              "self_service_cancel_auto_renew": {
+                                "type": "boolean"
+                              },
+                              "self_service_purchase": {
+                                "type": "boolean"
+                              }
+                            },
+                            "required": [
+                              "self_service_purchase",
+                              "self_service_cancel_auto_renew",
+                              "download_invoices"
+                            ],
+                            "title": "BillingActions",
+                            "type": "object"
+                          },
+                          "available_offers": {
+                            "description": "Codes of running campaigns the box shows to members.",
+                            "items": {
+                              "properties": {
+                                "campaign_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "code": {
+                                  "type": "string"
+                                },
+                                "description": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "discount_type": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "discount_value": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "ends_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "code"
+                              ],
+                              "title": "BillingAvailableOffer",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "contact": {
+                            "properties": {
+                              "box_chat_slug": {
+                                "description": "The published box page whose chat reaches the box (`/b/{slug}/chat`).",
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "box_chat_slug"
+                            ],
+                            "title": "BillingContact",
+                            "type": "object"
+                          },
+                          "credit_balance_cents": {
+                            "type": "integer"
+                          },
+                          "entitlement": {
+                            "additionalProperties": true,
+                            "description": "The effective entitlement (remaining allowances), without usage entries.",
+                            "nullable": true,
+                            "type": "object"
+                          },
+                          "invoices": {
+                            "items": {
+                              "properties": {
+                                "balance_due_cents": {
+                                  "type": "integer"
+                                },
+                                "currency": {
+                                  "type": "string"
+                                },
+                                "document_kind": {
+                                  "enum": [
+                                    "invoice",
+                                    "receipt"
+                                  ],
+                                  "type": "string"
+                                },
+                                "downloadable": {
+                                  "description": "A PDF is on file to download.",
+                                  "type": "boolean"
+                                },
+                                "due_date": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "invoice_number": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "issue_date": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string"
+                                },
+                                "total_cents": {
+                                  "type": "integer"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "document_kind",
+                                "status",
+                                "total_cents",
+                                "balance_due_cents",
+                                "currency",
+                                "downloadable"
+                              ],
+                              "title": "BillingInvoice",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "kind": {
+                            "enum": [
+                              "gym",
+                              "coach"
+                            ],
+                            "type": "string"
+                          },
+                          "logo_url": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "membership": {
+                            "nullable": true,
+                            "properties": {
+                              "entitlement_status": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "expires_on": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "starts_on": {
+                                "format": "date",
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "status": {
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "status"
+                            ],
+                            "title": "BillingMembership",
+                            "type": "object"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "organization_id": {
+                            "format": "uuid",
+                            "type": "string"
+                          },
+                          "outstanding_cents": {
+                            "type": "integer"
+                          },
+                          "partial": {
+                            "description": "Some sections could not be read.",
+                            "type": "boolean"
+                          },
+                          "payments": {
+                            "items": {
+                              "properties": {
+                                "amount_cents": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "currency": {
+                                  "type": "string"
+                                },
+                                "finance_invoice_id": {
+                                  "format": "uuid",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "net_amount_cents": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "paid_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "payment_method": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "payment_status": {
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "currency"
+                              ],
+                              "title": "BillingPayment",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "perks": {
+                            "items": {
+                              "description": "Reserved for partner perks (outside-store deals, post-MVP). Always empty for now.",
+                              "properties": {
+                                "code": {
+                                  "type": "string"
+                                },
+                                "discount": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "store": {
+                                  "type": "string"
+                                },
+                                "terms": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "url": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "valid_until": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "store",
+                                "code"
+                              ],
+                              "title": "BillingPerk",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "primary_color": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "promotions": {
+                            "items": {
+                              "properties": {
+                                "campaign_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "discount_type": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "discount_value": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "redeemed_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id"
+                              ],
+                              "title": "BillingPromotion",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "referrals": {
+                            "properties": {
+                              "credit_total_cents": {
+                                "type": "integer"
+                              },
+                              "credits": {
+                                "items": {
+                                  "properties": {
+                                    "amount_cents": {
+                                      "type": "integer"
+                                    },
+                                    "currency": {
+                                      "type": "string"
+                                    },
+                                    "description": {
+                                      "nullable": true,
+                                      "type": "string"
+                                    },
+                                    "id": {
+                                      "format": "uuid",
+                                      "type": "string"
+                                    },
+                                    "occurred_on": {
+                                      "format": "date",
+                                      "nullable": true,
+                                      "type": "string"
+                                    }
+                                  },
+                                  "required": [
+                                    "id",
+                                    "amount_cents",
+                                    "currency"
+                                  ],
+                                  "title": "BillingReferralCredit",
+                                  "type": "object"
+                                },
+                                "type": "array"
+                              },
+                              "invited": {
+                                "type": "integer"
+                              },
+                              "paid": {
+                                "type": "integer"
+                              },
+                              "trials": {
+                                "type": "integer"
+                              }
+                            },
+                            "required": [
+                              "credits",
+                              "credit_total_cents",
+                              "invited",
+                              "trials",
+                              "paid"
+                            ],
+                            "title": "BillingReferrals",
+                            "type": "object"
+                          },
+                          "refund_receipts": {
+                            "items": {
+                              "properties": {
+                                "amount_cents": {
+                                  "type": "integer"
+                                },
+                                "currency": {
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "invoice_number": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "issued_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "reason": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "receipt_number": {
+                                  "type": "string"
+                                },
+                                "reversal_type": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "receipt_number",
+                                "amount_cents",
+                                "currency"
+                              ],
+                              "title": "BillingRefundReceipt",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "seasons": {
+                            "items": {
+                              "properties": {
+                                "currency": {
+                                  "type": "string"
+                                },
+                                "ends_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "price_cents": {
+                                  "type": "integer"
+                                },
+                                "season_id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "starts_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string"
+                                },
+                                "title": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "season_id",
+                                "title",
+                                "status"
+                              ],
+                              "title": "BillingSeason",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "slug": {
+                            "type": "string"
+                          },
+                          "subscriptions": {
+                            "items": {
+                              "properties": {
+                                "auto_renew": {
+                                  "nullable": true,
+                                  "type": "boolean"
+                                },
+                                "billing_period": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "commitment_ends_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "corporate": {
+                                  "type": "boolean"
+                                },
+                                "current": {
+                                  "description": "The package in force today.",
+                                  "type": "boolean"
+                                },
+                                "ends_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "package_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "package_type": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "price_cents": {
+                                  "nullable": true,
+                                  "type": "integer"
+                                },
+                                "starts_on": {
+                                  "format": "date",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "status",
+                                "current"
+                              ],
+                              "title": "BillingSubscription",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          },
+                          "trials": {
+                            "items": {
+                              "properties": {
+                                "class_name": {
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "class_starts_at": {
+                                  "format": "date-time",
+                                  "nullable": true,
+                                  "type": "string"
+                                },
+                                "id": {
+                                  "format": "uuid",
+                                  "type": "string"
+                                },
+                                "status": {
+                                  "type": "string"
+                                }
+                              },
+                              "required": [
+                                "id",
+                                "status"
+                              ],
+                              "title": "BillingTrial",
+                              "type": "object"
+                            },
+                            "type": "array"
+                          }
+                        },
+                        "required": [
+                          "organization_id",
+                          "name",
+                          "slug",
+                          "kind",
+                          "partial",
+                          "contact",
+                          "actions",
+                          "subscriptions",
+                          "invoices",
+                          "payments",
+                          "refund_receipts",
+                          "promotions",
+                          "seasons",
+                          "referrals",
+                          "trials",
+                          "available_offers",
+                          "perks",
+                          "outstanding_cents",
+                          "credit_balance_cents"
+                        ],
+                        "title": "BillingProvider",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "providers"
+                  ],
+                  "title": "MyBilling",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Billing"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your billing at every gym or coach you are a client of",
+        "tags": [
+          "Me"
+        ]
+      }
+    },
+    "/api/me/billing/transactions": {
+      "get": {
+        "callbacks": {},
+        "operationId": "PaleeWeb.MyBillingController.transactions",
+        "parameters": [
+          {
+            "description": "One provider; event entries of hosts that are not providers always stay.",
+            "in": "query",
+            "name": "organization_id",
+            "required": false,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "kind",
+            "required": false,
+            "schema": {
+              "enum": [
+                "invoice",
+                "payment",
+                "refund",
+                "credit",
+                "event_payment",
+                "event_refund",
+                "shop_order"
+              ],
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "maximum": 100,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "kinds": {
+                      "items": {
+                        "enum": [
+                          "invoice",
+                          "payment",
+                          "refund",
+                          "credit",
+                          "event_payment",
+                          "event_refund",
+                          "shop_order"
+                        ],
+                        "type": "string"
+                      },
+                      "type": "array"
+                    },
+                    "next_cursor": {
+                      "nullable": true,
+                      "type": "string"
+                    },
+                    "partial": {
+                      "type": "boolean"
+                    },
+                    "total": {
+                      "description": "Entries in scope, before the kind filter.",
+                      "type": "integer"
+                    },
+                    "transactions": {
+                      "items": {
+                        "properties": {
+                          "amount_cents": {
+                            "description": "Negative for money back.",
+                            "type": "integer"
+                          },
+                          "counterparty": {
+                            "properties": {
+                              "kind": {
+                                "enum": [
+                                  "gym",
+                                  "coach",
+                                  "organiser"
+                                ],
+                                "type": "string"
+                              },
+                              "name": {
+                                "nullable": true,
+                                "type": "string"
+                              },
+                              "organization_id": {
+                                "format": "uuid",
+                                "type": "string"
+                              },
+                              "slug": {
+                                "nullable": true,
+                                "type": "string"
+                              }
+                            },
+                            "required": [
+                              "organization_id",
+                              "kind"
+                            ],
+                            "title": "BillingCounterparty",
+                            "type": "object"
+                          },
+                          "currency": {
+                            "type": "string"
+                          },
+                          "date": {
+                            "format": "date-time",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "details": {
+                            "additionalProperties": true,
+                            "description": "Per kind: invoice number, due date, balance, lines and `downloadable`; payment method; refund reason and receipt; event id.",
+                            "type": "object"
+                          },
+                          "id": {
+                            "description": "`kind:source_id`, stable across pages.",
+                            "type": "string"
+                          },
+                          "kind": {
+                            "enum": [
+                              "invoice",
+                              "payment",
+                              "refund",
+                              "credit",
+                              "event_payment",
+                              "event_refund",
+                              "shop_order"
+                            ],
+                            "type": "string"
+                          },
+                          "source_id": {
+                            "type": "string"
+                          },
+                          "source_url": {
+                            "description": "In-app path of the source's own page when it has one (e.g. a shop order).",
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "status": {
+                            "nullable": true,
+                            "type": "string"
+                          },
+                          "title": {
+                            "nullable": true,
+                            "type": "string"
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "kind",
+                          "source_id",
+                          "counterparty",
+                          "amount_cents",
+                          "currency",
+                          "details"
+                        ],
+                        "title": "BillingTransaction",
+                        "type": "object"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "transactions",
+                    "next_cursor",
+                    "total",
+                    "kinds",
+                    "partial"
+                  ],
+                  "title": "MyBillingTransactions",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Transactions"
+          },
+          "400": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Invalid cursor"
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "summary": "Your complete transaction history, newest first (cursor-paginated)",
         "tags": [
           "Me"
         ]

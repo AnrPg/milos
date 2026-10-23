@@ -584,7 +584,7 @@ export function WorkoutCreationCanvas({ embedded = false, initialDraftId = null,
       <button
         type="button"
         onClick={() => setShowShortcuts(true)}
-        className={(embedded ? "absolute" : "fixed") + " bottom-4 end-4 z-(--z-sticky) hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
+        className={(embedded ? "absolute bottom-4" : "fixed bottom-[calc(var(--bottom-float-inset)+1rem)]") + " end-4 z-(--z-sticky) hidden h-8 w-8 items-center justify-center rounded-full text-sm font-bold md:flex"}
         style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--muted)" }}
         title={i18n("keyboardShortcuts72933ee")}
       >

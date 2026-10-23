@@ -4,6 +4,7 @@ import { useId, useRef, type CSSProperties, type FormEvent, type ReactNode } fro
 import { createPortal } from "react-dom";
 import { useTranslations } from "next-intl";
 
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 
 export type DialogSize = "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" | "5xl" | "full";
@@ -129,6 +130,8 @@ export function Dialog({
     if (dismissible) onClose();
   });
   const pressStartedOnBackdrop = useRef(false);
+  // The member app's floating bottom bar steps aside while a dialog is open.
+  useHideBottomNav();
 
   if (typeof document === "undefined") return null;
 

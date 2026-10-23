@@ -349,7 +349,7 @@ export function SectionedWorkoutEditor({ draftId, folderId = null, onDraftReady,
         + {i18n("addTextSection")}
       </button>
 
-      <footer className="sticky bottom-0 flex flex-wrap items-center justify-between gap-3 border-t py-3" style={{ borderColor: "var(--dim)", background: "var(--bg)" }}>
+      <footer className="sticky bottom-(--bottom-nav-space) flex flex-wrap items-center justify-between gap-3 border-t py-3" style={{ borderColor: "var(--dim)", background: "var(--bg)" }}>
         <span className="text-xs" role={notice ? "alert" : undefined} style={{ color: notice ? "var(--danger)" : "var(--muted)" }}>
           {notice ??
             (showProblems && (titleMissing || !type)

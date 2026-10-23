@@ -56,7 +56,9 @@ export function surfaceRole(
   // link in that bar (navigation-by-role.md §2).
   const staff = membershipRoles(membership).filter((role) => (STAFF_ROLES as readonly string[]).includes(role));
   if (client && staff.length > 0 && staff.every((role) => role === "janitor")) return client;
-  if (hasStaffRole(membership) && !(view === "client" && client)) return "admin";
+  // Every staff member can use the member app (view "client"); the console
+  // is the "staff" view (lib/view-mode.ts).
+  if (hasStaffRole(membership) && view === "staff") return "admin";
   return client ?? "member";
 }
 
@@ -119,13 +121,14 @@ export function staffNavItems(membership: MembershipLike | null | undefined): Na
 
 /**
  * The member app's four fixed tabs (redesign Phase 1, ADR-137; brief §6.1):
- * Αρχική · Box · Ημερολόγιο · Εγώ. Every member page lives under the tab
+ * Feed · Box · Journal · Εγώ. The floating bar (lib/bottom-nav.ts) adds the
+ * bell next to Εγώ and lists the routes it never shows on. Every member page lives under the tab
  * that is its home (lib/member-routes.ts lists the moves); workout pages
  * opened from Box stay at /workouts and are claimed by Box.
  */
 export function clientNavItems(): NavItem[] {
   return [
-    { id: "home", href: "/", labelKey: "home", match: ["/", "/feed", "/clubs", "/around", "/around/events", "/around/boxes", "/around/clubs", "/around/posts"], exact: true },
+    { id: "home", href: "/", labelKey: "feed", match: ["/", "/feed", "/clubs", "/around", "/around/events", "/around/boxes", "/around/clubs", "/around/posts"], exact: true },
     {
       id: "box",
       href: "/box",
@@ -152,14 +155,6 @@ export function clientExtraLinks(membership?: MembershipLike | null): NavItem[] 
     items.push({ id: "inventory", href: "/admin/inventory", labelKey: "inventory", match: ["/admin/inventory"], scoped: true });
   }
   return items;
-}
-
-/** Full-screen pages where the bottom bar would get in the way. */
-const BOTTOM_BAR_HIDDEN = [/^\/workouts\/[^/]+\/execute(?:\/|$)/, /^\/workouts\/free-text\/execute(?:\/|$)/, /^\/class-timer\/[^/]+\/(?:display|control)(?:\/|$)/, /^\/admin\/check-in\/(?:door|poster)\/[^/]+\/?$/];
-
-export function showsBottomBar(pathname: string) {
-  const path = relativePath(pathname);
-  return !BOTTOM_BAR_HIDDEN.some((pattern) => pattern.test(path));
 }
 
 function relativePath(pathname: string) {
