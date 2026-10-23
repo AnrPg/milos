@@ -9984,8 +9984,11 @@
         "body": "Η παραγγελία {number} στο {box} ακυρώθηκε."
       }
     },
-    "codeAtOrder": "Ο κωδικός {code} ελέγχεται με την παραγγελία.",
-    "packageDiscountPlain": "Έκπτωση πακέτου"
+    "packageDiscountPlain": "Έκπτωση πακέτου",
+    "codeApplied": "Ο κωδικός {code} εφαρμόστηκε",
+    "postMembersOnly": "Για μέλη του box",
+    "postFewLeft": "Λίγα κομμάτια ακόμα",
+    "postWithCode": "{price} με τον κωδικό {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% σε {what}",

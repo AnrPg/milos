@@ -9984,8 +9984,11 @@
         "body": "تم إلغاء الطلب {number} في {box}."
       }
     },
-    "codeAtOrder": "يتم التحقق من الرمز {code} عند الطلب.",
-    "packageDiscountPlain": "خصم الباقة"
+    "packageDiscountPlain": "خصم الباقة",
+    "codeApplied": "تم تطبيق الرمز {code}",
+    "postMembersOnly": "لأعضاء النادي",
+    "postFewLeft": "لم يتبقَّ إلا القليل",
+    "postWithCode": "{price} مع الرمز {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% على {what}",

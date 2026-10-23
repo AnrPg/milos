@@ -88,8 +88,10 @@ describe("cart totals in integer cents", () => {
 
 describe("stored cart", () => {
   it("round-trips and drops malformed lines", () => {
-    const cart = { ...addToCart(EMPTY_CART, tee), source: { kind: "club_post" as const, id: "p" } };
+    const cart = { ...addToCart(EMPTY_CART, tee), source: { kind: "club_post" as const, id: "p", code: "TEE10" } };
     expect(parseCart(serializeCart(cart))).toEqual(cart);
+    const uncoded = { ...cart, source: { kind: "club_post" as const, id: "p" } };
+    expect(parseCart(serializeCart(uncoded)).source).toEqual({ kind: "club_post", id: "p", code: null });
     expect(parseCart('{"lines":[{"variantId":"a","productId":"b","quantity":-1},{"variantId":3}]}')).toEqual(EMPTY_CART);
     expect(parseCart("not json")).toEqual(EMPTY_CART);
     expect(parseCart(null)).toEqual(EMPTY_CART);

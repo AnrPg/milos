@@ -9984,8 +9984,11 @@
         "body": "Order {number} at {box} was cancelled."
       }
     },
-    "codeAtOrder": "Code {code} is checked when you order.",
-    "packageDiscountPlain": "Package discount"
+    "packageDiscountPlain": "Package discount",
+    "codeApplied": "Code {code} applied",
+    "postMembersOnly": "For members of the box",
+    "postFewLeft": "Only a few left",
+    "postWithCode": "{price} with code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% on {what}",

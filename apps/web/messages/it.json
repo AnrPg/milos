@@ -9984,8 +9984,11 @@
         "body": "L'ordine {number} presso {box} è stato annullato."
       }
     },
-    "codeAtOrder": "Il codice {code} viene verificato all'ordine.",
-    "packageDiscountPlain": "Sconto pacchetto"
+    "packageDiscountPlain": "Sconto pacchetto",
+    "codeApplied": "Codice {code} applicato",
+    "postMembersOnly": "Per i membri del box",
+    "postFewLeft": "Ne restano pochi",
+    "postWithCode": "{price} con il codice {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% su {what}",

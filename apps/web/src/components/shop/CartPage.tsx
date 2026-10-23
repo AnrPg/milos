@@ -19,9 +19,14 @@ const ORDER_ERRORS: Record<string, string> = {
   product_not_available: "errorUnavailable",
   variant_not_found: "errorUnavailable",
   insufficient_stock: "errorStock",
-  invalid_promotion_code: "errorCode",
+  promotion_code_invalid: "errorCode",
+  promotion_code_expired: "errorCode",
+  promotion_code_exhausted: "errorCode",
+  promotion_code_changed: "errorCode",
   promotion_code_not_applicable: "errorCode",
 };
+
+const isCodeError = (error: unknown) => error instanceof ApiError && String(error.payload.code ?? "").startsWith("promotion_code_");
 
 function errorKey(error: unknown) {
   const code = error instanceof ApiError ? error.payload.code : null;
@@ -59,9 +64,14 @@ export function CartPage() {
 
   const orderable = cart.lines.filter((line) => !totals.missing.includes(line.variantId));
   const [pickupId, setPickupId] = useState<string | null>(null);
-  // The server prices the basket and says where it can be picked up and how it can be paid.
-  const preview = useCartPreview(slug, cartItems({ ...cart, lines: orderable }), pickupId);
-  const quote = preview.data ?? null;
+  // A code from a «Προώθηση» post starts typed in; «Έχεις κωδικό;» can set another.
+  // `undefined` until the member types or removes one; the stored cart loads after hydration.
+  const [typedPromotion, setPromotion] = useState<string | null | undefined>(undefined);
+  const promotion = typedPromotion === undefined ? (cart.source?.code ?? null) : typedPromotion;
+  // The server prices the basket (with the code) and says where it can be picked up and how it can be paid.
+  const preview = useCartPreview(slug, cartItems({ ...cart, lines: orderable }), pickupId, promotion);
+  const codeRejected = Boolean(promotion) && preview.isError && isCodeError(preview.error);
+  const quote = codeRejected ? null : (preview.data ?? null);
   const allowed = quote?.pickup_location_ids ?? [];
   const places = (shop?.pickup_locations ?? []).filter((item) => allowed.length === 0 || allowed.includes(item.id));
   const pickup = places.find((item) => item.id === pickupId) ?? places[0] ?? null;
@@ -74,10 +84,10 @@ export function CartPage() {
     { mode: "online", available: onlineAvailable },
   ];
   const [mode, setMode] = useState<ShopPaymentMode>("at_pickup");
-  const [codeOpen, setCodeOpen] = useState(false);
-  const [code, setCode] = useState("");
-  // TODO(ADR-190): the cart preview takes no code, so the code is checked when the order is placed.
-  const [promotion, setPromotion] = useState<string | null>(null);
+  const [openState, setCodeOpen] = useState(false);
+  const codeOpen = openState || Boolean(promotion);
+  const [typedCode, setCode] = useState<string | null>(null);
+  const code = typedCode ?? promotion ?? "";
   const [idempotencyKey] = useState(newKey);
   const place = usePlaceOrder(slug);
   const currency = quote?.currency ?? totals.currency ?? shop?.currency ?? "EUR";
@@ -95,7 +105,7 @@ export function CartPage() {
         lines: cartItems({ ...cart, lines: orderable }),
         pickup_location_id: pickup?.id ?? null,
         payment_mode: mode,
-        promotion_code: promotion,
+        promotion_code: codeRejected ? null : promotion,
         source: cart.source ? cart.source.kind : "direct",
         source_ref_id: cart.source?.id ?? null,
         idempotency_key: idempotencyKey,
@@ -232,7 +242,16 @@ export function CartPage() {
               </button>
             </span>
           </label>
-          {promotion ? <span className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>{t("codeAtOrder", { code: promotion })}</span> : null}
+          {codeRejected ? (
+            <div className="flex items-center justify-between gap-2">
+              <ErrorNotice message={t(errorKey(preview.error))} />
+              <button type="button" onClick={() => { setPromotion(null); setCode(""); }} className="min-h-11 px-2 text-xs font-bold" style={{ color: "var(--danger)" }}>
+                {t("remove")}
+              </button>
+            </div>
+          ) : quote?.promotion_code ? (
+            <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>{t("codeApplied", { code: quote.promotion_code })}</span>
+          ) : null}
         </Panel>
       ) : (
         <button type="button" onClick={() => setCodeOpen(true)} className="min-h-11 self-start text-sm font-bold" style={{ color: "var(--primary-strong)" }}>

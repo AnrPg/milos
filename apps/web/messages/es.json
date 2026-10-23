@@ -9984,8 +9984,11 @@
         "body": "El pedido {number} en {box} se canceló."
       }
     },
-    "codeAtOrder": "El código {code} se comprueba al hacer el pedido.",
-    "packageDiscountPlain": "Descuento del paquete"
+    "packageDiscountPlain": "Descuento del paquete",
+    "codeApplied": "Código {code} aplicado",
+    "postMembersOnly": "Para miembros del box",
+    "postFewLeft": "Quedan pocas unidades",
+    "postWithCode": "{price} con el código {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% en {what}",

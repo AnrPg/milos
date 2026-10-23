@@ -56,6 +56,8 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
   const locale = useUiLocale();
   const searchParams = useSearchParams();
   const postId = searchParams.get("post");
+  // A «Προώθηση» post's buy link carries its promotion code (ProductCards.buy_link).
+  const postCode = searchParams.get("code");
   const { update } = useCart(slug);
   const axes = product.options.axes;
   const [selection, setSelection] = useState<Selection>(() => initialSelection(axes, product.variants));
@@ -82,7 +84,7 @@ function ProductBody({ product, storefront, slug, explicit }: { product: ShopPro
     if (!variant) return;
     update((current) => {
       const next = addToCart(current, { variantId: variant.id, productId: product.id, quantity }, max);
-      return postId && !next.source ? { ...next, source: { kind: "club_post", id: postId } } : next;
+      return postId && !next.source ? { ...next, source: { kind: "club_post", id: postId, code: postCode } } : next;
     });
     setAdded(true);
   }

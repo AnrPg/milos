@@ -9984,8 +9984,11 @@
         "body": "Поръчка {number} в {box} беше отказана."
       }
     },
-    "codeAtOrder": "Кодът {code} се проверява при поръчката.",
-    "packageDiscountPlain": "Отстъпка от пакета"
+    "packageDiscountPlain": "Отстъпка от пакета",
+    "codeApplied": "Кодът {code} е приложен",
+    "postMembersOnly": "За членове на бокса",
+    "postFewLeft": "Остават само няколко",
+    "postWithCode": "{price} с кода {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% за {what}",

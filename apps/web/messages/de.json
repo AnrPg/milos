@@ -9984,8 +9984,11 @@
         "body": "Bestellung {number} bei {box} wurde storniert."
       }
     },
-    "codeAtOrder": "Der Code {code} wird bei der Bestellung geprüft.",
-    "packageDiscountPlain": "Paketrabatt"
+    "packageDiscountPlain": "Paketrabatt",
+    "codeApplied": "Code {code} angewendet",
+    "postMembersOnly": "Für Mitglieder der Box",
+    "postFewLeft": "Nur noch wenige da",
+    "postWithCode": "{price} mit dem Code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% auf {what}",

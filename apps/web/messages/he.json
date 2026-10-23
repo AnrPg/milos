@@ -9984,8 +9984,11 @@
         "body": "הזמנה {number} ב־{box} בוטלה."
       }
     },
-    "codeAtOrder": "הקוד {code} נבדק בעת ההזמנה.",
-    "packageDiscountPlain": "הנחת חבילה"
+    "packageDiscountPlain": "הנחת חבילה",
+    "codeApplied": "הקוד {code} הוחל",
+    "postMembersOnly": "לחברי הבוקס",
+    "postFewLeft": "נשארו רק מעט",
+    "postWithCode": "{price} עם הקוד {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% על {what}",

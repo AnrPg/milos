@@ -12,7 +12,8 @@ export const MAX_CART_LINES = 50;
 export type CartLine = { variantId: string; productId: string; quantity: number };
 
 /** Where the cart was started, for the order's `source` (ADR-192 attribution). */
-export type CartSource = { kind: "club_post"; id: string } | null;
+/** `code`: the post's promotion code, typed into the basket for the member. */
+export type CartSource = { kind: "club_post"; id: string; code?: string | null } | null;
 
 export type Cart = { lines: CartLine[]; source: CartSource };
 
@@ -148,7 +149,10 @@ export function parseCart(raw: string | null | undefined): Cart {
           .map((line) => ({ variantId: line.variantId, productId: line.productId, quantity: clampQuantity(line.quantity) }))
       : [];
     const source = value.source as CartSource;
-    const validSource = source && source.kind === "club_post" && typeof source.id === "string" ? source : null;
+    const validSource =
+      source && source.kind === "club_post" && typeof source.id === "string"
+        ? { kind: "club_post" as const, id: source.id, code: typeof source.code === "string" ? source.code : null }
+        : null;
     return { lines, source: lines.length > 0 ? validSource : null };
   } catch {
     return EMPTY_CART;

@@ -137,8 +137,14 @@ export function PostCard({ post }: { post: CommunityPost }) {
           <EventSnapshotCard snapshot={post.attachment} />
         ) : null
       ) : (post.attachment_type as string | null | undefined) === "product" && post.attachment ? (
-        // ADR-190: a product card from «Προώθηση»; TODO(ADR-190): drop the cast once the schema lists `product`.
-        <ProductPostCard snapshot={post.attachment} postId={post.id} organizationSlug={post.club?.organization_slug ?? null} />
+        // ADR-190: a product card from «Προώθηση», live from `post.product` (ProductCards).
+        // TODO(ADR-190): drop the casts once `npm run generate:api` lists `product`.
+        <ProductPostCard
+          card={((post as { product?: Record<string, unknown> | null }).product ?? null)}
+          snapshot={post.attachment}
+          postId={post.id}
+          organizationSlug={post.club?.organization_slug ?? null}
+        />
       ) : post.attachment_type && post.attachment ? (
         <Attachment type={post.attachment_type} snapshot={post.attachment} />
       ) : null}

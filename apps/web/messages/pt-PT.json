@@ -9984,8 +9984,11 @@
         "body": "A encomenda {number} em {box} foi cancelada."
       }
     },
-    "codeAtOrder": "O código {code} é verificado ao encomendar.",
-    "packageDiscountPlain": "Desconto do pacote"
+    "packageDiscountPlain": "Desconto do pacote",
+    "codeApplied": "Código {code} aplicado",
+    "postMembersOnly": "Para membros da box",
+    "postFewLeft": "Restam poucas unidades",
+    "postWithCode": "{price} com o código {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% em {what}",

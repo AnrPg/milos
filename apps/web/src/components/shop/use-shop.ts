@@ -97,13 +97,14 @@ export function useShopOrder(slug: string | null, orderId: string) {
   });
 }
 
-/** The server's price of the basket; refetched whenever the lines or the pickup branch change. */
-export function useCartPreview(slug: string | null, lines: ShopCartItem[], pickupLocationId: string | null) {
+/** The server's price of the basket; refetched whenever the lines, the pickup branch or the code change. */
+export function useCartPreview(slug: string | null, lines: ShopCartItem[], pickupLocationId: string | null, promotionCode: string | null) {
   const token = useToken();
-  const signature = JSON.stringify([lines, pickupLocationId]);
+  const signature = JSON.stringify([lines, pickupLocationId, promotionCode]);
   return useQuery({
     queryKey: shopKeys.preview(slug ?? "", signature),
-    queryFn: () => previewShopCart(token, slug!, { lines, pickup_location_id: pickupLocationId }),
+    queryFn: () => previewShopCart(token, slug!, { lines, pickup_location_id: pickupLocationId, promotion_code: promotionCode }),
+    retry: false,
     enabled: Boolean(token && slug && lines.length > 0),
     placeholderData: keepPreviousData,
     staleTime: 30_000,

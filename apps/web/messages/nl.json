@@ -9984,8 +9984,11 @@
         "body": "Bestelling {number} bij {box} is geannuleerd."
       }
     },
-    "codeAtOrder": "De code {code} wordt gecontroleerd bij het bestellen.",
-    "packageDiscountPlain": "Pakketkorting"
+    "packageDiscountPlain": "Pakketkorting",
+    "codeApplied": "Code {code} toegepast",
+    "postMembersOnly": "Voor leden van de box",
+    "postFewLeft": "Nog maar een paar over",
+    "postWithCode": "{price} met de code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% op {what}",

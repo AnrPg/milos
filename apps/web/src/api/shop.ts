@@ -136,6 +136,8 @@ export type ShopQuote = {
   pickup_location_ids: string[];
   payment_modes: ShopPaymentMode[];
   online_payment: { available: boolean; reason: string | null };
+  /** The promotion code the price includes, as the API normalised it. */
+  promotion_code: string | null;
 };
 
 export type ShopOrderCreate = {
@@ -233,6 +235,7 @@ type ApiPreview = {
   pickup_location_ids?: string[];
   payment_modes: ShopPaymentMode[];
   online_payment: { available: boolean; reason?: string | null };
+  promotion_code?: { id: string; code: string; applied: boolean } | null;
 };
 
 type ApiLocation = { id: string; name: string; address?: string | null; archived_at?: string | null };
@@ -388,11 +391,11 @@ export async function fetchStorefront(token: string, slug: string): Promise<Shop
   };
 }
 
-/** POST /org/{slug}/me/shop/cart/preview: the server's price, pickup branches, payment modes and online flag. */
+/** POST /org/{slug}/me/shop/cart/preview: the server's price (with a promotion code), pickup branches, payment modes and online flag. */
 export async function previewShopCart(
   token: string,
   slug: string,
-  body: { lines: ShopCartItem[]; pickup_location_id?: string | null },
+  body: { lines: ShopCartItem[]; pickup_location_id?: string | null; promotion_code?: string | null },
 ): Promise<ShopQuote> {
   const data = await apiRequest<ApiPreview>(shopPath(slug, "/cart/preview"), { method: "POST", token, body });
   return {
@@ -403,6 +406,7 @@ export async function previewShopCart(
     pickup_location_ids: data.pickup_location_ids ?? [],
     payment_modes: data.payment_modes ?? ["at_pickup"],
     online_payment: { available: data.online_payment?.available ?? false, reason: data.online_payment?.reason ?? null },
+    promotion_code: data.promotion_code?.applied ? data.promotion_code.code : null,
   };
 }
 

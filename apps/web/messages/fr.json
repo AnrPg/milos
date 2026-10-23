@@ -9984,8 +9984,11 @@
         "body": "La commande {number} chez {box} a été annulée."
       }
     },
-    "codeAtOrder": "Le code {code} est vérifié à la commande.",
-    "packageDiscountPlain": "Remise du forfait"
+    "packageDiscountPlain": "Remise du forfait",
+    "codeApplied": "Code {code} appliqué",
+    "postMembersOnly": "Pour les membres de la box",
+    "postFewLeft": "Plus que quelques pièces",
+    "postWithCode": "{price} avec le code {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% sur {what}",

@@ -9984,8 +9984,11 @@
         "body": "Заказ {number} в {box} был отменён."
       }
     },
-    "codeAtOrder": "Код {code} проверяется при оформлении заказа.",
-    "packageDiscountPlain": "Скидка пакета"
+    "packageDiscountPlain": "Скидка пакета",
+    "codeApplied": "Код {code} применён",
+    "postMembersOnly": "Для участников бокса",
+    "postFewLeft": "Осталось совсем немного",
+    "postWithCode": "{price} с кодом {code}"
   },
   "Perks": {
     "benefitPercentOn": "−{value}% на {what}",
