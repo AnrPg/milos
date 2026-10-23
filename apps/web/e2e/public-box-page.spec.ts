@@ -75,7 +75,7 @@ const user = {
   nickname: "Maria L",
   role: "member",
   email: "member-1@example.com",
-  completed_tours: ["admin", "member", "athlete"],
+  completed_tours: ["admin", "member", "athlete", "first_run"],
   preferred_locale: "en",
   vendor: false,
   memberships: [] as { organization_slug: string; role: string; settings: object }[],

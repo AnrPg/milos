@@ -21,7 +21,7 @@ function persona(role: "member" | "coach" = "member") {
     nickname: role === "coach" ? "Kostas" : "Maria",
     role: role === "coach" ? "admin" : "member",
     email: `${role}@example.com`,
-    completed_tours: ["admin", "member", "athlete"],
+    completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,
     memberships: [{ organization_slug: "kypseli", role, settings: {} }],
