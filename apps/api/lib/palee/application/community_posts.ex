@@ -24,6 +24,7 @@ defmodule Palee.Application.CommunityPosts do
     RealtimePublisher
   }
 
+  alias Palee.Application.Shop.ProductCards
   alias Palee.Community
 
   def create(%{user_id: user_id} = context, params) do
@@ -194,7 +195,11 @@ defmodule Palee.Application.CommunityPosts do
 
   defp reload(context, club, post_id) do
     with {:ok, post} <- Community.find_post(context, post_id) do
-      [presented] = PostPresenter.posts([post], [club], context.user_id)
+      [presented] =
+        [post]
+        |> PostPresenter.posts([club], context.user_id)
+        |> ProductCards.attach([club.organization_id])
+
       {:ok, presented}
     end
   end

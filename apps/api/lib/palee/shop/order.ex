@@ -38,6 +38,7 @@ defmodule Palee.Shop.Order do
     field :source, Ecto.Enum, values: OrderLifecycle.sources(), default: :direct
     field :source_ref_id, :binary_id
     field :promotion_code, :string
+    field :promotion_code_id, :binary_id
     field :finance_invoice_id, :binary_id
     field :fiscal_receipt_ref, :string
     field :payment_provider, :string
@@ -77,6 +78,7 @@ defmodule Palee.Shop.Order do
     :source,
     :source_ref_id,
     :promotion_code,
+    :promotion_code_id,
     :note,
     :idempotency_key,
     :placed_at,

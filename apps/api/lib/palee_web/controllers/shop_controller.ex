@@ -9,7 +9,7 @@ defmodule PaleeWeb.ShopController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.Shop.{Checkout, Fulfilment, ManageCatalog, ManageStock}
+  alias Palee.Application.Shop.{Checkout, Fulfilment, ManageCatalog, ManageStock, PromoteProduct}
   alias Palee.{Finance, Organizations, Shop}
   alias PaleeWeb.Schemas.Shop, as: S
   alias PaleeWeb.ShopJSON
@@ -152,6 +152,65 @@ defmodule PaleeWeb.ShopController do
     with {:ok, variant} <-
            ManageCatalog.archive_variant(conn.assigns.tenant_context, id, variant_id) do
       json(conn, %{variant: ShopJSON.variant(variant)})
+    end
+  end
+
+  # ── «Προώθηση» ───────────────────────────────────────────────────────────
+
+  operation(:promote,
+    summary:
+      "Promote a product with a club post (#ανακοινώσεις, a group or squad, or the public feed), optionally with a promotion code",
+    parameters: [@id],
+    request_body: S.body(S.promote_body()),
+    responses: [
+      created:
+        {"Post", "application/json",
+         %Schema{
+           type: :object,
+           properties: %{
+             post: PaleeWeb.Schemas.Community.post(),
+             promotion_code: %{S.promotion_code() | nullable: true}
+           },
+           required: [:post]
+         }}
+    ]
+  )
+
+  def promote(conn, %{id: id}) do
+    with {:ok, %{post: post, promotion_code: code}} <-
+           PromoteProduct.promote(conn.assigns.tenant_context, id, conn.body_params) do
+      conn
+      |> put_status(:created)
+      |> json(%{post: post, promotion_code: code && ShopJSON.promotion_code(code)})
+    end
+  end
+
+  operation(:promotion_codes,
+    summary: "Promotion codes, with their redemptions and status",
+    parameters: [
+      %Parameter{name: :product_id, in: :query, required: false, schema: S.uuid()}
+    ],
+    responses: [ok: {"Codes", "application/json", S.many(:promotion_codes, S.promotion_code())}]
+  )
+
+  def promotion_codes(conn, params) do
+    codes =
+      PromoteProduct.list_codes(conn.assigns.tenant_context, %{product_id: params[:product_id]})
+
+    json(conn, %{promotion_codes: Enum.map(codes, &ShopJSON.promotion_code/1)})
+  end
+
+  operation(:update_promotion_code,
+    summary: "Change a promotion code's discount, window or cap, or switch it off",
+    parameters: [@id],
+    request_body: S.body(S.promotion_code_update_body()),
+    responses: [ok: {"Code", "application/json", S.one(:promotion_code, S.promotion_code())}]
+  )
+
+  def update_promotion_code(conn, %{id: id}) do
+    with {:ok, code} <-
+           PromoteProduct.update_code(conn.assigns.tenant_context, id, conn.body_params) do
+      json(conn, %{promotion_code: ShopJSON.promotion_code(code)})
     end
   end
 

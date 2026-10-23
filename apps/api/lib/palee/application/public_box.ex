@@ -10,6 +10,7 @@ defmodule Palee.Application.PublicBox do
   every row of that gym, so each function projects only public fields.
   """
 
+  alias Palee.Application.Shop.ProductCards
   alias Palee.Application.{MediaUrls, OpenClubs, PostPresenter, Trials}
   alias Palee.{Community, Facility, Identity, Media, Organizations, Scheduling}
 
@@ -100,7 +101,10 @@ defmodule Palee.Application.PublicBox do
       {:ok,
        %{
          box: box,
-         posts: PostPresenter.public_box_posts(page, [box]),
+         posts:
+           page
+           |> PostPresenter.public_box_posts([box])
+           |> ProductCards.attach(fn -> ProductCards.member_organization_ids(viewer_id) end),
          next_cursor:
            if(rest != [] and page != [], do: Community.encode_feed_cursor(List.last(page)))
        }}

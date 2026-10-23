@@ -181,6 +181,7 @@ defmodule PaleeWeb.Schemas.Community do
             description:
               "The event as you see it now, when the post is an event card (attachment_type event)"
         },
+        product: PaleeWeb.Schemas.Shop.product_card(),
         media: %Schema{
           type: :array,
           items: PaleeWeb.Schemas.Media.post_media(),
