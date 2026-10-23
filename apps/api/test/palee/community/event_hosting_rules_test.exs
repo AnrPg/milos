@@ -115,7 +115,9 @@ defmodule Palee.Community.EventHostingRulesTest do
       }
 
       assert :ok = CohostPolicy.trial_offer_check(facts, @now)
-      assert {:error, :not_found} = CohostPolicy.trial_offer_check(%{facts | status: "removed"}, @now)
+
+      assert {:error, :not_found} =
+               CohostPolicy.trial_offer_check(%{facts | status: "removed"}, @now)
 
       assert {:error, :trial_offer_already_sent} =
                CohostPolicy.trial_offer_check(%{facts | trial_offer_sent_at: @now}, @now)

@@ -313,10 +313,7 @@ defmodule Palee.Application.EventCohosts do
   # The event's card in the co-host's announcements: its Feed shows it, and
   # it shows the event only while the box still co-hosts it.
   defp publish_card(%{organization_id: organization_id} = context, request) do
-    with %{} = club <-
-           context
-           |> Community.list_clubs([organization_id])
-           |> Enum.find(&(&1.kind == "gym" and is_nil(&1.archived_at))),
+    with {:ok, club} <- gym_club(context, organization_id),
          %{channels: channels} <- Community.get_club(context, club.id),
          %{} = channel <- Enum.find(channels, &(&1.kind == "announcements")),
          {:ok, post} <-
@@ -335,6 +332,17 @@ defmodule Palee.Application.EventCohosts do
         post_id: post.id,
         channel_id: channel.id
       })
+    end
+  end
+
+  # A box's gym club exists once anyone opened it; provision it otherwise.
+  defp gym_club(context, organization_id) do
+    context
+    |> Community.list_clubs([organization_id])
+    |> Enum.find(&(&1.kind == "gym" and is_nil(&1.archived_at)))
+    |> case do
+      nil -> Community.provision_gym_club(context)
+      club -> {:ok, club}
     end
   end
 

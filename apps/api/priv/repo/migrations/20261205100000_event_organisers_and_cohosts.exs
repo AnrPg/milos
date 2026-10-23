@@ -308,9 +308,18 @@ defmodule Palee.Repo.Migrations.EventOrganisersAndCohosts do
     create unique_index(:community_event_cohosts, [:event_id, :cohost_organization_id])
     create index(:community_event_cohosts, [:cohost_organization_id, :status])
 
-    secure("community_event_cohosts")
+    # The tenant stamp runs on insert only: the co-host answers through a
+    # definer function from its own tenant, and an update stamp would move
+    # the row there. The tenant policy still checks every host-side write.
+    execute("""
+    CREATE TRIGGER community_event_cohosts_apply_tenant_context
+    BEFORE INSERT ON community_event_cohosts
+    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
+    """)
 
-    staff = "palee_acting_user_runs_events(c.cohost_organization_id)"
+    secure_without_timestamps("community_event_cohosts")
+
+    staff ="palee_acting_user_runs_events(c.cohost_organization_id)"
 
     # A person's session reads the events co-hosted (accepted) by a box they
     # belong to, unless the event is for a member group only.
@@ -572,16 +581,6 @@ defmodule Palee.Repo.Migrations.EventOrganisersAndCohosts do
   end
 
   # ------------------------------------------------------------------ helpers
-
-  defp secure(table) do
-    execute("""
-    CREATE TRIGGER #{table}_apply_tenant_context
-    BEFORE INSERT OR UPDATE ON #{table}
-    FOR EACH ROW EXECUTE FUNCTION palee_apply_tenant_context()
-    """)
-
-    secure_without_timestamps(table)
-  end
 
   defp secure_without_timestamps(table) do
     execute("""
