@@ -4454,7 +4454,9 @@
     "apiErrorInvalidActivationRole": "Scegli titolare o amministratore.",
     "apiErrorInvalidActivationLifetime": "Un link dura da un’ora a 30 giorni.",
     "apiErrorAccountNotFound": "Nessun account corrisponde.",
-    "apiErrorUnknownDemoSection": "Non ci sono dati demo per questa schermata."
+    "apiErrorUnknownDemoSection": "Non ci sono dati demo per questa schermata.",
+    "ntfBusinessDemoIdleTitle": "La tua attività demo ti aspetta",
+    "ntfBusinessDemoIdleBody": "Nessuno usa {business} da un po'. Se nessuno la apre nei prossimi {days} giorni, i dati demo verranno rimossi e sarà archiviata. Puoi riaprirla quando vuoi."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -9616,7 +9618,12 @@
       "send": "Invia richiesta",
       "sending": "Invio…",
       "sent": "Richiesta inviata. Il team Palee ti risponderà.",
-      "cancel": "Ritira la richiesta"
+      "cancel": "Ritira la richiesta",
+      "archivedTitle": "Demo archiviata",
+      "archivedBody": "Archiviata il {date} perché nessuno la usava da un po'. Riaprila come demo vuota quando vuoi.",
+      "reopen": "Riapri",
+      "reopening": "Riapertura…",
+      "reopened": "Riaperta. È di nuovo tra le tue attività, vuota, e il team Palee ha la tua richiesta di attivazione."
     },
     "requestKind": {
       "conversion": "Account business",

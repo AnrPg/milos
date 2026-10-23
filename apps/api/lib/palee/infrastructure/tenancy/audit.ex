@@ -65,6 +65,13 @@ defmodule Palee.Infrastructure.Tenancy.Audit do
   # any session GUC is set - but F-13 flagged that omitting them entirely made
   # the audit look complete while saying nothing about them. They are reported
   # explicitly so the exemption is a claim on the record, not an absence.
+  #
+  # `organizations` also holds ADR-184's demo lifecycle (`activation`,
+  # `demo_last_active_at`, `demo_reminder_sent_at`, `demo_archived_at`):
+  # platform state of the tenant row, written only by SECURITY DEFINER
+  # functions (`palee_activate_business`, `palee_touch_demo_activity`,
+  # `palee_claim_demo_reminder`, `palee_mark_demo_archived`,
+  # `palee_reopen_demo_business`), never by a tenant session directly.
   @platform_administered_tables ~w(
     organizations organization_memberships organization_settings
     organization_domains organization_slug_aliases registration_invitations vendors users

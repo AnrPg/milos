@@ -27,6 +27,11 @@ describe("notificationTargetUrl", () => {
     expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings");
   });
 
+  it("opens the demo's console from the idle-demo reminder", () => {
+    expect(notificationTargetUrl({ type: "business_demo_idle", payload: { url: "/admin" } }, "owner")).toBe("/admin");
+    expect(notificationTargetUrl({ type: "business_demo_idle", payload: {} }, "owner")).toBe("/admin");
+  });
+
   it("opens Γύρω μου with the saved filter of an around alert", () => {
     expect(
       notificationTargetUrl({ type: "around_new_matches", payload: { filter_id: "f-1", url: "/around?filter=f-1" } }, "member"),

@@ -636,3 +636,9 @@ msgstr "Ваш пароль сброшен"
 
 msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr "Ваш пароль изменён по ссылке для сброса или с помощью кода восстановления, и все устройства вышли из аккаунта. Если это были не вы, свяжитесь со своим залом или со службой поддержки Palee."
+
+msgid "Your demo business is waiting for you"
+msgstr "Ваш демо-бизнес ждёт вас"
+
+msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
+msgstr "%{business} давно никто не открывал. Если его не откроют в ближайшие %{days} дн., демо-данные будут удалены, а бизнес отправится в архив. Его можно снова открыть в любое время."

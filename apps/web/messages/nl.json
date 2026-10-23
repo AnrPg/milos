@@ -4454,7 +4454,9 @@
     "apiErrorInvalidActivationRole": "Kies eigenaar of beheerder.",
     "apiErrorInvalidActivationLifetime": "Een link is één uur tot 30 dagen geldig.",
     "apiErrorAccountNotFound": "Geen account gevonden.",
-    "apiErrorUnknownDemoSection": "Er zijn geen demogegevens voor dit scherm."
+    "apiErrorUnknownDemoSection": "Er zijn geen demogegevens voor dit scherm.",
+    "ntfBusinessDemoIdleTitle": "Je demobedrijf wacht op je",
+    "ntfBusinessDemoIdleBody": "{business} is al een tijd niet gebruikt. Als niemand het in de komende {days} dagen opent, worden de demogegevens verwijderd en wordt het gearchiveerd. Je kunt het altijd weer openen."
   },
   "PrSharing": {
     "gymLabel": "Waar heb je dit PR neergezet?",
@@ -9616,7 +9618,12 @@
       "send": "Verzoek versturen",
       "sending": "Bezig met versturen…",
       "sent": "Verzoek verstuurd. Het Palee-team komt bij je terug.",
-      "cancel": "Verzoek intrekken"
+      "cancel": "Verzoek intrekken",
+      "archivedTitle": "Gearchiveerde demo",
+      "archivedBody": "Gearchiveerd op {date} omdat niemand hem een tijd gebruikte. Open hem wanneer je wilt opnieuw als lege demo.",
+      "reopen": "Opnieuw openen",
+      "reopening": "Bezig met openen…",
+      "reopened": "Weer geopend. Hij staat weer leeg bij je bedrijven en het Palee-team heeft je activeringsaanvraag."
     },
     "requestKind": {
       "conversion": "Zakelijk account",

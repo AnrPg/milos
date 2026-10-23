@@ -4,6 +4,7 @@ defmodule PaleeWeb.Plugs.ResolveTenantContext do
 
   alias Guardian.Plug, as: GuardianPlug
   alias Palee.Application.ResolveTenantContext
+  alias Palee.BusinessAccounts
 
   def init(opts), do: opts
 
@@ -14,6 +15,10 @@ defmodule PaleeWeb.Plugs.ResolveTenantContext do
       slug when is_binary(slug) and slug != "" ->
         case ResolveTenantContext.call(account, slug, request_metadata(conn)) do
           {:ok, context} ->
+            # ADR-184 follow-up: an owner or admin using a demo business keeps
+            # it alive (a no-op for every other request).
+            _touched = BusinessAccounts.touch_demo_activity(context)
+
             conn
             |> assign(:tenant_context, context)
             |> signal_canonical_slug(slug, context)
