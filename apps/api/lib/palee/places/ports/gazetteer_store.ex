@@ -8,6 +8,8 @@ defmodule Palee.Places.Ports.GazetteerStore do
           name: String.t(),
           name_en: String.t(),
           city_slug: String.t() | nil,
+          context: String.t() | nil,
+          context_en: String.t() | nil,
           latitude: float(),
           longitude: float(),
           radius_m: pos_integer()
@@ -18,4 +20,9 @@ defmodule Palee.Places.Ports.GazetteerStore do
   @callback get_many(ids :: [binary()]) :: [place()]
   @doc "The neighbourhood nearest to a point, within its reach (or a few kilometres)."
   @callback nearest({float(), float()}) :: place() | nil
+  @doc """
+  Stores a geocoded place (ADR-188) under its slug and id, or refreshes the
+  stored one's names and shape; curated places are never touched.
+  """
+  @callback import(map()) :: {:ok, place()} | {:error, term()}
 end

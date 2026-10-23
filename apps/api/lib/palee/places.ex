@@ -14,7 +14,8 @@ defmodule Palee.Places do
     Cursor,
     Origin,
     SearchArea,
-    SearchKey
+    SearchKey,
+    WorldPlace
   }
 
   # The filter.
@@ -75,6 +76,19 @@ defmodule Palee.Places do
   end
 
   defdelegate nearest_neighbourhood(point), to: GazetteerStore, as: :nearest
+
+  # The world beyond the curated gazetteer (ADR-188).
+  defdelegate geocoder_layers(), to: WorldPlace, as: :layers
+  defdelegate geocoder_area_layers(), to: WorldPlace, as: :area_layers
+  defdelegate world_suggestions(local, english), to: WorldPlace, as: :suggestions
+  defdelegate without_known_places(suggestions, known), to: WorldPlace, as: :without_duplicates
+  defdelegate address_place?(place), to: WorldPlace, as: :address?
+  defdelegate area_for_address(address, local, english), to: WorldPlace
+  defdelegate world_place_id(slug), to: WorldPlace, as: :id
+
+  @doc "Stores a geocoded place (or refreshes it) and returns the gazetteer row."
+  def import_neighbourhood(place),
+    do: GazetteerStore.import(Map.put(place, :search_key, WorldPlace.search_key(place)))
 
   # «Η περιοχή μου».
   defdelegate home_area(context), to: HomeAreaStore, as: :list
