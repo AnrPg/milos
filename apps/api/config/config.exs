@@ -458,7 +458,16 @@ config :logger, :default_formatter,
     :product_id,
     :variant_id,
     :channel,
-    :amount_cents
+    :amount_cents,
+    # ADR-192 shop revenue reconciliation
+    :event,
+    :error,
+    :day,
+    :currency,
+    :orders_cents,
+    :invoice_lines_cents,
+    :payments_cents,
+    :drift_cents
   ]
 
 # Use Jason for JSON parsing in Phoenix
