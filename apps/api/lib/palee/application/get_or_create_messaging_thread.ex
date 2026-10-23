@@ -11,7 +11,10 @@ defmodule Palee.Application.GetOrCreateMessagingThread do
     do: {:error, :self_conversation}
 
   def call(actor, %{context_type: :direct, participant_id: participant_id}) do
-    with %{} <- Identity.find_by_id(participant_id) || {:error, :not_found} do
+    # ADR-184: a demo business's mock people are invisible outside it, so a
+    # direct thread to one looks like an unknown person.
+    with %{} <- Identity.find_by_id(participant_id) || {:error, :not_found},
+         true <- Identity.visible_to?(participant_id, actor.id) || {:error, :not_found} do
       Messaging.get_or_create_thread(%{
         context_type: :direct,
         actor_id: actor.id,

@@ -302,6 +302,7 @@ export function AuthConsole({ initialMode = "login" }: { initialMode?: Mode }) {
                   value={registerForm.display_name}
                   autoComplete="name"
                   placeholder={t("displayNamePlaceholder")}
+                  hint={t("displayNameHint")}
                   maxLength={MAX_DISPLAY_NAME_LENGTH}
                   errors={fieldErrors.display_name}
                   onChange={(display_name) => setRegisterForm((f) => ({ ...f, display_name }))}
