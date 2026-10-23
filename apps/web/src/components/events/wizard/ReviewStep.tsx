@@ -3,16 +3,15 @@
 import type { ReactNode } from "react";
 import { useLocale, useTranslations } from "next-intl";
 
+import type { EventScope } from "@/api/events";
 import { asksCohosts, asksGoodForFriends, asksGuestPass, PROBLEM_STEP, type EventWizardStep } from "@/lib/event-wizard";
 import { formatInZone, zoneLabel } from "@/lib/zoned-time";
 
-import type { EventLocation } from "../EventFormParts";
-import { formAudience, localInstant, parsePriceCents, formatPrice } from "../events";
-import { ScopePicker } from "../EventFormParts";
-import { useAudienceOptions } from "./WhoStep";
-import { useDurationLabel } from "./WhenStep";
+import { ScopePicker, type EventLocation } from "../EventFormParts";
+import { formAudience, formatPrice, localInstant, parsePriceCents } from "../events";
 import type { StepProps } from "./types";
-import type { EventScope } from "@/api/events";
+import { useDurationLabel } from "./WhenStep";
+import { useAudienceOptions } from "./WhoStep";
 
 /**
  * Step 7: everything on one screen, grouped as the steps asked it, each
@@ -126,17 +125,15 @@ export function ReviewStep({
                 <h4 id={`review-${step}`} className="text-xs font-semibold uppercase tracking-[0.14em]" style={{ color: "var(--dim)" }}>
                   {stepLabel(step)}
                 </h4>
-                {step === "host" && context.editing ? null : (
-                  <button
-                    type="button"
-                    onClick={() => onEdit(step)}
-                    aria-label={tw("reviewEditAria", { step: stepLabel(step) })}
-                    className="-me-2 min-h-11 shrink-0 px-2 text-sm font-semibold"
-                    style={{ color: "var(--primary)" }}
-                  >
-                    {tw("reviewEdit")}
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => onEdit(step)}
+                  aria-label={tw("reviewEditAria", { step: stepLabel(step) })}
+                  className="-me-2 min-h-11 shrink-0 px-2 text-sm font-semibold"
+                  style={{ color: "var(--primary)" }}
+                >
+                  {tw("reviewEdit")}
+                </button>
               </div>
               <div className="flex flex-col gap-1 text-sm" style={{ color: "var(--text)" }}>
                 {lines.map((line, index) => (
