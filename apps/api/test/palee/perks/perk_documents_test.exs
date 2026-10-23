@@ -20,13 +20,19 @@ defmodule Palee.Perks.PerkDocumentsTest do
       assert fixed.valid?
       assert Ecto.Changeset.get_field(fixed, :currency) == "EUR"
       assert %{amount_cents: _} = errors(Benefit.changeset(%{type: "fixed_amount"}))
-      assert %{currency: _} = errors(Benefit.changeset(%{type: "fixed_amount", amount_cents: 1, currency: "EURO"}))
+
+      assert %{currency: _} =
+               errors(
+                 Benefit.changeset(%{type: "fixed_amount", amount_cents: 1, currency: "EURO"})
+               )
 
       assert Benefit.changeset(%{type: "free_item", item: "shaker"}).valid?
       assert %{item: _} = errors(Benefit.changeset(%{type: "free_item"}))
 
       assert Benefit.changeset(%{type: "buy_x_get_y", buy_quantity: 2, get_quantity: 1}).valid?
-      assert %{get_quantity: _} = errors(Benefit.changeset(%{type: "buy_x_get_y", buy_quantity: 2}))
+
+      assert %{get_quantity: _} =
+               errors(Benefit.changeset(%{type: "buy_x_get_y", buy_quantity: 2}))
 
       assert Benefit.changeset(%{type: "free_text", text: "Δωρεάν αξιολόγηση"}).valid?
       assert %{text: _} = errors(Benefit.changeset(%{type: "free_text"}))
@@ -177,7 +183,9 @@ defmodule Palee.Perks.PerkDocumentsTest do
     end
 
     test "a code pool goes live only with free codes and alerts when low" do
-      assert {:error, :perk_codes_required} = RedemptionMethod.ready("code_pool", %{free_codes: 0})
+      assert {:error, :perk_codes_required} =
+               RedemptionMethod.ready("code_pool", %{free_codes: 0})
+
       assert :ok = RedemptionMethod.ready("code_pool", %{free_codes: 1})
       assert :ok = RedemptionMethod.ready("shared_code", %{free_codes: 0})
 
@@ -196,7 +204,12 @@ defmodule Palee.Perks.PerkDocumentsTest do
       changeset =
         PerkVersion.changeset(
           %PerkVersion{version: 1},
-          %{benefit: %{type: "free_item", item: "shaker"}, rules: %{}, redemption: %{}, terms: "Ένα ανά μέλος"},
+          %{
+            benefit: %{type: "free_item", item: "shaker"},
+            rules: %{},
+            redemption: %{},
+            terms: "Ένα ανά μέλος"
+          },
           "show_membership"
         )
 

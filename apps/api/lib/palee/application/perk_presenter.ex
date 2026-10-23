@@ -16,7 +16,9 @@ defmodule Palee.Application.PerkPresenter do
 
   def staff_all(context, perks, today) do
     logos = logos(perks)
-    pools = Perks.code_stats(context, for(%{redemption_method: "code_pool", id: id} <- perks, do: id))
+
+    pools =
+      Perks.code_stats(context, for(%{redemption_method: "code_pool", id: id} <- perks, do: id))
 
     Enum.map(perks, fn perk ->
       redemption = documents(perk.version).redemption
@@ -102,8 +104,13 @@ defmodule Palee.Application.PerkPresenter do
   end
 
   defp plain(%module{} = value) when module in [Date, Time, DateTime, NaiveDateTime], do: value
-  defp plain(%{__struct__: _} = struct), do: struct |> Map.from_struct() |> Map.delete(:__meta__) |> plain()
-  defp plain(map) when is_map(map) and not is_struct(map), do: Map.new(map, fn {k, v} -> {k, plain(v)} end)
+
+  defp plain(%{__struct__: _} = struct),
+    do: struct |> Map.from_struct() |> Map.delete(:__meta__) |> plain()
+
+  defp plain(map) when is_map(map) and not is_struct(map),
+    do: Map.new(map, fn {k, v} -> {k, plain(v)} end)
+
   defp plain(list) when is_list(list), do: Enum.map(list, &plain/1)
   defp plain(value), do: value
 
@@ -142,7 +149,10 @@ defmodule Palee.Application.PerkPresenter do
   """
   def csv(rows) do
     header = Enum.map_join(@csv_columns, ",", &Atom.to_string/1)
-    lines = Enum.map(rows, fn row -> Enum.map_join(@csv_columns, ",", &cell(Map.get(row, &1))) end)
+
+    lines =
+      Enum.map(rows, fn row -> Enum.map_join(@csv_columns, ",", &cell(Map.get(row, &1))) end)
+
     Enum.join([header | lines], "\r\n") <> "\r\n"
   end
 

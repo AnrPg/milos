@@ -41,9 +41,14 @@ defmodule Palee.Application.PerkVerification do
         # Re-checked under the lock: the secret may have been replaced or the
         # claim revoked or used since `resolve/2` read it.
         cond do
-          locked.status in ["used", "revoked"] -> Perks.usable(tenant, perk, locked)
-          PerksContext.token_matches?(locked.token_hash, nonce) -> Perks.usable(tenant, perk, locked)
-          true -> {:error, :invalid_verification_link}
+          locked.status in ["used", "revoked"] ->
+            Perks.usable(tenant, perk, locked)
+
+          PerksContext.token_matches?(locked.token_hash, nonce) ->
+            Perks.usable(tenant, perk, locked)
+
+          true ->
+            {:error, :invalid_verification_link}
         end
       end
 

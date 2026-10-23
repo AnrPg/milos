@@ -156,7 +156,9 @@ defmodule Palee.Perks.PerkRulesTest do
 
       at_branch = perk(%{all_locations: false, location_ids: [branch]})
       assert PerkRules.for_member?(at_branch, %{everyone | home_location_id: branch})
+
       refute PerkRules.for_member?(at_branch, %{everyone | home_location_id: Ecto.UUID.generate()})
+
       # Members without a home branch roam (ADR-186).
       assert PerkRules.for_member?(at_branch, everyone)
     end
@@ -241,7 +243,10 @@ defmodule Palee.Perks.PerkRulesTest do
 
     test "a claim is usable while unused and the perk is published or paused in its window" do
       claimed = %{status: "claimed"}
-      usable? = fn perk, claim -> PerkRules.usable?(perk, perk.version.rules, claim, @today, @local) end
+
+      usable? = fn perk, claim ->
+        PerkRules.usable?(perk, perk.version.rules, claim, @today, @local)
+      end
 
       assert usable?.(perk(), claimed)
       assert usable?.(perk(%{status: "paused"}), claimed)
@@ -253,7 +258,13 @@ defmodule Palee.Perks.PerkRulesTest do
                PerkRules.usable(perk(), perk().version.rules, %{status: "used"}, @today, @local)
 
       assert {:error, :perk_claim_not_open} =
-               PerkRules.usable(perk(), perk().version.rules, %{status: "revoked"}, @today, @local)
+               PerkRules.usable(
+                 perk(),
+                 perk().version.rules,
+                 %{status: "revoked"},
+                 @today,
+                 @local
+               )
     end
 
     test "remaining claims under the cap" do
@@ -292,7 +303,9 @@ defmodule Palee.Perks.PerkRulesTest do
 
     test "a link lives at most the maximum, never past the perk's last day" do
       assert {:ok, expires} = VerificationToken.expires_at(@now, nil)
-      assert DateTime.diff(expires, DateTime.truncate(@now, :second)) == VerificationToken.max_seconds()
+
+      assert DateTime.diff(expires, DateTime.truncate(@now, :second)) ==
+               VerificationToken.max_seconds()
 
       assert {:ok, ~U[2026-12-16 00:00:00Z]} =
                VerificationToken.expires_at(~U[2026-12-15 23:50:00Z], @today)

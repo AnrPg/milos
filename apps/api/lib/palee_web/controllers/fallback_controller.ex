@@ -2318,7 +2318,8 @@ defmodule PaleeWeb.FallbackController do
       {:unprocessable_entity, "The limit can't be lower than the claims already made"},
     perk_has_claims: {:conflict, "Members claimed this perk; end it instead"},
     perk_codes_required: {:unprocessable_entity, "Add the partner's codes before publishing"},
-    perk_codes_not_used: {:unprocessable_entity, "Only a perk with a unique code per member has codes"},
+    perk_codes_not_used:
+      {:unprocessable_entity, "Only a perk with a unique code per member has codes"},
     invalid_perk_codes: {:unprocessable_entity, "Each code needs 1 to 64 letters or digits"},
     invalid_perk_packages: {:unprocessable_entity, "Choose packages of this business"},
     perk_not_available: {:conflict, "This perk isn't available now"},
@@ -2329,7 +2330,8 @@ defmodule PaleeWeb.FallbackController do
     perk_claim_not_open: {:conflict, "This claim is no longer open"},
     perk_not_qr: {:unprocessable_entity, "This perk isn't redeemed with a QR"},
     perk_outside_hours: {:conflict, "This perk works only at its set days and hours"},
-    perk_period_sold_out: {:conflict, "This perk has run out for now; it opens again next period"},
+    perk_period_sold_out:
+      {:conflict, "This perk has run out for now; it opens again next period"},
     perk_member_period_limit:
       {:conflict, "You've used this perk as often as it allows this period"},
     invalid_perk_groups: {:unprocessable_entity, "Choose groups of this business"},

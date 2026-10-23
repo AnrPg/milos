@@ -50,7 +50,10 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
 
           {version_attrs, :amend} ->
             {current
-             |> PerkVersion.changeset(version_attrs, Map.get(attrs, :redemption_method, perk.redemption_method))
+             |> PerkVersion.changeset(
+               version_attrs,
+               Map.get(attrs, :redemption_method, perk.redemption_method)
+             )
              |> Repo.update()
              |> or_rollback(), perk.current_version}
 
@@ -142,7 +145,8 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   defp claims?(organization_id, perk_id),
     do:
       Repo.exists?(
-        from c in PerkClaim, where: c.organization_id == ^organization_id and c.perk_id == ^perk_id
+        from c in PerkClaim,
+          where: c.organization_id == ^organization_id and c.perk_id == ^perk_id
       )
 
   @impl true
@@ -171,7 +175,9 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   defp with_version(organization_id) do
     from p in Perk,
       join: v in PerkVersion,
-      on: v.perk_id == p.id and v.version == p.current_version and v.organization_id == p.organization_id,
+      on:
+        v.perk_id == p.id and v.version == p.current_version and
+          v.organization_id == p.organization_id,
       where: p.organization_id == ^organization_id,
       select: {p, v}
   end
@@ -229,7 +235,10 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
       |> Enum.chunk_every(1_000)
       |> Enum.reduce(0, fn chunk, total ->
         {count, _} =
-          Repo.insert_all(PerkCode, chunk, on_conflict: :nothing, conflict_target: [:perk_id, :code])
+          Repo.insert_all(PerkCode, chunk,
+            on_conflict: :nothing,
+            conflict_target: [:perk_id, :code]
+          )
 
         total + count
       end)
@@ -323,7 +332,10 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
 
     {1, [counted]} =
       Repo.update_all(
-        from(p in Perk, where: p.id == ^perk.id and p.organization_id == ^organization_id, select: p),
+        from(p in Perk,
+          where: p.id == ^perk.id and p.organization_id == ^organization_id,
+          select: p
+        ),
         inc: [claims_count: 1]
       )
 
@@ -391,7 +403,10 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
              ) do
         {1, [counted]} =
           Repo.update_all(
-            from(p in Perk, where: p.id == ^perk.id and p.organization_id == ^organization_id, select: p),
+            from(p in Perk,
+              where: p.id == ^perk.id and p.organization_id == ^organization_id,
+              select: p
+            ),
             inc: [uses_count: 1]
           )
 
@@ -412,12 +427,14 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
 
       if claim.status != "claimed", do: Repo.rollback(:perk_claim_not_open)
 
-      revoked = claim |> PerkClaim.revoke_changeset(actor_id, at) |> Repo.update() |> or_rollback()
+      revoked =
+        claim |> PerkClaim.revoke_changeset(actor_id, at) |> Repo.update() |> or_rollback()
 
       {1, [counted]} =
         Repo.update_all(
           from(p in Perk,
-            where: p.id == ^perk.id and p.organization_id == ^organization_id and p.claims_count > 0,
+            where:
+              p.id == ^perk.id and p.organization_id == ^organization_id and p.claims_count > 0,
             select: p
           ),
           inc: [claims_count: -1]
@@ -467,7 +484,9 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
   defp get_claim_row(organization_id, id) do
     case Ecto.UUID.cast(id) do
       {:ok, id} ->
-        Repo.one(from c in PerkClaim, where: c.id == ^id and c.organization_id == ^organization_id)
+        Repo.one(
+          from c in PerkClaim, where: c.id == ^id and c.organization_id == ^organization_id
+        )
 
       :error ->
         nil
@@ -563,8 +582,11 @@ defmodule Palee.Infrastructure.Perks.EctoPerkStore do
     )
     |> Repo.one()
     |> case do
-      nil -> nil
-      {name, handle} -> (name || handle || "") |> String.split(~r/\s+/u, trim: true) |> List.first()
+      nil ->
+        nil
+
+      {name, handle} ->
+        (name || handle || "") |> String.split(~r/\s+/u, trim: true) |> List.first()
     end
   end
 
