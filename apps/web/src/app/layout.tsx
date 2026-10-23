@@ -26,12 +26,21 @@ import { isAppLocale, localeDirection } from "@/i18n/locales";
 import "@fontsource-variable/commissioner";
 import "./globals.css";
 import { HydrationMarker } from "@/components/HydrationMarker";
+import { siteOrigin } from "@/lib/site-url";
 
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
+  const brand = i18n("brandName");
+  const description = i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a");
   return {
-    title: i18n("brandName"),
-    description: i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a"),
+    metadataBase: await siteOrigin(),
+    applicationName: brand,
+    title: brand,
+    description,
+    // Search engines and link previews name the product from these, not only
+    // from <title>.
+    openGraph: { type: "website", siteName: brand, title: brand, description, images: ["/icon.svg"] },
+    twitter: { card: "summary", title: brand, description },
     manifest: "/manifest.webmanifest",
     icons: {
       icon: "/icon.svg",
