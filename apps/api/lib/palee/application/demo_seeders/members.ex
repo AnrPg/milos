@@ -5,7 +5,9 @@ defmodule Palee.Application.DemoSeeders.Members do
   Each mock person is an account no one can use: a nickname ending in
   `_demo_<hex>` (so it reads as demo wherever it shows), a random password
   that is never stored or shown and an `.invalid` address (RFC 2606) no mail
-  is ever delivered to. Their memberships are added without announcing
+  is ever delivered to. The profile is marked with the business
+  (`users.demo_organization_id`), so no discovery path outside it ever lists
+  them (ADR-184 follow-up «Mock people stay private»). Their memberships are added without announcing
   `:membership_activated`, so no referral, trial or event reaction runs.
   """
 
@@ -36,7 +38,8 @@ defmodule Palee.Application.DemoSeeders.Members do
   @impl true
   def seed(context, _seeded, now) do
     Enum.reduce_while(@people, {:ok, []}, fn {name, role}, {:ok, rows} ->
-      with {:ok, user} <- Identity.register(account_params(name, role)),
+      with {:ok, user} <-
+             Identity.register_demo_person(context.organization_id, account_params(name, role)),
            {:ok, membership} <-
              Organizations.add_demo_membership(context, %{
                user_id: user.id,

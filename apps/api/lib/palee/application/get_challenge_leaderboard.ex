@@ -15,9 +15,14 @@ defmodule Palee.Application.GetChallengeLeaderboard do
 
       challenge ->
         target = ChallengeProgress.target(challenge)
-        opted_in_progress = Gamification.list_challenge_leaderboard_participants(challenge_id)
+        # ADR-184: mock people only ever reach their demo business's staff.
+        progress = Gamification.list_challenge_leaderboard_participants(challenge_id)
 
-        user_ids = Enum.map(opted_in_progress, & &1.user_id)
+        user_ids =
+          progress |> Enum.map(& &1.user_id) |> Identity.visible_user_ids(requesting_user_id)
+
+        visible = MapSet.new(user_ids)
+        opted_in_progress = Enum.filter(progress, &MapSet.member?(visible, &1.user_id))
 
         user_lookup =
           user_ids

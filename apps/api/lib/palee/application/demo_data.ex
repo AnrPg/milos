@@ -53,11 +53,14 @@ defmodule Palee.Application.DemoData do
   def wipe(context, opts \\ []) do
     keep = MapSet.new(Keyword.get(opts, :keep_user_ids, []))
     records = BusinessAccounts.list_demo_records(context)
+    recorded = for %{source: "users", record_id: id} <- records, do: id
 
+    # ADR-184: the mark is authoritative, so a mock person whose record went
+    # missing is still deleted. Kept accounts (the owners) never are.
     people =
-      for %{source: "users", record_id: id} <- records,
-          not MapSet.member?(keep, id),
-          do: id
+      (recorded ++ Identity.demo_user_ids(context.organization_id))
+      |> Enum.uniq()
+      |> Enum.reject(&MapSet.member?(keep, &1))
 
     with :ok <- delete_people(people),
          :ok <- BusinessAccounts.delete_demo_rows(context, records),
