@@ -214,6 +214,12 @@ export function formProblem(form: EventForm, now: Date = new Date(), { editing =
 /** Who hosts the event being made (ADR-185): a club's or box's, a member group's, or the person's own. */
 export type EventHostMode = "club" | "group" | "self";
 
+/** The editor's mode: a person's own event, a member group's, else a club's. */
+export function eventHostMode({ own = false, group = false }: { own?: boolean; group?: boolean }): EventHostMode {
+  if (own) return "self";
+  return group ? "group" : "club";
+}
+
 /** Who an event is for, from the form (ADR-185). */
 export function formAudience(form: EventForm, mode: EventHostMode = "club"): "group" | "club" | "open" {
   if (mode === "group" && form.groupOnly) return "group";

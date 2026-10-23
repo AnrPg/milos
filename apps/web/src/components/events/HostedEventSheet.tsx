@@ -10,6 +10,7 @@ import { useSession } from "@/components/session-provider";
 import { Select } from "@/components/ui/Select";
 
 import { blankEventForm, EventEditorSheet, useEventLocations } from "./EventEditorSheet";
+import { eventHostMode } from "./events";
 import { invalidateEvents } from "./use-events";
 
 /** «Διοργάνωση ως» (ADR-185): «Ως εγώ» first, then each business where the person runs events. */
@@ -79,7 +80,7 @@ export function HostedEventSheet({
       title={t("newEventTitle")}
       eyebrow={self ? t("hostSelf") : (host?.name ?? undefined)}
       initial={{ ...blankEventForm(locations.data ?? []), openToAll: self }}
-      mode={self ? "self" : "club"}
+      mode={eventHostMode({ own: self })}
       hostPicker={
         <>
           {picker}

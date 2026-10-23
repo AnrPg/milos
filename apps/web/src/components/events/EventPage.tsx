@@ -28,7 +28,7 @@ import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { mapsSearchUrl, mapsUrl, readApple, serverApple, subscribeNever } from "@/lib/maps";
 import { can } from "@/lib/role-navigation";
 
-import { formFromEvent, formatPrice, formatWhen, placeAddress, placeName } from "./events";
+import { eventHostMode, formFromEvent, formatPrice, formatWhen, placeAddress, placeName } from "./events";
 import { EventEditorSheet, ScopePicker, useEventLocations } from "./EventEditorSheet";
 import { DateBlock, Goers, RsvpButton, useEventError } from "./EventParts";
 import { invalidateEvents } from "./use-events";
@@ -486,7 +486,7 @@ function ManageEvent({ event }: { event: CommunityEvent }) {
           initialCoverUrl={event.cover_url ?? null}
           editing={{ seriesId: event.series_id ?? null }}
           group={Boolean(event.channel_id)}
-          mode={own ? "self" : event.channel_id ? "group" : "club"}
+          mode={eventHostMode({ own, group: Boolean(event.channel_id) })}
           locations={locations.data ?? []}
           coverSlug={!own && can(membership, "manage_settings") ? event.box.slug : null}
           gymSlug={own ? null : event.box.slug}

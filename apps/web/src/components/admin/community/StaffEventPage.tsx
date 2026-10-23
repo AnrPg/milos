@@ -32,7 +32,7 @@ import { ChoicePill, ErrorLine, Sheet, SheetButton } from "@/components/communit
 import { EventEditorSheet, useEventLocations } from "@/components/events/EventEditorSheet";
 import { CancelEventSheet } from "@/components/events/EventPage";
 import { useEventError, usePriceLabel } from "@/components/events/EventParts";
-import { formFromEvent, formatWhen, hasEnded, placeName } from "@/components/events/events";
+import { eventHostMode, formFromEvent, formatWhen, hasEnded, placeName } from "@/components/events/events";
 import { invalidateEvents } from "@/components/events/use-events";
 import { useSession } from "@/components/session-provider";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
@@ -276,7 +276,7 @@ function StaffEventView({ event }: { event: StaffEvent }) {
           initialCoverUrl={event.cover_url ?? null}
           editing={{ seriesId: event.series_id ?? null }}
           group={Boolean(event.channel_id)}
-          mode={own ? "self" : event.channel_id ? "group" : "club"}
+          mode={eventHostMode({ own, group: Boolean(event.channel_id) })}
           locations={locations.data ?? []}
           coverSlug={!own && scope.settings ? event.box.slug : null}
           gymSlug={own ? null : event.box.slug}

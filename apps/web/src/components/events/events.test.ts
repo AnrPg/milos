@@ -6,6 +6,7 @@ import type { CommunityEvent } from "@/api/events";
 import {
   dateBlock,
   eventErrorKey,
+  eventHostMode,
   eventRequest,
   formFromEvent,
   formProblem,
@@ -262,6 +263,12 @@ describe("the create form", () => {
     expect(eventRequest(form, { mode: "self" })).toMatchObject({ audience: "open", open_to_non_members: true, guest_pass_allowed: false, guests_per_member: 0 });
     expect(eventRequest({ ...form, openToAll: false }, { mode: "self" })).toMatchObject({ audience: "club", open_to_non_members: false });
     expect(eventRequest({ ...form, groupOnly: true }, { mode: "self" }).audience).toBe("open");
+  });
+
+  it("picks the editor's mode: own, a member group's, else a club's", () => {
+    expect(eventHostMode({ own: true, group: true })).toBe("self");
+    expect(eventHostMode({ group: true })).toBe("group");
+    expect(eventHostMode({})).toBe("club");
   });
 
   it("fills the form from an event for editing", () => {
