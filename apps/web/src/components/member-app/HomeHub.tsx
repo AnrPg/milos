@@ -18,7 +18,7 @@ import { MyEventsCard } from "@/components/events/MyEventsCard";
 import { ChallengesCard } from "@/components/member-app/home/ChallengesCard";
 import { GreetingCard } from "@/components/member-app/home/GreetingCard";
 import { LeaderboardCard } from "@/components/member-app/home/LeaderboardCard";
-import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { FeedPage, HubCard } from "@/components/member-app/HubParts";
 import { WellnessStrip } from "@/components/member-app/wellness/WellnessStrip";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
@@ -54,15 +54,7 @@ export function HomeHub() {
   }, [openAround, router]);
 
   return (
-    <HubPage
-      title={t("homeTitle")}
-      actions={
-        <div className="flex items-center gap-2">
-          <HeartButton />
-          <ComposeButton clubs={clubs.data ?? []} />
-        </div>
-      }
-    >
+    <FeedPage title={t("homeTitle")} start={<ComposeButton clubs={clubs.data ?? []} />} end={<HeartButton />}>
       {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
       <ScopeToggle current="clubs" />
       <GreetingCard nickname={currentUser?.nickname ?? ""} quote={landing.data?.quote} />
@@ -85,6 +77,6 @@ export function HomeHub() {
         <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("feedPosts")}</p>
         <FeedList filter={{}} empty={t("feedPostsEmpty")} />
       </section>
-    </HubPage>
+    </FeedPage>
   );
 }

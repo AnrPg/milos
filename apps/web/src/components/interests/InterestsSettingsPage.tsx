@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
 import { InterestsEditor } from "@/components/interests/InterestsEditor";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 
 /** Εγώ › Ρυθμίσεις › «Τι κάνεις» (ADR-183): the first-run's step 2, any time later. */
 export function InterestsSettingsPage() {
@@ -14,9 +14,7 @@ export function InterestsSettingsPage() {
   return (
     <main className="min-h-screen px-4 py-6 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto flex max-w-2xl flex-col gap-4">
-        <Link href="/me" className="flex min-h-10 items-center text-sm font-semibold" style={{ color: "var(--text-soft)" }}>
-          {t("backToMe")}
-        </Link>
+        <BackToMe />
         <header className="flex flex-col gap-1">
           <h1 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{t("interestsTitle")}</h1>
           <p className="text-sm leading-6" style={{ color: "var(--text-soft)" }}>{t("interestsLead")}</p>

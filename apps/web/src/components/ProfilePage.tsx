@@ -35,6 +35,7 @@ import {
 import { PageHeader } from "@/components/PageHeader";
 import { ReplayTourButton } from "@/components/onboarding/Onboarding";
 import { OutboxSettingsCard } from "@/components/outbox/OutboxSettingsCard";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { ThemeSetting } from "@/components/profile/ThemeSetting";
 import { Select } from "@/components/ui/Select";
 
@@ -165,6 +166,7 @@ export function ProfilePage() {
   return (
     <main className="min-h-screen px-6 py-10 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
+        <BackToMe />
         <PageHeader title={tProfile("title")} actions={<ReplayTourButton />} />
 
         <Link

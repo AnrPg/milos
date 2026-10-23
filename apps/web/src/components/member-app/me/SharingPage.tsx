@@ -5,6 +5,7 @@ import { useTranslations } from "next-intl";
 import { AroundVisibilitySetting } from "@/components/around/AroundSettings";
 import { WellnessSummarySharing } from "@/components/buddy/WellnessSummarySharing";
 import { BlockedPeople, PartnerVisibilitySetting } from "@/components/partners/PartnerSettings";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { LeaderboardSetting } from "@/components/member-app/me/LeaderboardSetting";
 import { RestDaysSettings } from "@/components/member-app/me/RestDaysSettings";
 import { PRSharingSettings } from "@/components/pantheon/PRSharingSettings";
@@ -37,6 +38,7 @@ export function SharingPage() {
   return (
     <main className="min-h-screen px-4 py-8 md:px-10" style={{ background: "var(--bg)" }}>
       <div className="mx-auto max-w-3xl space-y-4">
+        <BackToMe />
         <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>{t("meSharing")}</h1>
         <CollapsibleSection id="pr-sharing" title={tPrSharing("settingsTitle")} description={tPrSharing("settingsDescription")} defaultOpen>
           <PRSharingSettings />

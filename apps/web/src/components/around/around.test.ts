@@ -10,15 +10,18 @@ import {
   clearNarrowing,
   filterKey,
   initialViewport,
+  isMine,
   narrowingCount,
   originKey,
   parseFilter,
   pointOrigin,
+  radiusChip,
   roundCoordinate,
   sameFilter,
   scopeFromParams,
   thinResults,
   toggleKind,
+  toggleMine,
   viewportDiagonalKm,
   type AroundFilter,
 } from "./around";
@@ -98,15 +101,33 @@ describe("activeFilterCount", () => {
 });
 
 describe("chips", () => {
-  it("maps the filter to chips", () => {
-    const chips = chipModel({ ...DEFAULT_FILTER, radius_km: 2, cost: ["free"], disciplines: ["boxing"] });
-    const radius = chips.find((chip) => chip.key === "radius");
-    expect(radius).toMatchObject({ kind: "menu", selected: ["2"] });
-    expect(radius && radius.kind === "menu" ? radius.options : []).toEqual(["1", "2", "3", "5", "10", "25"]);
-    expect(chips.find((chip) => chip.key === "free")).toMatchObject({ active: true });
-    expect(chips.find((chip) => chip.key === "trial")).toMatchObject({ active: false });
-    const discipline = chips.find((chip) => chip.key === "discipline");
-    expect(discipline && discipline.kind === "menu" ? discipline.options : []).toContain("boxing");
+  it("keeps only «Πότε» and «Δωρεάν» as shortcut chips, so the row fits a phone", () => {
+    const chips = chipModel({ ...DEFAULT_FILTER, when: "weekend", cost: ["free"], disciplines: ["boxing"] });
+    expect(chips.map((chip) => chip.key)).toEqual(["when", "free"]);
+    expect(chips[0]).toMatchObject({ kind: "menu", selected: ["weekend"], options: ["today", "tomorrow", "weekend", "week"] });
+    expect(chips[1]).toMatchObject({ kind: "toggle", active: true });
+    expect(chipModel({ ...DEFAULT_FILTER, when: "range", date_from: "2026-10-24", date_to: "2026-10-25" })[0]).toMatchObject({
+      options: ["today", "tomorrow", "weekend", "week", "range"],
+      selected: ["range"],
+    });
+  });
+
+  it("still counts every facet that left the row in «Φίλτρα (n)»", () => {
+    // Radius (beside «Αλλαγή περιοχής»), discipline, trial and posts are in the sheet only.
+    expect(activeFilterCount({ ...DEFAULT_FILTER, radius_km: 10 })).toBe(1);
+    expect(activeFilterCount({ ...DEFAULT_FILTER, disciplines: ["boxing"] })).toBe(1);
+    expect(activeFilterCount({ ...DEFAULT_FILTER, cost: ["trial"] })).toBe(1);
+    expect(activeFilterCount(toggleKind(DEFAULT_FILTER, "posts"))).toBe(1);
+  });
+
+  it("offers the usual radii plus the current one beside «Αλλαγή περιοχής»", () => {
+    expect(radiusChip({ ...DEFAULT_FILTER, radius_km: 2 })).toMatchObject({
+      key: "radius",
+      kind: "menu",
+      selected: ["2"],
+      options: ["1", "2", "3", "5", "10", "25"],
+    });
+    expect(radiusChip(DEFAULT_FILTER).options).toEqual(["1", "3", "5", "10", "25"]);
   });
 
   it("maps chips back to the filter", () => {
@@ -235,9 +256,16 @@ describe("scope", () => {
   });
 });
 
-describe("chipModel with the person's interests (ADR-183)", () => {
-  it("puts their disciplines first in the discipline chip", () => {
-    const discipline = chipModel(DEFAULT_FILTER, ["bjj_grappling", "yoga"]).find((chip) => chip.key === "discipline");
-    expect(discipline && discipline.kind === "menu" ? discipline.options.slice(0, 2) : []).toEqual(["bjj_grappling", "yoga"]);
+describe("«Τα αθλήματά μου» (ADR-183)", () => {
+  it("is on only when the filter's disciplines are exactly the person's", () => {
+    expect(isMine({ ...DEFAULT_FILTER, disciplines: ["yoga", "bjj_grappling"] }, ["bjj_grappling", "yoga"])).toBe(true);
+    expect(isMine({ ...DEFAULT_FILTER, disciplines: ["yoga"] }, ["bjj_grappling", "yoga"])).toBe(false);
+    expect(isMine(DEFAULT_FILTER, [])).toBe(false);
+  });
+
+  it("toggles between their disciplines and none", () => {
+    const on = toggleMine(DEFAULT_FILTER, ["bjj_grappling", "yoga"]);
+    expect(on.disciplines).toEqual(["bjj_grappling", "yoga"]);
+    expect(toggleMine(on, ["bjj_grappling", "yoga"]).disciplines).toEqual([]);
   });
 });

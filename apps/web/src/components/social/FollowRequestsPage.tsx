@@ -15,6 +15,7 @@ import {
 } from "@/api/social";
 import { clientErrorMessage } from "@/components/client/errors";
 import { HubPage } from "@/components/member-app/HubParts";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { BookingSharingOffer } from "@/components/social/BookingSharing";
 import { PersonAvatar } from "@/components/social/PersonAvatar";
@@ -35,7 +36,7 @@ export function FollowRequestsPage() {
   const entries = requests.data?.pages.flatMap((page) => page.entries) ?? [];
 
   return (
-    <HubPage title={t("requestsTitle")}>
+    <HubPage back={<BackToMe />} title={t("requestsTitle")}>
       <BookingSharingOffer />
       {requests.isPending ? <p style={{ color: "var(--dim)" }}>{t("loading")}</p> : null}
       {requests.isSuccess && entries.length === 0 ? (

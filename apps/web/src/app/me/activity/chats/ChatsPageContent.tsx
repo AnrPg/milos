@@ -20,6 +20,7 @@ import {
   type ThreadContextType,
 } from "@/api/messaging";
 import { MessageBubble } from "@/components/chat/MessageBubble";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { useUiPrefs } from "@/stores/ui-prefs";
 import { useQueryClient } from "@tanstack/react-query";
@@ -173,6 +174,7 @@ export function ChatsPageContent() {
   return (
     <div className="flex flex-col h-full min-h-screen" style={{ background: "var(--bg)" }}>
       <div className="max-w-4xl mx-auto w-full px-4 py-8 flex flex-col gap-6">
+        <BackToMe />
         <h1 className="text-xl font-semibold" style={{ color: "var(--text)" }}>
           {i18n("conversationHistory0f18fb3")}
         </h1>

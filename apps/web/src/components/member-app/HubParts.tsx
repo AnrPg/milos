@@ -2,14 +2,58 @@
 
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useTranslations } from "next-intl";
 
 // Shared building blocks of the four member hubs (ADR-137). Hubs use fixed
 // slots: a card keeps its place and shows an empty state instead of moving
 // (brief §4.2, §8.5).
 
-export function HubPage({ title, actions, children }: { title: ReactNode; actions?: ReactNode; children: ReactNode }) {
+/**
+ * The Feed's top (vision IA, mockup `feedTop`): ⊕ · Palee · ♡ and no visible
+ * page title. The title stays for screen readers as the page's heading.
+ */
+export function FeedPage({
+  title,
+  start,
+  end,
+  children,
+}: {
+  title: string;
+  start: ReactNode;
+  end: ReactNode;
+  children: ReactNode;
+}) {
+  const tUi = useTranslations("Ui");
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-6 pt-4">
+      <header data-feed-top="" className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+        <h1 className="sr-only">{title}</h1>
+        <div className="flex justify-start">{start}</div>
+        <p aria-hidden="true" className="text-xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>
+          {tUi("brandName")}
+        </p>
+        <div className="flex items-center justify-end gap-2">{end}</div>
+      </header>
+      {children}
+    </main>
+  );
+}
+
+export function HubPage({
+  title,
+  actions,
+  back,
+  children,
+}: {
+  title: ReactNode;
+  actions?: ReactNode;
+  /** A way back above the title, e.g. `<BackToMe />` on Εγώ's sub-pages. */
+  back?: ReactNode;
+  children: ReactNode;
+}) {
+  return (
+    <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-6 pt-4">
+      {back}
       <header className="flex items-center justify-between gap-3">
         <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>
           {title}

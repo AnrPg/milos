@@ -12,6 +12,7 @@ import { garminReturn, garminRowOf, returnReasonKey } from "@/components/devices
 import { DeviceDataExport } from "@/components/devices/DeviceDataExport";
 import { PhoneHealthRowItem } from "@/components/devices/PhoneHealthRow";
 import { anyDeviceConnected, isPhoneProvider, phoneRowOf, showsPhoneRow } from "@/components/devices/phone-health-model";
+import { BackToMe } from "@/components/member-app/me/BackToMe";
 import { useSession } from "@/components/session-provider";
 import { usePlatform } from "@/hooks/usePlatform";
 import { integrationStatusKey, visibleIntegrations } from "@/lib/platform/device-rows";
@@ -36,6 +37,7 @@ export function ConnectedDevicesPage() {
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
+      <BackToMe />
       <h1 className="text-3xl font-extrabold tracking-tight" style={{ color: "var(--text)" }}>{t("devicesTitle")}</h1>
       {toast.message ? (
         <div

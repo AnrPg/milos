@@ -8,13 +8,13 @@ import { ClubBar } from "@/components/community/ClubBar";
 import { ComposeButton } from "@/components/community/ComposeSheet";
 import { ErrorLine, Sheet } from "@/components/community/Sheet";
 import { useMyClubs } from "@/components/community/use-community";
-import { HubCard, HubPage } from "@/components/member-app/HubParts";
+import { FeedPage, HubCard } from "@/components/member-app/HubParts";
 import { HeartButton } from "@/components/social/HeartButton";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import { clearNarrowing, foundTotal, isOneOff, thinResults, withWhen, type OriginChoice } from "./around";
 import { AreaPicker, GeoMessage, useAroundError, useDevicePosition, useNeighbourhoodName } from "./AreaPicker";
-import { AroundChipRow } from "./AroundFilters";
+import { AroundChipRow, RadiusChip } from "./AroundFilters";
 import { AroundMapPanel } from "./AroundMapPanel";
 import { AroundSections, ThinResultsCard } from "./AroundSections";
 import { ScopeToggle } from "./ScopeToggle";
@@ -39,15 +39,7 @@ export function AroundPage() {
   const thin = data ? thinResults(data) : null;
 
   return (
-    <HubPage
-      title={tMember("homeTitle")}
-      actions={
-        <div className="flex items-center gap-2">
-          <HeartButton />
-          <ComposeButton clubs={clubs.data ?? []} />
-        </div>
-      }
-    >
+    <FeedPage title={tMember("homeTitle")} start={<ComposeButton clubs={clubs.data ?? []} />} end={<HeartButton />}>
       {clubs.data && clubs.data.length > 0 ? <ClubBar clubs={clubs.data} /> : null}
       <ScopeToggle current="around" />
 
@@ -117,7 +109,7 @@ export function AroundPage() {
 
       {areaSheet ? <AreaSheet onClose={() => setAreaSheet(false)} /> : null}
       {elsewhere ? <ElsewhereSheet onClose={() => setElsewhere(false)} /> : null}
-    </HubPage>
+    </FeedPage>
   );
 }
 
@@ -137,7 +129,7 @@ function StartCard({ onElsewhere }: { onElsewhere: () => void }) {
   );
 }
 
-/** «Από: Κυψέλη · Αλλαγή», or a one-off search with the way back. */
+/** «Από: Κυψέλη · ≤ 3 km · Αλλαγή περιοχής», or a one-off search with the way back. */
 function OriginBar({
   origin,
   choice,
@@ -173,7 +165,8 @@ function OriginBar({
       <p className="min-w-0 text-sm" style={{ color: "var(--text-soft)" }}>
         {oneOff ? t("searchingFrom", { place: label }) : label ? t("from", { place: label }) : null}
       </p>
-      <div className="flex gap-2">
+      <div data-origin-actions="" className="flex flex-wrap items-center gap-2">
+        <RadiusChip />
         {oneOff ? (
           <button type="button" onClick={onBack} className={link} style={linkStyle}>{t("backToArea")}</button>
         ) : (
