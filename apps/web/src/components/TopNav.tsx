@@ -402,7 +402,7 @@ export function TopNav() {
                 ) : (
                   <>
                     <OrganizationSelector variant="menu" onSelect={() => setMenuOpen(false)} />
-                    {role === "admin" && can(currentMembership, "manage_settings") ? (
+                    {role === "admin" && (can(currentMembership, "manage_settings") || can(currentMembership, "manage_locations")) ? (
                       <Link
                         href={adminHref("/admin/settings", selectedOrganizationSlug)}
                         className="block px-4 py-2.5 text-sm font-semibold transition-colors hover:bg-[var(--border)]"

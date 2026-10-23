@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "Open gym zit niet in je pakket. Vraag je coach naar de mogelijkheden.",
     "mbErrOpenGymUsedUp": "Je hebt al je open gym-bezoeken voor deze periode gebruikt.",
     "mbErrLocationArchived": "Deze locatie is niet meer beschikbaar. Kies een andere.",
+    "apiErrorLocationOutOfScope": "Dit hoort bij een vestiging waar je niet werkt.",
+    "apiErrorLocationRequired": "Kies eerst de vestiging.",
+    "apiErrorLocationScopeExceeded": "Je kunt alleen toegang geven tot je eigen vestigingen.",
+    "apiErrorInvalidLocationScope": "Kies alle vestigingen of minstens één.",
+    "apiErrorOwnerLocationScope": "Eigenaren werken altijd bij alle vestigingen.",
+    "apiErrorCannotChangeOwnMembership": "Iemand anders moet je eigen toegang wijzigen.",
+    "apiErrorRoleCeilingExceeded": "Je kunt geen hogere rol geven dan je mag toekennen.",
     "mbErrLocationNotFound": "We konden die locatie niet vinden. Kies een andere.",
     "mbNotifWaitlistPromotedTitle": "Je hebt een plek!",
     "mbNotifWaitlistPromotedBody": "Er kwam een plek vrij en je bent geboekt: {class}.",
@@ -9144,5 +9151,22 @@
     "hours": "Uren",
     "minutes": "Minuten",
     "done": "Klaar"
+  },
+  "BranchScope": {
+    "branches": "Vestigingen",
+    "branchesHelp": "Waar deze persoon werkt. Medewerkers van bepaalde vestigingen zien en beheren alleen die vestigingen.",
+    "allBranches": "Alle vestigingen",
+    "searchBranches": "Vestigingen zoeken",
+    "noBranchMatches": "Geen vestiging gevonden.",
+    "chooseOneBranch": "Kies minstens één vestiging.",
+    "branchManager": "Vestigingsmanager",
+    "branchManagerHelp": "Beheerdersrechten, beperkt tot de vestigingen die je hieronder kiest.",
+    "staffRoles": "Teamrollen",
+    "chooseOneRole": "Kies minstens één rol.",
+    "inviteBranches": "Werkt bij",
+    "inviteBranchesHelp": "De vestigingen waartoe deze link toegang geeft.",
+    "kindClient": "Klant",
+    "kindStaff": "Team",
+    "staffLinkReady": "Link klaar. Stuur hem naar je nieuwe teamlid ({roles})."
   }
 }

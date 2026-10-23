@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "التدريب الحر ليس ضمن باقتك. اسأل مدربك عن إضافته.",
     "mbErrOpenGymUsedUp": "لقد استخدمت جميع جلسات التدريب الحر لهذه الفترة.",
     "mbErrLocationArchived": "هذا الموقع لم يعد متاحًا. يرجى اختيار موقع آخر.",
+    "apiErrorLocationOutOfScope": "هذا في فرع لا تعمل فيه.",
+    "apiErrorLocationRequired": "اختر الفرع أولًا.",
+    "apiErrorLocationScopeExceeded": "يمكنك منح الوصول إلى فروعك فقط.",
+    "apiErrorInvalidLocationScope": "اختر جميع الفروع أو فرعًا واحدًا على الأقل.",
+    "apiErrorOwnerLocationScope": "يعمل المالكون دائمًا في جميع الفروع.",
+    "apiErrorCannotChangeOwnMembership": "يجب أن يغيّر شخص آخر صلاحياتك.",
+    "apiErrorRoleCeilingExceeded": "لا يمكنك منح دور أعلى مما يُسمح لك بمنحه.",
     "mbErrLocationNotFound": "لم نتمكن من العثور على هذا الموقع. يرجى اختيار موقع آخر.",
     "mbNotifWaitlistPromotedTitle": "حصلت على مكان!",
     "mbNotifWaitlistPromotedBody": "توفر مكان وتم حجزك: {class}.",
@@ -9144,5 +9151,22 @@
     "hours": "الساعات",
     "minutes": "الدقائق",
     "done": "تم"
+  },
+  "BranchScope": {
+    "branches": "الفروع",
+    "branchesHelp": "أين يعمل هذا الشخص. يرى موظفو فروع معيّنة تلك الفروع فقط ويعملون عليها.",
+    "allBranches": "جميع الفروع",
+    "searchBranches": "ابحث في الفروع",
+    "noBranchMatches": "لا يوجد فرع مطابق.",
+    "chooseOneBranch": "اختر فرعًا واحدًا على الأقل.",
+    "branchManager": "مدير الفرع",
+    "branchManagerHelp": "صلاحيات المسؤول، مقتصرة على الفروع التي تختارها أدناه.",
+    "staffRoles": "أدوار الموظفين",
+    "chooseOneRole": "اختر دورًا واحدًا على الأقل.",
+    "inviteBranches": "يعمل في",
+    "inviteBranchesHelp": "الفروع التي يمنح هذا الرابط الوصول إليها.",
+    "kindClient": "عميل",
+    "kindStaff": "موظف",
+    "staffLinkReady": "الرابط جاهز. أرسله إلى الشخص الجديد بدور: {roles}."
   }
 }

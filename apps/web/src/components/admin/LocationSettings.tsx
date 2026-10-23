@@ -15,7 +15,9 @@ import {
 } from "@/api/facility";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
+import { can } from "@/lib/role-navigation";
 
 const fieldStyle = { background: "var(--panel-muted)", border: "1px solid var(--border)", color: "var(--text)" };
 
@@ -29,6 +31,9 @@ export function LocationSettings({ token }: { token: string }) {
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const queryClient = useQueryClient();
+  // ADR-186: a branch manager edits their branches; opening or closing one is the business's call.
+  const { membership } = useSelectedMembershipRole();
+  const manageBranches = !membership || can(membership, "manage_settings");
   const [name, setName] = useState("");
   const [error, setError] = useState<string | null>(null);
 
@@ -79,6 +84,7 @@ export function LocationSettings({ token }: { token: string }) {
         <p className="max-w-2xl text-sm leading-6" style={{ color: "var(--muted)" }}>{i18n("admLocationsEmpty")}</p>
       ) : null}
 
+      {manageBranches ? (
       <form
         className="flex flex-col gap-3 sm:flex-row"
         onSubmit={(event) => {
@@ -105,6 +111,7 @@ export function LocationSettings({ token }: { token: string }) {
           {createMutation.isPending ? i18n("addingffb2e62") : i18n("admLocationAdd")}
         </button>
       </form>
+      ) : null}
 
       {query.isLoading ? <p className="text-sm" style={{ color: "var(--dim)" }}>{i18n("loading33ce417")}</p> : null}
 
@@ -133,6 +140,7 @@ export function LocationSettings({ token }: { token: string }) {
               >
                 {i18n("admLocationEdit")}
               </Link>
+              {manageBranches ? (
               <button
                 className="rounded-full px-4 py-2 text-xs font-semibold disabled:opacity-50"
                 disabled={archiveMutation.isPending}
@@ -144,6 +152,7 @@ export function LocationSettings({ token }: { token: string }) {
               >
                 {i18n("admLocationArchive")}
               </button>
+              ) : null}
             </div>
           </div>
         ))}

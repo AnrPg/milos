@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "Open Gym ist nicht Teil deines Pakets. Frag deinen Coach, ob du es dazubuchen kannst.",
     "mbErrOpenGymUsedUp": "Du hast alle Open-Gym-Besuche für diesen Zeitraum genutzt.",
     "mbErrLocationArchived": "Dieser Standort ist nicht mehr verfügbar. Bitte wähle einen anderen.",
+    "apiErrorLocationOutOfScope": "Das gehört zu einem Standort, an dem du nicht arbeitest.",
+    "apiErrorLocationRequired": "Wähle zuerst den Standort.",
+    "apiErrorLocationScopeExceeded": "Du kannst nur Zugang zu deinen eigenen Standorten geben.",
+    "apiErrorInvalidLocationScope": "Wähle alle Standorte oder mindestens einen.",
+    "apiErrorOwnerLocationScope": "Inhaber arbeiten immer an allen Standorten.",
+    "apiErrorCannotChangeOwnMembership": "Deinen eigenen Zugang muss jemand anderes ändern.",
+    "apiErrorRoleCeilingExceeded": "Du kannst keine Rolle vergeben, die über deinen Rechten liegt.",
     "mbErrLocationNotFound": "Wir konnten diesen Standort nicht finden. Bitte wähle einen anderen.",
     "mbNotifWaitlistPromotedTitle": "Du hast einen Platz!",
     "mbNotifWaitlistPromotedBody": "Ein Platz ist frei geworden und du bist gebucht: {class}.",
@@ -9144,5 +9151,22 @@
     "hours": "Stunden",
     "minutes": "Minuten",
     "done": "Fertig"
+  },
+  "BranchScope": {
+    "branches": "Standorte",
+    "branchesHelp": "Wo diese Person arbeitet. Mitarbeitende einzelner Standorte sehen und bearbeiten nur diese.",
+    "allBranches": "Alle Standorte",
+    "searchBranches": "Standorte suchen",
+    "noBranchMatches": "Kein Standort passt.",
+    "chooseOneBranch": "Wähle mindestens einen Standort.",
+    "branchManager": "Standortleitung",
+    "branchManagerHelp": "Admin-Rechte, beschränkt auf die unten gewählten Standorte.",
+    "staffRoles": "Mitarbeiterrollen",
+    "chooseOneRole": "Wähle mindestens eine Rolle.",
+    "inviteBranches": "Arbeitet in",
+    "inviteBranchesHelp": "Die Standorte, für die dieser Link Zugang gibt.",
+    "kindClient": "Kunde",
+    "kindStaff": "Team",
+    "staffLinkReady": "Link bereit. Schick ihn an deine neue Person im Team ({roles})."
   }
 }

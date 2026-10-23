@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "El open gym no forma parte de tu paquete. Pregunta a tu coach cómo añadirlo.",
     "mbErrOpenGymUsedUp": "Has usado todos tus accesos a open gym de este periodo.",
     "mbErrLocationArchived": "Esta sede ya no está disponible. Elige otra.",
+    "apiErrorLocationOutOfScope": "Esto pertenece a una sede en la que no trabajas.",
+    "apiErrorLocationRequired": "Elige primero la sede.",
+    "apiErrorLocationScopeExceeded": "Solo puedes dar acceso a tus propias sedes.",
+    "apiErrorInvalidLocationScope": "Elige todas las sedes o al menos una.",
+    "apiErrorOwnerLocationScope": "Los propietarios siempre trabajan en todas las sedes.",
+    "apiErrorCannotChangeOwnMembership": "Otra persona tiene que cambiar tu propio acceso.",
+    "apiErrorRoleCeilingExceeded": "No puedes dar un rol superior al que tienes permitido.",
     "mbErrLocationNotFound": "No encontramos esa sede. Elige otra.",
     "mbNotifWaitlistPromotedTitle": "¡Tienes plaza!",
     "mbNotifWaitlistPromotedBody": "Se liberó una plaza y ya tienes reserva: {class}.",
@@ -9144,5 +9151,22 @@
     "hours": "Horas",
     "minutes": "Minutos",
     "done": "Listo"
+  },
+  "BranchScope": {
+    "branches": "Sedes",
+    "branchesHelp": "Dónde trabaja esta persona. El personal de algunas sedes solo ve y gestiona esas sedes.",
+    "allBranches": "Todas las sedes",
+    "searchBranches": "Buscar sedes",
+    "noBranchMatches": "Ninguna sede coincide.",
+    "chooseOneBranch": "Elige al menos una sede.",
+    "branchManager": "Responsable de sede",
+    "branchManagerHelp": "Permisos de administrador, limitados a las sedes que elijas abajo.",
+    "staffRoles": "Roles del personal",
+    "chooseOneRole": "Elige al menos un rol.",
+    "inviteBranches": "Trabaja en",
+    "inviteBranchesHelp": "Las sedes a las que da acceso este enlace.",
+    "kindClient": "Cliente",
+    "kindStaff": "Personal",
+    "staffLinkReady": "Enlace listo. Envíalo a tu nueva incorporación ({roles})."
   }
 }

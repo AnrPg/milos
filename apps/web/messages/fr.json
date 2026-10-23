@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "L'accès libre ne fait pas partie de votre forfait. Demandez à votre coach comment l'ajouter.",
     "mbErrOpenGymUsedUp": "Vous avez utilisé tous vos accès libres pour cette période.",
     "mbErrLocationArchived": "Ce site n'est plus disponible. Choisissez-en un autre.",
+    "apiErrorLocationOutOfScope": "Ceci concerne un site où vous ne travaillez pas.",
+    "apiErrorLocationRequired": "Choisissez d’abord le site.",
+    "apiErrorLocationScopeExceeded": "Vous ne pouvez donner accès qu’à vos propres sites.",
+    "apiErrorInvalidLocationScope": "Choisissez tous les sites ou au moins un.",
+    "apiErrorOwnerLocationScope": "Les propriétaires travaillent toujours sur tous les sites.",
+    "apiErrorCannotChangeOwnMembership": "Quelqu’un d’autre doit modifier votre propre accès.",
+    "apiErrorRoleCeilingExceeded": "Vous ne pouvez pas attribuer un rôle supérieur à ceux que vous pouvez accorder.",
     "mbErrLocationNotFound": "Nous n'avons pas trouvé ce site. Choisissez-en un autre.",
     "mbNotifWaitlistPromotedTitle": "Une place s'est libérée pour vous !",
     "mbNotifWaitlistPromotedBody": "Une place s'est libérée et vous êtes inscrit : {class}.",
@@ -9144,5 +9151,22 @@
     "hours": "Heures",
     "minutes": "Minutes",
     "done": "Terminé"
+  },
+  "BranchScope": {
+    "branches": "Sites",
+    "branchesHelp": "Là où cette personne travaille. L’équipe de certains sites ne voit et ne gère que ces sites.",
+    "allBranches": "Tous les sites",
+    "searchBranches": "Rechercher un site",
+    "noBranchMatches": "Aucun site ne correspond.",
+    "chooseOneBranch": "Choisissez au moins un site.",
+    "branchManager": "Responsable de site",
+    "branchManagerHelp": "Droits d’administrateur, limités aux sites choisis ci-dessous.",
+    "staffRoles": "Rôles dans l’équipe",
+    "chooseOneRole": "Choisissez au moins un rôle.",
+    "inviteBranches": "Travaille à",
+    "inviteBranchesHelp": "Les sites auxquels ce lien donne accès.",
+    "kindClient": "Client",
+    "kindStaff": "Équipe",
+    "staffLinkReady": "Lien prêt. Envoyez-le à votre nouvelle recrue ({roles})."
   }
 }

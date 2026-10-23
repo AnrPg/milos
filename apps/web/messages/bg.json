@@ -3410,6 +3410,13 @@
     "mbErrOpenGymNotIncluded": "Свободната тренировка не е част от пакета ти. Попитай треньора си как да я добавиш.",
     "mbErrOpenGymUsedUp": "Използвал си всички свободни тренировки за този период.",
     "mbErrLocationArchived": "Тази локация вече не е налична. Избери друга.",
+    "apiErrorLocationOutOfScope": "Това е в обект, в който не работите.",
+    "apiErrorLocationRequired": "Първо изберете обекта.",
+    "apiErrorLocationScopeExceeded": "Можете да давате достъп само до своите обекти.",
+    "apiErrorInvalidLocationScope": "Изберете всички обекти или поне един.",
+    "apiErrorOwnerLocationScope": "Собствениците винаги работят във всички обекти.",
+    "apiErrorCannotChangeOwnMembership": "Собствения ви достъп трябва да промени някой друг.",
+    "apiErrorRoleCeilingExceeded": "Не можете да дадете роля, по-висока от позволената ви.",
     "mbErrLocationNotFound": "Не намерихме тази локация. Избери друга.",
     "mbNotifWaitlistPromotedTitle": "Имаш място!",
     "mbNotifWaitlistPromotedBody": "Освободи се място и си записан: {class}.",
@@ -9144,5 +9151,22 @@
     "hours": "Часове",
     "minutes": "Минути",
     "done": "Готово"
+  },
+  "BranchScope": {
+    "branches": "Обекти",
+    "branchesHelp": "Къде работи този човек. Персоналът на отделни обекти вижда и обслужва само тях.",
+    "allBranches": "Всички обекти",
+    "searchBranches": "Търсене на обекти",
+    "noBranchMatches": "Няма съвпадащ обект.",
+    "chooseOneBranch": "Изберете поне един обект.",
+    "branchManager": "Управител на обект",
+    "branchManagerHelp": "Администраторски права само за обектите, избрани по-долу.",
+    "staffRoles": "Роли на персонала",
+    "chooseOneRole": "Изберете поне една роля.",
+    "inviteBranches": "Работи в",
+    "inviteBranchesHelp": "Обектите, до които дава достъп тази връзка.",
+    "kindClient": "Клиент",
+    "kindStaff": "Персонал",
+    "staffLinkReady": "Връзката е готова. Изпратете я на новия служител ({roles})."
   }
 }
