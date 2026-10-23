@@ -14,6 +14,9 @@ import { useLocale, useTranslations } from "next-intl";
 import { SESSION_UPDATED_EVENT } from "@/api/client";
 import { signOutAllDevices } from "@/api/auth";
 import { getAvatarUploadUrl, updateAvatar, updateProfile } from "@/api/profile";
+import { IdentitySettings, IDENTITY_FORM_ID } from "@/components/account/IdentitySettings";
+import { ProfilesSection } from "@/components/account/ProfilesSection";
+import { RecoveryCodesSection } from "@/components/account/RecoveryCodesSection";
 import { AvatarEditorModal } from "@/components/profile/AvatarEditorModal";
 import { CollapsibleSection } from "@/components/profile/CollapsibleSection";
 import { AroundAreaSetting } from "@/components/around/AroundSettings";
@@ -45,20 +48,6 @@ function FieldGroup({ label, children }: { label: string; children: React.ReactN
   );
 }
 
-function TextInput(props: React.InputHTMLAttributes<HTMLInputElement>) {
-  return (
-    <input
-      {...props}
-      className="w-full rounded-xl px-4 py-2.5 text-sm outline-none"
-      style={{
-        background: "var(--panel-muted)",
-        border: "1px solid var(--border)",
-        color: "var(--text)",
-      }}
-    />
-  );
-}
-
 type CurrentUserWithAvatar = {
   id: string;
   nickname: string;
@@ -74,17 +63,12 @@ export function ProfilePage() {
   const tProfile = useTranslations("Profile");
   const tAround = useTranslations("Around");
   const tMe = useTranslations("MemberApp");
+  const tAccount = useTranslations("accountProfiles");
   const { tokens, currentUser, signOut } = useSession();
   const user = currentUser as CurrentUserWithAvatar | null;
   useLegacySectionRedirects();
   const push = usePushNotifications(tokens?.access_token);
 
-  const [nicknameValue, setNicknameValue] = useState(user?.nickname ?? "");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [personalError, setPersonalError] = useState<string | null>(null);
-  const [personalSuccess, setPersonalSuccess] = useState<string | null>(null);
-  const [personalPending, setPersonalPending] = useState(false);
   const [languagePending, setLanguagePending] = useState(false);
   const [languageError, setLanguageError] = useState<string | null>(null);
   const [securityPending, setSecurityPending] = useState(false);
@@ -107,46 +91,6 @@ export function ProfilePage() {
         },
       }),
     );
-  }
-
-  async function handlePersonalSave(e: React.FormEvent) {
-    e.preventDefault();
-    if (!tokens) return;
-
-    setPersonalError(null);
-    setPersonalSuccess(null);
-    setPersonalPending(true);
-
-    try {
-      const payload: Record<string, string> = {};
-      if (nicknameValue.trim() && nicknameValue.trim() !== user?.nickname) {
-        payload.nickname = nicknameValue.trim();
-      }
-      if (newPassword) {
-        payload.current_password = currentPassword;
-        payload.password = newPassword;
-      }
-
-      if (Object.keys(payload).length === 0) {
-        setPersonalSuccess(i18n("nothingToUpdate928017b"));
-        return;
-      }
-
-      const result = await updateProfile(tokens.access_token, payload);
-      broadcastUserUpdate(result.user);
-      setNicknameValue(result.user.nickname);
-      setCurrentPassword("");
-      setNewPassword("");
-      if (payload.password) {
-        signOut();
-      } else {
-        setPersonalSuccess(i18n("profileUpdatedbcf7629"));
-      }
-    } catch (err) {
-      setPersonalError(err instanceof Error ? localizeError(err, i18n) : i18n("updateFailed19a9955"));
-    } finally {
-      setPersonalPending(false);
-    }
   }
 
   async function handleSignOutAllDevices() {
@@ -237,14 +181,15 @@ export function ProfilePage() {
         <div className="flex justify-end">
           <button
             type="submit"
-            form="profile-personal-form"
-            disabled={personalPending}
+            form={IDENTITY_FORM_ID}
             className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
             style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
           >
-            {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
+            {i18n("saveChanges179359b")}
           </button>
         </div>
+
+        <ProfilesSection />
 
 
         <CollapsibleSection
@@ -345,70 +290,15 @@ export function ProfilePage() {
           </div>
         </CollapsibleSection>
 
+        <RecoveryCodesSection />
+
         <CollapsibleSection
           id="personal"
           title={i18n("personalInfo87a403c")}
-          description={i18n("nicknameAndPassword3e84316")}
+          description={tAccount("identityDescription")}
           defaultOpen
         >
-          <form id="profile-personal-form" className="space-y-5" onSubmit={(e) => void handlePersonalSave(e)}>
-            <FieldGroup label={i18n("nicknamece2bd99")}>
-              <TextInput
-                value={nicknameValue}
-                onChange={(e) => setNicknameValue(e.target.value)}
-                placeholder={i18n("yourNicknameb5c8b4b")}
-                minLength={3}
-                maxLength={30}
-              />
-            </FieldGroup>
-
-            <div className="border-t pt-5" style={{ borderColor: "var(--border)" }}>
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] mb-4" style={{ color: "var(--muted)" }}>
-                {i18n("changePasswordLeaveBlankToKeepCurrent6e6fc07")}
-              </p>
-              <div className="space-y-3">
-                <FieldGroup label={i18n("currentPassword19dff4d")}>
-                  <TextInput
-                    type="password"
-                    value={currentPassword}
-                    onChange={(e) => setCurrentPassword(e.target.value)}
-                    placeholder={i18n("enterCurrentPassword149b393")}
-                    autoComplete="current-password"
-                  />
-                </FieldGroup>
-                <FieldGroup label={i18n("newPasswordd850ee1")}>
-                  <TextInput
-                    type="password"
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    placeholder={i18n("passwordRules0c63f14")}
-                    minLength={4}
-                    autoComplete="new-password"
-                  />
-                </FieldGroup>
-              </div>
-            </div>
-
-            {personalError && (
-              <p className="text-sm font-semibold" style={{ color: "var(--danger)" }}>
-                {personalError}
-              </p>
-            )}
-            {personalSuccess && (
-              <p className="text-sm font-semibold" style={{ color: "var(--primary)" }}>
-                {personalSuccess}
-              </p>
-            )}
-
-            <button
-              type="submit"
-              disabled={personalPending}
-              className="rounded-xl px-6 py-2.5 text-sm font-semibold disabled:opacity-50"
-              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-            >
-              {personalPending ? i18n("saving56a2285") : i18n("saveChanges179359b")}
-            </button>
-          </form>
+          <IdentitySettings />
         </CollapsibleSection>
 
         <CollapsibleSection id="avatar" title={i18n("avatar7631b26")} description={i18n("profilePictureaeb8371")}>
