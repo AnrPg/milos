@@ -648,11 +648,12 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:packages,
     summary: "List membership packages",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Membership packages", "application/json", @list_response}]
   )
 
-  def packages(conn, _params) do
-    with {:ok, payload} <- ListFinancePackages.call(conn.assigns.tenant_context) do
+  def packages(conn, params) do
+    with {:ok, payload} <- ListFinancePackages.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end
@@ -762,6 +763,7 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:members,
     summary: "List all members with finance summary",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Members list", "application/json", @list_response}]
   )
 
@@ -1131,11 +1133,12 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:promotions,
     summary: "List promotion campaigns",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Promotion campaigns", "application/json", @list_response}]
   )
 
-  def promotions(conn, _params) do
-    with {:ok, payload} <- ListFinancePromotions.call(conn.assigns.tenant_context) do
+  def promotions(conn, params) do
+    with {:ok, payload} <- ListFinancePromotions.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end
@@ -1237,11 +1240,12 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:referrals,
     summary: "List referral events",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Referral events", "application/json", @list_response}]
   )
 
-  def referrals(conn, _params) do
-    with {:ok, payload} <- ListFinanceReferrals.call() do
+  def referrals(conn, params) do
+    with {:ok, payload} <- ListFinanceReferrals.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end
@@ -1277,11 +1281,13 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:referral_rewards,
     summary: "List referral rewards",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Referral rewards", "application/json", @list_response}]
   )
 
-  def referral_rewards(conn, _params) do
-    with {:ok, payload} <- ListFinanceReferralRewards.call() do
+  def referral_rewards(conn, params) do
+    with {:ok, payload} <-
+           ListFinanceReferralRewards.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end

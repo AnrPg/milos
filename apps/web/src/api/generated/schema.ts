@@ -10193,10 +10193,27 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Neighbourhoods and cities matching a name (case and accents ignored) */
+        /** Stored places matching a name (case and accents ignored), then places and addresses anywhere from the geocoder (ADR-188) */
         get: operations["PaleeWeb.PlacesController.neighbourhoods"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/places/neighbourhoods/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Store a place a search suggested and get its gazetteer id (an address becomes its neighbourhood) */
+        post: operations["PaleeWeb.PlacesController.import"];
         delete?: never;
         options?: never;
         head?: never;
@@ -11650,6 +11667,9 @@ export interface components {
         AroundAreaResponse: {
             neighbourhoods: {
                 city_slug: string | null;
+                /** @description What tells it apart: its city, or region and country */
+                context: string | null;
+                context_en: string | null;
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
@@ -23276,6 +23296,11 @@ export interface components {
         };
         /** FinanceRefundReceiptCollection */
         FinanceRefundReceiptCollection: {
+            /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+            branch_filter?: {
+                all_locations: boolean;
+                location_ids: string[];
+            };
             refund_receipts: {
                 amount_cents: number;
                 currency: string;
@@ -25688,6 +25713,9 @@ export interface components {
         /** Neighbourhood */
         Neighbourhood: {
             city_slug: string | null;
+            /** @description What tells it apart: its city, or region and country */
+            context: string | null;
+            context_en: string | null;
             /** Format: uuid */
             id: string;
             /** @enum {string} */
@@ -25702,16 +25730,28 @@ export interface components {
         NeighbourhoodsResponse: {
             neighbourhoods: {
                 city_slug: string | null;
-                /** Format: uuid */
+                context: string | null;
+                context_en: string | null;
+                /**
+                 * Format: uuid
+                 * @description The gazetteer id, also of a suggested place once stored
+                 */
                 id: string;
                 /** @enum {string} */
-                kind: "neighbourhood" | "city";
+                kind: "neighbourhood" | "city" | "address";
                 latitude: number;
                 longitude: number;
                 name: string;
                 name_en: string;
+                /** @description Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id */
+                ref?: string | null;
                 slug: string;
             }[];
+            /**
+             * @description Whether the worldwide geocoder answered, was down, or was not needed
+             * @enum {string}
+             */
+            remote: "ok" | "unavailable" | "skipped";
         };
         /** NutritionPlan */
         NutritionPlan: {
@@ -26930,6 +26970,49 @@ export interface components {
             at: string;
             id: string;
             kg: number;
+        };
+        /** PlaceImportRequest */
+        PlaceImportRequest: {
+            ref: string;
+        };
+        /** PlaceImportResponse */
+        PlaceImportResponse: {
+            /** Neighbourhood */
+            neighbourhood: {
+                city_slug: string | null;
+                /** @description What tells it apart: its city, or region and country */
+                context: string | null;
+                context_en: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "neighbourhood" | "city";
+                latitude: number;
+                longitude: number;
+                name: string;
+                name_en: string;
+                slug: string;
+            };
+        };
+        /** PlaceSuggestion */
+        PlaceSuggestion: {
+            city_slug: string | null;
+            context: string | null;
+            context_en: string | null;
+            /**
+             * Format: uuid
+             * @description The gazetteer id, also of a suggested place once stored
+             */
+            id: string;
+            /** @enum {string} */
+            kind: "neighbourhood" | "city" | "address";
+            latitude: number;
+            longitude: number;
+            name: string;
+            name_en: string;
+            /** @description Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id */
+            ref?: string | null;
+            slug: string;
         };
         /** PlatformPlan */
         PlatformPlan: {
@@ -37451,6 +37534,9 @@ export interface operations {
                     "application/json": {
                         neighbourhoods: {
                             city_slug: string | null;
+                            /** @description What tells it apart: its city, or region and country */
+                            context: string | null;
+                            context_en: string | null;
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
@@ -37490,6 +37576,9 @@ export interface operations {
                     "application/json": {
                         neighbourhoods: {
                             city_slug: string | null;
+                            /** @description What tells it apart: its city, or region and country */
+                            context: string | null;
+                            context_en: string | null;
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
@@ -60499,7 +60588,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.members": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -61102,7 +61194,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.packages": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -61467,7 +61562,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.promotions": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -62209,7 +62307,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.referral_rewards": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -62261,7 +62362,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.referrals": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -62394,6 +62498,8 @@ export interface operations {
                 from?: string;
                 to?: string;
                 limit?: number;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
             };
             header?: never;
             path?: never;
@@ -62408,6 +62514,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        branch_filter?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         refund_receipts: {
                             amount_cents: number;
                             currency: string;
@@ -77656,6 +77767,11 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
+                        /** @description ADR-186: the branches a staff member works at; all_locations means every branch */
+                        branch_filter?: {
+                            all_locations: boolean;
+                            location_ids: string[];
+                        };
                         refund_receipts: {
                             amount_cents: number;
                             currency: string;
@@ -85202,6 +85318,61 @@ export interface operations {
                     "application/json": {
                         neighbourhoods: {
                             city_slug: string | null;
+                            context: string | null;
+                            context_en: string | null;
+                            /**
+                             * Format: uuid
+                             * @description The gazetteer id, also of a suggested place once stored
+                             */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "neighbourhood" | "city" | "address";
+                            latitude: number;
+                            longitude: number;
+                            name: string;
+                            name_en: string;
+                            /** @description Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id */
+                            ref?: string | null;
+                            slug: string;
+                        }[];
+                        /**
+                         * @description Whether the worldwide geocoder answered, was down, or was not needed
+                         * @enum {string}
+                         */
+                        remote: "ok" | "unavailable" | "skipped";
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.PlacesController.import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    ref: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Place */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Neighbourhood */
+                        neighbourhood: {
+                            city_slug: string | null;
+                            /** @description What tells it apart: its city, or region and country */
+                            context: string | null;
+                            context_en: string | null;
                             /** Format: uuid */
                             id: string;
                             /** @enum {string} */
@@ -85211,7 +85382,18 @@ export interface operations {
                             name: string;
                             name_en: string;
                             slug: string;
-                        }[];
+                        };
+                    };
+                };
+            };
+            /** @description Expired or forged ref */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
                     };
                 };
             };

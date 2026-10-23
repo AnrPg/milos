@@ -1,5 +1,5 @@
 defmodule PaleeWeb.Schemas.Around do
-  @moduledoc "OpenAPI schemas of Γύρω μου, «Η περιοχή μου» and the gazetteer (ADR-154)."
+  @moduledoc "OpenAPI schemas of Γύρω μου, «Η περιοχή μου» and the gazetteer (ADR-154, ADR-188)."
 
   alias Palee.Places
   alias PaleeWeb.Schemas.{Community, CommunityEvents, CommunityGroups}
@@ -17,6 +17,8 @@ defmodule PaleeWeb.Schemas.Around do
   defp strings, do: list(string())
 
   defdelegate body(schema), to: Community
+
+  def error, do: %Schema{type: :object, additionalProperties: true}
 
   def kind, do: string(enum: Places.kinds())
 
@@ -317,18 +319,86 @@ defmodule PaleeWeb.Schemas.Around do
         name: string(),
         name_en: string(),
         city_slug: string(nullable: true),
+        context:
+          string(
+            nullable: true,
+            description: "What tells it apart: its city, or region and country"
+          ),
+        context_en: string(nullable: true),
         latitude: number(),
         longitude: number()
       },
-      [:id, :slug, :kind, :name, :name_en, :city_slug, :latitude, :longitude]
+      [
+        :id,
+        :slug,
+        :kind,
+        :name,
+        :name_en,
+        :city_slug,
+        :context,
+        :context_en,
+        :latitude,
+        :longitude
+      ]
+    )
+  end
+
+  def place_suggestion do
+    object(
+      "PlaceSuggestion",
+      %{
+        id: %{@uuid | description: "The gazetteer id, also of a suggested place once stored"},
+        slug: string(),
+        kind: string(enum: ~w(neighbourhood city address)),
+        name: string(),
+        name_en: string(),
+        city_slug: string(nullable: true),
+        context: string(nullable: true),
+        context_en: string(nullable: true),
+        latitude: number(),
+        longitude: number(),
+        ref:
+          string(
+            nullable: true,
+            description:
+              "Set on geocoder suggestions (ADR-188): POST it to /places/neighbourhoods/import before using the id"
+          )
+      },
+      [
+        :id,
+        :slug,
+        :kind,
+        :name,
+        :name_en,
+        :city_slug,
+        :context,
+        :context_en,
+        :latitude,
+        :longitude
+      ]
     )
   end
 
   def neighbourhoods_response,
     do:
-      object("NeighbourhoodsResponse", %{neighbourhoods: list(neighbourhood())}, [
-        :neighbourhoods
-      ])
+      object(
+        "NeighbourhoodsResponse",
+        %{
+          neighbourhoods: list(place_suggestion()),
+          remote:
+            string(
+              enum: ~w(ok unavailable skipped),
+              description: "Whether the worldwide geocoder answered, was down, or was not needed"
+            )
+        },
+        [:neighbourhoods, :remote]
+      )
+
+  def place_import_request,
+    do: object("PlaceImportRequest", %{ref: string(maxLength: 4_000)}, [:ref])
+
+  def place_import_response,
+    do: object("PlaceImportResponse", %{neighbourhood: neighbourhood()}, [:neighbourhood])
 
   def area_response,
     do:

@@ -1,17 +1,32 @@
 defmodule Palee.Application.ListFinanceReferralRewards do
+  alias Palee.Application.BranchReport
   alias Palee.{Finance, Identity}
 
   def call do
-    rewards = Finance.list_referral_rewards()
+    {:ok, %{referral_rewards: enrich(Finance.list_referral_rewards())}}
+  end
+
+  @doc """
+  ADR-186 §7: with `location_ids` only the rewards whose recipient has their
+  home branch in the filter (as the operational queues count them).
+  """
+  def call(context, params) do
+    report = BranchReport.resolve_list(context, params)
+
+    rewards =
+      BranchReport.people_only(Finance.list_referral_rewards(), report, & &1.recipient_user_id)
+
+    {:ok,
+     %{referral_rewards: enrich(rewards), branch_filter: BranchReport.filter_payload(report)}}
+  end
+
+  defp enrich(rewards) do
     events = Finance.list_referral_events()
     event_map = Map.new(events, &{&1.id, &1})
     programs = Finance.list_referral_programs() |> Map.new(&{&1.id, &1})
     users = user_map(rewards, events)
 
-    {:ok,
-     %{
-       referral_rewards: Enum.map(rewards, &enrich_reward(&1, event_map, programs, users))
-     }}
+    Enum.map(rewards, &enrich_reward(&1, event_map, programs, users))
   end
 
   defp enrich_reward(reward, event_map, programs, users) do

@@ -1,55 +1,29 @@
+import type { Metadata } from "next";
 
-
-
-import { PaleeMark } from "@/components/branding/PaleeMark";
-import {getUiTranslations} from "@/i18n/ui-server";
-
-import {useUiTranslations} from "@/i18n/ui";
-import type {Metadata} from "next";
-import Link from "next/link";
+import { ProductOverview } from "@/components/about/ProductOverview";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { getUiTranslations } from "@/i18n/ui-server";
+import { loadSiteFacts } from "@/lib/seo/site-facts";
+import { faqStructuredData } from "@/lib/seo/site-info";
 
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
+  const title = i18n("aboutPalee");
+  const description = i18n("howPaleeSupportsMembersAthletesAndCoaches");
   return {
-    title: i18n("aboutPalee"),
-    description: i18n("howPaleeSupportsMembersAthletesAndCoaches"),
+    title,
+    description,
+    alternates: { canonical: "/about" },
+    openGraph: { title, description, url: "/about" },
   };
 }
 
-export default function AboutPage() {
-  const i18n = useUiTranslations();
+export default async function AboutPage() {
+  const { facts, faq } = await loadSiteFacts();
   return (
-    <main className="mx-auto w-full max-w-4xl flex-1 px-6 py-16" style={{ color: "var(--text)" }}>
-      <p className="text-sm font-semibold uppercase tracking-[0.24em]" style={{ color: "var(--primary)" }}>
-        {i18n("trainWithIntent94cee47")}
-      </p>
-      <h1 className="mt-3 flex items-center gap-4 text-4xl font-bold tracking-tight sm:text-6xl">
-        <PaleeMark className="h-12 w-12 shrink-0 sm:h-16 sm:w-16" />
-        {i18n("brandName")}
-      </h1>
-      <p className="mt-6 max-w-2xl text-lg leading-8" style={{ color: "var(--muted)" }}>
-        {i18n("onePrivateSelfHostedHomeForGroupClasses89e3bcd")}
-      </p>
-      <div className="mt-10 grid gap-4 sm:grid-cols-3">
-        {[
-          [i18n("members1cb449c"), i18n("bookClassesFollowGymUpdatesAndKeepAttendancec7408d8")],
-          [i18n("athletesda22204"), i18n("executeTailoredTrainingWithAStepSynchronisedTimer9c0485e")],
-          [i18n("coaches181feb6"), i18n("programCommunicateAndUnderstandTrainingProgressWithoutSurveillance7c67d89")],
-        ].map(([title, body]) => (
-          <section key={title} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
-            <h2 className="font-semibold">{title}</h2>
-            <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>{body}</p>
-          </section>
-        ))}
-      </div>
-      <div className="mt-10 flex flex-wrap gap-3">
-        <Link className="rounded-xl px-5 py-3 font-semibold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} href="/register">
-          {i18n("createAnAccount3f4f547")}
-        </Link>
-        <Link className="rounded-xl border px-5 py-3 font-semibold" style={{ borderColor: "var(--border)" }} href="/login">
-          {i18n("signInada2e9e")}
-        </Link>
-      </div>
+    <main className="flex w-full flex-1">
+      <JsonLd data={faqStructuredData(faq)} />
+      <ProductOverview faq={faq} features={facts.features} />
     </main>
   );
 }

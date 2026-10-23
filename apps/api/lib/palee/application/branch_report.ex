@@ -46,6 +46,45 @@ defmodule Palee.Application.BranchReport do
     end
   end
 
+  @doc """
+  The filter of a list on a filtered page (finance operations tabs): like
+  `resolve/2` when the request names `location_ids`, and no filter at all
+  when it names none. Unlike a report, a list does not narrow to the
+  person's scope by default: people, directory and payments are unscoped
+  (§3), and covering items are already scoped by `CoveringBranches`.
+  """
+  def resolve_list(context, params) do
+    case Organizations.requested_location_ids(params || %{}) do
+      [] -> %{filter: :all, user_ids: nil, location_ids: nil, homes: nil, locations: []}
+      _ids -> resolve(context, params)
+    end
+  end
+
+  @doc """
+  The items of the people of the filter: `people_of.(item)` names the item's
+  person (or people; any one of them is enough). Items of nobody drop out
+  under a filter. With `:all` every item stays.
+  """
+  def people_only(items, %{filter: :all}, _people_of), do: items
+
+  def people_only(items, %{user_ids: users}, people_of) when is_function(people_of, 1) do
+    users = MapSet.new(users || [])
+
+    Enum.filter(items, fn item ->
+      item |> people_of.() |> List.wrap() |> Enum.any?(&MapSet.member?(users, &1))
+    end)
+  end
+
+  @doc """
+  Covering items valid at one of the filter's branches (ADR-186 §8):
+  `target_of.(item)` is `:all` or ids, and an item valid everywhere always
+  matches. With `:all` every item stays.
+  """
+  def covering_only(items, %{filter: :all}, _target_of), do: items
+
+  def covering_only(items, %{filter: ids}, target_of) when is_function(target_of, 1),
+    do: Enum.filter(items, &Organizations.covering_visible?(ids, target_of.(&1)))
+
   @doc "Params for a store read: the people and branches of the filter, when any."
   def scope_params(params, %{filter: :all}), do: params
 

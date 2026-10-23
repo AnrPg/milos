@@ -1,5 +1,5 @@
 defmodule Palee.Infrastructure.Places.EctoGazetteerStore do
-  @moduledoc "Ecto adapter of the neighbourhood gazetteer (ADR-154)."
+  @moduledoc "Ecto adapter of the neighbourhood gazetteer (ADR-154, ADR-188)."
 
   @behaviour Palee.Places.Ports.GazetteerStore
 
@@ -67,6 +67,50 @@ defmodule Palee.Infrastructure.Places.EctoGazetteerStore do
     |> normalize()
   end
 
+  # Refreshed on a repeat import: what the geocoder says may have improved.
+  @refreshed [
+    :name,
+    :name_en,
+    :context,
+    :context_en,
+    :latitude,
+    :longitude,
+    :radius_m,
+    :search_key,
+    :updated_at
+  ]
+
+  @impl true
+  def import(place) do
+    row =
+      %Neighbourhood{source: "osm"}
+      |> Ecto.Changeset.change(
+        Map.take(place, [
+          :id,
+          :slug,
+          :kind,
+          :name,
+          :name_en,
+          :context,
+          :context_en,
+          :country_code,
+          :latitude,
+          :longitude,
+          :radius_m,
+          :search_key
+        ])
+      )
+
+    case Repo.insert(row,
+           on_conflict: {:replace, @refreshed},
+           conflict_target: :slug,
+           returning: true
+         ) do
+      {:ok, stored} -> {:ok, normalize(stored)}
+      {:error, changeset} -> {:error, changeset}
+    end
+  end
+
   defp normalize(nil), do: nil
 
   defp normalize(%Neighbourhood{} = n),
@@ -78,6 +122,8 @@ defmodule Palee.Infrastructure.Places.EctoGazetteerStore do
         :name,
         :name_en,
         :city_slug,
+        :context,
+        :context_en,
         :latitude,
         :longitude,
         :radius_m

@@ -9,6 +9,7 @@ import {
   AROUND_KEY,
   fetchAroundArea,
   fetchAroundPins,
+  importPlace,
   neighbourhoodsKey,
   saveAroundArea,
   searchAround,
@@ -16,6 +17,8 @@ import {
   searchNeighbourhoods,
   type AroundKind,
   type AroundViewport,
+  type Neighbourhood,
+  type PlaceSuggestion,
 } from "@/api/around";
 import { ApiError } from "@/api/client";
 import {
@@ -219,6 +222,20 @@ export function useNeighbourhoodSearch(q: string) {
     staleTime: 5 * 60_000,
     retry,
     queryFn: ({ signal }) => searchNeighbourhoods(token!, query, signal),
+  });
+}
+
+/**
+ * Turns a picked suggestion into a gazetteer place: stored places as they
+ * are, geocoder suggestions (`ref`) stored first (ADR-188).
+ */
+export function useResolvePlace() {
+  const { tokens } = useSession();
+  return useMutation({
+    mutationFn: async (place: PlaceSuggestion): Promise<Neighbourhood> => {
+      if (!place.ref) return place as Neighbourhood;
+      return importPlace(tokens!.access_token, place.ref);
+    },
   });
 }
 
