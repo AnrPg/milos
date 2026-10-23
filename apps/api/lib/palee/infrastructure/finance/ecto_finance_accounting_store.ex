@@ -25,7 +25,8 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
   alias Palee.Finance.Domain.{
     DocumentNumber,
     ReconciliationMatching,
-    RefundReceipt
+    RefundReceipt,
+    RevenueBreakdown
   }
 
   alias Palee.Infrastructure.Tenancy.RepoContext
@@ -709,13 +710,17 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
   defp payment_rows(range_start, range_end) do
     reversed = reversed_by_payment()
 
+    # ADR-192: a walk-in shop payment has no membership, so the member is a
+    # left join; the lineage columns come from `payment_lineage/0`.
     from(payment in tenant_scope(MembershipPayment),
-      join: membership in Membership,
+      left_join: membership in Membership,
       on: membership.id == payment.membership_id,
       left_join: invoice in FinanceInvoice,
       on: invoice.id == payment.finance_invoice_id,
       left_join: reversed in subquery(reversed),
       on: reversed.payment_id == payment.id,
+      left_join: lineage in subquery(payment_lineage()),
+      on: lineage.id == payment.id,
       where: is_nil(payment.deleted_at),
       where:
         fragment("COALESCE(?, CAST(? AS date))", payment.paid_on, payment.inserted_at) >=
@@ -724,13 +729,15 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
         fragment("COALESCE(?, CAST(? AS date))", payment.paid_on, payment.inserted_at) <=
           ^range_end,
       order_by: [asc: payment.paid_on, asc: payment.inserted_at, asc: payment.id],
-      select: {payment, membership.user_id, invoice.invoice_number, reversed.cents}
+      select: {payment, membership.user_id, invoice.invoice_number, reversed.cents, lineage}
     )
     |> Repo.all()
-    |> Enum.map(fn {payment, user_id, invoice_number, reversed_cents} ->
+    |> Enum.map(fn {payment, user_id, invoice_number, reversed_cents, lineage} ->
       reversed_cents = to_integer(reversed_cents)
 
-      %{
+      lineage
+      |> lineage_columns()
+      |> Map.merge(%{
         "payment_id" => payment.id,
         "paid_on" => payment.paid_on || DateTime.to_date(payment.inserted_at),
         "recorded_at" => payment.inserted_at,
@@ -745,8 +752,67 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
         "amount_cents" => payment.amount_cents,
         "reversed_cents" => reversed_cents,
         "net_amount_cents" => max(payment.amount_cents - reversed_cents, 0)
-      }
+      })
     end)
+  end
+
+  # ADR-192: what the export says about where a payment's money came from:
+  # the stored stream and source (ADR-190) and the stream the finance summary
+  # reports it under. Read from the tables, not the schemas, so the export
+  # does not depend on which writer maps those columns.
+  defp payment_lineage do
+    from(payment in "membership_payments",
+      left_join: invoice in "finance_invoices",
+      on: invoice.id == payment.finance_invoice_id,
+      left_join: subscription in "membership_package_subscriptions",
+      on:
+        subscription.id ==
+          coalesce(
+            payment.membership_package_subscription_id,
+            invoice.membership_package_subscription_id
+          ),
+      left_join: package in "membership_packages",
+      on: package.id == subscription.membership_package_id,
+      select: %{
+        id: type(payment.id, :binary_id),
+        revenue_stream: type(payment.revenue_stream, :string),
+        source_type: type(payment.source_type, :string),
+        source_id: type(payment.source_id, :binary_id),
+        package_type: type(package.package_type, :string),
+        reference: type(fragment("(?->>'idempotency_key')", invoice.params), :string),
+        event_line:
+          type(
+            fragment(
+              "EXISTS (SELECT 1 FROM finance_invoice_lines line WHERE line.finance_invoice_id = ? AND line.revenue_stream = 'event')",
+              payment.finance_invoice_id
+            ),
+            :boolean
+          )
+      }
+    )
+  end
+
+  defp lineage_columns(nil),
+    do: %{
+      "revenue_stream" => nil,
+      "report_stream" => nil,
+      "source_type" => nil,
+      "source_id" => nil
+    }
+
+  defp lineage_columns(lineage) do
+    %{
+      "revenue_stream" => lineage.revenue_stream,
+      "report_stream" =>
+        RevenueBreakdown.classify(%{
+          explicit_stream: lineage.revenue_stream,
+          package_type: lineage.package_type,
+          reference: lineage.reference,
+          charge_category: if(lineage.event_line, do: "event")
+        }),
+      "source_type" => lineage.source_type,
+      "source_id" => lineage.source_id
+    }
   end
 
   defp allocation_rows(range_start, range_end) do
@@ -838,14 +904,33 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
       on: invoice.id == reversal.finance_invoice_id,
       left_join: receipt in FinanceRefundReceipt,
       on: receipt.finance_payment_reversal_id == reversal.id,
+      left_join: lineage in subquery(payment_lineage()),
+      on: lineage.id == reversal.membership_payment_id,
+      left_join: own in "finance_payment_reversals",
+      on: own.id == reversal.id,
       where: is_nil(reversal.deleted_at),
       where: reversal.occurred_on >= ^range_start and reversal.occurred_on <= ^range_end,
       order_by: [asc: reversal.occurred_at, asc: reversal.id],
-      select: {reversal, invoice.invoice_number, receipt.receipt_number}
+      select:
+        {reversal, invoice.invoice_number, receipt.receipt_number, lineage,
+         %{
+           revenue_stream: type(own.revenue_stream, :string),
+           source_type: type(own.source_type, :string),
+           source_id: type(own.source_id, :binary_id)
+         }}
     )
     |> Repo.all()
-    |> Enum.map(fn {reversal, invoice_number, receipt_number} ->
-      %{
+    |> Enum.map(fn {reversal, invoice_number, receipt_number, lineage, own} ->
+      # A refund belongs to the stream of the payment it reverses; its own
+      # stored stream and source are inherited from it (ADR-190 trigger).
+      lineage
+      |> lineage_columns()
+      |> Map.merge(%{
+        "revenue_stream" => own.revenue_stream,
+        "source_type" => own.source_type,
+        "source_id" => own.source_id
+      })
+      |> Map.merge(%{
         "reversal_id" => reversal.id,
         "occurred_on" => reversal.occurred_on,
         "occurred_at" => reversal.occurred_at,
@@ -859,7 +944,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceAccountingStore do
         "reason" => reversal.reason,
         "recorded_by_id" => reversal.created_by_id,
         "refund_receipt_number" => receipt_number
-      }
+      })
     end)
   end
 

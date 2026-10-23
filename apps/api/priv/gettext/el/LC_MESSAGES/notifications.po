@@ -642,3 +642,36 @@ msgstr "Η demo επιχείρησή σου σε περιμένει"
 
 msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
 msgstr "Κανείς δεν έχει χρησιμοποιήσει το %{business} εδώ και καιρό. Αν δεν το ανοίξει κανείς τις επόμενες %{days} ημέρες, τα demo δεδομένα του διαγράφονται και αρχειοθετείται. Μπορείς να το ξανανοίξεις όποτε θέλεις."
+
+msgid "Shop stock running low"
+msgstr "Λίγο απόθεμα στο κατάστημα"
+
+msgid "New shop order"
+msgstr "Νέα παραγγελία στο κατάστημα"
+
+msgid "Order #%{number} is waiting to be prepared."
+msgstr "Η παραγγελία #%{number} περιμένει να ετοιμαστεί."
+
+msgid "Your order is ready"
+msgstr "Η παραγγελία σου είναι έτοιμη"
+
+msgid "Order #%{number} is ready for pickup."
+msgstr "Η παραγγελία #%{number} είναι έτοιμη για παραλαβή."
+
+msgid "Your order is waiting for you"
+msgstr "Η παραγγελία σου σε περιμένει"
+
+msgid "Order #%{number} is ready for pickup. Your code: %{code}."
+msgstr "Η παραγγελία #%{number} είναι έτοιμη για παραλαβή. Ο κωδικός σου: %{code}."
+
+msgid "Your order was cancelled"
+msgstr "Η παραγγελία σου ακυρώθηκε"
+
+msgid "Order #%{number} was cancelled and nothing was charged."
+msgstr "Η παραγγελία #%{number} ακυρώθηκε και δεν χρεώθηκε τίποτα."
+
+msgid "Back in stock"
+msgstr "Ξανά διαθέσιμο"
+
+msgid "%{item} is available again."
+msgstr "Το %{item} είναι ξανά διαθέσιμο."

@@ -162,6 +162,8 @@ defmodule Palee.Application.PostPresenter do
       media_status: Map.get(post, :media_status) || "ready",
       # The live event card, filled by EventCards where the feed is read (ADR-153).
       event: nil,
+      # The live product card of a «Προώθηση» post, filled by ProductCards (ADR-190).
+      product: nil,
       kudos_count: post.kudos_count,
       comment_count: post.comment_count,
       kudos_by_me: post.kudos_by_me,

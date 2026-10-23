@@ -713,6 +713,68 @@ defmodule Palee.Notifications do
         url: "/admin/inventory?tab=supplies"
       })
 
+  # ADR-190: the e-shop.
+  def process_event("shop_stock_low", payload),
+    do:
+      enqueue_simple(:shop_stock_low, payload, %{
+        product_id: field(payload, :product_id),
+        variant_id: field(payload, :variant_id),
+        product_title: field(payload, :product_title),
+        variant_title: field(payload, :variant_title),
+        status: field(payload, :status),
+        available: field(payload, :available),
+        days_left: field(payload, :days_left),
+        url: "/admin/shop?tab=stock"
+      })
+
+  def process_event("shop_order_placed", payload),
+    do:
+      enqueue_simple(:shop_order_placed, payload, %{
+        order_id: field(payload, :order_id),
+        order_number: field(payload, :order_number),
+        total_cents: field(payload, :total_cents),
+        currency: field(payload, :currency),
+        url: "/admin/shop?tab=orders"
+      })
+
+  def process_event("shop_order_ready", payload),
+    do:
+      enqueue_simple(:shop_order_ready, payload, %{
+        order_id: field(payload, :order_id),
+        order_number: field(payload, :order_number),
+        pickup_location_id: field(payload, :pickup_location_id),
+        url: "/box/shop/orders/#{field(payload, :order_id)}"
+      })
+
+  def process_event("shop_order_reminder", payload),
+    do:
+      enqueue_simple(:shop_order_reminder, payload, %{
+        order_id: field(payload, :order_id),
+        order_number: field(payload, :order_number),
+        pickup_code: field(payload, :pickup_code),
+        pickup_location_id: field(payload, :pickup_location_id),
+        url: "/box/shop/orders/#{field(payload, :order_id)}"
+      })
+
+  def process_event("shop_order_cancelled", payload),
+    do:
+      enqueue_simple(:shop_order_cancelled, payload, %{
+        order_id: field(payload, :order_id),
+        order_number: field(payload, :order_number),
+        reason: field(payload, :reason),
+        url: "/box/shop/orders/#{field(payload, :order_id)}"
+      })
+
+  def process_event("shop_back_in_stock", payload),
+    do:
+      enqueue_simple(:shop_back_in_stock, payload, %{
+        product_id: field(payload, :product_id),
+        variant_id: field(payload, :variant_id),
+        product_title: field(payload, :product_title),
+        variant_title: field(payload, :variant_title),
+        url: "/box/shop/products/#{field(payload, :product_id)}"
+      })
+
   def process_event("inventory_digest", payload),
     do:
       enqueue_simple(:inventory_digest, payload, %{

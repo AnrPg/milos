@@ -69,6 +69,8 @@ defmodule Mix.Tasks.Palee.Architecture do
     gamification/gamification_store
     finance/finance_store
     finance/finance_accounting_store
+    finance/revenue_stream_store
+    shop/shop_store
     execution/execution_store
     execution/training_log_store
     wellbeing/wellbeing_store
@@ -110,6 +112,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     wallet/wallet_store
     business_accounts/business_account_store
     perks/perk_store
+    shop/shop_report_store
   )
 
   defp tenant_scope_violations do

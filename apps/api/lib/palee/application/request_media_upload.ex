@@ -74,6 +74,13 @@ defmodule Palee.Application.RequestMediaUpload do
       else: {:error, :forbidden}
   end
 
+  # ADR-190: product photos, by staff who manage the shop.
+  defp authorize(context, "shop_product_photo") do
+    if Organizations.can?(context, :manage_shop),
+      do: :ok,
+      else: {:error, :forbidden}
+  end
+
   defp authorize(%{user_id: user_id}, purpose)
        when purpose in ["post_photo", "post_video"] and is_binary(user_id),
        do: :ok

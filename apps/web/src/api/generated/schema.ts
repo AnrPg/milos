@@ -520,6 +520,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/boxes/{slug}/shop/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A published box's shop products for anyone (signed in) */
+        get: operations["PaleeWeb.MyShopController.public_products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/boxes/{slug}/trials": {
         parameters: {
             query?: never;
@@ -6890,6 +6907,177 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/shop/pricing-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Target margin per product category (cost-plus input) */
+        get: operations["PaleeWeb.AdminShopReportController.pricing_targets"];
+        /** Set or clear the target margin of a category (or the default) */
+        put: operations["PaleeWeb.AdminShopReportController.put_pricing_target"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/attribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales by promotion code, campaign and source (feed post, public page...) */
+        get: operations["PaleeWeb.AdminShopReportController.attribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales by channel (online pickup or desk) and by branch */
+        get: operations["PaleeWeb.AdminShopReportController.channels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stock on hand, stock value, low stock and sell-through */
+        get: operations["PaleeWeb.AdminShopReportController.inventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/margin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop revenue, cost and margin where the cost price is known */
+        get: operations["PaleeWeb.AdminShopReportController.margin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop KPIs: net sales, orders, AOV, units, refunds, margin and stock */
+        get: operations["PaleeWeb.AdminShopReportController.overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Advisory pricing indicators per variant (default window 90 days) */
+        get: operations["PaleeWeb.AdminShopReportController.pricing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Top shop products and variants by revenue and by units */
+        get: operations["PaleeWeb.AdminShopReportController.products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop revenue reconciliation: orders == shop invoice lines == payments - refunds */
+        get: operations["PaleeWeb.AdminShopReportController.reconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales per gym-local day: gross, refunds, net, orders and AOV */
+        get: operations["PaleeWeb.AdminShopReportController.sales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/trial-policy": {
         parameters: {
             query?: never;
@@ -9113,6 +9301,195 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/shop/cart/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Price the basket: lines, totals, pickup branches, payment modes and online_payment */
+        post: operations["PaleeWeb.MyShopController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My orders at this box, newest first */
+        get: operations["PaleeWeb.MyShopController.orders"];
+        put?: never;
+        /** Place an order for pickup (stock is reserved; idempotent per idempotency_key) */
+        post: operations["PaleeWeb.MyShopController.place_order"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of my orders */
+        get: operations["PaleeWeb.MyShopController.order"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel my unpaid order */
+        post: operations["PaleeWeb.MyShopController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
+        post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's shop: published products sold in the app */
+        get: operations["PaleeWeb.MyShopController.products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One product of the box's shop */
+        get: operations["PaleeWeb.MyShopController.product"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/stock-alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The member's «Ειδοποίησέ με» requests */
+        get: operations["PaleeWeb.MyShopController.stock_alerts"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/storefront": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's shop for the member: open or not, products, categories, pickup branches, member discount and online payment */
+        get: operations["PaleeWeb.MyShopController.storefront"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My shop transactions at this box (orders with their invoice, payments and refunds) */
+        get: operations["PaleeWeb.MyShopController.transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/variants/{id}/stock-alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** «Ειδοποίησέ με»: be told when this variant is back in stock */
+        put: operations["PaleeWeb.MyShopController.subscribe_stock_alert"];
+        post?: never;
+        /** Stop waiting for this variant */
+        delete: operations["PaleeWeb.MyShopController.unsubscribe_stock_alert"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads": {
         parameters: {
             query?: never;
@@ -10206,6 +10583,454 @@ export interface paths {
         put?: never;
         /** Dismiss a suggestion; nothing reaches the athlete */
         post: operations["PaleeWeb.StaffScalingController.dismiss"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/desk-sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A desk sale (Ταμείο) to a member or a walk-in, paid and handed over at once */
+        post: operations["PaleeWeb.ShopController.desk_sale"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The stock ledger across every variant, newest first, one page at a time */
+        get: operations["PaleeWeb.ShopController.ledger"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Orders collected at the acting staff member's branches, newest first, with the count of every status */
+        get: operations["PaleeWeb.ShopController.orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One order */
+        get: operations["PaleeWeb.ShopController.order"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel an unpaid order (its stock is released and its invoice voided) */
+        post: operations["PaleeWeb.ShopController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/fiscal-receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record the legal receipt reference (myDATA MARK or register receipt) of an order */
+        put: operations["PaleeWeb.ShopController.set_fiscal_receipt"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/lineage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Finance rows and stock movements of an order (revenue lineage drill-down) */
+        get: operations["PaleeWeb.ShopController.lineage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record the payment of an unpaid order at the desk */
+        post: operations["PaleeWeb.ShopController.record_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hand the order over (with payment_method, an unpaid order is paid first) */
+        post: operations["PaleeWeb.ShopController.pick_up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ready for pickup (the member is told where to collect it) */
+        post: operations["PaleeWeb.ShopController.mark_ready"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refund lines of a paid order (Finance reversal, refund receipt, optional restock) */
+        post: operations["PaleeWeb.ShopController.refund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/payment-methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Ways to pay, from the payment port: desk methods staff record, and the online card (available: false until Palee has a card vendor) */
+        get: operations["PaleeWeb.ShopController.payment_methods"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/photos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reserve a product photo (shop_product_photo) and get a presigned upload for it */
+        post: operations["PaleeWeb.ShopController.photo_upload"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/photos/{id}/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Verify an uploaded product photo (type, size, no metadata) and mark it ready */
+        post: operations["PaleeWeb.ShopController.complete_photo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The console's catalog: one filter's products and the counts of every filter */
+        get: operations["PaleeWeb.ShopController.products"];
+        put?: never;
+        /** Create a draft product with its variants (and optional opening stock) */
+        post: operations["PaleeWeb.ShopController.create_product"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One product */
+        get: operations["PaleeWeb.ShopController.product"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit a product's details, photos, options, channels and branches, and optionally its status and its variants, in one transaction */
+        patch: operations["PaleeWeb.ShopController.update_product"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Promote a product with a club post (#ανακοινώσεις, a group or squad, or the public feed), optionally with a promotion code */
+        post: operations["PaleeWeb.ShopController.promote"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Publish, unpublish (draft) or archive a product
+         * @description Publishing for `anyone` is a going-live action: a demo business answers 403 business_not_activated.
+         */
+        put: operations["PaleeWeb.ShopController.set_product_status"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a variant (one value per option) */
+        post: operations["PaleeWeb.ShopController.create_variant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/variants/{variant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit a variant; every price change is recorded in the price history */
+        patch: operations["PaleeWeb.ShopController.update_variant"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/variants/{variant_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a variant (kept on past orders) */
+        post: operations["PaleeWeb.ShopController.archive_variant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/promotion-codes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Promotion codes, with their redemptions and status */
+        get: operations["PaleeWeb.ShopController.promotion_codes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/promotion-codes/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Change a promotion code's discount, window or cap, or switch it off */
+        patch: operations["PaleeWeb.ShopController.update_promotion_code"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/ready-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Orders ready for pickup for a member, or for the pickup code they show (the check-in desk's «παραγγελία έτοιμη») */
+        get: operations["PaleeWeb.ShopController.ready_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/revenue-streams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Paid, refunded and net revenue per stream (membership, package, event, shop, other) */
+        get: operations["PaleeWeb.ShopController.revenue_streams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/variants/{id}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A variant's stock ledger, newest first */
+        get: operations["PaleeWeb.ShopController.movements"];
+        put?: never;
+        /** Receive, adjust (with a reason), recount or transfer a variant's stock */
+        post: operations["PaleeWeb.ShopController.record_movement"];
         delete?: never;
         options?: never;
         head?: never;
@@ -12866,7 +13691,7 @@ export interface components {
                     /** Format: uuid */
                     attachment_id?: string | null;
                     /** @enum {string|null} */
-                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                     /** @enum {string} */
                     audience: "club_channel" | "followers" | "public";
                     /** CommunityAuthor */
@@ -13099,6 +13924,44 @@ export interface components {
                     /** @enum {string} */
                     origin: "club" | "profile";
                     pinned: boolean;
+                    /**
+                     * ShopProductCard
+                     * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                     */
+                    product?: {
+                        /** @enum {string|null} */
+                        availability?: "in_stock" | "low" | null;
+                        /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                        buy_link?: {
+                            params?: {
+                                promotion_code?: string;
+                                source?: string;
+                                /** Format: uuid */
+                                source_ref_id?: string;
+                            };
+                            path?: string;
+                            /** Format: uuid */
+                            product_id?: string;
+                            url?: string;
+                        } | null;
+                        currency?: string | null;
+                        max_price_cents?: number | null;
+                        media_ids?: string[];
+                        price_cents?: number | null;
+                        /** Format: uuid */
+                        product_id: string;
+                        promotion?: {
+                            code?: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                        } | null;
+                        promotion_price_cents?: number | null;
+                        /** @enum {string} */
+                        status: "available" | "sold_out" | "members_only" | "unavailable";
+                        title?: string | null;
+                    } | null;
                 };
             })[];
             /** @enum {string} */
@@ -13261,7 +14124,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -13494,6 +14357,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             };
         };
         /** AroundPostsSection */
@@ -13513,7 +14414,7 @@ export interface components {
                     /** Format: uuid */
                     attachment_id?: string | null;
                     /** @enum {string|null} */
-                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                    attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                     /** @enum {string} */
                     audience: "club_channel" | "followers" | "public";
                     /** CommunityAuthor */
@@ -13746,6 +14647,44 @@ export interface components {
                     /** @enum {string} */
                     origin: "club" | "profile";
                     pinned: boolean;
+                    /**
+                     * ShopProductCard
+                     * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                     */
+                    product?: {
+                        /** @enum {string|null} */
+                        availability?: "in_stock" | "low" | null;
+                        /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                        buy_link?: {
+                            params?: {
+                                promotion_code?: string;
+                                source?: string;
+                                /** Format: uuid */
+                                source_ref_id?: string;
+                            };
+                            path?: string;
+                            /** Format: uuid */
+                            product_id?: string;
+                            url?: string;
+                        } | null;
+                        currency?: string | null;
+                        max_price_cents?: number | null;
+                        media_ids?: string[];
+                        price_cents?: number | null;
+                        /** Format: uuid */
+                        product_id: string;
+                        promotion?: {
+                            code?: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                        } | null;
+                        promotion_price_cents?: number | null;
+                        /** @enum {string} */
+                        status: "available" | "sold_out" | "members_only" | "unavailable";
+                        title?: string | null;
+                    } | null;
                 };
             }[];
             next_cursor: string | null;
@@ -14135,7 +15074,7 @@ export interface components {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -14368,6 +15307,44 @@ export interface components {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     }[];
                     next_cursor: string | null;
@@ -14675,7 +15652,7 @@ export interface components {
                         /** Format: uuid */
                         attachment_id?: string | null;
                         /** @enum {string|null} */
-                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                         /** @enum {string} */
                         audience: "club_channel" | "followers" | "public";
                         /** CommunityAuthor */
@@ -14908,6 +15885,44 @@ export interface components {
                         /** @enum {string} */
                         origin: "club" | "profile";
                         pinned: boolean;
+                        /**
+                         * ShopProductCard
+                         * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                         */
+                        product?: {
+                            /** @enum {string|null} */
+                            availability?: "in_stock" | "low" | null;
+                            /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                            buy_link?: {
+                                params?: {
+                                    promotion_code?: string;
+                                    source?: string;
+                                    /** Format: uuid */
+                                    source_ref_id?: string;
+                                };
+                                path?: string;
+                                /** Format: uuid */
+                                product_id?: string;
+                                url?: string;
+                            } | null;
+                            currency?: string | null;
+                            max_price_cents?: number | null;
+                            media_ids?: string[];
+                            price_cents?: number | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            promotion?: {
+                                code?: string;
+                                discount_cents?: number | null;
+                                discount_percent?: number | null;
+                                /** Format: date-time */
+                                ends_at?: string | null;
+                            } | null;
+                            promotion_price_cents?: number | null;
+                            /** @enum {string} */
+                            status: "available" | "sold_out" | "members_only" | "unavailable";
+                            title?: string | null;
+                        } | null;
                     };
                 }[];
                 next_cursor: string | null;
@@ -16367,7 +17382,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -16399,7 +17414,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -16469,7 +17484,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -16501,7 +17516,7 @@ export interface components {
                     /** @description A tiny blurred WebP data URI to show while the image loads */
                     placeholder?: string | null;
                     /** @enum {string} */
-                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                    purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                     rejection_reason?: string | null;
                     /**
                      * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -20199,7 +21214,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -20432,6 +21447,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
             posts: {
                 /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
@@ -20441,7 +21494,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -20674,6 +21727,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
         };
         /** CommunityGroup */
@@ -21183,7 +22274,7 @@ export interface components {
             /** Format: uuid */
             attachment_id?: string | null;
             /** @enum {string|null} */
-            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
             /** @enum {string} */
             audience: "club_channel" | "followers" | "public";
             /** CommunityAuthor */
@@ -21416,6 +22507,44 @@ export interface components {
             /** @enum {string} */
             origin: "club" | "profile";
             pinned: boolean;
+            /**
+             * ShopProductCard
+             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+             */
+            product?: {
+                /** @enum {string|null} */
+                availability?: "in_stock" | "low" | null;
+                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                buy_link?: {
+                    params?: {
+                        promotion_code?: string;
+                        source?: string;
+                        /** Format: uuid */
+                        source_ref_id?: string;
+                    };
+                    path?: string;
+                    /** Format: uuid */
+                    product_id?: string;
+                    url?: string;
+                } | null;
+                currency?: string | null;
+                max_price_cents?: number | null;
+                media_ids?: string[];
+                price_cents?: number | null;
+                /** Format: uuid */
+                product_id: string;
+                promotion?: {
+                    code?: string;
+                    discount_cents?: number | null;
+                    discount_percent?: number | null;
+                    /** Format: date-time */
+                    ends_at?: string | null;
+                } | null;
+                promotion_price_cents?: number | null;
+                /** @enum {string} */
+                status: "available" | "sold_out" | "members_only" | "unavailable";
+                title?: string | null;
+            } | null;
         };
         /** CommunityPostCreateRequest */
         CommunityPostCreateRequest: {
@@ -21630,7 +22759,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -21863,6 +22992,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             };
         };
         /** CommunityReportActionRequest */
@@ -24954,7 +26121,7 @@ export interface components {
             /** @description A tiny blurred WebP data URI to show while the image loads */
             placeholder?: string | null;
             /** @enum {string} */
-            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
             rejection_reason?: string | null;
             /**
              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -24998,7 +26165,7 @@ export interface components {
                 /** @description A tiny blurred WebP data URI to show while the image loads */
                 placeholder?: string | null;
                 /** @enum {string} */
-                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                 rejection_reason?: string | null;
                 /**
                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -27368,7 +28535,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -27601,6 +28768,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
         };
         /** PersonProfile */
@@ -28536,7 +29741,7 @@ export interface components {
                 /** Format: uuid */
                 attachment_id?: string | null;
                 /** @enum {string|null} */
-                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                 /** @enum {string} */
                 audience: "club_channel" | "followers" | "public";
                 /** CommunityAuthor */
@@ -28769,6 +29974,44 @@ export interface components {
                 /** @enum {string} */
                 origin: "club" | "profile";
                 pinned: boolean;
+                /**
+                 * ShopProductCard
+                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                 */
+                product?: {
+                    /** @enum {string|null} */
+                    availability?: "in_stock" | "low" | null;
+                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                    buy_link?: {
+                        params?: {
+                            promotion_code?: string;
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string;
+                        };
+                        path?: string;
+                        /** Format: uuid */
+                        product_id?: string;
+                        url?: string;
+                    } | null;
+                    currency?: string | null;
+                    max_price_cents?: number | null;
+                    media_ids?: string[];
+                    price_cents?: number | null;
+                    /** Format: uuid */
+                    product_id: string;
+                    promotion?: {
+                        code?: string;
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                    } | null;
+                    promotion_price_cents?: number | null;
+                    /** @enum {string} */
+                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                    title?: string | null;
+                } | null;
             }[];
         };
         /**
@@ -29620,6 +30863,30 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** RevenueStreamTotal */
+        RevenueStreamTotal: {
+            currency: string;
+            net_cents: number;
+            paid_cents: number;
+            refunded_cents: number;
+            /** @enum {string} */
+            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+        };
+        /** RevenueStreams */
+        RevenueStreams: {
+            /** Format: date */
+            from?: string | null;
+            streams: {
+                currency: string;
+                net_cents: number;
+                paid_cents: number;
+                refunded_cents: number;
+                /** @enum {string} */
+                revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+            }[];
+            /** Format: date */
+            to?: string | null;
+        };
         /** SaveFilterRequest */
         SaveFilterRequest: {
             name: string;
@@ -29958,6 +31225,1719 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** ShopAttributionReport */
+        ShopAttributionReport: {
+            attributed: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            by_campaign: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** Format: uuid */
+                campaign_id?: string | null;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_promotion_code: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                promotion_code?: string;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_source: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+                /** @description club_post, promotion_code, desk, public_page or other */
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+            }[];
+            unattributed: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopCartBody */
+        ShopCartBody: {
+            lines: {
+                quantity: number;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            promotion_code?: string | null;
+        };
+        /** ShopCartItem */
+        ShopCartItem: {
+            quantity: number;
+            /** Format: uuid */
+            variant_id: string;
+        };
+        /** ShopCartPreview */
+        ShopCartPreview: {
+            currency?: string;
+            discount_cents?: number;
+            lines: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * ShopMemberDiscount
+             * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+             */
+            member_discount?: {
+                /** @enum {string} */
+                applies_to?: "marked_products";
+                percent: number;
+                /** @enum {string} */
+                source?: "membership_package";
+            } | null;
+            /**
+             * ShopOnlinePayment
+             * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+             */
+            online_payment: {
+                available: boolean;
+                provider?: string;
+                /** @description e.g. no_provider */
+                reason?: string | null;
+            };
+            payment_modes: ("at_pickup" | "on_account" | "online")[];
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            pickup_location_ids?: string[];
+            /** @description The promotion code that applied (never stacked with the member discount) */
+            promotion_code?: {
+                applied?: boolean;
+                code?: string;
+                /** Format: uuid */
+                id?: string;
+            } | null;
+            /** Format: uuid */
+            promotion_code_id?: string | null;
+            subtotal_cents?: number;
+            total_cents: number;
+        };
+        /** ShopChannelsReport */
+        ShopChannelsReport: {
+            by_channel: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /**
+                 * @description online = online order for pickup; pos = desk
+                 * @enum {string}
+                 */
+                channel?: "online" | "pos";
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_location: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopCheckoutBody */
+        ShopCheckoutBody: {
+            idempotency_key: string;
+            lines: {
+                quantity: number;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            note?: string | null;
+            /** @enum {string} */
+            payment_mode?: "at_pickup" | "on_account" | "online";
+            payment_token?: string | null;
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            promotion_code?: string | null;
+            /** @enum {string} */
+            source?: "direct" | "club_post" | "promotion_code" | "desk" | "public_page" | "other";
+            /** Format: uuid */
+            source_ref_id?: string | null;
+        };
+        /** ShopDeskSaleBody */
+        ShopDeskSaleBody: {
+            customer_name?: string | null;
+            idempotency_key: string;
+            lines: {
+                quantity: number;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            /** @enum {string} */
+            payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+            promotion_code?: string | null;
+            /** Format: uuid */
+            source_ref_id?: string | null;
+            /** Format: uuid */
+            user_id?: string | null;
+        };
+        /** ShopFiscalReceiptBody */
+        ShopFiscalReceiptBody: {
+            fiscal_receipt_ref: string | null;
+        };
+        /** ShopInventoryReport */
+        ShopInventoryReport: {
+            items: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock?: boolean;
+                low_stock_threshold?: number | null;
+                on_hand?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                stock_value_cents?: number | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            low_stock: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock?: boolean;
+                low_stock_threshold?: number | null;
+                on_hand?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                stock_value_cents?: number | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            totals: {
+                low_stock_count?: number;
+                on_hand?: number;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                /** @description Integer minor units (cents) */
+                stock_value_cents?: number;
+                uncosted_variants?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopLedgerMovement */
+        ShopLedgerMovement: {
+            actor_name?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            /** Format: date-time */
+            occurred_at?: string | null;
+            /** Format: uuid */
+            order_id?: string | null;
+            /** Format: uuid */
+            order_line_id?: string | null;
+            order_number?: number | null;
+            /** Format: uuid */
+            product_id?: string | null;
+            product_title?: string | null;
+            quantity: number;
+            reason?: string | null;
+            sku?: string | null;
+            /** Format: uuid */
+            transfer_id?: string | null;
+            unit_cost_cents?: number | null;
+            /** Format: uuid */
+            user_id?: string | null;
+            /** Format: uuid */
+            variant_id: string;
+            variant_title?: string | null;
+        };
+        /** ShopLedgerPage */
+        ShopLedgerPage: {
+            movements: {
+                actor_name?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                /** Format: uuid */
+                location_id?: string | null;
+                note?: string | null;
+                /** Format: date-time */
+                occurred_at?: string | null;
+                /** Format: uuid */
+                order_id?: string | null;
+                /** Format: uuid */
+                order_line_id?: string | null;
+                order_number?: number | null;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_title?: string | null;
+                quantity: number;
+                reason?: string | null;
+                sku?: string | null;
+                /** Format: uuid */
+                transfer_id?: string | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                user_id?: string | null;
+                /** Format: uuid */
+                variant_id: string;
+                variant_title?: string | null;
+            }[];
+            next_cursor?: string | null;
+        };
+        /** ShopMarginReport */
+        ShopMarginReport: {
+            products: {
+                /** @description Integer minor units (cents) */
+                cost_cents?: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                costed_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                uncosted_revenue_cents?: number;
+            }[];
+            totals: {
+                /** @description Integer minor units (cents) */
+                cost_cents?: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                costed_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                uncosted_revenue_cents?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /**
+         * ShopMemberDiscount
+         * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+         */
+        ShopMemberDiscount: {
+            /** @enum {string} */
+            applies_to?: "marked_products";
+            percent: number;
+            /** @enum {string} */
+            source?: "membership_package";
+        } | null;
+        /** ShopMemberProduct */
+        ShopMemberProduct: {
+            all_locations?: boolean;
+            category?: string | null;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            location_ids?: string[];
+            media?: {
+                alt_text?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                thumb_url?: string | null;
+                url?: string | null;
+                width?: number | null;
+            }[];
+            media_ids?: string[];
+            options?: {
+                [key: string]: unknown;
+            };
+            per_person_limit?: number | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            title: string;
+            variants: {
+                /** @enum {string} */
+                available: "in_stock" | "low" | "sold_out";
+                compare_at_price_cents?: number | null;
+                currency: string;
+                /** Format: uuid */
+                id: string;
+                option_values?: {
+                    [key: string]: string;
+                };
+                price_cents: number;
+                /** Format: uuid */
+                product_id?: string;
+                sku?: string | null;
+                title?: string | null;
+            }[];
+            /** @enum {string} */
+            visibility?: "members_only" | "anyone";
+        };
+        /** ShopMemberVariant */
+        ShopMemberVariant: {
+            /** @enum {string} */
+            available: "in_stock" | "low" | "sold_out";
+            compare_at_price_cents?: number | null;
+            currency: string;
+            /** Format: uuid */
+            id: string;
+            option_values?: {
+                [key: string]: string;
+            };
+            price_cents: number;
+            /** Format: uuid */
+            product_id?: string;
+            sku?: string | null;
+            title?: string | null;
+        };
+        /**
+         * ShopNewPromotionCode
+         * @description A code of the promoted product: a percent off, or an amount off each unit
+         */
+        ShopNewPromotionCode: {
+            /** @description Letters, digits, - or _ (stored upper case) */
+            code: string;
+            /** @description Off each unit */
+            discount_cents?: number | null;
+            discount_percent?: number | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            max_redemptions?: number | null;
+            /** Format: date-time */
+            starts_at?: string | null;
+        } | null;
+        /**
+         * ShopOnlinePayment
+         * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+         */
+        ShopOnlinePayment: {
+            available: boolean;
+            provider?: string;
+            /** @description e.g. no_provider */
+            reason?: string | null;
+        };
+        /** ShopOptionAxis */
+        ShopOptionAxis: {
+            name: string;
+            values: string[];
+        };
+        /** ShopOrder */
+        ShopOrder: {
+            cancel_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @enum {string} */
+            channel: "online" | "pos";
+            currency?: string;
+            customer_name?: string | null;
+            discount_cents?: number;
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            fiscal_receipt_ref?: string | null;
+            /** Format: uuid */
+            id: string;
+            lines: {
+                discount_cents?: number;
+                /** Format: uuid */
+                finance_invoice_line_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** Format: uuid */
+                product_id?: string;
+                product_title: string;
+                quantity: number;
+                refunded_cents?: number;
+                refunded_quantity?: number;
+                sku?: string | null;
+                total_cents: number;
+                unit_price_cents?: number;
+                /** Format: uuid */
+                variant_id: string;
+                variant_title?: string | null;
+            }[];
+            number: number;
+            /** Format: date-time */
+            paid_at?: string | null;
+            paid_cents?: number;
+            payment_mode?: string;
+            /** @enum {string} */
+            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+            /** Format: date-time */
+            picked_up_at?: string | null;
+            /** @description The short code the buyer shows at the desk */
+            pickup_code?: string | null;
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            /** Format: date-time */
+            placed_at?: string | null;
+            promotion_code?: string | null;
+            /** Format: date-time */
+            ready_at?: string | null;
+            refunded_cents?: number;
+            /** @enum {string} */
+            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+            source?: string;
+            /** Format: uuid */
+            source_ref_id?: string | null;
+            /** @enum {string} */
+            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+            /** @enum {string} */
+            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+            subtotal_cents?: number;
+            total_cents: number;
+            /** Format: uuid */
+            user_id?: string | null;
+        };
+        /** ShopOrderCancelBody */
+        ShopOrderCancelBody: {
+            reason?: string | null;
+        };
+        /** ShopOrderLine */
+        ShopOrderLine: {
+            discount_cents?: number;
+            /** Format: uuid */
+            finance_invoice_line_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            /** Format: uuid */
+            product_id?: string;
+            product_title: string;
+            quantity: number;
+            refunded_cents?: number;
+            refunded_quantity?: number;
+            sku?: string | null;
+            total_cents: number;
+            unit_price_cents?: number;
+            /** Format: uuid */
+            variant_id: string;
+            variant_title?: string | null;
+        };
+        /**
+         * ShopOrderLineage
+         * @description Every Finance row of an order: invoice lines (source shop_order_line), the payment and refunds (source shop_order), and the stock movements.
+         */
+        ShopOrderLineage: {
+            invoice_lines: {
+                [key: string]: unknown;
+            }[];
+            movements: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                /** Format: uuid */
+                location_id?: string | null;
+                note?: string | null;
+                /** Format: date-time */
+                occurred_at?: string | null;
+                /** Format: uuid */
+                order_id?: string | null;
+                /** Format: uuid */
+                order_line_id?: string | null;
+                quantity: number;
+                reason?: string | null;
+                /** Format: uuid */
+                transfer_id?: string | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                user_id?: string | null;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            /** ShopOrder */
+            order: {
+                cancel_reason?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @enum {string} */
+                channel: "online" | "pos";
+                currency?: string;
+                customer_name?: string | null;
+                discount_cents?: number;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                fiscal_receipt_ref?: string | null;
+                /** Format: uuid */
+                id: string;
+                lines: {
+                    discount_cents?: number;
+                    /** Format: uuid */
+                    finance_invoice_line_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    product_id?: string;
+                    product_title: string;
+                    quantity: number;
+                    refunded_cents?: number;
+                    refunded_quantity?: number;
+                    sku?: string | null;
+                    total_cents: number;
+                    unit_price_cents?: number;
+                    /** Format: uuid */
+                    variant_id: string;
+                    variant_title?: string | null;
+                }[];
+                number: number;
+                /** Format: date-time */
+                paid_at?: string | null;
+                paid_cents?: number;
+                payment_mode?: string;
+                /** @enum {string} */
+                payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                /** Format: date-time */
+                picked_up_at?: string | null;
+                /** @description The short code the buyer shows at the desk */
+                pickup_code?: string | null;
+                /** Format: uuid */
+                pickup_location_id?: string | null;
+                /** Format: date-time */
+                placed_at?: string | null;
+                promotion_code?: string | null;
+                /** Format: date-time */
+                ready_at?: string | null;
+                refunded_cents?: number;
+                /** @enum {string} */
+                revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+                /** @enum {string} */
+                state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                /** @enum {string} */
+                status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                subtotal_cents?: number;
+                total_cents: number;
+                /** Format: uuid */
+                user_id?: string | null;
+            };
+            payments: {
+                [key: string]: unknown;
+            }[];
+            reversals: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** ShopOrderList */
+        ShopOrderList: {
+            /** @description Orders per status, within the branch, buyer and paid filters */
+            counts: {
+                cancelled: number;
+                picked_up: number;
+                placed: number;
+                ready_for_pickup: number;
+            };
+            orders: {
+                cancel_reason?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @enum {string} */
+                channel: "online" | "pos";
+                currency?: string;
+                customer_name?: string | null;
+                discount_cents?: number;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                fiscal_receipt_ref?: string | null;
+                /** Format: uuid */
+                id: string;
+                lines: {
+                    discount_cents?: number;
+                    /** Format: uuid */
+                    finance_invoice_line_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    product_id?: string;
+                    product_title: string;
+                    quantity: number;
+                    refunded_cents?: number;
+                    refunded_quantity?: number;
+                    sku?: string | null;
+                    total_cents: number;
+                    unit_price_cents?: number;
+                    /** Format: uuid */
+                    variant_id: string;
+                    variant_title?: string | null;
+                }[];
+                number: number;
+                /** Format: date-time */
+                paid_at?: string | null;
+                paid_cents?: number;
+                payment_mode?: string;
+                /** @enum {string} */
+                payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                /** Format: date-time */
+                picked_up_at?: string | null;
+                /** @description The short code the buyer shows at the desk */
+                pickup_code?: string | null;
+                /** Format: uuid */
+                pickup_location_id?: string | null;
+                /** Format: date-time */
+                placed_at?: string | null;
+                promotion_code?: string | null;
+                /** Format: date-time */
+                ready_at?: string | null;
+                refunded_cents?: number;
+                /** @enum {string} */
+                revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+                /** @enum {string} */
+                state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                /** @enum {string} */
+                status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                subtotal_cents?: number;
+                total_cents: number;
+                /** Format: uuid */
+                user_id?: string | null;
+            }[];
+        };
+        /** ShopOrderPaymentBody */
+        ShopOrderPaymentBody: {
+            /** @enum {string} */
+            payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+        };
+        /** ShopOrderPickupBody */
+        ShopOrderPickupBody: {
+            /** @enum {string} */
+            payment_method?: "cash" | "card_manual" | "bank_transfer" | "other";
+        };
+        /** ShopPayBody */
+        ShopPayBody: {
+            payment_token: string;
+        };
+        /** ShopPaymentMethod */
+        ShopPaymentMethod: {
+            available: boolean;
+            /** @enum {string} */
+            channel: "pos" | "online";
+            /** @description cash, card_manual (card at the terminal), bank_transfer, other, card_online */
+            id: string;
+            provider?: string | null;
+            reason?: string | null;
+        };
+        /** ShopPricingIndicators */
+        ShopPricingIndicators: {
+            categories: {
+                category?: string;
+                items?: number;
+                /** @description Integer minor units (cents) */
+                max_cents?: number;
+                /** @description Integer minor units (cents) */
+                median_cents?: number;
+                median_velocity_per_week?: number | null;
+                /** @description Integer minor units (cents) */
+                min_cents?: number;
+                /** @description Integer minor units (cents) */
+                p25_cents?: number;
+                /** @description Integer minor units (cents) */
+                p75_cents?: number;
+                target_margin_bp?: number;
+            }[];
+            variants: ({
+                band?: {
+                    [key: string]: unknown;
+                } | null;
+                category?: string;
+                cost_cents?: number | null;
+                days_of_stock_left?: number | null;
+                discount?: {
+                    [key: string]: unknown;
+                };
+                elasticity?: {
+                    [key: string]: unknown;
+                };
+                margin_percent?: number | null;
+                markup_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                price_cents?: number;
+                price_changes?: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                product_id?: string | null;
+                sell_through_percent?: number | null;
+                suggested_price?: {
+                    advisory?: boolean;
+                    explanation?: string[];
+                    high_cents?: number | null;
+                    inputs?: {
+                        [key: string]: unknown;
+                    };
+                    low_cents?: number | null;
+                } & {
+                    [key: string]: unknown;
+                };
+                /** Format: uuid */
+                variant_id?: string | null;
+                velocity_per_week?: number | null;
+            } & {
+                [key: string]: unknown;
+            })[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+            window_days: number;
+        };
+        /** ShopPricingTargetRequest */
+        ShopPricingTargetRequest: {
+            category?: string | null;
+            target_margin_bp?: number | null;
+            /** @description Alternative to basis points, e.g. "37.5" */
+            target_margin_percent?: string | null;
+        };
+        /** ShopPricingTargets */
+        ShopPricingTargets: {
+            targets: {
+                /** @description null = box-wide default */
+                category?: string | null;
+                /** @description The built-in default, not yet set */
+                implicit?: boolean;
+                target_margin_bp?: number;
+            }[];
+        };
+        /** ShopProduct */
+        ShopProduct: {
+            all_locations?: boolean;
+            /** Format: date-time */
+            archived_at?: string | null;
+            category?: string | null;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            location_ids?: string[];
+            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+            media?: {
+                alt_text?: string | null;
+                full_url?: string | null;
+                height?: number | null;
+                /** Format: uuid */
+                id: string;
+                thumb_url?: string | null;
+                url?: string | null;
+                width?: number | null;
+            }[];
+            media_ids?: string[];
+            member_discount_applies?: boolean;
+            options?: {
+                axes?: {
+                    name: string;
+                    values: string[];
+                }[];
+            };
+            per_person_limit?: number | null;
+            position?: number;
+            /** Format: date-time */
+            published_at?: string | null;
+            sell_at_desk?: boolean;
+            sell_in_app?: boolean;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            title: string;
+            variants: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                barcode?: string | null;
+                compare_at_price_cents?: number | null;
+                cost_price_cents?: number | null;
+                currency: string;
+                /** Format: uuid */
+                id: string;
+                low_stock_threshold?: number | null;
+                option_values?: {
+                    [key: string]: string;
+                };
+                position?: number;
+                price_cents: number;
+                /** Format: uuid */
+                product_id: string;
+                sku?: string | null;
+                /** ShopVariantStock */
+                stock?: {
+                    available: number;
+                    by_location?: {
+                        available?: number;
+                        /** Format: uuid */
+                        location_id?: string | null;
+                        on_hand?: number;
+                        reserved?: number;
+                    }[];
+                    on_hand: number;
+                    reserved: number;
+                };
+                /** @enum {string} */
+                stock_status: "ok" | "low" | "critical" | "out";
+                tax_class?: string | null;
+                title?: string | null;
+                track_inventory?: boolean;
+            }[];
+            /** @enum {string} */
+            visibility: "members_only" | "anyone";
+        };
+        /** ShopProductBody */
+        ShopProductBody: {
+            all_locations?: boolean;
+            category?: string | null;
+            description?: string | null;
+            location_ids?: string[];
+            media_ids?: string[];
+            member_discount_applies?: boolean;
+            options?: {
+                name: string;
+                values: string[];
+            }[];
+            per_person_limit?: number | null;
+            position?: number;
+            price_cents?: number;
+            sell_at_desk?: boolean;
+            sell_in_app?: boolean;
+            /**
+             * @description Created as a draft unless given; published runs the publish checks in the same transaction
+             * @enum {string}
+             */
+            status?: "draft" | "published" | "archived";
+            title: string;
+            variants?: {
+                barcode?: string | null;
+                compare_at_price_cents?: number | null;
+                cost_price_cents?: number | null;
+                currency?: string;
+                initial_quantity?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock_threshold?: number | null;
+                option_values?: {
+                    [key: string]: string;
+                };
+                position?: number;
+                price_cents: number;
+                sku?: string | null;
+                /** @enum {string|null} */
+                tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                title?: string | null;
+                track_inventory?: boolean;
+            }[];
+            /** @enum {string} */
+            visibility?: "members_only" | "anyone";
+        };
+        /**
+         * ShopProductCard
+         * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+         */
+        ShopProductCard: {
+            /** @enum {string|null} */
+            availability?: "in_stock" | "low" | null;
+            /** @description The in-app product route; an order placed from it sends these params as its attribution */
+            buy_link?: {
+                params?: {
+                    promotion_code?: string;
+                    source?: string;
+                    /** Format: uuid */
+                    source_ref_id?: string;
+                };
+                path?: string;
+                /** Format: uuid */
+                product_id?: string;
+                url?: string;
+            } | null;
+            currency?: string | null;
+            max_price_cents?: number | null;
+            media_ids?: string[];
+            price_cents?: number | null;
+            /** Format: uuid */
+            product_id: string;
+            promotion?: {
+                code?: string;
+                discount_cents?: number | null;
+                discount_percent?: number | null;
+                /** Format: date-time */
+                ends_at?: string | null;
+            } | null;
+            promotion_price_cents?: number | null;
+            /** @enum {string} */
+            status: "available" | "sold_out" | "members_only" | "unavailable";
+            title?: string | null;
+        } | null;
+        /** ShopProductList */
+        ShopProductList: {
+            /** @description Products per filter, within the branch and search filters */
+            counts: {
+                all: number;
+                archived: number;
+                draft: number;
+                low_stock: number;
+                published: number;
+            };
+            products: {
+                all_locations?: boolean;
+                /** Format: date-time */
+                archived_at?: string | null;
+                category?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                location_ids?: string[];
+                /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                media?: {
+                    alt_text?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    thumb_url?: string | null;
+                    url?: string | null;
+                    width?: number | null;
+                }[];
+                media_ids?: string[];
+                member_discount_applies?: boolean;
+                options?: {
+                    axes?: {
+                        name: string;
+                        values: string[];
+                    }[];
+                };
+                per_person_limit?: number | null;
+                position?: number;
+                /** Format: date-time */
+                published_at?: string | null;
+                sell_at_desk?: boolean;
+                sell_in_app?: boolean;
+                /** @enum {string} */
+                status: "draft" | "published" | "archived";
+                title: string;
+                variants: {
+                    /** Format: date-time */
+                    archived_at?: string | null;
+                    barcode?: string | null;
+                    compare_at_price_cents?: number | null;
+                    cost_price_cents?: number | null;
+                    currency: string;
+                    /** Format: uuid */
+                    id: string;
+                    low_stock_threshold?: number | null;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    position?: number;
+                    price_cents: number;
+                    /** Format: uuid */
+                    product_id: string;
+                    sku?: string | null;
+                    /** ShopVariantStock */
+                    stock?: {
+                        available: number;
+                        by_location?: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            on_hand?: number;
+                            reserved?: number;
+                        }[];
+                        on_hand: number;
+                        reserved: number;
+                    };
+                    /** @enum {string} */
+                    stock_status: "ok" | "low" | "critical" | "out";
+                    tax_class?: string | null;
+                    title?: string | null;
+                    track_inventory?: boolean;
+                }[];
+                /** @enum {string} */
+                visibility: "members_only" | "anyone";
+            }[];
+        };
+        /** ShopProductPhoto */
+        ShopProductPhoto: {
+            alt_text?: string | null;
+            full_url?: string | null;
+            height?: number | null;
+            /** Format: uuid */
+            id: string;
+            thumb_url?: string | null;
+            url?: string | null;
+            width?: number | null;
+        };
+        /** ShopProductStatusBody */
+        ShopProductStatusBody: {
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+        };
+        /** ShopProductUpdateBody */
+        ShopProductUpdateBody: {
+            all_locations?: boolean;
+            category?: string | null;
+            description?: string | null;
+            location_ids?: string[];
+            media_ids?: string[];
+            member_discount_applies?: boolean;
+            options?: {
+                name: string;
+                values: string[];
+            }[];
+            per_person_limit?: number | null;
+            position?: number;
+            sell_at_desk?: boolean;
+            sell_in_app?: boolean;
+            /** @enum {string} */
+            status?: "draft" | "published" | "archived";
+            title?: string;
+            /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
+            variants?: {
+                barcode?: string | null;
+                compare_at_price_cents?: number | null;
+                cost_price_cents?: number | null;
+                currency?: string;
+                /** Format: uuid */
+                id?: string | null;
+                initial_quantity?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock_threshold?: number | null;
+                option_values?: {
+                    [key: string]: string;
+                };
+                position?: number;
+                price_cents?: number;
+                sku?: string | null;
+                /** @enum {string|null} */
+                tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                title?: string | null;
+                track_inventory?: boolean;
+            }[];
+            /** @enum {string} */
+            visibility?: "members_only" | "anyone";
+        };
+        /** ShopProductsReport */
+        ShopProductsReport: {
+            products_by_revenue: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            products_by_units: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            variants_by_revenue: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            variants_by_units: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopPromoteBody */
+        ShopPromoteBody: {
+            body?: string | null;
+            /** Format: uuid */
+            channel_id?: string | null;
+            /**
+             * ShopNewPromotionCode
+             * @description A code of the promoted product: a percent off, or an amount off each unit
+             */
+            promotion_code?: {
+                /** @description Letters, digits, - or _ (stored upper case) */
+                code: string;
+                /** @description Off each unit */
+                discount_cents?: number | null;
+                discount_percent?: number | null;
+                /** Format: date-time */
+                ends_at?: string | null;
+                max_redemptions?: number | null;
+                /** Format: date-time */
+                starts_at?: string | null;
+            } | null;
+            /**
+             * Format: uuid
+             * @description An existing code of this product
+             */
+            promotion_code_id?: string | null;
+            /**
+             * @description announcements (club #ανακοινώσεις, default), channel (a member group or PT squad: channel_id) or feed (public: box page and followers)
+             * @enum {string}
+             */
+            target?: "announcements" | "channel" | "feed";
+        };
+        /** ShopPromotionCode */
+        ShopPromotionCode: {
+            active: boolean;
+            code: string;
+            discount_cents?: number | null;
+            discount_percent?: number | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string | null;
+            max_redemptions?: number | null;
+            /** Format: uuid */
+            post_id?: string | null;
+            /** Format: uuid */
+            product_id: string;
+            /** @description Orders (not cancelled) that used it */
+            redemptions: number;
+            /** Format: date-time */
+            starts_at?: string | null;
+            /** @enum {string} */
+            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+        } | null;
+        /** ShopPromotionCodeUpdateBody */
+        ShopPromotionCodeUpdateBody: {
+            active?: boolean;
+            /** @description Off each unit */
+            discount_cents?: number | null;
+            discount_percent?: number | null;
+            /** Format: date-time */
+            ends_at?: string | null;
+            max_redemptions?: number | null;
+            /** Format: date-time */
+            starts_at?: string | null;
+        };
+        /** ShopRefundBody */
+        ShopRefundBody: {
+            idempotency_key: string;
+            lines: {
+                /** Format: uuid */
+                order_line_id: string;
+                quantity: number;
+                restock?: boolean;
+            }[];
+            reason?: string | null;
+        };
+        /** ShopReportOverview */
+        ShopReportOverview: {
+            kpis: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                low_stock_count?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                refund_rate_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+                sell_through_percent?: number | null;
+                stock_on_hand?: number;
+                /** @description Integer minor units (cents) */
+                stock_value_cents?: number;
+                units_per_order?: number | null;
+                units_sold?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopRevenueReconciliation */
+        ShopRevenueReconciliation: {
+            days: {
+                currency?: string;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                drift_cents?: number;
+                /** @description Integer minor units (cents) */
+                invoice_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                lines_vs_payments_cents?: number;
+                ok?: boolean;
+                /** @description Integer minor units (cents) */
+                orders_cents?: number;
+                /** @description Integer minor units (cents) */
+                orders_vs_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                payments_cents?: number;
+            }[];
+            /** @description Integer minor units (cents) */
+            drift_cents: number;
+            drifted: {
+                currency?: string;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                drift_cents?: number;
+                /** @description Integer minor units (cents) */
+                invoice_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                lines_vs_payments_cents?: number;
+                ok?: boolean;
+                /** @description Integer minor units (cents) */
+                orders_cents?: number;
+                /** @description Integer minor units (cents) */
+                orders_vs_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                payments_cents?: number;
+            }[];
+            /** Format: date */
+            from?: string;
+            ok: boolean;
+            time_zone?: string;
+            /** Format: date */
+            to?: string;
+        };
+        /** ShopSalesReport */
+        ShopSalesReport: {
+            series: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            totals: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopStockAlert */
+        ShopStockAlert: {
+            available?: boolean | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: date-time */
+            inserted_at?: string | null;
+            /** Format: date-time */
+            notified_at?: string | null;
+            /** Format: uuid */
+            product_id?: string | null;
+            /** Format: uuid */
+            variant_id: string;
+        };
+        /** ShopStockMovement */
+        ShopStockMovement: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            /** Format: date-time */
+            occurred_at?: string | null;
+            /** Format: uuid */
+            order_id?: string | null;
+            /** Format: uuid */
+            order_line_id?: string | null;
+            quantity: number;
+            reason?: string | null;
+            /** Format: uuid */
+            transfer_id?: string | null;
+            unit_cost_cents?: number | null;
+            /** Format: uuid */
+            user_id?: string | null;
+            /** Format: uuid */
+            variant_id: string;
+        };
+        /** ShopStockMovementBody */
+        ShopStockMovementBody: {
+            counted?: number;
+            /** @enum {string} */
+            kind: "receive" | "adjustment" | "recount" | "transfer";
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            quantity?: number;
+            /** @enum {string} */
+            reason?: "recount" | "damage" | "loss" | "return" | "other";
+            /** Format: uuid */
+            to_location_id?: string | null;
+            unit_cost_cents?: number | null;
+        };
+        /** ShopStorefront */
+        ShopStorefront: {
+            categories?: string[];
+            /** @enum {string|null} */
+            closed_reason?: "no_products" | "business_not_activated" | null;
+            /**
+             * ShopMemberDiscount
+             * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+             */
+            member_discount?: {
+                /** @enum {string} */
+                applies_to?: "marked_products";
+                percent: number;
+                /** @enum {string} */
+                source?: "membership_package";
+            } | null;
+            /**
+             * ShopOnlinePayment
+             * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+             */
+            online_payment: {
+                available: boolean;
+                provider?: string;
+                /** @description e.g. no_provider */
+                reason?: string | null;
+            };
+            open: boolean;
+            pickup_locations: {
+                address?: string | null;
+                /** Format: uuid */
+                id: string;
+                name?: string | null;
+            }[];
+            products: {
+                all_locations?: boolean;
+                category?: string | null;
+                description?: string | null;
+                /** Format: uuid */
+                id: string;
+                location_ids?: string[];
+                media?: {
+                    alt_text?: string | null;
+                    full_url?: string | null;
+                    height?: number | null;
+                    /** Format: uuid */
+                    id: string;
+                    thumb_url?: string | null;
+                    url?: string | null;
+                    width?: number | null;
+                }[];
+                media_ids?: string[];
+                options?: {
+                    [key: string]: unknown;
+                };
+                per_person_limit?: number | null;
+                /** Format: date-time */
+                published_at?: string | null;
+                title: string;
+                variants: {
+                    /** @enum {string} */
+                    available: "in_stock" | "low" | "sold_out";
+                    compare_at_price_cents?: number | null;
+                    currency: string;
+                    /** Format: uuid */
+                    id: string;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    price_cents: number;
+                    /** Format: uuid */
+                    product_id?: string;
+                    sku?: string | null;
+                    title?: string | null;
+                }[];
+                /** @enum {string} */
+                visibility?: "members_only" | "anyone";
+            }[];
+        };
+        /** ShopTransaction */
+        ShopTransaction: {
+            channel?: string;
+            currency?: string;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            fiscal_receipt_ref?: string | null;
+            invoice_number?: string | null;
+            invoice_status?: string | null;
+            /** @enum {string} */
+            kind: "shop_order";
+            lines?: {
+                [key: string]: unknown;
+            }[];
+            /** Format: uuid */
+            order_id: string;
+            order_number?: number;
+            paid_cents?: number;
+            payments?: {
+                [key: string]: unknown;
+            }[];
+            /** Format: date-time */
+            placed_at?: string | null;
+            refunded_cents?: number;
+            refunds?: {
+                [key: string]: unknown;
+            }[];
+            /** @enum {string} */
+            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+            /** @enum {string} */
+            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+            total_cents: number;
+        };
+        /** ShopVariant */
+        ShopVariant: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            barcode?: string | null;
+            compare_at_price_cents?: number | null;
+            cost_price_cents?: number | null;
+            currency: string;
+            /** Format: uuid */
+            id: string;
+            low_stock_threshold?: number | null;
+            option_values?: {
+                [key: string]: string;
+            };
+            position?: number;
+            price_cents: number;
+            /** Format: uuid */
+            product_id: string;
+            sku?: string | null;
+            /** ShopVariantStock */
+            stock?: {
+                available: number;
+                by_location?: {
+                    available?: number;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    on_hand?: number;
+                    reserved?: number;
+                }[];
+                on_hand: number;
+                reserved: number;
+            };
+            /** @enum {string} */
+            stock_status: "ok" | "low" | "critical" | "out";
+            tax_class?: string | null;
+            title?: string | null;
+            track_inventory?: boolean;
+        };
+        /** ShopVariantBody */
+        ShopVariantBody: {
+            barcode?: string | null;
+            compare_at_price_cents?: number | null;
+            cost_price_cents?: number | null;
+            currency?: string;
+            low_stock_threshold?: number | null;
+            option_values?: {
+                [key: string]: string;
+            };
+            position?: number;
+            price_cents?: number;
+            sku?: string | null;
+            /** @enum {string|null} */
+            tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+            title?: string | null;
+            track_inventory?: boolean;
+        };
+        /** ShopVariantStock */
+        ShopVariantStock: {
+            available: number;
+            by_location?: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                on_hand?: number;
+                reserved?: number;
+            }[];
+            on_hand: number;
+            reserved: number;
         };
         /** SocialSummary */
         SocialSummary: {
@@ -34391,7 +37371,7 @@ export interface operations {
                                         /** Format: uuid */
                                         attachment_id?: string | null;
                                         /** @enum {string|null} */
-                                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                        attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                                         /** @enum {string} */
                                         audience: "club_channel" | "followers" | "public";
                                         /** CommunityAuthor */
@@ -34624,6 +37604,44 @@ export interface operations {
                                         /** @enum {string} */
                                         origin: "club" | "profile";
                                         pinned: boolean;
+                                        /**
+                                         * ShopProductCard
+                                         * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                                         */
+                                        product?: {
+                                            /** @enum {string|null} */
+                                            availability?: "in_stock" | "low" | null;
+                                            /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                            buy_link?: {
+                                                params?: {
+                                                    promotion_code?: string;
+                                                    source?: string;
+                                                    /** Format: uuid */
+                                                    source_ref_id?: string;
+                                                };
+                                                path?: string;
+                                                /** Format: uuid */
+                                                product_id?: string;
+                                                url?: string;
+                                            } | null;
+                                            currency?: string | null;
+                                            max_price_cents?: number | null;
+                                            media_ids?: string[];
+                                            price_cents?: number | null;
+                                            /** Format: uuid */
+                                            product_id: string;
+                                            promotion?: {
+                                                code?: string;
+                                                discount_cents?: number | null;
+                                                discount_percent?: number | null;
+                                                /** Format: date-time */
+                                                ends_at?: string | null;
+                                            } | null;
+                                            promotion_price_cents?: number | null;
+                                            /** @enum {string} */
+                                            status: "available" | "sold_out" | "members_only" | "unavailable";
+                                            title?: string | null;
+                                        } | null;
                                     };
                                 }[];
                                 next_cursor: string | null;
@@ -34976,7 +37994,7 @@ export interface operations {
                                 /** Format: uuid */
                                 attachment_id?: string | null;
                                 /** @enum {string|null} */
-                                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                                attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                                 /** @enum {string} */
                                 audience: "club_channel" | "followers" | "public";
                                 /** CommunityAuthor */
@@ -35209,6 +38227,44 @@ export interface operations {
                                 /** @enum {string} */
                                 origin: "club" | "profile";
                                 pinned: boolean;
+                                /**
+                                 * ShopProductCard
+                                 * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                                 */
+                                product?: {
+                                    /** @enum {string|null} */
+                                    availability?: "in_stock" | "low" | null;
+                                    /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                    buy_link?: {
+                                        params?: {
+                                            promotion_code?: string;
+                                            source?: string;
+                                            /** Format: uuid */
+                                            source_ref_id?: string;
+                                        };
+                                        path?: string;
+                                        /** Format: uuid */
+                                        product_id?: string;
+                                        url?: string;
+                                    } | null;
+                                    currency?: string | null;
+                                    max_price_cents?: number | null;
+                                    media_ids?: string[];
+                                    price_cents?: number | null;
+                                    /** Format: uuid */
+                                    product_id: string;
+                                    promotion?: {
+                                        code?: string;
+                                        discount_cents?: number | null;
+                                        discount_percent?: number | null;
+                                        /** Format: date-time */
+                                        ends_at?: string | null;
+                                    } | null;
+                                    promotion_price_cents?: number | null;
+                                    /** @enum {string} */
+                                    status: "available" | "sold_out" | "members_only" | "unavailable";
+                                    title?: string | null;
+                                } | null;
                             };
                         })[];
                         /** @enum {string} */
@@ -36742,7 +39798,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -36975,6 +40031,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                     };
                 };
@@ -37070,6 +40164,73 @@ export interface operations {
                                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
                             } | null;
                         } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.public_products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        }[];
                     };
                 };
             };
@@ -39805,7 +42966,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -40038,6 +43199,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -42798,7 +45997,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43031,6 +46230,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -43188,7 +46425,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43421,6 +46658,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -43463,7 +46738,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43696,6 +46971,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -43738,7 +47051,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -43971,6 +47284,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -46804,7 +50155,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -47037,6 +50388,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                         posts: {
                             /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
@@ -47046,7 +50435,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -47279,6 +50668,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                     };
                 };
@@ -48836,7 +52263,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -48915,7 +52342,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -48998,7 +52425,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -65969,7 +69396,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66001,7 +69428,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66097,7 +69524,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66129,7 +69556,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66247,7 +69674,7 @@ export interface operations {
                             /** @description A tiny blurred WebP data URI to show while the image loads */
                             placeholder?: string | null;
                             /** @enum {string} */
-                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                             rejection_reason?: string | null;
                             /**
                              * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66322,7 +69749,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66354,7 +69781,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66499,7 +69926,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -66531,7 +69958,7 @@ export interface operations {
                                 /** @description A tiny blurred WebP data URI to show while the image loads */
                                 placeholder?: string | null;
                                 /** @enum {string} */
-                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video";
+                                purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
                                 rejection_reason?: string | null;
                                 /**
                                  * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
@@ -69129,6 +72556,800 @@ export interface operations {
                             /** @enum {string|null} */
                             source: "confirmed" | "inferred" | null;
                             timezone: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.pricing_targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pricing targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        targets: {
+                            /** @description null = box-wide default */
+                            category?: string | null;
+                            /** @description The built-in default, not yet set */
+                            implicit?: boolean;
+                            target_margin_bp?: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.put_pricing_target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Pricing target */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    category?: string | null;
+                    target_margin_bp?: number | null;
+                    /** @description Alternative to basis points, e.g. "37.5" */
+                    target_margin_percent?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Pricing targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        targets: {
+                            /** @description null = box-wide default */
+                            category?: string | null;
+                            /** @description The built-in default, not yet set */
+                            implicit?: boolean;
+                            target_margin_bp?: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.attribution": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attribution */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attributed: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        by_campaign: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** Format: uuid */
+                            campaign_id?: string | null;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_promotion_code: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            promotion_code?: string;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_source: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                            /** @description club_post, promotion_code, desk, public_page or other */
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                        }[];
+                        unattributed: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.channels": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channels */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        by_channel: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /**
+                             * @description online = online order for pickup; pos = desk
+                             * @enum {string}
+                             */
+                            channel?: "online" | "pos";
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_location: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.inventory": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            low_stock?: boolean;
+                            low_stock_threshold?: number | null;
+                            on_hand?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            stock_value_cents?: number | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        low_stock: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            low_stock?: boolean;
+                            low_stock_threshold?: number | null;
+                            on_hand?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            stock_value_cents?: number | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        totals: {
+                            low_stock_count?: number;
+                            on_hand?: number;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            /** @description Integer minor units (cents) */
+                            stock_value_cents?: number;
+                            uncosted_variants?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.margin": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Margin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            /** @description Integer minor units (cents) */
+                            cost_cents?: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            costed_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            uncosted_revenue_cents?: number;
+                        }[];
+                        totals: {
+                            /** @description Integer minor units (cents) */
+                            cost_cents?: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            costed_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            uncosted_revenue_cents?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.overview": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop KPIs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        kpis: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            low_stock_count?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            refund_rate_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                            sell_through_percent?: number | null;
+                            stock_on_hand?: number;
+                            /** @description Integer minor units (cents) */
+                            stock_value_cents?: number;
+                            units_per_order?: number | null;
+                            units_sold?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.pricing": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pricing indicators */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories: {
+                            category?: string;
+                            items?: number;
+                            /** @description Integer minor units (cents) */
+                            max_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            median_cents?: number;
+                            median_velocity_per_week?: number | null;
+                            /** @description Integer minor units (cents) */
+                            min_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            p25_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            p75_cents?: number;
+                            target_margin_bp?: number;
+                        }[];
+                        variants: ({
+                            band?: {
+                                [key: string]: unknown;
+                            } | null;
+                            category?: string;
+                            cost_cents?: number | null;
+                            days_of_stock_left?: number | null;
+                            discount?: {
+                                [key: string]: unknown;
+                            };
+                            elasticity?: {
+                                [key: string]: unknown;
+                            };
+                            margin_percent?: number | null;
+                            markup_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            price_cents?: number;
+                            price_changes?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            sell_through_percent?: number | null;
+                            suggested_price?: {
+                                advisory?: boolean;
+                                explanation?: string[];
+                                high_cents?: number | null;
+                                inputs?: {
+                                    [key: string]: unknown;
+                                };
+                                low_cents?: number | null;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            velocity_per_week?: number | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                        window_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.products": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+                /** @description Rows per ranking (default 10) */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Top products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products_by_revenue: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        products_by_units: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        variants_by_revenue: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        variants_by_units: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.reconciliation": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reconciliation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        days: {
+                            currency?: string;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            drift_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            invoice_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            lines_vs_payments_cents?: number;
+                            ok?: boolean;
+                            /** @description Integer minor units (cents) */
+                            orders_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            orders_vs_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            payments_cents?: number;
+                        }[];
+                        /** @description Integer minor units (cents) */
+                        drift_cents: number;
+                        drifted: {
+                            currency?: string;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            drift_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            invoice_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            lines_vs_payments_cents?: number;
+                            ok?: boolean;
+                            /** @description Integer minor units (cents) */
+                            orders_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            orders_vs_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            payments_cents?: number;
+                        }[];
+                        /** Format: date */
+                        from?: string;
+                        ok: boolean;
+                        time_zone?: string;
+                        /** Format: date */
+                        to?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.sales": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop sales */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        series: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        totals: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
                         };
                     };
                 };
@@ -76714,7 +80935,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -76947,6 +81168,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -77104,7 +81363,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -77337,6 +81596,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -77379,7 +81676,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -77612,6 +81909,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -77654,7 +81989,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -77887,6 +82222,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -80769,6 +85142,1036 @@ export interface operations {
                 content: {
                     "application/json": Record<string, never>;
                 };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    lines: {
+                        quantity: number;
+                        /** Format: uuid */
+                        variant_id: string;
+                    }[];
+                    /** Format: uuid */
+                    pickup_location_id?: string | null;
+                    promotion_code?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        currency?: string;
+                        discount_cents?: number;
+                        lines: {
+                            [key: string]: unknown;
+                        }[];
+                        /**
+                         * ShopMemberDiscount
+                         * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+                         */
+                        member_discount?: {
+                            /** @enum {string} */
+                            applies_to?: "marked_products";
+                            percent: number;
+                            /** @enum {string} */
+                            source?: "membership_package";
+                        } | null;
+                        /**
+                         * ShopOnlinePayment
+                         * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+                         */
+                        online_payment: {
+                            available: boolean;
+                            provider?: string;
+                            /** @description e.g. no_provider */
+                            reason?: string | null;
+                        };
+                        payment_modes: ("at_pickup" | "on_account" | "online")[];
+                        /** Format: uuid */
+                        pickup_location_id?: string | null;
+                        pickup_location_ids?: string[];
+                        /** @description The promotion code that applied (never stacked with the member discount) */
+                        promotion_code?: {
+                            applied?: boolean;
+                            code?: string;
+                            /** Format: uuid */
+                            id?: string;
+                        } | null;
+                        /** Format: uuid */
+                        promotion_code_id?: string | null;
+                        subtotal_cents?: number;
+                        total_cents: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        orders: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.place_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    lines: {
+                        quantity: number;
+                        /** Format: uuid */
+                        variant_id: string;
+                    }[];
+                    note?: string | null;
+                    /** @enum {string} */
+                    payment_mode?: "at_pickup" | "on_account" | "online";
+                    payment_token?: string | null;
+                    /** Format: uuid */
+                    pickup_location_id?: string | null;
+                    promotion_code?: string | null;
+                    /** @enum {string} */
+                    source?: "direct" | "club_post" | "promotion_code" | "desk" | "public_page" | "other";
+                    /** Format: uuid */
+                    source_ref_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Replayed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Order */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    payment_token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.products": {
+        parameters: {
+            query?: {
+                category?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopMemberProduct */
+                        product: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.stock_alerts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Alerts */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        stock_alerts: {
+                            available?: boolean | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            notified_at?: string | null;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.storefront": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Storefront */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories?: string[];
+                        /** @enum {string|null} */
+                        closed_reason?: "no_products" | "business_not_activated" | null;
+                        /**
+                         * ShopMemberDiscount
+                         * @description The member's package discount: on products marked member_discount_applies, never stacked with a promotion code
+                         */
+                        member_discount?: {
+                            /** @enum {string} */
+                            applies_to?: "marked_products";
+                            percent: number;
+                            /** @enum {string} */
+                            source?: "membership_package";
+                        } | null;
+                        /**
+                         * ShopOnlinePayment
+                         * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+                         */
+                        online_payment: {
+                            available: boolean;
+                            provider?: string;
+                            /** @description e.g. no_provider */
+                            reason?: string | null;
+                        };
+                        open: boolean;
+                        pickup_locations: {
+                            address?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name?: string | null;
+                        }[];
+                        products: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transactions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        transactions: {
+                            channel?: string;
+                            currency?: string;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            invoice_number?: string | null;
+                            invoice_status?: string | null;
+                            /** @enum {string} */
+                            kind: "shop_order";
+                            lines?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: uuid */
+                            order_id: string;
+                            order_number?: number;
+                            paid_cents?: number;
+                            payments?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            refunded_cents?: number;
+                            refunds?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** @enum {string} */
+                            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            total_cents: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.subscribe_stock_alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Alert */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopStockAlert */
+                        stock_alert: {
+                            available?: boolean | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            /** Format: date-time */
+                            notified_at?: string | null;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.unsubscribe_stock_alert": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Removed */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
         };
     };
@@ -85306,6 +90709,2912 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.ShopController.desk_sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    customer_name?: string | null;
+                    idempotency_key: string;
+                    lines: {
+                        quantity: number;
+                        /** Format: uuid */
+                        variant_id: string;
+                    }[];
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                    promotion_code?: string | null;
+                    /** Format: uuid */
+                    source_ref_id?: string | null;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Replayed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Order */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.ledger": {
+        parameters: {
+            query?: {
+                location_ids?: string;
+                kind?: string;
+                variant_id?: string;
+                product_id?: string;
+                from?: string;
+                to?: string;
+                cursor?: string;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Ledger */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            actor_name?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            order_number?: number | null;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_title?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            sku?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                            variant_title?: string | null;
+                        }[];
+                        next_cursor?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.orders": {
+        parameters: {
+            query?: {
+                status?: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                user_id?: string;
+                location_ids?: string;
+                pickup_code?: string;
+                paid?: boolean;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Orders per status, within the branch, buyer and paid filters */
+                        counts: {
+                            cancelled: number;
+                            picked_up: number;
+                            placed: number;
+                            ready_for_pickup: number;
+                        };
+                        orders: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.set_fiscal_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    fiscal_receipt_ref: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.lineage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lineage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invoice_lines: {
+                            [key: string]: unknown;
+                        }[];
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        payments: {
+                            [key: string]: unknown;
+                        }[];
+                        reversals: {
+                            [key: string]: unknown;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.record_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.pick_up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    payment_method?: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.mark_ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    lines: {
+                        /** Format: uuid */
+                        order_line_id: string;
+                        quantity: number;
+                        restock?: boolean;
+                    }[];
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Refunded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.payment_methods": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Methods */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        payment_methods: {
+                            available: boolean;
+                            /** @enum {string} */
+                            channel: "pos" | "online";
+                            /** @description cash, card_manual (card at the terminal), bank_transfer, other, card_online */
+                            id: string;
+                            provider?: string | null;
+                            reason?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.photo_upload": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    byte_size: number;
+                    /**
+                     * @description Images are re-encoded in the browser (drops EXIF/GPS) before upload.
+                     * @enum {string}
+                     */
+                    content_type: "image/jpeg" | "image/webp";
+                };
+            };
+        };
+        responses: {
+            /** @description Upload */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        expires_in: number;
+                        max_bytes: number;
+                        /** Format: uuid */
+                        media_id: string;
+                        required_headers: {
+                            [key: string]: string;
+                        };
+                        upload_url: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.complete_photo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Media */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Media */
+                        media: {
+                            alt_text?: string | null;
+                            content_type: string;
+                            duration_ms?: number | null;
+                            feed_url?: string | null;
+                            full_url?: string | null;
+                            height: number | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind?: "image" | "video";
+                            /** @description A tiny blurred WebP data URI to show while the image loads */
+                            placeholder?: string | null;
+                            /** @enum {string} */
+                            purpose: "body_photo" | "box_photo" | "meal_photo" | "post_photo" | "post_video" | "shop_product_photo";
+                            rejection_reason?: string | null;
+                            /**
+                             * @description Post uploads: pending (not uploaded yet) → processing → ready | rejected (see rejection_reason)
+                             * @enum {string}
+                             */
+                            status: "pending" | "processing" | "ready" | "rejected";
+                            thumb_url?: string | null;
+                            /** @description Stable for public media; presigned and short-lived for private media. A processed upload: its full rendition. */
+                            url: string | null;
+                            video_url?: string | null;
+                            width: number | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.products": {
+        parameters: {
+            query?: {
+                status?: "draft" | "published" | "archived" | "low_stock";
+                q?: string;
+                category?: string;
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** @description Products per filter, within the branch and search filters */
+                        counts: {
+                            all: number;
+                            archived: number;
+                            draft: number;
+                            low_stock: number;
+                            published: number;
+                        };
+                        products: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.create_product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    category?: string | null;
+                    description?: string | null;
+                    location_ids?: string[];
+                    media_ids?: string[];
+                    member_discount_applies?: boolean;
+                    options?: {
+                        name: string;
+                        values: string[];
+                    }[];
+                    per_person_limit?: number | null;
+                    position?: number;
+                    price_cents?: number;
+                    sell_at_desk?: boolean;
+                    sell_in_app?: boolean;
+                    /**
+                     * @description Created as a draft unless given; published runs the publish checks in the same transaction
+                     * @enum {string}
+                     */
+                    status?: "draft" | "published" | "archived";
+                    title: string;
+                    variants?: {
+                        barcode?: string | null;
+                        compare_at_price_cents?: number | null;
+                        cost_price_cents?: number | null;
+                        currency?: string;
+                        initial_quantity?: number;
+                        /** Format: uuid */
+                        location_id?: string | null;
+                        low_stock_threshold?: number | null;
+                        option_values?: {
+                            [key: string]: string;
+                        };
+                        position?: number;
+                        price_cents: number;
+                        sku?: string | null;
+                        /** @enum {string|null} */
+                        tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                        title?: string | null;
+                        track_inventory?: boolean;
+                    }[];
+                    /** @enum {string} */
+                    visibility?: "members_only" | "anyone";
+                };
+            };
+        };
+        responses: {
+            /** @description Product */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.update_product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    category?: string | null;
+                    description?: string | null;
+                    location_ids?: string[];
+                    media_ids?: string[];
+                    member_discount_applies?: boolean;
+                    options?: {
+                        name: string;
+                        values: string[];
+                    }[];
+                    per_person_limit?: number | null;
+                    position?: number;
+                    sell_at_desk?: boolean;
+                    sell_in_app?: boolean;
+                    /** @enum {string} */
+                    status?: "draft" | "published" | "archived";
+                    title?: string;
+                    /** @description The full list of live variants: with id edited, without one added (with optional opening stock), live ones left out archived. Written with the product in one transaction. */
+                    variants?: {
+                        barcode?: string | null;
+                        compare_at_price_cents?: number | null;
+                        cost_price_cents?: number | null;
+                        currency?: string;
+                        /** Format: uuid */
+                        id?: string | null;
+                        initial_quantity?: number;
+                        /** Format: uuid */
+                        location_id?: string | null;
+                        low_stock_threshold?: number | null;
+                        option_values?: {
+                            [key: string]: string;
+                        };
+                        position?: number;
+                        price_cents?: number;
+                        sku?: string | null;
+                        /** @enum {string|null} */
+                        tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                        title?: string | null;
+                        track_inventory?: boolean;
+                    }[];
+                    /** @enum {string} */
+                    visibility?: "members_only" | "anyone";
+                };
+            };
+        };
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.promote": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    body?: string | null;
+                    /** Format: uuid */
+                    channel_id?: string | null;
+                    /**
+                     * ShopNewPromotionCode
+                     * @description A code of the promoted product: a percent off, or an amount off each unit
+                     */
+                    promotion_code?: {
+                        /** @description Letters, digits, - or _ (stored upper case) */
+                        code: string;
+                        /** @description Off each unit */
+                        discount_cents?: number | null;
+                        discount_percent?: number | null;
+                        /** Format: date-time */
+                        ends_at?: string | null;
+                        max_redemptions?: number | null;
+                        /** Format: date-time */
+                        starts_at?: string | null;
+                    } | null;
+                    /**
+                     * Format: uuid
+                     * @description An existing code of this product
+                     */
+                    promotion_code_id?: string | null;
+                    /**
+                     * @description announcements (club #ανακοινώσεις, default), channel (a member group or PT squad: channel_id) or feed (public: box page and followers)
+                     * @enum {string}
+                     */
+                    target?: "announcements" | "channel" | "feed";
+                };
+            };
+        };
+        responses: {
+            /** @description Post */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /**
+                         * CommunityPost
+                         * @description A club post (origin club: club and channel set; channel null on a box's public post seen from outside the club) or a profile post (origin profile: no club)
+                         */
+                        post: {
+                            /** @description What the attached journal entry showed when it was shared: title, workout_type, scale_level_slug, occurred_at, duration_seconds, section_scores; for a PR title, score, unit, occurred_on */
+                            attachment?: {
+                                [key: string]: unknown;
+                            } | null;
+                            /** Format: uuid */
+                            attachment_id?: string | null;
+                            /** @enum {string|null} */
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
+                            /** @enum {string} */
+                            audience: "club_channel" | "followers" | "public";
+                            /** CommunityAuthor */
+                            author: {
+                                avatar_url?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                nickname?: string | null;
+                            };
+                            body?: string | null;
+                            can_delete: boolean;
+                            can_moderate: boolean;
+                            can_pin: boolean;
+                            can_report?: boolean;
+                            channel: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string | null;
+                                name?: string | null;
+                            } | null;
+                            club: {
+                                /** Format: uuid */
+                                id: string;
+                                kind?: string;
+                                logo_url?: string | null;
+                                name: string;
+                                organization_slug?: string | null;
+                                primary_color?: string | null;
+                            } | null;
+                            comment_count: number;
+                            /**
+                             * CommunityPostEvent
+                             * @description The event as you see it now, when the post is an event card (attachment_type event)
+                             */
+                            event?: {
+                                /**
+                                 * @description ADR-185: who it is for: a member group only, the club (and its co-hosts), or open to everyone
+                                 * @enum {string}
+                                 */
+                                audience: "group" | "club" | "open";
+                                /** CommunityEventBox */
+                                box: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    slug?: string | null;
+                                };
+                                /** @description You run events at this box */
+                                can_manage: boolean;
+                                can_rsvp: boolean;
+                                cancel_reason?: string | null;
+                                cancelled: boolean;
+                                /** Format: date-time */
+                                cancelled_at?: string | null;
+                                /** @description Null: no limit */
+                                capacity?: number | null;
+                                /**
+                                 * Format: uuid
+                                 * @description The member group this event belongs to; null for a club event
+                                 */
+                                channel_id?: string | null;
+                                /** CommunityEventClub */
+                                club: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    kind?: string | null;
+                                    name?: string | null;
+                                };
+                                /** Format: uuid */
+                                club_id: string;
+                                /** @description ADR-185: boxes that co-host it (accepted) */
+                                cohosts: {
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    slug?: string | null;
+                                }[];
+                                /** Format: uuid */
+                                cover_media_id?: string | null;
+                                cover_url?: string | null;
+                                currency: string;
+                                description?: string | null;
+                                /** Format: date-time */
+                                ends_at: string;
+                                /** @description Who's going, for people who can see the club (a preview in lists, everyone on the event page); null for everyone else, who see going_count */
+                                goers?: {
+                                    avatar_url?: string | null;
+                                    /** Format: uuid */
+                                    id: string;
+                                    nickname?: string | null;
+                                }[] | null;
+                                going_count: number;
+                                /** @description Staff tagged it «Καλό για φίλους»: it comes first on Φέρε φίλο */
+                                good_for_friends: boolean;
+                                /**
+                                 * CommunityEventGroup
+                                 * @description The member group of a group event (free, for its members only)
+                                 */
+                                group?: {
+                                    /** Format: uuid */
+                                    id: string;
+                                    name?: string | null;
+                                } | null;
+                                guest_pass_allowed: boolean;
+                                /** @description Event page: guests you can still bring (going, guest passes on) */
+                                guests_left?: number | null;
+                                guests_per_member: number;
+                                /** CommunityEventHost */
+                                host: {
+                                    /** @enum {string} */
+                                    kind: "person" | "business";
+                                    logo_url?: string | null;
+                                    name?: string | null;
+                                    /** Format: uuid */
+                                    organization_id: string;
+                                    /**
+                                     * CommunityAuthor
+                                     * @description The person hosting their own event
+                                     */
+                                    person?: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    } | null;
+                                    /** @description The business's box page; null for a person */
+                                    slug?: string | null;
+                                };
+                                /** Format: uuid */
+                                id: string;
+                                /** @description Event page opened with an invitation link */
+                                invitation?: {
+                                    /** @description ADR-185: the host's own invitation */
+                                    host?: boolean;
+                                    /** CommunityAuthor */
+                                    inviter: {
+                                        avatar_url?: string | null;
+                                        /** Format: uuid */
+                                        id: string;
+                                        nickname?: string | null;
+                                    };
+                                    /** @enum {string|null} */
+                                    reason?: "guests_not_allowed" | "inviter_not_going" | "guest_limit_reached" | "event_cancelled" | "event_started" | null;
+                                    usable: boolean;
+                                } | null;
+                                /**
+                                 * CommunityEventMine
+                                 * @description Where you stand; null if not on it
+                                 */
+                                my?: {
+                                    /** Format: uuid */
+                                    invited_by_id?: string | null;
+                                    late_cancel: boolean;
+                                    paid: boolean;
+                                    /** @enum {string} */
+                                    source: "member" | "open" | "guest";
+                                    /** @enum {string} */
+                                    status: "going" | "waitlisted" | "cancelled";
+                                } | null;
+                                open_to_non_members: boolean;
+                                /** Format: uuid */
+                                organization_id: string;
+                                /** CommunityEventPlace */
+                                place: {
+                                    address: string | null;
+                                    city?: string | null;
+                                    latitude: number | null;
+                                    /**
+                                     * Format: uuid
+                                     * @description One of the box's locations, or null
+                                     */
+                                    location_id: string | null;
+                                    longitude: number | null;
+                                    name: string | null;
+                                    neighbourhood?: string | null;
+                                };
+                                /**
+                                 * Format: uuid
+                                 * @description Its card in the club feed
+                                 */
+                                post_id?: string | null;
+                                /** @description 0: free; otherwise paid at the box */
+                                price_cents: number;
+                                /**
+                                 * Format: uuid
+                                 * @description Shared by every week of a weekly event
+                                 */
+                                series_id?: string | null;
+                                /** @description Null: no limit */
+                                spots_left?: number | null;
+                                /** Format: date-time */
+                                starts_at: string;
+                                /** @description ADR-179: the zone the event is planned in (its own when it happens away, else its gym's); times show on this clock */
+                                time_zone: string;
+                                /** @description The event or its gym has a confirmed zone (false: a guess, organisers are nudged) */
+                                time_zone_confirmed?: boolean;
+                                title: string;
+                                waitlist_count: number;
+                            } | null;
+                            hidden: boolean;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at: string;
+                            kudos_by_me: boolean;
+                            kudos_count: number;
+                            /** @description Up to ten photos or one video, in order (ADR-157) */
+                            media: {
+                                alt_text?: string | null;
+                                duration_ms?: number | null;
+                                feed_url?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** @enum {string} */
+                                kind: "image" | "video";
+                                placeholder?: string | null;
+                                /** @enum {string} */
+                                status: "pending" | "processing" | "ready" | "rejected" | "missing";
+                                thumb_url?: string | null;
+                                video_url?: string | null;
+                                width?: number | null;
+                            }[];
+                            /**
+                             * @description ready for everyone; otherwise only the author (and moderators) get the post: processing («επεξεργάζεται») or failed
+                             * @enum {string}
+                             */
+                            media_status: "ready" | "processing" | "failed";
+                            /** @enum {string} */
+                            origin: "club" | "profile";
+                            pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
+                        };
+                        /** Format: uuid */
+                        post_id: string;
+                        /** ShopPromotionCode */
+                        promotion_code?: {
+                            active: boolean;
+                            code: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            max_redemptions?: number | null;
+                            /** Format: uuid */
+                            post_id?: string | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            /** @description Orders (not cancelled) that used it */
+                            redemptions: number;
+                            /** Format: date-time */
+                            starts_at?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+                        } | null;
+                        /** Format: uuid */
+                        promotion_code_id?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.set_product_status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "draft" | "published" | "archived";
+                };
+            };
+        };
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            /** @description The photos of media_ids, resolved (ready ones only, in order) */
+                            media?: {
+                                alt_text?: string | null;
+                                full_url?: string | null;
+                                height?: number | null;
+                                /** Format: uuid */
+                                id: string;
+                                thumb_url?: string | null;
+                                url?: string | null;
+                                width?: number | null;
+                            }[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.create_variant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    barcode?: string | null;
+                    compare_at_price_cents?: number | null;
+                    cost_price_cents?: number | null;
+                    currency?: string;
+                    low_stock_threshold?: number | null;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    position?: number;
+                    price_cents?: number;
+                    sku?: string | null;
+                    /** @enum {string|null} */
+                    tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                    title?: string | null;
+                    track_inventory?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Variant */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.update_variant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    barcode?: string | null;
+                    compare_at_price_cents?: number | null;
+                    cost_price_cents?: number | null;
+                    currency?: string;
+                    low_stock_threshold?: number | null;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    position?: number;
+                    price_cents?: number;
+                    sku?: string | null;
+                    /** @enum {string|null} */
+                    tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                    title?: string | null;
+                    track_inventory?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Variant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.archive_variant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Variant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.promotion_codes": {
+        parameters: {
+            query?: {
+                product_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Codes */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        promotion_codes: {
+                            active: boolean;
+                            code: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            max_redemptions?: number | null;
+                            /** Format: uuid */
+                            post_id?: string | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            /** @description Orders (not cancelled) that used it */
+                            redemptions: number;
+                            /** Format: date-time */
+                            starts_at?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.update_promotion_code": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    active?: boolean;
+                    /** @description Off each unit */
+                    discount_cents?: number | null;
+                    discount_percent?: number | null;
+                    /** Format: date-time */
+                    ends_at?: string | null;
+                    max_redemptions?: number | null;
+                    /** Format: date-time */
+                    starts_at?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Code */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopPromotionCode */
+                        promotion_code: {
+                            active: boolean;
+                            code: string;
+                            discount_cents?: number | null;
+                            discount_percent?: number | null;
+                            /** Format: date-time */
+                            ends_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date-time */
+                            inserted_at?: string | null;
+                            max_redemptions?: number | null;
+                            /** Format: uuid */
+                            post_id?: string | null;
+                            /** Format: uuid */
+                            product_id: string;
+                            /** @description Orders (not cancelled) that used it */
+                            redemptions: number;
+                            /** Format: date-time */
+                            starts_at?: string | null;
+                            /** @enum {string} */
+                            status: "active" | "scheduled" | "expired" | "exhausted" | "inactive";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.ready_orders": {
+        parameters: {
+            query?: {
+                user_id?: string;
+                pickup_code?: string;
+                location_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        orders: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** @description The short code the buyer shows at the desk */
+                            pickup_code?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.revenue_streams": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Streams */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date */
+                        from?: string | null;
+                        streams: {
+                            currency: string;
+                            net_cents: number;
+                            paid_cents: number;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+                        }[];
+                        /** Format: date */
+                        to?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Movements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.record_movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    counted?: number;
+                    /** @enum {string} */
+                    kind: "receive" | "adjustment" | "recount" | "transfer";
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    note?: string | null;
+                    quantity?: number;
+                    /** @enum {string} */
+                    reason?: "recount" | "damage" | "loss" | "return" | "other";
+                    /** Format: uuid */
+                    to_location_id?: string | null;
+                    unit_cost_cents?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.WorkoutController.show": {
         parameters: {
             query?: never;
@@ -87495,7 +95804,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -87728,6 +96037,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         }[];
                     };
                 };
@@ -89830,7 +98177,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -90063,6 +98410,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };
@@ -90220,7 +98605,7 @@ export interface operations {
                             /** Format: uuid */
                             attachment_id?: string | null;
                             /** @enum {string|null} */
-                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | null;
+                            attachment_type?: "training_log_entry" | "workout_execution" | "pr" | "event" | "product" | null;
                             /** @enum {string} */
                             audience: "club_channel" | "followers" | "public";
                             /** CommunityAuthor */
@@ -90453,6 +98838,44 @@ export interface operations {
                             /** @enum {string} */
                             origin: "club" | "profile";
                             pinned: boolean;
+                            /**
+                             * ShopProductCard
+                             * @description The promoted product as the reader can buy it now (attachment_type product, ADR-190)
+                             */
+                            product?: {
+                                /** @enum {string|null} */
+                                availability?: "in_stock" | "low" | null;
+                                /** @description The in-app product route; an order placed from it sends these params as its attribution */
+                                buy_link?: {
+                                    params?: {
+                                        promotion_code?: string;
+                                        source?: string;
+                                        /** Format: uuid */
+                                        source_ref_id?: string;
+                                    };
+                                    path?: string;
+                                    /** Format: uuid */
+                                    product_id?: string;
+                                    url?: string;
+                                } | null;
+                                currency?: string | null;
+                                max_price_cents?: number | null;
+                                media_ids?: string[];
+                                price_cents?: number | null;
+                                /** Format: uuid */
+                                product_id: string;
+                                promotion?: {
+                                    code?: string;
+                                    discount_cents?: number | null;
+                                    discount_percent?: number | null;
+                                    /** Format: date-time */
+                                    ends_at?: string | null;
+                                } | null;
+                                promotion_price_cents?: number | null;
+                                /** @enum {string} */
+                                status: "available" | "sold_out" | "members_only" | "unavailable";
+                                title?: string | null;
+                            } | null;
                         };
                     };
                 };

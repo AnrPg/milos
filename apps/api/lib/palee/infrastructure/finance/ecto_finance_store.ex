@@ -47,6 +47,7 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     PaymentModelPolicy,
     PromotionRedemptionPolicy,
     ReferralLifecycle,
+    RevenueBreakdown,
     ReferralPolicy,
     ReferralRewardFulfillment,
     SubscriptionSelection,
@@ -285,6 +286,34 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
           credit_ledger_entries: list_credit_ledger_entries(membership.id),
           credit_balance: credit_balance(membership.id),
           entitlement: entitlement_for_membership(membership)
+        }
+    end
+  end
+
+  # ADR-190: what a shop sale needs to know about the buyer's membership:
+  # its id (the invoice's owner) and the package member discount when its
+  # scope covers products (ADR-097).
+  @impl true
+  def member_shop_terms(user_id) do
+    case tenant_scope(Membership)
+         |> where([membership], membership.user_id == ^user_id)
+         |> Repo.one() do
+      nil ->
+        nil
+
+      %Membership{} = membership ->
+        terms =
+          case effective_subscription(membership.id, GymClock.today()) do
+            nil -> %{}
+            subscription -> package_terms(subscription.params_snapshot)
+          end
+
+        scope = terms[:member_discount_scope] || []
+
+        %{
+          membership_id: membership.id,
+          member_discount_percent:
+            if("products" in scope, do: terms[:member_discount_percent], else: nil)
         }
     end
   end
@@ -3014,8 +3043,10 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     params = string_key_map(params || %{})
     since = summary_since(params["days"])
     users = branch_users(params)
+    scope = %{users: users, location_ids: branch_location_ids(params)}
     renewal_metrics = renewal_invoice_metrics(users)
     first_month = GymClock.today() |> Date.beginning_of_month() |> Date.shift(month: -23)
+    streams = revenue_by_stream(since, scope)
 
     {aggregate_status, aggregate_error, aggregate_rows} =
       case RepoContext.current_setting("app.organization_id") do
@@ -3058,16 +3089,21 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       aggregates: aggregate_rows,
       monthly_revenue:
         if(is_list(users),
-          do: monthly_payment_revenue(users, first_month),
+          do: monthly_payment_revenue(scope, first_month),
           else: monthly_revenue(aggregate_rows, first_month)
         ),
+      # ADR-192 §2: the same paid revenue split by stream, per month and in
+      # the window. `monthly_revenue` and `totals` keep their meaning.
+      monthly_revenue_by_stream: monthly_revenue_by_stream(first_month, scope),
+      revenue_streams: streams.rows,
       aggregate_status: aggregate_status,
       aggregate_error: aggregate_error,
       period: %{since: since, days: parse_integer(params["days"], 30)},
       totals: %{
         active_memberships: active_membership_count(users),
         expiring_memberships: length(list_expiring_memberships(30, users)),
-        paid_revenue_cents: total_paid_revenue_cents(since, users),
+        paid_revenue_cents: total_paid_revenue_cents(since, scope),
+        revenue_by_stream: streams.net_by_stream,
         credit_balance_cents: total_credit_balance_cents(users),
         outstanding_invoice_balance_cents: total_outstanding_invoice_balance_cents(users),
         overdue_invoice_balance_cents: total_overdue_invoice_balance_cents(users),
@@ -4953,6 +4989,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
   defp branch_users(%{"user_ids" => users}) when is_list(users), do: users
   defp branch_users(_params), do: nil
 
+  defp branch_location_ids(%{"location_ids" => ids}) when is_list(ids), do: ids
+  defp branch_location_ids(_params), do: []
+
   defp for_users(query, nil), do: query
   defp for_users(query, users), do: where(query, [record], record.user_id in ^users)
 
@@ -4965,11 +5004,14 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     where(query, [record], record.membership_id in subquery(memberships))
   end
 
-  defp monthly_payment_revenue(users, first_month) do
+  defp monthly_payment_revenue(scope, first_month) do
     rows =
-      MembershipPayment
-      |> for_user_memberships(users)
-      |> where([payment], is_nil(payment.deleted_at) and payment.paid_on >= ^first_month)
+      payment_rows()
+      |> for_payment_scope(scope)
+      |> where(
+        [payment],
+        is_nil(payment.deleted_at) and payment.paid_on >= type(^first_month, :date)
+      )
       |> where([payment], payment.payment_status in ["paid", "pending"])
       |> select([payment], {payment.paid_on, payment.payment_status, payment.amount_cents})
       |> Repo.all()
@@ -5115,29 +5157,9 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
     |> Repo.one()
   end
 
-  defp total_paid_revenue_cents(since, users) do
-    payment_reversals =
-      from(reversal in FinancePaymentReversal,
-        where: is_nil(reversal.deleted_at),
-        group_by: reversal.membership_payment_id,
-        select: %{
-          membership_payment_id: reversal.membership_payment_id,
-          reversed_cents: sum(reversal.amount_cents)
-        }
-      )
-
-    MembershipPayment
-    |> for_user_memberships(users)
-    |> where([payment], payment.payment_status == "paid")
-    |> where([payment], payment.paid_on >= ^since)
-    |> where([payment], is_nil(payment.deleted_at))
-    |> join(:left, [payment], invoice in FinanceInvoice,
-      on: invoice.id == payment.finance_invoice_id
-    )
-    |> where([payment, invoice], is_nil(payment.finance_invoice_id) or is_nil(invoice.deleted_at))
-    |> join(:left, [payment, _invoice], reversal in subquery(payment_reversals),
-      on: reversal.membership_payment_id == payment.id
-    )
+  defp total_paid_revenue_cents(since, scope) do
+    since
+    |> paid_revenue_base(scope)
     |> select(
       [payment, _invoice, reversal],
       sum(
@@ -5149,6 +5171,193 @@ defmodule Palee.Infrastructure.Finance.EctoFinanceStore do
       nil -> 0
       value -> db_integer(value)
     end
+  end
+
+  # The paid payments behind `paid_revenue_cents`: paid, not deleted, on or
+  # after `since`, on a live invoice (or none), joined to their reversals.
+  # The headline figure and its per-stream breakdown (ADR-192 §2) both read
+  # this one query, so the breakdown always adds up to the headline.
+  defp paid_revenue_base(since, scope) do
+    payment_reversals =
+      from(reversal in FinancePaymentReversal,
+        where: is_nil(reversal.deleted_at),
+        group_by: reversal.membership_payment_id,
+        select: %{
+          membership_payment_id: reversal.membership_payment_id,
+          reversed_cents: sum(reversal.amount_cents)
+        }
+      )
+
+    payment_rows()
+    |> for_payment_scope(scope)
+    |> where([payment], payment.payment_status == "paid")
+    |> where([payment], payment.paid_on >= type(^since, :date))
+    |> where([payment], is_nil(payment.deleted_at))
+    |> join(:left, [payment], invoice in FinanceInvoice,
+      on: invoice.id == payment.finance_invoice_id
+    )
+    |> where([payment, invoice], is_nil(payment.finance_invoice_id) or is_nil(invoice.deleted_at))
+    |> join(:left, [payment, _invoice], reversal in subquery(payment_reversals),
+      on: reversal.membership_payment_id == payment.id
+    )
+  end
+
+  # The payment rows of the revenue reads, with ADR-190's lineage columns.
+  # Read from the table rather than the schema so the reads do not depend on
+  # which writer maps those columns; Postgres inlines the subquery, so the
+  # plan is the plain table scan of before.
+  defp payment_rows do
+    from(
+      payment in subquery(
+        from(payment in "membership_payments",
+          select: %{
+            id: type(payment.id, :binary_id),
+            membership_id: type(payment.membership_id, :binary_id),
+            membership_package_subscription_id:
+              type(payment.membership_package_subscription_id, :binary_id),
+            finance_invoice_id: type(payment.finance_invoice_id, :binary_id),
+            amount_cents: type(payment.amount_cents, :integer),
+            paid_on: type(payment.paid_on, :date),
+            payment_status: type(payment.payment_status, :string),
+            deleted_at: type(payment.deleted_at, :utc_datetime_usec),
+            revenue_stream: type(payment.revenue_stream, :string),
+            source_type: type(payment.source_type, :string),
+            source_id: type(payment.source_id, :binary_id)
+          }
+        )
+      )
+    )
+  end
+
+  # ADR-192 §2: net paid revenue per revenue stream, from the same payments,
+  # window and reversal netting as `paid_revenue_cents`. The database groups
+  # by what the classifier looks at (a handful of groups however many
+  # payments there are); `RevenueBreakdown` names each group's stream.
+  defp revenue_by_stream(since, scope) do
+    since
+    |> paid_revenue_base(scope)
+    |> stream_inputs_join()
+    |> group_by([payment, invoice, _reversal, _subscription, package], [
+      payment.revenue_stream,
+      package.package_type,
+      fragment("(?->>'idempotency_key')", invoice.params),
+      fragment(
+        "EXISTS (SELECT 1 FROM finance_invoice_lines line WHERE line.finance_invoice_id = ? AND line.revenue_stream = 'event')",
+        payment.finance_invoice_id
+      )
+    ])
+    |> select([payment, invoice, reversal, _subscription, package], {
+      payment.revenue_stream,
+      package.package_type,
+      fragment("(?->>'idempotency_key')", invoice.params),
+      fragment(
+        "EXISTS (SELECT 1 FROM finance_invoice_lines line WHERE line.finance_invoice_id = ? AND line.revenue_stream = 'event')",
+        payment.finance_invoice_id
+      ),
+      sum(payment.amount_cents),
+      sum(
+        fragment("GREATEST(? - COALESCE(?, 0), 0)", payment.amount_cents, reversal.reversed_cents)
+      ),
+      count(payment.id)
+    })
+    |> Repo.all()
+    |> Enum.map(fn {stream, package_type, reference, event_line?, gross, net, count} ->
+      {stream_fact(stream, package_type, reference, event_line?), db_integer(gross),
+       db_integer(net), count}
+    end)
+    |> RevenueBreakdown.breakdown()
+  end
+
+  # Monthly net paid revenue per stream over the 24 months of
+  # `monthly_revenue`, bucketed by `paid_on` (the gym-local business date).
+  defp monthly_revenue_by_stream(first_month, scope) do
+    first_month
+    |> paid_revenue_base(scope)
+    |> stream_inputs_join()
+    |> group_by([payment, invoice, _reversal, _subscription, package], [
+      fragment("date_trunc('month', ?)::date", payment.paid_on),
+      payment.revenue_stream,
+      package.package_type,
+      fragment("(?->>'idempotency_key')", invoice.params),
+      fragment(
+        "EXISTS (SELECT 1 FROM finance_invoice_lines line WHERE line.finance_invoice_id = ? AND line.revenue_stream = 'event')",
+        payment.finance_invoice_id
+      )
+    ])
+    |> select([payment, invoice, reversal, _subscription, package], {
+      fragment("date_trunc('month', ?)::date", payment.paid_on),
+      payment.revenue_stream,
+      package.package_type,
+      fragment("(?->>'idempotency_key')", invoice.params),
+      fragment(
+        "EXISTS (SELECT 1 FROM finance_invoice_lines line WHERE line.finance_invoice_id = ? AND line.revenue_stream = 'event')",
+        payment.finance_invoice_id
+      ),
+      sum(
+        fragment("GREATEST(? - COALESCE(?, 0), 0)", payment.amount_cents, reversal.reversed_cents)
+      )
+    })
+    |> Repo.all()
+    |> Enum.group_by(&elem(&1, 0), fn {_month, stream, type, reference, event_line?, net} ->
+      {stream_fact(stream, type, reference, event_line?), 0, db_integer(net), 0}
+    end)
+    |> then(fn by_month ->
+      Enum.map(0..23, fn offset ->
+        month = Date.shift(first_month, month: offset)
+        %{net_by_stream: net} = RevenueBreakdown.breakdown(Map.get(by_month, month, []))
+        %{period_start: month, revenue_by_stream: net}
+      end)
+    end)
+  end
+
+  defp stream_inputs_join(query) do
+    query
+    |> join(:left, [payment, invoice, _reversal], subscription in MembershipPackageSubscription,
+      on:
+        subscription.id ==
+          coalesce(
+            payment.membership_package_subscription_id,
+            invoice.membership_package_subscription_id
+          )
+    )
+    |> join(:left, [_payment, _invoice, _reversal, subscription], package in MembershipPackage,
+      on: package.id == subscription.membership_package_id
+    )
+  end
+
+  defp stream_fact(stream, package_type, reference, event_line?) do
+    %{
+      explicit_stream: stream,
+      package_type: package_type,
+      reference: reference,
+      charge_category: if(event_line?, do: "event")
+    }
+  end
+
+  # ADR-186 §7 and ADR-192 §2: under a branch filter a payment belongs to the
+  # people whose home branch is in the filter, except shop payments, which
+  # belong to the branch of the order they pay (a walk-in has no home
+  # branch, and a member may shop at another branch). Before the shop no
+  # payment is `shop`, so every older figure is exactly what it was.
+  defp for_payment_scope(query, %{users: nil}), do: query
+
+  defp for_payment_scope(query, %{users: users, location_ids: location_ids}) do
+    memberships =
+      from(membership in Membership, where: membership.user_id in ^users, select: membership.id)
+
+    shop_location_ids = normalize_uuid_list(location_ids)
+
+    where(
+      query,
+      [payment],
+      (payment.revenue_stream != "shop" and payment.membership_id in subquery(memberships)) or
+        (payment.revenue_stream == "shop" and payment.source_type == "shop_order" and
+           fragment(
+             "EXISTS (SELECT 1 FROM shop_orders shop_order WHERE shop_order.id = ? AND shop_order.pickup_location_id = ANY(?))",
+             payment.source_id,
+             type(^shop_location_ids, {:array, :binary_id})
+           ))
+    )
   end
 
   defp total_credit_balance_cents(users) do

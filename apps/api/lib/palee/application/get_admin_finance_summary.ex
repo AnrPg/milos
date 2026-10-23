@@ -16,12 +16,17 @@ defmodule Palee.Application.GetAdminFinanceSummary do
     summary = Finance.financial_summary(context, BranchReport.scope_params(params, report))
 
     branches =
-      BranchReport.splits(context, report, fn users, _location_id ->
-        totals = Finance.financial_summary(context, Map.put(params, "user_ids", users)).totals
+      BranchReport.splits(context, report, fn users, location_id ->
+        totals =
+          Finance.financial_summary(
+            context,
+            BranchReport.split_params(params, users, location_id)
+          ).totals
 
         %{
           active_memberships: totals.active_memberships,
           paid_revenue_cents: totals.paid_revenue_cents,
+          revenue_by_stream: totals.revenue_by_stream,
           outstanding_invoice_balance_cents: totals.outstanding_invoice_balance_cents
         }
       end)

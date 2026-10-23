@@ -18,6 +18,15 @@ defmodule Palee.Infrastructure.Observability.TelemetryLogReporter do
     [:palee, :auth, :anomaly],
     [:palee, :rate_limit, :rejected],
     [:palee, :cache, :state],
+    [:palee, :finance, :revenue, :recorded],
+    [:palee, :finance, :revenue, :refunded],
+    [:palee, :shop, :order, :placed],
+    [:palee, :shop, :order, :paid],
+    [:palee, :shop, :order, :refunded],
+    [:palee, :shop, :order, :cancelled],
+    [:palee, :shop, :stock, :moved],
+    [:palee, :shop, :stock, :status_changed],
+    [:palee, :shop, :reconciliation, :checked],
     [:oban, :job, :exception],
     [:oban, :job, :discard],
     [:oban, :job, :stop],
@@ -55,7 +64,13 @@ defmodule Palee.Infrastructure.Observability.TelemetryLogReporter do
         :cache,
         :operation,
         :bucket,
-        :failed
+        :failed,
+        :stream,
+        :currency,
+        :channel,
+        :payment_mode,
+        :kind,
+        :status
       ])
       |> Enum.reduce(%{}, fn {key, value}, tags ->
         case normalize_tag(value) do

@@ -1087,6 +1087,81 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  def build("shop_stock_low", payload, localize) do
+    item =
+      [payload["product_title"], payload["variant_title"]]
+      |> Enum.reject(&(&1 in [nil, ""]))
+      |> Enum.join(" · ")
+
+    %{
+      title: localize.("Shop stock running low", %{}),
+      body:
+        localize.("%{item}: %{quantity} left.", %{
+          item: item,
+          quantity: payload["available"] || ""
+        }),
+      url: payload["url"] || "/admin/shop"
+    }
+  end
+
+  def build("shop_order_placed", payload, localize) do
+    %{
+      title: localize.("New shop order", %{}),
+      body:
+        localize.("Order #%{number} is waiting to be prepared.", %{
+          number: payload["order_number"] || ""
+        }),
+      url: payload["url"] || "/admin/shop"
+    }
+  end
+
+  def build("shop_order_ready", payload, localize) do
+    %{
+      title: localize.("Your order is ready", %{}),
+      body:
+        localize.("Order #%{number} is ready for pickup.", %{
+          number: payload["order_number"] || ""
+        }),
+      url: payload["url"] || "/box/shop"
+    }
+  end
+
+  def build("shop_order_reminder", payload, localize) do
+    %{
+      title: localize.("Your order is waiting for you", %{}),
+      body:
+        localize.("Order #%{number} is ready for pickup. Your code: %{code}.", %{
+          number: payload["order_number"] || "",
+          code: payload["pickup_code"] || ""
+        }),
+      url: payload["url"] || "/box/shop"
+    }
+  end
+
+  def build("shop_order_cancelled", payload, localize) do
+    %{
+      title: localize.("Your order was cancelled", %{}),
+      body:
+        localize.("Order #%{number} was cancelled and nothing was charged.", %{
+          number: payload["order_number"] || ""
+        }),
+      url: payload["url"] || "/box/shop"
+    }
+  end
+
+  def build("shop_back_in_stock", payload, localize) do
+    item =
+      [payload["product_title"], payload["variant_title"]]
+      |> Enum.reject(&(&1 in [nil, ""]))
+      |> Enum.join(" · ")
+
+    %{
+      title: localize.("Back in stock", %{}),
+      body: localize.("%{item} is available again.", %{item: item}),
+      url: payload["url"] || "/box/shop"
+    }
+  end
+
   def build("coach_note_viewed", payload, localize) do
     %{
       title: localize.("An admin read your note", %{}),

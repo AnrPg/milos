@@ -19,6 +19,8 @@ defmodule Palee.Finance.FinanceRefundReceipt do
     field :finance_invoice_id, :binary_id
     field :membership_id, :binary_id
     field :user_id, :binary_id
+    # ADR-190: copied from the reversal by trigger; a shop receipt may name no membership.
+    field :revenue_stream, :string, default: "membership", read_after_writes: true
     field :sequence, :integer
     field :receipt_number, :string
     field :reversal_type, :string
@@ -55,7 +57,7 @@ defmodule Palee.Finance.FinanceRefundReceipt do
     :snapshot_sha256
   ]
 
-  @required @fields -- [:finance_invoice_id, :reason, :issued_by_id]
+  @required @fields -- [:finance_invoice_id, :membership_id, :reason, :issued_by_id]
 
   def create_changeset(params) do
     %__MODULE__{}
@@ -78,5 +80,6 @@ defmodule Palee.Finance.FinanceRefundReceipt do
     |> foreign_key_constraint(:membership_id)
     |> foreign_key_constraint(:user_id)
     |> foreign_key_constraint(:issued_by_id)
+    |> check_constraint(:membership_id, name: :finance_refund_receipts_member_or_shop_check)
   end
 end

@@ -39,6 +39,9 @@ config :palee, Oban,
        {"23 * * * *", Palee.Workers.CoachingReplyOverdueJob},
        {"41 6 * * *", Palee.Workers.CorporateInvoicingJob},
        {"7 7 * * *", Palee.Workers.InventoryDigestJob},
+       {"11 * * * *", Palee.Workers.ShopOrderSweepJob},
+       # ADR-192: shop orders == shop invoice lines == payments - refunds.
+       {"25 3 * * *", Palee.Workers.ShopRevenueReconciliationJob},
        {"30 8 * * *", Palee.Workers.SubscriptionExpiryJob},
        {"13 * * * *", Palee.Workers.ProvisionGymClubsJob},
        {"52 * * * *", Palee.Workers.SweepOrphanMediaJob},
@@ -130,6 +133,19 @@ config :palee,
 config :palee,
        :inventory_store,
        Palee.Infrastructure.Inventory.EctoInventoryStore
+
+# ADR-190: the e-shop and Finance's revenue streams.
+config :palee, :shop_store, Palee.Infrastructure.Shop.EctoShopStore
+config :palee, :shop_notifier, Palee.Infrastructure.Shop.NotificationsShopNotifier
+
+config :palee,
+       :finance_revenue_stream_store,
+       Palee.Infrastructure.Finance.EctoRevenueStreamStore
+
+# No card vendor yet (ADR-190): the mock provider reports online payment as
+# unavailable. Dev and test switch it to `:simulate` to exercise the paid flow.
+config :palee, :shop_payment_provider, Palee.Infrastructure.Shop.MockPaymentProvider
+config :palee, Palee.Infrastructure.Shop.MockPaymentProvider, mode: :unavailable
 
 config :palee,
        :community_store,
@@ -251,6 +267,9 @@ config :palee,
        Palee.Infrastructure.Execution.EctoTrainingLogStore
 
 config :palee, :finance_store, Palee.Infrastructure.Finance.EctoFinanceStore
+
+# ADR-192: the shop's report read model.
+config :palee, :shop_report_store, Palee.Infrastructure.Shop.EctoShopReportStore
 
 config :palee,
        :finance_accounting_store,
@@ -426,7 +445,30 @@ config :palee, :mail_from, name: "Palee", address: "no-reply@example.com"
 # Configures Elixir's Logger
 config :logger, :default_formatter,
   format: "timestamp=$time level=$level $metadata message=\"$message\"\n",
-  metadata: [:request_id, :user_id, :user_role, :job_id, :oban_job_id]
+  metadata: [
+    :request_id,
+    :user_id,
+    :user_role,
+    :job_id,
+    :oban_job_id,
+    # ADR-190 shop structured logs
+    :organization_id,
+    :shop_event,
+    :order_id,
+    :product_id,
+    :variant_id,
+    :channel,
+    :amount_cents,
+    # ADR-192 shop revenue reconciliation
+    :event,
+    :error,
+    :day,
+    :currency,
+    :orders_cents,
+    :invoice_lines_cents,
+    :payments_cents,
+    :drift_cents
+  ]
 
 # Use Jason for JSON parsing in Phoenix
 config :phoenix, :json_library, Jason

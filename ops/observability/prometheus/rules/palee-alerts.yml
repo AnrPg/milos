@@ -227,6 +227,18 @@ groups:
           summary: "Uploads failing storage verification"
           description: "{{ $value | humanize }} uploads in 15m were missing or unverifiable in object storage; check MinIO health, bucket policy and MINIO_PUBLIC_ENDPOINT/CORS."
 
+  # ADR-192: shop revenue lineage. Runbook:
+  # docs/operations/shop-revenue-reconciliation.md
+  - name: palee-shop-revenue
+    rules:
+      - alert: PaleeShopRevenueDrift
+        expr: sum(increase(palee_shop_reconciliation_drifted_days_total[26h])) > 0
+        labels:
+          severity: warning
+        annotations:
+          summary: "Shop revenue does not reconcile"
+          description: "At least one business day drifted in the last nightly reconciliation: shop order totals, shop-stream invoice lines and shop payments minus refunds disagree. Search the logs for shop_revenue_drift (organization_id, day, the three figures) and follow docs/operations/shop-revenue-reconciliation.md."
+
   - name: palee-monitoring-meta
     rules:
       - alert: AlertmanagerNotificationsFailing
