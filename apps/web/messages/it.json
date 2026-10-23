@@ -4433,7 +4433,20 @@
     "zonedTimeYoursTitle": "Sul tuo orologio ({zone})",
     "zonedTimeGymClock": "Gli orari seguono l'orologio della palestra ({zone}).",
     "scoreFieldLabel": "Punteggio {number}",
-    "removeScoreField": "Rimuovi punteggio {number}"
+    "removeScoreField": "Rimuovi punteggio {number}",
+    "apiErrorBusinessNotActivated": "Il team Palee attiva questa attività prima che diventi pubblica.",
+    "apiErrorBusinessAccountExists": "Hai già un’attività in attesa di attivazione.",
+    "apiErrorBusinessSignupClosed": "Chiedi al team Palee di trasformare il tuo account in un account business.",
+    "apiErrorInvalidBusinessKind": "Scegli una palestra o un coach indipendente.",
+    "apiErrorInvalidBusinessRequest": "Controlla i dati della richiesta.",
+    "apiErrorBusinessRequestPending": "Hai già una richiesta di questo tipo in attesa.",
+    "apiErrorBusinessRequestClosed": "Questa richiesta ha già una risposta.",
+    "apiErrorInvalidActivationLink": "Questo link di attivazione non vale per il tuo account.",
+    "apiErrorBusinessAlreadyActive": "Questa attività è già attiva.",
+    "apiErrorInvalidActivationRole": "Scegli titolare o amministratore.",
+    "apiErrorInvalidActivationLifetime": "Un link dura da un’ora a 30 giorni.",
+    "apiErrorAccountNotFound": "Nessun account corrisponde.",
+    "apiErrorUnknownDemoSection": "Non ci sono dati demo per questa schermata."
   },
   "PrSharing": {
     "gymLabel": "Dove hai stabilito questo PR?",
@@ -9391,5 +9404,147 @@
     "saveInterests": "Salva",
     "interestsSaved": "Salvato.",
     "interestsHubHint": "Sport e livello, per i suggerimenti"
+  },
+  "Business": {
+    "common": {
+      "cancel": "Annulla",
+      "close": "Chiudi"
+    },
+    "demo": {
+      "button": "Dati demo",
+      "working": "In corso…",
+      "eyebrow": "Modalità demo",
+      "title": "Provalo con dati demo",
+      "intro": "Riempi questa schermata con iscritti, lezioni e pagamenti inventati. Niente arriva a persone reali finché il team Palee non attiva la tua attività.",
+      "fill": {
+        "all": "Riempi tutte le schermate",
+        "members": "Aggiungi iscritti demo",
+        "schedule": "Riempi la settimana di lezioni",
+        "finance": "Aggiungi pacchetti e pagamenti demo",
+        "workouts": "Aggiungi allenamenti demo"
+      },
+      "filled": "Questa schermata ha già dati demo",
+      "remove": "Rimuovi dati demo",
+      "removeConfirm": "Rimuovere tutti gli iscritti, le lezioni e i pagamenti demo? Quello che hai impostato tu resta.",
+      "removeYes": "Rimuovi"
+    },
+    "activation": {
+      "request": "Chiedi l’attivazione al team Palee",
+      "pending": "La tua richiesta di attivazione è al team Palee. Ti manderanno un link di attivazione."
+    },
+    "notice": {
+      "eyebrow": "Modalità demo",
+      "title": "Attivazione da parte del team Palee",
+      "body": "La tua attività è in modalità demo: tutto funziona con dati demo, ma niente è ancora pubblico. Finché il team Palee non la attiva:",
+      "locked": {
+        "people": "nessun iscritto o membro dello staff reale può unirsi",
+        "public": "la tua pagina pubblica resta nascosta da Intorno a me e dalla ricerca",
+        "bookings": "nessuno fuori dal tuo team può prenotare",
+        "payments": "non si ricevono pagamenti reali",
+        "messages": "nessuna email, notifica o messaggio va a chi è fuori dal tuo account"
+      },
+      "howOwner": "Chiedilo qui sotto al team Palee. Dopo averti sentito ti manderanno un link di attivazione: aprilo con questo account.",
+      "howStaff": "Il titolare di questa attività può chiedere l’attivazione al team Palee dal pulsante demo nelle schermate di gestione."
+    },
+    "signUp": {
+      "link": "Account business",
+      "title": "Account business",
+      "intro": "Per palestre, box e coach indipendenti. Parti in modalità demo e il team Palee ti attiva dopo che vi siete sentiti.",
+      "account": "Il tuo account",
+      "demoNote": "Fino all’attivazione solo tu vedi la tua attività: dati demo, nessun iscritto, prenotazione, pagamento o messaggio reale.",
+      "submit": "Apri la mia attività",
+      "creating": "Apertura…",
+      "personal": "Meglio un account personale",
+      "nameRule": "Tra 2 e 120 caratteri.",
+      "createdTitle": "La tua attività è aperta",
+      "created": "È in modalità demo. Prova ogni schermata con il pulsante demo; il team Palee ti contatterà per l’attivazione.",
+      "openConsole": "Vai alla mia console",
+      "closed": "Questo account è stato creato tempo fa, quindi è il team Palee ad aprire l’attività per te. Mandagli una richiesta dalle Impostazioni.",
+      "closedAction": "Apri Impostazioni"
+    },
+    "form": {
+      "kind": "Tipo di attività",
+      "gymName": "Nome della palestra o del box",
+      "coachName": "Il tuo nome da coach",
+      "city": "Città",
+      "phone": "Telefono",
+      "phoneHint": "Così il team Palee può contattarti per l’attivazione.",
+      "message": "Qualcosa che il team Palee dovrebbe sapere"
+    },
+    "kind": {
+      "gym": "Palestra o box",
+      "gymHint": "Lezioni, iscritti, un team",
+      "coach": "Coach indipendente",
+      "coachHint": "I tuoi clienti, sessioni e Team"
+    },
+    "role": {
+      "owner": "Titolare",
+      "admin": "Amministratore"
+    },
+    "activate": {
+      "title": "Attiva la tua attività",
+      "loading": "Verifica del link…",
+      "invalid": "Questo link di attivazione non vale per l’account con cui hai effettuato l’accesso. Potrebbe essere scaduto o già usato: chiedine uno nuovo al team Palee.",
+      "signedInAs": "Accesso come {name}.",
+      "removes": "I dati demo vengono rimossi ({rows} record, incluse {people} persone demo).",
+      "nothingToRemove": "Non ci sono dati demo da rimuovere.",
+      "keeps": "Tutto ciò che hai impostato tu resta: impostazioni, immagine, lezioni, pacchetti e la bozza della pagina pubblica.",
+      "goesLive": "Poi potrai invitare persone reali, pubblicare la tua pagina, accettare prenotazioni e pagamenti.",
+      "confirm": "Attiva",
+      "working": "Attivazione…",
+      "doneTitle": "Sei attivo",
+      "done": "{name} è attivo. I dati demo sono stati rimossi e tutto ciò che hai impostato ti aspetta."
+    },
+    "settings": {
+      "title": "Account business",
+      "description": "Gestisci una palestra, un box o il tuo coaching su Palee",
+      "intro": "Chiedi al team Palee di trasformare questo account in un’attività. La apriranno in modalità demo e ti contatteranno per l’attivazione.",
+      "send": "Invia richiesta",
+      "sending": "Invio…",
+      "sent": "Richiesta inviata. Il team Palee ti risponderà.",
+      "cancel": "Ritira la richiesta"
+    },
+    "requestKind": {
+      "conversion": "Account business",
+      "activation": "Attivazione"
+    },
+    "status": {
+      "pending": "In attesa",
+      "approved": "Approvata",
+      "declined": "Rifiutata",
+      "cancelled": "Ritirata",
+      "completed": "Attivato"
+    },
+    "me": {
+      "row": "Account business",
+      "rowHint": "Una palestra, un box o il tuo coaching"
+    },
+    "console": {
+      "back": "Organizzazioni",
+      "title": "Account business",
+      "subtitle": "Richieste di apertura o attivazione di un’attività e tutte le attività ancora in modalità demo.",
+      "forbidden": "Solo il team Palee può aprire questa pagina.",
+      "requests": "Richieste",
+      "noRequests": "Nessuna richiesta in attesa.",
+      "demoBusinesses": "In modalità demo",
+      "noDemoBusinesses": "Nessuna attività è in modalità demo.",
+      "role": "Ruolo concesso",
+      "note": "Nota per chi ha chiesto",
+      "approveConversion": "Apri l’attività",
+      "approveActivation": "Genera link di attivazione",
+      "decline": "Rifiuta",
+      "demoSince": "in demo dal {date}",
+      "liveLink": "Link attivo per {name} ({role}), fino al {date}",
+      "revoke": "Revoca",
+      "account": "Account",
+      "pickAccount": "Scegli un account",
+      "issueLink": "Genera link di attivazione",
+      "replaceLink": "Sostituisci il link",
+      "issued": "Link di attivazione ({role}). Mandalo al titolare: funziona solo con il suo account.",
+      "linkLabel": "Link di attivazione",
+      "copy": "Copia",
+      "copied": "Copiato",
+      "linkHint": "Mostrato solo ora. Un nuovo link sostituisce questo."
+    }
   }
 }

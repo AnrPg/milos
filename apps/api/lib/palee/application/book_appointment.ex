@@ -5,7 +5,7 @@ defmodule Palee.Application.BookAppointment do
   reserved through the ledger and kept until the session is used or cancelled.
   """
 
-  alias Palee.Application.{AppointmentLedger, NotifyAppointment}
+  alias Palee.Application.{AppointmentLedger, GoLive, NotifyAppointment}
   alias Palee.{Appointments, Finance, Identity, Organizations}
   alias Palee.Appointments.Domain.AppointmentPolicy
 
@@ -13,6 +13,8 @@ defmodule Palee.Application.BookAppointment do
     now = DateTime.utc_now()
 
     with {:ok, client} <- client(context, actor, for_user_id),
+         # ADR-184: a business in demo mode takes no bookings from real people.
+         :ok <- GoLive.check_booking(context, client.id),
          %{} = slot <- Appointments.get_slot(context, slot_id) || {:error, :not_found},
          :ok <- AppointmentPolicy.can_book?(slot, slot.bookings, client.id, now),
          :ok <- terms_allow(context, client, slot),
