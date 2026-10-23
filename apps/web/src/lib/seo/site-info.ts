@@ -6,16 +6,22 @@ export const BRAND_NAME = "Palee";
 
 export type FaqEntry = { question: string; answer: string };
 
+export type FeatureFacts = { title: string; summary: string; details: string[] };
+
 export type SiteFacts = {
   origin: URL;
   description: string;
-  features: string[];
+  // Who Palee is for: the business side and the social side in one app.
+  overview: string[];
+  features: FeatureFacts[];
   languages: readonly string[];
 };
 
 export const FAQ_KEYS = [
   ["whatIsQuestion", "whatIsAnswer"],
+  ["twoSidesQuestion", "twoSidesAnswer"],
   ["whoForQuestion", "whoForAnswer"],
+  ["eventsQuestion", "eventsAnswer"],
   ["offlineQuestion", "offlineAnswer"],
   ["adsQuestion", "adsAnswer"],
   ["languagesQuestion", "languagesAnswer"],
@@ -65,7 +71,7 @@ export function siteStructuredData({ origin, description, features, languages }:
         operatingSystem: "Web",
         browserRequirements: "Requires JavaScript",
         inLanguage: [...languages],
-        featureList: features,
+        featureList: features.map(({ title, summary }) => `${title}: ${summary}`),
         publisher: { "@id": organizationId },
       },
     ],
@@ -85,14 +91,23 @@ export function faqStructuredData(entries: FaqEntry[]) {
 }
 
 // https://llmstxt.org: a Markdown map of the site for language models.
-export function llmsText({ origin, description, features }: SiteFacts, faq: FaqEntry[]) {
+export function llmsText({ origin, description, overview, features }: SiteFacts, faq: FaqEntry[]) {
   return [
     `# ${BRAND_NAME}`,
     "",
     `> ${description}`,
     "",
-    ...features.map((feature) => `- ${feature}`),
+    ...overview.flatMap((paragraph) => [paragraph, ""]),
+    "## Features",
     "",
+    ...features.flatMap(({ title, summary, details }) => [
+      `### ${title}`,
+      "",
+      summary,
+      "",
+      ...details.map((detail) => `- ${detail}`),
+      "",
+    ]),
     "## Pages",
     "",
     ...PUBLIC_PAGES.map(({ path, title }) => `- [${title}](${absolute(path, origin)})`),

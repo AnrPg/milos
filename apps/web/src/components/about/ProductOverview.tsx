@@ -3,11 +3,11 @@ import { getTranslations } from "next-intl/server";
 
 import { PaleeMark } from "@/components/branding/PaleeMark";
 import { getUiTranslations } from "@/i18n/ui-server";
-import type { FaqEntry } from "@/lib/seo/site-info";
+import type { FaqEntry, FeatureFacts } from "@/lib/seo/site-info";
 
 // The public description of Palee: the About page, and what crawlers that do
 // not run JavaScript read on the home page. Server-rendered, answer first.
-export async function ProductOverview({ faq }: { faq: FaqEntry[] }) {
+export async function ProductOverview({ faq, features }: { faq: FaqEntry[]; features: FeatureFacts[] }) {
   const i18n = await getUiTranslations();
   const info = await getTranslations("SiteInfo");
   return (
@@ -42,6 +42,18 @@ export async function ProductOverview({ faq }: { faq: FaqEntry[] }) {
           {i18n("signInada2e9e")}
         </Link>
       </div>
+      <section className="mt-16" aria-labelledby="palee-features">
+        <h2 id="palee-features" className="text-2xl font-bold tracking-tight">{info("featuresTitle")}</h2>
+        <p className="mt-3 max-w-2xl leading-7" style={{ color: "var(--muted)" }}>{info("twoSidesSummary")}</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2">
+          {features.map(({ title, summary }) => (
+            <section key={title} className="rounded-2xl border p-5" style={{ borderColor: "var(--border)", background: "var(--surface)" }}>
+              <h3 className="font-semibold">{title}</h3>
+              <p className="mt-2 text-sm leading-6" style={{ color: "var(--muted)" }}>{summary}</p>
+            </section>
+          ))}
+        </div>
+      </section>
       <section className="mt-16" aria-labelledby="palee-faq">
         <h2 id="palee-faq" className="text-2xl font-bold tracking-tight">{info("faqTitle")}</h2>
         <dl className="mt-6 grid gap-6">

@@ -10,14 +10,14 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function HomeRoute() {
-  const { faq } = await loadSiteFacts();
+  const { facts, faq } = await loadSiteFacts();
   return (
     <>
       {/* The session lives in the browser, so the server cannot tell a guest
           from a member; crawlers that skip JavaScript read the overview here
           instead of the "restoring session" placeholder. */}
       <noscript>
-        <ProductOverview faq={faq} />
+        <ProductOverview faq={faq} features={facts.features} />
       </noscript>
       <AuthGuard roleRedirects={{ admin: "/admin" }}>
         <Home />
