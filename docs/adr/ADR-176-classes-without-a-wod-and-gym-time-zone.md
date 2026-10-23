@@ -92,11 +92,18 @@ edge provides it.
   ("Create a published workout and an active class type…", stale since the WOD
   became optional). "+ Slot" and "Create series" open a small dialog that
   creates the first class type and continues to the form.
-* 2026-10-23: the class and series forms pick the WOD with
-  `schedule/WodPicker`: a searchable list (newest first, accent-insensitive),
-  a popover from 640px up and a bottom sheet on phones, "No WOD yet" as a real
-  choice. "+ New WOD" on the field's label row opens the usual WOD editor with
-  `?return_to=`; the form is kept in sessionStorage
-  (`class-draft-handoff.ts`) and publishing returns with `?wod=<id>`, which
-  reopens the form with that WOD chosen (`lib/workout-return.ts`, internal
-  paths only).
+* 2026-10-23 (revised the same day): the class and series forms, and the
+  class sheet's missing-WOD notice, pick the WOD with `schedule/WodPicker`,
+  built for libraries of thousands; the schedule page no longer loads the
+  library. Under an empty field, one tap takes the WOD other classes use that
+  gym day, else one recently used for the class type. The picker (a dialog,
+  a tall sheet on phones) opens on short suggestion groups (that day, recent
+  for the class type, newest) from `GET /admin/workouts/choices/suggested`;
+  anything else is found by title words with type and folder filters behind
+  the filter button, 20 at a time, from `GET /admin/workouts/choices`
+  (`Application.WorkoutChoices`; `master_workouts_title_trgm_index`,
+  migration `20261202100000`). "+ New WOD" on the field's label row opens the
+  usual WOD editor with `?return_to=`; the form (or the class to link) is kept
+  in sessionStorage (`class-draft-handoff.ts`) and publishing returns with
+  `?wod=<id>`, which reopens the form with that WOD chosen, or links it to the
+  class (`lib/workout-return.ts`, internal paths only).

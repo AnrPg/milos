@@ -13,6 +13,7 @@ import { ApiError } from "@/api/client";
 import {
   createScheduleSlot,
   createScheduleSeries,
+  linkScheduleSlotWorkout,
   deleteScheduleSlot,
   fetchSchedule,
   updateScheduleSlot,
@@ -24,7 +25,6 @@ import {
 } from "@/api/schedule";
 import { fetchMyEntitlement, type EffectiveEntitlement } from "@/api/my-finance";
 import { fetchAdminSettings, type SchedulingSettings } from "@/api/settings";
-import { listAdminWorkouts, type WorkoutRecord } from "@/api/workouts";
 import { useSession } from "@/components/session-provider";
 import { ViewModeSelector } from "@/components/calendar/ViewModeSelector";
 import { BookingModal } from "@/components/schedule/BookingModal";
@@ -79,7 +79,11 @@ type SeriesEditorState = {
 type PendingCreate = { kind: "slot"; isoDate: string } | { kind: "series" };
 
 /** A class form left open for the WOD editor ("+ New WOD"). */
-type ClassDraft = { kind: "slot"; editor: SlotEditorState } | { kind: "series"; editor: SeriesEditorState };
+type ClassDraft =
+  | { kind: "slot"; editor: SlotEditorState }
+  | { kind: "series"; editor: SeriesEditorState }
+  // A class without its WOD (ADR-176): the new WOD is linked to it on return.
+  | { kind: "link"; slotId: string };
 
 const hasActiveClassType = (types: ClassTypeRecord[]) => types.some((type) => !type.archived_at);
 
@@ -142,10 +146,10 @@ export function ScheduleConsole({
   );
   const [resolveMessage, setResolveMessage] = useState("");
   const [busy, setBusy] = useState(false);
-  const [workouts, setWorkouts] = useState<WorkoutRecord[]>([]);
   const [editor, setEditor] = useState<SlotEditorState | null>(null);
   const [seriesEditor, setSeriesEditor] = useState<SeriesEditorState | null>(null);
   const [pendingCreate, setPendingCreate] = useState<PendingCreate | null>(null);
+  const [reopenSlotId, setReopenSlotId] = useState<string | null>(null);
   const router = useRouter();
   const organizationSlug = useOrganizationSlug();
   const [schedulingDefaults, setSchedulingDefaults] = useState<SchedulingSettings | undefined>();
@@ -250,17 +254,16 @@ export function ScheduleConsole({
 
     let cancelled = false;
 
-    void Promise.all([listAdminWorkouts(token), fetchAdminSettings(token)])
-      .then(([nextWorkouts, settings]) => {
+    // The WOD picker searches the library on demand (WodPicker); the page no
+    // longer loads every workout.
+    void fetchAdminSettings(token)
+      .then((settings) => {
         if (!cancelled) {
-          setWorkouts(nextWorkouts.filter((workout) => workout.status === "published"));
           setSchedulingDefaults(settings.scheduling);
           setGymTimeZone(settings.time_zone?.timezone ?? null);
         }
       })
-      .catch(() => {
-        if (!cancelled) setWorkouts([]);
-      });
+      .catch(() => undefined);
 
     return () => {
       cancelled = true;
@@ -320,13 +323,41 @@ export function ScheduleConsole({
       router.replace(`${url.pathname}${url.search}`, { scroll: false });
     }
     if (!draft) return;
+    if (draft.kind === "link") {
+      const token = tokens?.access_token;
+      if (returnedWorkoutId && token) {
+        void linkScheduleSlotWorkout(token, draft.slotId, returnedWorkoutId)
+          .catch((reason) => setError(localizeError(reason, i18n)))
+          .finally(() => setReopenSlotId(draft.slotId));
+      } else {
+        const frame = window.requestAnimationFrame(() => setReopenSlotId(draft.slotId));
+        return () => window.cancelAnimationFrame(frame);
+      }
+      return;
+    }
     const master_workout_id = returnedWorkoutId ?? draft.editor.values.master_workout_id;
     const frame = window.requestAnimationFrame(() => {
       if (draft.kind === "slot") setEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
       else setSeriesEditor({ ...draft.editor, values: { ...draft.editor.values, master_workout_id } });
     });
     return () => window.cancelAnimationFrame(frame);
+    // Runs once on arrival; the session token is already there by then.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [router]);
+
+  // Reopen the class the coach left from once the schedule has it.
+  useEffect(() => {
+    if (!reopenSlotId || loading) return;
+    const slot = schedule.find((item) => item.id === reopenSlotId);
+    if (!slot) return;
+    const frame = window.requestAnimationFrame(() => {
+      setReopenSlotId(null);
+      setSelectedSlot(slot);
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [loading, reopenSlotId, schedule]);
+
+  const classTypeName = (id: string | null | undefined) => classTypes.find((type) => type.id === id)?.name ?? null;
 
   function createNewWod(draft: ClassDraft) {
     stashClassDraft(draft);
@@ -666,7 +697,7 @@ export function ScheduleConsole({
           }}
           onBook={() => setBookingTarget(selectedSlot)}
           guestsIncluded={includesGuestPasses(entitlement)}
-          linkableWorkouts={workouts}
+          onCreateWorkout={() => createNewWod({ kind: "link", slotId: selectedSlot.id })}
           locations={locations}
           onCancelBooking={({ lateCancellation }) => {
             setNotice(lateCancellation ? i18n("mbLateCancellationNotice") : null);
@@ -780,7 +811,10 @@ export function ScheduleConsole({
                   <div key={label} className="md:col-span-2">
                     <WodPicker
                       label={label}
-                      workouts={workouts}
+                      token={tokens?.access_token ?? ""}
+                      date={dateTimeLocalInZone(editor.values.scheduled_at, gymZone).slice(0, 10) || null}
+                      classTypeId={editor.values.class_type_id || null}
+                      classTypeName={classTypeName(editor.values.class_type_id)}
                       value={editor.values.master_workout_id ?? null}
                       onChange={(workoutId) =>
                         setEditor((current) =>
@@ -955,7 +989,10 @@ export function ScheduleConsole({
               <div className="sm:col-span-2">
                 <WodPicker
                   label={i18n("classSeriesWod")}
-                  workouts={workouts}
+                  token={tokens?.access_token ?? ""}
+                  date={seriesEditor.startDate || null}
+                  classTypeId={seriesEditor.values.class_type_id || null}
+                  classTypeName={classTypeName(seriesEditor.values.class_type_id)}
                   value={seriesEditor.values.master_workout_id ?? null}
                   onChange={(workoutId) => setSeriesEditor({ ...seriesEditor, values: { ...seriesEditor.values, master_workout_id: workoutId } })}
                   onCreateNew={() => createNewWod({ kind: "series", editor: seriesEditor })}

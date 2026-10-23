@@ -31,6 +31,12 @@ defmodule Palee.Workouts.WorkoutStore do
   def list_workouts(context), do: within_tenant(context, &adapter().list_workouts/0)
   def list_folders(context), do: within_tenant(context, &adapter().list_folders/0)
 
+  def search_workout_choices(context, opts),
+    do: within_tenant(context, fn -> adapter().search_workout_choices(opts) end)
+
+  def workout_choices_by_ids(context, ids),
+    do: within_tenant(context, fn -> adapter().workout_choices_by_ids(ids) end)
+
   def get_assigned_workout(context, id),
     do: within_tenant(context, fn -> adapter().get_assigned_workout(id) end)
 

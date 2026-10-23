@@ -779,6 +779,8 @@ defmodule PaleeWeb.Router do
     patch("/class-types/:id", AdminClassTypeController, :update)
     delete("/class-types/:id", AdminClassTypeController, :delete)
     get("/workouts", AdminWorkoutController, :index)
+    get("/workouts/choices", AdminWorkoutChoiceController, :search)
+    get("/workouts/choices/suggested", AdminWorkoutChoiceController, :suggested)
     get("/workout-folders", AdminWorkoutFolderController, :index)
     post("/workout-folders", AdminWorkoutFolderController, :create)
     patch("/workout-folders/:id", AdminWorkoutFolderController, :update)

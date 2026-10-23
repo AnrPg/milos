@@ -259,6 +259,87 @@ defmodule Palee.Infrastructure.Workouts.EctoWorkoutStore do
     end)
   end
 
+  # The class form's WOD picker: published library WODs as light summaries,
+  # searched and paged in the database so a library of thousands stays fast
+  # (title words matched with the trigram index; newest first).
+  @impl true
+  def search_workout_choices(opts) do
+    limit = opts |> Keyword.get(:limit, 20) |> min(50) |> max(1)
+    offset = opts |> Keyword.get(:offset, 0) |> max(0)
+
+    rows =
+      choice_scope()
+      |> filter_choice_words(Keyword.get(opts, :query))
+      |> filter_choice_type(Keyword.get(opts, :type))
+      |> filter_choice_folder(Keyword.get(opts, :folder_id))
+      |> order_by([workout], desc: workout.updated_at, desc: workout.id)
+      |> limit(^(limit + 1))
+      |> offset(^offset)
+      |> select_choice()
+      |> Repo.all()
+
+    %{workouts: Enum.take(rows, limit), has_more: length(rows) > limit}
+  end
+
+  @impl true
+  def workout_choices_by_ids([]), do: []
+
+  def workout_choices_by_ids(ids) do
+    by_id =
+      choice_scope()
+      |> where([workout], workout.id in ^Enum.uniq(ids))
+      |> select_choice()
+      |> Repo.all()
+      |> Map.new(&{&1.id, &1})
+
+    ids |> Enum.uniq() |> Enum.flat_map(&List.wrap(Map.get(by_id, &1)))
+  end
+
+  defp choice_scope do
+    MasterWorkout
+    |> scoped_to_tenant()
+    |> where([workout], workout.status == :published and workout.library_visibility == "shared")
+  end
+
+  defp select_choice(query) do
+    select(query, [workout], %{
+      id: workout.id,
+      title: workout.title,
+      type: workout.type,
+      icon: workout.icon,
+      icon_source: workout.icon_source,
+      folder_id: workout.folder_id,
+      updated_at: workout.updated_at
+    })
+  end
+
+  defp filter_choice_words(query, text) when is_binary(text) do
+    text
+    |> String.split(~r/\s+/u, trim: true)
+    |> Enum.take(8)
+    |> Enum.reduce(query, fn word, acc ->
+      pattern = "%" <> escape_like(word) <> "%"
+      where(acc, [workout], ilike(workout.title, ^pattern))
+    end)
+  end
+
+  defp filter_choice_words(query, _text), do: query
+
+  defp filter_choice_type(query, type) when is_binary(type) and type != "" do
+    if type in Enum.map(Palee.Workouts.Domain.WorkoutType.values(), &to_string/1),
+      do: where(query, [workout], workout.type == ^String.to_existing_atom(type)),
+      else: where(query, [workout], false)
+  end
+
+  defp filter_choice_type(query, _type), do: query
+
+  defp filter_choice_folder(query, folder_id) when is_binary(folder_id) and folder_id != "",
+    do: where(query, [workout], workout.folder_id == ^folder_id)
+
+  defp filter_choice_folder(query, _folder_id), do: query
+
+  defp escape_like(text), do: String.replace(text, ~r/[\\%_]/, &"\\#{&1}")
+
   @impl true
   def list_folders do
     WorkoutFolder
