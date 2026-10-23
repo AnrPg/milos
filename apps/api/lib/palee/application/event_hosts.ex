@@ -146,7 +146,8 @@ defmodule Palee.Application.EventHosts do
   defp pin_address(%{latitude: lat} = params) when is_number(lat), do: params
 
   defp pin_address(params) do
-    query = [params[:place_name], params[:address]] |> Enum.filter(&is_binary/1) |> Enum.join(", ")
+    query =
+      [params[:place_name], params[:address]] |> Enum.filter(&is_binary/1) |> Enum.join(", ")
 
     if is_nil(params[:location_id]) and String.length(String.trim(query)) >= 3 do
       case Facility.search_addresses(query, limit: 1) do
@@ -165,8 +166,9 @@ defmodule Palee.Application.EventHosts do
 
   defp create_as_business(context, organization_id, params) do
     with {:ok, clubs} <- ClubScope.call(context),
-         %{} = club <- business_club(clubs, organization_id, params[:club_id]) ||
-           {:error, :not_found},
+         %{} = club <-
+           business_club(clubs, organization_id, params[:club_id]) ||
+             {:error, :not_found},
          do: CommunityEvents.create(context, club.id, params)
   end
 

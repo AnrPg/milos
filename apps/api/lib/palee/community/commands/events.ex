@@ -49,7 +49,6 @@ defmodule Palee.Community.Commands.Events do
     end
   end
 
-
   @doc """
   ADR-185: whether the attributes make a valid event, before there is a
   club for it (a person's first own event creates their organisation only

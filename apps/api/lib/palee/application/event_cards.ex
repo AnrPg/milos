@@ -37,7 +37,9 @@ defmodule Palee.Application.EventCards do
         post[:origin] == "profile" ->
           case found do
             {raw, shown} ->
-              if EventPresenter.visible?(raw, viewer), do: [Map.put(post, :event, shown)], else: []
+              if EventPresenter.visible?(raw, viewer),
+                do: [Map.put(post, :event, shown)],
+                else: []
 
             nil ->
               []
@@ -65,7 +67,9 @@ defmodule Palee.Application.EventCards do
   # Which cross-organisation cards are still co-hosted by the post's box.
   defp cohosting(wanted, user_id) do
     crossing =
-      for {{org, event_id}, _post_id, post_org} <- wanted, is_binary(post_org), org != post_org,
+      for {{org, event_id}, _post_id, post_org} <- wanted,
+          is_binary(post_org),
+          org != post_org,
           do: event_id
 
     case crossing do

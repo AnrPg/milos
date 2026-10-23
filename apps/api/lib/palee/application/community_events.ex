@@ -55,7 +55,9 @@ defmodule Palee.Application.CommunityEvents do
         context
         |> gym_of(club.organization_id)
         |> Community.list_events(filter)
-        |> Kernel.++(if club.kind == "gym", do: cohosted(context, [club.organization_id], filter), else: [])
+        |> Kernel.++(
+          if club.kind == "gym", do: cohosted(context, [club.organization_id], filter), else: []
+        )
         |> visible_only(context, clubs)
         |> sort_window(params[:scope])
 
@@ -247,7 +249,9 @@ defmodule Palee.Application.CommunityEvents do
   """
   def record_view(%{user_id: user_id} = context, event_id, now \\ DateTime.utc_now()) do
     with {:ok, event, _clubs, _invite} <- locate(context, event_id, nil) do
-      unless host?(user_id, event) do
+      host? = host?(user_id, event)
+
+      unless host? do
         day = DateTime.to_date(now)
         key = KeyDerivation.derive("event-view", Enum.join([event.id, day, user_id], "|"))
 
@@ -259,7 +263,7 @@ defmodule Palee.Application.CommunityEvents do
         )
       end
 
-      {:ok, %{recorded: true}}
+      {:ok, %{counted: not host?}}
     end
   end
 
@@ -428,9 +432,15 @@ defmodule Palee.Application.CommunityEvents do
   end
 
   defp organiser_host?(%{organization_id: organization_id}),
-    do: Community.organiser?(Map.get(Organizations.provider_kinds([organization_id]), organization_id))
+    do:
+      Community.organiser?(
+        Map.get(Organizations.provider_kinds([organization_id]), organization_id)
+      )
 
-  defp publish_profile_card(%{user_id: user_id}, [%{open_to_non_members: true} = first | _] = events) do
+  defp publish_profile_card(
+         %{user_id: user_id},
+         [%{open_to_non_members: true} = first | _] = events
+       ) do
     with {:ok, _post} <-
            Community.create_profile_post(%{user_id: user_id}, "public", %{
              attachment_type: "event",
@@ -735,7 +745,10 @@ defmodule Palee.Application.CommunityEvents do
       suspects = Enum.filter(events, &MapSet.member?(blocked, &1.created_by_id))
 
       kinds =
-        suspects |> Enum.map(& &1.organization_id) |> Enum.uniq() |> Organizations.provider_kinds()
+        suspects
+        |> Enum.map(& &1.organization_id)
+        |> Enum.uniq()
+        |> Organizations.provider_kinds()
 
       Enum.reject(events, fn event ->
         MapSet.member?(blocked, event.created_by_id) and

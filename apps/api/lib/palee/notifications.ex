@@ -33,7 +33,7 @@ defmodule Palee.Notifications do
   @event_types ~w(
     community_event_waitlist_promoted community_event_cancelled community_event_changed
     community_event_reminder community_event_guest_joined community_event_trial_offer
-    community_event_message
+    community_event_message community_event_cohost_request community_event_cohost_answered
   )
 
   @referral_types ~w(referral_progress referral_reward referral_review)
@@ -1148,6 +1148,7 @@ defmodule Palee.Notifications do
       person_nickname: field(payload, :person_nickname),
       box_name: field(payload, :box_name),
       message: field(payload, :message),
+      answer: field(payload, :answer),
       dedupe_key: "#{type}:#{event_id}:#{field(payload, :dedupe)}",
       url: field(payload, :url) || "/events/#{event_id}"
     }

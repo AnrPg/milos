@@ -269,7 +269,11 @@ defmodule Palee.Community do
   defdelegate get_event_cohost(context, id), to: EventStore, as: :get_cohost
   defdelegate insert_event_cohost(context, attrs), to: EventStore, as: :insert_cohost
   defdelegate update_event_cohost(context, cohost, attrs), to: EventStore, as: :update_cohost
-  defdelegate event_cohost_requests(context, organization_id), to: EventStore, as: :cohost_requests
+
+  defdelegate event_cohost_requests(context, organization_id),
+    to: EventStore,
+    as: :cohost_requests
+
   defdelegate respond_event_cohost(context, id, status, now), to: EventStore, as: :respond_cohost
 
   defdelegate accepted_event_cohosts(context, event_ids, cohost_ids),

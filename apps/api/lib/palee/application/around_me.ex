@@ -38,7 +38,9 @@ defmodule Palee.Application.AroundMe do
 
   def search(%{user_id: user_id} = context, body, now \\ DateTime.utc_now()) do
     body = stringify(body)
-    memberships = user_id |> Organizations.list_memberships() |> Organizations.provider_memberships()
+
+    memberships =
+      user_id |> Organizations.list_memberships() |> Organizations.provider_memberships()
 
     with {:ok, filter} <- Places.parse_filter(body["filter"], vocabulary()),
          {:ok, origin} <- origin(context, body["origin"], filter) do
@@ -120,6 +122,7 @@ defmodule Palee.Application.AroundMe do
     memberships =
       memberships ||
         user_id |> Organizations.list_memberships() |> Organizations.provider_memberships()
+
     %{user_id: user_id, organization_ids: Enum.map(memberships, & &1.organization.id)}
   end
 

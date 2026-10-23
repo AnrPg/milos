@@ -120,5 +120,6 @@ defmodule Palee.Community.Domain.EventNumbers do
   def percent(_part, whole) when whole in [0, nil], do: nil
   def percent(part, whole), do: min(round(part * 100 / whole), 100)
 
-  defp add(acc, row, keys), do: Enum.reduce(keys, acc, &Map.update!(&2, &1, fn v -> v + Map.fetch!(row, &1) end))
+  defp add(acc, row, keys),
+    do: Enum.reduce(keys, acc, &Map.update!(&2, &1, fn v -> v + Map.fetch!(row, &1) end))
 end

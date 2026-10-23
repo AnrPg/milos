@@ -603,3 +603,23 @@ msgstr "%{class} (%{when}) non ha ancora un WOD. Collegane uno prima che inizi."
 # ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
 msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} ora tua"
+
+
+# ADR-185: co-hosting an event.
+msgid "Co-host request"
+msgstr "Richiesta di co-organizzazione"
+
+msgid "%{box} invites you to co-host «%{event}» (%{when})."
+msgstr "%{box} ti invita a co-organizzare «%{event}» (%{when})."
+
+msgid "Co-hosting"
+msgstr "Co-organizzazione"
+
+msgid "%{box} will co-host «%{event}»."
+msgstr "%{box} co-organizzerà «%{event}»."
+
+msgid "%{box} declined to co-host «%{event}»."
+msgstr "%{box} ha rifiutato di co-organizzare «%{event}»."
+
+msgid "%{box} no longer co-hosts «%{event}»."
+msgstr "%{box} non co-organizza più «%{event}»."

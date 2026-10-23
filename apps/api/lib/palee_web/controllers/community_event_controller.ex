@@ -8,7 +8,7 @@ defmodule PaleeWeb.CommunityEventController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.CommunityEvents
+  alias Palee.Application.{CommunityEvents, EventHosts}
   alias PaleeWeb.Schemas.CommunityEvents, as: S
   alias OpenApiSpex.{Parameter, Schema}
 
@@ -153,6 +153,42 @@ defmodule PaleeWeb.CommunityEventController do
     with {:ok, invitation} <- CommunityEvents.invite(conn.assigns.user_context, id) do
       conn |> put_status(:created) |> json(invitation)
     end
+  end
+
+  # ADR-185: «Διοργάνωση ως».
+  operation(:hosts,
+    summary: "Who you can host an event as: «Ως εγώ» and each business where you run events",
+    responses: [ok: {"Hosts", "application/json", S.hosts_response()}]
+  )
+
+  def hosts(conn, _params) do
+    with {:ok, result} <- EventHosts.hosts(conn.assigns.user_context),
+         do: json(conn, result)
+  end
+
+  operation(:host_create,
+    summary:
+      "Create an event as yourself (open to everyone or by invitation) or as a business; rate limited",
+    request_body: S.body(S.host_create_request()),
+    responses: [created: {"Created", "application/json", S.created_response()}]
+  )
+
+  def host_create(conn, _params) do
+    with {:ok, result} <- EventHosts.create(conn.assigns.user_context, conn.body_params) do
+      conn |> put_status(:created) |> json(result)
+    end
+  end
+
+  operation(:view,
+    summary:
+      "Counts an open of the event page (once per person and day, without keeping who; hosts are not counted)",
+    parameters: [@id],
+    responses: [ok: {"View", "application/json", S.view_response()}]
+  )
+
+  def view(conn, %{id: id}) do
+    with {:ok, result} <- CommunityEvents.record_view(conn.assigns.user_context, id),
+         do: json(conn, result)
   end
 
   defp reply(conn, {:ok, event}), do: json(conn, %{event: event})

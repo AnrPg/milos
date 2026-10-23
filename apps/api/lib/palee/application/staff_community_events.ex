@@ -233,6 +233,108 @@ defmodule Palee.Application.StaffCommunityEvents do
     end
   end
 
+  @doc """
+  ADR-185: records that a paid place was given back (all of it by default,
+  or `amount_cents` of it). The money moves outside Palee, as with «Πλήρωσε».
+  """
+  def refund(context, event_id, user_id, amount_cents) do
+    with :ok <- authorize(context, [:manage_events, :take_payments]),
+         {:ok, event} <- CommunityEvents.fetch_own(context, event_id),
+         true <- (is_nil(amount_cents) or is_integer(amount_cents)) || {:error, :invalid_refund},
+         {:ok, _attendee} <-
+           Community.record_event_refund(
+             context,
+             event.id,
+             user_id,
+             amount_cents,
+             DateTime.utc_now()
+           ) do
+      show(context, event.id)
+    end
+  end
+
+  @doc """
+  ADR-185 «Οικονομικά»: each event's ticket income, refunds and what is
+  still owed, with totals per currency. `scope`: `all` (default), `upcoming`
+  or `past`.
+  """
+  def finances(context, params, now \\ DateTime.utc_now()) do
+    with :ok <- authorize(context, [:manage_events, :take_payments]) do
+      events = console_events(context, params[:scope], now)
+
+      attendees =
+        context
+        |> Community.list_attendees(Enum.map(events, & &1.id))
+        |> Enum.group_by(& &1.event_id)
+
+      rows =
+        Enum.map(events, fn event ->
+          event
+          |> Community.event_finances(Map.get(attendees, event.id, []))
+          |> Map.merge(event_line(event))
+        end)
+
+      {:ok, %{events: rows, totals: Community.event_finance_totals(rows)}}
+    end
+  end
+
+  @doc """
+  ADR-185 «Αναλυτικά»: each event's reach (page opens and distinct viewers,
+  counted per day without keeping who), RSVPs, waitlist, attendance and
+  conversion, with totals.
+  """
+  def analytics(context, params, now \\ DateTime.utc_now()) do
+    with :ok <- authorize(context, @read) do
+      events = console_events(context, params[:scope], now)
+      ids = Enum.map(events, & &1.id)
+      attendees = context |> Community.list_attendees(ids) |> Enum.group_by(& &1.event_id)
+      views = Community.event_view_totals(context, ids)
+
+      rows =
+        Enum.map(events, fn event ->
+          event
+          |> Community.event_analytics(
+            Map.get(attendees, event.id, []),
+            Map.get(views, event.id, %{}),
+            now
+          )
+          |> Map.merge(event_line(event))
+        end)
+
+      {:ok, %{events: rows, totals: Community.event_analytics_totals(rows)}}
+    end
+  end
+
+  defp console_events(%{organization_id: organization_id} = context, scope, now) do
+    base = %{organization_ids: [organization_id], include_cancelled: true}
+
+    upcoming =
+      if scope in [nil, "all", "upcoming"],
+        do: Community.list_events(context, Map.merge(base, %{from: now, limit: @upcoming_limit})),
+        else: []
+
+    past =
+      if scope in [nil, "all", "past"],
+        do:
+          Community.list_events(
+            context,
+            Map.merge(base, %{ended_before: now, order: :desc, limit: @past_limit})
+          ),
+        else: []
+
+    Enum.uniq_by(upcoming ++ past, & &1.id)
+  end
+
+  defp event_line(event),
+    do: %{
+      event_id: event.id,
+      title: event.title,
+      starts_at: event.starts_at,
+      ends_at: event.ends_at,
+      time_zone: event.time_zone,
+      cancelled_at: event.cancelled_at
+    }
+
   defp claim_offer(context, event_id, now) do
     case Community.claim_event_step(context, event_id, :trial_offer_sent_at, now) do
       {:ok, event} -> {:ok, event}
@@ -267,6 +369,8 @@ defmodule Palee.Application.StaffCommunityEvents do
       payment_method: attendee.payment_method,
       amount_cents: attendee.amount_cents,
       receipt_issued: not is_nil(attendee.finance_invoice_id),
+      refunded_at: attendee.refunded_at,
+      refund_cents: attendee.refund_cents,
       checked_in_at: attendee.checked_in_at,
       cancelled_at: attendee.cancelled_at,
       late_cancel: attendee.late_cancel,

@@ -59,8 +59,7 @@ defmodule Palee.Application.EventPresenter do
     Community.event_belongs?(event, %{
       club_member?: MapSet.member?(viewer.club_ids, event.club_id),
       group_member?: MapSet.member?(viewer.group_ids, event.channel_id),
-      cohost_member?:
-        MapSet.member?(Map.get(viewer, :cohosted_event_ids, MapSet.new()), event.id)
+      cohost_member?: MapSet.member?(Map.get(viewer, :cohosted_event_ids, MapSet.new()), event.id)
     })
   end
 
@@ -213,7 +212,8 @@ defmodule Palee.Application.EventPresenter do
 
   # Accepted co-hosts, as their public box pages show them.
   defp cohosts(events, viewer) do
-    rows = Community.accepted_event_cohosts(%{user_id: viewer.user_id}, Enum.map(events, & &1.id), nil)
+    rows =
+      Community.accepted_event_cohosts(%{user_id: viewer.user_id}, Enum.map(events, & &1.id), nil)
 
     faces =
       case rows |> Enum.map(& &1.cohost_organization_id) |> Enum.uniq() do
