@@ -20,6 +20,11 @@ defmodule Palee.Organizations.RegistrationInvitation do
     field :intended_email_digest, :binary
     # A coach's client invitation: the redeemed client becomes theirs (ADR-100).
     field :coach_user_id, :binary_id
+    # ADR-186: the role set (`role` is its primary role; empty = `[role]`) and
+    # the branches the redeemed membership works at.
+    field :roles, {:array, Ecto.Enum}, values: MembershipPolicy.roles(), default: []
+    field :all_locations, :boolean, default: true
+    field :location_ids, {:array, :binary_id}, default: []
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -35,16 +40,31 @@ defmodule Palee.Organizations.RegistrationInvitation do
       :expires_at,
       :issued_by_user_id,
       :intended_email_digest,
-      :coach_user_id
+      :coach_user_id,
+      :roles,
+      :all_locations,
+      :location_ids
     ])
     |> validate_required([:organization_id, :token_digest, :role, :expires_at])
     |> validate_digest(:token_digest)
     |> validate_optional_digest(:intended_email_digest)
     |> validate_expiry(issued_at)
+    |> check_constraint(:location_ids,
+      name: :registration_invitations_location_scope_check,
+      message: "must list between 1 and 200 locations"
+    )
     |> unique_constraint(:token_digest)
     |> foreign_key_constraint(:organization_id)
     |> foreign_key_constraint(:issued_by_user_id)
   end
+
+  @doc "ADR-186: the role set an invitation grants (older links carry one role)."
+  def granted_roles(%__MODULE__{roles: [_ | _] = roles}), do: roles
+  def granted_roles(%__MODULE__{role: role}), do: [role]
+
+  @doc "ADR-186: the branch scope an invitation grants, `:all` or location ids."
+  def granted_scope(%__MODULE__{all_locations: false, location_ids: [_ | _] = ids}), do: ids
+  def granted_scope(%__MODULE__{}), do: :all
 
   def redeem_changeset(invitation, user_id, redeemed_at) do
     invitation

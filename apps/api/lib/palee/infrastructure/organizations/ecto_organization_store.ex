@@ -5,9 +5,13 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
 
   alias Ecto.Multi
 
+  alias Palee.Infrastructure.Organizations.EctoLocationScopeStore
+  alias Palee.Infrastructure.Tenancy.RepoContext
+
   alias Palee.Organizations.Domain.{
     BrandLogoPolicy,
     InvitationPolicy,
+    LocationScopePolicy,
     MembershipPolicy,
     SlugRenamePolicy,
     TimeZonePolicy
@@ -117,7 +121,9 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
         Repo.rollback(:invalid_invitation)
       end
 
+      previous = get_membership(invitation.organization_id, user_id)
       membership = upsert_redeemed_membership(invitation, user_id, redeemed_at)
+      {membership, location_scope} = apply_invited_scope(invitation, previous, membership)
 
       redeemed =
         invitation
@@ -128,10 +134,62 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
       %{
         invitation: redeemed,
         membership: membership,
+        location_scope: location_scope,
         organization: Repo.get!(Organization, invitation.organization_id)
       }
     end)
     |> flatten_transaction()
+  end
+
+  # ADR-186: the redeemed membership works at the invited branches, in the
+  # same transaction as the roles, so a link never grants more than it says.
+  # Branch rows live under row security, so this part runs in the gym's scope.
+  defp apply_invited_scope(invitation, previous, membership) do
+    context = %{organization_id: invitation.organization_id, user_id: membership.user_id}
+
+    RepoContext.run(context, fn ->
+      previous_roles = if previous && previous.status == :active, do: previous.roles, else: []
+
+      target =
+        LocationScopePolicy.merge_on_redeem(
+          previous_roles,
+          stored_scope(context, previous),
+          existing_locations(context, RegistrationInvitation.granted_scope(invitation))
+        )
+
+      membership =
+        if target == :all and membership.all_locations != false do
+          membership
+        else
+          case EctoLocationScopeStore.put_scope(context, membership.id, target) do
+            {:ok, updated} -> updated
+            {:error, reason} -> Repo.rollback(reason)
+          end
+        end
+
+      active = if target == :all, do: [], else: EctoLocationScopeStore.location_ids(context, membership.id)
+      {membership, LocationScopePolicy.effective(membership.roles, target == :all, active)}
+    end)
+  end
+
+  defp stored_scope(context, %OrganizationMembership{all_locations: false} = membership),
+    do: EctoLocationScopeStore.location_ids(context, membership.id)
+
+  defp stored_scope(_context, _membership), do: :all
+
+  # A branch deleted since the link was issued drops out of it.
+  defp existing_locations(_context, :all), do: :all
+
+  defp existing_locations(%{organization_id: organization_id}, ids) do
+    organization_id = Ecto.UUID.dump!(organization_id)
+    ids = Enum.map(ids, &Ecto.UUID.dump!/1)
+
+    "facility_locations"
+    |> where([l], l.organization_id == ^organization_id and l.id in ^ids)
+    |> select([l], l.id)
+    |> Repo.all()
+    |> Enum.map(&Ecto.UUID.load!/1)
+    |> Enum.sort()
   end
 
   @impl true
@@ -1099,10 +1157,12 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
   end
 
   defp upsert_redeemed_membership(invitation, user_id, redeemed_at) do
+    invited_roles = RegistrationInvitation.granted_roles(invitation)
+
     params = %{
       organization_id: invitation.organization_id,
       user_id: user_id,
-      role: invitation.role,
+      roles: invited_roles,
       status: :active,
       joined_at: redeemed_at,
       invited_by_user_id: invitation.issued_by_user_id
@@ -1120,11 +1180,11 @@ defmodule Palee.Infrastructure.Organizations.EctoOrganizationStore do
       membership ->
         roles =
           if membership.status == :active,
-            do: Enum.uniq([invitation.role | membership.roles]),
-            else: [invitation.role]
+            do: Enum.uniq(invited_roles ++ membership.roles),
+            else: invited_roles
 
         membership
-        |> OrganizationMembership.changeset(params |> Map.delete(:role) |> Map.put(:roles, roles))
+        |> OrganizationMembership.changeset(Map.put(params, :roles, roles))
         |> Repo.update()
         |> unwrap_or_rollback()
     end

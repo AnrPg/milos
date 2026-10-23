@@ -21,7 +21,14 @@ defmodule Palee.Organizations.Commands.SetCoachScope do
     with %{} = membership <-
            OrganizationStore.get_membership(context.organization_id, user_id) ||
              {:error, :not_found},
-         true <- :coach in membership.roles || {:error, :not_a_coach} do
+         true <- :coach in membership.roles || {:error, :not_a_coach},
+         # ADR-186: only for a coach of the granter's own branches.
+         :ok <-
+           Palee.Organizations.Commands.SetMembershipLocationScope.authorize_manage(
+             context,
+             membership,
+             membership.roles
+           ) do
       OrganizationStore.update_membership_settings(
         context.organization_id,
         membership.id,

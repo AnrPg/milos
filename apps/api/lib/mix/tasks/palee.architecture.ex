@@ -102,6 +102,7 @@ defmodule Mix.Tasks.Palee.Architecture do
     media/media_store
     identity/saved_filter_store
     organizations/public_profile_store
+    organizations/location_scope_store
     ai_usage/ai_usage_store
     places/discovery_store
     places/home_area_store

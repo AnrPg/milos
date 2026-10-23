@@ -1,12 +1,24 @@
 defmodule Palee.Organizations.Domain.TenantAuthorization do
   @moduledoc false
 
-  alias Palee.Organizations.Domain.{AccessPolicy, MembershipPolicy}
+  alias Palee.Organizations.Domain.{AccessPolicy, LocationScopePolicy, MembershipPolicy}
   alias Palee.Organizations.TenantContext
 
-  def build(account, organization, membership, request_metadata, role_grants \\ %{})
+  @doc """
+  The tenant context of an account in a gym. `location_ids` are the active
+  branches of a branch-scoped membership (ADR-186); they are ignored when the
+  membership works everywhere.
+  """
+  def build(
+        account,
+        organization,
+        membership,
+        request_metadata,
+        role_grants \\ %{},
+        location_ids \\ []
+      )
 
-  def build(account, organization, membership, request_metadata, role_grants)
+  def build(account, organization, membership, request_metadata, role_grants, location_ids)
       when is_map(account) and is_map(organization) and is_map(membership) do
     cond do
       organization.status != :active ->
@@ -22,6 +34,13 @@ defmodule Palee.Organizations.Domain.TenantAuthorization do
         roles = membership_roles(membership)
         coach_scope = Map.get(membership, :coach_scope) || :own
 
+        location_scope =
+          LocationScopePolicy.effective(
+            roles,
+            Map.get(membership, :all_locations, true),
+            location_ids
+          )
+
         {:ok,
          %TenantContext{
            organization: organization,
@@ -33,17 +52,20 @@ defmodule Palee.Organizations.Domain.TenantAuthorization do
            role: MembershipPolicy.primary_role(roles) || membership.role,
            roles: roles,
            capabilities:
-             AccessPolicy.capabilities(roles,
+             roles
+             |> AccessPolicy.capabilities(
                coach_scope: coach_scope,
                role_grants: role_grants || %{}
-             ),
+             )
+             |> LocationScopePolicy.narrow_capabilities(location_scope),
            coach_scope: coach_scope,
+           location_scope: location_scope,
            request_metadata: request_metadata || %{}
          }}
     end
   end
 
-  def build(_account, _organization, _membership, _request_metadata, _role_grants),
+  def build(_account, _organization, _membership, _request_metadata, _role_grants, _ids),
     do: {:error, :membership_required}
 
   @doc """

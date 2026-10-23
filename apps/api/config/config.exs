@@ -93,6 +93,11 @@ config :palee,
        :organization_store,
        Palee.Infrastructure.Organizations.EctoOrganizationStore
 
+# ADR-186: which branches a staff membership works at.
+config :palee,
+       :location_scope_store,
+       Palee.Infrastructure.Organizations.EctoLocationScopeStore
+
 config :palee, :coaching_store, Palee.Infrastructure.Coaching.EctoCoachingStore
 
 config :palee,

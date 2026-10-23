@@ -16,6 +16,7 @@ defmodule Palee.Organizations.Commands.SetMembershipRole do
   alias Palee.Application.BroadcastUserSync
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Organizations.OrganizationStore
+  alias Palee.Organizations.Commands.SetMembershipLocationScope
   alias Palee.{Finance, Scheduling, Workouts}
 
   @doc "Replaces the target's roles with one role (single-role callers)."
@@ -51,6 +52,8 @@ defmodule Palee.Organizations.Commands.SetMembershipRole do
          :ok <- refuse_self_change(context, membership),
          changed = symmetric_difference(roles, membership.roles),
          :ok <- authorize_role_ceiling(TenantAuthorization.roles(context), changed),
+         # ADR-186: a branch manager changes only staff of their own branches.
+         :ok <- SetMembershipLocationScope.authorize_manage(context, membership, roles),
          :ok <- keep_an_owner(context, membership, roles) do
       OrganizationStore.transaction(fn ->
         with :ok <- reconcile_role_owned_state(context, membership, roles) do

@@ -1,7 +1,7 @@
 defmodule Palee.Organizations.Queries.ResolveTenantContext do
   alias Palee.Infrastructure.Tenancy.RepoContext
   alias Palee.Organizations.Domain.TenantAuthorization
-  alias Palee.Organizations.OrganizationStore
+  alias Palee.Organizations.{LocationScopeStore, OrganizationStore}
 
   def call(account, slug, request_metadata) when is_map(account) and is_binary(slug) do
     # Resolution runs inside a user-scoped session so the root tenant tables'
@@ -28,7 +28,8 @@ defmodule Palee.Organizations.Queries.ResolveTenantContext do
         organization,
         membership,
         request_metadata,
-        role_grants(organization)
+        role_grants(organization),
+        location_ids(account, membership)
       )
     end)
   end
@@ -54,12 +55,24 @@ defmodule Palee.Organizations.Queries.ResolveTenantContext do
         organization,
         membership,
         request_metadata,
-        role_grants(organization)
+        role_grants(organization),
+        location_ids(account, membership)
       )
     end)
   end
 
   def by_id(_account, _organization_id, _request_metadata), do: {:error, :membership_required}
+
+  # ADR-186: the branches of a branch-scoped staff membership, read once per
+  # request. A membership that works everywhere needs no read.
+  defp location_ids(account, %{all_locations: false, status: :active} = membership) do
+    LocationScopeStore.location_ids(
+      %{organization_id: membership.organization_id, user_id: account.id},
+      membership.id
+    )
+  end
+
+  defp location_ids(_account, _membership), do: []
 
   # What the gym unlocked for roles such as front desk (ADR-099).
   defp role_grants(nil), do: %{}

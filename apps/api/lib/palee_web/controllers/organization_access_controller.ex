@@ -86,6 +86,12 @@ defmodule PaleeWeb.OrganizationAccessController do
     properties: %{
       organization: @organization_schema,
       role: %Schema{type: :string},
+      roles: %Schema{
+        type: :array,
+        items: %Schema{type: :string},
+        description: "ADR-186: the role set; `role` is its primary role"
+      },
+      location_scope: PaleeWeb.Schemas.LocationScope.schema(),
       expires_at: %Schema{type: :string, format: :date_time},
       token: %Schema{type: :string, nullable: true}
     },
@@ -111,6 +117,7 @@ defmodule PaleeWeb.OrganizationAccessController do
         description: "capability => scope (all, own, status), ADR-099",
         additionalProperties: %Schema{type: :string}
       },
+      location_scope: PaleeWeb.Schemas.LocationScope.schema(),
       organization: @organization_schema,
       settings: @organization_settings_schema
     },
@@ -158,11 +165,34 @@ defmodule PaleeWeb.OrganizationAccessController do
           schema: %Schema{
             type: :object,
             properties: %{
-              role: %Schema{type: :string, enum: ~w(owner admin coach member athlete)},
+              role: %Schema{
+                type: :string,
+                enum: ~w(owner admin coach front_desk accountant janitor member athlete),
+                description: "One role (older clients); `roles` wins when both are sent"
+              },
+              roles: %Schema{
+                type: :array,
+                minItems: 1,
+                items: %Schema{
+                  type: :string,
+                  enum: ~w(owner admin coach front_desk accountant janitor member athlete)
+                },
+                description: "ADR-186: the role set the invited person gets"
+              },
+              all_locations: %Schema{
+                type: :boolean,
+                description: "ADR-186: staff work at every branch («Όλα τα καταστήματα»)"
+              },
+              location_ids: %Schema{
+                type: :array,
+                maxItems: 200,
+                items: %Schema{type: :string, format: :uuid},
+                description:
+                  "ADR-186: the branches staff work at; defaults to the issuer's own scope"
+              },
               lifetime_seconds: %Schema{type: :integer, minimum: 300, maximum: 604_800},
               intended_email: %Schema{type: :string}
-            },
-            required: [:role]
+            }
           }
         }
       }
@@ -182,6 +212,8 @@ defmodule PaleeWeb.OrganizationAccessController do
     properties: %{
       id: %Schema{type: :string, format: :uuid},
       role: %Schema{type: :string},
+      roles: %Schema{type: :array, items: %Schema{type: :string}},
+      location_scope: PaleeWeb.Schemas.LocationScope.schema(),
       expires_at: %Schema{type: :string, format: :date_time},
       issued_at: %Schema{type: :string, format: :date_time},
       email_bound: %Schema{type: :boolean}
@@ -317,6 +349,8 @@ defmodule PaleeWeb.OrganizationAccessController do
     %{
       id: invitation.id,
       role: to_string(invitation.role),
+      roles: invitation_roles(invitation),
+      location_scope: invitation_scope(invitation),
       expires_at: invitation.expires_at,
       issued_at: invitation.inserted_at,
       email_bound: not is_nil(invitation.intended_email_digest)
@@ -355,6 +389,8 @@ defmodule PaleeWeb.OrganizationAccessController do
         serialize_invitation(%{
           organization: conn.assigns.tenant_context.organization,
           role: result.invitation.role,
+          roles: invitation_roles(result.invitation),
+          location_scope: invitation_scope(result.invitation),
           expires_at: result.invitation.expires_at,
           token: result.token
         })
@@ -377,11 +413,27 @@ defmodule PaleeWeb.OrganizationAccessController do
         slug: invitation.organization.slug
       },
       role: to_string(invitation.role),
+      roles: Map.get(invitation, :roles) || [to_string(invitation.role)],
+      location_scope:
+        Map.get(invitation, :location_scope) || %{all_locations: true, location_ids: []},
       expires_at: invitation.expires_at,
       token: Map.get(invitation, :token)
     }
     |> then(fn value -> if value.token, do: value, else: Map.delete(value, :token) end)
   end
+
+  # ADR-186: older invitations carry one role and work everywhere.
+  defp invitation_roles(invitation) do
+    case Map.get(invitation, :roles) do
+      [_ | _] = roles -> Enum.map(roles, &to_string/1)
+      _single -> [to_string(invitation.role)]
+    end
+  end
+
+  defp invitation_scope(%{all_locations: false, location_ids: [_ | _] = ids}),
+    do: %{all_locations: false, location_ids: ids}
+
+  defp invitation_scope(_invitation), do: %{all_locations: true, location_ids: []}
 
   defp serialize_membership(%{membership: membership, organization: organization} = entry) do
     %{
@@ -395,9 +447,12 @@ defmodule PaleeWeb.OrganizationAccessController do
         membership.roles
         |> Palee.Organizations.capabilities_for(
           membership.coach_scope,
-          role_grants(Map.get(entry, :settings))
+          role_grants(Map.get(entry, :settings)),
+          Map.get(entry, :location_scope, :all)
         )
         |> Map.new(fn {capability, scope} -> {to_string(capability), to_string(scope)} end),
+      location_scope:
+        entry |> Map.get(:location_scope, :all) |> Palee.Organizations.location_scope_payload(),
       organization: %{
         id: organization.id,
         name: organization.name,
