@@ -940,6 +940,40 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/me/archived-demos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The person's demo businesses archived for inactivity */
+        get: operations["PaleeWeb.BusinessAccountController.archived_demos"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/me/archived-demos/{id}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen an archived demo business: empty, in demo mode, activation requested */
+        post: operations["PaleeWeb.BusinessAccountController.reopen_demo"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/me/around/area": {
         parameters: {
             query?: never;
@@ -16290,6 +16324,30 @@ export interface components {
             };
             roles: string[];
         };
+        /** BusinessArchivedDemo */
+        BusinessArchivedDemo: {
+            /** Format: date_time */
+            demo_archived_at: string;
+            /** Format: uuid */
+            id: string;
+            name: string;
+            /** @enum {string} */
+            provider_kind: "gym" | "coach";
+            slug: string;
+        };
+        /** BusinessArchivedDemos */
+        BusinessArchivedDemos: {
+            businesses: {
+                /** Format: date_time */
+                demo_archived_at: string;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                /** @enum {string} */
+                provider_kind: "gym" | "coach";
+                slug: string;
+            }[];
+        };
         /** BusinessDemoStatus */
         BusinessDemoStatus: {
             /** @enum {string} */
@@ -16338,6 +16396,47 @@ export interface components {
             name: string;
             provider_kind: string;
             slug: string;
+        };
+        /** BusinessReopenedDemo */
+        BusinessReopenedDemo: {
+            /** BusinessOrganization */
+            organization: {
+                /** Format: date_time */
+                activated_at?: string | null;
+                /** @enum {string} */
+                activation: "demo" | "active";
+                /** Format: date_time */
+                demo_started_at?: string | null;
+                /** Format: uuid */
+                id: string;
+                name: string;
+                provider_kind: string;
+                slug: string;
+            };
+            /** BusinessRequest */
+            request: {
+                /** @enum {string} */
+                business_kind: "gym" | "coach";
+                business_name: string;
+                city?: string | null;
+                /** Format: date_time */
+                decided_at?: string | null;
+                decision_note?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: date_time */
+                inserted_at: string;
+                /** @enum {string} */
+                kind: "conversion" | "activation";
+                message?: string | null;
+                /** Format: uuid */
+                organization_id?: string | null;
+                phone?: string | null;
+                /** @description Vendors: nickname */
+                requested_by?: string | null;
+                /** @enum {string} */
+                status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+            };
         };
         /** BusinessRequest */
         BusinessRequest: {
@@ -36595,6 +36694,98 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.archived_demos": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Archived demos */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        businesses: {
+                            /** Format: date_time */
+                            demo_archived_at: string;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            /** @enum {string} */
+                            provider_kind: "gym" | "coach";
+                            slug: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.BusinessAccountController.reopen_demo": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reopened */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** BusinessOrganization */
+                        organization: {
+                            /** Format: date_time */
+                            activated_at?: string | null;
+                            /** @enum {string} */
+                            activation: "demo" | "active";
+                            /** Format: date_time */
+                            demo_started_at?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            name: string;
+                            provider_kind: string;
+                            slug: string;
+                        };
+                        /** BusinessRequest */
+                        request: {
+                            /** @enum {string} */
+                            business_kind: "gym" | "coach";
+                            business_name: string;
+                            city?: string | null;
+                            /** Format: date_time */
+                            decided_at?: string | null;
+                            decision_note?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            /** Format: date_time */
+                            inserted_at: string;
+                            /** @enum {string} */
+                            kind: "conversion" | "activation";
+                            message?: string | null;
+                            /** Format: uuid */
+                            organization_id?: string | null;
+                            phone?: string | null;
+                            /** @description Vendors: nickname */
+                            requested_by?: string | null;
+                            /** @enum {string} */
+                            status: "pending" | "approved" | "declined" | "cancelled" | "completed";
+                        };
+                    };
+                };
             };
         };
     };

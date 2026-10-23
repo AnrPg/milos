@@ -15,6 +15,10 @@ defmodule PaleeWeb.BusinessAccountJSON do
     }
   end
 
+  def archived_demo(demo) do
+    Map.take(demo, [:id, :slug, :name, :provider_kind, :demo_archived_at])
+  end
+
   def demo_status(status, activation_request \\ nil) do
     %{
       activation: status.activation,

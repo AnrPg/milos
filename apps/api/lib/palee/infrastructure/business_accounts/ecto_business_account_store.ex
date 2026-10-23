@@ -200,6 +200,122 @@ defmodule Palee.Infrastructure.BusinessAccounts.EctoBusinessAccountStore do
 
   def notification_suppressed?(_organization_id, _user_id), do: false
 
+  ## Abandoned demos
+
+  @impl true
+  def touch_demo_activity(organization_id, now, interval_seconds) do
+    %{rows: [[count]]} =
+      Repo.query!("SELECT palee_touch_demo_activity($1, $2, $3)", [
+        dump(organization_id),
+        naive(now),
+        interval_seconds
+      ])
+
+    count
+  end
+
+  @impl true
+  def idle_demo_organizations(before) do
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT organization_id, last_active_at, reminder_sent_at, owner_ids " <>
+          "FROM palee_idle_demo_organizations($1)",
+        [naive(before)]
+      )
+
+    Enum.map(rows, fn [id, last_active_at, reminder_sent_at, owner_ids] ->
+      %{
+        organization_id: Ecto.UUID.load!(id),
+        last_active_at: utc(last_active_at),
+        reminder_sent_at: utc(reminder_sent_at),
+        owner_ids: Enum.map(owner_ids, &Ecto.UUID.load!/1)
+      }
+    end)
+  end
+
+  @impl true
+  def claim_demo_reminder(organization_id, before, now) do
+    case Repo.query!("SELECT palee_claim_demo_reminder($1, $2, $3)", [
+           Ecto.UUID.dump!(organization_id),
+           naive(before),
+           naive(now)
+         ]) do
+      %{rows: [[%NaiveDateTime{} = last_active_at]]} -> {:ok, utc(last_active_at)}
+      _not_claimed -> :not_claimed
+    end
+  end
+
+  @impl true
+  def mark_demo_archived(organization_id, before, reminded_before, now) do
+    %{rows: [[archived]]} =
+      Repo.query!("SELECT palee_mark_demo_archived($1, $2, $3, $4)", [
+        Ecto.UUID.dump!(organization_id),
+        naive(before),
+        naive(reminded_before),
+        naive(now)
+      ])
+
+    archived == true
+  end
+
+  # An archived demo leaves the vendors' queue: its pending activation
+  # request is withdrawn and a live link stops working.
+  @impl true
+  def close_demo_activation(organization_id, now) do
+    from(request in BusinessRequest,
+      where:
+        request.organization_id == ^organization_id and request.kind == "activation" and
+          request.status == "pending"
+    )
+    |> Repo.update_all(set: [status: "cancelled", decided_at: now, updated_at: now])
+
+    from(link in ActivationLink,
+      where:
+        link.organization_id == ^organization_id and is_nil(link.redeemed_at) and
+          is_nil(link.revoked_at)
+    )
+    |> Repo.update_all(set: [revoked_at: now, updated_at: now])
+
+    :ok
+  end
+
+  @impl true
+  def list_archived_demos do
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT id, slug, name, provider_kind, demo_archived_at " <>
+          "FROM palee_archived_demo_businesses()",
+        []
+      )
+
+    Enum.map(rows, fn [id, slug, name, kind, archived_at] ->
+      %{
+        id: Ecto.UUID.load!(id),
+        slug: slug,
+        name: name,
+        provider_kind: kind,
+        demo_archived_at: utc(archived_at)
+      }
+    end)
+  end
+
+  @impl true
+  def reopen_demo_business(organization_id, now) do
+    with id when is_binary(id) <- dump(organization_id),
+         %{rows: [[reopened]]} when is_binary(reopened) <-
+           Repo.query!("SELECT palee_reopen_demo_business($1, $2)", [id, naive(now)]) do
+      {:ok, Ecto.UUID.load!(reopened)}
+    else
+      _missing -> {:error, :not_found}
+    end
+  end
+
+  # The lifecycle columns are `timestamp` (UTC) like every `utc_datetime_usec`.
+  defp naive(%DateTime{} = at), do: at |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_naive()
+
+  defp utc(nil), do: nil
+  defp utc(%NaiveDateTime{} = at), do: DateTime.from_naive!(at, "Etc/UTC")
+
   defp dump(nil), do: nil
 
   defp dump(id) do

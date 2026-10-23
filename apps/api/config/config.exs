@@ -45,6 +45,7 @@ config :palee, Oban,
        {"37 3 * * *", Palee.Workers.SweepOrphanMediaJob, args: %{"dangling" => true}},
        {"20 4 * * *", Palee.Workers.ArchiveQuietGroupsJob},
        {"35 4 * * *", Palee.Workers.OrganiserCleanupJob},
+       {"50 4 * * *", Palee.Workers.AbandonedDemosJob},
        {"*/10 * * * *", Palee.Workers.EventRemindersJob},
        {"*/5 * * * *", Palee.Workers.ClassWorkoutAlertsJob},
        {"0 7 * * *", Palee.Workers.AroundAlertsJob},
@@ -422,6 +423,15 @@ config :open_api_spex, :json_render_error_v2, true
 # Cache the API spec once; see PaleeWeb.OpenApiSpecCache (ADR-134) for
 # why the default adapter exhausts the VM's literal area.
 config :open_api_spex, :cache_adapter, PaleeWeb.OpenApiSpecCache
+
+# ADR-184 follow-up: an idle demo business gets one reminder after
+# `reminder_after_days` and is archived after `archive_after_days` (at least
+# the difference after its reminder). Owner activity is written at most once
+# per `touch_interval_seconds`.
+config :palee, :abandoned_demos,
+  reminder_after_days: 60,
+  archive_after_days: 90,
+  touch_interval_seconds: 3_600
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

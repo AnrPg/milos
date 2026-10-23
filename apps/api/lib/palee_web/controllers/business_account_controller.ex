@@ -9,7 +9,7 @@ defmodule PaleeWeb.BusinessAccountController do
 
   alias Guardian.Plug, as: GuardianPlug
   alias OpenApiSpex.{Parameter, Schema}
-  alias Palee.Application.{BusinessActivation, BusinessRequests, BusinessSignUp}
+  alias Palee.Application.{AbandonedDemos, BusinessActivation, BusinessRequests, BusinessSignUp}
   alias PaleeWeb.BusinessAccountJSON
   alias PaleeWeb.Schemas.BusinessAccounts, as: S
 
@@ -74,6 +74,33 @@ defmodule PaleeWeb.BusinessAccountController do
   def cancel_request(conn, %{id: id}) do
     with {:ok, request} <- BusinessRequests.cancel(account(conn), id) do
       json(conn, BusinessAccountJSON.request(request))
+    end
+  end
+
+  operation(:archived_demos,
+    summary: "The person's demo businesses archived for inactivity",
+    responses: [ok: {"Archived demos", "application/json", S.archived_demos()}]
+  )
+
+  def archived_demos(conn, _params) do
+    with {:ok, demos} <- AbandonedDemos.list_archived(account(conn)) do
+      json(conn, %{businesses: Enum.map(demos, &BusinessAccountJSON.archived_demo/1)})
+    end
+  end
+
+  operation(:reopen_demo,
+    summary: "Reopen an archived demo business: empty, in demo mode, activation requested",
+    parameters: [@id],
+    responses: [ok: {"Reopened", "application/json", S.reopened_demo()}]
+  )
+
+  def reopen_demo(conn, %{id: id}) do
+    with {:ok, %{organization: organization, request: request}} <-
+           AbandonedDemos.reopen(account(conn), id) do
+      json(conn, %{
+        organization: BusinessAccountJSON.organization(organization),
+        request: BusinessAccountJSON.request(request)
+      })
     end
   end
 

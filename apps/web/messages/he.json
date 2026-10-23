@@ -4446,7 +4446,9 @@
     "apiErrorInvalidActivationRole": "בחר בעלים או מנהל.",
     "apiErrorInvalidActivationLifetime": "קישור תקף בין שעה ל־30 ימים.",
     "apiErrorAccountNotFound": "לא נמצא חשבון תואם.",
-    "apiErrorUnknownDemoSection": "אין נתוני הדגמה למסך הזה."
+    "apiErrorUnknownDemoSection": "אין נתוני הדגמה למסך הזה.",
+    "ntfBusinessDemoIdleTitle": "העסק לדוגמה שלך מחכה לך",
+    "ntfBusinessDemoIdleBody": "אף אחד לא השתמש ב-{business} כבר זמן מה. אם אף אחד לא יפתח אותו ב-{days} הימים הקרובים, נתוני הדוגמה שלו יימחקו והוא יועבר לארכיון. אפשר לפתוח אותו מחדש בכל עת."
   },
   "PrSharing": {
     "gymLabel": "איפה קבעת את השיא הזה?",
@@ -9608,7 +9610,12 @@
       "send": "שליחת בקשה",
       "sending": "שולח…",
       "sent": "הבקשה נשלחה. צוות Palee יחזור אליך.",
-      "cancel": "ביטול הבקשה"
+      "cancel": "ביטול הבקשה",
+      "archivedTitle": "הדגמה בארכיון",
+      "archivedBody": "הועבר לארכיון ב-{date} כי אף אחד לא השתמש בו זמן מה. אפשר לפתוח אותו מחדש כהדגמה ריקה מתי שרוצים.",
+      "reopen": "פתיחה מחדש",
+      "reopening": "פותח…",
+      "reopened": "נפתח מחדש. הוא שוב בין העסקים שלך, ריק, וצוות Palee קיבל את בקשת ההפעלה שלך."
     },
     "requestKind": {
       "conversion": "חשבון עסקי",

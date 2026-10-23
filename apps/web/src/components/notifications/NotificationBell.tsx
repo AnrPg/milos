@@ -429,6 +429,12 @@ function NotificationCard({
           ? i18n("ntfClassWodMissingHourBody", values)
           : i18n("ntfClassWodMissingMorningBody", values);
       }
+      // ADR-184 follow-up: the one reminder before an idle demo is archived.
+      case "business_demo_idle":
+        return i18n("ntfBusinessDemoIdleBody", {
+          business: text("business_name") || "—",
+          days: String(notification.payload.days_left ?? "—"),
+        });
       case "nutrition_plan_updated":
         return text("title") || i18n("stfNotifNutritionPlanBody");
       case "appointment_booked":
@@ -549,6 +555,8 @@ function NotificationCard({
         return i18n("stfNotifReplyOverdueTitle");
       case "class_workout_missing":
         return i18n("ntfClassWodMissingTitle");
+      case "business_demo_idle":
+        return i18n("ntfBusinessDemoIdleTitle");
       case "nutrition_plan_updated":
         return i18n("stfNotifNutritionPlanTitle");
       case "appointment_booked":

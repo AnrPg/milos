@@ -96,7 +96,8 @@ defmodule Palee.Notifications.Notification do
     :season_cancelled,
     :class_workout_missing,
     :password_reset_requested,
-    :password_reset_completed
+    :password_reset_completed,
+    :business_demo_idle
   ]
 
   schema "notifications" do

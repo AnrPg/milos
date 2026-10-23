@@ -19,16 +19,25 @@ defmodule Palee.Application.BusinessRequests do
   - **declines** either, with an optional note.
   """
 
-  alias Palee.Application.{BusinessActivation, BusinessSignUp}
+  alias Palee.Application.{AbandonedDemos, BusinessActivation, BusinessSignUp}
   alias Palee.{BusinessAccounts, Identity, Organizations}
 
   ## The person
 
   def mine(account), do: BusinessAccounts.list_my_requests(account)
 
+  @doc """
+  A conversion request. An account whose demo of that kind was archived for
+  inactivity needs no review: the demo reopens, empty, and the answer is
+  its new activation request.
+  """
   def request_conversion(account, params) do
     with {:ok, details} <- BusinessAccounts.normalize_request_details(params) do
-      BusinessAccounts.file_request(account, "conversion", details)
+      case AbandonedDemos.reopen_for_kind(account, details.business_kind, details) do
+        {:ok, %{request: request}} -> {:ok, request}
+        :none -> BusinessAccounts.file_request(account, "conversion", details)
+        error -> error
+      end
     end
   end
 
@@ -73,6 +82,8 @@ defmodule Palee.Application.BusinessRequests do
         organizations
         |> Enum.map(&Map.get(&1, :organization, &1))
         |> Enum.filter(&Organizations.business_gated?/1)
+        # Archived for inactivity: back in the queue only when reopened.
+        |> Enum.reject(&(Map.get(&1, :status) == :archived))
 
       {:ok, links} =
         BusinessAccounts.list_activation_links(platform_context, Enum.map(demo, & &1.id))
