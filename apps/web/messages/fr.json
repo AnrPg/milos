@@ -18,6 +18,7 @@
     "dashboard": "Tableau de bord",
     "platform": "Plate-forme",
     "home": "Accueil",
+    "feed": "Fil",
     "users": "Utilisateurs",
     "finance": "Finances",
     "classes": "Cours",
@@ -70,7 +71,11 @@
     "memberTabs": "Sections principales",
     "trials": "Séances d'essai",
     "community": "Communauté",
-    "body": "Corps"
+    "body": "Corps",
+    "notificationsShort": "Alertes",
+    "messages": "Messages",
+    "messagesUnread": "Messages ({count} non lus)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Profil",
@@ -5131,7 +5136,7 @@
       "support": "Un message rapide à ton buddy",
       "voice": "Dis ce que tu as fait"
     },
-    "homeTitle": "Accueil",
+    "homeTitle": "Fil",
     "wodToday": "Le WOD du jour à la salle",
     "wodTodayEmpty": "Pas d’entraînement en cours aujourd’hui.",
     "feedPosts": "De votre club",
@@ -5515,7 +5520,7 @@
     "myClubsEmpty": "Tu n'es encore membre d'aucun club.",
     "notifyLabel": "Notifications",
     "myPostsTitle": "Mes publications",
-    "myPostsEmpty": "Tu n'as encore rien publié. Touche ⊕ sur l'Accueil.",
+    "myPostsEmpty": "Tu n’as encore rien publié. Touche ⊕ dans le Fil.",
     "channel": {
       "announcements": "annonces",
       "wod": "wod-du-jour",
@@ -6773,7 +6778,7 @@
     "conversionLine": "Conversion : {rate} %"
   },
   "Around": {
-    "scopeLabel": "Ce que montre l’accueil",
+    "scopeLabel": "Ce que montre le Fil",
     "scopeClubs": "Mes clubs",
     "scopeAround": "Autour de moi",
     "loading": "Chargement…",

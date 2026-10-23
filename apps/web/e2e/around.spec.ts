@@ -362,7 +362,7 @@ test.describe("Γύρω μου", () => {
   test("the scope toggle opens Γύρω μου; sections link to «Δες όλα» with cursor paging", async ({ page }) => {
     const calls = await stub(page);
     await page.goto("/");
-    await page.getByRole("navigation", { name: "Τι δείχνει η Αρχική" }).getByRole("link", { name: "Γύρω μου" }).click();
+    await page.getByRole("navigation", { name: "Τι δείχνει το Feed" }).getByRole("link", { name: "Γύρω μου" }).click();
     await expect(page).toHaveURL(/\/around$/);
     await expect.poll(() => calls.scopes).toContainEqual({ scope: "around" });
 

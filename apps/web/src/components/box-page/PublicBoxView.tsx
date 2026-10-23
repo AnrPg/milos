@@ -8,7 +8,7 @@ import { useTranslations } from "next-intl";
 
 import type { PublicBoxPage } from "@/api/social";
 import { useMyClubs } from "@/components/community/use-community";
-import { BOTTOM_TAB_BAR_HEIGHT, useBottomTabBarVisible } from "@/components/nav/BottomTabBar";
+import { BOTTOM_NAV_SPACE, useBottomTabBarVisible } from "@/components/nav/BottomNav";
 import { useSession } from "@/components/session-provider";
 import { FollowButton } from "@/components/social/FollowButton";
 import { TrialButton } from "@/components/trials/TrialButton";
@@ -231,7 +231,7 @@ export function PublicBoxView({ page }: { page: PublicBoxPage }) {
       <div
         className="fixed inset-x-0 z-(--z-sticky) px-4 pt-3 lg:hidden"
         style={{
-          bottom: tabBar ? BOTTOM_TAB_BAR_HEIGHT : 0,
+          bottom: BOTTOM_NAV_SPACE,
           paddingBottom: tabBar ? "0.75rem" : "max(0.75rem, env(safe-area-inset-bottom))",
           background: "color-mix(in srgb, var(--bg) 92%, transparent)",
           borderTop: "1px solid var(--border)",

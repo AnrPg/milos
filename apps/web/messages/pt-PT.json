@@ -18,6 +18,7 @@
     "dashboard": "Painel",
     "platform": "Plataforma",
     "home": "Início",
+    "feed": "Feed",
     "users": "Utilizadores",
     "finance": "Finanças",
     "classes": "Aulas",
@@ -70,7 +71,11 @@
     "memberTabs": "Secções principais",
     "trials": "Aulas experimentais",
     "community": "Comunidade",
-    "body": "Corpo"
+    "body": "Corpo",
+    "notificationsShort": "Alertas",
+    "messages": "Mensagens",
+    "messagesUnread": "Mensagens ({count} por ler)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Perfil",
@@ -5131,7 +5136,7 @@
       "support": "Uma mensagem rápida ao teu buddy",
       "voice": "Diz o que fizeste"
     },
-    "homeTitle": "Início",
+    "homeTitle": "Feed",
     "wodToday": "O WOD de hoje no box",
     "wodTodayEmpty": "Hoje não há treino de aula.",
     "feedPosts": "Do seu clube",
@@ -5515,7 +5520,7 @@
     "myClubsEmpty": "Ainda não és membro de nenhum club.",
     "notifyLabel": "Notificações",
     "myPostsTitle": "As minhas publicações",
-    "myPostsEmpty": "Ainda não publicaste. Toca em ⊕ no Início.",
+    "myPostsEmpty": "Ainda não publicaste. Toca em ⊕ no Feed.",
     "channel": {
       "announcements": "anúncios",
       "wod": "wod-hoje",
@@ -6773,7 +6778,7 @@
     "conversionLine": "Conversão: {rate}%"
   },
   "Around": {
-    "scopeLabel": "O que o Início mostra",
+    "scopeLabel": "O que o Feed mostra",
     "scopeClubs": "Os meus clubs",
     "scopeAround": "Perto de mim",
     "loading": "A carregar…",

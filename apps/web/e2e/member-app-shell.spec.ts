@@ -334,7 +334,8 @@ test.describe("member app shell", () => {
     await page.goto("/box");
 
     const tabs = page.getByRole("navigation", { name: "Main sections" });
-    await expect(tabs.getByRole("link")).toHaveText(["Home", "Box", "Journal", "Me"]);
+    await expect(tabs.getByRole("link")).toHaveText(["Feed", "Box", "Journal", /Me$/]);
+    await expect(tabs.getByRole("button", { name: "Notifications" })).toBeVisible();
     await expect(tabs.getByRole("link", { name: "Box" })).toHaveAttribute("aria-current", "page");
 
     await expect(page.getByRole("heading", { name: "Box Kypseli" })).toBeVisible();
@@ -380,7 +381,7 @@ test.describe("member app shell", () => {
     await stubMemberApi(page);
     await page.goto("/");
 
-    await expect(page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Home" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("navigation", { name: "Main sections" }).getByRole("link", { name: "Feed" })).toHaveAttribute("aria-current", "page");
     await expect(page.getByText("Strength grows in the moments you think you can't go on.")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Fran" })).toBeVisible();
     // ADR-138 D6: the gym club's #wod-today card, with the score action.

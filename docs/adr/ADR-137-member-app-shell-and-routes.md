@@ -114,3 +114,30 @@ lost from today's features.
   the day they were written, and `/journal/reviews` (the review form) lights
   Ροή. Νέα καταχώρηση groups its kinds as Προπόνηση · Ευεξία · Coach and
   hides a group with no kinds, so kinds can be added without moving others.
+
+## Amendment (2026-10-23): the floating bottom bar
+
+Owner's decision after the redesign deploy (vision §6.1 updated the same day).
+
+- The member app has no top bar. Its navigation is a floating bottom bar
+  (`components/nav/BottomNav.tsx`): **Feed · Box · Journal · Ειδοποιήσεις ·
+  avatar (Εγώ)**. Side margins, a rounded, slightly see-through blurred
+  panel, lifted off the bottom edge and the safe area; centred with a max
+  width on wide screens. The tabs were renamed: Αρχική → Feed, Ημερολόγιο →
+  Journal (routes unchanged).
+- The bell sits next to the avatar with the unread badge; it is one entry,
+  so `BELL_IN_BOTTOM_NAV` in `lib/bottom-nav.ts` moves it back to the Feed
+  header (4-tab fallback). ✈ Μηνύματα and ⊕ stay in the Feed header.
+- The bar is for every signed-in person who is not in the staff console,
+  including people with no membership (Box shows its find-a-box state).
+- Where it hides: a route registry (`BOTTOM_NAV_HIDDEN_ROUTES`: workout
+  execution, class timer, check-in kiosk and scan, `/welcome`, auth pages,
+  the vendor console) plus `useHideBottomNav()` for screens that are not
+  routes; `ui/Layer`, `ui/Dialog`, the camera, the media viewer, the muscle
+  picker and the cast view call it. It also slides away while scrolling
+  down (not with reduced motion).
+- Room for it is one CSS variable, `--bottom-nav-space`, padded on `<body>`;
+  fixed bottom elements sit on `--bottom-float-inset`.
+- What the avatar menu held now lives in Εγώ (profile switch, password
+  resets, Διαχείριση); a long press on the avatar tab opens the profile
+  switch (ADR-187).

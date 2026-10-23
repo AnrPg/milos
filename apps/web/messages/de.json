@@ -18,6 +18,7 @@
     "dashboard": "Armaturenbrett",
     "platform": "Plattform",
     "home": "Start",
+    "feed": "Feed",
     "users": "Benutzer",
     "finance": "Finanzen",
     "classes": "Kurse",
@@ -70,7 +71,11 @@
     "memberTabs": "Hauptbereiche",
     "trials": "Probetrainings",
     "community": "Community",
-    "body": "Körper"
+    "body": "Körper",
+    "notificationsShort": "Mitteilungen",
+    "messages": "Nachrichten",
+    "messagesUnread": "Nachrichten ({count} ungelesen)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Profil",
@@ -5131,7 +5136,7 @@
       "support": "Eine kurze Nachricht an deinen Buddy",
       "voice": "Sag, was du gemacht hast"
     },
-    "homeTitle": "Start",
+    "homeTitle": "Feed",
     "wodToday": "WOD des Tages in der Box",
     "wodTodayEmpty": "Heute gibt es kein Kurstraining.",
     "feedPosts": "Aus deinem Club",
@@ -5515,7 +5520,7 @@
     "myClubsEmpty": "Du bist noch in keinem Club Mitglied.",
     "notifyLabel": "Benachrichtigungen",
     "myPostsTitle": "Meine Beiträge",
-    "myPostsEmpty": "Du hast noch nichts gepostet. Tippe auf ⊕ in der Startseite.",
+    "myPostsEmpty": "Du hast noch nichts gepostet. Tippe im Feed auf ⊕.",
     "channel": {
       "announcements": "ankündigungen",
       "wod": "wod-heute",
@@ -6773,7 +6778,7 @@
     "conversionLine": "Konversion: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Was die Startseite zeigt",
+    "scopeLabel": "Was der Feed zeigt",
     "scopeClubs": "Meine Clubs",
     "scopeAround": "In der Nähe",
     "loading": "Wird geladen…",
