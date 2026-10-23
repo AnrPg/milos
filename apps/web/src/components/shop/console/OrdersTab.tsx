@@ -4,7 +4,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { DeskPaymentMethod, ShopOrder, ShopOrderStatus } from "@/api/shop";
+import type { DeskPaymentMethod, ShopOrder, ShopOrderStatus } from "@/api/shop-admin";
 import type { BranchFilterState } from "@/components/admin/BranchFilter";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { Segmented, Toggle } from "@/components/admin/finance/packages/package-ui";

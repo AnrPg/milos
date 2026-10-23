@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { catalogView, orderActionRequest, productFromWire, salesFromWire, stockItemsFromCatalog } from "./shop";
+import { catalogView, orderActionRequest, productFromWire, salesFromWire, stockItemsFromCatalog } from "./shop-admin";
 
 const wireVariant = (extra: Record<string, unknown> = {}) => ({
   id: "v1",

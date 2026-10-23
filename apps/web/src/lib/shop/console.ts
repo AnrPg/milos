@@ -13,7 +13,7 @@ import type {
   ShopStockStatus,
   ShopVariant,
   ShopVariantInput,
-} from "@/api/shop";
+} from "@/api/shop-admin";
 
 /** The proposal allows up to two options per product (e.g. size × colour). */
 export const MAX_OPTIONS = 2;

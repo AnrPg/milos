@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import type { ShopMedia } from "@/api/shop";
+import type { ShopMedia } from "@/api/shop-admin";
 import { completeMediaUpload, discardMedia, requestMediaUpload, type MediaContentType } from "@/api/media";
 import { useSession } from "@/components/session-provider";
 import { preparePhoto } from "@/lib/media-files";

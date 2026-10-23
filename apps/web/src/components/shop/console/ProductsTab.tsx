@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { ShopProduct, ShopProductCounts, ShopProductStatus } from "@/api/shop";
+import type { ShopProduct, ShopProductCounts, ShopProductStatus } from "@/api/shop-admin";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { formatMoney } from "@/components/inventory/inventory-helpers";
 import { useShopProducts } from "@/components/shop/console/use-shop";

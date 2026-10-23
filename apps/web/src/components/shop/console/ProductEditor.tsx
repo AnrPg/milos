@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { ShopOption, ShopProduct, ShopProductInput, ShopProductStatus, ShopVisibility } from "@/api/shop";
+import type { ShopOption, ShopProduct, ShopProductInput, ShopProductStatus, ShopVisibility } from "@/api/shop-admin";
 import { useBranchFilter } from "@/components/admin/BranchFilter";
 import { Segmented, Toggle } from "@/components/admin/finance/packages/package-ui";
 import { centsToInput, formatMoney, parseMoneyToCents } from "@/components/inventory/inventory-helpers";

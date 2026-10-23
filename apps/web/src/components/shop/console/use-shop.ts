@@ -33,7 +33,7 @@ import {
   type ShopProductInput,
   type ShopProductStatus,
   type ShopReportName,
-} from "@/api/shop";
+} from "@/api/shop-admin";
 import { useSession } from "@/components/session-provider";
 import { memberDiscountPercent, unpaidBalanceCents } from "@/lib/shop/console";
 import { useSelectedMembershipRole } from "@/lib/membership-role";

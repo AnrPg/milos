@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { PromoteTarget, ShopProduct } from "@/api/shop";
+import type { PromoteTarget, ShopProduct } from "@/api/shop-admin";
 import { Segmented, Toggle } from "@/components/admin/finance/packages/package-ui";
 import { formatMoney } from "@/components/inventory/inventory-helpers";
 import { Field } from "@/components/inventory/inventory-ui";

@@ -2,7 +2,8 @@
 
 import { useTranslations } from "next-intl";
 
-import type { ShopStockStatus } from "@/api/shop";
+/** Stock state of a variant (ADR-190 `stock_status`). */
+export type ShopStockStatus = "ok" | "low" | "critical" | "out";
 import { Pill } from "@/components/staff/staff-ui";
 import { formatMoney } from "@/components/inventory/inventory-helpers";
 

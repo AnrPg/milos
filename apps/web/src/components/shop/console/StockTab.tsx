@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useTranslations } from "next-intl";
 
-import type { ShopStockItem } from "@/api/shop";
+import type { ShopStockItem } from "@/api/shop-admin";
 import type { BranchFilterState } from "@/components/admin/BranchFilter";
 import { Segmented } from "@/components/admin/finance/packages/package-ui";
 import { formatDateTime } from "@/components/client/format";

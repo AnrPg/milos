@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { shopIdempotencyKey, type DeskPaymentMethod, type ShopOrder, type ShopProduct, type ShopVariant } from "@/api/shop";
+import { shopIdempotencyKey, type DeskPaymentMethod, type ShopOrder, type ShopProduct, type ShopVariant } from "@/api/shop-admin";
 import { useBranchFilter } from "@/components/admin/BranchFilter";
 import { Segmented, Toggle } from "@/components/admin/finance/packages/package-ui";
 import { UserSearchField } from "@/components/admin/finance/shared/UserSearchField";

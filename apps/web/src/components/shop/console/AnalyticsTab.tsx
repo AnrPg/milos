@@ -5,7 +5,7 @@ import { useState, type ReactNode } from "react";
 import { useTranslations } from "next-intl";
 import { Bar, BarChart, CartesianGrid, Cell, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
-import type { MarginRow, PricingRow } from "@/api/shop";
+import type { MarginRow, PricingRow } from "@/api/shop-admin";
 import type { BranchFilterState } from "@/components/admin/BranchFilter";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 import { formatMoney } from "@/components/inventory/inventory-helpers";

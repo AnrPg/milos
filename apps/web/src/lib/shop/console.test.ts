@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import type { PricingRow, ShopProduct, ShopVariant } from "@/api/shop";
+import type { PricingRow, ShopProduct, ShopVariant } from "@/api/shop-admin";
 import {
   addOptionValue,
   addToCart,
