@@ -8,7 +8,7 @@ defmodule PaleeWeb.AdminCommunityEventController do
   use PaleeWeb, :controller
   use OpenApiSpex.ControllerSpecs
 
-  alias Palee.Application.StaffCommunityEvents
+  alias Palee.Application.{EventCohosts, StaffCommunityEvents}
   alias PaleeWeb.Schemas.CommunityEvents, as: S
   alias OpenApiSpex.{Parameter, Schema}
 
@@ -27,6 +27,13 @@ defmodule PaleeWeb.AdminCommunityEventController do
     in: :query,
     required: false,
     schema: %Schema{type: :string, enum: ~w(upcoming past)}
+  }
+  @cohost_id %Parameter{name: :cohost_id, in: :path, required: true, schema: @uuid}
+  @console_scope %Parameter{
+    name: :scope,
+    in: :query,
+    required: false,
+    schema: %Schema{type: :string, enum: S.console_scopes()}
   }
   @event {"Event", "application/json", S.staff_event_response()}
 
@@ -153,6 +160,123 @@ defmodule PaleeWeb.AdminCommunityEventController do
 
   def trial_offer(conn, %{id: id}) do
     with {:ok, result} <- StaffCommunityEvents.trial_offer(conn.assigns.tenant_context, id),
+         do: json(conn, result)
+  end
+
+  # ADR-185: the organiser console -------------------------------------------
+
+  operation(:refund,
+    summary: "Record that a paid place was given back (all of it unless amount_cents)",
+    parameters: [@id, @user_id],
+    request_body: S.body(S.refund_request()),
+    responses: [ok: @event]
+  )
+
+  def refund(conn, %{id: id, user_id: user_id}) do
+    reply(
+      conn,
+      StaffCommunityEvents.refund(
+        conn.assigns.tenant_context,
+        id,
+        user_id,
+        Map.get(conn.body_params, :amount_cents)
+      )
+    )
+  end
+
+  operation(:finances,
+    summary: "«Οικονομικά»: ticket income, refunds and outstanding, per event and in total",
+    parameters: [@console_scope],
+    responses: [ok: {"Finances", "application/json", S.finances_response()}]
+  )
+
+  def finances(conn, params) do
+    with {:ok, result} <- StaffCommunityEvents.finances(conn.assigns.tenant_context, params),
+         do: json(conn, result)
+  end
+
+  operation(:analytics,
+    summary: "«Αναλυτικά»: views, RSVPs, waitlist, attendance and conversion",
+    parameters: [@console_scope],
+    responses: [ok: {"Analytics", "application/json", S.analytics_response()}]
+  )
+
+  def analytics(conn, params) do
+    with {:ok, result} <- StaffCommunityEvents.analytics(conn.assigns.tenant_context, params),
+         do: json(conn, result)
+  end
+
+  # ADR-185: co-hosts ---------------------------------------------------------
+
+  @cohosts {"Co-hosts", "application/json", S.cohosts_response()}
+  @requests {"Co-host requests", "application/json", S.cohost_requests_response()}
+
+  operation(:cohosts,
+    summary: "The event's co-hosts and their answers",
+    parameters: [@id],
+    responses: [ok: @cohosts]
+  )
+
+  def cohosts(conn, %{id: id}) do
+    with {:ok, result} <- EventCohosts.list(conn.assigns.tenant_context, id),
+         do: json(conn, result)
+  end
+
+  operation(:invite_cohost,
+    summary: "Ask a published box to co-host the event (and its later weeks)",
+    parameters: [@id],
+    request_body: S.body(S.cohost_invite_request()),
+    responses: [ok: @cohosts]
+  )
+
+  def invite_cohost(conn, %{id: id}) do
+    with {:ok, result} <-
+           EventCohosts.invite(conn.assigns.tenant_context, id, conn.body_params.slug),
+         do: json(conn, result)
+  end
+
+  operation(:remove_cohost,
+    summary: "Take a co-host off the event (and its later weeks)",
+    parameters: [@id, @cohost_id],
+    responses: [ok: @cohosts]
+  )
+
+  def remove_cohost(conn, %{id: id, cohost_id: cohost_id}) do
+    with {:ok, result} <- EventCohosts.remove(conn.assigns.tenant_context, id, cohost_id),
+         do: json(conn, result)
+  end
+
+  operation(:cohost_requests,
+    summary: "Other hosts' requests for this box to co-host their events",
+    responses: [ok: @requests]
+  )
+
+  def cohost_requests(conn, _params) do
+    with {:ok, result} <- EventCohosts.requests(conn.assigns.tenant_context),
+         do: json(conn, result)
+  end
+
+  operation(:answer_cohost_request,
+    summary: "Accept or decline a co-host request, or withdraw after accepting",
+    parameters: [@id],
+    request_body: S.body(S.cohost_answer_request()),
+    responses: [ok: @requests]
+  )
+
+  def answer_cohost_request(conn, %{id: id}) do
+    with {:ok, result} <-
+           EventCohosts.respond(conn.assigns.tenant_context, id, conn.body_params.answer),
+         do: json(conn, result)
+  end
+
+  operation(:cohost_trial_offer,
+    summary: "The co-host's own trial offer, once, to the people who came and are not members",
+    parameters: [@id],
+    responses: [ok: {"Sent", "application/json", S.sent_response()}]
+  )
+
+  def cohost_trial_offer(conn, %{id: id}) do
+    with {:ok, result} <- EventCohosts.trial_offer(conn.assigns.tenant_context, id),
          do: json(conn, result)
   end
 

@@ -141,6 +141,11 @@ function NotificationCard({
     if (notice === "event_message") return text("message");
     let variant = "body";
     if (notice === "event_cancelled" && values.reason) variant = "reason_body";
+    // ADR-185: an answer to a co-host request reads by the answer.
+    if (notice === "event_cohost_answered") {
+      const answer = text("answer");
+      variant = answer === "accepted" || answer === "declined" ? [answer, "body"].join("_") : "removed_body";
+    }
     if (notice === "event_changed") {
       const changes = text("changes").split(",");
       variant = changes.includes("place") ? (changes.includes("time") ? "both_body" : "place_body") : "body";
@@ -742,6 +747,8 @@ const COMMUNITY_NOTICES = [
   "community_event_guest_joined",
   "community_event_trial_offer",
   "community_event_message",
+  "community_event_cohost_request",
+  "community_event_cohost_answered",
 ] as const;
 
 export function NotificationBell({

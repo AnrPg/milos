@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useRef, useState, type ReactNode } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -16,7 +16,7 @@ import { BoxPhotoUploadError, uploadBoxPhoto } from "@/lib/box-photo-upload";
 import { useOrganizationTimeZoneStatus } from "@/lib/organization-slug";
 import { timeZoneOptions, zoneLabel } from "@/lib/zoned-time";
 
-import { DURATIONS, eventRequest, formProblem, type EventForm } from "./events";
+import { DURATIONS, eventRequest, formAudience, formProblem, type EventForm, type EventHostMode } from "./events";
 import { useEventError } from "./EventParts";
 import { Select } from "@/components/ui/Select";
 import { DateInput, TimeInput } from "@/components/ui/DateInput";
@@ -74,6 +74,7 @@ export function blankEventForm(locations: EventLocation[], now: Date = new Date(
     repeatUntil: "",
     coverMediaId: null,
     timeZone: null,
+    groupOnly: true,
   };
 }
 
@@ -83,9 +84,11 @@ type Body = ReturnType<typeof eventRequest>;
  * «Νέο event» and editing (board 8 Q1): title, day and time, how long, where
  * (one of the box's locations or an address), how many, free or a price paid
  * at the box, members only or open to everyone, a guest pass with guests per
- * member, weekly until a date, a cover and a description. A member group's
- * event is free and for its members, so those choices don't show. Editing a
- * weekly event asks: this one, or this and the following.
+ * member, weekly until a date, a cover and a description. ADR-185: a member
+ * group's admin picks the price, whether it is for the group, the club or
+ * everyone, and guest passes; a person's own event («Ως εγώ», `mode="self"`)
+ * is for everyone or by their invitation. `hostPicker` puts «Διοργάνωση ως»
+ * first. Editing a weekly event asks: this one, or this and the following.
  */
 export function EventEditorSheet({
   title,
@@ -94,6 +97,8 @@ export function EventEditorSheet({
   initialCoverUrl = null,
   editing = null,
   group = false,
+  mode = group ? "group" : "club",
+  hostPicker = null,
   locations,
   clubs,
   clubId,
@@ -109,6 +114,8 @@ export function EventEditorSheet({
   initialCoverUrl?: string | null;
   editing?: { seriesId: string | null } | null;
   group?: boolean;
+  mode?: EventHostMode;
+  hostPicker?: ReactNode;
   locations: EventLocation[];
   clubs?: { id: string; name: string }[];
   clubId?: string;
@@ -139,11 +146,12 @@ export function EventEditorSheet({
   const away = Boolean(gym.zone && clock.timeZone && clock.timeZone !== gym.zone);
   const problem = formProblem(clock, new Date(), { editing: Boolean(editing) });
   const save = useMutation({
-    mutationFn: () => onSubmit(eventRequest(clock, { group, editing: Boolean(editing), gymTimeZone: gym.zone }), scope),
+    mutationFn: () => onSubmit(eventRequest(clock, { mode, editing: Boolean(editing), gymTimeZone: gym.zone }), scope),
     onSuccess: onClose,
   });
   const set = <K extends keyof EventForm>(key: K, value: EventForm[K]) => setForm((current) => ({ ...current, [key]: value }));
   const formId = editing ? "event-edit-form" : "event-create-form";
+  const audience = formAudience(form, mode);
 
   async function pick(file: File | undefined) {
     if (!file || !coverSlug || !tokens?.access_token) return;
@@ -189,6 +197,7 @@ export function EventEditorSheet({
           if (!problem) save.mutate();
         }}
       >
+        {hostPicker}
         {clubs && clubs.length > 1 && onClubChange ? (
           <Field label={t("fieldClub")}>
             <Select value={clubId} onValueChange={(value) => onClubChange(value)} className="min-h-11 rounded-2xl px-3 text-sm font-normal" style={inputStyle}>
@@ -321,10 +330,7 @@ export function EventEditorSheet({
           />
         </Field>
 
-        {group ? (
-          <p className="rounded-2xl px-3 py-2 text-sm" style={{ background: "var(--panel-raised)", color: "var(--text-soft)" }}>{t("groupTerms")}</p>
-        ) : (
-          <>
+        <>
             <fieldset className="flex flex-col gap-2">
               <legend className="mb-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{t("fieldPrice")}</legend>
               <div role="radiogroup" aria-label={t("fieldPrice")} className="flex gap-2">
@@ -347,11 +353,33 @@ export function EventEditorSheet({
             </fieldset>
             <fieldset className="flex flex-col gap-2">
               <legend className="mb-1 text-sm font-semibold" style={{ color: "var(--text)" }}>{t("fieldWho")}</legend>
-              <div role="radiogroup" aria-label={t("fieldWho")} className="flex gap-2">
-                <ChoicePill selected={!form.openToAll} onSelect={() => set("openToAll", false)} hint={t("membersOnlyHint")}>{t("membersOnly")}</ChoicePill>
-                <ChoicePill selected={form.openToAll} onSelect={() => set("openToAll", true)} hint={t("openToAllHint")}>{t("openToAll")}</ChoicePill>
+              <div role="radiogroup" aria-label={t("fieldWho")} className="flex flex-wrap gap-2">
+                {mode === "group" ? (
+                  <ChoicePill
+                    selected={audience === "group"}
+                    onSelect={() => setForm((current) => ({ ...current, groupOnly: true, openToAll: false }))}
+                    hint={t("whoGroupOnlyHint")}
+                  >
+                    {t("whoGroupOnly")}
+                  </ChoicePill>
+                ) : null}
+                <ChoicePill
+                  selected={audience === "club"}
+                  onSelect={() => setForm((current) => ({ ...current, groupOnly: false, openToAll: false }))}
+                  hint={mode === "self" ? t("whoSelfInviteHint") : t("membersOnlyHint")}
+                >
+                  {mode === "self" ? t("whoSelfInvite") : mode === "group" ? t("whoClub") : t("membersOnly")}
+                </ChoicePill>
+                <ChoicePill
+                  selected={audience === "open"}
+                  onSelect={() => setForm((current) => ({ ...current, groupOnly: false, openToAll: true }))}
+                  hint={mode === "self" ? t("whoSelfOpenHint") : t("openToAllHint")}
+                >
+                  {t("openToAll")}
+                </ChoicePill>
               </div>
             </fieldset>
+            {mode === "self" || audience === "group" ? null : (
             <div className="flex flex-col gap-2">
               <label className="flex min-h-11 items-center gap-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
                 <input type="checkbox" checked={form.guestPass} onChange={(event) => set("guestPass", event.target.checked)} className="h-5 w-5" />
@@ -372,7 +400,8 @@ export function EventEditorSheet({
                 </Field>
               ) : null}
             </div>
-            {form.openToAll || form.guestPass ? (
+            )}
+            {audience === "open" || (mode !== "self" && audience !== "group" && form.guestPass) ? (
               <label className="flex min-h-11 items-center gap-3 text-sm font-semibold" style={{ color: "var(--text)" }}>
                 <input type="checkbox" checked={form.goodForFriends} onChange={(event) => set("goodForFriends", event.target.checked)} className="h-5 w-5" />
                 <span>
@@ -381,8 +410,7 @@ export function EventEditorSheet({
                 </span>
               </label>
             ) : null}
-          </>
-        )}
+        </>
 
         {editing ? null : (
           <div className="flex flex-col gap-2">

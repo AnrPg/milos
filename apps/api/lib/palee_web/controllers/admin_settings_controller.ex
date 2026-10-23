@@ -106,7 +106,7 @@ defmodule PaleeWeb.AdminSettingsController do
     description:
       "ADR-162: how members see this organization: a gym or an independent coach. Only the owner may change it.",
     properties: %{
-      kind: %Schema{type: :string, enum: ["gym", "coach"]},
+      kind: %Schema{type: :string, enum: ["gym", "coach", "organiser"]},
       editable: %Schema{type: :boolean}
     },
     required: [:kind, :editable]

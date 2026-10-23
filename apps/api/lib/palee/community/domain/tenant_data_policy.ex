@@ -12,9 +12,12 @@ defmodule Palee.Community.Domain.TenantDataPolicy do
             purge_order: 15,
             disposition: :purge,
             basis:
-              "Clubs, channels, posts, reactions, comments, reports, events and their attendees and the gym's community rules are social content of the gym's members with no retention obligation; deleted once exported.",
+              "Clubs, channels, posts, reactions, comments, reports, events and their attendees, co-hosts and aggregated views (ADR-185) and the gym's community rules are social content of the gym's members with no retention obligation; deleted once exported.",
             tables: [
               %{table: "community_reports"},
+              %{table: "community_event_view_marks"},
+              %{table: "community_event_view_days"},
+              %{table: "community_event_cohosts"},
               %{table: "community_event_attendees"},
               %{table: "community_events"},
               %{table: "community_post_comments"},

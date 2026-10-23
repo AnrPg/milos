@@ -22,6 +22,20 @@ defmodule Palee.Application.TenantDefaults do
   end
 
   @doc """
+  ADR-185: the defaults of a person's own organiser organisation: only what
+  events need (their club, named after the person, and the free organiser
+  plan). No scale levels or anything else a gym console would show.
+  """
+  def organiser(club_name) when is_binary(club_name) do
+    fn scope ->
+      with {:ok, club} <- Community.provision_gym_club(scope, club_name),
+           {:ok, subscription} <- PlatformPlans.ensure_subscription(scope) do
+        {:ok, %{gym_club: club, subscription: subscription}}
+      end
+    end
+  end
+
+  @doc """
   ADR-170: the defaults of an independent coach's practice: the same as any
   organization, with the club named after the coach («Team Νίκος»).
   """

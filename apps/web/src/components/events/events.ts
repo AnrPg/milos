@@ -164,6 +164,11 @@ export type EventForm = {
   repeatUntil: string;
   coverMediaId: string | null;
   /**
+   * ADR-185: a member group's event for the group only (else the club, or
+   * everyone with `openToAll`). Only a group's event reads it.
+   */
+  groupOnly?: boolean;
+  /**
    * ADR-179: the clock the date and time are read on: the gym's, or the
    * event's own when it happens elsewhere. Null: this device's clock.
    */
@@ -206,14 +211,38 @@ export function formProblem(form: EventForm, now: Date = new Date(), { editing =
   return null;
 }
 
+/** Who hosts the event being made (ADR-185): a club's or box's, a member group's, or the person's own. */
+export type EventHostMode = "club" | "group" | "self";
+
+/** The editor's mode: a person's own event, a member group's, else a club's. */
+export function eventHostMode({ own = false, group = false }: { own?: boolean; group?: boolean }): EventHostMode {
+  if (own) return "self";
+  return group ? "group" : "club";
+}
+
+/** Who an event is for, from the form (ADR-185). */
+export function formAudience(form: EventForm, mode: EventHostMode = "club"): "group" | "club" | "open" {
+  if (mode === "group" && form.groupOnly) return "group";
+  return form.openToAll ? "open" : "club";
+}
+
 /**
- * The request body of a valid form. A member group's event is always free,
- * for its members and without guest passes (the API enforces it too).
+ * The request body of a valid form. ADR-185: a member group's admin picks
+ * the price, who it is for (the group, the club or everyone) and guest
+ * passes like any host; a person's own event is for everyone or by their
+ * invitation only, with no guest passes.
  */
 export function eventRequest(
   form: EventForm,
-  { group = false, editing = false, gymTimeZone = null }: { group?: boolean; editing?: boolean; gymTimeZone?: string | null } = {},
+  {
+    group = false,
+    mode = group ? "group" : "club",
+    editing = false,
+    gymTimeZone = null,
+  }: { group?: boolean; mode?: EventHostMode; editing?: boolean; gymTimeZone?: string | null } = {},
 ) {
+  const audience = formAudience(form, mode);
+  const guests = mode !== "self" && audience !== "group" && form.guestPass;
   const start = localInstant(form.date, form.time, form.timeZone)!;
   const end = new Date(start.getTime() + form.durationMinutes * 60_000);
   const capacity = form.capacity.trim() ? Number(form.capacity.trim()) : null;
@@ -228,13 +257,14 @@ export function eventRequest(
     ends_at: end.toISOString(),
     ...place,
     capacity,
-    price_cents: group || !form.paid ? 0 : (parsePriceCents(form.price) ?? 0),
+    price_cents: !form.paid ? 0 : (parsePriceCents(form.price) ?? 0),
     currency: "EUR",
-    open_to_non_members: group ? false : form.openToAll,
-    guest_pass_allowed: group ? false : form.guestPass,
-    guests_per_member: group || !form.guestPass ? 0 : form.guestsPerMember,
+    audience,
+    open_to_non_members: audience === "open",
+    guest_pass_allowed: guests,
+    guests_per_member: guests ? form.guestsPerMember : 0,
     // «Καλό για φίλους» (ADR-156) only where a friend can come.
-    good_for_friends: !group && (form.openToAll || form.guestPass) && form.goodForFriends,
+    good_for_friends: (audience === "open" || guests) && form.goodForFriends,
     cover_media_id: form.coverMediaId,
   };
   // ADR-179: an event's own zone only when it differs from its gym's; while
@@ -269,6 +299,7 @@ export function formFromEvent(event: CommunityEvent): EventForm {
     repeatUntil: "",
     coverMediaId: event.cover_media_id ?? null,
     timeZone,
+    groupOnly: event.audience ? event.audience === "group" : Boolean(event.channel_id) && !event.open_to_non_members,
   };
 }
 
@@ -289,6 +320,18 @@ export const EVENT_ERROR_CODES = [
   "trial_offer_already_sent",
   "nobody_to_offer",
   "trials_disabled",
+  // ADR-185: hosts, co-hosts and refunds.
+  "invalid_host",
+  "event_rate_limited",
+  "box_not_found",
+  "cannot_cohost_own_event",
+  "group_event",
+  "already_invited",
+  "cohost_limit_reached",
+  "not_pending",
+  "not_paid",
+  "already_refunded",
+  "invalid_refund",
 ] as const;
 
 export function eventErrorKey(error: unknown): string | null {

@@ -97,3 +97,23 @@ export async function cancelEvent(token: string, eventId: string, reason: string
   });
   return data.event;
 }
+
+/** ADR-185: counts an open of the event page (once a day per person; hosts aren't counted). */
+export function recordEventView(token: string, eventId: string) {
+  return apiRequest<{ counted: boolean }>(`/me/events/${id(eventId)}/views`, { method: "POST", token });
+}
+
+export type EventHostChoice = components["schemas"]["CommunityEventHostChoice"];
+export type HostedEventDraft = components["schemas"]["CommunityEventHostedRequest"];
+export const EVENT_HOSTS_KEY = ["events", "hosts"] as const;
+
+/** «Διοργάνωση ως»: «Ως εγώ» and each business where the person runs events. */
+export async function fetchEventHosts(token: string) {
+  const data = await apiRequest<{ hosts: EventHostChoice[] }>("/me/event-hosts", { token });
+  return data.hosts ?? [];
+}
+
+/** Creates an event as yourself (`host: "self"`) or as a business (its organisation id). */
+export function createHostedEvent(token: string, draft: HostedEventDraft) {
+  return apiRequest<{ event: CommunityEvent; occurrences: number }>("/me/events", { method: "POST", token, body: draft });
+}

@@ -203,4 +203,23 @@ describe("notificationTargetUrl after the member-app move", () => {
     expect(notificationTargetUrl({ type: "referral_reward", payload: {} }, "member")).toBe("/me/referrals?tab=invites");
     expect(notificationTargetUrl({ type: "referral_review", payload: {} }, "admin")).toBe("/admin/finance?tab=referrals");
   });
+
+  it("opens the organiser console on a co-host request or answer (ADR-185)", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "community_event_cohost_request", payload: { event_id: "event-1", url: "/events/hosting?org=org-2&tab=requests" } },
+        "admin",
+      ),
+    ).toBe("/events/hosting?org=org-2&tab=requests");
+    expect(
+      notificationTargetUrl(
+        { type: "community_event_cohost_answered", payload: { event_id: "event-1", url: "/events/hosting?org=org-1&event=event-1" } },
+        "member",
+      ),
+    ).toBe("/events/hosting?org=org-1&event=event-1");
+    // Any other link falls back to the event page.
+    expect(
+      notificationTargetUrl({ type: "community_event_cohost_answered", payload: { event_id: "event-1", url: "https://evil.example" } }, "member"),
+    ).toBe("/events/event-1");
+  });
 });

@@ -126,6 +126,11 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
   end
 
+  # ADR-185: new events from the member app («Διοργάνωση ως»).
+  pipeline :event_create_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit, max: 10, interval: 3_600_000, bucket: "event-create")
+  end
+
   # ADR-154: Γύρω μου searches run several indexed queries (and may geocode
   # a typed place); a generous budget that still bounds scraping.
   pipeline :around_rate_limited do
@@ -899,6 +904,38 @@ defmodule PaleeWeb.Router do
     )
 
     delete("/community/events/:id/attendees/:user_id", AdminCommunityEventController, :remove)
+    # ADR-185: the organiser console (refunds, numbers) and co-hosting.
+    put(
+      "/community/events/:id/attendees/:user_id/refund",
+      AdminCommunityEventController,
+      :refund
+    )
+
+    get("/community/event-finances", AdminCommunityEventController, :finances)
+    get("/community/event-analytics", AdminCommunityEventController, :analytics)
+    get("/community/events/:id/cohosts", AdminCommunityEventController, :cohosts)
+    post("/community/events/:id/cohosts", AdminCommunityEventController, :invite_cohost)
+
+    delete(
+      "/community/events/:id/cohosts/:cohost_id",
+      AdminCommunityEventController,
+      :remove_cohost
+    )
+
+    get("/community/cohost-requests", AdminCommunityEventController, :cohost_requests)
+
+    post(
+      "/community/cohost-requests/:id/answer",
+      AdminCommunityEventController,
+      :answer_cohost_request
+    )
+
+    post(
+      "/community/cohost-requests/:id/trial-offer",
+      AdminCommunityEventController,
+      :cohost_trial_offer
+    )
+
     get("/public-profile", AdminPublicProfileController, :show)
     put("/public-profile", AdminPublicProfileController, :update)
     post("/public-profile/publish", AdminPublicProfileController, :publish)
@@ -1377,6 +1414,9 @@ defmodule PaleeWeb.Router do
     post("/me/events/:id/cancel", CommunityEventController, :cancel)
     put("/me/events/:id/rsvp", CommunityEventController, :rsvp)
     post("/me/events/:id/invites", CommunityEventController, :invite)
+    # ADR-185: «Διοργάνωση ως» and the event page's view count.
+    get("/me/event-hosts", CommunityEventController, :hosts)
+    post("/me/events/:id/views", CommunityEventController, :view)
     # ADR-142: follows, profile posts and people.
     get("/me/social", FollowController, :summary)
     put("/me/social/booking-sharing", FollowController, :booking_sharing)
@@ -1478,6 +1518,21 @@ defmodule PaleeWeb.Router do
     )
 
     put("/me/wellness-summary-sharing", WellnessSummarySharingController, :update)
+  end
+
+  # ADR-185: creating an event as yourself or a business has its own budget
+  # on top of the per-host daily limit, so a script can't flood Γύρω μου.
+  scope "/api", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :tenant_write_rate_limited,
+      :event_create_rate_limited
+    ])
+
+    post("/me/events", CommunityEventController, :host_create)
   end
 
   # ADR-160: the public landing page of a buddy invite link.

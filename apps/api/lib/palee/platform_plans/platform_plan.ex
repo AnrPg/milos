@@ -6,7 +6,7 @@ defmodule Palee.PlatformPlans.PlatformPlan do
 
   alias Palee.PlatformPlans.Domain.PlanLimits
 
-  @audiences ~w(gym coach)
+  @audiences ~w(gym coach organiser)
   @price_statuses ~w(placeholder confirmed)
   @editable [
     :name,
