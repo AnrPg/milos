@@ -94,6 +94,15 @@ defmodule Palee.Analytics.Domain.EventCatalog do
     # ADR-144 trials: the funnel from ask to member.
     "trial_requested" => {"trial", [:scheduled_class_id, :status, :source], :subject},
     "trial_status_changed" => {"trial", [:scheduled_class_id, :status], nil},
+    # ADR-191 partner perks: the business's actions on a perk and the
+    # members' claims and uses (the audit trail; subject ids only).
+    "perk_created" => {"perk", [:redemption_method, :benefit_type, :audience], nil},
+    "perk_published" => {"perk", [:redemption_method, :benefit_type, :audience], nil},
+    "perk_paused" => {"perk", [:redemption_method], nil},
+    "perk_expired" => {"perk", [:redemption_method], nil},
+    "perk_claimed" => {"perk_claim", [:perk_id, :status], :subject},
+    "perk_redeemed" => {"perk_claim", [:perk_id, :used_via], :subject},
+    "perk_claim_revoked" => {"perk_claim", [:perk_id], :subject},
     "class_booking_timed_out" => {"class_booking", [:scheduled_class_id], :subject},
     "class_attendance_recorded" =>
       {"class_attendance", [:scheduled_class_id, :booking_id, :status], nil},
