@@ -152,7 +152,8 @@ businesses, and are not part of this.
 - A seeder that writes a new table must add it to the store's deletable
   sources, or seeding fails with `demo_source_not_deletable`.
 - Mock people are real `users` rows while a business is in demo mode. They
-  can appear in global user search (TD-184).
+  are marked and kept out of every discovery path (Follow-ups › Mock people
+  stay private).
 
 ## Implementation Notes
 - Migration `20261206100000_business_activation`: columns, constraint,
@@ -170,3 +171,48 @@ businesses, and are not part of this.
 - The schedule seeder links one of the demo workouts to each class, because
   a class without a WOD is a draft nobody can book (ADR-176). So `schedule`
   requires `members` and `workouts`.
+
+## Follow-ups
+
+### Mock people stay private
+Date: 2026-10-23
+
+- **A durable mark.** `users.demo_organization_id` names the demo business
+  a mock person belongs to. The members seeder registers mock people through
+  `Identity.register_demo_person/2`, which sets it at insert; a trigger
+  (`users_demo_person_marker_guard`) refuses any later change, so a real
+  person never becomes a mock one or the reverse. Migration
+  `20261209100000_demo_people_marker` backfills existing mock people from
+  `demo_records`. The column has no foreign key on purpose: `users` outlives
+  tenant data (the clean slate purge truncates `organizations` CASCADE and
+  keeps users), and `DeleteOrganization` already deletes a deleted
+  business's own people. A mark whose business is gone still hides the
+  person. The email domain and nickname suffix stay cosmetic.
+- **One visibility rule.** A mock person is visible only to itself and to
+  the active staff (owner, admin, coach, front desk, accountant, janitor) of
+  its demo business. In SQL it is the definer
+  `palee_demo_user_visible(user, viewer)`. In Elixir it is
+  `Identity.visible_user_ids/2` and `Identity.visible_to?/2`. Callers that
+  only need to know whether an account is a mock person use
+  `Identity.demo_user?/1` (an account or an id) and
+  `Identity.demo_user_ids/1`. The account struct also carries
+  `demo_organization_id`.
+- **Every discovery path applies it:**
+  - Global user and athlete search (`Identity.search_users`,
+    `search_athletes`, used by the vendor's `/me/search/users`) never lists
+    a marked person. No viewer could be their staff there.
+  - A person's profile and posts (`/api/people/:id`) are a 404 for
+    everyone else. The same holds for following them and for the
+    exact-nickname PR grantee lookup.
+  - Buddy candidates (`palee_buddy_candidates`), the partner deck and
+    swipe, and the gym and challenge leaderboards filter through the rule.
+  - The people half of Γύρω μου (`palee_around_match_posts`) excludes
+    marked people outright.
+  - In-business screens (the staff's member search, rosters) are
+    unchanged: their viewers are the staff.
+  - There are no @mention suggestions or follow/friend suggestion lists
+    yet. A new one must filter through the same rule.
+- **Wipe and notifications read the mark too.** `DemoData.wipe/1` deletes
+  the recorded mock people plus any marked person of the business whose
+  record went missing. `palee_notification_suppressed` is true for a marked
+  person even without a demo record.
