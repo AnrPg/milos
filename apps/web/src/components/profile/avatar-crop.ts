@@ -1,11 +1,5 @@
+import { avatarDrawRect, type AvatarTransform, type ImageSize } from "@/lib/avatar-crop";
 import { readToken } from "@/lib/theme";
-
-export type AvatarCrop = {
-  dx: number;
-  dy: number;
-  width: number;
-  height: number;
-};
 
 export const MAX_AVATAR_BYTES = 5 * 1_024 * 1_024;
 const SUPPORTED_AVATAR_SOURCE_TYPES = new Set([
@@ -33,77 +27,76 @@ export function isSupportedAvatarSource(file: Pick<File, "name" | "type">) {
   return extension ? SUPPORTED_AVATAR_SOURCE_EXTENSIONS.has(extension) : false;
 }
 
-export function calculateAvatarCrop(
-  imageWidth: number,
-  imageHeight: number,
-  outputSize: number,
-  zoom: number,
-  horizontalPosition: number,
-  verticalPosition: number,
-  rotationDegrees = 0,
-): AvatarCrop {
-  const normalizedRotation = ((rotationDegrees % 360) + 360) % 360;
-  const rotated = normalizedRotation === 90 || normalizedRotation === 270;
-  const effectiveWidth = rotated ? imageHeight : imageWidth;
-  const effectiveHeight = rotated ? imageWidth : imageHeight;
-  const coverScale = Math.max(outputSize / effectiveWidth, outputSize / effectiveHeight);
-  const scale = coverScale * Math.max(1, zoom);
-  const width = effectiveWidth * scale;
-  const height = effectiveHeight * scale;
-  const overflowX = Math.max(0, width - outputSize);
-  const overflowY = Math.max(0, height - outputSize);
-  const clampedX = Math.max(-100, Math.min(100, horizontalPosition));
-  const clampedY = Math.max(-100, Math.min(100, verticalPosition));
+export type AvatarImage = CanvasImageSource & ImageSize;
 
-  return {
-    dx: (outputSize - width) / 2 + (clampedX / 100) * (overflowX / 2),
-    dy: (outputSize - height) / 2 + (clampedY / 100) * (overflowY / 2),
-    width,
-    height,
-  };
-}
-
-export function drawAvatarCrop(
-  canvas: HTMLCanvasElement,
-  image: CanvasImageSource & { width: number; height: number },
-  zoom: number,
-  horizontalPosition: number,
-  verticalPosition: number,
-  rotationDegrees = 0,
-) {
+/** Draws the edited photo onto a square canvas, rotation included. */
+export function drawAvatar(canvas: HTMLCanvasElement, image: AvatarImage, transform: AvatarTransform) {
   const context = canvas.getContext("2d");
   if (!context) throw new Error("Canvas is not available in this browser.");
-  const normalizedRotation = ((rotationDegrees % 360) + 360) % 360;
-  const rotated = normalizedRotation === 90 || normalizedRotation === 270;
-  const effectiveWidth = rotated ? image.height : image.width;
-  const crop = calculateAvatarCrop(
-    image.width,
-    image.height,
-    canvas.width,
-    zoom,
-    horizontalPosition,
-    verticalPosition,
-    normalizedRotation,
-  );
-  const scale = crop.width / effectiveWidth;
-  const scaledImageWidth = image.width * scale;
-  const scaledImageHeight = image.height * scale;
-  const radians = (normalizedRotation * Math.PI) / 180;
+  const rect = avatarDrawRect(image, transform, canvas.width);
 
+  context.setTransform(1, 0, 0, 1, 0, 0);
   context.clearRect(0, 0, canvas.width, canvas.height);
   context.fillStyle = readToken("deep");
   context.fillRect(0, 0, canvas.width, canvas.height);
-  context.save();
-  context.translate(crop.dx + crop.width / 2, crop.dy + crop.height / 2);
-  context.rotate(radians);
-  context.drawImage(
-    image,
-    -scaledImageWidth / 2,
-    -scaledImageHeight / 2,
-    scaledImageWidth,
-    scaledImageHeight,
-  );
-  context.restore();
+  context.imageSmoothingQuality = "high";
+  context.translate(rect.centerX, rect.centerY);
+  context.rotate(rect.radians);
+  context.drawImage(image, -rect.width / 2, -rect.height / 2, rect.width, rect.height);
+  context.setTransform(1, 0, 0, 1, 0, 0);
+}
+
+async function decode(blob: Blob): Promise<AvatarImage> {
+  if (typeof createImageBitmap === "function") {
+    try {
+      // Applies the EXIF orientation, so phone photos load upright.
+      return await createImageBitmap(blob, { imageOrientation: "from-image" });
+    } catch {
+      // Some browsers cannot decode every format into a bitmap; an <img> can.
+    }
+  }
+  const url = URL.createObjectURL(blob);
+  try {
+    const image = new Image();
+    image.decoding = "async";
+    image.src = url;
+    await image.decode();
+    return image;
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+/**
+ * Loads a picked file, or the current avatar by URL, into something a canvas
+ * can draw and export. Avatars live on the public media host (another
+ * origin, CORS open for reads), so the URL is fetched as a blob: the canvas
+ * then stays untainted and `toBlob` works. Credentials go only to our own
+ * origin; the public bucket needs none and rejects them with a wildcard CORS.
+ */
+export async function loadAvatarImage(source: Blob | string, signal?: AbortSignal): Promise<AvatarImage> {
+  if (typeof source !== "string") return decode(source);
+  let blob: Blob;
+  try {
+    // `reload` skips a copy the page's <img> cached without CORS headers.
+    const response = await fetch(source, { mode: "cors", credentials: "same-origin", cache: "reload", signal });
+    if (!response.ok) throw new Error(`avatar_fetch_failed_${response.status}`);
+    blob = await response.blob();
+  } catch (error) {
+    if (signal?.aborted) throw error;
+    // A media host missing from connect-src can still load as a CORS image.
+    return loadCorsImage(source);
+  }
+  return decode(blob);
+}
+
+async function loadCorsImage(url: string): Promise<AvatarImage> {
+  const image = new Image();
+  image.crossOrigin = "anonymous";
+  image.decoding = "async";
+  image.src = url;
+  await image.decode();
+  return image;
 }
 
 function canvasToBlob(canvas: HTMLCanvasElement, quality: number) {
