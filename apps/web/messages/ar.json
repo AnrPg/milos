@@ -75,7 +75,8 @@
     "notificationsShort": "الإشعارات",
     "messages": "الرسائل",
     "messagesUnread": "الرسائل (غير المقروءة: {count})",
-    "socialApp": "اجتماعي"
+    "socialApp": "اجتماعي",
+    "shop": "المتجر"
   },
   "Profile": {
     "eyebrow": "الملف الشخصي",
@@ -6817,7 +6818,6 @@
     "placeAddress": "المنطقة المحيطة بهذا العنوان",
     "placeAdding": "جارٍ الإضافة…",
     "worldwideUnavailable": "البحث العالمي غير متاح الآن، لذا نعرض فقط الأماكن التي نعرفها مسبقًا.",
-    "placesAttribution": "الأماكن: © مساهمو OpenStreetMap، GeoNames (CC BY 4.0)",
     "placeUnknown": "منطقة",
     "from": "من: {place}",
     "searchingFrom": "البحث من: {place}",
@@ -6945,7 +6945,8 @@
     "visibilityNeedsArea": "تظهر فقط بعد أن تحدد «منطقتي».",
     "notifTitle": "جديد حولك",
     "notifBody": "جديد في «{name}»: {count}",
-    "myDisciplines": "رياضاتي"
+    "myDisciplines": "رياضاتي",
+    "placesAttribution": "الأماكن: © مساهمو OpenStreetMap، GeoNames (CC BY 4.0)"
   },
   "CheckIn": {
     "loading": "جارٍ التحميل…",
@@ -9855,6 +9856,476 @@
     "shownTotal": "المعروض: {amounts}",
     "tabTransactions": "المعاملات",
     "shopOrder": "شراء منتجات"
+  },
+  "ShopConsole": {
+    "title": "المتجر",
+    "loading": "جارٍ التحميل…",
+    "noAccess": "ليست لديك صلاحية الوصول إلى المتجر.",
+    "openState": "مفتوح · {count, plural, one {منتج واحد} two {منتجان} other {# منتجات}}",
+    "closedState": "مغلق أمام الأعضاء",
+    "pos": {
+      "loading": "جارٍ التحميل…",
+      "noAccess": "يتطلب الصندوق صلاحية تحصيل المدفوعات.",
+      "back": "المتجر",
+      "title": "الصندوق",
+      "branch": "الفرع",
+      "products": "المنتجات",
+      "search": "منتج أو رمز أو باركود",
+      "noProducts": "لا توجد منتجات نشطة تُباع في الصندوق.",
+      "left": "تبقى {count}",
+      "pickVariant": "اختر نوعًا من {product}",
+      "sale": "البيع",
+      "walkIn": "عميل بدون حساب",
+      "walkInName": "الاسم (اختياري)",
+      "member": "العضو",
+      "unpaid": "رصيد غير مدفوع {amount}",
+      "noUnpaid": "لا يوجد غير مدفوع",
+      "packageDiscount": "−{percent}% من الباقة",
+      "emptyCart": "اضغط على منتج لإضافته.",
+      "charged": "تم التحصيل · {order}. يظهر البيع في معاملات العضو.",
+      "quantityOf": "كمية {item}",
+      "short": "المتوفر {count} فقط",
+      "discount": "خصم الباقة −{percent}%",
+      "total": "الإجمالي",
+      "payment": "الدفع",
+      "methods": {
+        "cash": "نقدًا",
+        "card_manual": "بطاقة على الجهاز"
+      },
+      "manualNote": "تتم مدفوعات البطاقة على جهازك؛ وهنا تسجلها.",
+      "manualNoteOnlineLater": "تتم مدفوعات البطاقة على جهازك؛ وهنا تسجلها. الدفع بالبطاقة عبر الإنترنت يأتي لاحقًا.",
+      "charge": "تحصيل {amount}",
+      "charging": "جارٍ التحصيل…",
+      "pickMember": "اختر العضو، أو انتقل إلى عميل بدون حساب.",
+      "receiptNote": "تصدر فاتورة مع الدفع، مثل أي بيع آخر في المالية."
+    },
+    "newProduct": "منتج جديد",
+    "branchNote": "تظهر الطلبات والمخزون والتقارير للفروع المختارة فقط.",
+    "tabs": {
+      "products": "المنتجات",
+      "orders": "الطلبات",
+      "stock": "المخزون",
+      "analytics": "التحليلات"
+    },
+    "empty": {
+      "title": "بِع لأعضائك من التطبيق",
+      "body": "يطلب الأعضاء من Box ويستلمون من الاستقبال. ترى ما يجب تجهيزه وكم تبقى. ويمكن للاستقبال أيضًا البيع من الصندوق.",
+      "steps": {
+        "product": {
+          "title": "أضف منتجك الأول",
+          "body": "صورة وسعر ومقاسات. يبدأ كمسودة."
+        },
+        "pickup": {
+          "title": "تحقق من نقطة الاستلام",
+          "body": "يستلم الأعضاء من استقبال فرعهم."
+        },
+        "publish": {
+          "title": "انشر لفتح المتجر",
+          "body": "تظهر بطاقة المتجر في Box لدى الأعضاء بمجرد نشر منتج."
+        }
+      },
+      "addProduct": "منتج جديد",
+      "pickupSettings": "إعدادات الاستلام",
+      "membersNote": "حتى تنشر، لا يرى الأعضاء بطاقة المتجر في Box. بعد الفتح يبقى لها مكان ثابت تحت الاشتراك."
+    },
+    "products": {
+      "title": "المنتجات",
+      "filter": "عرض المنتجات",
+      "filters": {
+        "all": "الكل",
+        "published": "نشطة",
+        "draft": "مسودات",
+        "low_stock": "مخزون منخفض",
+        "archived": "مؤرشفة"
+      },
+      "search": "ابحث في المنتجات",
+      "loading": "جارٍ تحميل المنتجات…",
+      "none": "لا توجد منتجات هنا.",
+      "from": "ابتداءً من {price}",
+      "variants": "{count, plural, one {خيار واحد} two {خياران} other {# خيارات}}",
+      "stockMeter": "{count} في المخزون",
+      "stockUnits": "{count, plural, one {قطعة واحدة} two {قطعتان} other {# قطع}}",
+      "stockWeakest": "{count, plural, one {قطعة واحدة} two {قطعتان} other {# قطع}} · {variant}: تبقى {left}",
+      "status": {
+        "draft": "مسودة",
+        "published": "نشط",
+        "archived": "مؤرشف"
+      }
+    },
+    "editor": {
+      "loading": "جارٍ تحميل المنتج…",
+      "noAccess": "لا يمكنك تعديل منتجات المتجر.",
+      "back": "المنتجات",
+      "newTitle": "منتج جديد",
+      "promote": "ترويج",
+      "status": {
+        "draft": "مسودة",
+        "published": "نشط",
+        "archived": "مؤرشف"
+      },
+      "photos": {
+        "title": "الصور",
+        "hint": "الصور المربعة تبدو أفضل. تظهر الصورة الأولى في القائمة.",
+        "alt": "صورة المنتج {index}",
+        "uploading": "جارٍ الرفع…",
+        "failed": "فشل الرفع",
+        "cover": "الغلاف",
+        "makeCover": "اجعلها الغلاف",
+        "remove": "إزالة",
+        "add": "إضافة صور"
+      },
+      "basics": {
+        "title": "التفاصيل",
+        "name": "الاسم",
+        "description": "الوصف",
+        "category": "الفئة",
+        "categoryHint": "مثلًا: ملابس"
+      },
+      "price": {
+        "title": "السعر",
+        "price": "السعر شامل الضريبة (€)",
+        "compareAt": "السعر قبل الخصم (€)",
+        "cost": "سعر التكلفة (€، لك فقط)",
+        "hint": "يظهر السعر قبل الخصم مشطوبًا. يغذي سعر التكلفة الهامش في التحليلات ولا يظهر للأعضاء أبدًا."
+      },
+      "variants": {
+        "title": "الخيارات والمخزون",
+        "hint": "حتى خيارين، مثل المقاس واللون. يُحسب المخزون لكل تركيبة وفرع.",
+        "addSize": "أضف خيارًا (مثل المقاس)",
+        "addColour": "أضف خيارًا ثانيًا (مثل اللون)",
+        "optionName": "الخيار",
+        "optionNameHint": "مثلًا: المقاس",
+        "removeOption": "إزالة الخيار",
+        "values": "القيم",
+        "removeValue": "إزالة {value}",
+        "newValue": "قيمة جديدة",
+        "newValueHint": "مثلًا: M",
+        "addValue": "إضافة",
+        "list": "الأنواع",
+        "single": "نوع واحد",
+        "price": "السعر (€)",
+        "priceOf": "سعر {variant}",
+        "same": "نفسه ({price})",
+        "stock": "المخزون",
+        "onHand": "{count} متوفر · {reserved} محجوز",
+        "openingOf": "المخزون الافتتاحي لـ {variant} في {branch}",
+        "ledgerNote": "يتغير مخزون الأنواع المحفوظة من تبويب المخزون، ليكون لكل تغيير سبب."
+      },
+      "selling": {
+        "title": "البيع",
+        "channel": "أين يُباع",
+        "channels": {
+          "both": "التطبيق والصندوق",
+          "app": "التطبيق فقط",
+          "desk": "الصندوق فقط"
+        },
+        "visibility": "من يمكنه الشراء",
+        "visibilities": {
+          "members_only": "الأعضاء فقط",
+          "anyone": "والزوار أيضًا"
+        },
+        "visibilityHint": "والزوار أيضًا: يظهر كذلك في الصفحة العامة للنادي لأي شخص لديه حساب Palee.",
+        "memberDiscount": "خصم باقة العضو",
+        "memberDiscountHint": "تنطبق نسبة خصم باقة العضو على هذا المنتج.",
+        "status": "الحالة",
+        "newIsDraft": "تبدأ المنتجات الجديدة كمسودات. انشر بعد الحفظ."
+      },
+      "errors": {
+        "title": "أعطِ المنتج اسمًا.",
+        "price": "أدخل سعرًا أكبر من صفر.",
+        "compareAt": "السعر قبل الخصم ليس مبلغًا صالحًا.",
+        "cost": "سعر التكلفة ليس مبلغًا صالحًا.",
+        "variantPrice": "سعر {variant} ليس مبلغًا صالحًا."
+      },
+      "save": "حفظ",
+      "create": "إنشاء مسودة",
+      "saving": "جارٍ الحفظ…",
+      "saved": "تم الحفظ."
+    },
+    "promote": {
+      "eyebrow": "ترويج",
+      "where": "أين تنشر",
+      "targets": {
+        "announcements": "الإعلانات",
+        "channel": "مجموعة أعضاء",
+        "feed": "الموجز"
+      },
+      "targetHints": {
+        "announcements": "منشور للنادي في قناة الإعلانات مع بطاقة المنتج.",
+        "channel": "يرى المنشور أعضاء مجموعة واحدة فقط.",
+        "feed": "منشور ناديك في موجز أعضائك ومتابعيك."
+      },
+      "group": "المجموعة",
+      "groupPick": "اختر مجموعة",
+      "text": "نص المنشور",
+      "defaultBody": "جديد في المتجر: {product}. اطلبه من التطبيق واستلمه من الاستقبال.",
+      "preview": "معاينة",
+      "cardCta": "عرض",
+      "code": "رمز الخصم",
+      "codeHint": "رمز لهذا المنتج فقط، في المالية › العروض.",
+      "codeValue": "الرمز",
+      "percent": "الخصم (%)",
+      "endsOn": "صالح حتى",
+      "newLabel": "يعرض المتجر تلقائيًا علامة جديد لمدة 14 يومًا بعد النشر.",
+      "errors": {
+        "body": "اكتب نص المنشور.",
+        "group": "اختر مجموعة.",
+        "code": "أدخل رمزًا وخصمًا بين 1 و100%."
+      },
+      "cancel": "إلغاء",
+      "post": "نشر",
+      "posting": "جارٍ النشر…"
+    },
+    "orders": {
+      "title": "الطلبات",
+      "filter": "عرض الطلبات",
+      "status": {
+        "placed": "للتجهيز",
+        "ready_for_pickup": "جاهز",
+        "picked_up": "تم الاستلام",
+        "cancelled": "ملغى"
+      },
+      "none": {
+        "placed": "لا شيء للتجهيز.",
+        "ready_for_pickup": "لا توجد طلبات بانتظار الاستلام.",
+        "picked_up": "لا توجد طلبات مستلمة بعد.",
+        "cancelled": "لا توجد طلبات ملغاة."
+      },
+      "loading": "جارٍ تحميل الطلبات…",
+      "walkIn": "عميل بدون حساب",
+      "channel": {
+        "online": "من التطبيق",
+        "pos": "من الصندوق"
+      },
+      "payment": {
+        "pending_payment": "للدفع",
+        "paid": "مدفوع",
+        "partially_refunded": "مسترد جزئيًا",
+        "refunded": "مسترد",
+        "void": "ملغى"
+      },
+      "mode": {
+        "at_pickup": "عند الاستلام",
+        "on_account": "على الحساب",
+        "online": "عبر الإنترنت",
+        "cash": "نقدًا",
+        "card_manual": "بطاقة على الجهاز",
+        "bank_transfer": "تحويل بنكي",
+        "other": "أخرى"
+      },
+      "reserveNote": "تحجز الطلبات مخزونها حتى الاستلام أو الإلغاء. الطلبات غير المستلمة خلال 7 أيام تُلغى تلقائيًا، مع تذكير للعضو في اليوم الثالث.",
+      "lineQty": "{count} × {price}",
+      "lineRefunded": "{count} مسترد",
+      "discount": "الخصم",
+      "total": "الإجمالي",
+      "totalWithInvoice": "الإجمالي · الفاتورة {invoice}",
+      "paid": "المدفوع",
+      "refunded": "المسترد",
+      "paymentMode": "الدفع",
+      "code": "الرمز",
+      "timeline": "السجل",
+      "timelinePlaced": "طُلب {channel} · {when}",
+      "timelineReady": "جاهز للاستلام · {when}",
+      "timelinePickedUp": "تم الاستلام · {when}",
+      "timelineCancelled": "أُلغي · {when}",
+      "timelineExpires": "الاستلام قبل {when}",
+      "markReady": "جاهز للاستلام",
+      "readyHint": "يرسل «جاهز» إشعارًا للعضو بمكان وموعد الاستلام.",
+      "markPickedUp": "تم الاستلام",
+      "collect": "تحصيل {amount}",
+      "method": "طريقة الدفع",
+      "collectHint": "يُسجل الدفع في فاتورة الطلب. يراه العضو في المعاملات.",
+      "confirmPickup": "تأكيد الاستلام",
+      "cancel": "إلغاء الطلب",
+      "cancelReason": "السبب (اختياري)",
+      "cancelHint": "الإلغاء يحرر المخزون المحجوز.",
+      "confirmCancel": "إلغاء الطلب",
+      "refund": "استرداد",
+      "refundWhat": "ما الذي يُعاد؟",
+      "refundQty": "كمية {item} المستردة",
+      "restock": "إعادة إلى المخزون",
+      "refundHint": "يُصدر الاسترداد إيصال الاسترداد. اترك «إعادة إلى المخزون» مطفأ للقطع التالفة.",
+      "confirmRefund": "استرداد",
+      "back": "رجوع"
+    },
+    "stock": {
+      "title": "المخزون",
+      "filter": "عرض المخزون",
+      "views": {
+        "attention": "يحتاج إعادة طلب",
+        "all": "كل الأنواع"
+      },
+      "none": {
+        "attention": "لا شيء يحتاج إعادة طلب.",
+        "all": "لا توجد أنواع بعد."
+      },
+      "loading": "جارٍ تحميل المخزون…",
+      "units": "{count, plural, one {قطعة واحدة} two {قطعتان} other {# قطع}}",
+      "daysLeft": "~{count, plural, one {يوم واحد} two {يومان} other {# أيام}}",
+      "reserved": "{count} محجوز",
+      "history": "الحركات",
+      "adjust": "تعديل",
+      "policyNote": "تأتي الحالة من أيام المخزون المتبقية بالوتيرة الحالية: حرج تحت 7 أيام، منخفض تحت 21. تصل التنبيهات فقط عند التراجع، ويدخل المخزون في الملخص اليومي.",
+      "recent": "أحدث الحركات",
+      "allMovements": "كل الحركات",
+      "historyOf": "الحركات · {item}",
+      "noMovements": "لا توجد حركات بعد.",
+      "kinds": {
+        "receive": "توريد",
+        "sale": "بيع",
+        "refund_restock": "إعادة إلى المخزون",
+        "adjustment": "تعديل",
+        "transfer": "نقل",
+        "reserve": "محجوز لطلب",
+        "release": "تحرير"
+      },
+      "reasons": {
+        "recount": "إعادة عدّ",
+        "damage": "تلف",
+        "loss": "فقدان",
+        "return": "إرجاع",
+        "other": "أخرى"
+      },
+      "adjustEyebrow": "حركة مخزون",
+      "reason": "ماذا حدث",
+      "form": {
+        "receive": "توريد",
+        "recount": "إعادة عدّ",
+        "damage": "تلف",
+        "loss": "فقدان",
+        "return": "إرجاع"
+      },
+      "quantity": "الكمية",
+      "counted": "المعدود على الرف",
+      "unitCost": "التكلفة للقطعة (€)",
+      "note": "ملاحظة",
+      "noteHint": "مثلًا: فاتورة المورد 0891",
+      "now": "المتوفر الآن {count}",
+      "after": "المتوفر {from} → {to}",
+      "errors": {
+        "amount": "أدخل كمية تغيّر المخزون."
+      },
+      "cancel": "إلغاء",
+      "record": "تسجيل"
+    },
+    "analytics": {
+      "title": "التحليلات",
+      "loading": "جارٍ تحميل التقارير…",
+      "unavailable": "تقارير المتجر غير متاحة بعد.",
+      "range": "الفترة",
+      "ranges": {
+        "28": "4 أسابيع",
+        "84": "12 أسبوعًا",
+        "365": "12 شهرًا"
+      },
+      "kpi": {
+        "sales": "صافي المبيعات",
+        "salesChange": "صافي المبيعات · {change, number}% مقارنة بالفترة السابقة",
+        "margin": "الهامش الإجمالي (حيث التكلفة معروفة · {costed}/{total} منتجات)",
+        "units": "القطع · {orders, plural, one {طلب واحد} two {طلبان} other {# طلبات}}",
+        "stockValue": "قيمة المخزون بالتكلفة · {count} منخفض"
+      },
+      "weekly": "المبيعات أسبوعيًا",
+      "weeklyHint": "بعد خصم التخفيضات والمرتجعات. الأسبوع الحالي غير المكتمل أفتح لونًا.",
+      "weekOf": "أسبوع {date}",
+      "net": "الصافي",
+      "noSales": "لا مبيعات في هذه الفترة.",
+      "top": "أفضل المنتجات",
+      "product": "المنتج",
+      "units": "القطع",
+      "revenue": "الإيراد",
+      "marginCol": "الهامش",
+      "marginHint": "«—»: سعر التكلفة غير موجود، لذا يبقى خارج الهامش بدلًا من احتسابه 100%.",
+      "channels": "التطبيق أو الصندوق",
+      "channel": {
+        "online": "التطبيق (استلام)",
+        "pos": "الصندوق"
+      },
+      "branches": "حسب الفرع",
+      "noBranch": "بدون فرع",
+      "attribution": "من أين جاءت المبيعات",
+      "attributionHint": "يُنسب الطلب إلى الرمز المستخدم، وإلا إلى المنشور أو العرض الذي فُتح منه المنتج خلال 7 أيام، وإلا إلى بطاقة المتجر في Box.",
+      "source": {
+        "club_post": "منشور",
+        "promotion_code": "رمز",
+        "public_page": "الصفحة العامة",
+        "direct": "بطاقة المتجر في Box",
+        "desk": "الصندوق",
+        "other": "أخرى"
+      },
+      "codeRow": "الرمز {code}",
+      "ordersMoney": "{count, plural, one {طلب واحد} two {طلبان} other {# طلبات}} · {amount}",
+      "unattributed": "بدون نسبة: {count, plural, one {طلب واحد} two {طلبان} other {# طلبات}} · {amount}",
+      "lowStock": "مخزون منخفض",
+      "noLowStock": "لا شيء على وشك النفاد.",
+      "left": "تبقى {count}",
+      "openStock": "فتح المخزون",
+      "pricing": {
+        "title": "مؤشرات التسعير",
+        "hint": "لكل نوع، خلال الفترة المختارة. النطاق المقترح استشاري: أنت من يحدد الأسعار.",
+        "none": "لا توجد أنواع بمبيعات أو مخزون بعد.",
+        "marginShort": "هامش {margin}%",
+        "noCost": "بدون سعر تكلفة",
+        "perWeek": "{value}/أسبوع",
+        "margin": "الهامش",
+        "markup": "نسبة الربح على التكلفة",
+        "sellThrough": "نسبة البيع",
+        "daysOfStock": "أيام المخزون",
+        "velocity": "المباع أسبوعيًا",
+        "sold": "المباع",
+        "discountEffect": "أثر الخصم",
+        "lift": "{change, number}% قطع لكل طلب · {share}% من القطع",
+        "priceChange": "آخر تغيير للسعر",
+        "velocityChange": "{from} → {to}: {before} → {after}/أسبوع",
+        "position": {
+          "below": "تحت النطاق",
+          "within": "ضمن النطاق",
+          "above": "فوق النطاق"
+        },
+        "suggested": "نطاق السعر المقترح",
+        "advisory": "استشاري",
+        "range": "{low} – {high}",
+        "noRange": "لا نطاق بدون سعر تكلفة.",
+        "inputs": "كيف يُحسب",
+        "inputCostPlus": "التكلفة {cost} بهامش مستهدف {margin}% ({source}).",
+        "sourceCategory": "هدف الفئة",
+        "sourceDefault": "الهدف الافتراضي",
+        "inputNoCost": "أضف سعر التكلفة للحصول على نطاق.",
+        "pace": {
+          "fast": "يُباع {velocity}/أسبوع، أي 1.5 ضعف وسيط فئته على الأقل ({median}/أسبوع)، لذا يمتد النطاق فوق التكلفة زائد الهامش.",
+          "slow": "يُباع {velocity}/أسبوع، أي نصف وسيط فئته على الأكثر ({median}/أسبوع)، لذا ينزل النطاق تحت التكلفة زائد الهامش، دون أن يقل عن التكلفة أبدًا.",
+          "normal": "يُباع {velocity}/أسبوع، قريبًا من وتيرة فئته ({median}/أسبوع).",
+          "unknown": "لا توجد مبيعات كافية بعد لمقارنة وتيرته بفئته."
+        },
+        "priceSensitive": "يبدو الطلب حساسًا للسعر، لذا خُفّض هامش الارتفاع إلى النصف.",
+        "yourCall": "استشاري فقط: النادي يحدد أسعاره."
+      }
+    },
+    "finance": {
+      "eyebrow": "الإيرادات حسب المصدر",
+      "title": "من أين يأتي المال",
+      "streams": {
+        "membership": "الاشتراكات",
+        "package": "باقات التدريب الشخصي والخدمات",
+        "event": "الفعاليات والمواسم",
+        "shop": "المتجر",
+        "other": "أخرى"
+      },
+      "hint": "يأخذ كل دفع مصدره من أصله، لا من نصه أبدًا. تُخصم المرتجعات ضمن المصدر نفسه.",
+      "recent": "أحدث مبيعات المتجر",
+      "desk": "الصندوق"
+    }
+  },
+  "ShopShared": {
+    "stock": {
+      "ok": "متوفر",
+      "low": "منخفض",
+      "critical": "حرج",
+      "out": "نفد"
+    },
+    "compareAt": "كان {price}",
+    "less": "واحد أقل",
+    "more": "واحد أكثر"
   },
   "EventWizard": {
     "step_host": "المنظِّم",
