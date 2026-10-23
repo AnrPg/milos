@@ -16,6 +16,7 @@ import { useSession } from "@/components/session-provider";
 import { PageHeader } from "@/components/PageHeader";
 import { localizeError } from "@/i18n/presentation";
 import { useUiTranslations } from "@/i18n/ui";
+import { membershipLocationScope } from "@/lib/location-scope";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { Select } from "@/components/ui/Select";
@@ -50,6 +51,8 @@ export function CheckInDesk() {
     queryFn: () => listAdminLocations(token!),
   });
   const activeLocations = (locationsQuery.data ?? []).filter((location) => !location.archived_at);
+  const branchScoped = membershipLocationScope(membership) !== "all";
+  const deskLocationId = locationId || (branchScoped ? (activeLocations[0]?.id ?? "") : "");
 
   const checkInsQuery = useQuery({
     queryKey: ["admin", "check-ins", date],
@@ -59,7 +62,7 @@ export function CheckInDesk() {
   const checkIns = checkInsQuery.data ?? [];
 
   const checkIn = useMutation({
-    mutationFn: () => createCheckIn(token!, { user_id: member.id, location_id: locationId || null }),
+    mutationFn: () => createCheckIn(token!, { user_id: member.id, location_id: deskLocationId || null }),
     onSuccess: async (record: FacilityCheckIn) => {
       const name = record.nickname ?? member.nickname;
       setResult(
@@ -107,7 +110,7 @@ export function CheckInDesk() {
               </nav>
             ) : null}
 
-            <DeskScanner token={token} locationId={locationId} />
+            <DeskScanner token={token} locationId={deskLocationId} />
 
             <section className="space-y-4 rounded-[2rem] p-6" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
               <h2 className="text-lg font-semibold" style={{ color: "var(--text)" }}>{i18n("admCheckInMember")}</h2>
@@ -124,8 +127,9 @@ export function CheckInDesk() {
                 {activeLocations.length > 0 ? (
                   <label className="space-y-1">
                     <span className="block text-xs font-semibold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{i18n("admSlotLocation")}</span>
-                    <Select className="w-full rounded-xl px-3 py-2 text-sm" onValueChange={(value) => setLocationId(value)} style={fieldStyle} value={locationId}>
-                      <option value="">{i18n("admCheckInNoLocation")}</option>
+                    <Select className="w-full rounded-xl px-3 py-2 text-sm" onValueChange={(value) => setLocationId(value)} style={fieldStyle} value={deskLocationId}>
+                      {/* ADR-186: branch staff check in at one of their branches (the API defaults a single one). */}
+                      {branchScoped ? null : <option value="">{i18n("admCheckInNoLocation")}</option>}
                       {activeLocations.map((location) => (
                         <option key={location.id} value={location.id}>{location.name}</option>
                       ))}
