@@ -72,7 +72,8 @@ function eventRewardPillStyle(
   return { background: "var(--border)", color: "var(--dim)" };
 }
 
-export function ReferralsTab() {
+/** `locationIds`: the page branch filter (ADR-186 §7). */
+export function ReferralsTab({ locationIds }: { locationIds?: string } = {}) {
   const i18n = useUiTranslations();
   function eventRewardStatusText(
     event: FinanceRecord | null | undefined,
@@ -130,16 +131,17 @@ export function ReferralsTab() {
     queryFn: () => fetchReferralPrograms(token),
   });
 
+  // ADR-186 §7: referrals and rewards follow their people; programmes are business-wide.
   const eventsQuery = useQuery({
-    queryKey: ["admin", "finance", "referrals"],
+    queryKey: ["admin", "finance", "referrals", ...(locationIds ? [locationIds] : [])],
     enabled: Boolean(token),
-    queryFn: () => fetchReferralEvents(token),
+    queryFn: () => fetchReferralEvents(token, locationIds),
   });
 
   const rewardsQuery = useQuery({
-    queryKey: ["admin", "finance", "referral-rewards"],
+    queryKey: ["admin", "finance", "referral-rewards", ...(locationIds ? [locationIds] : [])],
     enabled: Boolean(token),
-    queryFn: () => fetchReferralRewards(token),
+    queryFn: () => fetchReferralRewards(token, locationIds),
   });
 
   const programs = programsQuery.data?.referral_programs ?? [];

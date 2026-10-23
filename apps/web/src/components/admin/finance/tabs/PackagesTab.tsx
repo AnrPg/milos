@@ -21,6 +21,9 @@ import { useT } from "@/components/admin/finance/packages/package-ui";
 import { usePackageAuthoring } from "@/components/admin/finance/packages/use-package-authoring";
 import { typeLabelKey, type PackageDraft } from "@/components/admin/finance/packages/package-catalog";
 import { SPARK_ACTIVE_STYLE, SPARK_CREATE_STYLE } from "@/lib/spark";
+import type { FacilityLocation } from "@/api/facility";
+import { BranchCoverageBadge } from "@/components/admin/BranchFilter";
+import type { LocationScope } from "@/lib/location-scope";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -33,7 +36,15 @@ function money(uiLocale: string, cents: unknown) {
   return new Intl.NumberFormat(uiLocale, { style: "currency", currency: "EUR" }).format(amount / 100);
 }
 
-export function PackagesTab() {
+/** The branches a package is valid at (`facility.location_ids`, empty = everywhere). */
+export function packageCoverage(pkg: FinanceRecord): LocationScope {
+  const fields = (pkg.fields ?? {}) as Record<string, unknown>;
+  const ids = fields["facility.location_ids"];
+  return Array.isArray(ids) && ids.length > 0 ? ids.map(String).sort() : "all";
+}
+
+/** `locationIds`: the page branch filter (ADR-186 §7); packages valid there or everywhere show. */
+export function PackagesTab({ locationIds }: { locationIds?: string } = {}) {
   const i18n = useUiTranslations();
   const { tokens } = useSession();
   const token = tokens?.access_token ?? "";
@@ -54,9 +65,9 @@ export function PackagesTab() {
   );
 
   const packagesQuery = useQuery({
-    queryKey: ["admin", "finance", "packages"],
+    queryKey: ["admin", "finance", "packages", ...(locationIds ? [locationIds] : [])],
     enabled: Boolean(token),
-    queryFn: () => fetchFinancePackages(token),
+    queryFn: () => fetchFinancePackages(token, locationIds),
   });
 
   const packages = packagesQuery.data?.packages ?? [];
@@ -89,7 +100,7 @@ export function PackagesTab() {
         ) : activePackages.length === 0 ? (
           <p className="px-6 py-8 text-sm" style={{ color: "var(--dim)" }}>{i18n("noActivePackages84ac1e8")}</p>
         ) : (
-          <PackageRows packages={activePackages} onOpen={(id) => setParam("package", id)} />
+          <PackageRows packages={activePackages} locations={locations} onOpen={(id) => setParam("package", id)} />
         )}
       </div>
 
@@ -99,7 +110,7 @@ export function PackagesTab() {
             {i18n("archivedPackages6f2dd9a")} {inactivePackages.length}
           </summary>
           <div style={{ background: "var(--panel)", borderTop: "1px solid var(--border)" }}>
-            <PackageRows packages={inactivePackages} onOpen={(id) => setParam("package", id)} />
+            <PackageRows packages={inactivePackages} locations={locations} onOpen={(id) => setParam("package", id)} />
           </div>
         </details>
       ) : null}
@@ -158,7 +169,15 @@ export function PackagesTab() {
   );
 }
 
-function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: (id: string) => void }) {
+function PackageRows({
+  packages,
+  locations,
+  onOpen,
+}: {
+  packages: FinanceRecord[];
+  locations: FacilityLocation[] | null | undefined;
+  onOpen: (id: string) => void;
+}) {
   const uiLocale = useUiLocale();
   const i18n = useUiTranslations();
   const t = useT();
@@ -179,6 +198,7 @@ function PackageRows({ packages, onOpen }: { packages: FinanceRecord[]; onOpen: 
         </p>
       </div>
       <div className="flex items-center gap-4">
+        <BranchCoverageBadge target={packageCoverage(pkg)} locations={locations} />
         <span className="text-sm font-semibold" style={{ color: "var(--text)" }}>
           {money(uiLocale, pkg.base_price_cents)}
         </span>

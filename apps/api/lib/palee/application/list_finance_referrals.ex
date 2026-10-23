@@ -1,12 +1,34 @@
 defmodule Palee.Application.ListFinanceReferrals do
+  alias Palee.Application.BranchReport
   alias Palee.{Finance, Identity}
 
   def call do
     events = Finance.list_referral_events()
+    {:ok, %{referral_events: enrich(events)}}
+  end
+
+  @doc """
+  ADR-186 §7: with `location_ids` only the referrals whose referrer or
+  referred person has their home branch in the filter (as the operational
+  queues count them).
+  """
+  def call(context, params) do
+    report = BranchReport.resolve_list(context, params)
+
+    events =
+      BranchReport.people_only(
+        Finance.list_referral_events(),
+        report,
+        &[&1.referrer_user_id, &1.referred_user_id]
+      )
+
+    {:ok, %{referral_events: enrich(events), branch_filter: BranchReport.filter_payload(report)}}
+  end
+
+  defp enrich(events) do
     programs = program_map()
     users = user_map(events)
-
-    {:ok, %{referral_events: Enum.map(events, &enrich_event(&1, programs, users))}}
+    Enum.map(events, &enrich_event(&1, programs, users))
   end
 
   defp enrich_event(event, programs, users) do

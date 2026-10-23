@@ -65,7 +65,8 @@ defmodule PaleeWeb.AdminFinanceAccountingController do
         name: :limit,
         in: :query,
         schema: %Schema{type: :integer, minimum: 1, maximum: 500}
-      }
+      },
+      PaleeWeb.Schemas.LocationScope.filter_parameter()
     ],
     responses: [
       ok: {"Refund receipts", "application/json", FinanceAccounting.refund_receipt_collection()}
@@ -73,7 +74,7 @@ defmodule PaleeWeb.AdminFinanceAccountingController do
   )
 
   def refund_receipts(conn, params) do
-    filters = Map.take(params, ["q", "user_id", "from", "to", "limit"])
+    filters = Map.take(params, ["q", "user_id", "from", "to", "limit", "location_ids"])
 
     with {:ok, payload} <- ListFinanceRefundReceipts.call(tenant_context(conn), :staff, filters) do
       json(conn, payload)

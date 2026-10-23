@@ -1,4 +1,5 @@
 defmodule Palee.Application.ListFinanceMembers do
+  alias Palee.Application.BranchReport
   alias Palee.{Finance, Identity, Organizations}
 
   # TD-092: the rows are the gym's own active members. The `users` table has no
@@ -6,12 +7,19 @@ defmodule Palee.Application.ListFinanceMembers do
   # the platform to any gym's finance desk (their finance columns were merely
   # empty). The finance reads run in the caller's tenant scope (the controller
   # wraps each action in `Finance.with_tenant_context/2`).
+  #
+  # ADR-186 §7: with `location_ids` the rows are the people whose home branch
+  # is in the filter (`BranchReport`, the shared attribution); without it the
+  # list stays the whole gym, since people roam between branches (§3).
   def call(context, params \\ %{}) do
+    params = params || %{}
     limit = parse_limit(params["limit"] || params[:limit])
+    report = BranchReport.resolve_list(context, params)
 
     users =
       context
       |> Organizations.list_active_membership_user_ids()
+      |> BranchReport.people_only(report, & &1)
       |> Identity.list_by_ids()
       |> Enum.reject(&(&1.role == :admin))
       |> Enum.sort_by(& &1.nickname)
@@ -33,7 +41,12 @@ defmodule Palee.Application.ListFinanceMembers do
       |> Enum.map(&build_row(&1, finance_summaries, referrals_made))
       |> Enum.take(limit)
 
-    {:ok, %{members: members, meta: %{total: length(users), limit: limit}}}
+    {:ok,
+     %{
+       members: members,
+       meta: %{total: length(users), limit: limit},
+       branch_filter: BranchReport.filter_payload(report)
+     }}
   end
 
   defp build_row(user, finance_summaries, referrals_made) do

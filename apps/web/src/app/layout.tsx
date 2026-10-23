@@ -26,12 +26,24 @@ import { isAppLocale, localeDirection } from "@/i18n/locales";
 import "@fontsource-variable/commissioner";
 import "./globals.css";
 import { HydrationMarker } from "@/components/HydrationMarker";
+import { siteOrigin } from "@/lib/site-url";
+import { JsonLd } from "@/components/seo/JsonLd";
+import { loadSiteFacts } from "@/lib/seo/site-facts";
+import { siteStructuredData } from "@/lib/seo/site-info";
 
 export async function generateMetadata(): Promise<Metadata> {
   const i18n = await getUiTranslations();
+  const brand = i18n("brandName");
+  const description = i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a");
   return {
-    title: i18n("brandName"),
-    description: i18n("gymSchedulingAthleteProgrammingAndWorkoutExecution7f2b88a"),
+    metadataBase: await siteOrigin(),
+    applicationName: brand,
+    title: brand,
+    description,
+    // Search engines and link previews name the product from these, not only
+    // from <title>.
+    openGraph: { type: "website", siteName: brand, title: brand, description },
+    twitter: { card: "summary_large_image", title: brand, description },
     manifest: "/manifest.webmanifest",
     icons: {
       icon: "/icon.svg",
@@ -94,6 +106,7 @@ export default async function RootLayout({
   const resolvedLocale = await getLocale();
   const locale = isAppLocale(resolvedLocale) ? resolvedLocale : "en";
   const timeZone = await getTimeZone();
+  const { facts } = await loadSiteFacts();
 
   return (
     <html
@@ -109,6 +122,7 @@ export default async function RootLayout({
           suppressHydrationWarning
           dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
         />
+        <JsonLd data={siteStructuredData(facts)} />
       </head>
       <body className="min-h-full flex flex-col">
         <ClientMessagesProvider locale={locale} timeZone={timeZone}>
