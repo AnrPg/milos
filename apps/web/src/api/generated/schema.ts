@@ -520,6 +520,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/boxes/{slug}/shop/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A published box's shop products for anyone (signed in) */
+        get: operations["PaleeWeb.MyShopController.public_products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/boxes/{slug}/trials": {
         parameters: {
             query?: never;
@@ -6589,6 +6606,177 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/admin/shop/pricing-targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Target margin per product category (cost-plus input) */
+        get: operations["PaleeWeb.AdminShopReportController.pricing_targets"];
+        /** Set or clear the target margin of a category (or the default) */
+        put: operations["PaleeWeb.AdminShopReportController.put_pricing_target"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/attribution": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales by promotion code, campaign and source (feed post, public page...) */
+        get: operations["PaleeWeb.AdminShopReportController.attribution"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/channels": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales by channel (online pickup or desk) and by branch */
+        get: operations["PaleeWeb.AdminShopReportController.channels"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/inventory": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Stock on hand, stock value, low stock and sell-through */
+        get: operations["PaleeWeb.AdminShopReportController.inventory"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/margin": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop revenue, cost and margin where the cost price is known */
+        get: operations["PaleeWeb.AdminShopReportController.margin"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop KPIs: net sales, orders, AOV, units, refunds, margin and stock */
+        get: operations["PaleeWeb.AdminShopReportController.overview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/pricing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Advisory pricing indicators per variant (default window 90 days) */
+        get: operations["PaleeWeb.AdminShopReportController.pricing"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Top shop products and variants by revenue and by units */
+        get: operations["PaleeWeb.AdminShopReportController.products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/reconciliation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop revenue reconciliation: orders == shop invoice lines == payments - refunds */
+        get: operations["PaleeWeb.AdminShopReportController.reconciliation"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/admin/shop/reports/sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Shop sales per gym-local day: gross, refunds, net, orders and AOV */
+        get: operations["PaleeWeb.AdminShopReportController.sales"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/admin/trial-policy": {
         parameters: {
             query?: never;
@@ -8812,6 +9000,143 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/org/{organization_slug}/me/shop/cart/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Price the basket: lines, totals, pickup branches, payment modes and online_payment */
+        post: operations["PaleeWeb.MyShopController.preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My orders at this box, newest first */
+        get: operations["PaleeWeb.MyShopController.orders"];
+        put?: never;
+        /** Place an order for pickup (stock is reserved; idempotent per idempotency_key) */
+        post: operations["PaleeWeb.MyShopController.place_order"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One of my orders */
+        get: operations["PaleeWeb.MyShopController.order"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel my unpaid order */
+        post: operations["PaleeWeb.MyShopController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/orders/{id}/pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Pay an unpaid order online (409 online_payment_unavailable until a provider exists) */
+        post: operations["PaleeWeb.MyShopController.pay"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The box's shop: published products sold in the app */
+        get: operations["PaleeWeb.MyShopController.products"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One product of the box's shop */
+        get: operations["PaleeWeb.MyShopController.product"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/me/shop/transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** My shop transactions at this box (orders with their invoice, payments and refunds) */
+        get: operations["PaleeWeb.MyShopController.transactions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/org/{organization_slug}/me/threads": {
         parameters: {
             query?: never;
@@ -9905,6 +10230,335 @@ export interface paths {
         put?: never;
         /** Dismiss a suggestion; nothing reaches the athlete */
         post: operations["PaleeWeb.StaffScalingController.dismiss"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/desk-sales": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A desk sale (Ταμείο) to a member or a walk-in, paid and handed over at once */
+        post: operations["PaleeWeb.ShopController.desk_sale"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Orders collected at the acting staff member's branches, newest first */
+        get: operations["PaleeWeb.ShopController.orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One order */
+        get: operations["PaleeWeb.ShopController.order"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel an unpaid order (its stock is released and its invoice voided) */
+        post: operations["PaleeWeb.ShopController.cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/fiscal-receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Record the legal receipt reference (myDATA MARK or register receipt) of an order */
+        put: operations["PaleeWeb.ShopController.set_fiscal_receipt"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/lineage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The Finance rows and stock movements of an order (revenue lineage drill-down) */
+        get: operations["PaleeWeb.ShopController.lineage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Record the payment of an unpaid order at the desk */
+        post: operations["PaleeWeb.ShopController.record_payment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/pickup": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hand the order over (with payment_method, an unpaid order is paid first) */
+        post: operations["PaleeWeb.ShopController.pick_up"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ready for pickup (the member is told where to collect it) */
+        post: operations["PaleeWeb.ShopController.mark_ready"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/orders/{id}/refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refund lines of a paid order (Finance reversal, refund receipt, optional restock) */
+        post: operations["PaleeWeb.ShopController.refund"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Products with their variants and stock (drafts and published; archived on request) */
+        get: operations["PaleeWeb.ShopController.products"];
+        put?: never;
+        /** Create a draft product with its variants (and optional opening stock) */
+        post: operations["PaleeWeb.ShopController.create_product"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One product */
+        get: operations["PaleeWeb.ShopController.product"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit a product's details, photos, options, channels and branches */
+        patch: operations["PaleeWeb.ShopController.update_product"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Publish, unpublish (draft) or archive a product
+         * @description Publishing for `anyone` is a going-live action: a demo business answers 403 business_not_activated.
+         */
+        put: operations["PaleeWeb.ShopController.set_product_status"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/variants": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add a variant (one value per option) */
+        post: operations["PaleeWeb.ShopController.create_variant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/variants/{variant_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Edit a variant; every price change is recorded in the price history */
+        patch: operations["PaleeWeb.ShopController.update_variant"];
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/products/{id}/variants/{variant_id}/archive": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Archive a variant (kept on past orders) */
+        post: operations["PaleeWeb.ShopController.archive_variant"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/ready-orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A member's orders ready for pickup (the check-in desk's «παραγγελία έτοιμη») */
+        get: operations["PaleeWeb.ShopController.ready_orders"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/revenue-streams": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Paid, refunded and net revenue per stream (membership, package, event, shop, other) */
+        get: operations["PaleeWeb.ShopController.revenue_streams"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/org/{organization_slug}/staff/shop/variants/{id}/movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A variant's stock ledger, newest first */
+        get: operations["PaleeWeb.ShopController.movements"];
+        put?: never;
+        /** Receive, adjust (with a reason), recount or transfer a variant's stock */
+        post: operations["PaleeWeb.ShopController.record_movement"];
         delete?: never;
         options?: never;
         head?: never;
@@ -28044,6 +28698,30 @@ export interface components {
                 [key: string]: unknown;
             };
         };
+        /** RevenueStreamTotal */
+        RevenueStreamTotal: {
+            currency: string;
+            net_cents: number;
+            paid_cents: number;
+            refunded_cents: number;
+            /** @enum {string} */
+            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+        };
+        /** RevenueStreams */
+        RevenueStreams: {
+            /** Format: date */
+            from?: string | null;
+            streams: {
+                currency: string;
+                net_cents: number;
+                paid_cents: number;
+                refunded_cents: number;
+                /** @enum {string} */
+                revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+            }[];
+            /** Format: date */
+            to?: string | null;
+        };
         /** SaveFilterRequest */
         SaveFilterRequest: {
             name: string;
@@ -28382,6 +29060,1162 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** ShopAttributionReport */
+        ShopAttributionReport: {
+            attributed: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            by_campaign: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** Format: uuid */
+                campaign_id?: string | null;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_promotion_code: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                promotion_code?: string;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_source: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+                /** @description club_post, promotion_code, desk, public_page or other */
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+            }[];
+            unattributed: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopCartBody */
+        ShopCartBody: {
+            lines: {
+                quantity: number;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+        };
+        /** ShopCartItem */
+        ShopCartItem: {
+            quantity: number;
+            /** Format: uuid */
+            variant_id: string;
+        };
+        /** ShopCartPreview */
+        ShopCartPreview: {
+            currency?: string;
+            discount_cents?: number;
+            lines: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * ShopOnlinePayment
+             * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+             */
+            online_payment: {
+                available: boolean;
+                provider?: string;
+                /** @description e.g. no_provider */
+                reason?: string | null;
+            };
+            payment_modes: ("at_pickup" | "on_account" | "online")[];
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            pickup_location_ids?: string[];
+            subtotal_cents?: number;
+            total_cents: number;
+        };
+        /** ShopChannelsReport */
+        ShopChannelsReport: {
+            by_channel: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /**
+                 * @description online = online order for pickup; pos = desk
+                 * @enum {string}
+                 */
+                channel?: "online" | "pos";
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            by_location: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopCheckoutBody */
+        ShopCheckoutBody: {
+            idempotency_key: string;
+            lines: {
+                quantity: number;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            note?: string | null;
+            /** @enum {string} */
+            payment_mode?: "at_pickup" | "on_account" | "online";
+            payment_token?: string | null;
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            promotion_code?: string | null;
+            /** @enum {string} */
+            source?: "direct" | "club_post" | "promotion_code" | "desk" | "public_page" | "other";
+            /** Format: uuid */
+            source_ref_id?: string | null;
+        };
+        /** ShopDeskSaleBody */
+        ShopDeskSaleBody: {
+            customer_name?: string | null;
+            idempotency_key: string;
+            lines: {
+                quantity: number;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            /** @enum {string} */
+            payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+            promotion_code?: string | null;
+            /** Format: uuid */
+            source_ref_id?: string | null;
+            /** Format: uuid */
+            user_id?: string | null;
+        };
+        /** ShopFiscalReceiptBody */
+        ShopFiscalReceiptBody: {
+            fiscal_receipt_ref: string | null;
+        };
+        /** ShopInventoryReport */
+        ShopInventoryReport: {
+            items: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock?: boolean;
+                low_stock_threshold?: number | null;
+                on_hand?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                stock_value_cents?: number | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            low_stock: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock?: boolean;
+                low_stock_threshold?: number | null;
+                on_hand?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                stock_value_cents?: number | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            totals: {
+                low_stock_count?: number;
+                on_hand?: number;
+                reserved?: number;
+                sell_through_percent?: number | null;
+                sold_units?: number;
+                /** @description Integer minor units (cents) */
+                stock_value_cents?: number;
+                uncosted_variants?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopMarginReport */
+        ShopMarginReport: {
+            products: {
+                /** @description Integer minor units (cents) */
+                cost_cents?: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                costed_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                uncosted_revenue_cents?: number;
+            }[];
+            totals: {
+                /** @description Integer minor units (cents) */
+                cost_cents?: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                costed_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                /** @description Integer minor units (cents) */
+                uncosted_revenue_cents?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopMemberProduct */
+        ShopMemberProduct: {
+            all_locations?: boolean;
+            category?: string | null;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            location_ids?: string[];
+            media_ids?: string[];
+            options?: {
+                [key: string]: unknown;
+            };
+            per_person_limit?: number | null;
+            /** Format: date-time */
+            published_at?: string | null;
+            title: string;
+            variants: {
+                /** @enum {string} */
+                available: "in_stock" | "low" | "sold_out";
+                compare_at_price_cents?: number | null;
+                currency: string;
+                /** Format: uuid */
+                id: string;
+                option_values?: {
+                    [key: string]: string;
+                };
+                price_cents: number;
+                /** Format: uuid */
+                product_id?: string;
+                sku?: string | null;
+                title?: string | null;
+            }[];
+            /** @enum {string} */
+            visibility?: "members_only" | "anyone";
+        };
+        /** ShopMemberVariant */
+        ShopMemberVariant: {
+            /** @enum {string} */
+            available: "in_stock" | "low" | "sold_out";
+            compare_at_price_cents?: number | null;
+            currency: string;
+            /** Format: uuid */
+            id: string;
+            option_values?: {
+                [key: string]: string;
+            };
+            price_cents: number;
+            /** Format: uuid */
+            product_id?: string;
+            sku?: string | null;
+            title?: string | null;
+        };
+        /**
+         * ShopOnlinePayment
+         * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+         */
+        ShopOnlinePayment: {
+            available: boolean;
+            provider?: string;
+            /** @description e.g. no_provider */
+            reason?: string | null;
+        };
+        /** ShopOptionAxis */
+        ShopOptionAxis: {
+            name: string;
+            values: string[];
+        };
+        /** ShopOrder */
+        ShopOrder: {
+            cancel_reason?: string | null;
+            /** Format: date-time */
+            cancelled_at?: string | null;
+            /** @enum {string} */
+            channel: "online" | "pos";
+            currency?: string;
+            customer_name?: string | null;
+            discount_cents?: number;
+            /** Format: date-time */
+            expires_at?: string | null;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            fiscal_receipt_ref?: string | null;
+            /** Format: uuid */
+            id: string;
+            lines: {
+                discount_cents?: number;
+                /** Format: uuid */
+                finance_invoice_line_id?: string | null;
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                location_id?: string | null;
+                /** Format: uuid */
+                product_id?: string;
+                product_title: string;
+                quantity: number;
+                refunded_cents?: number;
+                refunded_quantity?: number;
+                sku?: string | null;
+                total_cents: number;
+                unit_price_cents?: number;
+                /** Format: uuid */
+                variant_id: string;
+                variant_title?: string | null;
+            }[];
+            number: number;
+            /** Format: date-time */
+            paid_at?: string | null;
+            paid_cents?: number;
+            payment_mode?: string;
+            /** @enum {string} */
+            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+            /** Format: date-time */
+            picked_up_at?: string | null;
+            /** Format: uuid */
+            pickup_location_id?: string | null;
+            /** Format: date-time */
+            placed_at?: string | null;
+            promotion_code?: string | null;
+            /** Format: date-time */
+            ready_at?: string | null;
+            refunded_cents?: number;
+            /** @enum {string} */
+            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+            source?: string;
+            /** Format: uuid */
+            source_ref_id?: string | null;
+            /** @enum {string} */
+            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+            /** @enum {string} */
+            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+            subtotal_cents?: number;
+            total_cents: number;
+            /** Format: uuid */
+            user_id?: string | null;
+        };
+        /** ShopOrderCancelBody */
+        ShopOrderCancelBody: {
+            reason?: string | null;
+        };
+        /** ShopOrderLine */
+        ShopOrderLine: {
+            discount_cents?: number;
+            /** Format: uuid */
+            finance_invoice_line_id?: string | null;
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            location_id?: string | null;
+            /** Format: uuid */
+            product_id?: string;
+            product_title: string;
+            quantity: number;
+            refunded_cents?: number;
+            refunded_quantity?: number;
+            sku?: string | null;
+            total_cents: number;
+            unit_price_cents?: number;
+            /** Format: uuid */
+            variant_id: string;
+            variant_title?: string | null;
+        };
+        /**
+         * ShopOrderLineage
+         * @description Every Finance row of an order: invoice lines (source shop_order_line), the payment and refunds (source shop_order), and the stock movements.
+         */
+        ShopOrderLineage: {
+            invoice_lines: {
+                [key: string]: unknown;
+            }[];
+            movements: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                /** Format: uuid */
+                location_id?: string | null;
+                note?: string | null;
+                /** Format: date-time */
+                occurred_at?: string | null;
+                /** Format: uuid */
+                order_id?: string | null;
+                /** Format: uuid */
+                order_line_id?: string | null;
+                quantity: number;
+                reason?: string | null;
+                /** Format: uuid */
+                transfer_id?: string | null;
+                unit_cost_cents?: number | null;
+                /** Format: uuid */
+                user_id?: string | null;
+                /** Format: uuid */
+                variant_id: string;
+            }[];
+            /** ShopOrder */
+            order: {
+                cancel_reason?: string | null;
+                /** Format: date-time */
+                cancelled_at?: string | null;
+                /** @enum {string} */
+                channel: "online" | "pos";
+                currency?: string;
+                customer_name?: string | null;
+                discount_cents?: number;
+                /** Format: date-time */
+                expires_at?: string | null;
+                /** Format: uuid */
+                finance_invoice_id?: string | null;
+                fiscal_receipt_ref?: string | null;
+                /** Format: uuid */
+                id: string;
+                lines: {
+                    discount_cents?: number;
+                    /** Format: uuid */
+                    finance_invoice_line_id?: string | null;
+                    /** Format: uuid */
+                    id: string;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    /** Format: uuid */
+                    product_id?: string;
+                    product_title: string;
+                    quantity: number;
+                    refunded_cents?: number;
+                    refunded_quantity?: number;
+                    sku?: string | null;
+                    total_cents: number;
+                    unit_price_cents?: number;
+                    /** Format: uuid */
+                    variant_id: string;
+                    variant_title?: string | null;
+                }[];
+                number: number;
+                /** Format: date-time */
+                paid_at?: string | null;
+                paid_cents?: number;
+                payment_mode?: string;
+                /** @enum {string} */
+                payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                /** Format: date-time */
+                picked_up_at?: string | null;
+                /** Format: uuid */
+                pickup_location_id?: string | null;
+                /** Format: date-time */
+                placed_at?: string | null;
+                promotion_code?: string | null;
+                /** Format: date-time */
+                ready_at?: string | null;
+                refunded_cents?: number;
+                /** @enum {string} */
+                revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                source?: string;
+                /** Format: uuid */
+                source_ref_id?: string | null;
+                /** @enum {string} */
+                state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                /** @enum {string} */
+                status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                subtotal_cents?: number;
+                total_cents: number;
+                /** Format: uuid */
+                user_id?: string | null;
+            };
+            payments: {
+                [key: string]: unknown;
+            }[];
+            reversals: {
+                [key: string]: unknown;
+            }[];
+        };
+        /** ShopOrderPaymentBody */
+        ShopOrderPaymentBody: {
+            /** @enum {string} */
+            payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+        };
+        /** ShopOrderPickupBody */
+        ShopOrderPickupBody: {
+            /** @enum {string} */
+            payment_method?: "cash" | "card_manual" | "bank_transfer" | "other";
+        };
+        /** ShopPayBody */
+        ShopPayBody: {
+            payment_token: string;
+        };
+        /** ShopPricingIndicators */
+        ShopPricingIndicators: {
+            categories: {
+                category?: string;
+                items?: number;
+                /** @description Integer minor units (cents) */
+                max_cents?: number;
+                /** @description Integer minor units (cents) */
+                median_cents?: number;
+                median_velocity_per_week?: number | null;
+                /** @description Integer minor units (cents) */
+                min_cents?: number;
+                /** @description Integer minor units (cents) */
+                p25_cents?: number;
+                /** @description Integer minor units (cents) */
+                p75_cents?: number;
+                target_margin_bp?: number;
+            }[];
+            variants: ({
+                band?: {
+                    [key: string]: unknown;
+                } | null;
+                category?: string;
+                cost_cents?: number | null;
+                days_of_stock_left?: number | null;
+                discount?: {
+                    [key: string]: unknown;
+                };
+                elasticity?: {
+                    [key: string]: unknown;
+                };
+                margin_percent?: number | null;
+                markup_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                price_cents?: number;
+                price_changes?: {
+                    [key: string]: unknown;
+                }[];
+                /** Format: uuid */
+                product_id?: string | null;
+                sell_through_percent?: number | null;
+                suggested_price?: {
+                    advisory?: boolean;
+                    explanation?: string[];
+                    high_cents?: number | null;
+                    inputs?: {
+                        [key: string]: unknown;
+                    };
+                    low_cents?: number | null;
+                } & {
+                    [key: string]: unknown;
+                };
+                /** Format: uuid */
+                variant_id?: string | null;
+                velocity_per_week?: number | null;
+            } & {
+                [key: string]: unknown;
+            })[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+            window_days: number;
+        };
+        /** ShopPricingTargetRequest */
+        ShopPricingTargetRequest: {
+            category?: string | null;
+            target_margin_bp?: number | null;
+            /** @description Alternative to basis points, e.g. "37.5" */
+            target_margin_percent?: string | null;
+        };
+        /** ShopPricingTargets */
+        ShopPricingTargets: {
+            targets: {
+                /** @description null = box-wide default */
+                category?: string | null;
+                /** @description The built-in default, not yet set */
+                implicit?: boolean;
+                target_margin_bp?: number;
+            }[];
+        };
+        /** ShopProduct */
+        ShopProduct: {
+            all_locations?: boolean;
+            /** Format: date-time */
+            archived_at?: string | null;
+            category?: string | null;
+            description?: string | null;
+            /** Format: uuid */
+            id: string;
+            location_ids?: string[];
+            media_ids?: string[];
+            member_discount_applies?: boolean;
+            options?: {
+                axes?: {
+                    name: string;
+                    values: string[];
+                }[];
+            };
+            per_person_limit?: number | null;
+            position?: number;
+            /** Format: date-time */
+            published_at?: string | null;
+            sell_at_desk?: boolean;
+            sell_in_app?: boolean;
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+            title: string;
+            variants: {
+                /** Format: date-time */
+                archived_at?: string | null;
+                barcode?: string | null;
+                compare_at_price_cents?: number | null;
+                cost_price_cents?: number | null;
+                currency: string;
+                /** Format: uuid */
+                id: string;
+                low_stock_threshold?: number | null;
+                option_values?: {
+                    [key: string]: string;
+                };
+                position?: number;
+                price_cents: number;
+                /** Format: uuid */
+                product_id: string;
+                sku?: string | null;
+                /** ShopVariantStock */
+                stock?: {
+                    available: number;
+                    by_location?: {
+                        available?: number;
+                        /** Format: uuid */
+                        location_id?: string | null;
+                        on_hand?: number;
+                        reserved?: number;
+                    }[];
+                    on_hand: number;
+                    reserved: number;
+                };
+                /** @enum {string} */
+                stock_status: "ok" | "low" | "critical" | "out";
+                tax_class?: string | null;
+                title?: string | null;
+                track_inventory?: boolean;
+            }[];
+            /** @enum {string} */
+            visibility: "members_only" | "anyone";
+        };
+        /** ShopProductBody */
+        ShopProductBody: {
+            all_locations?: boolean;
+            category?: string | null;
+            description?: string | null;
+            location_ids?: string[];
+            media_ids?: string[];
+            member_discount_applies?: boolean;
+            options?: {
+                name: string;
+                values: string[];
+            }[];
+            per_person_limit?: number | null;
+            position?: number;
+            price_cents?: number;
+            sell_at_desk?: boolean;
+            sell_in_app?: boolean;
+            title: string;
+            variants?: {
+                barcode?: string | null;
+                compare_at_price_cents?: number | null;
+                cost_price_cents?: number | null;
+                currency?: string;
+                initial_quantity?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                low_stock_threshold?: number | null;
+                option_values?: {
+                    [key: string]: string;
+                };
+                position?: number;
+                price_cents: number;
+                sku?: string | null;
+                /** @enum {string|null} */
+                tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                title?: string | null;
+                track_inventory?: boolean;
+            }[];
+            /** @enum {string} */
+            visibility?: "members_only" | "anyone";
+        };
+        /** ShopProductStatusBody */
+        ShopProductStatusBody: {
+            /** @enum {string} */
+            status: "draft" | "published" | "archived";
+        };
+        /** ShopProductUpdateBody */
+        ShopProductUpdateBody: {
+            all_locations?: boolean;
+            category?: string | null;
+            description?: string | null;
+            location_ids?: string[];
+            media_ids?: string[];
+            member_discount_applies?: boolean;
+            options?: {
+                name: string;
+                values: string[];
+            }[];
+            per_person_limit?: number | null;
+            position?: number;
+            sell_at_desk?: boolean;
+            sell_in_app?: boolean;
+            title?: string;
+            /** @enum {string} */
+            visibility?: "members_only" | "anyone";
+        };
+        /** ShopProductsReport */
+        ShopProductsReport: {
+            products_by_revenue: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            products_by_units: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            variants_by_revenue: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            variants_by_units: {
+                /** @description Integer minor units (cents) */
+                net_revenue_cents?: number;
+                net_units?: number;
+                /** Format: uuid */
+                product_id?: string | null;
+                product_name?: string | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents?: number;
+                refunded_units?: number;
+                /** @description Integer minor units (cents) */
+                revenue_cents?: number;
+                units?: number;
+                /** Format: uuid */
+                variant_id?: string | null;
+                variant_name?: string | null;
+            }[];
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopRefundBody */
+        ShopRefundBody: {
+            idempotency_key: string;
+            lines: {
+                /** Format: uuid */
+                order_line_id: string;
+                quantity: number;
+                restock?: boolean;
+            }[];
+            reason?: string | null;
+        };
+        /** ShopReportOverview */
+        ShopReportOverview: {
+            kpis: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                cost_coverage_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                low_stock_count?: number;
+                /** @description Integer minor units (cents) */
+                margin_cents?: number;
+                margin_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                refund_rate_percent?: number | null;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+                sell_through_percent?: number | null;
+                stock_on_hand?: number;
+                /** @description Integer minor units (cents) */
+                stock_value_cents?: number;
+                units_per_order?: number | null;
+                units_sold?: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopRevenueReconciliation */
+        ShopRevenueReconciliation: {
+            days: {
+                currency?: string;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                drift_cents?: number;
+                /** @description Integer minor units (cents) */
+                invoice_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                lines_vs_payments_cents?: number;
+                ok?: boolean;
+                /** @description Integer minor units (cents) */
+                orders_cents?: number;
+                /** @description Integer minor units (cents) */
+                orders_vs_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                payments_cents?: number;
+            }[];
+            /** @description Integer minor units (cents) */
+            drift_cents: number;
+            drifted: {
+                currency?: string;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                drift_cents?: number;
+                /** @description Integer minor units (cents) */
+                invoice_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                lines_vs_payments_cents?: number;
+                ok?: boolean;
+                /** @description Integer minor units (cents) */
+                orders_cents?: number;
+                /** @description Integer minor units (cents) */
+                orders_vs_lines_cents?: number;
+                /** @description Integer minor units (cents) */
+                payments_cents?: number;
+            }[];
+            /** Format: date */
+            from?: string;
+            ok: boolean;
+            time_zone?: string;
+            /** Format: date */
+            to?: string;
+        };
+        /** ShopSalesReport */
+        ShopSalesReport: {
+            series: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** Format: date */
+                day?: string;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            }[];
+            totals: {
+                /** @description Integer minor units (cents) */
+                average_order_value_cents: number;
+                /** @description Integer minor units (cents) */
+                gross_cents: number;
+                /** @description Integer minor units (cents) */
+                net_cents: number;
+                orders: number;
+                /** @description Integer minor units (cents) */
+                refunded_cents: number;
+            };
+            window: {
+                /** Format: date */
+                from: string;
+                location_ids?: string[] | null;
+                /** @description The gym's zone the days follow */
+                time_zone: string;
+                /** Format: date */
+                to: string;
+            };
+        };
+        /** ShopStockMovement */
+        ShopStockMovement: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            /** Format: date-time */
+            occurred_at?: string | null;
+            /** Format: uuid */
+            order_id?: string | null;
+            /** Format: uuid */
+            order_line_id?: string | null;
+            quantity: number;
+            reason?: string | null;
+            /** Format: uuid */
+            transfer_id?: string | null;
+            unit_cost_cents?: number | null;
+            /** Format: uuid */
+            user_id?: string | null;
+            /** Format: uuid */
+            variant_id: string;
+        };
+        /** ShopStockMovementBody */
+        ShopStockMovementBody: {
+            counted?: number;
+            /** @enum {string} */
+            kind: "receive" | "adjustment" | "recount" | "transfer";
+            /** Format: uuid */
+            location_id?: string | null;
+            note?: string | null;
+            quantity?: number;
+            /** @enum {string} */
+            reason?: "recount" | "damage" | "loss" | "return" | "other";
+            /** Format: uuid */
+            to_location_id?: string | null;
+            unit_cost_cents?: number | null;
+        };
+        /** ShopTransaction */
+        ShopTransaction: {
+            channel?: string;
+            currency?: string;
+            /** Format: uuid */
+            finance_invoice_id?: string | null;
+            fiscal_receipt_ref?: string | null;
+            invoice_number?: string | null;
+            invoice_status?: string | null;
+            /** @enum {string} */
+            kind: "shop_order";
+            lines?: {
+                [key: string]: unknown;
+            }[];
+            /** Format: uuid */
+            order_id: string;
+            order_number?: number;
+            paid_cents?: number;
+            payments?: {
+                [key: string]: unknown;
+            }[];
+            /** Format: date-time */
+            placed_at?: string | null;
+            refunded_cents?: number;
+            refunds?: {
+                [key: string]: unknown;
+            }[];
+            /** @enum {string} */
+            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+            /** @enum {string} */
+            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+            total_cents: number;
+        };
+        /** ShopVariant */
+        ShopVariant: {
+            /** Format: date-time */
+            archived_at?: string | null;
+            barcode?: string | null;
+            compare_at_price_cents?: number | null;
+            cost_price_cents?: number | null;
+            currency: string;
+            /** Format: uuid */
+            id: string;
+            low_stock_threshold?: number | null;
+            option_values?: {
+                [key: string]: string;
+            };
+            position?: number;
+            price_cents: number;
+            /** Format: uuid */
+            product_id: string;
+            sku?: string | null;
+            /** ShopVariantStock */
+            stock?: {
+                available: number;
+                by_location?: {
+                    available?: number;
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    on_hand?: number;
+                    reserved?: number;
+                }[];
+                on_hand: number;
+                reserved: number;
+            };
+            /** @enum {string} */
+            stock_status: "ok" | "low" | "critical" | "out";
+            tax_class?: string | null;
+            title?: string | null;
+            track_inventory?: boolean;
+        };
+        /** ShopVariantBody */
+        ShopVariantBody: {
+            barcode?: string | null;
+            compare_at_price_cents?: number | null;
+            cost_price_cents?: number | null;
+            currency?: string;
+            low_stock_threshold?: number | null;
+            option_values?: {
+                [key: string]: string;
+            };
+            position?: number;
+            price_cents?: number;
+            sku?: string | null;
+            /** @enum {string|null} */
+            tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+            title?: string | null;
+            track_inventory?: boolean;
+        };
+        /** ShopVariantStock */
+        ShopVariantStock: {
+            available: number;
+            by_location?: {
+                available?: number;
+                /** Format: uuid */
+                location_id?: string | null;
+                on_hand?: number;
+                reserved?: number;
+            }[];
+            on_hand: number;
+            reserved: number;
         };
         /** SocialSummary */
         SocialSummary: {
@@ -35374,6 +37208,63 @@ export interface operations {
                                 status: "requested" | "booked" | "declined" | "cancelled" | "expired" | "attended" | "no_show" | "converted";
                             } | null;
                         } | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.public_products": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                slug: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        }[];
                     };
                 };
             };
@@ -65821,6 +67712,800 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.AdminShopReportController.pricing_targets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pricing targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        targets: {
+                            /** @description null = box-wide default */
+                            category?: string | null;
+                            /** @description The built-in default, not yet set */
+                            implicit?: boolean;
+                            target_margin_bp?: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.put_pricing_target": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** @description Pricing target */
+        requestBody?: {
+            content: {
+                "application/json": {
+                    category?: string | null;
+                    target_margin_bp?: number | null;
+                    /** @description Alternative to basis points, e.g. "37.5" */
+                    target_margin_percent?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Pricing targets */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        targets: {
+                            /** @description null = box-wide default */
+                            category?: string | null;
+                            /** @description The built-in default, not yet set */
+                            implicit?: boolean;
+                            target_margin_bp?: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.attribution": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Attribution */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        attributed: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        by_campaign: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** Format: uuid */
+                            campaign_id?: string | null;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_promotion_code: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            promotion_code?: string;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_source: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                            /** @description club_post, promotion_code, desk, public_page or other */
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                        }[];
+                        unattributed: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.channels": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Channels */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        by_channel: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /**
+                             * @description online = online order for pickup; pos = desk
+                             * @enum {string}
+                             */
+                            channel?: "online" | "pos";
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        by_location: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.inventory": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Inventory */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        items: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            low_stock?: boolean;
+                            low_stock_threshold?: number | null;
+                            on_hand?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            stock_value_cents?: number | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        low_stock: {
+                            available?: number;
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            low_stock?: boolean;
+                            low_stock_threshold?: number | null;
+                            on_hand?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            stock_value_cents?: number | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        totals: {
+                            low_stock_count?: number;
+                            on_hand?: number;
+                            reserved?: number;
+                            sell_through_percent?: number | null;
+                            sold_units?: number;
+                            /** @description Integer minor units (cents) */
+                            stock_value_cents?: number;
+                            uncosted_variants?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.margin": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Margin */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            /** @description Integer minor units (cents) */
+                            cost_cents?: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            costed_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            uncosted_revenue_cents?: number;
+                        }[];
+                        totals: {
+                            /** @description Integer minor units (cents) */
+                            cost_cents?: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            costed_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            uncosted_revenue_cents?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.overview": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop KPIs */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        kpis: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            cost_coverage_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            low_stock_count?: number;
+                            /** @description Integer minor units (cents) */
+                            margin_cents?: number;
+                            margin_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            refund_rate_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                            sell_through_percent?: number | null;
+                            stock_on_hand?: number;
+                            /** @description Integer minor units (cents) */
+                            stock_value_cents?: number;
+                            units_per_order?: number | null;
+                            units_sold?: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.pricing": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Pricing indicators */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        categories: {
+                            category?: string;
+                            items?: number;
+                            /** @description Integer minor units (cents) */
+                            max_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            median_cents?: number;
+                            median_velocity_per_week?: number | null;
+                            /** @description Integer minor units (cents) */
+                            min_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            p25_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            p75_cents?: number;
+                            target_margin_bp?: number;
+                        }[];
+                        variants: ({
+                            band?: {
+                                [key: string]: unknown;
+                            } | null;
+                            category?: string;
+                            cost_cents?: number | null;
+                            days_of_stock_left?: number | null;
+                            discount?: {
+                                [key: string]: unknown;
+                            };
+                            elasticity?: {
+                                [key: string]: unknown;
+                            };
+                            margin_percent?: number | null;
+                            markup_percent?: number | null;
+                            /** @description Integer minor units (cents) */
+                            price_cents?: number;
+                            price_changes?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            sell_through_percent?: number | null;
+                            suggested_price?: {
+                                advisory?: boolean;
+                                explanation?: string[];
+                                high_cents?: number | null;
+                                inputs?: {
+                                    [key: string]: unknown;
+                                };
+                                low_cents?: number | null;
+                            } & {
+                                [key: string]: unknown;
+                            };
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            velocity_per_week?: number | null;
+                        } & {
+                            [key: string]: unknown;
+                        })[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                        window_days: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.products": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+                /** @description Rows per ranking (default 10) */
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Top products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products_by_revenue: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        products_by_units: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        variants_by_revenue: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        variants_by_units: {
+                            /** @description Integer minor units (cents) */
+                            net_revenue_cents?: number;
+                            net_units?: number;
+                            /** Format: uuid */
+                            product_id?: string | null;
+                            product_name?: string | null;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents?: number;
+                            refunded_units?: number;
+                            /** @description Integer minor units (cents) */
+                            revenue_cents?: number;
+                            units?: number;
+                            /** Format: uuid */
+                            variant_id?: string | null;
+                            variant_name?: string | null;
+                        }[];
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.reconciliation": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Reconciliation */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        days: {
+                            currency?: string;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            drift_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            invoice_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            lines_vs_payments_cents?: number;
+                            ok?: boolean;
+                            /** @description Integer minor units (cents) */
+                            orders_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            orders_vs_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            payments_cents?: number;
+                        }[];
+                        /** @description Integer minor units (cents) */
+                        drift_cents: number;
+                        drifted: {
+                            currency?: string;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            drift_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            invoice_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            lines_vs_payments_cents?: number;
+                            ok?: boolean;
+                            /** @description Integer minor units (cents) */
+                            orders_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            orders_vs_lines_cents?: number;
+                            /** @description Integer minor units (cents) */
+                            payments_cents?: number;
+                        }[];
+                        /** Format: date */
+                        from?: string;
+                        ok: boolean;
+                        time_zone?: string;
+                        /** Format: date */
+                        to?: string;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.AdminShopReportController.sales": {
+        parameters: {
+            query?: {
+                /** @description Gym-local days ending today (default 30; pricing 90) */
+                days?: number;
+                /** @description First gym-local day (with `to`), ISO 8601 */
+                from?: string;
+                /** @description Last gym-local day (with `from`), ISO 8601 */
+                to?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Shop sales */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        series: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** Format: date */
+                            day?: string;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        }[];
+                        totals: {
+                            /** @description Integer minor units (cents) */
+                            average_order_value_cents: number;
+                            /** @description Integer minor units (cents) */
+                            gross_cents: number;
+                            /** @description Integer minor units (cents) */
+                            net_cents: number;
+                            orders: number;
+                            /** @description Integer minor units (cents) */
+                            refunded_cents: number;
+                        };
+                        window: {
+                            /** Format: date */
+                            from: string;
+                            location_ids?: string[] | null;
+                            /** @description The gym's zone the days follow */
+                            time_zone: string;
+                            /** Format: date */
+                            to: string;
+                        };
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.AdminTrialController.policy": {
         parameters: {
             query?: never;
@@ -77458,6 +80143,796 @@ export interface operations {
             };
         };
     };
+    "PaleeWeb.MyShopController.preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    lines: {
+                        quantity: number;
+                        /** Format: uuid */
+                        variant_id: string;
+                    }[];
+                    /** Format: uuid */
+                    pickup_location_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Preview */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        currency?: string;
+                        discount_cents?: number;
+                        lines: {
+                            [key: string]: unknown;
+                        }[];
+                        /**
+                         * ShopOnlinePayment
+                         * @description Whether online card payment can be offered; false greys out «Πληρωμή».
+                         */
+                        online_payment: {
+                            available: boolean;
+                            provider?: string;
+                            /** @description e.g. no_provider */
+                            reason?: string | null;
+                        };
+                        payment_modes: ("at_pickup" | "on_account" | "online")[];
+                        /** Format: uuid */
+                        pickup_location_id?: string | null;
+                        pickup_location_ids?: string[];
+                        subtotal_cents?: number;
+                        total_cents: number;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.orders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        orders: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.place_order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    lines: {
+                        quantity: number;
+                        /** Format: uuid */
+                        variant_id: string;
+                    }[];
+                    note?: string | null;
+                    /** @enum {string} */
+                    payment_mode?: "at_pickup" | "on_account" | "online";
+                    payment_token?: string | null;
+                    /** Format: uuid */
+                    pickup_location_id?: string | null;
+                    promotion_code?: string | null;
+                    /** @enum {string} */
+                    source?: "direct" | "club_post" | "promotion_code" | "desk" | "public_page" | "other";
+                    /** Format: uuid */
+                    source_ref_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Replayed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Order */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.pay": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    payment_token: string;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.products": {
+        parameters: {
+            query?: {
+                category?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopMemberProduct */
+                        product: {
+                            all_locations?: boolean;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            options?: {
+                                [key: string]: unknown;
+                            };
+                            per_person_limit?: number | null;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            title: string;
+                            variants: {
+                                /** @enum {string} */
+                                available: "in_stock" | "low" | "sold_out";
+                                compare_at_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id?: string;
+                                sku?: string | null;
+                                title?: string | null;
+                            }[];
+                            /** @enum {string} */
+                            visibility?: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.MyShopController.transactions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Transactions */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        transactions: {
+                            channel?: string;
+                            currency?: string;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            invoice_number?: string | null;
+                            invoice_status?: string | null;
+                            /** @enum {string} */
+                            kind: "shop_order";
+                            lines?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: uuid */
+                            order_id: string;
+                            order_number?: number;
+                            paid_cents?: number;
+                            payments?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            refunded_cents?: number;
+                            refunds?: {
+                                [key: string]: unknown;
+                            }[];
+                            /** @enum {string} */
+                            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            total_cents: number;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
     "PaleeWeb.MessagingController.list_threads": {
         parameters: {
             query?: {
@@ -81987,6 +85462,2124 @@ export interface operations {
                 content: {
                     "application/json": {
                         [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.desk_sale": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    customer_name?: string | null;
+                    idempotency_key: string;
+                    lines: {
+                        quantity: number;
+                        /** Format: uuid */
+                        variant_id: string;
+                    }[];
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    note?: string | null;
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                    promotion_code?: string | null;
+                    /** Format: uuid */
+                    source_ref_id?: string | null;
+                    /** Format: uuid */
+                    user_id?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Replayed */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+            /** @description Order */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.orders": {
+        parameters: {
+            query?: {
+                status?: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                user_id?: string;
+                location_ids?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        orders: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.order": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.set_fiscal_receipt": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    fiscal_receipt_ref: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.lineage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Lineage */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        invoice_lines: {
+                            [key: string]: unknown;
+                        }[];
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        payments: {
+                            [key: string]: unknown;
+                        }[];
+                        reversals: {
+                            [key: string]: unknown;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.record_payment": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    payment_method: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.pick_up": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    payment_method?: "cash" | "card_manual" | "bank_transfer" | "other";
+                };
+            };
+        };
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.mark_ready": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Order */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.refund": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    idempotency_key: string;
+                    lines: {
+                        /** Format: uuid */
+                        order_line_id: string;
+                        quantity: number;
+                        restock?: boolean;
+                    }[];
+                    reason?: string | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Refunded */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopOrder */
+                        order: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        };
+                        refund: {
+                            [key: string]: unknown;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.products": {
+        parameters: {
+            query?: {
+                status?: "draft" | "published" | "archived";
+                q?: string;
+                category?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Products */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        products: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.create_product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    category?: string | null;
+                    description?: string | null;
+                    location_ids?: string[];
+                    media_ids?: string[];
+                    member_discount_applies?: boolean;
+                    options?: {
+                        name: string;
+                        values: string[];
+                    }[];
+                    per_person_limit?: number | null;
+                    position?: number;
+                    price_cents?: number;
+                    sell_at_desk?: boolean;
+                    sell_in_app?: boolean;
+                    title: string;
+                    variants?: {
+                        barcode?: string | null;
+                        compare_at_price_cents?: number | null;
+                        cost_price_cents?: number | null;
+                        currency?: string;
+                        initial_quantity?: number;
+                        /** Format: uuid */
+                        location_id?: string | null;
+                        low_stock_threshold?: number | null;
+                        option_values?: {
+                            [key: string]: string;
+                        };
+                        position?: number;
+                        price_cents: number;
+                        sku?: string | null;
+                        /** @enum {string|null} */
+                        tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                        title?: string | null;
+                        track_inventory?: boolean;
+                    }[];
+                    /** @enum {string} */
+                    visibility?: "members_only" | "anyone";
+                };
+            };
+        };
+        responses: {
+            /** @description Product */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.update_product": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    all_locations?: boolean;
+                    category?: string | null;
+                    description?: string | null;
+                    location_ids?: string[];
+                    media_ids?: string[];
+                    member_discount_applies?: boolean;
+                    options?: {
+                        name: string;
+                        values: string[];
+                    }[];
+                    per_person_limit?: number | null;
+                    position?: number;
+                    sell_at_desk?: boolean;
+                    sell_in_app?: boolean;
+                    title?: string;
+                    /** @enum {string} */
+                    visibility?: "members_only" | "anyone";
+                };
+            };
+        };
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.set_product_status": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    /** @enum {string} */
+                    status: "draft" | "published" | "archived";
+                };
+            };
+        };
+        responses: {
+            /** @description Product */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopProduct */
+                        product: {
+                            all_locations?: boolean;
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            category?: string | null;
+                            description?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            location_ids?: string[];
+                            media_ids?: string[];
+                            member_discount_applies?: boolean;
+                            options?: {
+                                axes?: {
+                                    name: string;
+                                    values: string[];
+                                }[];
+                            };
+                            per_person_limit?: number | null;
+                            position?: number;
+                            /** Format: date-time */
+                            published_at?: string | null;
+                            sell_at_desk?: boolean;
+                            sell_in_app?: boolean;
+                            /** @enum {string} */
+                            status: "draft" | "published" | "archived";
+                            title: string;
+                            variants: {
+                                /** Format: date-time */
+                                archived_at?: string | null;
+                                barcode?: string | null;
+                                compare_at_price_cents?: number | null;
+                                cost_price_cents?: number | null;
+                                currency: string;
+                                /** Format: uuid */
+                                id: string;
+                                low_stock_threshold?: number | null;
+                                option_values?: {
+                                    [key: string]: string;
+                                };
+                                position?: number;
+                                price_cents: number;
+                                /** Format: uuid */
+                                product_id: string;
+                                sku?: string | null;
+                                /** ShopVariantStock */
+                                stock?: {
+                                    available: number;
+                                    by_location?: {
+                                        available?: number;
+                                        /** Format: uuid */
+                                        location_id?: string | null;
+                                        on_hand?: number;
+                                        reserved?: number;
+                                    }[];
+                                    on_hand: number;
+                                    reserved: number;
+                                };
+                                /** @enum {string} */
+                                stock_status: "ok" | "low" | "critical" | "out";
+                                tax_class?: string | null;
+                                title?: string | null;
+                                track_inventory?: boolean;
+                            }[];
+                            /** @enum {string} */
+                            visibility: "members_only" | "anyone";
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.create_variant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    barcode?: string | null;
+                    compare_at_price_cents?: number | null;
+                    cost_price_cents?: number | null;
+                    currency?: string;
+                    low_stock_threshold?: number | null;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    position?: number;
+                    price_cents?: number;
+                    sku?: string | null;
+                    /** @enum {string|null} */
+                    tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                    title?: string | null;
+                    track_inventory?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Variant */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.update_variant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    barcode?: string | null;
+                    compare_at_price_cents?: number | null;
+                    cost_price_cents?: number | null;
+                    currency?: string;
+                    low_stock_threshold?: number | null;
+                    option_values?: {
+                        [key: string]: string;
+                    };
+                    position?: number;
+                    price_cents?: number;
+                    sku?: string | null;
+                    /** @enum {string|null} */
+                    tax_class?: "standard" | "reduced" | "super_reduced" | "zero" | "exempt" | null;
+                    title?: string | null;
+                    track_inventory?: boolean;
+                };
+            };
+        };
+        responses: {
+            /** @description Variant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.archive_variant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+                variant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Variant */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.ready_orders": {
+        parameters: {
+            query: {
+                user_id: string;
+                location_id?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Orders */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        orders: {
+                            cancel_reason?: string | null;
+                            /** Format: date-time */
+                            cancelled_at?: string | null;
+                            /** @enum {string} */
+                            channel: "online" | "pos";
+                            currency?: string;
+                            customer_name?: string | null;
+                            discount_cents?: number;
+                            /** Format: date-time */
+                            expires_at?: string | null;
+                            /** Format: uuid */
+                            finance_invoice_id?: string | null;
+                            fiscal_receipt_ref?: string | null;
+                            /** Format: uuid */
+                            id: string;
+                            lines: {
+                                discount_cents?: number;
+                                /** Format: uuid */
+                                finance_invoice_line_id?: string | null;
+                                /** Format: uuid */
+                                id: string;
+                                /** Format: uuid */
+                                location_id?: string | null;
+                                /** Format: uuid */
+                                product_id?: string;
+                                product_title: string;
+                                quantity: number;
+                                refunded_cents?: number;
+                                refunded_quantity?: number;
+                                sku?: string | null;
+                                total_cents: number;
+                                unit_price_cents?: number;
+                                /** Format: uuid */
+                                variant_id: string;
+                                variant_title?: string | null;
+                            }[];
+                            number: number;
+                            /** Format: date-time */
+                            paid_at?: string | null;
+                            paid_cents?: number;
+                            payment_mode?: string;
+                            /** @enum {string} */
+                            payment_status: "pending_payment" | "paid" | "partially_refunded" | "refunded" | "void";
+                            /** Format: date-time */
+                            picked_up_at?: string | null;
+                            /** Format: uuid */
+                            pickup_location_id?: string | null;
+                            /** Format: date-time */
+                            placed_at?: string | null;
+                            promotion_code?: string | null;
+                            /** Format: date-time */
+                            ready_at?: string | null;
+                            refunded_cents?: number;
+                            /** @enum {string} */
+                            revenue_stream?: "membership" | "package" | "event" | "shop" | "other";
+                            source?: string;
+                            /** Format: uuid */
+                            source_ref_id?: string | null;
+                            /** @enum {string} */
+                            state: "pending_payment" | "paid" | "ready_for_pickup" | "picked_up" | "cancelled" | "partially_refunded" | "refunded";
+                            /** @enum {string} */
+                            status: "placed" | "ready_for_pickup" | "picked_up" | "cancelled";
+                            subtotal_cents?: number;
+                            total_cents: number;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.revenue_streams": {
+        parameters: {
+            query?: {
+                from?: string;
+                to?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Streams */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        /** Format: date */
+                        from?: string | null;
+                        streams: {
+                            currency: string;
+                            net_cents: number;
+                            paid_cents: number;
+                            refunded_cents: number;
+                            /** @enum {string} */
+                            revenue_stream: "membership" | "package" | "event" | "shop" | "other";
+                        }[];
+                        /** Format: date */
+                        to?: string | null;
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.movements": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Movements */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                    };
+                };
+            };
+        };
+    };
+    "PaleeWeb.ShopController.record_movement": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    counted?: number;
+                    /** @enum {string} */
+                    kind: "receive" | "adjustment" | "recount" | "transfer";
+                    /** Format: uuid */
+                    location_id?: string | null;
+                    note?: string | null;
+                    quantity?: number;
+                    /** @enum {string} */
+                    reason?: "recount" | "damage" | "loss" | "return" | "other";
+                    /** Format: uuid */
+                    to_location_id?: string | null;
+                    unit_cost_cents?: number | null;
+                };
+            };
+        };
+        responses: {
+            /** @description Recorded */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        movements: {
+                            /** Format: uuid */
+                            id: string;
+                            /** @enum {string} */
+                            kind: "receive" | "sale" | "refund_restock" | "adjustment" | "transfer" | "reserve" | "release";
+                            /** Format: uuid */
+                            location_id?: string | null;
+                            note?: string | null;
+                            /** Format: date-time */
+                            occurred_at?: string | null;
+                            /** Format: uuid */
+                            order_id?: string | null;
+                            /** Format: uuid */
+                            order_line_id?: string | null;
+                            quantity: number;
+                            reason?: string | null;
+                            /** Format: uuid */
+                            transfer_id?: string | null;
+                            unit_cost_cents?: number | null;
+                            /** Format: uuid */
+                            user_id?: string | null;
+                            /** Format: uuid */
+                            variant_id: string;
+                        }[];
+                        /** ShopVariant */
+                        variant: {
+                            /** Format: date-time */
+                            archived_at?: string | null;
+                            barcode?: string | null;
+                            compare_at_price_cents?: number | null;
+                            cost_price_cents?: number | null;
+                            currency: string;
+                            /** Format: uuid */
+                            id: string;
+                            low_stock_threshold?: number | null;
+                            option_values?: {
+                                [key: string]: string;
+                            };
+                            position?: number;
+                            price_cents: number;
+                            /** Format: uuid */
+                            product_id: string;
+                            sku?: string | null;
+                            /** ShopVariantStock */
+                            stock?: {
+                                available: number;
+                                by_location?: {
+                                    available?: number;
+                                    /** Format: uuid */
+                                    location_id?: string | null;
+                                    on_hand?: number;
+                                    reserved?: number;
+                                }[];
+                                on_hand: number;
+                                reserved: number;
+                            };
+                            /** @enum {string} */
+                            stock_status: "ok" | "low" | "critical" | "out";
+                            tax_class?: string | null;
+                            title?: string | null;
+                            track_inventory?: boolean;
+                        };
                     };
                 };
             };
