@@ -971,6 +971,18 @@ defmodule PaleeWeb.Router do
 
     get("/athletes/:id/drill-down", AdminCoachingController, :drill_down)
     get("/finance/summary", AdminFinanceController, :summary)
+    # ADR-192: shop reports, pricing indicators and revenue reconciliation.
+    get("/shop/reports/overview", AdminShopReportController, :overview)
+    get("/shop/reports/sales", AdminShopReportController, :sales)
+    get("/shop/reports/products", AdminShopReportController, :products)
+    get("/shop/reports/margin", AdminShopReportController, :margin)
+    get("/shop/reports/channels", AdminShopReportController, :channels)
+    get("/shop/reports/inventory", AdminShopReportController, :inventory)
+    get("/shop/reports/attribution", AdminShopReportController, :attribution)
+    get("/shop/reports/pricing", AdminShopReportController, :pricing)
+    get("/shop/reports/reconciliation", AdminShopReportController, :reconciliation)
+    get("/shop/pricing-targets", AdminShopReportController, :pricing_targets)
+    put("/shop/pricing-targets", AdminShopReportController, :put_pricing_target)
     get("/finance/queues", AdminFinanceController, :operational_queues)
     get("/finance/cleanup-records", AdminFinanceController, :cleanup_records)
     post("/finance/cleanup-records/:id/purge", AdminFinanceController, :purge_record)

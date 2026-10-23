@@ -27,6 +27,7 @@ defmodule PaleeWeb.RouteCapabilities do
     W.AdminInjuryWarningController => [:view_health],
     W.AdminSearchController => [:view_directory],
     W.AdminAnalyticsController => [:view_business_analytics],
+    W.AdminShopReportController => [:view_business_analytics],
     W.CoachingExtrasController => [:manage_coaching],
     W.AppointmentsController => [:manage_appointments],
     W.StaffController => [:manage_coaching, :manage_appointments, :manage_schedule],
@@ -214,6 +215,13 @@ defmodule PaleeWeb.RouteCapabilities do
       :view_finance_reports
     ],
     {W.AdminFinanceController, :summary} => [:view_finance_reports],
+    # ADR-192: shop reports read like the business statistics; the
+    # reconciliation is also a finance check; targets are a setting.
+    {W.AdminShopReportController, :reconciliation} => [
+      :view_business_analytics,
+      :view_finance_reports
+    ],
+    {W.AdminShopReportController, :put_pricing_target} => [:manage_settings],
     {W.AdminFinanceController, :operational_queues} => [:view_finance_reports],
     {W.AdminFinanceController, :cleanup_records} => [:manage_billing],
     {W.AdminFinanceController, :purge_record} => [:manage_billing],

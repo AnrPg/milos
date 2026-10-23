@@ -39,6 +39,8 @@ config :palee, Oban,
        {"23 * * * *", Palee.Workers.CoachingReplyOverdueJob},
        {"41 6 * * *", Palee.Workers.CorporateInvoicingJob},
        {"7 7 * * *", Palee.Workers.InventoryDigestJob},
+       # ADR-192: shop orders == shop invoice lines == payments - refunds.
+       {"25 3 * * *", Palee.Workers.ShopRevenueReconciliationJob},
        {"30 8 * * *", Palee.Workers.SubscriptionExpiryJob},
        {"13 * * * *", Palee.Workers.ProvisionGymClubsJob},
        {"52 * * * *", Palee.Workers.SweepOrphanMediaJob},
@@ -241,6 +243,9 @@ config :palee,
        Palee.Infrastructure.Execution.EctoTrainingLogStore
 
 config :palee, :finance_store, Palee.Infrastructure.Finance.EctoFinanceStore
+
+# ADR-192: the shop's report read model.
+config :palee, :shop_report_store, Palee.Infrastructure.Shop.EctoShopReportStore
 
 config :palee,
        :finance_accounting_store,

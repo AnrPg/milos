@@ -1812,6 +1812,20 @@ defmodule PaleeWeb.FallbackController do
     |> json(%{code: "forbidden", error: "Forbidden"})
   end
 
+  # ADR-192: shop reports and pricing targets.
+  def call(conn, {:error, reason})
+      when reason in [:invalid_report_window, :invalid_pricing_target] do
+    message =
+      case reason do
+        :invalid_report_window -> "Choose 1 to 366 days, or a from/to range of at most 366 days"
+        :invalid_pricing_target -> "A target margin is 0 to 95% in whole basis points"
+      end
+
+    conn
+    |> put_status(:unprocessable_entity)
+    |> json(%{code: Atom.to_string(reason), error: message})
+  end
+
   def call(conn, {:error, :organization_context_required}) do
     conn
     |> put_status(:forbidden)

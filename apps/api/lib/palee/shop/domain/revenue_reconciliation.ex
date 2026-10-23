@@ -1,63 +1,67 @@
 defmodule Palee.Shop.Domain.RevenueReconciliation do
   @moduledoc """
   The shop's daily revenue reconciliation (ADR-192 §5). For each gym-local
-  day three independent figures must agree:
+  business day and currency three independently stored figures must agree,
+  to the cent:
 
-    * `orders_cents`: the net total of the shop orders paid that day
-      (order totals minus their refunds);
-    * `invoice_lines_cents`: the net of the `shop`-stream invoice lines of
-      that day (lines minus refund lines or reversals);
-    * `payments_cents`: the shop payments of that day minus their refunds.
+    * `orders_cents` - the shop orders paid that day: order totals minus the
+      refunds recorded on the orders;
+    * `invoice_lines_cents` - Finance's `shop`-stream invoice lines of those
+      orders minus the refunds (reversals) of their payments;
+    * `payments_cents` - Finance's `shop`-stream payments of that business
+      day minus their refunds.
 
-  A day drifts when any two differ. Pure: the caller reads the figures.
+  Refunds belong to the day of the sale they refund, in all three figures,
+  the way Finance attributes reversals to the original payment.
+
+  Figures arrive as maps keyed by `{day, currency}`. Integer cents only: a
+  day reconciles when the three integers are equal. Pure.
   """
 
-  @type day_figures :: %{
-          day: Date.t(),
-          orders_cents: integer(),
-          invoice_lines_cents: integer(),
-          payments_cents: integer()
+  @type key :: {Date.t(), String.t()}
+  @type figures :: %{key() => integer()}
+
+  @doc "Compares the three figures for every day and currency any of them names."
+  @spec compare(figures(), figures(), figures()) :: %{
+          days: [map()],
+          drifted: [map()],
+          ok: boolean(),
+          drift_cents: non_neg_integer()
         }
-
-  @doc """
-  Compares per-day figures, given as three maps of `day => cents`. Every day
-  that appears in any of them is checked.
-  """
-  @spec compare(%{Date.t() => integer()}, %{Date.t() => integer()}, %{Date.t() => integer()}) ::
-          %{days: [map()], drifted: [map()], ok?: boolean(), drift_cents: non_neg_integer()}
   def compare(orders, lines, payments) do
     days =
       [orders, lines, payments]
       |> Enum.flat_map(&Map.keys/1)
       |> Enum.uniq()
-      |> Enum.sort(Date)
-      |> Enum.map(fn day ->
+      |> Enum.sort_by(fn {day, currency} -> {Date.to_gregorian_days(day), currency} end)
+      |> Enum.map(fn {day, currency} = key ->
         check(%{
           day: day,
-          orders_cents: Map.get(orders, day, 0),
-          invoice_lines_cents: Map.get(lines, day, 0),
-          payments_cents: Map.get(payments, day, 0)
+          currency: currency,
+          orders_cents: Map.get(orders, key, 0),
+          invoice_lines_cents: Map.get(lines, key, 0),
+          payments_cents: Map.get(payments, key, 0)
         })
       end)
 
-    drifted = Enum.reject(days, & &1.ok?)
+    drifted = Enum.reject(days, & &1.ok)
 
     %{
       days: days,
       drifted: drifted,
-      ok?: drifted == [],
+      ok: drifted == [],
       drift_cents: Enum.reduce(drifted, 0, &(&2 + &1.drift_cents))
     }
   end
 
   @doc "One day's verdict: the largest gap between the three figures."
-  @spec check(day_figures()) :: map()
-  def check(%{orders_cents: orders, invoice_lines_cents: lines, payments_cents: payments} = day) do
-    values = [orders, lines, payments]
-    drift = Enum.max(values) - Enum.min(values)
+  @spec check(map()) :: map()
+  def check(%{orders_cents: orders, invoice_lines_cents: lines, payments_cents: payments} = day)
+      when is_integer(orders) and is_integer(lines) and is_integer(payments) do
+    drift = Enum.max([orders, lines, payments]) - Enum.min([orders, lines, payments])
 
     Map.merge(day, %{
-      ok?: drift == 0,
+      ok: drift == 0,
       drift_cents: drift,
       orders_vs_lines_cents: orders - lines,
       lines_vs_payments_cents: lines - payments
