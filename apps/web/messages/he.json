@@ -18,6 +18,7 @@
     "dashboard": "לוח בקרה",
     "platform": "פּלַטפוֹרמָה",
     "home": "בית",
+    "feed": "פיד",
     "users": "משתמשים",
     "finance": "כספים",
     "classes": "שיעורים",
@@ -70,7 +71,11 @@
     "memberTabs": "מדורים ראשיים",
     "trials": "אימוני ניסיון",
     "community": "קהילה",
-    "body": "גוף"
+    "body": "גוף",
+    "notificationsShort": "התראות",
+    "messages": "הודעות",
+    "messagesUnread": "הודעות (לא נקראו: {count})",
+    "socialApp": "חברתי"
   },
   "Profile": {
     "eyebrow": "פרופיל",
@@ -5127,7 +5132,7 @@
       "support": "הודעה מהירה לבאדי שלך",
       "voice": "ספר/י מה עשית"
     },
-    "homeTitle": "בית",
+    "homeTitle": "פיד",
     "wodToday": "האימון היומי במכון",
     "wodTodayEmpty": "אין היום אימון בשיעורים.",
     "feedPosts": "מהמועדון שלכם",

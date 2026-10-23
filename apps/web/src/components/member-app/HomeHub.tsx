@@ -22,7 +22,7 @@ import { HubCard, HubPage } from "@/components/member-app/HubParts";
 import { WellnessStrip } from "@/components/member-app/wellness/WellnessStrip";
 import { useLanding } from "@/components/member-app/progress/use-landing";
 import { useSession } from "@/components/session-provider";
-import { HeartButton } from "@/components/social/HeartButton";
+import { FeedInboxButtons } from "@/components/chat/MessagesButton";
 import { MyTrialsCard } from "@/components/trials/MyTrialsCard";
 import { useSelectedMembershipRole } from "@/lib/membership-role";
 
@@ -58,7 +58,7 @@ export function HomeHub() {
       title={t("homeTitle")}
       actions={
         <div className="flex items-center gap-2">
-          <HeartButton />
+          <FeedInboxButtons />
           <ComposeButton clubs={clubs.data ?? []} />
         </div>
       }

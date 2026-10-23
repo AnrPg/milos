@@ -18,6 +18,7 @@
     "dashboard": "Dashboard",
     "platform": "Platform",
     "home": "Home",
+    "feed": "Feed",
     "users": "Users",
     "finance": "Finance",
     "classes": "Classes",
@@ -70,7 +71,11 @@
     "memberTabs": "Main sections",
     "trials": "Trials",
     "community": "Community",
-    "body": "Body"
+    "body": "Body",
+    "notificationsShort": "Alerts",
+    "messages": "Messages",
+    "messagesUnread": "Messages ({count} unread)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Profile",
@@ -5127,7 +5132,7 @@
       "support": "A quick message to your buddy",
       "voice": "Say what you did"
     },
-    "homeTitle": "Home",
+    "homeTitle": "Feed",
     "wodToday": "Today's WOD at the gym",
     "wodTodayEmpty": "No class workout today.",
     "feedPosts": "From your club",
@@ -5455,7 +5460,8 @@
         "invalid_media": "The photo isn't ready. Pick it again."
       }
     },
-    "seasonChip": "{title} · {season}"
+    "seasonChip": "{title} · {season}",
+    "myPostsEmpty": "You have not posted yet. Tap ⊕ on Feed."
   },
   "Community": {
     "all": "All",

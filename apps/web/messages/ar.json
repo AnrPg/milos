@@ -18,6 +18,7 @@
     "dashboard": "لوحة التحكم",
     "platform": "منصة",
     "home": "الرئيسية",
+    "feed": "الموجز",
     "users": "المستخدمون",
     "finance": "المالية",
     "classes": "الحصص",
@@ -70,7 +71,11 @@
     "memberTabs": "الأقسام الرئيسية",
     "trials": "حصص تجريبية",
     "community": "المجتمع",
-    "body": "الجسم"
+    "body": "الجسم",
+    "notificationsShort": "الإشعارات",
+    "messages": "الرسائل",
+    "messagesUnread": "الرسائل (غير المقروءة: {count})",
+    "socialApp": "اجتماعي"
   },
   "Profile": {
     "eyebrow": "الملف الشخصي",
@@ -5127,7 +5132,7 @@
       "support": "رسالة سريعة إلى رفيقك",
       "voice": "قل ما قمت به"
     },
-    "homeTitle": "الرئيسية",
+    "homeTitle": "الموجز",
     "wodToday": "تمرين اليوم في النادي",
     "wodTodayEmpty": "لا يوجد تمرين حصة اليوم.",
     "feedPosts": "من ناديك",

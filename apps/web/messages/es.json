@@ -18,6 +18,7 @@
     "dashboard": "Panel",
     "platform": "Plataforma",
     "home": "Inicio",
+    "feed": "Feed",
     "users": "Usuarios",
     "finance": "Finanzas",
     "classes": "Clases",
@@ -70,7 +71,11 @@
     "memberTabs": "Secciones principales",
     "trials": "Clases de prueba",
     "community": "Comunidad",
-    "body": "Cuerpo"
+    "body": "Cuerpo",
+    "notificationsShort": "Avisos",
+    "messages": "Mensajes",
+    "messagesUnread": "Mensajes ({count} sin leer)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Perfil",
@@ -5127,7 +5132,7 @@
       "support": "Un mensaje rápido a tu buddy",
       "voice": "Di lo que hiciste"
     },
-    "homeTitle": "Inicio",
+    "homeTitle": "Feed",
     "wodToday": "El WOD de hoy en el box",
     "wodTodayEmpty": "Hoy no hay entrenamiento de clase.",
     "feedPosts": "De tu club",

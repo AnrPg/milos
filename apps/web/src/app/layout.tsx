@@ -13,7 +13,7 @@ import { SessionProvider } from "@/components/session-provider";
 import { ServiceWorkerBootstrap } from "@/components/service-worker-bootstrap";
 import { PersonalThemeBridge, ThemeProvider } from "@/components/theme-provider";
 import { TopNav } from "@/components/TopNav";
-import { BottomTabBar } from "@/components/nav/BottomTabBar";
+import { BottomNav } from "@/components/nav/BottomNav";
 import { ScreenPreloader } from "@/components/nav/ScreenPreloader";
 import { OnboardingHost } from "@/components/onboarding/Onboarding";
 import { DemoModeHost } from "@/components/business/DemoModeHost";
@@ -110,7 +110,8 @@ export default async function RootLayout({
           dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
         />
       </head>
-      <body className="min-h-full flex flex-col">
+      {/* --bottom-nav-space (globals.css): room for the member app's floating bar. */}
+      <body className="min-h-full flex flex-col pb-(--bottom-nav-space)">
         <ClientMessagesProvider locale={locale} timeZone={timeZone}>
           <QueryProvider>
             <ThemeProvider>
@@ -127,7 +128,7 @@ export default async function RootLayout({
                 <WidgetsGeofenceBridge />
                 <TopNav />
                 {children}
-                <BottomTabBar />
+                <BottomNav />
                 <ScreenPreloader />
                 <OnboardingHost />
                 <DemoModeHost />

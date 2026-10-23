@@ -7,6 +7,7 @@ import { useTranslations } from "next-intl";
 import type { BodyPose } from "@/api/body";
 import { key } from "@/components/body/BodyBits";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 
 const TIMER_SECONDS = 10;
 
@@ -30,6 +31,8 @@ export function BodyCamera({
   onKeep: (file: Blob) => void;
   onClose: () => void;
 }) {
+  // A full-screen surface: the member app's bottom bar steps aside.
+  useHideBottomNav();
   const t = useTranslations("Body");
   const titleId = useId();
   const dialog = useModalFocusTrap<HTMLDivElement>(onClose);

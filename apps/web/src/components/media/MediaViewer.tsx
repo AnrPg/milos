@@ -9,6 +9,7 @@ import { ReportButton } from "@/components/community/ReportButton";
 import { InlineVideo } from "@/components/media/PostMediaView";
 import { useModalFocusTrap } from "@/hooks/useModalFocusTrap";
 import { buildSrcSet, clampIndex, indexFromScroll, keyIndex } from "@/lib/post-media";
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 
 const MAX_SCALE = 4;
 const DOUBLE_TAP_SCALE = 2.5;
@@ -37,6 +38,8 @@ export function MediaViewer({
   onClose: () => void;
   onReport?: () => void;
 }) {
+  // A full-screen surface: the member app's bottom bar steps aside.
+  useHideBottomNav();
   const t = useTranslations("Media");
   const tCommunity = useTranslations("Community");
   const dialog = useModalFocusTrap<HTMLDivElement>(onClose);

@@ -18,6 +18,7 @@
     "dashboard": "Табло",
     "platform": "Платформа",
     "home": "Начало",
+    "feed": "Лента",
     "users": "Потребители",
     "finance": "Финанси",
     "classes": "Класове",
@@ -70,7 +71,11 @@
     "memberTabs": "Основни раздели",
     "trials": "Пробни тренировки",
     "community": "Общност",
-    "body": "Тяло"
+    "body": "Тяло",
+    "notificationsShort": "Известия",
+    "messages": "Съобщения",
+    "messagesUnread": "Съобщения (непрочетени: {count})",
+    "socialApp": "Социално"
   },
   "Profile": {
     "eyebrow": "Профил",
@@ -5127,7 +5132,7 @@
       "support": "Кратко съобщение до твоето бъди",
       "voice": "Кажи какво направи"
     },
-    "homeTitle": "Начало",
+    "homeTitle": "Лента",
     "wodToday": "Тренировката на деня в залата",
     "wodTodayEmpty": "Днес няма тренировка в часовете.",
     "feedPosts": "От вашия клуб",

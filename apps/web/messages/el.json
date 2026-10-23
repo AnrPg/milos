@@ -18,6 +18,7 @@
     "dashboard": "Πίνακας ελέγχου",
     "platform": "Πλατφόρμα",
     "home": "Αρχική",
+    "feed": "Feed",
     "users": "Χρήστες",
     "finance": "Οικονομικά",
     "classes": "Τμήματα",
@@ -47,7 +48,7 @@
     "reports": "Αναφορές",
     "cleaningLog": "Καθαριότητα",
     "training": "Προπόνηση",
-    "journal": "Ημερολόγιο",
+    "journal": "Journal",
     "gymClasses": "Μαθήματα",
     "personalTraining": "Personal training",
     "wodsVault": "Αρχείο WOD",
@@ -70,7 +71,11 @@
     "memberTabs": "Κύριες ενότητες",
     "trials": "Δοκιμαστικά",
     "community": "Κοινότητα",
-    "body": "Σώμα"
+    "body": "Σώμα",
+    "notificationsShort": "Ειδοποιήσεις",
+    "messages": "Μηνύματα",
+    "messagesUnread": "Μηνύματα ({count} αδιάβαστα)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Λογαριασμός",
@@ -5053,7 +5058,7 @@
     },
     "boxTitle": "Box",
     "meTitle": "Εγώ",
-    "journalTitle": "Ημερολόγιο",
+    "journalTitle": "Journal",
     "loading": "Φόρτωση…",
     "cancel": "Άκυρο",
     "signOut": "Αποσύνδεση",
@@ -5127,7 +5132,7 @@
       "support": "Ένα γρήγορο μήνυμα στον buddy σου",
       "voice": "Πες τι έκανες"
     },
-    "homeTitle": "Αρχική",
+    "homeTitle": "Feed",
     "wodToday": "Το WOD της ημέρας στο box",
     "wodTodayEmpty": "Δεν υπάρχει WOD μαθήματος σήμερα.",
     "feedPosts": "Από το club σου",

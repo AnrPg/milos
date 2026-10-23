@@ -18,6 +18,7 @@
     "dashboard": "Dashboard",
     "platform": "Platform",
     "home": "Thuis",
+    "feed": "Feed",
     "users": "Gebruikers",
     "finance": "Financiën",
     "classes": "Lessen",
@@ -70,7 +71,11 @@
     "memberTabs": "Hoofdonderdelen",
     "trials": "Proeflessen",
     "community": "Community",
-    "body": "Lichaam"
+    "body": "Lichaam",
+    "notificationsShort": "Meldingen",
+    "messages": "Berichten",
+    "messagesUnread": "Berichten ({count} ongelezen)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Profiel",
@@ -5127,7 +5132,7 @@
       "support": "Een snel bericht aan je buddy",
       "voice": "Zeg wat je deed"
     },
-    "homeTitle": "Home",
+    "homeTitle": "Feed",
     "wodToday": "De WOD van vandaag in de box",
     "wodTodayEmpty": "Vandaag is er geen lestraining.",
     "feedPosts": "Uit je club",

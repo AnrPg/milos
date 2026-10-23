@@ -9,7 +9,7 @@ import { ComposeButton } from "@/components/community/ComposeSheet";
 import { ErrorLine, Sheet } from "@/components/community/Sheet";
 import { useMyClubs } from "@/components/community/use-community";
 import { HubCard, HubPage } from "@/components/member-app/HubParts";
-import { HeartButton } from "@/components/social/HeartButton";
+import { FeedInboxButtons } from "@/components/chat/MessagesButton";
 import { useDebounced } from "@/hooks/useDebounced";
 
 import { clearNarrowing, foundTotal, isOneOff, thinResults, withWhen, type OriginChoice } from "./around";
@@ -43,7 +43,7 @@ export function AroundPage() {
       title={tMember("homeTitle")}
       actions={
         <div className="flex items-center gap-2">
-          <HeartButton />
+          <FeedInboxButtons />
           <ComposeButton clubs={clubs.data ?? []} />
         </div>
       }

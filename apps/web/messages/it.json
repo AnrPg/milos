@@ -18,6 +18,7 @@
     "dashboard": "Cruscotto",
     "platform": "Piattaforma",
     "home": "Casa",
+    "feed": "Feed",
     "users": "Utenti",
     "finance": "Finanze",
     "classes": "Corsi",
@@ -70,7 +71,11 @@
     "memberTabs": "Sezioni principali",
     "trials": "Lezioni di prova",
     "community": "Comunità",
-    "body": "Corpo"
+    "body": "Corpo",
+    "notificationsShort": "Notifiche",
+    "messages": "Messaggi",
+    "messagesUnread": "Messaggi ({count} non letti)",
+    "socialApp": "Social"
   },
   "Profile": {
     "eyebrow": "Profilo",
@@ -5127,7 +5132,7 @@
       "support": "Un messaggio veloce al tuo buddy",
       "voice": "Di cosa hai fatto"
     },
-    "homeTitle": "Home",
+    "homeTitle": "Feed",
     "wodToday": "Il WOD di oggi in palestra",
     "wodTodayEmpty": "Oggi non c'è un allenamento in lezione.",
     "feedPosts": "Dal tuo club",

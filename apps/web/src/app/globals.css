@@ -32,6 +32,22 @@
   --z-fullscreen: 80; /* camera, media viewer, cast view */
   --z-popover: 90;    /* menus, dropdowns, tooltips: above whatever opened them */
   --z-toast: 100;     /* session and system notices */
+
+  /*
+   * The member app's floating bottom bar (components/nav/BottomNav.tsx).
+   * --bottom-nav-space is the room it takes at the bottom of the screen, 0
+   * where it does not show: the body pads by it, and anything fixed to the
+   * bottom (floating buttons, toasts, action bars) sits on
+   * --bottom-float-inset so nothing hides behind the bar.
+   */
+  --bottom-nav-height: 4rem;
+  --bottom-nav-offset: max(0.75rem, calc(env(safe-area-inset-bottom) + 0.25rem));
+  --bottom-nav-space: 0px;
+  --bottom-float-inset: max(var(--bottom-nav-space), env(safe-area-inset-bottom));
+}
+
+:root[data-bottom-nav="on"] {
+  --bottom-nav-space: calc(var(--bottom-nav-height) + var(--bottom-nav-offset) + 0.5rem);
 }
 
 @theme inline {

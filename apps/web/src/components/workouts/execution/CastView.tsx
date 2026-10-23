@@ -4,6 +4,7 @@ import { useUiTranslations } from "@/i18n/ui";
 import React, { useEffect, useRef } from "react";
 
 import { formatClock, PHASE_COLORS, type TimerPhase } from "./TimerDisplay";
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 
 type Props = {
   seconds: number;
@@ -24,6 +25,8 @@ type Props = {
  * fullscreen and landscape where the browser allows, and any tap exits.
  */
 export function CastView({ seconds, phase, label, sectionName, roundText, nextText, finalSeconds, paused, onExit }: Props) {
+  // A full-screen surface: the member app's bottom bar steps aside.
+  useHideBottomNav();
   const i18n = useUiTranslations();
   const rootRef = useRef<HTMLDivElement>(null);
   const color = PHASE_COLORS[phase];
