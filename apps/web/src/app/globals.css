@@ -48,6 +48,8 @@
 
 :root[data-bottom-nav="on"] {
   --bottom-nav-space: calc(var(--bottom-nav-height) + var(--bottom-nav-offset) + 0.5rem);
+  /* Focus moves, anchors and scrollIntoView stop above the bar, not under it. */
+  scroll-padding-bottom: var(--bottom-nav-space);
 }
 
 @theme inline {

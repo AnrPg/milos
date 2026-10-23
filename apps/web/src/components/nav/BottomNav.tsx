@@ -181,7 +181,7 @@ export function BottomNav() {
       style={{ paddingBottom: "var(--bottom-nav-offset)" }}
     >
       <ul
-        className="pointer-events-auto grid w-full max-w-md items-stretch gap-0.5 rounded-[1.75rem] p-1 transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none"
+        className={`${hidden ? "pointer-events-none" : "pointer-events-auto"} grid w-full max-w-md items-stretch gap-0.5 rounded-[1.75rem] p-1 transition-[transform,opacity] duration-300 ease-out motion-reduce:transition-none`}
         style={{
           gridTemplateColumns: `repeat(${entries.length}, minmax(0, 1fr))`,
           height: "var(--bottom-nav-height)",

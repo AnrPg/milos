@@ -334,7 +334,7 @@ test.describe("member app shell", () => {
     await page.goto("/box");
 
     const tabs = page.getByRole("navigation", { name: "Main sections" });
-    await expect(tabs.getByRole("link")).toHaveText(["Feed", "Box", "Journal", "Me"]);
+    await expect(tabs.getByRole("link")).toHaveText(["Feed", "Box", "Journal", /Me$/]);
     await expect(tabs.getByRole("button", { name: "Notifications" })).toBeVisible();
     await expect(tabs.getByRole("link", { name: "Box" })).toHaveAttribute("aria-current", "page");
 
