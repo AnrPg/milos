@@ -31,20 +31,56 @@ export function PerkLogo({ name, url, size = 40 }: { name: string; url: string |
   );
 }
 
-/** The benefit in the member's words: «−10% σε όλα τα συμπληρώματα», «−15,00 €», or the gift. */
+/**
+ * The benefit in the member's words (`Palee.Perks.Benefit`): «−10% σε όλα τα
+ * συμπληρώματα», «−15,00 €», «Δώρο: shaker», «Αγόρασε 2, πάρε 1», or the
+ * gift; the API's English label is the fallback.
+ */
 export function useBenefitText() {
   const t = useTranslations("Perks");
   const locale = useUiLocale();
-  return (perk: Pick<PerkCommon, "benefit_type" | "benefit_value" | "benefit_text" | "benefit_label" | "currency">) => {
-    const what = perk.benefit_text?.trim();
-    if (perk.benefit_type === "percent" && perk.benefit_value !== null) {
-      return what ? t("benefitPercentOn", { value: perk.benefit_value, what }) : t("benefitPercent", { value: perk.benefit_value });
+  return (perk: Pick<PerkCommon, "benefit" | "benefit_label">) => {
+    const benefit = perk.benefit;
+    const what = benefit?.text?.trim();
+    const item = benefit?.item?.trim();
+    switch (benefit?.type) {
+      case "percent":
+        if (benefit.percent) return what ? t("benefitPercentOn", { value: benefit.percent, what }) : t("benefitPercent", { value: benefit.percent });
+        break;
+      case "fixed_amount":
+        if (benefit.amount_cents) {
+          const amount = formatMinorUnits(locale, benefit.amount_cents, benefit.currency ?? "EUR");
+          return what ? t("benefitAmountOn", { amount, what }) : t("benefitAmount", { amount });
+        }
+        break;
+      case "free_item":
+        if (item) return t("benefitFreeItem", { item });
+        break;
+      case "buy_x_get_y":
+        if (benefit.buy_quantity && benefit.get_quantity) {
+          const deal = t("benefitBuyGet", { buy: benefit.buy_quantity, get: benefit.get_quantity });
+          return item ? `${deal} · ${item}` : deal;
+        }
+        break;
+      case "free_text":
+        if (what) return what;
+        break;
     }
-    if (perk.benefit_type === "fixed_amount" && perk.benefit_value !== null) {
-      const amount = formatMinorUnits(locale, perk.benefit_value, perk.currency);
-      return what ? t("benefitAmountOn", { amount, what }) : t("benefitAmount", { amount });
-    }
-    return what || perk.benefit_label;
+    return perk.benefit_label;
+  };
+}
+
+/** The spend rules under the benefit: «Με αγορά από 30,00 €», «Έως 20,00 € έκπτωση». */
+export function useBenefitConditions() {
+  const t = useTranslations("Perks");
+  const locale = useUiLocale();
+  return (perk: Pick<PerkCommon, "benefit">) => {
+    const { benefit } = perk;
+    const currency = benefit?.currency ?? "EUR";
+    return [
+      benefit?.min_spend_cents ? t("benefitMinSpend", { amount: formatMinorUnits(locale, benefit.min_spend_cents, currency) }) : null,
+      benefit?.type === "percent" && benefit.max_discount_cents ? t("benefitMaxDiscount", { amount: formatMinorUnits(locale, benefit.max_discount_cents, currency) }) : null,
+    ].filter((line): line is string => Boolean(line));
   };
 }
 

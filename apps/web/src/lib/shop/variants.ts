@@ -17,7 +17,10 @@ export function isSoldOut(variant: Pick<ShopVariant, "stock_status" | "available
 }
 
 export function isLow(variant: Pick<ShopVariant, "stock_status" | "available">) {
-  return !isSoldOut(variant) && variant.available !== null && variant.available <= LAST_UNITS_THRESHOLD;
+  if (isSoldOut(variant)) return false;
+  // Members get no stock counts from the API, only `low`; staff-side data may carry a count.
+  if (variant.available === null) return variant.stock_status === "low" || variant.stock_status === "critical";
+  return variant.available <= LAST_UNITS_THRESHOLD;
 }
 
 function matches(variant: ShopVariant, selection: Selection, except?: string) {

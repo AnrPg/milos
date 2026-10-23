@@ -4,48 +4,84 @@ import { ApiError, apiRequest } from "@/api/client";
  * Partner perks (ADR-191): offers of partner businesses that the box
  * publishes for its own clients (never in Γύρω μου). Members claim them in
  * Εγώ › Πληρωμές › Προσφορές; staff manage them in Οικονομικά › Προσφορές ›
- * Συνεργατών. How the store redeems one is up to the partner:
- *   - `shared_code`: one code for everybody;
- *   - `unique_code`: a pool of the partner's single-use codes, pasted or
- *     uploaded and topped up; a claim hands one out;
- *   - `qr`: a personal Palee QR; the store opens its signed public link
- *     (`/perks/verify/{token}`, no login) and marks it used;
- *   - `partner_link`, `show_membership`: see TODO below.
+ * Συνεργατών. How the store redeems one is up to the partner
+ * (`redemption_method`):
+ *   - partner-issued, checked in the partner's own system: `shared_code`
+ *     (one code for everybody, the default), `code_pool` (the partner's
+ *     single-use codes, pasted or uploaded and topped up; a claim hands one
+ *     out), `partner_link` (an online store link with the code applied) and
+ *     `show_membership` (no code);
+ *   - Palee-issued: `personal_qr`, a single-use QR whose signed public link
+ *     (`/perks/verify/{token}`, no login) the store opens to mark it used.
+ * What a perk gives (`benefit`), when and for whom it holds (`rules`) and what
+ * the method needs (`redemption`) are versioned documents: a claim keeps the
+ * version the member agreed to.
  *
- * Shapes follow `PerkPresenter`, `MemberPerks` and `PerkVerification` on
- * the perks-api branch (no controllers or OpenAPI yet).
- * TODO(ADR-191): swap for `components["schemas"]` once `npm run generate:api`
- * exports them, and confirm the routes named next to each call.
- * TODO(ADR-191): `partner_link` (the partner's link with the code applied),
- * `show_membership` (the member shows their Palee membership), `rules`
- * (recurring windows, channel, eligibility) and `box_benefits` are not in the
- * API's domain yet; the form sends them so the API can take them on without
- * a web change.
+ * Shapes follow PaleeWeb.Schemas.Perks on the perks-api branch.
+ * TODO(ADR-191): alias them to `components["schemas"]` once
+ * `npm run generate:api` (needs `mix`) exports them.
  */
 
-export type PerkBenefitType = "percent" | "fixed_amount" | "free_text";
-export type PerkMethod = "shared_code" | "unique_code" | "qr" | "partner_link" | "show_membership";
+export type PerkBenefitType = "percent" | "fixed_amount" | "free_item" | "buy_x_get_y" | "free_text";
+export type PerkMethod = "shared_code" | "code_pool" | "partner_link" | "show_membership" | "personal_qr";
 export type PerkStatus = "draft" | "published" | "paused" | "expired";
-export type PerkAudience = "all_clients" | "packages";
 export type PerkChannel = "in_store" | "online" | "both";
+export type PerkPeriod = "day" | "week" | "month";
+export type PerkClaimStatus = "claimed" | "used" | "revoked";
 
-/** Conditions beyond the window and the caps; all optional. */
-export type PerkRules = {
-  /** ISO weekdays 1 (Monday) … 7 the perk holds on; empty = every day. */
-  weekdays: number[];
-  /** `HH:MM` local to the partner; both or neither. */
-  time_from: string | null;
-  time_until: string | null;
-  channel: PerkChannel | null;
-  /** Only for someone who is new to the partner. */
-  new_customers_only: boolean;
-  /** Spend at least this much (cents) for it to apply. */
-  min_spend_cents: number | null;
+/** What a perk gives (`PerkBenefit`); which fields count depends on `type`. */
+export type PerkBenefit = {
+  type: PerkBenefitType;
+  percent?: number | null;
+  amount_cents?: number | null;
+  currency?: string | null;
+  item?: string | null;
+  buy_quantity?: number | null;
+  get_quantity?: number | null;
+  /** The gift for `free_text`; an optional note («σε όλα τα συμπληρώματα») for the others. */
+  text?: string | null;
+  min_spend_cents?: number | null;
+  /** A cap; it only means something for a percent. */
+  max_discount_cents?: number | null;
 };
 
-export const NO_RULES: PerkRules = { weekdays: [], time_from: null, time_until: null, channel: null, new_customers_only: false, min_spend_cents: null };
+/** A weekly window in the business's local time; `HH:MM:SS`. */
+export type PerkWindow = { weekdays: number[]; starts_at: string; ends_at: string };
 
-/** What every reader of a perk sees (`PerkPresenter.common`). */
+export type PerkLimits = {
+  max_claims?: number | null;
+  max_per_member?: number;
+  period?: PerkPeriod | null;
+  max_per_period?: number | null;
+  max_per_member_per_period?: number | null;
+};
+
+/** Empty lists mean everyone; memberships are packages. */
+export type PerkEligibility = { package_ids?: string[]; group_ids?: string[]; min_tenure_days?: number | null };
+
+/** When and for whom a perk holds (`PerkRules`). */
+export type PerkRules = {
+  valid_from?: string | null;
+  valid_until?: string | null;
+  channel?: PerkChannel;
+  /** How it combines with other offers, in words. */
+  stacking?: string | null;
+  /** None means always. */
+  recurring?: PerkWindow[];
+  limits?: PerkLimits;
+  eligibility?: PerkEligibility;
+};
+
+/** What the method needs (`PerkRedemptionSettings`). */
+export type PerkRedemption = {
+  shared_code?: string | null;
+  /** partner_link: https; `{code}` in it is replaced by the code. */
+  link_url?: string | null;
+  low_pool_threshold?: number | null;
+  instructions?: string | null;
+};
+
+/** What every reader of a perk sees. */
 export type PerkCommon = {
   id: string;
   organization_id: string;
@@ -54,106 +90,106 @@ export type PerkCommon = {
   partner_address: string | null;
   logo_media_id: string | null;
   logo_url: string | null;
-  benefit_type: PerkBenefitType;
-  /** Percent 1..100, or cents for a fixed amount. */
-  benefit_value: number | null;
-  benefit_text: string | null;
-  /** The API's one-line label: `10%`, `5.00 EUR` or the text. */
-  benefit_label: string;
-  currency: string;
   redemption_method: PerkMethod;
+  version: number;
+  benefit: PerkBenefit;
+  /** The API's one-line label (`10%`, `5.00 EUR`, `Free shaker`); the app words it itself. */
+  benefit_label: string;
+  rules: PerkRules;
   terms: string | null;
+  instructions: string | null;
   valid_from: string | null;
   valid_until: string | null;
   status: PerkStatus;
-  rules?: PerkRules | null;
-  box_benefits?: boolean;
 };
 
-export type PerkProvider = { organization_id: string; name: string; slug: string | null; kind: string; logo_url: string | null };
+export type PerkProvider = { organization_id: string; name: string | null; slug: string | null; kind?: "gym" | "coach"; logo_url: string | null };
 
 export type PerkVerificationLink = { token: string; path: string; expires_at: string };
 
 export type PerkClaim = {
   id: string;
   perk_id: string;
+  perk_version: number;
   organization_id: string;
   provider: PerkProvider;
   partner_name: string;
   benefit_label: string;
   redemption_method: PerkMethod;
   terms: string | null;
+  instructions: string | null;
   valid_until: string | null;
   partner_url: string | null;
-  /** The code (shared or from the pool); for a QR claim, the short code under it. */
+  /** What to give the partner: the shared code, the pool code, the code under the QR; null for show_membership. */
   code: string | null;
-  status: "claimed" | "used" | "revoked";
+  reference: string;
+  /** partner_link: the store link with the code applied. */
+  url: string | null;
+  show_membership: boolean;
+  status: PerkClaimStatus;
   usable: boolean;
   claimed_at: string;
   used_at: string | null;
-  /** A QR claim's signed link, only right after claiming or refreshing it. */
+  /** personal_qr: the signed link, right after claiming or refreshing it. */
   verification: PerkVerificationLink | null;
 };
+
+export type PerkUnavailableReason =
+  | "perk_sold_out"
+  | "perk_period_sold_out"
+  | "perk_member_limit"
+  | "perk_member_period_limit"
+  | "perk_outside_hours"
+  | "perk_not_available";
 
 export type MemberPerk = PerkCommon & {
   provider: PerkProvider;
   claimable: boolean;
-  /** `perk_sold_out`, `perk_member_limit`, … when it cannot be claimed now. */
-  unavailable_reason: string | null;
+  unavailable_reason: PerkUnavailableReason | null;
+  /** The member's unused claim. */
   claim: PerkClaim | null;
 };
 
+export type PerkCodePool = { total: number; free: number; low: boolean };
+
 export type StaffPerk = PerkCommon & {
-  shared_code: string | null;
-  max_claims: number | null;
-  max_claims_per_member: number;
-  audience: PerkAudience;
-  package_ids: string[];
+  redemption: PerkRedemption;
   all_locations: boolean;
   location_ids: string[];
   /** Members who claimed it (opened the code). */
   claims_count: number;
   uses_count: number;
-  /** Left under `max_claims`; null when uncapped. */
+  /** Left under the overall cap; null when uncapped. */
   remaining: number | null;
-  /** The unique-code pool; null for other methods. */
-  codes: { total: number; free: number } | null;
+  /** The code pool of a code_pool perk; null for the other methods. */
+  codes: PerkCodePool | null;
   published_at: string | null;
 };
 
-/** What staff send to create or edit a perk (`Perk.editable_fields`, plus the pending extras). */
+/** What staff send (`PerkCreate` / `PerkUpdate`, no extra fields allowed). */
 export type StaffPerkInput = {
   partner_name: string;
   partner_url: string | null;
   partner_address: string | null;
   logo_media_id: string | null;
-  benefit_type: PerkBenefitType;
-  benefit_value: number | null;
-  benefit_text: string | null;
-  currency: string;
   redemption_method: PerkMethod;
-  shared_code: string | null;
-  terms: string | null;
-  valid_from: string | null;
-  valid_until: string | null;
-  max_claims: number | null;
-  max_claims_per_member: number;
-  audience: PerkAudience;
-  package_ids: string[];
   all_locations: boolean;
   location_ids: string[];
+  benefit: PerkBenefit;
   rules: PerkRules;
-  box_benefits: boolean;
+  redemption: PerkRedemption;
+  terms: string | null;
 };
 
-export type PerkCodesResult = { added: number; duplicates: number; total: number; free: number };
+export type PerkCodesResult = PerkCodePool & { added: number; duplicates: number };
 
-export type PerkCheckStatus = "valid" | "used" | "revoked" | "expired";
+export type PerkCheckStatus = "valid" | "used" | "revoked" | "expired" | "outside_hours";
 
-/** What the store sees on a member's QR link (`PerkVerification.present`). */
+/** What the store sees on a member's QR link (`PerkVerification`). */
 export type PerkCheck = {
   status: PerkCheckStatus;
-  code: string | null;
+  code: string;
+  member_first_name: string | null;
   claimed_at: string;
   used_at: string | null;
   perk: { partner_name: string; benefit_label: string; terms: string | null; valid_until: string | null };
@@ -168,14 +204,14 @@ export const perkKeys = {
   check: (token: string) => ["perk-check", token] as const,
 };
 
-/** A route the API does not serve yet answers 404; lists then read as empty instead of failing. */
+/** A route an older API does not serve answers 404; lists then read as empty instead of failing. */
 export function isMissingEndpoint(error: unknown) {
   return error instanceof ApiError && error.status === 404;
 }
 
 // Member (account-wide: every provider the person is a client of) ------------
 
-// TODO(ADR-191): GET /api/me/perks
+/** GET /api/me/perks */
 export async function fetchMemberPerks(token: string) {
   try {
     const data = await apiRequest<{ perks?: MemberPerk[] }>("/me/perks", { token, scope: "account" });
@@ -186,14 +222,12 @@ export async function fetchMemberPerks(token: string) {
   }
 }
 
-/** Claims a perk, or returns the member's open claim of it (safe to repeat). */
-// TODO(ADR-191): POST /api/me/perks/{id}/claim
+/** POST /api/me/perks/{id}/claim: claims a perk, or returns the open claim of it (safe to repeat). */
 export async function claimPerk(token: string, perkId: string) {
-  return apiRequest<{ claim: PerkClaim; created: boolean }>(`/me/perks/${id(perkId)}/claim`, { method: "POST", token, scope: "account" });
+  return apiRequest<{ claim: PerkClaim; created?: boolean }>(`/me/perks/${id(perkId)}/claim`, { method: "POST", token, scope: "account" });
 }
 
-/** A fresh short-lived link for a QR claim; the previous one stops working. */
-// TODO(ADR-191): POST /api/me/perks/claims/{id}/verification-link
+/** POST /api/me/perks/claims/{id}/verification-link: a fresh short-lived QR link; the previous one stops working. */
 export async function refreshPerkLink(token: string, claimId: string) {
   const data = await apiRequest<{ claim: PerkClaim }>(`/me/perks/claims/${id(claimId)}/verification-link`, {
     method: "POST",
@@ -205,7 +239,7 @@ export async function refreshPerkLink(token: string, claimId: string) {
 
 // Staff (Οικονομικά › Προσφορές › Συνεργατών) --------------------------------
 
-// TODO(ADR-191): GET /api/org/{slug}/admin/perks
+/** GET /api/org/{slug}/admin/perks */
 export async function fetchStaffPerks(token: string) {
   try {
     const data = await apiRequest<{ perks?: StaffPerk[] }>("/admin/perks", { token });
@@ -216,40 +250,37 @@ export async function fetchStaffPerks(token: string) {
   }
 }
 
-// TODO(ADR-191): POST /api/org/{slug}/admin/perks (a new draft)
+/** POST /api/org/{slug}/admin/perks (a new draft) */
 export async function createStaffPerk(token: string, body: StaffPerkInput) {
   const data = await apiRequest<{ perk: StaffPerk }>("/admin/perks", { method: "POST", token, body });
   return data.perk;
 }
 
-// TODO(ADR-191): PATCH /api/org/{slug}/admin/perks/{id}
+/** PATCH /api/org/{slug}/admin/perks/{id}: amends the version until the first claim, then makes a new one. */
 export async function updateStaffPerk(token: string, perkId: string, body: Partial<StaffPerkInput>) {
   const data = await apiRequest<{ perk: StaffPerk }>(`/admin/perks/${id(perkId)}`, { method: "PATCH", token, body });
   return data.perk;
 }
 
-/** Publish is a going-live action: a demo business gets 403 `business_not_activated`. */
-// TODO(ADR-191): POST /api/org/{slug}/admin/perks/{id}/publish|pause|expire
+/** POST …/admin/perks/{id}/publish|pause|expire. Publish is going live: a demo business gets 403 `business_not_activated`. */
 export async function stepStaffPerk(token: string, perkId: string, step: "publish" | "pause" | "expire") {
   const data = await apiRequest<{ perk: StaffPerk }>(`/admin/perks/${id(perkId)}/${step}`, { method: "POST", token });
   return data.perk;
 }
 
-/** Adds a batch of the partner's unique codes; repeats are skipped. */
-// TODO(ADR-191): POST /api/org/{slug}/admin/perks/{id}/codes
+/** POST …/admin/perks/{id}/codes: adds a batch of the partner's codes; repeats are skipped. */
 export async function addPerkCodes(token: string, perkId: string, codes: string[]) {
   return apiRequest<PerkCodesResult>(`/admin/perks/${id(perkId)}/codes`, { method: "POST", token, body: { codes } });
 }
 
 // The store's check page (public, no login) -----------------------------------
 
-// TODO(ADR-191): GET /api/public/perk-verifications/{token}
+/** GET /api/public/perk-verifications/{token} */
 export async function fetchPerkCheck(token: string) {
   return apiRequest<PerkCheck>(`/public/perk-verifications/${id(token)}`, { scope: "account" });
 }
 
-/** «Σημείωση ως χρησιμοποιημένο»: once; a second scan answers `perk_claim_already_used`. */
-// TODO(ADR-191): POST /api/public/perk-verifications/{token}/redeem
+/** POST /api/public/perk-verifications/{token}/redeem: «Σημείωση ως χρησιμοποιημένο», once. */
 export async function redeemPerkCheck(token: string) {
   return apiRequest<PerkCheck>(`/public/perk-verifications/${id(token)}/redeem`, { method: "POST", scope: "account" });
 }

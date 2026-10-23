@@ -5,8 +5,8 @@ import { expect, test, type Page } from "./support/test";
 // the public verification page a store opens from a Palee QR, and the
 // console list + form under Finance › Offers › Partners.
 // The API is stubbed; anything not stubbed answers `{}`.
-// TODO(ADR-191): not run yet — the owner asked to skip Playwright until the
-// perks API branch is merged; re-check the stub shapes against the OpenAPI.
+// Not run yet: the owner asked to skip Playwright until the perks API branch
+// is merged. Stubs follow PaleeWeb.Schemas.Perks.
 
 const json = (body: unknown, status = 200) => ({ status, contentType: "application/json", body: JSON.stringify(body) });
 
@@ -47,13 +47,13 @@ const common = {
   partner_address: null,
   logo_media_id: null,
   logo_url: null,
-  benefit_type: "percent",
-  benefit_value: 15,
-  benefit_text: "all supplements",
+  redemption_method: "code_pool",
+  version: 1,
+  benefit: { type: "percent", percent: 15, text: "all supplements" },
   benefit_label: "15%",
-  currency: "EUR",
-  redemption_method: "unique_code",
+  rules: { limits: { max_per_member: 1 } },
   terms: "One use per member.",
+  instructions: null,
   valid_from: null,
   valid_until: null,
   status: "published",
@@ -62,15 +62,20 @@ const common = {
 const claim = {
   id: "claim-1",
   perk_id: "perk-1",
+  perk_version: 1,
   organization_id: "org-kypseli",
   provider,
   partner_name: "Nutri Shop",
   benefit_label: "15%",
-  redemption_method: "unique_code",
+  redemption_method: "code_pool",
   terms: "One use per member.",
+  instructions: null,
   valid_until: null,
   partner_url: "https://nutri.example",
   code: "NUTRI-7Q2K",
+  reference: "PK-1",
+  url: null,
+  show_membership: false,
   status: "claimed",
   usable: true,
   claimed_at: new Date().toISOString(),
@@ -116,6 +121,7 @@ test.describe("partner perks · public verification", () => {
     const check = () => ({
       status: used ? "used" : "valid",
       code: "Q-7781",
+      member_first_name: "Maria",
       claimed_at: new Date().toISOString(),
       used_at: used ? new Date().toISOString() : null,
       perk: { partner_name: "Nutri Shop", benefit_label: "15%", terms: null, valid_until: null },
@@ -136,17 +142,13 @@ test.describe("partner perks · public verification", () => {
 test.describe("partner perks · console", () => {
   const staff = {
     ...common,
-    shared_code: null,
-    max_claims: null,
-    max_claims_per_member: 1,
-    audience: "all_clients",
-    package_ids: [],
+    redemption: { low_pool_threshold: null },
     all_locations: true,
     location_ids: [],
     claims_count: 12,
     uses_count: 7,
     remaining: null,
-    codes: { total: 50, free: 38 },
+    codes: { total: 50, free: 38, low: false },
     published_at: new Date().toISOString(),
   };
 
@@ -164,8 +166,8 @@ test.describe("partner perks · console", () => {
     await page.route("**/api/org/kypseli/admin/perks", (route) => route.fulfill(json({ perks: [] })));
     await page.goto("/admin/finance?tab=promotions&offers=partners");
     await page.getByTestId("perk-new").click();
-    await page.getByRole("radio", { name: /Unique codes from the partner/ }).click();
-    await page.locator("textarea").first().fill("A1\nA2\nA1");
+    await page.getByTestId("perk-method-code_pool").click();
+    await page.getByTestId("perk-codes-input").fill("A1\nA2\nA1");
     await expect(page.getByText("2 codes ready")).toBeVisible();
     await expect(page.getByTestId("perk-publish")).toBeDisabled();
     await expect(page.getByText("More conditions")).toBeVisible();

@@ -12,10 +12,18 @@ import { useSession } from "@/components/session-provider";
 import { Dialog } from "@/components/ui/Dialog";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 
-import { PerkLogo, useBenefitText } from "./PerkRows";
+import { PerkLogo, useBenefitConditions, useBenefitText } from "./PerkRows";
 import { useClaimPerk, useMemberPerks, useRefreshPerkLink } from "./use-perks";
 
-const REASONS = new Set(["perk_sold_out", "perk_member_limit", "perk_not_available", "perk_codes_exhausted"]);
+const REASONS = new Set([
+  "perk_sold_out",
+  "perk_period_sold_out",
+  "perk_member_limit",
+  "perk_member_period_limit",
+  "perk_outside_hours",
+  "perk_not_available",
+  "perk_codes_exhausted",
+]);
 
 function reasonKey(code: string | null | undefined) {
   return code && REASONS.has(code) ? `reason_${code}` : "reason_other";
@@ -26,8 +34,7 @@ function reasonKey(code: string | null | undefined) {
  * then the way this partner redeems it: a code with Αντιγραφή and «Δείξε
  * QR» (shared, from the pool, or applied by the partner's link), a personal
  * Palee QR the store scans, or «Δείξε τη συνδρομή σου». The code is only
- * handed out when the member claims it. Terms, address and the
- * «Συνεργασία» disclosure close the page.
+ * handed out when the member claims it. Terms and the address close the page.
  */
 export function PerkPage({ perkId }: { perkId: string }) {
   const t = useTranslations("Perks");
@@ -57,6 +64,7 @@ function PerkBody({ perk }: { perk: MemberPerk }) {
   const t = useTranslations("Perks");
   const locale = useUiLocale();
   const benefit = useBenefitText();
+  const conditions = useBenefitConditions()(perk);
   const claim = useClaimPerk();
   const current = perk.claim;
   const until = perk.valid_until ? t("until", { date: formatDate(locale, perk.valid_until) }) : t("noEnd");
@@ -67,8 +75,9 @@ function PerkBody({ perk }: { perk: MemberPerk }) {
         <PerkLogo name={perk.partner_name} url={perk.logo_url} size={56} />
         <h1 className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{perk.partner_name}</h1>
         <p className="text-lg font-bold" style={{ color: "var(--text)" }}>{benefit(perk)}</p>
+        {conditions.length > 0 ? <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{conditions.join(" · ")}</p> : null}
         <p className="text-sm" style={{ color: "var(--text-soft)" }}>
-          {t("forMembersOf", { box: perk.provider.name })} · {until}
+          {t("forMembersOf", { box: perk.provider.name ?? "" })} · {until}
         </p>
       </section>
 
@@ -119,11 +128,6 @@ function PerkBody({ perk }: { perk: MemberPerk }) {
         </a>
       ) : null}
 
-      {perk.box_benefits ? (
-        <p className="self-center rounded-full px-3 py-1 text-center text-xs font-semibold" style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}>
-          {t("disclosure")}
-        </p>
-      ) : null}
     </>
   );
 }
@@ -143,30 +147,39 @@ function Redeem({ perk, claim }: { perk: MemberPerk; claim: PerkClaim }) {
     );
   }
 
-  if (perk.redemption_method === "qr") return <PaleeQr claim={claim} />;
-  if (perk.redemption_method === "show_membership") return <ShowMembership perk={perk} />;
+  const instructions = claim.instructions ?? perk.instructions;
+  const note = instructions ? <p className="whitespace-pre-wrap text-sm" style={{ color: "var(--text)" }}>{instructions}</p> : null;
+
+  if (perk.redemption_method === "personal_qr") return <PaleeQr claim={claim} note={note} />;
+  if (perk.redemption_method === "show_membership" || claim.show_membership) return <ShowMembership perk={perk} note={note} />;
 
   const code = claim.code ?? "";
+  const method = perk.redemption_method;
   return (
     <section className="flex flex-col gap-3 rounded-3xl p-5" style={{ background: "var(--panel)", border: "1px solid var(--border)" }}>
-      <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
-        {perk.redemption_method === "unique_code" ? t("yourCode") : t("code")}
-      </p>
-      <p className="rounded-2xl px-4 py-3 text-center font-mono text-2xl font-extrabold tracking-[0.12em]" style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px dashed var(--border)" }} data-testid="perk-code">
-        {code}
-      </p>
-      <div className="grid grid-cols-2 gap-2">
-        <CopyButton code={code} />
-        <button type="button" onClick={() => setShowQr(true)} className="min-h-11 rounded-2xl px-3 text-sm font-bold" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}>
-          {t("showQr")}
-        </button>
-      </div>
-      {perk.redemption_method === "partner_link" && claim.partner_url ? (
-        <a href={claim.partner_url} target="_blank" rel="noreferrer" className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}>
+      {code ? (
+        <>
+          <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>
+            {method === "code_pool" ? t("yourCode") : t("code")}
+          </p>
+          <p className="rounded-2xl px-4 py-3 text-center font-mono text-2xl font-extrabold tracking-[0.12em]" style={{ background: "var(--panel-raised)", color: "var(--text)", border: "1px dashed var(--border)" }} data-testid="perk-code">
+            {code}
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            <CopyButton code={code} />
+            <button type="button" onClick={() => setShowQr(true)} className="min-h-11 rounded-2xl px-3 text-sm font-bold" style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}>
+              {t("showQr")}
+            </button>
+          </div>
+        </>
+      ) : null}
+      {method === "partner_link" && (claim.url ?? claim.partner_url) ? (
+        <a href={claim.url ?? claim.partner_url ?? undefined} target="_blank" rel="noreferrer" className="flex min-h-11 items-center justify-center rounded-2xl px-4 text-sm font-bold" style={{ background: "var(--primary)", color: "var(--primary-contrast)" }} data-testid="perk-partner-link">
           {t("openPartnerLink")}
         </a>
       ) : null}
-      <p className="text-xs" style={{ color: "var(--dim)" }}>{t(perk.redemption_method === "partner_link" ? "hint_partner_link" : perk.redemption_method === "unique_code" ? "hint_unique_code" : "hint_shared_code")}</p>
+      {note}
+      <p className="text-xs" style={{ color: "var(--dim)" }}>{t(method === "partner_link" ? (code ? "hint_partner_link" : "hint_partner_link_only") : method === "code_pool" ? "hint_code_pool" : "hint_shared_code")}</p>
       {showQr ? (
         <QrDialog value={code} title={perk.partner_name} caption={code} onClose={() => setShowQr(false)} />
       ) : null}
@@ -175,7 +188,7 @@ function Redeem({ perk, claim }: { perk: MemberPerk; claim: PerkClaim }) {
 }
 
 /** A personal Palee QR: the store scans it and opens the signed link; the API signs a new one each time it is shown. */
-function PaleeQr({ claim }: { claim: PerkClaim }) {
+function PaleeQr({ claim, note }: { claim: PerkClaim; note: React.ReactNode }) {
   const t = useTranslations("Perks");
   const refresh = useRefreshPerkLink();
   const link = claim.verification;
@@ -199,7 +212,8 @@ function PaleeQr({ claim }: { claim: PerkClaim }) {
         )}
       </div>
       {claim.code ? <p className="font-mono text-lg font-bold tracking-[0.1em]" style={{ color: "var(--text)" }}>{claim.code}</p> : null}
-      <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("hint_qr")}</p>
+      {note}
+      <p className="text-sm" style={{ color: "var(--text-soft)" }}>{t("hint_personal_qr")}</p>
       <button type="button" onClick={() => refresh.mutate(claim.id)} disabled={refresh.isPending} className="min-h-11 text-sm font-bold disabled:opacity-50" style={{ color: "var(--primary-strong)" }}>
         {t("newQr")}
       </button>
@@ -208,7 +222,7 @@ function PaleeQr({ claim }: { claim: PerkClaim }) {
 }
 
 /** «Δείξε τη συνδρομή σου»: a live card (the clock keeps moving, so a screenshot shows). */
-function ShowMembership({ perk }: { perk: MemberPerk }) {
+function ShowMembership({ perk, note }: { perk: MemberPerk; note: React.ReactNode }) {
   const t = useTranslations("Perks");
   const locale = useUiLocale();
   const { currentUser } = useSession();
@@ -222,8 +236,9 @@ function ShowMembership({ perk }: { perk: MemberPerk }) {
     <section className="flex flex-col items-center gap-2 rounded-3xl p-5 text-center" style={{ background: "color-mix(in srgb, var(--primary) 12%, var(--panel))", border: "1px solid var(--primary)" }} data-testid="perk-membership">
       <p className="text-xs font-bold uppercase tracking-[0.18em]" style={{ color: "var(--dim)" }}>{t("membershipCard")}</p>
       <p className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{name}</p>
-      <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("memberOf", { box: perk.provider.name })}</p>
+      <p className="text-sm font-semibold" style={{ color: "var(--text)" }}>{t("memberOf", { box: perk.provider.name ?? "" })}</p>
       <p className="font-mono text-lg tabular-nums" style={{ color: "var(--text)" }}>{now.toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit", second: "2-digit" })}</p>
+      {note}
       <p className="text-xs" style={{ color: "var(--text-soft)" }}>{t("hint_show_membership")}</p>
     </section>
   );

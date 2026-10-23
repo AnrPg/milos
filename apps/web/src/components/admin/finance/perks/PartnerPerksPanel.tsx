@@ -24,7 +24,7 @@ const PHASE_TONE: Record<string, string> = {
 /**
  * Οικονομικά › Προσφορές › Συνεργατών (ADR-191): the box's partner perks
  * with how many members claimed the code and how many used it, and for a
- * pool of unique codes how many were handed out. A row opens the form.
+ * code pool how many were handed out. A row opens the form.
  * Partner perks never appear in Γύρω μου: only the box's clients see them.
  */
 export function PartnerPerksPanel() {
@@ -58,9 +58,10 @@ export function PartnerPerksPanel() {
         ) : (
           list.map((perk, index) => {
             const phase = perkPhase(perk, today);
+            const packages = perk.rules.eligibility?.package_ids ?? [];
             const meta = [
-              t(`method_${perk.redemption_method}`) + (perk.shared_code ? ` ${perk.shared_code}` : ""),
-              perk.audience === "packages" ? t("sum_packages", { count: perk.package_ids.length }) : t("audience_all_clients"),
+              t(`method_${perk.redemption_method}`) + (perk.redemption.shared_code ? ` ${perk.redemption.shared_code}` : ""),
+              packages.length > 0 ? t("sum_packages", { count: packages.length }) : t("audience_all_clients"),
               perk.valid_until ? t("until", { date: formatDate(locale, perk.valid_until) }) : t("noEnd"),
             ];
             return (
@@ -84,8 +85,8 @@ export function PartnerPerksPanel() {
                   </span>
                 </span>
                 <span className="flex shrink-0 items-center gap-2">
-                  {perk.box_benefits ? (
-                    <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "var(--panel-muted)", color: "var(--text-soft)" }}>{t("partnership")}</span>
+                  {perk.codes?.low ? (
+                    <span className="rounded-full px-2.5 py-1 text-xs font-semibold" style={{ background: "color-mix(in srgb, var(--warning) 14%, var(--panel))", color: "var(--warning)" }}>{t("poolLow")}</span>
                   ) : null}
                   <span className="rounded-full px-3 py-1 text-xs font-semibold" style={{ background: `color-mix(in srgb, ${PHASE_TONE[phase]} 14%, var(--panel))`, color: PHASE_TONE[phase] }}>
                     {t(`status_${phase}`)}

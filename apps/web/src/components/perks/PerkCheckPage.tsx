@@ -19,8 +19,8 @@ function errorKey(error: unknown) {
 /**
  * What the partner's counter sees after scanning a member's Palee QR: the
  * perk, the box, valid or used, and one «Σημείωση ως χρησιμοποιημένο». No
- * account; the signed link is the credential and says nothing about who
- * the member is beyond the short code under their QR.
+ * account; the signed link is the credential and shows only the member's
+ * first name and the short code under their QR.
  */
 export function PerkCheckPage({ token }: { token: string }) {
   const t = useTranslations("Perks");
@@ -40,6 +40,7 @@ export function PerkCheckPage({ token }: { token: string }) {
           <p className="text-xl font-extrabold" style={{ color: "var(--text)" }}>{data.perk.partner_name}</p>
           <p className="text-lg font-bold" style={{ color: "var(--text)" }}>{data.perk.benefit_label}</p>
           {data.code ? <p className="font-mono text-lg font-bold tracking-[0.1em]" style={{ color: "var(--text)" }}>{data.code}</p> : null}
+          {data.member_first_name ? <p className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>{t("check.member", { name: data.member_first_name })}</p> : null}
           <p role="status" className="rounded-full px-4 py-1.5 text-base font-extrabold" style={{ background: `color-mix(in srgb, ${tone} 16%, var(--panel))`, color: tone }} data-testid="perk-check-status">
             {data.status === "used" && data.used_at
               ? t("check.usedAt", { date: new Date(data.used_at).toLocaleString(locale, { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) })

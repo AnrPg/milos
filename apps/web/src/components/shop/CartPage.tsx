@@ -6,13 +6,13 @@ import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import { ApiError } from "@/api/client";
-import type { ShopPaymentMode, ShopProductSummary, ShopQuote, ShopVariant } from "@/api/shop";
+import type { ShopPaymentMode, ShopProductSummary, ShopVariant } from "@/api/shop";
 import { useUiLocale } from "@/i18n/use-ui-locale";
 import { EMPTY_CART, cartItems, cartTotals, removeLine, setLineQuantity } from "@/lib/shop/cart";
 import { orderableUnits } from "@/lib/shop/variants";
 
 import { ErrorNotice, Eyebrow, LoadingLine, Money, Panel, ProductPhoto, ShopHeader, Stepper } from "./ShopParts";
-import { shopHref, useCart, usePlaceOrder, usePricedCatalog, useQuoteCart, useShopBox, useShopProducts, useStorefront } from "./use-shop";
+import { shopHref, useCart, useCartPreview, usePlaceOrder, usePricedCatalog, useShopBox, useShopProducts, useStorefront } from "./use-shop";
 
 const ORDER_ERRORS: Record<string, string> = {
   per_person_limit_exceeded: "errorLimit",
@@ -57,44 +57,45 @@ export function CartPage() {
     return map;
   }, [products.data]);
 
-  const places = shop?.pickup_locations ?? [];
+  const orderable = cart.lines.filter((line) => !totals.missing.includes(line.variantId));
   const [pickupId, setPickupId] = useState<string | null>(null);
-  const pickup = places.find((place) => place.id === pickupId) ?? places[0] ?? null;
+  // The server prices the basket and says where it can be picked up and how it can be paid.
+  const preview = useCartPreview(slug, cartItems({ ...cart, lines: orderable }), pickupId);
+  const quote = preview.data ?? null;
+  const allowed = quote?.pickup_location_ids ?? [];
+  const places = (shop?.pickup_locations ?? []).filter((item) => allowed.length === 0 || allowed.includes(item.id));
+  const pickup = places.find((item) => item.id === pickupId) ?? places[0] ?? null;
+  const serverModes = quote?.payment_modes ?? ["at_pickup"];
+  const onlineAvailable = quote?.online_payment.available ?? false;
   const modes: { mode: ShopPaymentMode; available: boolean }[] = [
-    { mode: "at_pickup", available: shop?.payment_modes.at_pickup ?? true },
-    ...(shop?.payment_modes.on_account ? [{ mode: "on_account" as const, available: true }] : []),
+    { mode: "at_pickup", available: serverModes.includes("at_pickup") },
+    ...(serverModes.includes("on_account") ? [{ mode: "on_account" as const, available: true }] : []),
     // Owner's call: online card payment is visible but blocked until the provider ships.
-    { mode: "online", available: shop?.online_payment.available ?? false },
+    { mode: "online", available: onlineAvailable },
   ];
   const [mode, setMode] = useState<ShopPaymentMode>("at_pickup");
   const [codeOpen, setCodeOpen] = useState(false);
   const [code, setCode] = useState("");
-  const [quote, setQuote] = useState<{ quote: ShopQuote; signature: string } | null>(null);
+  // TODO(ADR-190): the cart preview takes no code, so the code is checked when the order is placed.
+  const [promotion, setPromotion] = useState<string | null>(null);
   const [idempotencyKey] = useState(newKey);
-  const quoteCart = useQuoteCart(slug);
   const place = usePlaceOrder(slug);
-  const signature = JSON.stringify(cartItems(cart));
-  const applied = quote && quote.signature === signature ? quote.quote : null;
-  const currency = totals.currency ?? shop?.currency ?? "EUR";
+  const currency = quote?.currency ?? totals.currency ?? shop?.currency ?? "EUR";
   const back = shopHref("", slug, explicit);
 
   function applyCode() {
-    const promotion = code.trim();
-    if (!promotion) return;
-    quoteCart.mutate(
-      { lines: cartItems(cart), promotion_code: promotion },
-      { onSuccess: (result) => setQuote({ quote: result, signature }) },
-    );
+    const value = code.trim();
+    setPromotion(value || null);
   }
 
   function placeOrder() {
     if (!slug || totals.lines.length === 0) return;
     place.mutate(
       {
-        lines: cartItems({ ...cart, lines: cart.lines.filter((line) => !totals.missing.includes(line.variantId)) }),
+        lines: cartItems({ ...cart, lines: orderable }),
         pickup_location_id: pickup?.id ?? null,
         payment_mode: mode,
-        promotion_code: applied?.promotion?.code ?? null,
+        promotion_code: promotion,
         source: cart.source ? cart.source.kind : "direct",
         source_ref_id: cart.source?.id ?? null,
         idempotency_key: idempotencyKey,
@@ -133,11 +134,10 @@ export function CartPage() {
     );
   }
 
-  const discountCents = applied ? applied.discount_cents : totals.discountCents;
-  const totalCents = applied ? applied.total_cents : totals.totalCents;
-  const subtotalCents = applied ? applied.subtotal_cents : totals.subtotalCents;
-  const promotionCents = applied?.promotion?.discount_cents ?? 0;
-  const packageCents = discountCents - promotionCents;
+  const discountCents = quote ? quote.discount_cents : totals.discountCents;
+  const totalCents = quote ? quote.total_cents : totals.totalCents;
+  const subtotalCents = quote ? quote.subtotal_cents : totals.subtotalCents;
+  const percent = shop?.member_discount_percent ?? null;
 
   return (
     <main className="mx-auto flex w-full max-w-xl flex-col gap-4 px-4 pb-8 pt-4">
@@ -207,7 +207,7 @@ export function CartPage() {
               disabled={!available}
               onSelect={() => setMode(option)}
               title={t(`pay_${option}`)}
-              hint={option === "online" && !available ? shop?.online_payment.reason || t("pay_online_blocked") : t(`pay_${option}_hint`)}
+              hint={option === "online" && !available ? t("pay_online_blocked") : t(`pay_${option}_hint`)}
               testId={`shop-pay-${option}`}
             />
           ))}
@@ -227,13 +227,12 @@ export function CartPage() {
                 className="min-h-11 min-w-0 flex-1 rounded-2xl px-3 font-mono text-sm outline-none"
                 style={{ background: "var(--panel-raised)", border: "1px solid var(--border)", color: "var(--text)" }}
               />
-              <button type="button" onClick={applyCode} disabled={!code.trim() || quoteCart.isPending} className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
+              <button type="button" onClick={applyCode} disabled={!code.trim()} className="min-h-11 rounded-2xl px-4 text-sm font-bold disabled:opacity-50" style={{ background: "var(--text)", color: "var(--bg)" }}>
                 {t("apply")}
               </button>
             </span>
           </label>
-          {quoteCart.isError ? <ErrorNotice message={t(errorKey(quoteCart.error))} /> : null}
-          {applied?.promotion ? <span className="text-sm font-semibold" style={{ color: "var(--success)" }}>{t("codeApplied", { code: applied.promotion.code })}</span> : null}
+          {promotion ? <span className="text-sm font-semibold" style={{ color: "var(--text-soft)" }}>{t("codeAtOrder", { code: promotion })}</span> : null}
         </Panel>
       ) : (
         <button type="button" onClick={() => setCodeOpen(true)} className="min-h-11 self-start text-sm font-bold" style={{ color: "var(--primary-strong)" }}>
@@ -244,14 +243,11 @@ export function CartPage() {
       <Panel>
         <dl className="flex flex-col gap-1 text-sm">
           <Row label={t("subtotal")} value={<Money cents={subtotalCents} currency={currency} locale={locale} />} />
-          {packageCents > 0 ? (
+          {discountCents > 0 ? (
             <Row
-              label={t("packageDiscount", { percent: shop?.member_discount_percent ?? 0 })}
-              value={<span style={{ color: "var(--success)" }}>−<Money cents={packageCents} currency={currency} locale={locale} /></span>}
+              label={percent ? t("packageDiscount", { percent }) : t("packageDiscountPlain")}
+              value={<span style={{ color: "var(--success)" }}>−<Money cents={discountCents} currency={currency} locale={locale} /></span>}
             />
-          ) : null}
-          {promotionCents > 0 ? (
-            <Row label={t("codeDiscount")} value={<span style={{ color: "var(--success)" }}>−<Money cents={promotionCents} currency={currency} locale={locale} /></span>} />
           ) : null}
           <Row strong label={t("total")} value={<Money cents={totalCents} currency={currency} locale={locale} />} />
         </dl>
@@ -261,7 +257,7 @@ export function CartPage() {
       <button
         type="button"
         onClick={placeOrder}
-        disabled={place.isPending || totals.lines.length === 0 || (mode === "online" && !shop?.online_payment.available)}
+        disabled={place.isPending || totals.lines.length === 0 || (mode === "online" && !onlineAvailable)}
         className="min-h-12 rounded-2xl px-4 text-base font-bold disabled:opacity-50"
         style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
         data-testid="shop-place-order"

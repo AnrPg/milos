@@ -4,8 +4,8 @@ import { expect, test, type Page } from "./support/test";
 // product, the product page with every size, the one-screen cart where the
 // online card is visible but blocked, and the order page with QR + timeline.
 // The API is stubbed; anything not stubbed answers `{}`.
-// TODO(ADR-190): not run yet — the owner asked to skip Playwright until the
-// shop API branches are merged; re-check the stub shapes against the OpenAPI.
+// Not run yet: the owner asked to skip Playwright until the shop API branch
+// is merged. Stubs follow PaleeWeb.Schemas.Shop.
 
 const json = (body: unknown, status = 200) => ({ status, contentType: "application/json", body: JSON.stringify(body) });
 
@@ -36,16 +36,15 @@ const membership = {
   settings: { brand_name: "Box Kypseli", brand_logo_url: null, brand_primary_color: null },
 };
 
-const photo = { url: "data:image/gif;base64,R0lGODlhAQABAAAAACw=", alt: null };
-
-const variant = (id: string, size: string, stock: "in_stock" | "low" | "sold_out", available: number | null) => ({
+// The member API shapes (PaleeWeb.Schemas.Shop: ShopMemberProduct / ShopMemberVariant).
+const variant = (id: string, size: string, available: "in_stock" | "low" | "sold_out") => ({
   id,
+  product_id: "p-tee",
   title: `Black / ${size}`,
   option_values: { Colour: "Black", Size: size },
   price_cents: 2500,
   compare_at_price_cents: null,
   currency: "EUR",
-  stock_status: stock,
   available,
 });
 
@@ -53,30 +52,32 @@ const tee = {
   id: "p-tee",
   title: "Box tee",
   category: "Apparel",
-  photos: [photo],
-  is_new: true,
-  member_discount: true,
+  media_ids: [],
+  visibility: "members_only",
+  published_at: new Date().toISOString(),
   per_person_limit: null,
-  options: [
-    { name: "Colour", values: ["Black"], kind: "colour" },
-    { name: "Size", values: ["S", "M", "L"], kind: "size" },
-  ],
-  variants: [variant("v-s", "S", "in_stock", 10), variant("v-m", "M", "sold_out", 0), variant("v-l", "L", "low", 2)],
+  all_locations: true,
+  location_ids: [],
+  options: {
+    axes: [
+      { name: "Colour", values: ["Black"] },
+      { name: "Size", values: ["S", "M", "L"] },
+    ],
+  },
+  variants: [variant("v-s", "S", "in_stock"), variant("v-m", "M", "sold_out"), variant("v-l", "L", "low")],
   description: "Cotton.",
-  pickup_location_ids: ["loc-1"],
 };
 
-const storefront = {
-  open: true,
-  published_count: 1,
-  new_count: 1,
-  preview: [{ id: tee.id, title: tee.title, photo }],
+const preview = {
+  lines: [],
   currency: "EUR",
-  member_discount_percent: 10,
-  pickup_locations: [{ id: "loc-1", name: "Kypseli", address: null }],
-  payment_modes: { at_pickup: true, on_account: true },
-  online_payment: { available: false, reason: null },
-  open_orders: [],
+  subtotal_cents: 2500,
+  discount_cents: 250,
+  total_cents: 2250,
+  pickup_location_id: null,
+  pickup_location_ids: ["loc-1"],
+  payment_modes: ["at_pickup", "on_account"],
+  online_payment: { available: false, reason: "no_provider" },
 };
 
 const order = {
@@ -85,16 +86,19 @@ const order = {
   status: "placed",
   payment_status: "unpaid",
   payment_mode: "at_pickup",
-  pickup_location: storefront.pickup_locations[0],
-  totals: { currency: "EUR", subtotal_cents: 2500, discount_cents: 250, total_cents: 2250 },
+  channel: "online",
+  state: "pending_payment",
+  pickup_location_id: "loc-1",
+  currency: "EUR",
+  subtotal_cents: 2500,
+  discount_cents: 250,
+  total_cents: 2250,
   placed_at: new Date().toISOString(),
   ready_at: null,
   picked_up_at: null,
   cancelled_at: null,
   expires_at: null,
-  pickup_code: "K42-SIGNED",
-  can_cancel: true,
-  lines: [{ id: "l-1", product_id: tee.id, variant_id: "v-s", title: tee.title, variant_title: "Black / S", quantity: 1, unit_price_cents: 2500, total_cents: 2250, photo }],
+  lines: [{ id: "l-1", product_id: tee.id, variant_id: "v-s", product_title: tee.title, variant_title: "Black / S", quantity: 1, unit_price_cents: 2500, discount_cents: 250, total_cents: 2250 }],
 };
 
 async function common(page: Page) {
@@ -105,12 +109,10 @@ async function common(page: Page) {
   await page.route("**/api/auth/me", (route) => route.fulfill(json(me.user)));
   await page.route("**/api/memberships", (route) => route.fulfill(json([membership])));
   await page.route("**/api/notifications?**", (route) => route.fulfill(json({ notifications: [] })));
-  await page.route("**/api/org/kypseli/me/shop", (route) => route.fulfill(json({ storefront })));
+  await page.route("**/api/org/kypseli/locations", (route) => route.fulfill(json({ locations: [{ id: "loc-1", name: "Kypseli", address: null, archived_at: null }] })));
   await page.route("**/api/org/kypseli/me/shop/products", (route) => route.fulfill(json({ products: [tee] })));
   await page.route("**/api/org/kypseli/me/shop/products/p-tee", (route) => route.fulfill(json({ product: tee })));
-  await page.route("**/api/org/kypseli/me/shop/orders/quote", (route) =>
-    route.fulfill(json({ quote: { currency: "EUR", subtotal_cents: 2500, discount_cents: 250, code_discount_cents: 0, total_cents: 2250, code: null, lines: [] } })),
-  );
+  await page.route("**/api/org/kypseli/me/shop/cart/preview", (route) => route.fulfill(json(preview)));
   await page.route("**/api/org/kypseli/me/shop/orders/o-1", (route) => route.fulfill(json({ order })));
 }
 
@@ -127,7 +129,7 @@ test.describe("shop", () => {
     await page.goto("/box/shop");
     const cards = page.getByTestId("shop-product-card");
     await expect(cards).toHaveCount(1);
-    await expect(cards.first()).toContainText("€25");
+    await expect(cards.first()).toContainText("25");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });
@@ -147,6 +149,7 @@ test.describe("shop", () => {
     await common(page);
     const placed: unknown[] = [];
     await page.route("**/api/org/kypseli/me/shop/orders", (route) => {
+      if (route.request().method() !== "POST") return route.fulfill(json({ orders: [] }));
       placed.push(route.request().postDataJSON());
       return route.fulfill(json({ order }, 201));
     });

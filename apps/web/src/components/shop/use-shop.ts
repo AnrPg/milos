@@ -1,6 +1,6 @@
 "use client";
 
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useSearchParams } from "next/navigation";
 import { useCallback, useMemo, useSyncExternalStore } from "react";
 
@@ -11,7 +11,7 @@ import {
   fetchShopProducts,
   fetchStorefront,
   placeShopOrder,
-  quoteShopCart,
+  previewShopCart,
   requestBackInStock,
   shopKeys,
   type ShopCartItem,
@@ -97,10 +97,16 @@ export function useShopOrder(slug: string | null, orderId: string) {
   });
 }
 
-export function useQuoteCart(slug: string | null) {
+/** The server's price of the basket; refetched whenever the lines or the pickup branch change. */
+export function useCartPreview(slug: string | null, lines: ShopCartItem[], pickupLocationId: string | null) {
   const token = useToken();
-  return useMutation({
-    mutationFn: (body: { lines: ShopCartItem[]; promotion_code?: string | null }) => quoteShopCart(token, slug!, body),
+  const signature = JSON.stringify([lines, pickupLocationId]);
+  return useQuery({
+    queryKey: shopKeys.preview(slug ?? "", signature),
+    queryFn: () => previewShopCart(token, slug!, { lines, pickup_location_id: pickupLocationId }),
+    enabled: Boolean(token && slug && lines.length > 0),
+    placeholderData: keepPreviousData,
+    staleTime: 30_000,
   });
 }
 
