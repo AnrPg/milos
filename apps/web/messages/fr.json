@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "Les propriétaires travaillent toujours sur tous les sites.",
     "apiErrorCannotChangeOwnMembership": "Quelqu’un d’autre doit modifier votre propre accès.",
     "apiErrorRoleCeilingExceeded": "Vous ne pouvez pas attribuer un rôle supérieur à ceux que vous pouvez accorder.",
+    "apiErrorPromotionLocationNotIncluded": "Cette promotion n'est pas valable dans les sites de cette formule.",
     "mbErrLocationNotFound": "Nous n'avons pas trouvé ce site. Choisissez-en un autre.",
     "mbNotifWaitlistPromotedTitle": "Une place s'est libérée pour vous !",
     "mbNotifWaitlistPromotedBody": "Une place s'est libérée et vous êtes inscrit : {class}.",
@@ -9682,6 +9683,21 @@
     "inviteBranchesHelp": "Les sites auxquels ce lien donne accès.",
     "kindClient": "Client",
     "kindStaff": "Équipe",
-    "staffLinkReady": "Lien prêt. Envoyez-le à votre nouvelle recrue ({roles})."
+    "staffLinkReady": "Lien prêt. Envoyez-le à votre nouvelle recrue ({roles}).",
+    "filterLabel": "Sites :",
+    "filterAll": "Tous",
+    "filterCount": "{count, plural, one {# site} other {# sites}}",
+    "perBranch": "Par site",
+    "perBranchHelp": "Chaque personne compte dans son site principal : celui où elle s'est le plus entraînée ces 90 derniers jours, parmi les sites autorisés par sa formule. Les personnes sans site principal ne comptent que dans les totaux.",
+    "branch": "Site",
+    "checkIns": "Entrées enregistrées",
+    "attended": "Cours suivis",
+    "activeMemberships": "Abonnements actifs",
+    "appliesTo": "Valable pour",
+    "appliesToEachHelp": "Un élément distinct est créé dans chaque site choisi.",
+    "appliesToCoveringHelp": "Un seul élément, valable dans les sites choisis.",
+    "createdClasses": "{count, plural, one {# cours créé :} other {# cours créés :}}",
+    "createdSeries": "{count, plural, one {# série de cours créée :} other {# séries de cours créées :}}",
+    "createdAppointmentSlots": "{count, plural, one {# créneau de rendez-vous créé.} other {# créneaux de rendez-vous créés, un par site.}}"
   }
 }

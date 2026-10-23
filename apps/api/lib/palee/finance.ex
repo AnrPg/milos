@@ -283,6 +283,14 @@ defmodule Palee.Finance do
 
   def financial_summary(params \\ %{}), do: FinancialSummary.call(params)
   def financial_summary(context, params), do: scoped(context, fn -> financial_summary(params) end)
+
+  @doc """
+  The branches each person's current packages cover, `%{user_id => :all |
+  [location_id]}` (ADR-186 §7: the home-branch attribution reads it).
+  """
+  def package_location_scopes(context),
+    do: scoped(context, fn -> FinanceStore.package_location_scopes() end)
+
   defdelegate create_promotion_campaign(params), to: CreatePromotionCampaign, as: :call
 
   def create_promotion_campaign(context, params),

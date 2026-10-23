@@ -5,6 +5,19 @@ defmodule Palee.Coaching do
 
   defdelegate get_aggregates(), to: GetAggregates, as: :call
   defdelegate get_aggregates(context), to: GetAggregates, as: :call
+
+  @doc """
+  The coaching aggregate computed live for some people only (ADR-186 §7: a
+  branch filter); `nil` reads the business-wide view.
+  """
+  def get_aggregates(context, nil), do: get_aggregates(context)
+
+  def get_aggregates(context, user_ids) when is_list(user_ids),
+    do:
+      CoachingStore.with_tenant_context(context, fn ->
+        CoachingStore.get_aggregates_for_users(user_ids)
+      end)
+
   defdelegate refresh_aggregates(), to: RefreshAggregates, as: :call
   defdelegate with_tenant_context(context, fun), to: CoachingStore
 

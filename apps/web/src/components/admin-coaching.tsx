@@ -23,6 +23,7 @@ import { ReplyQueue } from "@/components/staff/ReplyQueue";
 import { SemanticLabel } from "@/components/semantic-label";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { BranchFilterControl, useBranchFilter } from "@/components/admin/BranchFilter";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 function asRecord(v: unknown): Record<string, unknown> {
@@ -148,12 +149,15 @@ export function AdminCoaching() {
   const [selectedAthleteId, setSelectedAthleteId] = useState("");
   const [showDrillDown, setShowDrillDown] = useState(false);
 
+  // ADR-186 §7: the athlete list follows the branch filter (home branch).
+  const branchFilter = useBranchFilter("coaching");
+  const locationIds = branchFilter.param;
   const athletesQuery = useQuery({
-    queryKey: ["admin", "athletes"],
+    queryKey: ["admin", "athletes", locationIds ?? "all"],
     enabled: Boolean(tokens?.access_token),
     queryFn: async () => {
       if (!tokens?.access_token) throw new Error(i18n("authenticationRequired9e44e0b"));
-      return fetchAthletes(tokens.access_token);
+      return fetchAthletes(tokens.access_token, undefined, locationIds);
     },
   });
 
@@ -176,9 +180,12 @@ export function AdminCoaching() {
         <PageHeader
           title={i18n("athleteCoachingWorkspaceae374b0")}
           actions={
-            <Link href={adminHref("/admin", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
-              {i18n("backToAdminHome941355d")}
-            </Link>
+            <>
+              <BranchFilterControl filter={branchFilter} />
+              <Link href={adminHref("/admin", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+                {i18n("backToAdminHome941355d")}
+              </Link>
+            </>
           }
         />
 

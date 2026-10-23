@@ -7,11 +7,13 @@ defmodule Palee.Application.ListAthletes do
   programming is decided by their package when the assignment is created.
   """
 
+  alias Palee.Application.BranchReport
   alias Palee.{Identity, Organizations}
 
   def call(context, query, opts \\ [])
 
-  def call(%{organization_id: organization_id}, query, opts) when is_binary(organization_id) do
+  def call(%{organization_id: organization_id} = context, query, opts)
+      when is_binary(organization_id) do
     roles =
       if Keyword.get(opts, :include_members, false), do: [:athlete, :member], else: [:athlete]
 
@@ -19,6 +21,7 @@ defmodule Palee.Application.ListAthletes do
 
     roles_by_user
     |> Map.keys()
+    |> at_branches(context, Keyword.get(opts, :location_ids, []))
     |> Identity.list_by_ids()
     |> filter_query(query)
     |> Enum.map(&%{id: &1.id, nickname: &1.nickname, role: to_string(roles_by_user[&1.id])})
@@ -44,6 +47,18 @@ defmodule Palee.Application.ListAthletes do
       end)
     end)
     |> Map.new()
+  end
+
+  # ADR-186 §7: the coaching page's branch filter keeps the people whose home
+  # branch is one of the requested ones (inside the person's scope). Pickers
+  # name no branches and keep everyone.
+  defp at_branches(user_ids, _context, []), do: user_ids
+
+  defp at_branches(user_ids, context, location_ids) do
+    case BranchReport.resolve(context, %{"location_ids" => location_ids}) do
+      %{user_ids: nil} -> user_ids
+      %{user_ids: users} -> Enum.filter(user_ids, &(&1 in users))
+    end
   end
 
   defp filter_query(users, query) when is_binary(query) and query != "",

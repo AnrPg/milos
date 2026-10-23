@@ -21,8 +21,10 @@ export type FinanceCleanupRecord = {
   deleted_at?: string | null;
 };
 
-export async function fetchFinanceSummary(token: string) {
-  return apiRequest<FinanceRecord>("/admin/finance/summary", { token });
+/** ADR-186 §7: `locationIds` (comma-separated) narrows the summary to some branches. */
+export async function fetchFinanceSummary(token: string, locationIds?: string) {
+  const query = locationIds ? `?${new URLSearchParams({ location_ids: locationIds }).toString()}` : "";
+  return apiRequest<FinanceRecord>(`/admin/finance/summary${query}`, { token });
 }
 
 export async function fetchFinanceCleanupRecords(

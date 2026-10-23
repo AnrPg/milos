@@ -28,7 +28,9 @@ defmodule PaleeWeb.MyWorkoutController do
         in: :query,
         required: false,
         schema: %Schema{type: :string, format: :date}
-      }
+      },
+      # ADR-186 §7: staff narrow the week to some branches.
+      PaleeWeb.Schemas.LocationScope.filter_parameter()
     ],
     responses: [
       ok:

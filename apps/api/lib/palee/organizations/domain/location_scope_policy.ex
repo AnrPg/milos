@@ -18,7 +18,9 @@ defmodule Palee.Organizations.Domain.LocationScopePolicy do
       with `:all` act on it, unless an area decides otherwise (ADR-186 lists
       them);
     * capabilities over the business as a whole (`organization_wide/0`) are
-      dropped for branch-scoped staff;
+      dropped for branch-scoped staff; reports, packages and promotions are
+      not among them since the page branch filter (ADR-186 §7) narrows the
+      reports and «Ισχύει για» (§8) the packages and promotions;
     * nobody grants a scope wider than their own, nor manages the roles of
       staff working outside it.
 
@@ -32,15 +34,12 @@ defmodule Palee.Organizations.Domain.LocationScopePolicy do
   @max_locations 200
 
   # Capabilities whose objects have no branch: gym-wide settings and branding,
-  # the package catalogue and promotions, finance settings and reports,
-  # business analytics, clubs and their settings, and the owner's own powers.
+  # finance settings, clubs and their settings, and the owner's own powers.
+  # Reports, analytics, packages and promotions are split by branch instead
+  # (ADR-186 §7, §8).
   @organization_wide [
     :manage_settings,
-    :manage_packages,
-    :manage_promotions,
     :manage_finance_settings,
-    :view_finance_reports,
-    :view_business_analytics,
     :manage_community,
     :create_organization,
     :manage_organization_lifecycle,
@@ -205,6 +204,77 @@ defmodule Palee.Organizations.Domain.LocationScopePolicy do
     end
   end
 
+  @doc """
+  The branches a report shows (ADR-186 §7): the requested ones narrowed to the
+  scope, or the whole scope when nothing is requested. `:all` means no filter
+  (everything, including what belongs to no branch).
+  """
+  def report_filter(scope_or_context, requested) do
+    case {to_scope(scope_or_context), clean_ids(requested)} do
+      {scope, []} -> scope
+      {:all, ids} -> ids
+      {scope, ids} -> Enum.filter(ids, &(&1 in scope))
+    end
+  end
+
+  @doc """
+  The `location_ids` a request asks for: a list, or one comma-separated
+  string (`location_ids`, `location_ids[]`). `[]` when none.
+  """
+  def requested_ids(params) when is_map(params) do
+    params
+    |> Map.get(:location_ids, Map.get(params, "location_ids", Map.get(params, "location_ids[]")))
+    |> case do
+      ids when is_list(ids) -> clean_ids(ids)
+      ids when is_binary(ids) -> ids |> String.split(",", trim: true) |> clean_ids()
+      _none -> []
+    end
+  end
+
+  def requested_ids(_params), do: []
+
+  @doc """
+  The branches a one-place item (class, class series, appointment slot) is
+  created at (ADR-186 §8): one item per requested branch, each inside the
+  scope, or the single `location_id` when no list is given (checked by the
+  caller as before). `{:ok, [location_id | nil]}` or an error.
+  """
+  def creation_targets(scope_or_context, requested, single) do
+    case clean_ids(requested) do
+      [] ->
+        {:ok, [blank_to_nil(single)]}
+
+      ids when length(ids) > @max_locations ->
+        {:error, :invalid_location_scope}
+
+      ids ->
+        if Enum.all?(ids, &covers?(scope_or_context, &1)),
+          do: {:ok, ids},
+          else: {:error, :location_out_of_scope}
+    end
+  end
+
+  @doc """
+  Whether a covering item (package, promotion, coaching assignment) valid at
+  `target` (`:all` or ids) shows under a report filter or for a scope: when
+  it is valid everywhere or at one of the branches.
+  """
+  def covering_visible?(scope_or_filter, target) do
+    case {to_scope(scope_or_filter), target} do
+      {:all, _target} -> true
+      {_ids, :all} -> true
+      {ids, target} when is_list(target) -> Enum.any?(target, &(&1 in ids))
+    end
+  end
+
+  @doc """
+  A covering item may be created or changed with `target` when it lies inside
+  the scope; `:all` («Όλα τα καταστήματα», future branches included) needs an
+  all-branch scope. `:ok` or `{:error, :location_scope_exceeded}`.
+  """
+  def authorize_covering(scope_or_context, target),
+    do: authorize_grant(to_scope(scope_or_context), target)
+
   @doc "The JSON shape of a scope."
   def to_payload(:all), do: %{all_locations: true, location_ids: []}
   def to_payload(ids) when is_list(ids), do: %{all_locations: false, location_ids: ids}
@@ -216,6 +286,11 @@ defmodule Palee.Organizations.Domain.LocationScopePolicy do
   defp location_id(%{location_id: id}), do: id
   defp location_id(%{"location_id" => id}), do: id
   defp location_id(_item), do: nil
+
+  defp clean_ids(ids) when is_list(ids),
+    do: ids |> Enum.filter(&(is_binary(&1) and &1 != "")) |> Enum.uniq() |> Enum.sort()
+
+  defp clean_ids(_ids), do: []
 
   defp blank_to_nil(""), do: nil
   defp blank_to_nil(value), do: value

@@ -1,5 +1,5 @@
 defmodule Palee.Application.GetAssignedWorkoutWeek do
-  alias Palee.Application.Seasons
+  alias Palee.Application.{CoveringBranches, Seasons}
   alias Palee.{Identity, Workouts}
 
   def call(context, user, params) do
@@ -10,6 +10,7 @@ defmodule Palee.Application.GetAssignedWorkoutWeek do
         case context.role do
           role when role in [:owner, :admin, :coach] ->
             Workouts.list_assigned_workouts_for_admin(context, start_date, end_date)
+            |> at_branches(context, params)
             |> attach_athletes()
 
           # ADR-125: members see the personal workouts and class variants
@@ -33,6 +34,23 @@ defmodule Palee.Application.GetAssignedWorkoutWeek do
   end
 
   def call(_user, _params), do: {:error, :organization_context_required}
+
+  # ADR-186 §7/§8: staff see the programmes valid at one of their branches,
+  # narrowed further by the page's branch filter.
+  defp at_branches(assignments, context, params) do
+    visible = CoveringBranches.visible(context, assignments, &CoveringBranches.of_row/1)
+
+    case Palee.Organizations.requested_location_ids(params) do
+      [] ->
+        visible
+
+      ids ->
+        Enum.filter(
+          visible,
+          &Palee.Organizations.covering_visible?(ids, CoveringBranches.of_row(&1))
+        )
+    end
+  end
 
   defp parse_start_date(params) do
     case Map.get(params, "start_date") || Map.get(params, :start_date) do

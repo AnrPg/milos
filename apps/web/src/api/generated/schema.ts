@@ -6327,7 +6327,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Create a scheduled class slot */
+        /** Create a scheduled class slot (one per branch of location_ids) */
         post: operations["PaleeWeb.AdminScheduleController.create_slot"];
         delete?: never;
         options?: never;
@@ -51239,6 +51239,8 @@ export interface operations {
         parameters: {
             query?: {
                 days?: number;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
             };
             header?: never;
             path?: never;
@@ -51269,9 +51271,12 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    all_locations?: boolean;
                     /** @description Assignee user ids (athletes or members). */
                     athlete_ids: string[];
                     instructions?: string;
+                    /** @description ADR-186: create one item at each of these branches */
+                    location_ids?: string[];
                     /** Format: uuid */
                     master_workout_id: string;
                     /** Format: date */
@@ -51337,8 +51342,11 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": {
+                    all_locations?: boolean;
                     athlete_ids: string[];
                     instructions?: string;
+                    /** @description ADR-186: create one item at each of these branches */
+                    location_ids?: string[];
                     /** Format: date */
                     scheduled_for: string;
                 };
@@ -51366,6 +51374,8 @@ export interface operations {
                 q?: string;
                 /** @description Also list active members (who may receive personal programming when their package allows it). */
                 include_members?: boolean;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
             };
             header?: never;
             path?: never;
@@ -60610,9 +60620,12 @@ export interface operations {
             content: {
                 "application/json": {
                     active?: boolean;
+                    all_locations?: boolean;
                     description?: string | null;
                     /** Format: date */
                     ends_on?: string | null;
+                    /** @description ADR-186: create one item at each of these branches */
+                    location_ids?: string[];
                     name: string;
                     params?: {
                         [key: string]: unknown;
@@ -60700,7 +60713,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.operational_queues": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -61798,7 +61814,10 @@ export interface operations {
     };
     "PaleeWeb.AdminFinanceController.summary": {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -64258,6 +64277,8 @@ export interface operations {
                     duration_minutes?: number;
                     /** Format: uuid */
                     location_id?: string | null;
+                    /** @description ADR-186: create one item at each of these branches */
+                    location_ids?: string[];
                     /** Format: uuid */
                     master_workout_id?: string | null;
                     name?: string;
@@ -64277,6 +64298,10 @@ export interface operations {
                         slot: {
                             [key: string]: unknown;
                         };
+                        /** @description ADR-186: every class created, one per branch */
+                        slots: {
+                            [key: string]: unknown;
+                        }[];
                     };
                 };
             };
@@ -64307,6 +64332,8 @@ export interface operations {
                     local_start_time: string;
                     /** Format: uuid */
                     location_id?: string | null;
+                    /** @description ADR-186: create one item at each of these branches */
+                    location_ids?: string[];
                     /** Format: uuid */
                     master_workout_id?: string | null;
                     name: string;
@@ -78432,6 +78459,8 @@ export interface operations {
         parameters: {
             query?: {
                 start_date?: string;
+                /** @description ADR-186: comma-separated branch ids to filter by */
+                location_ids?: string;
             };
             header?: never;
             path?: never;
@@ -78823,6 +78852,8 @@ export interface operations {
                     kind: "pt_session" | "assessment";
                     /** Format: uuid */
                     location_id?: string | null;
+                    /** @description ADR-186: create one item at each of these branches */
+                    location_ids?: string[];
                     meeting_url?: string | null;
                     /** @enum {string} */
                     mode?: "in_person" | "online";

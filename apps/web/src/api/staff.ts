@@ -97,6 +97,16 @@ export async function createAppointmentSlot(token: string, body: AppointmentSlot
   return response.slot;
 }
 
+/** ADR-186 §8: one slot per branch in `location_ids`, created together (all or nothing). */
+export async function createAppointmentSlotsAt(token: string, body: AppointmentSlotInput, locationIds: string[]) {
+  const response = await apiRequest<SlotResponse & { slots?: SlotResponse["slot"][] }>("/staff/appointment-slots", {
+    method: "POST",
+    token,
+    body: { ...body, location_id: null, location_ids: locationIds },
+  });
+  return response.slots ?? [response.slot];
+}
+
 export async function cancelAppointmentSlot(token: string, slotId: string) {
   const response = await apiRequest<SlotResponse>(`/staff/appointment-slots/${slotId}/cancel`, {
     method: "POST",

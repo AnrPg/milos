@@ -26,6 +26,7 @@ import { SeasonsTab } from "@/components/admin/finance/tabs/SeasonsTab";
 import { useSession } from "@/components/session-provider";
 import { adminHref, useOrganizationSlug } from "@/lib/organization-slug";
 import { PageHeader, pageHeaderActionClass } from "@/components/PageHeader";
+import { BranchFilterControl, useBranchFilter } from "@/components/admin/BranchFilter";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
 
 type Tab = "members" | "packages" | "seasons" | "promotions" | "referrals" | "queues" | "accounting" | "corporate";
@@ -62,16 +63,21 @@ export function FinanceOperations() {
   const requestedTab = searchParams.get("tab");
   const activeTab: Tab = TABS.some(({ id }) => id === requestedTab) ? (requestedTab as Tab) : "members";
 
+  // ADR-186 §7: the attention figures follow the branch filter.
+  const branchFilter = useBranchFilter("finance-operations");
+  const locationIds = branchFilter.param;
+
   const summaryQuery = useQuery({
-    queryKey: ["admin", "finance", "summary"],
+    queryKey: ["admin", "finance", "summary", locationIds ?? "all"],
     enabled: Boolean(token),
-    queryFn: () => fetchFinanceSummary(token!),
+    queryFn: () => fetchFinanceSummary(token!, locationIds),
   });
 
   const queuesQuery = useQuery({
-    queryKey: ["admin", "finance", "queues"],
+    queryKey: ["admin", "finance", "queues", locationIds ?? "all"],
     enabled: Boolean(token),
-    queryFn: () => fetchFinanceQueues(token!, { expires_within_days: "30" }),
+    queryFn: () =>
+      fetchFinanceQueues(token!, { expires_within_days: "30", ...(locationIds ? { location_ids: locationIds } : {}) }),
   });
 
   const totals = (summaryQuery.data?.totals ?? {}) as FinanceRecord;
@@ -110,9 +116,12 @@ export function FinanceOperations() {
         <PageHeader
           title={i18n("financeOperations60f9e5a")}
           actions={
-            <Link href={adminHref("/admin/metrics/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
-              {i18n("financeAnalytics271fe3b")}
-            </Link>
+            <>
+              <BranchFilterControl filter={branchFilter} />
+              <Link href={adminHref("/admin/metrics/finance", organizationSlug)} className={pageHeaderActionClass} style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}>
+                {i18n("financeAnalytics271fe3b")}
+              </Link>
+            </>
           }
         />
 

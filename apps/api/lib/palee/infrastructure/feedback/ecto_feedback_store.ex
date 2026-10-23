@@ -112,16 +112,23 @@ defmodule Palee.Infrastructure.Feedback.EctoFeedbackStore do
   def review_summary(filters) do
     filters = string_key_map(filters || %{})
     since = summary_since(filters["days"])
+    # ADR-186 §7: a branch filter arrives as the people whose home branch it is.
+    users = if is_list(filters["user_ids"]), do: filters["user_ids"]
 
     %{
       since: since,
-      total: count_reviews(since),
-      average_rating: average_rating(since),
-      by_status: count_reviews_by(:status, since),
-      by_sentiment: count_reviews_by(:sentiment, since),
-      by_target_type: count_reviews_by(:target_type, since),
-      low_rating_count: low_rating_count(since)
+      total: count_reviews(since, users),
+      average_rating: average_rating(since, users),
+      by_status: count_reviews_by(:status, since, users),
+      by_sentiment: count_reviews_by(:sentiment, since, users),
+      by_target_type: count_reviews_by(:target_type, since, users),
+      low_rating_count: low_rating_count(since, users)
     }
+  end
+
+  defp reviews_since(since, users) do
+    query = Review |> scoped_to_tenant() |> where([review], review.inserted_at >= ^since)
+    if is_list(users), do: where(query, [review], review.user_id in ^users), else: query
   end
 
   defp insert_answers([], _repo), do: {:ok, []}
@@ -244,17 +251,15 @@ defmodule Palee.Infrastructure.Feedback.EctoFeedbackStore do
 
   defp normalize_answers(_), do: []
 
-  defp count_reviews(since) do
-    Review
-    |> scoped_to_tenant()
-    |> where([review], review.inserted_at >= ^since)
+  defp count_reviews(since, users) do
+    since
+    |> reviews_since(users)
     |> Repo.aggregate(:count)
   end
 
-  defp average_rating(since) do
-    Review
-    |> scoped_to_tenant()
-    |> where([review], review.inserted_at >= ^since)
+  defp average_rating(since, users) do
+    since
+    |> reviews_since(users)
     |> where([review], not is_nil(review.rating))
     |> Repo.aggregate(:avg, :rating)
     |> case do
@@ -263,20 +268,18 @@ defmodule Palee.Infrastructure.Feedback.EctoFeedbackStore do
     end
   end
 
-  defp count_reviews_by(field, since) do
-    Review
-    |> scoped_to_tenant()
-    |> where([review], review.inserted_at >= ^since)
+  defp count_reviews_by(field, since, users) do
+    since
+    |> reviews_since(users)
     |> group_by([review], field(review, ^field))
     |> select([review], {field(review, ^field), count(review.id)})
     |> Repo.all()
     |> Map.new()
   end
 
-  defp low_rating_count(since) do
-    Review
-    |> scoped_to_tenant()
-    |> where([review], review.inserted_at >= ^since)
+  defp low_rating_count(since, users) do
+    since
+    |> reviews_since(users)
     |> where([review], not is_nil(review.rating) and review.rating <= 2)
     |> Repo.aggregate(:count)
   end

@@ -346,6 +346,20 @@ export async function createGuestBooking(token: string, slotId: string, guestNam
   return response.booking;
 }
 
+/**
+ * ADR-186 §8: one class per branch in `location_ids`, created together (all
+ * or nothing).
+ */
+export async function createScheduleSlotsAt(token: string, payload: ScheduleSlotPayload, locationIds: string[]) {
+  const response = await apiRequest<{ slot: ScheduleSlot; slots: ScheduleSlot[] }>("/admin/schedule/slots", {
+    method: "POST",
+    token,
+    body: { ...payload, location_id: null, location_ids: locationIds },
+  });
+
+  return response.slots ?? [response.slot];
+}
+
 export async function createScheduleSlot(token: string, payload: ScheduleSlotPayload) {
   const response = await apiRequest<{ slot: ScheduleSlot }>("/admin/schedule/slots", {
     method: "POST",
@@ -372,11 +386,14 @@ export async function createScheduleSeries(
     auto_approve: boolean;
     booking_timeout_minutes: number;
     location_id?: string | null;
+    /** ADR-186 §8: one series per branch, created together. */
+    location_ids?: string[];
     /** Optional (ADR-176): each occurrence can get its own WOD later. */
     master_workout_id?: string | null;
   },
 ) {
-  return apiRequest<{ series: { id: string; occurrence_count: number } }>(
+  type CreatedSeries = { id: string; occurrence_count: number; location_id?: string | null };
+  return apiRequest<{ series: CreatedSeries; series_list?: CreatedSeries[] }>(
     "/admin/schedule/slots/series",
     { method: "POST", token, body: payload },
   );

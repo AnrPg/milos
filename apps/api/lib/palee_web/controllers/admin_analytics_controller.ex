@@ -20,7 +20,8 @@ defmodule PaleeWeb.AdminAnalyticsController do
         in: :query,
         required: false,
         schema: %Schema{type: :integer, minimum: 1, maximum: 365}
-      }
+      },
+      PaleeWeb.Schemas.LocationScope.filter_parameter()
     ],
     responses: [ok: {"Analytics summary", "application/json", @summary_schema}]
   )

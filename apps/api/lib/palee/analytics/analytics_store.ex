@@ -27,6 +27,7 @@ defmodule Palee.Analytics.AnalyticsStore do
 
   def upsert_exercise_catalog_entry(params), do: adapter().upsert_exercise_catalog_entry(params)
   def analytics_summary(params), do: adapter().analytics_summary(params)
+  def branch_activity(since), do: adapter().branch_activity(since)
 
   defp adapter do
     Application.get_env(:palee, :analytics_store, @default_adapter)

@@ -26,6 +26,60 @@ defmodule Palee.Application.ClassLocation do
   end
 
   @doc """
+  «Ισχύει για» (ADR-186 §8): the params of each item to create, one per
+  branch of `location_ids` (each checked like `check/2`), or the params
+  themselves when no list is given. Keys keep the params' own style.
+  """
+  def targets(context, params) when is_map(params) do
+    requested = Organizations.requested_location_ids(params)
+    single = Map.get(params, :location_id) || Map.get(params, "location_id")
+
+    with {:ok, ids} <- Organizations.location_creation_targets(context, requested, single) do
+      if requested == [] do
+        {:ok, [Map.drop(params, [:location_ids, "location_ids"])]}
+      else
+        key = if Map.has_key?(params, "location_ids"), do: "location_id", else: :location_id
+        base = Map.drop(params, [:location_ids, "location_ids", :location_id, "location_id"])
+
+        ids
+        |> Enum.reduce_while({:ok, []}, fn id, {:ok, acc} ->
+          item = Map.put(base, key, id)
+
+          case check(context, item) do
+            :ok -> {:cont, {:ok, [item | acc]}}
+            error -> {:halt, error}
+          end
+        end)
+        |> case do
+          {:ok, items} -> {:ok, Enum.reverse(items)}
+          error -> error
+        end
+      end
+    end
+  end
+
+  @doc """
+  Creates one item per params in one transaction: all of them, or none and
+  the first error (ADR-186 §8).
+  """
+  def create_all(context, items, create, transaction \\ &Scheduling.transaction/2)
+      when is_function(create, 1) and is_function(transaction, 2) do
+    transaction.(context, fn ->
+      items
+      |> Enum.reduce_while({:ok, []}, fn item, {:ok, acc} ->
+        case create.(item) do
+          {:ok, created} -> {:cont, {:ok, [created | acc]}}
+          {:error, reason} -> {:halt, {:error, reason}}
+        end
+      end)
+      |> case do
+        {:ok, created} -> {:ok, Enum.reverse(created)}
+        error -> error
+      end
+    end)
+  end
+
+  @doc """
   `:ok` when the acting staff work at the branch of a scheduled class (and
   of its bookings and attendance). Staff who work everywhere skip the read.
   """

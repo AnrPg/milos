@@ -35,6 +35,7 @@ defmodule Palee.Scheduling do
     GetSlot
   }
 
+  defdelegate transaction(context, fun), to: Palee.Scheduling.SchedulingStore
   defdelegate create_slot(context, params), to: CreateSlot, as: :call
   defdelegate create_slot(params), to: CreateSlot, as: :call
   defdelegate create_class_series(context, params), to: CreateClassSeries, as: :call

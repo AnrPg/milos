@@ -4,12 +4,14 @@ import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useId, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { listAdminLocations } from "@/api/facility";
+import { listAdminLocations, type FacilityLocation } from "@/api/facility";
+import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
 import {
   bookAppointmentForClient,
   cancelAppointmentBooking,
   cancelAppointmentSlot,
   createAppointmentSlot,
+  createAppointmentSlotsAt,
   fetchAppointmentSlots,
   fetchGymStaff,
   recordAppointmentAttendance,
@@ -72,11 +74,14 @@ function CreateSlotForm({
   onCreated,
 }: {
   coaches: Array<{ id: string; nickname: string }>;
-  locations: Array<{ id: string; name: string }>;
-  onCreated: () => void;
+  locations: FacilityLocation[];
+  onCreated: (count: number) => void;
 }) {
   const i18n = useUiTranslations();
   const tCoach = useTranslations("SoloCoach");
+  // ADR-186 §8: «Ισχύει για» creates one slot per chosen branch.
+  const manyBranches = showsAppliesTo(locations);
+  const [branchIds, setBranchIds] = useState<string[]>(() => defaultAppliesTo(locations));
   const { tokens, currentUser } = useSession();
   const queryClient = useQueryClient();
   const baseId = useId();
@@ -100,11 +105,13 @@ function CreateSlotForm({
     Number.isInteger(durationValue) &&
     durationValue >= 15 &&
     durationValue <= 240 &&
-    (mode === "in_person" || !meetingUrl.trim() || meetingUrl.trim().startsWith("https://"));
+    (mode === "in_person" || !meetingUrl.trim() || meetingUrl.trim().startsWith("https://")) &&
+    !(mode === "in_person" && manyBranches && branchIds.length === 0);
+  const atBranches = mode === "in_person" && manyBranches;
 
   const mutation = useMutation({
-    mutationFn: () =>
-      createAppointmentSlot(tokens!.access_token, {
+    mutationFn: async () => {
+      const body = {
         coach_id: coachId || null,
         starts_at: startsIso!,
         duration_minutes: durationValue,
@@ -115,11 +122,15 @@ function CreateSlotForm({
         notes: notes.trim() || null,
         mode,
         meeting_url: mode === "online" ? meetingUrl.trim() || null : null,
-      }),
-    onSuccess: async () => {
+      };
+      if (atBranches) return (await createAppointmentSlotsAt(tokens!.access_token, body, branchIds)).length;
+      await createAppointmentSlot(tokens!.access_token, body);
+      return 1;
+    },
+    onSuccess: async (count) => {
       setNotes("");
       await queryClient.invalidateQueries({ queryKey: SLOTS_KEY });
-      onCreated();
+      onCreated(count);
     },
   });
 
@@ -269,6 +280,15 @@ function CreateSlotForm({
             style={inputStyle}
             type="url"
             value={meetingUrl}
+          />
+        </div>
+      ) : atBranches ? (
+        <div className="sm:col-span-2 lg:col-span-4">
+          <AppliesToBranches
+            kind="each"
+            locations={locations}
+            value={branchIds}
+            onChange={(value) => setBranchIds(value === "all" ? defaultAppliesTo(locations) : value)}
           />
         </div>
       ) : (
@@ -535,6 +555,8 @@ export function AdminAppointments() {
   const [view, setView] = useState<View>("week");
   const [anchor, setAnchor] = useState(() => new Date());
   const [showCreate, setShowCreate] = useState(false);
+  const [createdCount, setCreatedCount] = useState<number | null>(null);
+  const branchT = useTranslations("BranchScope");
   const zone = useOrganizationTimeZone();
   const range = useMemo(() => appointmentRange(anchor, view, zone), [anchor, view, zone]);
 
@@ -600,7 +622,16 @@ export function AdminAppointments() {
           }
         >
           {showCreate ? (
-            <CreateSlotForm coaches={coaches} locations={locations} onCreated={() => setShowCreate(false)} />
+            <CreateSlotForm
+              coaches={coaches}
+              locations={locations}
+              onCreated={(count) => {
+                setShowCreate(false);
+                setCreatedCount(count > 1 ? count : null);
+              }}
+            />
+          ) : createdCount ? (
+            <StatusText tone="success">{branchT("createdAppointmentSlots", { count: createdCount })}</StatusText>
           ) : (
             <StatusText tone="muted">{i18n("stfNewSlotHint")}</StatusText>
           )}

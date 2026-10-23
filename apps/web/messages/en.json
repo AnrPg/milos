@@ -3417,6 +3417,7 @@
     "apiErrorOwnerLocationScope": "Owners always work at every branch.",
     "apiErrorCannotChangeOwnMembership": "Someone else has to change your own access.",
     "apiErrorRoleCeilingExceeded": "You can't give a role higher than you may grant.",
+    "apiErrorPromotionLocationNotIncluded": "This promotion isn't valid at the branches of this package.",
     "mbErrLocationNotFound": "We couldn't find that location. Please pick another one.",
     "mbNotifWaitlistPromotedTitle": "You got a spot!",
     "mbNotifWaitlistPromotedBody": "A spot opened up and you're booked: {class}.",
@@ -9682,6 +9683,21 @@
     "inviteBranchesHelp": "The branches this link gives access to.",
     "kindClient": "Client",
     "kindStaff": "Staff",
-    "staffLinkReady": "Link ready. Send it to your new {roles}."
+    "staffLinkReady": "Link ready. Send it to your new {roles}.",
+    "filterLabel": "Branches:",
+    "filterAll": "All",
+    "filterCount": "{count, plural, one {# branch} other {# branches}}",
+    "perBranch": "Per branch",
+    "perBranchHelp": "Each person counts at their home branch: where they trained most in the last 90 days, among the branches their package allows. People without one count only in the totals.",
+    "branch": "Branch",
+    "checkIns": "Check-ins",
+    "attended": "Attended classes",
+    "activeMemberships": "Active memberships",
+    "appliesTo": "Applies to",
+    "appliesToEachHelp": "A separate one is created at each branch you choose.",
+    "appliesToCoveringHelp": "One item, valid at the branches you choose.",
+    "createdClasses": "{count, plural, one {Created # class:} other {Created # classes:}}",
+    "createdSeries": "{count, plural, one {Created # class series:} other {Created # class series:}}",
+    "createdAppointmentSlots": "{count, plural, one {Created # appointment slot.} other {Created # appointment slots, one per branch.}}"
   }
 }

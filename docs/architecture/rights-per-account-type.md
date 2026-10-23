@@ -45,8 +45,11 @@ at a list of the business's locations. Branch-scoped staff act only on
 located things at their branches (classes, bookings, attendance, check-ins,
 doors, location settings, appointment slots, events, cleaning areas,
 machines) and lose the capabilities over the whole business
-(`LocationScopePolicy.organization_wide/0`: gym settings, packages,
-promotions, finance settings and reports, business analytics, clubs). An
+(`LocationScopePolicy.organization_wide/0`: gym settings, finance settings,
+clubs, lifecycle, platform subscription, granting admin). Reports follow a
+page branch filter, and packages, promotions and programme assignments are
+valid at chosen branches, edited only inside one's own (ADR-186 §7/§8).
+Seasons and referral programmes stay with all-branch staff. An
 admin with a branch scope is a **branch manager** («Υπεύθυνος
 καταστήματος»). Owners always work everywhere; members and athletes are not
 affected.

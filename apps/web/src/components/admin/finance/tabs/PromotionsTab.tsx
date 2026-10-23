@@ -17,6 +17,10 @@ import { CampaignPanel } from "@/components/admin/finance/panels/CampaignPanel";
 import { SidePanel } from "@/components/admin/finance/shared/SidePanel";
 import { SPARK_ACTIVE_STYLE, SPARK_CREATE_STYLE } from "@/lib/spark";
 import { DateInput } from "@/components/ui/DateInput";
+import { listAdminLocations } from "@/api/facility";
+import { AppliesToBranches, defaultAppliesTo, showsAppliesTo } from "@/components/admin/AppliesToBranches";
+import { membershipLocationScope, type LocationScope } from "@/lib/location-scope";
+import { useSelectedMembershipRole } from "@/lib/membership-role";
 
 function field(record: FinanceRecord | null | undefined, key: string, fallback = "") {
   const value = record?.[key];
@@ -59,6 +63,17 @@ export function PromotionsTab() {
   const openCampaign = campaigns.find((c) => field(c, "id") === openCampaignId) ?? null;
 
   const [form, setForm] = useState(BLANK);
+  // ADR-186 §8: «Ισχύει για» — one promotion valid at the chosen branches.
+  const { membership } = useSelectedMembershipRole();
+  const everywhere = membershipLocationScope(membership) === "all";
+  const locationsQuery = useQuery({
+    queryKey: ["admin", "locations"],
+    enabled: Boolean(token),
+    queryFn: () => listAdminLocations(token),
+  });
+  const manyBranches = showsAppliesTo(locationsQuery.data);
+  const [branchDraft, setBranchDraft] = useState<LocationScope | null>(null);
+  const branches: LocationScope = branchDraft ?? (everywhere ? "all" : defaultAppliesTo(locationsQuery.data));
 
   const createMutation = useMutation({
     mutationFn: () =>
@@ -66,9 +81,15 @@ export function PromotionsTab() {
         ...form,
         starts_on: form.starts_on || null,
         ends_on: form.ends_on || null,
+        ...(manyBranches
+          ? branches === "all"
+            ? { all_locations: true }
+            : { all_locations: false, location_ids: branches }
+          : {}),
       }),
     onSuccess: async () => {
       setForm(BLANK);
+      setBranchDraft(null);
       setParam("new", null);
       await queryClient.invalidateQueries({ queryKey: ["admin", "finance", "promotions"] });
     },
@@ -125,7 +146,7 @@ export function PromotionsTab() {
               <button
                 className="rounded-full px-5 py-2 text-sm font-semibold disabled:opacity-50"
                 style={{ background: "var(--text)", color: "var(--bg)" }}
-                disabled={createMutation.isPending || !form.name}
+                disabled={createMutation.isPending || !form.name || (manyBranches && branches !== "all" && branches.length === 0)}
                 onClick={() => createMutation.mutate()}
                 type="button"
               >
@@ -185,6 +206,7 @@ export function PromotionsTab() {
               />
               {i18n("activea733b80")}
             </label>
+            <AppliesToBranches kind="covering" locations={locationsQuery.data} value={branches} onChange={setBranchDraft} />
             {createMutation.error instanceof Error && (
               <p className="text-sm" style={{ color: "var(--primary-strong)" }}>{localizeError(createMutation.error, i18n)}</p>
             )}

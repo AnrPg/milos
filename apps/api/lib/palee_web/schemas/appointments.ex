@@ -64,6 +64,7 @@ defmodule PaleeWeb.Schemas.Appointments do
         duration_minutes: %Schema{type: :integer, minimum: 15, maximum: 240},
         capacity: %Schema{type: :integer, minimum: 1, maximum: 4},
         location_id: @nullable_uuid,
+        location_ids: PaleeWeb.Schemas.LocationScope.targets_schema(),
         notes: %Schema{type: :string, maxLength: 1000, nullable: true},
         mode: %Schema{type: :string, enum: ["in_person", "online"]},
         meeting_url: %Schema{type: :string, maxLength: 500, nullable: true}
