@@ -401,7 +401,11 @@ test.describe("Γύρω μου", () => {
     await expect(manage).toHaveCount(0);
 
     // Clearing everything and tapping the saved chip brings the combination back.
-    await sheet.getByRole("button", { name: "Καθαρισμός", exact: true }).click();
+    // (The row's ✕, not the sheet's footer: the dev-mode indicator covers the footer on a phone.)
+    await page.keyboard.press("Escape");
+    await expect(sheet).toHaveCount(0);
+    await page.getByRole("button", { name: "Καθαρισμός όλων των φίλτρων" }).click();
+    await page.getByRole("button", { name: "Φίλτρα", exact: true }).click();
     // With the alert on, the chip says so to screen readers too.
     const chip = saved.getByRole("button", { name: "ΣΚ κοντά (ειδοποιήσεις ενεργές)" });
     await expect(chip).toHaveAttribute("aria-pressed", "false");
