@@ -5516,7 +5516,7 @@
     "myClubsEmpty": "Δεν είσαι ακόμη μέλος σε κάποιο club.",
     "notifyLabel": "Ειδοποιήσεις",
     "myPostsTitle": "Οι αναρτήσεις μου",
-    "myPostsEmpty": "Δεν έχεις αναρτήσει ακόμη. Πάτα ⊕ στην Αρχική.",
+    "myPostsEmpty": "Δεν έχεις αναρτήσει ακόμη. Πάτα ⊕ στο Feed.",
     "channel": {
       "announcements": "ανακοινώσεις",
       "wod": "wod-σήμερα",
@@ -6774,7 +6774,7 @@
     "conversionLine": "Μετατροπή: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Τι δείχνει η Αρχική",
+    "scopeLabel": "Τι δείχνει το Feed",
     "scopeClubs": "Τα clubs μου",
     "scopeAround": "Γύρω μου",
     "loading": "Φόρτωση…",

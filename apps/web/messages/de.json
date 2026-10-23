@@ -5516,7 +5516,7 @@
     "myClubsEmpty": "Du bist noch in keinem Club Mitglied.",
     "notifyLabel": "Benachrichtigungen",
     "myPostsTitle": "Meine Beiträge",
-    "myPostsEmpty": "Du hast noch nichts gepostet. Tippe auf ⊕ in der Startseite.",
+    "myPostsEmpty": "Du hast noch nichts gepostet. Tippe im Feed auf ⊕.",
     "channel": {
       "announcements": "ankündigungen",
       "wod": "wod-heute",
@@ -6774,7 +6774,7 @@
     "conversionLine": "Konversion: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Was die Startseite zeigt",
+    "scopeLabel": "Was der Feed zeigt",
     "scopeClubs": "Meine Clubs",
     "scopeAround": "In der Nähe",
     "loading": "Wird geladen…",

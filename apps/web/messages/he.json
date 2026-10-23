@@ -5516,7 +5516,7 @@
     "myClubsEmpty": "אינך חבר עדיין באף מועדון.",
     "notifyLabel": "התראות",
     "myPostsTitle": "הפוסטים שלי",
-    "myPostsEmpty": "עוד לא פרסמת. הקש ⊕ בדף הבית.",
+    "myPostsEmpty": "עוד לא פרסמת. הקש ⊕ בפיד.",
     "channel": {
       "announcements": "הודעות",
       "wod": "אימון-היום",
@@ -6774,7 +6774,7 @@
     "conversionLine": "המרה: {rate}%"
   },
   "Around": {
-    "scopeLabel": "מה מוצג בבית",
+    "scopeLabel": "מה מוצג בפיד",
     "scopeClubs": "המועדונים שלי",
     "scopeAround": "סביבי",
     "loading": "טוען…",

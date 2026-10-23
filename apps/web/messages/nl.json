@@ -5516,7 +5516,7 @@
     "myClubsEmpty": "Je bent nog geen lid van een club.",
     "notifyLabel": "Meldingen",
     "myPostsTitle": "Mijn berichten",
-    "myPostsEmpty": "Je hebt nog niets geplaatst. Tik op ⊕ op Start.",
+    "myPostsEmpty": "Je hebt nog niets geplaatst. Tik op ⊕ in de feed.",
     "channel": {
       "announcements": "mededelingen",
       "wod": "wod-vandaag",
@@ -6774,7 +6774,7 @@
     "conversionLine": "Conversie: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Wat Start laat zien",
+    "scopeLabel": "Wat de feed laat zien",
     "scopeClubs": "Mijn clubs",
     "scopeAround": "In de buurt",
     "loading": "Laden…",

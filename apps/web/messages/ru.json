@@ -5516,7 +5516,7 @@
     "myClubsEmpty": "Вы пока не состоите ни в одном клубе.",
     "notifyLabel": "Уведомления",
     "myPostsTitle": "Мои публикации",
-    "myPostsEmpty": "Вы ещё ничего не публиковали. Нажмите ⊕ на Главной.",
+    "myPostsEmpty": "Вы ещё ничего не публиковали. Нажмите ⊕ в Ленте.",
     "channel": {
       "announcements": "объявления",
       "wod": "wod-сегодня",
@@ -6774,7 +6774,7 @@
     "conversionLine": "Конверсия: {rate}%"
   },
   "Around": {
-    "scopeLabel": "Что показывает Главная",
+    "scopeLabel": "Что показывает Лента",
     "scopeClubs": "Мои клубы",
     "scopeAround": "Рядом",
     "loading": "Загрузка…",

@@ -5460,8 +5460,7 @@
         "invalid_media": "The photo isn't ready. Pick it again."
       }
     },
-    "seasonChip": "{title} · {season}",
-    "myPostsEmpty": "You have not posted yet. Tap ⊕ on Feed."
+    "seasonChip": "{title} · {season}"
   },
   "Community": {
     "all": "All",
@@ -5517,7 +5516,7 @@
     "myClubsEmpty": "You are not a member of any club yet.",
     "notifyLabel": "Notifications",
     "myPostsTitle": "My posts",
-    "myPostsEmpty": "You have not posted yet. Tap ⊕ on Home.",
+    "myPostsEmpty": "You have not posted yet. Tap ⊕ on Feed.",
     "channel": {
       "announcements": "announcements",
       "wod": "wod-today",
@@ -6775,7 +6774,7 @@
     "conversionLine": "Conversion: {rate}%"
   },
   "Around": {
-    "scopeLabel": "What Home shows",
+    "scopeLabel": "What Feed shows",
     "scopeClubs": "My clubs",
     "scopeAround": "Around me",
     "loading": "Loading…",
