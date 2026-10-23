@@ -277,22 +277,73 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
   def analytics_summary(params) do
     params = string_key_map(params || %{})
     since = summary_since(params["days"])
+    # ADR-186 §7: a branch filter restricts people (`user_ids`, their home
+    # branch) and located facts (`location_ids`); absent, nothing is filtered.
+    users = list_or_nil(params["user_ids"])
+    locations = list_or_nil(params["location_ids"])
 
     %{
-      events: event_summary(since),
-      notification_clicks: notification_click_summary(since),
-      push_dispatch: push_dispatch_summary(since),
-      attendance: attendance_summary(since),
-      communication: communication_summary(since),
+      events: event_summary(since, users),
+      notification_clicks: notification_click_summary(since, users),
+      push_dispatch: push_dispatch_summary(since, users),
+      attendance: attendance_summary(since, locations),
+      communication: communication_summary(since, users),
       exercise_catalog: exercise_catalog_summary(),
-      team_workouts: team_workout_summary(since)
+      team_workouts: team_workout_summary(since, users)
     }
   end
 
-  defp event_summary(since) do
+  @impl true
+  def branch_activity(%DateTime{} = since) do
+    organization_id = RepoContext.current_setting("app.organization_id")
+
+    if is_binary(organization_id) do
+      org = Ecto.UUID.dump!(organization_id)
+
+      check_ins =
+        from(check_in in "facility_check_ins",
+          where:
+            check_in.organization_id == ^org and check_in.checked_in_at >= ^since and
+              not is_nil(check_in.location_id) and not is_nil(check_in.user_id),
+          group_by: [check_in.user_id, check_in.location_id],
+          select: {check_in.user_id, check_in.location_id, count(check_in.id)}
+        )
+        |> Repo.all()
+
+      attended =
+        from(record in "class_attendance_records",
+          join: class in "scheduled_classes",
+          on: class.id == record.scheduled_class_id,
+          where:
+            record.organization_id == ^org and record.status == "attended" and
+              class.scheduled_at >= ^since and not is_nil(class.location_id),
+          group_by: [record.user_id, class.location_id],
+          select: {record.user_id, class.location_id, count(record.id)}
+        )
+        |> Repo.all()
+
+      Enum.map(check_ins, fn {user, location, count} -> {load_uuid(user), load_uuid(location), count, 0} end) ++
+        Enum.map(attended, fn {user, location, count} -> {load_uuid(user), load_uuid(location), 0, count} end)
+    else
+      []
+    end
+  end
+
+  defp load_uuid(nil), do: nil
+  defp load_uuid(<<_::128>> = raw), do: Ecto.UUID.load!(raw)
+  defp load_uuid(value), do: value
+
+  defp list_or_nil(values) when is_list(values), do: values
+  defp list_or_nil(_values), do: nil
+
+  defp for_users(query, nil, _field), do: query
+  defp for_users(query, users, field), do: where(query, [row], field(row, ^field) in ^users)
+
+  defp event_summary(since, users) do
     rows =
       AnalyticsEvent
       |> scoped_to_tenant()
+      |> for_users(users, :user_id)
       |> where([event], event.occurred_at >= ^since)
       |> group_by([event], event.event_name)
       |> select([event], {event.event_name, count(event.id)})
@@ -305,20 +356,22 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
     }
   end
 
-  defp notification_click_summary(since) do
+  defp notification_click_summary(since, users) do
     total =
       NotificationClickEvent
       |> scoped_to_tenant()
+      |> for_users(users, :user_id)
       |> where([event], event.clicked_at >= ^since)
       |> Repo.aggregate(:count)
 
     %{since: since, total: total}
   end
 
-  defp push_dispatch_summary(since) do
+  defp push_dispatch_summary(since, users) do
     rows =
       PushDispatchAttempt
       |> scoped_to_tenant()
+      |> for_users(users, :user_id)
       |> where([attempt], attempt.attempted_at >= ^since)
       |> group_by([attempt], attempt.status)
       |> select([attempt], {attempt.status, count(attempt.id)})
@@ -327,10 +380,11 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
     %{since: since, by_status: Map.new(rows)}
   end
 
-  defp attendance_summary(since) do
+  defp attendance_summary(since, locations) do
     rows =
       AttendanceRecord
       |> scoped_to_tenant()
+      |> at_locations(locations)
       |> where([record], record.marked_at >= ^since)
       |> group_by([record], record.status)
       |> select([record], {record.status, count(record.id)})
@@ -339,10 +393,27 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
     %{since: since, by_status: Map.new(rows)}
   end
 
-  defp communication_summary(since) do
+  defp at_locations(query, nil), do: query
+
+  defp at_locations(query, locations) do
+    ids = Enum.map(locations, &Ecto.UUID.dump!/1)
+
+    classes =
+      from(class in "scheduled_classes", where: class.location_id in ^ids, select: class.id)
+
+    where(query, [record], record.scheduled_class_id in subquery(classes))
+  end
+
+  defp messages_of(query, nil), do: query
+
+  defp messages_of(query, users),
+    do: where(query, [message], message.sender_id in ^users or message.recipient_id in ^users)
+
+  defp communication_summary(since, users) do
     direction_rows =
       CommunicationMessage
       |> scoped_to_tenant()
+      |> messages_of(users)
       |> where([message], message.sent_at >= ^since)
       |> group_by([message], message.direction)
       |> select([message], {message.direction, count(message.id)})
@@ -351,6 +422,7 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
     channel_rows =
       CommunicationMessage
       |> scoped_to_tenant()
+      |> messages_of(users)
       |> where([message], message.sent_at >= ^since)
       |> group_by([message], message.channel)
       |> select([message], {message.channel, count(message.id)})
@@ -359,6 +431,7 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
     thread_rows =
       CommunicationThread
       |> scoped_to_tenant()
+      |> for_users(users, :created_by_id)
       |> group_by([thread], thread.status)
       |> select([thread], {thread.status, count(thread.id)})
       |> Repo.all()
@@ -381,11 +454,12 @@ defmodule Palee.Infrastructure.Analytics.EctoAnalyticsStore do
     }
   end
 
-  defp team_workout_summary(since) do
+  defp team_workout_summary(since, users) do
     rows =
       WorkoutExecution
       |> join(:inner, [e], w in MasterWorkout, on: e.master_workout_id == w.id)
       |> scoped_to_execution_tenant()
+      |> for_users(users, :user_id)
       |> where([e, _w], not is_nil(e.completed_at_utc) and e.completed_at_utc >= ^since)
       |> group_by([e, w], [e.user_id, w.is_team_workout])
       |> select([e, w], {e.user_id, w.is_team_workout, count(e.id)})

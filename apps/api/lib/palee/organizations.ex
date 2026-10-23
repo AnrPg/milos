@@ -913,6 +913,28 @@ defmodule Palee.Organizations do
     to: Palee.Organizations.Domain.LocationScopePolicy,
     as: :to_payload
 
+  @doc "The branches a report shows: requested ones inside the scope (ADR-186 §7)."
+  defdelegate report_filter(context, requested_ids),
+    to: Palee.Organizations.Domain.LocationScopePolicy
+
+  @doc "The `location_ids` a request names (list or comma-separated)."
+  defdelegate requested_location_ids(params),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :requested_ids
+
+  @doc "The branches a one-place item is created at, one item each (ADR-186 §8)."
+  defdelegate location_creation_targets(context, requested_ids, single_location_id),
+    to: Palee.Organizations.Domain.LocationScopePolicy,
+    as: :creation_targets
+
+  @doc "Whether an item valid at `target` (`:all` or ids) shows for a scope or filter."
+  defdelegate covering_visible?(scope_or_filter, target),
+    to: Palee.Organizations.Domain.LocationScopePolicy
+
+  @doc "`:ok` when an item valid at `target` lies inside the acting scope (ADR-186 §8)."
+  defdelegate authorize_covering(context, target),
+    to: Palee.Organizations.Domain.LocationScopePolicy
+
   @doc "Sets the branches someone works at (`:all` or parsed ids)."
   def set_membership_location_scope(context, user_id, scope),
     do: Palee.Organizations.Commands.SetMembershipLocationScope.call(context, user_id, scope)

@@ -78,6 +78,7 @@ defmodule PaleeWeb.AdminFinanceController do
     required: true,
     schema: %Schema{type: :string, format: :uuid}
   }
+  @location_ids_parameter PaleeWeb.Schemas.LocationScope.filter_parameter()
   @request_body %RequestBody{
     required: true,
     content: %{"application/json" => %MediaType{schema: @open_object}}
@@ -632,11 +633,12 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:summary,
     summary: "Fetch finance analytics summary",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Finance summary", "application/json", @open_object}]
   )
 
-  def summary(conn, _params) do
-    with {:ok, payload} <- GetAdminFinanceSummary.call() do
+  def summary(conn, params) do
+    with {:ok, payload} <- GetAdminFinanceSummary.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end
@@ -654,11 +656,13 @@ defmodule PaleeWeb.AdminFinanceController do
 
   operation(:operational_queues,
     summary: "Fetch operational finance queues",
+    parameters: [@location_ids_parameter],
     responses: [ok: {"Operational finance queues", "application/json", @open_object}]
   )
 
   def operational_queues(conn, params) do
-    with {:ok, payload} <- GetFinanceOperationalQueues.call(params) do
+    with {:ok, payload} <-
+           GetFinanceOperationalQueues.call(conn.assigns.tenant_context, params) do
       json(conn, payload)
     end
   end

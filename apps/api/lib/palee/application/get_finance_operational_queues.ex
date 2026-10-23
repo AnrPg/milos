@@ -1,4 +1,5 @@
 defmodule Palee.Application.GetFinanceOperationalQueues do
+  alias Palee.Application.BranchReport
   alias Palee.{Finance, Identity}
 
   def call(params \\ %{}) do
@@ -6,6 +7,17 @@ defmodule Palee.Application.GetFinanceOperationalQueues do
     users = user_map(queues)
 
     {:ok, %{queues: enrich_queues(queues, users)}}
+  end
+
+  @doc "ADR-186 §7: the queues of the people of the filtered branches."
+  def call(context, params) do
+    params = Map.new(params || %{}, fn {key, value} -> {to_string(key), value} end)
+    report = BranchReport.resolve(context, params)
+    queues = Finance.operational_queues(context, BranchReport.scope_params(params, report))
+    users = user_map(queues)
+
+    {:ok,
+     %{queues: enrich_queues(queues, users), branch_filter: BranchReport.filter_payload(report)}}
   end
 
   defp enrich_queues(queues, users) do

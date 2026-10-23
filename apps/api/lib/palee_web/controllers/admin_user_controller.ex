@@ -492,7 +492,8 @@ defmodule PaleeWeb.AdminUserController do
         description:
           "Also list active members (who may receive personal programming when their package allows it).",
         schema: %Schema{type: :boolean, default: false}
-      }
+      },
+      PaleeWeb.Schemas.LocationScope.filter_parameter()
     ],
     responses: [
       ok:
@@ -1081,7 +1082,10 @@ defmodule PaleeWeb.AdminUserController do
   end
 
   def index_athletes(conn, params) do
-    opts = [include_members: truthy?(params["include_members"] || params[:include_members])]
+    opts = [
+      include_members: truthy?(params["include_members"] || params[:include_members]),
+      location_ids: Palee.Organizations.requested_location_ids(params)
+    ]
 
     case ListAthletes.call(conn.assigns.tenant_context, params["q"] || params[:q], opts) do
       {:error, reason} -> {:error, reason}

@@ -36,7 +36,8 @@ defmodule Palee.Execution.ExecutionStore do
   def list_executions_for_coaching(user_id), do: adapter().list_executions_for_coaching(user_id)
 
   @impl true
-  def list_executions_for_kpis(since), do: adapter().list_executions_for_kpis(since)
+  def list_executions_for_kpis(since, user_ids \\ nil),
+    do: adapter().list_executions_for_kpis(since, user_ids)
 
   @impl true
   def list_stale_executions(started_before, started_after, limit),

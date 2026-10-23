@@ -14,5 +14,8 @@ defmodule Palee.Coaching.CoachingStore do
   def get_aggregates, do: adapter().get_aggregates()
 
   @impl true
+  def get_aggregates_for_users(user_ids), do: adapter().get_aggregates_for_users(user_ids)
+
+  @impl true
   def refresh_aggregates, do: adapter().refresh_aggregates()
 end

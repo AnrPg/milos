@@ -134,6 +134,8 @@ defmodule Palee.Finance.FinanceStore do
   @impl true
   def financial_summary(params), do: adapter().financial_summary(params)
   @impl true
+  def package_location_scopes, do: adapter().package_location_scopes()
+  @impl true
   def create_promotion_campaign(params), do: adapter().create_promotion_campaign(params)
   @impl true
   def list_promotion_campaigns, do: adapter().list_promotion_campaigns()

@@ -198,17 +198,22 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
   def injury_summary(filters) do
     filters = string_key_map(filters || %{})
     since = summary_since(filters["days"])
+    # ADR-186 §7: a branch filter arrives as the people whose home branch it is.
+    users = if is_list(filters["user_ids"]), do: filters["user_ids"]
 
     %{
       since: since,
-      total: count_injuries(since),
-      active_count: count_status("active", since),
-      healed_count: count_status("healed", since),
-      by_body_area: count_injuries_by(:body_area, since),
-      by_severity: count_injuries_by(:severity, since),
-      by_status: count_injuries_by(:status, since)
+      total: count_injuries(since, users),
+      active_count: count_status("active", since, users),
+      healed_count: count_status("healed", since, users),
+      by_body_area: count_injuries_by(:body_area, since, users),
+      by_severity: count_injuries_by(:severity, since, users),
+      by_status: count_injuries_by(:status, since, users)
     }
   end
+
+  defp injuries_of(query, nil), do: query
+  defp injuries_of(query, users), do: where(query, [injury], injury.user_id in ^users)
 
   defp maybe_filter(query, _field, value) when value in [nil, "", "all"], do: query
 
@@ -281,9 +286,10 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
     Map.new(params, fn {key, value} -> {to_string(key), value} end)
   end
 
-  defp count_injuries(since) do
+  defp count_injuries(since, users) do
     InjuryReport
     |> scoped_to_tenant()
+    |> injuries_of(users)
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
   end
@@ -301,17 +307,19 @@ defmodule Palee.Infrastructure.Wellbeing.EctoWellbeingStore do
 
   defp validate_healing(_injury_report, _healed_on), do: :ok
 
-  defp count_status(status, since) do
+  defp count_status(status, since, users) do
     InjuryReport
     |> scoped_to_tenant()
+    |> injuries_of(users)
     |> where([injury], injury.status == ^status)
     |> where([injury], injury.inserted_at >= ^since)
     |> Repo.aggregate(:count)
   end
 
-  defp count_injuries_by(field, since) do
+  defp count_injuries_by(field, since, users) do
     InjuryReport
     |> scoped_to_tenant()
+    |> injuries_of(users)
     |> where([injury], injury.inserted_at >= ^since)
     |> group_by([injury], field(injury, ^field))
     |> select([injury], {field(injury, ^field), count(injury.id)})

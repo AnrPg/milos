@@ -200,7 +200,8 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
   end
 
   @impl true
-  def list_executions_for_kpis(%DateTime{} = since) do
+  # ADR-186 §7: `user_ids` (the people of a branch filter) narrows the report.
+  def list_executions_for_kpis(%DateTime{} = since, user_ids) do
     case RepoContext.current_setting("app.organization_id") do
       organization_id when is_binary(organization_id) ->
         WorkoutExecution
@@ -208,6 +209,11 @@ defmodule Palee.Infrastructure.Execution.EctoExecutionStore do
           [execution],
           execution.organization_id == ^organization_id and execution.started_at_utc >= ^since
         )
+        |> then(fn query ->
+          if is_list(user_ids),
+            do: where(query, [execution], execution.user_id in ^user_ids),
+            else: query
+        end)
         |> select([execution], %{
           status: execution.status,
           completed_at_utc: execution.completed_at_utc,
