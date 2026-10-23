@@ -636,3 +636,9 @@ msgstr "הסיסמה שלך אופסה"
 
 msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr "הסיסמה שלך שונתה באמצעות קישור איפוס או קוד שחזור, וכל המכשירים נותקו מהחשבון. אם זה לא היית את/ה, פנה/י למכון שלך או לתמיכה של Palee."
+
+msgid "Your demo business is waiting for you"
+msgstr "העסק לדוגמה שלך מחכה לך"
+
+msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
+msgstr "אף אחד לא השתמש ב-%{business} כבר זמן מה. אם אף אחד לא יפתח אותו ב-%{days} הימים הקרובים, נתוני הדוגמה שלו יימחקו והוא יועבר לארכיון. אפשר לפתוח אותו מחדש בכל עת."

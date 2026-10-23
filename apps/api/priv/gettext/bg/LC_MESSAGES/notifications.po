@@ -636,3 +636,9 @@ msgstr "Паролата ти беше нулирана"
 
 msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
 msgstr "Паролата ти беше сменена чрез линк за нулиране или код за възстановяване и всички устройства бяха отписани. Ако не си бил ти, свържи се с залата си или с поддръжката на Palee."
+
+msgid "Your demo business is waiting for you"
+msgstr "Демо бизнесът ти те очаква"
+
+msgid "Nobody has used %{business} for a while. If nobody opens it in the next %{days} days, its demo data is removed and it is archived. You can reopen it any time."
+msgstr "Никой не е използвал %{business} от известно време. Ако никой не го отвори в следващите %{days} дни, демо данните му ще бъдат премахнати и той ще бъде архивиран. Можеш да го отвориш отново по всяко време."

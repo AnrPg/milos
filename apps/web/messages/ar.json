@@ -4453,7 +4453,9 @@
     "apiErrorInvalidActivationRole": "اختر المالك أو المسؤول.",
     "apiErrorInvalidActivationLifetime": "تدوم صلاحية الرابط بين ساعة و30 يومًا.",
     "apiErrorAccountNotFound": "لا يوجد حساب مطابق.",
-    "apiErrorUnknownDemoSection": "لا توجد بيانات تجريبية لهذه الشاشة."
+    "apiErrorUnknownDemoSection": "لا توجد بيانات تجريبية لهذه الشاشة.",
+    "ntfBusinessDemoIdleTitle": "نشاطك التجريبي بانتظارك",
+    "ntfBusinessDemoIdleBody": "لم يستخدم أحد {business} منذ فترة. إذا لم يفتحه أحد خلال {days} يومًا القادمة، ستُحذف بياناته التجريبية ويُؤرشف. يمكنك إعادة فتحه في أي وقت."
   },
   "PrSharing": {
     "gymLabel": "أين حققت هذا الرقم القياسي؟",
@@ -9615,7 +9617,12 @@
       "send": "إرسال الطلب",
       "sending": "جارٍ الإرسال…",
       "sent": "أُرسل الطلب. سيعود إليك فريق Palee.",
-      "cancel": "سحب الطلب"
+      "cancel": "سحب الطلب",
+      "archivedTitle": "نسخة تجريبية مؤرشفة",
+      "archivedBody": "أُرشفت في {date} لأن أحدًا لم يستخدمها منذ فترة. أعد فتحها كنسخة تجريبية فارغة متى شئت.",
+      "reopen": "إعادة الفتح",
+      "reopening": "جارٍ الفتح…",
+      "reopened": "أُعيد فتحها. عادت إلى أنشطتك، فارغة، وتلقى فريق Palee طلب التفعيل الخاص بك."
     },
     "requestKind": {
       "conversion": "حساب أعمال",

@@ -112,6 +112,40 @@ defmodule PaleeWeb.Schemas.BusinessAccounts do
     }
   end
 
+  def archived_demos do
+    %Schema{
+      title: "BusinessArchivedDemos",
+      type: :object,
+      properties: %{
+        businesses: %Schema{
+          type: :array,
+          items: %Schema{
+            title: "BusinessArchivedDemo",
+            type: :object,
+            properties: %{
+              id: @uuid,
+              slug: %Schema{type: :string},
+              name: %Schema{type: :string},
+              provider_kind: @business_kind,
+              demo_archived_at: @time
+            },
+            required: [:id, :slug, :name, :provider_kind, :demo_archived_at]
+          }
+        }
+      },
+      required: [:businesses]
+    }
+  end
+
+  def reopened_demo do
+    %Schema{
+      title: "BusinessReopenedDemo",
+      type: :object,
+      properties: %{organization: business_organization(), request: request()},
+      required: [:organization, :request]
+    }
+  end
+
   def demo_status do
     %Schema{
       title: "BusinessDemoStatus",

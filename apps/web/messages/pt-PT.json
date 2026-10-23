@@ -4453,7 +4453,9 @@
     "apiErrorInvalidActivationRole": "Escolhe proprietário ou administrador.",
     "apiErrorInvalidActivationLifetime": "Um link dura entre uma hora e 30 dias.",
     "apiErrorAccountNotFound": "Nenhuma conta corresponde.",
-    "apiErrorUnknownDemoSection": "Não há dados de demonstração para este ecrã."
+    "apiErrorUnknownDemoSection": "Não há dados de demonstração para este ecrã.",
+    "ntfBusinessDemoIdleTitle": "O teu negócio de demonstração está à tua espera",
+    "ntfBusinessDemoIdleBody": "Ninguém usa {business} há algum tempo. Se ninguém o abrir nos próximos {days} dias, os dados de demonstração serão removidos e será arquivado. Podes reabri-lo quando quiseres."
   },
   "PrSharing": {
     "gymLabel": "Onde fizeste este PR?",
@@ -9615,7 +9617,12 @@
       "send": "Enviar pedido",
       "sending": "A enviar…",
       "sent": "Pedido enviado. A equipa Palee vai responder-te.",
-      "cancel": "Retirar pedido"
+      "cancel": "Retirar pedido",
+      "archivedTitle": "Demonstração arquivada",
+      "archivedBody": "Arquivada a {date} porque ninguém a usou durante algum tempo. Reabre-a como demonstração vazia quando quiseres.",
+      "reopen": "Reabrir",
+      "reopening": "A reabrir…",
+      "reopened": "Reaberta. Está outra vez nos teus negócios, vazia, e a equipa Palee tem o teu pedido de ativação."
     },
     "requestKind": {
       "conversion": "Conta empresarial",

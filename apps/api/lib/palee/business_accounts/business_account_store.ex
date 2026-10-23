@@ -63,6 +63,37 @@ defmodule Palee.BusinessAccounts.BusinessAccountStore do
 
   def deletable_sources, do: impl().deletable_sources()
 
+  # Abandoned demos. The acting owner or admin touches and reopens; the
+  # sweep runs as a system session of the demo itself.
+  def touch_demo_activity(%{user_id: _} = scope, organization_id, now, interval_seconds),
+    do:
+      RepoContext.run(scope, fn ->
+        impl().touch_demo_activity(organization_id, now, interval_seconds)
+      end)
+
+  def idle_demo_organizations(before), do: impl().idle_demo_organizations(before)
+
+  def claim_demo_reminder(%{organization_id: organization_id} = scope, before, now),
+    do:
+      RepoContext.run(scope, fn ->
+        impl().claim_demo_reminder(organization_id, before, now)
+      end)
+
+  def mark_demo_archived(%{organization_id: organization_id} = scope, before, reminded, now),
+    do:
+      RepoContext.run(scope, fn ->
+        impl().mark_demo_archived(organization_id, before, reminded, now)
+      end)
+
+  def close_demo_activation(%{organization_id: organization_id} = scope, now),
+    do: RepoContext.run(scope, fn -> impl().close_demo_activation(organization_id, now) end)
+
+  def list_archived_demos(%{user_id: _} = scope),
+    do: RepoContext.run(scope, fn -> impl().list_archived_demos() end)
+
+  def reopen_demo_business(%{user_id: _} = scope, organization_id, now),
+    do: RepoContext.run(scope, fn -> impl().reopen_demo_business(organization_id, now) end)
+
   defp impl,
     do:
       Application.get_env(

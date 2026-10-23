@@ -14,6 +14,9 @@ export type BusinessAccountsQueue = components["schemas"]["BusinessAccountsQueue
 export type BusinessRequestDecision = components["schemas"]["BusinessRequestDecision"];
 export type BusinessActivationPreview = components["schemas"]["BusinessActivationPreview"];
 export type BusinessActivationResult = components["schemas"]["BusinessActivationResult"];
+export type BusinessArchivedDemos = components["schemas"]["BusinessArchivedDemos"];
+export type BusinessArchivedDemo = BusinessArchivedDemos["businesses"][number];
+export type BusinessReopenedDemo = components["schemas"]["BusinessReopenedDemo"];
 export type BusinessKind = BusinessRequest["business_kind"];
 export type ActivationRole = BusinessActivationLink["role"];
 export type DemoSection = "members" | "schedule" | "finance" | "workouts";
@@ -30,6 +33,7 @@ export const BUSINESS_KINDS: BusinessKind[] = ["gym", "coach"];
 export const DEMO_SECTIONS: DemoSection[] = ["members", "schedule", "finance", "workouts"];
 export const ADMIN_BUSINESS_KEY = ["admin", "business"] as const;
 export const MY_BUSINESS_REQUESTS_KEY = ["me", "business-requests"] as const;
+export const MY_ARCHIVED_DEMOS_KEY = ["me", "archived-demos"] as const;
 export const PLATFORM_BUSINESS_KEY = ["platform", "business-accounts"] as const;
 
 export function isBusinessNotActivated(error: unknown) {
@@ -70,6 +74,20 @@ export function requestConversion(token: string, body: BusinessDetails) {
 
 export function cancelBusinessRequest(token: string, id: string) {
   return apiRequest<BusinessRequest>(`/me/business-requests/${encodeURIComponent(id)}/cancel`, {
+    method: "POST",
+    token,
+    scope: "account",
+  });
+}
+
+/** ADR-184 follow-up: the person's demo businesses archived for inactivity. */
+export function fetchArchivedDemos(token: string) {
+  return apiRequest<BusinessArchivedDemos>("/me/archived-demos", { token, scope: "account" });
+}
+
+/** Reopens an archived demo: empty, in demo mode, with a new activation request. */
+export function reopenArchivedDemo(token: string, id: string) {
+  return apiRequest<BusinessReopenedDemo>(`/me/archived-demos/${encodeURIComponent(id)}/reopen`, {
     method: "POST",
     token,
     scope: "account",

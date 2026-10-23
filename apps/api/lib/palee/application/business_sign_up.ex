@@ -11,7 +11,7 @@ defmodule Palee.Application.BusinessSignUp do
   (`Application.BusinessRequests`).
   """
 
-  alias Palee.Application.{StartCoachPractice, TenantDefaults}
+  alias Palee.Application.{AbandonedDemos, StartCoachPractice, TenantDefaults}
   alias Palee.{BusinessAccounts, Identity, Organizations}
 
   def call(account, params, now \\ DateTime.utc_now()) when is_map(params) do
@@ -23,8 +23,20 @@ defmodule Palee.Application.BusinessSignUp do
     end
   end
 
-  @doc "Creates the demo business for `account` and queues its activation request."
+  @doc """
+  Creates the demo business for `account` and queues its activation request.
+  An account whose demo of this kind was archived for inactivity gets that
+  one back, empty (`AbandonedDemos.reopen_for_kind/3`).
+  """
   def create(account, details, timezone \\ nil, locale \\ "el") do
+    case AbandonedDemos.reopen_for_kind(account, details.business_kind, details) do
+      {:ok, %{organization: organization}} -> {:ok, organization}
+      :none -> open(account, details, timezone, locale)
+      error -> error
+    end
+  end
+
+  defp open(account, details, timezone, locale) do
     BusinessAccounts.transaction(fn ->
       with {:ok, organization} <-
              Organizations.create_business_account(
