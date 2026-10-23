@@ -5,7 +5,7 @@ defmodule Palee.Infrastructure.Community.EctoEventStore do
 
   import Ecto.Query
 
-  alias Palee.Community.{Event, EventAttendee}
+  alias Palee.Community.{Event, EventAttendee, EventCohost, EventViewDay, EventViewMark}
   alias Palee.Repo
 
   # Events ---------------------------------------------------------------------
@@ -231,4 +231,254 @@ defmodule Palee.Infrastructure.Community.EctoEventStore do
     |> Repo.update_all(set: [converted_at: at, updated_at: at])
     |> elem(0)
   end
+
+  # ADR-185: rate limits ---------------------------------------------------------
+
+  @impl true
+  def creation_counts(%{organization_id: organization_id}, since, now) do
+    created =
+      Event
+      |> where([e], e.organization_id == ^organization_id and e.inserted_at >= ^since)
+      |> select([e], count(fragment("DISTINCT COALESCE(?, ?)", e.series_id, e.id)))
+      |> Repo.one()
+
+    upcoming =
+      Event
+      |> where(
+        [e],
+        e.organization_id == ^organization_id and is_nil(e.cancelled_at) and e.ends_at > ^now
+      )
+      |> select([e], count(e.id))
+      |> Repo.one()
+
+    %{created_last_day: created || 0, upcoming: upcoming || 0}
+  end
+
+  # ADR-185: co-hosts, the host's side (tenant rows) ----------------------------------
+
+  @impl true
+  def list_cohosts(_context, []), do: []
+
+  def list_cohosts(_context, event_ids) do
+    EventCohost
+    |> where([c], c.event_id in ^event_ids)
+    |> order_by([c], asc: c.inserted_at, asc: c.id)
+    |> Repo.all()
+  end
+
+  @impl true
+  def get_cohost(_context, id) do
+    case Ecto.UUID.cast(id) do
+      {:ok, id} -> Repo.get(EventCohost, id)
+      :error -> nil
+    end
+  end
+
+  @impl true
+  def insert_cohost(_context, attrs),
+    do: attrs |> EventCohost.create_changeset() |> Repo.insert()
+
+  @impl true
+  def update_cohost(_context, cohost, attrs),
+    do: cohost |> EventCohost.status_changeset(attrs) |> Repo.update()
+
+  # ADR-185: co-hosts, the co-host's side (definer functions, ADR-131 §2) ------------
+
+  @request_keys ~w(id event_id host_organization_id status invited_by_id inserted_at
+                   responded_at trial_offer_sent_at title starts_at ends_at time_zone
+                   cancelled_at series_id audience created_by_id host_name host_slug
+                   host_kind)a
+  @request_ids ~w(id event_id host_organization_id invited_by_id series_id created_by_id)a
+  @request_times ~w(inserted_at responded_at trial_offer_sent_at starts_at ends_at cancelled_at)a
+
+  @impl true
+  def cohost_requests(_context, organization_id) do
+    with {:ok, id} <- dump(organization_id) do
+      %{rows: rows} =
+        Repo.query!(
+          "SELECT #{Enum.join(@request_keys, ", ")} FROM palee_event_cohost_requests($1)",
+          [id]
+        )
+
+      Enum.map(rows, &row(@request_keys, &1, @request_ids, @request_times))
+    else
+      :error -> []
+    end
+  end
+
+  @impl true
+  def respond_cohost(_context, id, status, now) do
+    with {:ok, id} <- dump(id) do
+      %{rows: rows} =
+        Repo.query!(
+          "SELECT id, event_id, organization_id, status FROM palee_respond_event_cohost($1, $2, $3)",
+          [id, status, naive(now)]
+        )
+
+      Enum.map(
+        rows,
+        &row(~w(id event_id organization_id status)a, &1, ~w(id event_id organization_id)a, [])
+      )
+    else
+      :error -> []
+    end
+  end
+
+  @impl true
+  def accepted_cohosts(_context, event_ids, cohost_ids) do
+    %{rows: rows} =
+      Repo.query!(
+        "SELECT event_id, host_organization_id, cohost_organization_id FROM palee_accepted_event_cohosts($1, $2)",
+        [dump_all(event_ids), dump_all(cohost_ids)]
+      )
+
+    keys = ~w(event_id host_organization_id cohost_organization_id)a
+    Enum.map(rows, &row(keys, &1, keys, []))
+  end
+
+  @impl true
+  def cohosted_by?(_context, event_id, organization_id) do
+    with {:ok, event_id} <- dump(event_id),
+         {:ok, organization_id} <- dump(organization_id) do
+      %{rows: [[answer]]} =
+        Repo.query!("SELECT palee_event_cohosted_by($1, $2)", [event_id, organization_id])
+
+      answer == true
+    else
+      :error -> false
+    end
+  end
+
+  @facts_keys ~w(event_id host_organization_id cohost_organization_id status club_id title
+                 starts_at ends_at time_zone cancelled_at trial_offer_sent_at came_user_ids)a
+
+  @impl true
+  def cohost_trial_offer_facts(_context, id) do
+    with {:ok, id} <- dump(id),
+         %{rows: [row]} <-
+           Repo.query!(
+             "SELECT #{Enum.join(@facts_keys, ", ")} FROM palee_cohost_trial_offer_facts($1)",
+             [id]
+           ) do
+      @facts_keys
+      |> row(
+        row,
+        ~w(event_id host_organization_id cohost_organization_id club_id)a,
+        ~w(starts_at ends_at cancelled_at trial_offer_sent_at)a
+      )
+      |> Map.update!(:came_user_ids, fn ids -> Enum.map(ids || [], &Ecto.UUID.load!/1) end)
+    else
+      _none -> nil
+    end
+  end
+
+  @impl true
+  def claim_cohost_trial_offer(_context, id, now) do
+    with {:ok, id} <- dump(id) do
+      %{rows: [[claimed]]} =
+        Repo.query!("SELECT palee_claim_cohost_trial_offer($1, $2)", [id, naive(now)])
+
+      claimed == true
+    else
+      :error -> false
+    end
+  end
+
+  # ADR-185: views -------------------------------------------------------------------
+
+  @impl true
+  def record_view(%{organization_id: organization_id}, event_id, day, viewer_key) do
+    Repo.transaction(fn ->
+      # Yesterday's marks are no longer needed to dedupe anyone.
+      EventViewMark
+      |> where([m], m.event_id == ^event_id and m.day < ^day)
+      |> Repo.delete_all()
+
+      {new_viewer, _rows} =
+        Repo.insert_all(
+          EventViewMark,
+          [
+            %{
+              organization_id: organization_id,
+              event_id: event_id,
+              day: day,
+              viewer_key: viewer_key
+            }
+          ],
+          on_conflict: :nothing,
+          conflict_target: [:event_id, :day, :viewer_key]
+        )
+
+      Repo.insert_all(
+        EventViewDay,
+        [
+          %{
+            organization_id: organization_id,
+            event_id: event_id,
+            day: day,
+            views: 1,
+            viewers: new_viewer
+          }
+        ],
+        on_conflict: [inc: [views: 1, viewers: new_viewer]],
+        conflict_target: [:event_id, :day]
+      )
+    end)
+
+    :ok
+  end
+
+  @impl true
+  def view_totals(_context, []), do: %{}
+
+  def view_totals(_context, event_ids) do
+    EventViewDay
+    |> where([v], v.event_id in ^event_ids)
+    |> group_by([v], v.event_id)
+    |> select([v], {v.event_id, sum(v.views), sum(v.viewers)})
+    |> Repo.all()
+    |> Map.new(fn {id, views, viewers} ->
+      {id, %{views: to_int(views), viewers: to_int(viewers)}}
+    end)
+  end
+
+  @impl true
+  def empty_organiser_organization_ids(_context, before) do
+    %{rows: rows} =
+      Repo.query!("SELECT id FROM palee_empty_organiser_organization_ids($1) AS id", [
+        naive(before)
+      ])
+
+    Enum.map(rows, fn [id] -> Ecto.UUID.load!(id) end)
+  end
+
+  defp row(keys, values, id_keys, time_keys) do
+    keys
+    |> Enum.zip(values)
+    |> Map.new(fn {key, value} ->
+      cond do
+        key in id_keys and is_binary(value) -> {key, Ecto.UUID.load!(value)}
+        key in time_keys and match?(%NaiveDateTime{}, value) -> {key, utc(value)}
+        true -> {key, value}
+      end
+    end)
+  end
+
+  defp utc(%NaiveDateTime{} = value), do: DateTime.from_naive!(value, "Etc/UTC")
+
+  defp naive(%DateTime{} = at), do: at |> DateTime.shift_zone!("Etc/UTC") |> DateTime.to_naive()
+  defp naive(%NaiveDateTime{} = at), do: at
+
+  defp dump(id) when is_binary(id), do: Ecto.UUID.dump(id)
+  defp dump(_id), do: :error
+
+  defp dump_all(nil), do: nil
+  defp dump_all(ids), do: Enum.flat_map(ids, &List.wrap(elem_ok(dump(&1))))
+
+  defp elem_ok({:ok, value}), do: value
+  defp elem_ok(:error), do: nil
+
+  defp to_int(nil), do: 0
+  defp to_int(%Decimal{} = value), do: Decimal.to_integer(value)
+  defp to_int(value) when is_integer(value), do: value
 end

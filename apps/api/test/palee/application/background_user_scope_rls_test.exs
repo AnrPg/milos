@@ -487,7 +487,7 @@ defmodule Palee.Application.BackgroundUserScopeRLSTest do
             })
 
           {:ok, _renamed} =
-            Palee.Identity.update_profile(sender.id, %{nickname: new_nickname})
+            Palee.Identity.update_profile(sender.id, %{display_name: new_nickname})
 
           recipient
         end)

@@ -54,6 +54,8 @@ type SessionContextValue = {
   signUpAdmin: (payload: AdminRegisterRequest) => Promise<CurrentUser>;
   signUpInvited: (payload: InvitedRegisterRequest) => Promise<CurrentUser>;
   rotate: () => Promise<void>;
+  /** ADR-187: takes over a session issued for another profile of the same login. */
+  switchSession: (issuedTokens: AuthTokens) => Promise<CurrentUser>;
   signOut: () => void;
 };
 
@@ -157,6 +159,16 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
 
   async function signUpInvited(payload: InvitedRegisterRequest) {
     const issuedTokens = await registerInvitedUser(payload);
+    return establishSession(issuedTokens);
+  }
+
+  // Another profile is another person to the app: drop what belonged to the
+  // previous one (live socket, chosen gym) before committing the new session.
+  async function switchSession(issuedTokens: AuthTokens) {
+    resetRealtimeSocket();
+    try {
+      window.localStorage.removeItem(SELECTED_ORGANIZATION_SLUG_KEY);
+    } catch {}
     return establishSession(issuedTokens);
   }
 
@@ -288,6 +300,7 @@ export function SessionProvider({ children }: { children: React.ReactNode }) {
         signUpAdmin,
         signUpInvited,
         rotate,
+        switchSession,
         signOut,
       }}
     >

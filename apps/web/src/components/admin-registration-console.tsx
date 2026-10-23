@@ -16,7 +16,11 @@ import { rememberSelectedOrganization } from "@/lib/organization-slug";
 
 type FieldErrors = Record<string, string[]>;
 
-const INITIAL_FORM: AdminRegisterRequest = {
+// ADR-187: the admin form still types one name, sent as the handle (the
+// display name defaults to it).
+type AdminRegisterForm = AdminRegisterRequest & { nickname: string };
+
+const INITIAL_FORM: AdminRegisterForm = {
   nickname: "",
   password: "",
   email: "",
@@ -49,7 +53,7 @@ export function AdminRegistrationConsole() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { signUpAdmin, status } = useSession();
-  const [form, setForm] = useState<AdminRegisterRequest>(() => ({
+  const [form, setForm] = useState<AdminRegisterForm>(() => ({
     ...INITIAL_FORM,
     invitation_token: searchParams.get("token") ?? "",
   }));

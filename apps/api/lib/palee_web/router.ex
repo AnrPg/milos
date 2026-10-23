@@ -126,6 +126,11 @@ defmodule PaleeWeb.Router do
     plug(PaleeWeb.Plugs.RateLimit, max: 30, interval: 60_000, bucket: "geocode")
   end
 
+  # ADR-185: new events from the member app («Διοργάνωση ως»).
+  pipeline :event_create_rate_limited do
+    plug(PaleeWeb.Plugs.RateLimit, max: 10, interval: 3_600_000, bucket: "event-create")
+  end
+
   # ADR-154: Γύρω μου searches run several indexed queries (and may geocode
   # a typed place); a generous budget that still bounds scraping.
   pipeline :around_rate_limited do
@@ -320,6 +325,8 @@ defmodule PaleeWeb.Router do
     pipe_through([:api, :auth_rate_limited])
 
     get("/nickname-available", AuthController, :nickname_available)
+    get("/handle-available", AuthController, :handle_available)
+    get("/handle-suggestion", AuthController, :handle_suggestion)
     post("/register", AuthController, :register)
     post("/register-member", AuthController, :register_member)
     post("/register-admin", AuthController, :register_admin)
@@ -328,6 +335,10 @@ defmodule PaleeWeb.Router do
     post("/login", AuthController, :login)
     post("/refresh", AuthController, :refresh)
     post("/logout", AuthController, :logout)
+    # ADR-187: password recovery without a mail service.
+    post("/password-reset-requests", PasswordRecoveryController, :request)
+    post("/password-reset", PasswordRecoveryController, :complete)
+    post("/password-reset/recovery-code", PasswordRecoveryController, :redeem_code)
   end
 
   scope "/api/auth", PaleeWeb do
@@ -335,6 +346,26 @@ defmodule PaleeWeb.Router do
 
     get("/me", AuthController, :me)
     post("/sign-out-all", AuthController, :sign_out_all)
+    # ADR-187: the login's up to three profiles.
+    get("/profiles", AccountProfilesController, :index)
+    post("/profiles", AccountProfilesController, :create)
+    post("/switch-profile", AccountProfilesController, :switch)
+    get("/recovery-codes", PasswordRecoveryController, :codes_status)
+    post("/recovery-codes", PasswordRecoveryController, :generate_codes)
+  end
+
+  # ADR-187: the password reset requests the signed-in person can handle
+  # (vendor, box owner/admin/front desk, the person's coach).
+  scope "/api/password-resets", PaleeWeb do
+    pipe_through([:api, :authenticated, :authenticated_rate_limited])
+
+    get("/", PasswordRecoveryController, :inbox)
+    post("/:id/claim", PasswordRecoveryController, :claim)
+    post("/:id/release", PasswordRecoveryController, :release)
+    post("/:id/link", PasswordRecoveryController, :issue_link)
+    post("/:id/reject", PasswordRecoveryController, :reject)
+    post("/:id/dismiss", PasswordRecoveryController, :dismiss)
+    post("/:id/hide", PasswordRecoveryController, :hide)
   end
 
   scope "/api", PaleeWeb do
@@ -875,6 +906,38 @@ defmodule PaleeWeb.Router do
     )
 
     delete("/community/events/:id/attendees/:user_id", AdminCommunityEventController, :remove)
+    # ADR-185: the organiser console (refunds, numbers) and co-hosting.
+    put(
+      "/community/events/:id/attendees/:user_id/refund",
+      AdminCommunityEventController,
+      :refund
+    )
+
+    get("/community/event-finances", AdminCommunityEventController, :finances)
+    get("/community/event-analytics", AdminCommunityEventController, :analytics)
+    get("/community/events/:id/cohosts", AdminCommunityEventController, :cohosts)
+    post("/community/events/:id/cohosts", AdminCommunityEventController, :invite_cohost)
+
+    delete(
+      "/community/events/:id/cohosts/:cohost_id",
+      AdminCommunityEventController,
+      :remove_cohost
+    )
+
+    get("/community/cohost-requests", AdminCommunityEventController, :cohost_requests)
+
+    post(
+      "/community/cohost-requests/:id/answer",
+      AdminCommunityEventController,
+      :answer_cohost_request
+    )
+
+    post(
+      "/community/cohost-requests/:id/trial-offer",
+      AdminCommunityEventController,
+      :cohost_trial_offer
+    )
+
     get("/public-profile", AdminPublicProfileController, :show)
     put("/public-profile", AdminPublicProfileController, :update)
     post("/public-profile/publish", AdminPublicProfileController, :publish)
@@ -1105,6 +1168,8 @@ defmodule PaleeWeb.Router do
     ])
 
     get("/tag-suggestions", PlatformTagSuggestionController, :index)
+    # ADR-187: the password reset security log.
+    get("/password-reset-log", PasswordRecoveryController, :log)
     # ADR-170: platform plans, prices and each organization's plan.
     get("/plans", PlatformPlanController, :index)
     post("/plans", PlatformPlanController, :create)
@@ -1162,6 +1227,51 @@ defmodule PaleeWeb.Router do
     post("/organizations/:id/purge/approve", PlatformOrganizationPurgeController, :approve)
     post("/organizations/:id/purge/cancel", PlatformOrganizationPurgeController, :cancel)
     post("/organizations/:id/purge/resume", PlatformOrganizationPurgeController, :resume)
+  end
+
+  # ADR-184: business accounts in demo mode until the platform team activates
+  # them: the business step of sign-up, requests and the activation link.
+  scope "/api", PaleeWeb do
+    pipe_through([:api, :authenticated, :authenticated_rate_limited, :tenant_write_rate_limited])
+
+    post("/business-accounts", BusinessAccountController, :sign_up)
+    get("/me/business-requests", BusinessAccountController, :my_requests)
+    post("/me/business-requests", BusinessAccountController, :request_conversion)
+    post("/me/business-requests/:id/cancel", BusinessAccountController, :cancel_request)
+    post("/business-activation/inspect", BusinessAccountController, :inspect_activation)
+    post("/business-activation/redeem", BusinessAccountController, :redeem_activation)
+  end
+
+  # ADR-184: the floating demo-data button and the activation request.
+  scope "/api/org/:organization_slug/admin", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :admin_only,
+      :tenant_write_rate_limited
+    ])
+
+    get("/business", AdminBusinessController, :show)
+    post("/business/demo-data", AdminBusinessController, :seed)
+    delete("/business/demo-data", AdminBusinessController, :remove)
+    post("/business/activation-request", AdminBusinessController, :request_activation)
+  end
+
+  # ADR-184: the vendors' queue and activation links.
+  scope "/api/platform", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :vendor,
+      :platform_write_rate_limited
+    ])
+
+    get("/business-accounts", PlatformBusinessAccountController, :queue)
+    post("/business-requests/:id/decision", PlatformBusinessAccountController, :decide)
+    post("/organizations/:id/activation-links", PlatformBusinessAccountController, :issue_link)
+    delete("/activation-links/:id", PlatformBusinessAccountController, :revoke_link)
   end
 
   scope "/api/me", PaleeWeb do
@@ -1229,6 +1339,9 @@ defmodule PaleeWeb.Router do
     get("/wellbeing/check-ins", CheckInController, :index)
     post("/wellbeing/check-ins", CheckInController, :create)
     delete("/wellbeing/check-ins/:id", CheckInController, :delete)
+    # ADR-183: «Τι κάνεις», asked by the first-run.
+    get("/me/interests", MyInterestsController, :show)
+    put("/me/interests", MyInterestsController, :update)
     get("/me/wellness", WellnessController, :show)
     post("/me/wellness/entries", WellnessController, :create_entry)
     patch("/me/wellness/entries/:id", WellnessController, :update_entry)
@@ -1303,6 +1416,9 @@ defmodule PaleeWeb.Router do
     post("/me/events/:id/cancel", CommunityEventController, :cancel)
     put("/me/events/:id/rsvp", CommunityEventController, :rsvp)
     post("/me/events/:id/invites", CommunityEventController, :invite)
+    # ADR-185: «Διοργάνωση ως» and the event page's view count.
+    get("/me/event-hosts", CommunityEventController, :hosts)
+    post("/me/events/:id/views", CommunityEventController, :view)
     # ADR-142: follows, profile posts and people.
     get("/me/social", FollowController, :summary)
     put("/me/social/booking-sharing", FollowController, :booking_sharing)
@@ -1404,6 +1520,21 @@ defmodule PaleeWeb.Router do
     )
 
     put("/me/wellness-summary-sharing", WellnessSummarySharingController, :update)
+  end
+
+  # ADR-185: creating an event as yourself or a business has its own budget
+  # on top of the per-host daily limit, so a script can't flood Γύρω μου.
+  scope "/api", PaleeWeb do
+    pipe_through([
+      :api,
+      :authenticated,
+      :authenticated_rate_limited,
+      :user_only,
+      :tenant_write_rate_limited,
+      :event_create_rate_limited
+    ])
+
+    post("/me/events", CommunityEventController, :host_create)
   end
 
   # ADR-160: the public landing page of a buddy invite link.

@@ -6,7 +6,7 @@ defmodule Palee.Organizations.Queries.InspectJoinLink do
   """
 
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.JoinLinkPolicy
+  alias Palee.Organizations.Domain.{GoLivePolicy, JoinLinkPolicy}
   alias Palee.Organizations.OrganizationStore
 
   def call(slug) when is_binary(slug) do
@@ -15,7 +15,9 @@ defmodule Palee.Organizations.Queries.InspectJoinLink do
       with %{} = organization <- OrganizationStore.get_organization_by_slug(slug),
            settings <- OrganizationStore.get_organization_settings(organization.id),
            join_link <- JoinLinkPolicy.from_settings(settings && settings.settings),
-           true <- JoinLinkPolicy.joinable?(join_link, organization.status) do
+           true <- JoinLinkPolicy.joinable?(join_link, organization.status),
+           # ADR-184: a business in demo mode is not reachable from outside.
+           :ok <- GoLivePolicy.check(organization, :join) do
         {:ok, %{organization: organization, settings: settings, role: join_link["role"]}}
       else
         _unavailable -> {:error, :join_link_unavailable}

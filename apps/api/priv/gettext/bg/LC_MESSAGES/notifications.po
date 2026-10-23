@@ -603,3 +603,36 @@ msgstr "%{class} (%{when}) все още няма WOD. Свържи WOD, пре�
 # ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
 msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} твое време"
+
+
+# ADR-185: co-hosting an event.
+msgid "Co-host request"
+msgstr "Покана за съорганизиране"
+
+msgid "%{box} invites you to co-host «%{event}» (%{when})."
+msgstr "%{box} ви кани да съорганизирате «%{event}» (%{when})."
+
+msgid "Co-hosting"
+msgstr "Съорганизиране"
+
+msgid "%{box} will co-host «%{event}»."
+msgstr "%{box} ще съорганизира «%{event}»."
+
+msgid "%{box} declined to co-host «%{event}»."
+msgstr "%{box} отказа да съорганизира «%{event}»."
+
+msgid "%{box} no longer co-hosts «%{event}»."
+msgstr "%{box} вече не съорганизира «%{event}»."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "Заявка за нова парола"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "%{name} (@%{handle}) не може да влезе и поиска нулиране на паролата."
+
+msgid "Your password was reset"
+msgstr "Паролата ти беше нулирана"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "Паролата ти беше сменена чрез линк за нулиране или код за възстановяване и всички устройства бяха отписани. Ако не си бил ти, свържи се с залата си или с поддръжката на Palee."

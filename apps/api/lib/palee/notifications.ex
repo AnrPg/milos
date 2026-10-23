@@ -33,7 +33,7 @@ defmodule Palee.Notifications do
   @event_types ~w(
     community_event_waitlist_promoted community_event_cancelled community_event_changed
     community_event_reminder community_event_guest_joined community_event_trial_offer
-    community_event_message
+    community_event_message community_event_cohost_request community_event_cohost_answered
   )
 
   @referral_types ~w(referral_progress referral_reward referral_review)
@@ -599,6 +599,21 @@ defmodule Palee.Notifications do
         url: "/admin/schedule?open_slot=#{field(payload, :scheduled_class_id)}"
       })
 
+  # ADR-187: a person asked for a password reset; each event names one of
+  # the people who can handle it.
+  def process_event("password_reset_requested", payload),
+    do:
+      enqueue_simple(:password_reset_requested, payload, %{
+        request_id: field(payload, :request_id),
+        person_handle: field(payload, :person_handle),
+        person_name: field(payload, :person_name),
+        dedupe_key: field(payload, :dedupe_key),
+        url: "/password-resets?request=#{field(payload, :request_id)}"
+      })
+
+  def process_event("password_reset_completed", payload),
+    do: enqueue_simple(:password_reset_completed, payload, %{url: "/me/settings"})
+
   def process_event("coaching_reply_overdue", payload),
     do:
       enqueue_simple(:coaching_reply_overdue, payload, %{
@@ -1148,6 +1163,7 @@ defmodule Palee.Notifications do
       person_nickname: field(payload, :person_nickname),
       box_name: field(payload, :box_name),
       message: field(payload, :message),
+      answer: field(payload, :answer),
       dedupe_key: "#{type}:#{event_id}:#{field(payload, :dedupe)}",
       url: field(payload, :url) || "/events/#{event_id}"
     }
@@ -1417,7 +1433,7 @@ defmodule Palee.Notifications do
          end) do
       {:ok, notification} = ok ->
         case notification do
-          :duplicate ->
+          skipped when skipped in [:duplicate, :suppressed] ->
             :ok
 
           _notification ->

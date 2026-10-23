@@ -43,13 +43,46 @@ defmodule Palee.Application.EventNotices do
         %{person_nickname: guest_nickname, dedupe: guest_id}
       end)
 
+  @doc """
+  The trial offer after the event. A co-host's own offer (ADR-185) names its
+  box and is deduplicated per box, so it never collides with the host's.
+  """
   def trial_offer(event, attendees, box),
     do:
       each(attendees, event, :community_event_trial_offer, fn _attendee ->
         %{
+          organization_id: box.organization_id,
           box_name: box.name,
           url: "/b/#{box.slug}?trial=1&referral_event_id=#{event.id}",
-          dedupe: event.id
+          dedupe:
+            if(box.organization_id == event.organization_id,
+              do: event.id,
+              else: box.organization_id
+            )
+        }
+      end)
+
+  @doc "ADR-185: a box is asked to co-host; its event staff hear it."
+  def cohost_request(event, staff_ids, host_name, cohost_organization_id, request_id),
+    do:
+      each(Enum.map(staff_ids, &%{user_id: &1}), event, :community_event_cohost_request, fn _ ->
+        %{
+          organization_id: cohost_organization_id,
+          box_name: host_name,
+          url: "/events/hosting?org=#{cohost_organization_id}&tab=requests",
+          dedupe: request_id
+        }
+      end)
+
+  @doc "ADR-185: the person who asked hears the co-host's answer."
+  def cohost_answered(event, inviter_id, cohost_name, answer, request_id, answered_at),
+    do:
+      each([%{user_id: inviter_id}], event, :community_event_cohost_answered, fn _ ->
+        %{
+          box_name: cohost_name,
+          answer: answer,
+          url: "/events/hosting?org=#{event.organization_id}&event=#{event.id}",
+          dedupe: "#{request_id}:#{answer}:#{stamp(answered_at)}"
         }
       end)
 

@@ -24,6 +24,7 @@ defmodule Palee.Community.Event do
     :price_cents,
     :currency,
     :open_to_non_members,
+    :audience,
     :guest_pass_allowed,
     :guests_per_member,
     :good_for_friends,
@@ -54,6 +55,9 @@ defmodule Palee.Community.Event do
     field :price_cents, :integer, default: 0
     field :currency, :string, default: "EUR"
     field :open_to_non_members, :boolean, default: false
+    # ADR-185: who it is for: a member `group`, the `club`, or everyone
+    # (`open`, always the same as `open_to_non_members`).
+    field :audience, :string, default: "club"
     field :guest_pass_allowed, :boolean, default: false
     field :guests_per_member, :integer, default: 1
     field :good_for_friends, :boolean, default: false
@@ -70,7 +74,10 @@ defmodule Palee.Community.Event do
     timestamps(type: :utc_datetime_usec)
   end
 
+  @audiences ~w(group club open)
+
   def editable_fields, do: @editable
+  def audiences, do: @audiences
 
   @doc "ADR-179: the clock the event is planned on: its own zone, else its gym's."
   def time_zone(%{time_zone: zone}, _gym_zone) when is_binary(zone) and zone != "", do: zone
@@ -86,6 +93,7 @@ defmodule Palee.Community.Event do
       :series_id | @editable
     ])
     |> validate_required([:club_id])
+    |> default_group_audience(attrs)
     |> validate()
   end
 
@@ -106,7 +114,7 @@ defmodule Palee.Community.Event do
     |> update_change(:place_name, &trim/1)
     |> update_change(:address, &trim/1)
     |> update_change(:currency, &(&1 && String.upcase(&1)))
-    |> validate_required([:title, :starts_at, :ends_at, :price_cents, :currency])
+    |> validate_required([:title, :starts_at, :ends_at, :price_cents, :currency, :audience])
     |> validate_length(:title, max: 120)
     |> validate_length(:description, max: 4_000)
     |> validate_length(:place_name, max: 120)
@@ -126,13 +134,13 @@ defmodule Palee.Community.Event do
     end)
     |> validate_place()
     |> validate_times()
-    |> validate_group()
+    |> sync_audience()
     |> validate_good_for_friends()
     |> check_constraint(:good_for_friends, name: :community_events_good_for_friends_check)
     |> check_constraint(:starts_at, name: :community_events_time_check)
     |> check_constraint(:location_id, name: :community_events_place_check)
     |> check_constraint(:capacity, name: :community_events_limits_check)
-    |> check_constraint(:price_cents, name: :community_events_group_check)
+    |> check_constraint(:audience, name: :community_events_audience_check)
     |> foreign_key_constraint(:channel_id, name: :community_events_channel_id_fkey)
     |> foreign_key_constraint(:location_id)
     |> foreign_key_constraint(:club_id, name: :community_events_club_id_fkey)
@@ -162,17 +170,51 @@ defmodule Palee.Community.Event do
     end
   end
 
-  # A member group's event is free and for the group only (ADR-153 §13).
-  defp validate_group(changeset) do
-    if is_nil(get_field(changeset, :channel_id)) do
-      changeset
-    else
-      changeset
-      |> validate_number(:price_cents, equal_to: 0, message: "group events are free")
-      |> validate_inclusion(:open_to_non_members, [false],
-        message: "group events are for the group"
-      )
-      |> validate_inclusion(:guest_pass_allowed, [false], message: "group events take no guests")
+  # A group's event created without an audience stays with the group, as
+  # before ADR-185.
+  defp default_group_audience(changeset, attrs) do
+    explicit? = is_binary(Map.get(attrs, :audience, Map.get(attrs, "audience")))
+
+    if explicit? or is_nil(get_field(changeset, :channel_id)) or
+         get_field(changeset, :open_to_non_members),
+       do: changeset,
+       else: put_change(changeset, :audience, "group")
+  end
+
+  # ADR-185: `audience` and `open_to_non_members` always agree. Whichever
+  # was asked wins; a group's audience needs a group.
+  defp sync_audience(changeset) do
+    changeset =
+      cond do
+        is_binary((changeset.params || %{})["audience"]) ->
+          put_change(
+            changeset,
+            :open_to_non_members,
+            get_field(changeset, :audience) == "open"
+          )
+
+        Map.has_key?(changeset.changes, :open_to_non_members) ->
+          put_change(changeset, :audience, audience_for_open(changeset))
+
+        true ->
+          changeset
+      end
+
+    changeset
+    |> validate_inclusion(:audience, @audiences)
+    |> then(fn changeset ->
+      if get_field(changeset, :audience) == "group" and is_nil(get_field(changeset, :channel_id)),
+        do: add_error(changeset, :audience, "only a member group's event is for the group"),
+        else: changeset
+    end)
+  end
+
+  defp audience_for_open(changeset) do
+    cond do
+      get_field(changeset, :open_to_non_members) -> "open"
+      get_field(changeset, :audience) == "open" and get_field(changeset, :channel_id) -> "group"
+      get_field(changeset, :audience) == "open" -> "club"
+      true -> get_field(changeset, :audience) || "club"
     end
   end
 

@@ -18,7 +18,7 @@ defmodule Palee.Identity.RegisterUserTest do
       refute user.password_hash == "S3cur3P@ss!42"
     end
 
-    test "rejects duplicate nickname" do
+    test "rejects a duplicate handle" do
       params = %{
         nickname: "atlas",
         password: "S3cur3P@ss!42",
@@ -28,8 +28,28 @@ defmodule Palee.Identity.RegisterUserTest do
 
       {:ok, _user} = RegisterUser.call(params)
 
-      assert {:error, changeset} = RegisterUser.call(params)
-      assert "has already been taken" in errors_on(changeset).nickname
+      assert {:error, changeset} =
+               RegisterUser.call(%{params | email: "atlas-other@placeholder.invalid"})
+
+      assert "has already been taken" in errors_on(changeset).handle
+    end
+
+    test "a second login with the same email is refused (ADR-187)" do
+      params = %{
+        nickname: "atlas",
+        password: "S3cur3P@ss!42",
+        role: :member,
+        email: "atlas@placeholder.invalid"
+      }
+
+      {:ok, _user} = RegisterUser.call(params)
+
+      assert {:error, :email_taken} =
+               RegisterUser.call(%{
+                 params
+                 | nickname: "atlas_two",
+                   email: "ATLAS@placeholder.invalid"
+               })
     end
 
     test "preserves a display nickname while normalizing it before uniqueness checks" do
@@ -42,6 +62,7 @@ defmodule Palee.Identity.RegisterUserTest do
         })
 
       assert user.nickname == "Atlas"
+      assert user.handle == "atlas"
       assert user.normalized_nickname == "atlas"
 
       assert {:error, changeset} =
@@ -52,7 +73,7 @@ defmodule Palee.Identity.RegisterUserTest do
                  email: "atlas3@placeholder.invalid"
                })
 
-      assert "has already been taken" in errors_on(changeset).nickname
+      assert "has already been taken" in errors_on(changeset).handle
     end
 
     test "rejects invalid role" do
@@ -79,16 +100,16 @@ defmodule Palee.Identity.RegisterUserTest do
       assert errors_on(changeset).password != []
     end
 
-    test "accepts simple and whitespace-containing passwords with at least four characters" do
+    test "accepts simple and whitespace-containing passwords with at least four non-whitespace characters" do
       params = %{
         nickname: "simple_pass",
-        password: "a b ",
+        password: "a b c d",
         role: :member,
         email: "simple-pass@placeholder.invalid"
       }
 
       assert {:ok, user} = RegisterUser.call(params)
-      refute user.password_hash == "a b "
+      refute user.password_hash == "a b c d"
     end
 
     test "database rejects invalid roles outside Ecto changesets" do
@@ -98,21 +119,32 @@ defmodule Palee.Identity.RegisterUserTest do
         Ecto.Adapters.SQL.query!(
           Repo,
           """
-          INSERT INTO users (id, nickname, password_hash, role, leaderboard_opt_in, email, inserted_at, updated_at)
-          VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+          INSERT INTO users (id, nickname, display_nickname, role, leaderboard_opt_in, login_id, inserted_at, updated_at)
+          VALUES ($1, $2, $2, $3, $4, $5, $6, $7)
           """,
           [
             Ecto.UUID.dump!(Ecto.UUID.generate()),
             "raw_insert_user",
-            "hashed",
             "owner",
             false,
-            "raw_insert_user@placeholder.invalid",
+            Ecto.UUID.dump!(raw_login_id(now)),
             now,
             now
           ]
         )
       end
     end
+  end
+
+  defp raw_login_id(now) do
+    id = Ecto.UUID.generate()
+
+    Ecto.Adapters.SQL.query!(
+      Repo,
+      "INSERT INTO logins (id, email, password_hash, inserted_at, updated_at) VALUES ($1, $2, 'h', $3, $3)",
+      [Ecto.UUID.dump!(id), "raw-#{System.unique_integer([:positive])}@placeholder.invalid", now]
+    )
+
+    id
   end
 end

@@ -16,6 +16,7 @@ import { TopNav } from "@/components/TopNav";
 import { BottomTabBar } from "@/components/nav/BottomTabBar";
 import { ScreenPreloader } from "@/components/nav/ScreenPreloader";
 import { OnboardingHost } from "@/components/onboarding/Onboarding";
+import { DemoModeHost } from "@/components/business/DemoModeHost";
 import { ReferralClaimBridge } from "@/components/referrals/ReferralClaimBridge";
 import { NativeAppBridge } from "@/components/platform/NativeAppBridge";
 import { PhoneHealthSyncBridge } from "@/components/platform/PhoneHealthSyncBridge";
@@ -129,6 +130,7 @@ export default async function RootLayout({
                 <BottomTabBar />
                 <ScreenPreloader />
                 <OnboardingHost />
+                <DemoModeHost />
                 <HydrationMarker />
               </SessionProvider>
             </ThemeProvider>

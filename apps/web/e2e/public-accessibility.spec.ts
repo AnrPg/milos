@@ -4,6 +4,7 @@ import { expect, test, type Page } from "./support/test";
 const pages = [
   { path: "/about", heading: /palee/i },
   { path: "/register", heading: /create your account/i },
+  { path: "/forgot-password", heading: /forgot your password/i },
   {
     path: "/box/schedule",
     heading: /^schedule$/i,
@@ -50,7 +51,7 @@ async function stubApi(page: Page, user?: { id: string; nickname: string; role: 
       ...user,
       email: `${user.id}@example.com`,
       // The first-run product tour (ADR-107) would cover the page under test.
-      completed_tours: ["admin", "member", "athlete"],
+      completed_tours: ["admin", "member", "athlete", "first_run"],
       preferred_locale: "en",
       vendor: false,
       memberships: [{ organization_slug: "demo-gym", role: user.role, settings: {} }],

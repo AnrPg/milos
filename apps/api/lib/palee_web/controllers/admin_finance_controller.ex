@@ -845,7 +845,12 @@ defmodule PaleeWeb.AdminFinanceController do
   )
 
   def record_payment(conn, params) do
-    with {:ok, payment} <- RecordFinancePayment.call(param_id(params), body_params(conn, params)) do
+    with {:ok, payment} <-
+           RecordFinancePayment.call(
+             conn.assigns.tenant_context,
+             param_id(params),
+             body_params(conn, params)
+           ) do
       conn
       |> put_status(:created)
       |> json(%{payment: payment})
@@ -862,6 +867,7 @@ defmodule PaleeWeb.AdminFinanceController do
   def create_receipt(conn, params) do
     with {:ok, receipt} <-
            CreateFinanceReceipt.call(
+             conn.assigns.tenant_context,
              param_id(params),
              current_user_id(conn),
              body_params(conn, params)
@@ -882,6 +888,7 @@ defmodule PaleeWeb.AdminFinanceController do
   def create_invoice(conn, params) do
     with {:ok, invoice} <-
            CreateFinanceInvoice.call(
+             conn.assigns.tenant_context,
              param_id(params),
              current_user_id(conn),
              body_params(conn, params)

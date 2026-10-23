@@ -182,4 +182,8 @@ must have an ADR. See `template.md` for the format.
 | ADR-180 | Workouts in text sections, the WOD-assistant switch and per-section scoring | Accepted |
 | ADR-181 | Tabbed WOD editor and in-place, colour-coded assistant suggestions | Accepted |
 | ADR-182 | Themed dropdowns and date and time pickers instead of native controls | Accepted |
+| ADR-183 | The member first-run and account interests | Accepted |
+| ADR-184 | Business accounts: demo mode, the go-live gate and activation by the Palee team | Accepted |
+| ADR-185 | Event organisers («Διοργάνωση ως»), co-hosting and the organiser console | Accepted |
 | ADR-186 | Branch-scoped staff and the branch manager | Accepted |
+| ADR-187 | Logins with up to three profiles, @handle + display name, and mail-free password recovery | Accepted |

@@ -1,6 +1,6 @@
 defmodule Palee.Organizations.Commands.UpdateJoinLink do
   alias Palee.Infrastructure.Tenancy.RepoContext
-  alias Palee.Organizations.Domain.{JoinLinkPolicy, TenantAuthorization}
+  alias Palee.Organizations.Domain.{GoLivePolicy, JoinLinkPolicy, TenantAuthorization}
   alias Palee.Organizations.OrganizationStore
 
   def call(context, params) do
@@ -10,6 +10,7 @@ defmodule Palee.Organizations.Commands.UpdateJoinLink do
         current = JoinLinkPolicy.from_settings(settings && settings.settings)
 
         with {:ok, join_link} <- JoinLinkPolicy.update(current, params),
+             :ok <- live_link(context, join_link),
              {:ok, _settings} <-
                OrganizationStore.put_organization_settings_entry(
                  context.organization_id,
@@ -21,4 +22,10 @@ defmodule Palee.Organizations.Commands.UpdateJoinLink do
       end)
     end
   end
+
+  # ADR-184: a business in demo mode may set its link up but not open it.
+  defp live_link(context, %{"enabled" => true}),
+    do: GoLivePolicy.check(Map.get(context, :organization), :invite_people)
+
+  defp live_link(_context, _join_link), do: :ok
 end

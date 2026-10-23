@@ -21,6 +21,15 @@ function preferredUrl(notification: LinkableNotification) {
   // ADR-153: event notifications open the event page; the trial offer keeps
   // its own link to the box's trial sheet.
   const eventId = notification.payload.event_id;
+  // ADR-185: co-host requests and answers open the organiser console.
+  const consoleUrl = notification.payload.url;
+  if (
+    (notification.type === "community_event_cohost_request" || notification.type === "community_event_cohost_answered") &&
+    typeof consoleUrl === "string" &&
+    consoleUrl.startsWith("/events/hosting")
+  ) {
+    return consoleUrl;
+  }
   if (
     notification.type.startsWith("community_event_") &&
     notification.type !== "community_event_trial_offer" &&
@@ -33,6 +42,14 @@ function preferredUrl(notification: LinkableNotification) {
   if (notification.type === "class_workout_missing" && typeof slotId === "string" && slotId) {
     return `/admin/schedule?open_slot=${encodeURIComponent(slotId)}`;
   }
+  // ADR-187: a password reset request opens that request; the reset itself opens Settings.
+  if (notification.type === "password_reset_requested") {
+    const requestId = notification.payload.request_id;
+    return typeof requestId === "string" && requestId
+      ? `/password-resets?request=${encodeURIComponent(requestId)}`
+      : "/password-resets";
+  }
+  if (notification.type === "password_reset_completed") return "/me/settings";
   // ADR-155: a visitor at the door opens the desk on that visitor.
   if (notification.type === "check_in_visitor") {
     const scanId = notification.payload.scan_id;

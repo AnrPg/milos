@@ -14,7 +14,7 @@ function persona(id: string, nickname: string, roles: string[]) {
     nickname,
     role: "member",
     email: `${id}@example.com`,
-    completed_tours: ["admin", "member", "athlete"],
+    completed_tours: ["admin", "member", "athlete", "first_run"],
     preferred_locale: "en",
     vendor: false,
     memberships: [{ organization_slug: "kypseli", role: roles[0], settings: {} }],

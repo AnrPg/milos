@@ -68,6 +68,8 @@ defmodule Palee.Notifications.Notification do
     :community_event_guest_joined,
     :community_event_trial_offer,
     :community_event_message,
+    :community_event_cohost_request,
+    :community_event_cohost_answered,
     :referral_progress,
     :referral_reward,
     :referral_review,
@@ -92,7 +94,9 @@ defmodule Palee.Notifications.Notification do
     :season_confirmed,
     :season_declined,
     :season_cancelled,
-    :class_workout_missing
+    :class_workout_missing,
+    :password_reset_requested,
+    :password_reset_completed
   ]
 
   schema "notifications" do

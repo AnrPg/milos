@@ -121,15 +121,15 @@ defmodule Palee.Organizations.InvitationEmailBindingTest do
   test "email addresses are unique across accounts, case-insensitively" do
     register_with_email("taken@example.com")
 
-    assert {:error, changeset} =
+    # ADR-187: a second login with the same email is refused; more profiles
+    # on it are added from a signed-in session.
+    assert {:error, :email_taken} =
              Identity.register(%{
                nickname: "dup_#{System.unique_integer([:positive])}",
                password: "S3cur3P@ss!42",
                role: :member,
                email: "TAKEN@example.com"
              })
-
-    assert changeset.errors[:email]
   end
 
   test "email is mandatory for new accounts" do

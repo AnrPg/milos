@@ -17,6 +17,12 @@ defmodule Palee.Application.CommunityEvents do
   Every write runs in the scope of the gym that runs the club. Publishing an
   event posts its card in the club's #ανακοινώσεις; changes and
   cancellations reach the people going.
+
+  ADR-185: a person's own event (an organiser organisation's) posts its card
+  to the host's followers instead, when it is open to everyone; boxes that
+  co-host an event list it with their own; the host's own invitation link
+  needs no guest pass; events of a host the person blocked never show; and
+  opening an event page counts a view (aggregated, deduped per day).
   """
 
   alias Palee.Application.{
@@ -27,6 +33,8 @@ defmodule Palee.Application.CommunityEvents do
     EventInvites,
     EventNotices,
     EventPresenter,
+    GoLive,
+    KeyDerivation,
     PublicBox,
     RealtimePublisher
   }
@@ -48,7 +56,11 @@ defmodule Palee.Application.CommunityEvents do
         context
         |> gym_of(club.organization_id)
         |> Community.list_events(filter)
+        |> Kernel.++(
+          if club.kind == "gym", do: cohosted(context, [club.organization_id], filter), else: []
+        )
         |> visible_only(context, clubs)
+        |> sort_window(params[:scope])
 
       {:ok, %{events: present(context, events, clubs, now: now)}}
     end
@@ -67,6 +79,10 @@ defmodule Palee.Application.CommunityEvents do
             limit: @upcoming_limit
           })
         end)
+        |> Kernel.++(
+          cohosted(context, gym_organization_ids(clubs), %{from: now, limit: @upcoming_limit})
+        )
+        |> Enum.uniq_by(& &1.id)
         |> visible_only(context, clubs)
         |> sort()
 
@@ -99,13 +115,15 @@ defmodule Palee.Application.CommunityEvents do
   def box_events(context, slug, now \\ DateTime.utc_now()) do
     with {:ok, box, _scope} <- PublicBox.resolve(slug),
          {:ok, clubs} <- ClubScope.call(context) do
+      window = %{open_only: true, from: now, limit: @upcoming_limit}
+
       events =
-        Community.list_events(gym(box.organization_id, context), %{
-          organization_ids: [box.organization_id],
-          open_only: true,
-          from: now,
-          limit: @upcoming_limit
-        })
+        gym(box.organization_id, context)
+        |> Community.list_events(Map.put(window, :organization_ids, [box.organization_id]))
+        |> Kernel.++(cohosted(context, [box.organization_id], window))
+        |> Enum.uniq_by(& &1.id)
+        |> without_blocked_hosts(context)
+        |> sort()
 
       {:ok, %{events: present(context, events, clubs, now: now)}}
     end
@@ -139,18 +157,23 @@ defmodule Palee.Application.CommunityEvents do
     with {:ok, event, clubs, invite} <- locate(context, event_id, params[:invite_token]) do
       gym = gym(event.organization_id, context)
 
+      invited_by = invite && invite.inviter_id != user_id && invite.inviter_id
+
       result =
         if params[:going] do
-          Community.rsvp_event(
-            gym,
-            event.id,
-            user_id,
-            %{
-              club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
-              invited_by: invite && invite.inviter_id != user_id && invite.inviter_id
-            },
-            now
-          )
+          rsvp_live(event, user_id, fn ->
+            Community.rsvp_event(
+              gym,
+              event.id,
+              user_id,
+              %{
+                club_member?: EventPresenter.belongs?(event, viewer(context, clubs)),
+                invited_by: invited_by,
+                host_invite?: is_binary(invited_by) and host?(invited_by, event)
+              },
+              now
+            )
+          end)
         else
           Community.withdraw_from_event(gym, event.id, user_id, user_id, now)
         end
@@ -160,6 +183,14 @@ defmodule Palee.Application.CommunityEvents do
         announce(event)
         show(context, event.id, params[:invite_token])
       end
+    end
+  end
+
+  # ADR-184: a business in demo mode takes no places from real people.
+  defp rsvp_live(event, user_id, rsvp) do
+    case GoLive.check_booking_at(event.organization_id, user_id) do
+      :ok -> rsvp.()
+      error -> error
     end
   end
 
@@ -173,16 +204,44 @@ defmodule Palee.Application.CommunityEvents do
 
   defp after_rsvp(_event, _outcome, _user_id), do: :ok
 
-  @doc "A going member's guest pass link for the event."
+  @doc """
+  A going member's guest pass link for the event; for whoever runs it, the
+  host's own invitation link (no guest pass, no limit; ADR-185).
+  """
   def invite(%{user_id: user_id} = context, event_id) do
     now = DateTime.utc_now()
 
     with {:ok, event, _clubs, _invite} <- locate(context, event_id, nil),
+         # ADR-184: no guest links out of a business in demo mode.
+         :ok <- GoLive.check_at(event.organization_id, :invite_people),
          gym = gym(event.organization_id, context),
-         :ok <- Community.event_open_for_rsvp(event, now),
-         status = attendee_status(gym, event.id, user_id),
-         guests = Community.count_guests(gym, event.id, user_id),
-         :ok <- Community.event_guest_check(event, status, guests) do
+         :ok <- Community.event_open_for_rsvp(event, now) do
+      if host?(user_id, event),
+        do: host_invite(event, user_id),
+        else: guest_pass(gym, event, user_id)
+    end
+  end
+
+  defp host_invite(event, user_id) do
+    with :ok <- Community.event_invite_check(event, :host, nil, 0) do
+      token = EventInvites.sign(event, user_id)
+
+      {:ok,
+       %{
+         token: token,
+         path: EventInvites.path(event.id, token),
+         guests_left: nil,
+         host: true,
+         expires_at: event.starts_at
+       }}
+    end
+  end
+
+  defp guest_pass(gym, event, user_id) do
+    status = attendee_status(gym, event.id, user_id)
+    guests = Community.count_guests(gym, event.id, user_id)
+
+    with :ok <- Community.event_guest_check(event, status, guests) do
       token = EventInvites.sign(event, user_id)
 
       {:ok,
@@ -190,10 +249,39 @@ defmodule Palee.Application.CommunityEvents do
          token: token,
          path: EventInvites.path(event.id, token),
          guests_left: event.guests_per_member - guests,
+         host: false,
          expires_at: event.starts_at
        }}
     end
   end
+
+  @doc """
+  ADR-185: counts an open of the event page, once per person and day for
+  the distinct viewers (an HMAC of event, day and person under a server
+  key; no person is stored). People who run the event are not counted.
+  """
+  def record_view(%{user_id: user_id} = context, event_id, now \\ DateTime.utc_now()) do
+    with {:ok, event, _clubs, _invite} <- locate(context, event_id, nil) do
+      host? = host?(user_id, event)
+
+      unless host? do
+        day = DateTime.to_date(now)
+        key = KeyDerivation.derive("event-view", Enum.join([event.id, day, user_id], "|"))
+
+        Community.record_event_view(
+          gym(event.organization_id, context),
+          event.id,
+          day,
+          binary_part(key, 0, 16)
+        )
+      end
+
+      {:ok, %{counted: not host?}}
+    end
+  end
+
+  # Whoever runs the event at its box (manage_events there), or a group's admin.
+  defp host?(user_id, event), do: event.organization_id in managed(user_id)
 
   # ------------------------------------------------------------------ running events (member app)
 
@@ -297,7 +385,14 @@ defmodule Palee.Application.CommunityEvents do
 
       settle_covers(manager, results)
       Enum.each(results, &announce(&1.after))
-      {:ok, Enum.find(results, &(&1.after.id == event.id)).after}
+      edited = Enum.find(results, &(&1.after.id == event.id))
+
+      # ADR-185: a person's event that opened to everyone reaches their followers.
+      if not edited.before.open_to_non_members and edited.after.open_to_non_members and
+           organiser_host?(manager),
+         do: publish_profile_card(manager, [edited.after])
+
+      {:ok, edited.after}
     end
   end
 
@@ -362,8 +457,40 @@ defmodule Palee.Application.CommunityEvents do
   # ------------------------------------------------------------------ internals
 
   # A club event's card goes in the club's announcements, a group event's in
-  # the group.
-  defp publish_card(manager, club, group, [first | _] = events) do
+  # the group; a person's own open event's card goes to their followers.
+  defp publish_card(manager, club, group, events) do
+    if organiser_host?(manager),
+      do: publish_profile_card(manager, events),
+      else: publish_club_card(manager, club, group, events)
+  end
+
+  defp organiser_host?(%{organization_id: organization_id}),
+    do:
+      Community.organiser?(
+        Map.get(Organizations.provider_kinds([organization_id]), organization_id)
+      )
+
+  defp publish_profile_card(
+         %{user_id: user_id},
+         [%{open_to_non_members: true} = first | _] = events
+       ) do
+    with {:ok, _post} <-
+           Community.create_profile_post(%{user_id: user_id}, "public", %{
+             attachment_type: "event",
+             attachment_id: first.id,
+             attachment: %{
+               "title" => first.title,
+               "starts_at" => DateTime.to_iso8601(first.starts_at),
+               "occurrences" => length(events),
+               "organization_id" => first.organization_id
+             }
+           }),
+         do: {:ok, events}
+  end
+
+  defp publish_profile_card(_manager, events), do: {:ok, events}
+
+  defp publish_club_card(manager, club, group, [first | _] = events) do
     channel =
       group ||
         case Community.get_club(manager, club.id) do
@@ -462,6 +589,7 @@ defmodule Palee.Application.CommunityEvents do
         (invite && Community.get_event(gym(invite.organization_id, context), event_id))
 
     with %{} <- event || {:error, :not_found},
+         true <- without_blocked_hosts([event], context) != [] || {:error, :not_found},
          {:ok, clubs} <- ClubScope.call(context) do
       viewer = viewer(context, clubs)
 
@@ -478,12 +606,14 @@ defmodule Palee.Application.CommunityEvents do
   defp invitation(gym, event, invite, now) do
     people = CommunityPeople.by_ids([invite.inviter_id])
     guests = Community.count_guests(gym, event.id, invite.inviter_id)
+    inviter = if host?(invite.inviter_id, event), do: :host, else: :guest_pass
 
     check =
       with :ok <- Community.event_open_for_rsvp(event, now),
            do:
-             Community.event_guest_check(
+             Community.event_invite_check(
                event,
+               inviter,
                attendee_status(gym, event.id, invite.inviter_id),
                guests
              )
@@ -628,8 +758,64 @@ defmodule Palee.Application.CommunityEvents do
 
   defp visible_only(events, context, clubs) do
     viewer = viewer(context, clubs)
-    Enum.filter(events, &EventPresenter.visible?(&1, viewer))
+
+    events
+    |> Enum.filter(&EventPresenter.visible?(&1, viewer))
+    |> without_blocked_hosts(context)
   end
+
+  @doc false
+  # ADR-185: a person's own events are hidden from people they blocked or
+  # who blocked them (Community.blocked_user_ids/1, both ways).
+  def without_blocked_hosts([], _context), do: []
+
+  def without_blocked_hosts(events, %{user_id: user_id}) do
+    blocked = MapSet.new(Community.blocked_user_ids(%{user_id: user_id}))
+
+    if MapSet.size(blocked) == 0 do
+      events
+    else
+      suspects = Enum.filter(events, &MapSet.member?(blocked, &1.created_by_id))
+
+      kinds =
+        suspects
+        |> Enum.map(& &1.organization_id)
+        |> Enum.uniq()
+        |> Organizations.provider_kinds()
+
+      Enum.reject(events, fn event ->
+        MapSet.member?(blocked, event.created_by_id) and
+          Community.organiser?(Map.get(kinds, event.organization_id))
+      end)
+    end
+  end
+
+  # ADR-185: events other boxes host and these boxes co-host (accepted),
+  # read in the person's session (the co-host read policy), within `window`.
+  defp cohosted(_context, [], _window), do: []
+
+  defp cohosted(%{user_id: _} = context, organization_ids, window) do
+    context
+    |> Community.accepted_event_cohosts(nil, organization_ids)
+    |> Enum.group_by(& &1.host_organization_id, & &1.event_id)
+    |> Enum.flat_map(fn {host_id, ids} ->
+      host_id
+      |> gym(context)
+      |> Community.list_events(
+        window
+        |> Map.take([:from, :ended_before, :order, :limit, :include_cancelled, :open_only])
+        |> Map.merge(%{organization_ids: [host_id], ids: Enum.uniq(ids)})
+      )
+    end)
+  end
+
+  defp gym_organization_ids(clubs),
+    do: clubs |> Enum.filter(&(&1.kind == "gym")) |> Enum.map(& &1.organization_id) |> Enum.uniq()
+
+  defp sort_window(events, "past"),
+    do: events |> sort() |> Enum.reverse() |> Enum.take(@past_limit)
+
+  defp sort_window(events, _upcoming), do: events |> sort() |> Enum.take(@upcoming_limit)
 
   defp gym_of(context, organization_id), do: gym(organization_id, context)
 

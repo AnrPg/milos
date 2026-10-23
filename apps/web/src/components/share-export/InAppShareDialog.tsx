@@ -3,12 +3,13 @@
 import { useId, useRef, useState } from "react";
 
 import { createDirectThread, searchUsers, sendMessage } from "@/api/messaging";
+import { PersonName } from "@/components/account/PersonName";
 import { SemanticLabel } from "@/components/semantic-label";
 import { useSession } from "@/components/session-provider";
 import { useUiTranslations } from "@/i18n/ui";
 import { Dialog } from "@/components/ui/Dialog";
 
-type UserResult = { id: string; nickname: string; role: string };
+type UserResult = { id: string; nickname: string; handle?: string | null; role: string };
 
 export function InAppShareDialog({
   title,
@@ -127,7 +128,7 @@ export function InAppShareDialog({
                     style={{ borderTop: index > 0 ? "1px solid var(--border)" : undefined, color: "var(--text)" }}
                     type="button"
                   >
-                    <span className="font-semibold">{user.nickname}</span>
+                    <PersonName name={user.nickname} handle={user.handle} inline />
                     <span className="text-xs" style={{ color: "var(--dim)" }}><SemanticLabel value={user.role} /></span>
                   </button>
                 ))}

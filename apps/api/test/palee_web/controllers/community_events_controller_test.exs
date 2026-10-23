@@ -586,7 +586,9 @@ defmodule PaleeWeb.CommunityEventsControllerTest do
       user
     end
 
-    test "a group's admin runs free, members-only events that only the group sees", ctx do
+    # ADR-185: the group's admin picks price, audience and guest passes.
+    test "a group's admin picks the price and a group-only audience that only the group sees",
+         ctx do
       group_id = group!(ctx)
       outside = club_member!(ctx)
       path = "/api/me/community/clubs/#{ctx.club_id}/events"
@@ -598,8 +600,8 @@ defmodule PaleeWeb.CommunityEventsControllerTest do
         ends_at: at(2 * 24 * 60 + 60),
         place_name: "Λόφος Φιλοπάππου",
         price_cents: 2000,
-        open_to_non_members: true,
-        guest_pass_allowed: true
+        audience: "group",
+        guest_pass_allowed: false
       }
 
       assert %{"event" => event} =
@@ -608,7 +610,8 @@ defmodule PaleeWeb.CommunityEventsControllerTest do
       assert %{
                "channel_id" => ^group_id,
                "group" => %{"id" => ^group_id, "name" => "Πρωινοί δρομείς"},
-               "price_cents" => 0,
+               "price_cents" => 2000,
+               "audience" => "group",
                "open_to_non_members" => false,
                "guest_pass_allowed" => false,
                "can_manage" => true
@@ -637,8 +640,14 @@ defmodule PaleeWeb.CommunityEventsControllerTest do
       assert rsvp(ctx, outside, event, true) |> json_response(404)
       assert rsvp(ctx, ctx.visitor, event, true) |> json_response(404)
 
-      # The admin edits it; it stays free and closed.
-      assert %{"event" => %{"title" => "Τρέξιμο της ομάδας (8 χλμ.)", "price_cents" => 0}} =
+      # The admin edits it, price too; it stays for the group.
+      assert %{
+               "event" => %{
+                 "title" => "Τρέξιμο της ομάδας (8 χλμ.)",
+                 "price_cents" => 500,
+                 "audience" => "group"
+               }
+             } =
                ctx.as.(ctx.member)
                |> send_json(:patch, "/api/me/events/#{id}", %{
                  title: "Τρέξιμο της ομάδας (8 χλμ.)",
@@ -668,6 +677,48 @@ defmodule PaleeWeb.CommunityEventsControllerTest do
 
       drain()
       assert "community_event_cancelled" in types(ctx.other)
+    end
+
+    test "a group's admin opens its event to everyone, with guest passes", ctx do
+      group_id = group!(ctx)
+      outside = club_member!(ctx)
+      path = "/api/me/community/clubs/#{ctx.club_id}/events"
+
+      assert %{"event" => event} =
+               ctx.as.(ctx.member)
+               |> send_json(:post, path, %{
+                 channel_id: group_id,
+                 title: "Ανοιχτό τρέξιμο",
+                 starts_at: at(2 * 24 * 60),
+                 ends_at: at(2 * 24 * 60 + 60),
+                 place_name: "Λόφος Φιλοπάππου",
+                 price_cents: 1000,
+                 audience: "open",
+                 guest_pass_allowed: true
+               })
+               |> json_response(201)
+
+      assert %{
+               "audience" => "open",
+               "open_to_non_members" => true,
+               "price_cents" => 1000,
+               "guest_pass_allowed" => true
+             } = event
+
+      # A club member outside the group and a visitor see it and come.
+      assert %{"my" => %{"status" => "going"}} = rsvp(ctx, outside, event, true) |> event_json()
+
+      assert %{"my" => %{"status" => "going", "source" => "open"}} =
+               rsvp(ctx, ctx.visitor, event, true) |> event_json()
+
+      # Narrowing it to the club keeps it off the open web, not off the club.
+      assert %{"event" => %{"audience" => "club", "open_to_non_members" => false}} =
+               ctx.as.(ctx.member)
+               |> send_json(:patch, "/api/me/events/#{event["id"]}", %{audience: "club"})
+               |> json_response(200)
+
+      assert %{"event" => %{"id" => _}} =
+               ctx.as.(outside) |> get("/api/me/events/#{event["id"]}") |> json_response(200)
     end
 
     test "events go only in an active group of the club", ctx do

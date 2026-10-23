@@ -59,6 +59,8 @@ defmodule Palee.Application.CorporateInvoicing do
   defp deliver(_kind, _invoice, %{billing_email: email}, _sender) when email in [nil, ""],
     do: {:error, :corporate_billing_email_missing}
 
+  defp deliver(_kind, _invoice, _client, %{live: {:error, _reason} = gated}), do: gated
+
   defp deliver(kind, invoice, client, sender) do
     localize = fn message, bindings ->
       Localization.translate(sender.locale, message, bindings, "corporate_invoices")
@@ -78,7 +80,9 @@ defmodule Palee.Application.CorporateInvoicing do
     %{
       gym_name: (settings && settings.brand_name) || organization.name,
       locale: (settings && settings.default_locale) || "en",
-      from: {Keyword.fetch!(from_config, :name), Keyword.fetch!(from_config, :address)}
+      from: {Keyword.fetch!(from_config, :name), Keyword.fetch!(from_config, :address)},
+      # ADR-184: a business in demo mode emails nobody.
+      live: Organizations.go_live(organization, :send_outside)
     }
   end
 

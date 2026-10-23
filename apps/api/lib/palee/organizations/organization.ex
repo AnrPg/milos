@@ -14,6 +14,13 @@ defmodule Palee.Organizations.Organization do
     # ADR-162: `gym` or `coach` (an independent coach); set by the owner
     # (`Organizations.put_provider_kind/2`), never through `changeset/2`.
     field :provider_kind, :string, default: "gym"
+    # ADR-184: `demo` until the platform team activates the business; set at
+    # creation (`put_initial_activation/2`) and changed only by
+    # `palee_activate_business/2`, never through `changeset/2`.
+    field :activation, :string, default: "active"
+    field :demo_started_at, :utc_datetime_usec
+    field :activated_at, :utc_datetime_usec
+    field :activated_by_id, :binary_id
 
     timestamps(type: :utc_datetime_usec)
   end
@@ -41,8 +48,20 @@ defmodule Palee.Organizations.Organization do
   def put_initial_provider_kind(changeset, kind) do
     changeset
     |> put_change(:provider_kind, kind)
-    |> validate_inclusion(:provider_kind, ["gym", "coach"])
+    |> validate_inclusion(:provider_kind, ["gym", "coach", "organiser"])
   end
+
+  @doc """
+  ADR-184: a self-serve business (a gym or an independent coach) starts in
+  demo mode; vendor-provisioned and pre-existing organizations are active.
+  """
+  def put_initial_activation(changeset, "demo") do
+    changeset
+    |> put_change(:activation, "demo")
+    |> put_change(:demo_started_at, DateTime.utc_now())
+  end
+
+  def put_initial_activation(changeset, _activation), do: changeset
 
   defp derive_slug(changeset) do
     case get_change(changeset, :slug) do

@@ -603,3 +603,36 @@ msgstr "%{class} (%{when}) non ha ancora un WOD. Collegane uno prima che inizi."
 # ADR-179: a moment on the organiser's clock, then on the reader's when theirs differs.
 msgid "%{time} %{zone} · %{local} your time"
 msgstr "%{time} %{zone} · %{local} ora tua"
+
+
+# ADR-185: co-hosting an event.
+msgid "Co-host request"
+msgstr "Richiesta di co-organizzazione"
+
+msgid "%{box} invites you to co-host «%{event}» (%{when})."
+msgstr "%{box} ti invita a co-organizzare «%{event}» (%{when})."
+
+msgid "Co-hosting"
+msgstr "Co-organizzazione"
+
+msgid "%{box} will co-host «%{event}»."
+msgstr "%{box} co-organizzerà «%{event}»."
+
+msgid "%{box} declined to co-host «%{event}»."
+msgstr "%{box} ha rifiutato di co-organizzare «%{event}»."
+
+msgid "%{box} no longer co-hosts «%{event}»."
+msgstr "%{box} non co-organizza più «%{event}»."
+
+# ADR-187: a password reset request (handlers) and the reset itself (the person).
+msgid "Password reset request"
+msgstr "Richiesta di reimpostazione della password"
+
+msgid "%{name} (@%{handle}) can't sign in and asked for a password reset."
+msgstr "%{name} (@%{handle}) non riesce ad accedere e ha chiesto di reimpostare la password."
+
+msgid "Your password was reset"
+msgstr "La tua password è stata reimpostata"
+
+msgid "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support."
+msgstr "La tua password è stata cambiata con un link di reimpostazione o un codice di recupero, ed è stata chiusa la sessione su tutti i dispositivi. Se non sei stato tu, contatta la tua palestra o l'assistenza Palee."

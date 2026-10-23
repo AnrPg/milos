@@ -393,8 +393,15 @@ defmodule Palee.Application.Trials do
   defp referral_event(%{organization_id: organization_id} = context, event_id) do
     case Community.get_event(context, event_id) do
       %{organization_id: ^organization_id, id: id} -> {:ok, id}
-      _other -> {:error, :event_not_found}
+      _other -> cohosted_event(context, event_id)
     end
+  end
+
+  # ADR-185: or from the offer of a box that co-hosts someone else's event.
+  defp cohosted_event(%{organization_id: organization_id} = context, event_id) do
+    if Community.event_cohosted_by?(context, event_id, organization_id),
+      do: {:ok, event_id},
+      else: {:error, :event_not_found}
   end
 
   defp maybe_book("booked", context, user_id, slot, params),

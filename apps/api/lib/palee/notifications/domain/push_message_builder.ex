@@ -468,6 +468,33 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
     }
   end
 
+  # ADR-185: co-hosting. The invited box's staff hear the request; the
+  # person who asked hears the answer.
+  def build("community_event_cohost_request", payload, localize) do
+    %{
+      title: localize.("Co-host request", %{}),
+      body:
+        localize.(
+          "%{box} invites you to co-host «%{event}» (%{when}).",
+          Map.put(event_bindings(payload), :box, payload["box_name"])
+        ),
+      url: payload["url"] || "/"
+    }
+  end
+
+  def build("community_event_cohost_answered", payload, localize) do
+    bindings = Map.put(event_bindings(payload), :box, payload["box_name"])
+
+    body =
+      case payload["answer"] do
+        "accepted" -> localize.("%{box} will co-host «%{event}».", bindings)
+        "declined" -> localize.("%{box} declined to co-host «%{event}».", bindings)
+        _removed -> localize.("%{box} no longer co-hosts «%{event}».", bindings)
+      end
+
+    %{title: localize.("Co-hosting", %{}), body: body, url: payload["url"] || "/"}
+  end
+
   def build("community_event_message", payload, localize) do
     %{
       title: localize.("Message about «%{event}»", event_bindings(payload)),
@@ -890,6 +917,33 @@ defmodule Palee.Notifications.Domain.PushMessageBuilder do
       title: localize.("Your form review is ready", %{}),
       body: localize.("Your coach left feedback on your video.", %{}),
       url: payload["url"] || "/coaching"
+    }
+  end
+
+  # ADR-187: a person asked for a password reset.
+  def build("password_reset_requested", payload, localize) do
+    name = payload["person_name"] || payload["person_handle"] || ""
+
+    %{
+      title: localize.("Password reset request", %{}),
+      body:
+        localize.("%{name} (@%{handle}) can't sign in and asked for a password reset.", %{
+          name: name,
+          handle: payload["person_handle"] || ""
+        }),
+      url: payload["url"] || "/password-resets"
+    }
+  end
+
+  def build("password_reset_completed", payload, localize) do
+    %{
+      title: localize.("Your password was reset", %{}),
+      body:
+        localize.(
+          "Your password was changed with a reset link or a recovery code, and every device was signed out. If this wasn't you, contact your gym or Palee support.",
+          %{}
+        ),
+      url: payload["url"] || "/me/settings"
     }
   end
 

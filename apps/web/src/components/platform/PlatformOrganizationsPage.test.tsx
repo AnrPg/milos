@@ -24,6 +24,12 @@ vi.mock("@/components/session-provider", () => ({
   useSession: () => ({ status: "authenticated", tokens: { access_token: "token" }, currentUser: { id: "vendor-1" } }),
 }));
 
+// ADR-187: the dashboard links to the password reset log.
+vi.mock("next-intl", () => ({
+  useTranslations: () => (key: string) => key,
+  useLocale: () => "en",
+}));
+
 vi.mock("@/i18n/use-ui-locale", () => ({
   useUiLocale: () => "en",
 }));

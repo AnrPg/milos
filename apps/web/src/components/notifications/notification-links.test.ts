@@ -10,6 +10,23 @@ describe("notificationTargetUrl", () => {
     expect(notificationTargetUrl({ type: "check_in_visitor", payload: {} }, "admin")).toBe("/admin/check-in#visitors");
   });
 
+  it("opens the password reset request a handler was told about", () => {
+    for (const role of ["admin", "coach", "member", null]) {
+      expect(
+        notificationTargetUrl(
+          { type: "password_reset_requested", payload: { request_id: "req-1", url: "/password-resets?request=req-1" } },
+          role,
+        ),
+      ).toBe("/password-resets?request=req-1");
+    }
+    expect(notificationTargetUrl({ type: "password_reset_requested", payload: {} }, "admin")).toBe("/password-resets");
+  });
+
+  it("opens Settings after the person's password was reset", () => {
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: { url: "/me/settings" } }, "member")).toBe("/me/settings");
+    expect(notificationTargetUrl({ type: "password_reset_completed", payload: {} }, "admin")).toBe("/me/settings");
+  });
+
   it("opens Γύρω μου with the saved filter of an around alert", () => {
     expect(
       notificationTargetUrl({ type: "around_new_matches", payload: { filter_id: "f-1", url: "/around?filter=f-1" } }, "member"),
@@ -185,5 +202,24 @@ describe("notificationTargetUrl after the member-app move", () => {
     ).toBe("/me/referrals?tab=invites&box=kypseli");
     expect(notificationTargetUrl({ type: "referral_reward", payload: {} }, "member")).toBe("/me/referrals?tab=invites");
     expect(notificationTargetUrl({ type: "referral_review", payload: {} }, "admin")).toBe("/admin/finance?tab=referrals");
+  });
+
+  it("opens the organiser console on a co-host request or answer (ADR-185)", () => {
+    expect(
+      notificationTargetUrl(
+        { type: "community_event_cohost_request", payload: { event_id: "event-1", url: "/events/hosting?org=org-2&tab=requests" } },
+        "admin",
+      ),
+    ).toBe("/events/hosting?org=org-2&tab=requests");
+    expect(
+      notificationTargetUrl(
+        { type: "community_event_cohost_answered", payload: { event_id: "event-1", url: "/events/hosting?org=org-1&event=event-1" } },
+        "member",
+      ),
+    ).toBe("/events/hosting?org=org-1&event=event-1");
+    // Any other link falls back to the event page.
+    expect(
+      notificationTargetUrl({ type: "community_event_cohost_answered", payload: { event_id: "event-1", url: "https://evil.example" } }, "member"),
+    ).toBe("/events/event-1");
   });
 });

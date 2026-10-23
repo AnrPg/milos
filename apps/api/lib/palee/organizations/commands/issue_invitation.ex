@@ -1,5 +1,6 @@
 defmodule Palee.Organizations.Commands.IssueInvitation do
   alias Palee.Organizations.Domain.{
+    GoLivePolicy,
     InvitationToken,
     LocationScopePolicy,
     MembershipPolicy,
@@ -20,6 +21,8 @@ defmodule Palee.Organizations.Commands.IssueInvitation do
   """
   def call(context, params, issued_at) do
     with :ok <- TenantAuthorization.authorize_capability(context, :invite_clients),
+         # ADR-184: a business in demo mode invites nobody real.
+         :ok <- GoLivePolicy.check(Map.get(context, :organization), :invite_people),
          {:ok, roles} <- requested_roles(params),
          :ok <- authorize_role_ceiling(TenantAuthorization.roles(context), roles),
          {:ok, scope} <- invitation_scope(context, roles, params) do

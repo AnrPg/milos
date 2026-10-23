@@ -22,7 +22,7 @@ defmodule PaleeWeb.Schemas.PlatformPlans do
       type: :object,
       properties: %{
         code: %Schema{type: :string},
-        audience: %Schema{type: :string, enum: ["gym", "coach"]},
+        audience: %Schema{type: :string, enum: ["gym", "coach", "organiser"]},
         name: %Schema{type: :string},
         description: %Schema{type: :string, nullable: true},
         limits: limits(),

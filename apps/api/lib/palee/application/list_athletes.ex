@@ -61,13 +61,8 @@ defmodule Palee.Application.ListAthletes do
     end
   end
 
-  defp filter_query(users, query) when is_binary(query) and query != "" do
-    normalized_query = String.downcase(query)
-
-    Enum.filter(users, fn user ->
-      String.contains?(String.downcase(user.nickname || ""), normalized_query)
-    end)
-  end
+  defp filter_query(users, query) when is_binary(query) and query != "",
+    do: Enum.filter(users, &Palee.Identity.Domain.NameSearch.matches?(&1, query))
 
   defp filter_query(users, _query), do: users
 end

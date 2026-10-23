@@ -23,14 +23,14 @@ defmodule Palee.Identity.RegistrationPolicyTest do
       refute RegistrationPolicy.valid_nickname?("atlas!")
     end
 
-    test "accepts any password string with at least four characters" do
+    test "accepts any password with at least four non-whitespace characters" do
       assert RegistrationPolicy.valid_password?("p@55")
       assert RegistrationPolicy.valid_password?("aaaa")
-      assert RegistrationPolicy.valid_password?("    ")
       assert RegistrationPolicy.valid_password?(" pass word ")
       assert RegistrationPolicy.valid_password?("1234")
 
       refute RegistrationPolicy.valid_password?("abc")
+      refute RegistrationPolicy.valid_password?("    ")
       refute RegistrationPolicy.valid_password?(nil)
     end
   end

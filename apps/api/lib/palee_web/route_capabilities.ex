@@ -46,7 +46,9 @@ defmodule PaleeWeb.RouteCapabilities do
     W.TrainingHistoryController => [:view_client_training],
     # ADR-174: the queue also requires view_health per athlete (service).
     W.StaffScalingController => [:manage_coaching],
-    W.AdminAiSettingsController => [:manage_settings]
+    W.AdminAiSettingsController => [:manage_settings],
+    # ADR-184: demo data and the activation request (owners and admins).
+    W.AdminBusinessController => [:manage_settings]
   }
 
   @actions %{
@@ -153,6 +155,16 @@ defmodule PaleeWeb.RouteCapabilities do
     {W.AdminCommunityEventController, :remove} => [:manage_events],
     {W.AdminCommunityEventController, :message} => [:manage_events],
     {W.AdminCommunityEventController, :trial_offer} => [:manage_events],
+    # ADR-185: the organiser console and co-hosting.
+    {W.AdminCommunityEventController, :refund} => [:manage_events, :take_payments],
+    {W.AdminCommunityEventController, :finances} => [:manage_events, :take_payments],
+    {W.AdminCommunityEventController, :analytics} => [:manage_events, :check_in, :take_payments],
+    {W.AdminCommunityEventController, :cohosts} => [:manage_events],
+    {W.AdminCommunityEventController, :invite_cohost} => [:manage_events],
+    {W.AdminCommunityEventController, :remove_cohost} => [:manage_events],
+    {W.AdminCommunityEventController, :cohost_requests} => [:manage_events],
+    {W.AdminCommunityEventController, :answer_cohost_request} => [:manage_events],
+    {W.AdminCommunityEventController, :cohost_trial_offer} => [:manage_events],
 
     # Schedule
     {W.AdminScheduleController, :create_slot} => [:manage_schedule],

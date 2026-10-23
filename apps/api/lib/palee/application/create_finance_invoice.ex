@@ -1,6 +1,14 @@
 defmodule Palee.Application.CreateFinanceInvoice do
-  alias Palee.Application.RecordAnalyticsEvent
+  alias Palee.Application.{GoLive, RecordAnalyticsEvent}
   alias Palee.Finance
+
+  @doc """
+  ADR-184: the same, refused with `:business_not_activated` when a business
+  in demo mode would take money from anyone but one of its mock people.
+  """
+  def call(context, user_id, admin_id, params) do
+    with :ok <- GoLive.check_payment(context, user_id), do: call(user_id, admin_id, params)
+  end
 
   def call(user_id, admin_id, params) do
     with {:ok, membership_id} <- membership_id_for_user(user_id),
