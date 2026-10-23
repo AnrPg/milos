@@ -19,11 +19,11 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function AboutPage() {
-  const { faq } = await loadSiteFacts();
+  const { facts, faq } = await loadSiteFacts();
   return (
     <main className="flex w-full flex-1">
       <JsonLd data={faqStructuredData(faq)} />
-      <ProductOverview faq={faq} />
+      <ProductOverview faq={faq} features={facts.features} />
     </main>
   );
 }
