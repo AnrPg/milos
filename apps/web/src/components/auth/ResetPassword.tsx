@@ -8,7 +8,7 @@ import { completePasswordReset } from "@/api/auth";
 import { AuthField } from "@/components/auth/AuthField";
 import { AuthNotice, AuthShell, primaryButtonClass, primaryButtonStyle } from "@/components/auth/AuthShell";
 import {
-  MIN_PASSWORD_LENGTH,
+  passwordLongEnough,
   resetFailure,
   resetTokenFromHash,
   type FieldErrors,
@@ -59,7 +59,7 @@ export function ResetPassword() {
   async function submit() {
     if (!token) return;
     const errors: FieldErrors = {};
-    if (password.length < MIN_PASSWORD_LENGTH) errors.password = [t("passwordRule")];
+    if (!passwordLongEnough(password)) errors.password = [t("passwordRule")];
     else if (confirm !== password) errors.confirm = [t("passwordsDontMatch")];
     setFieldErrors(errors);
     setError(null);

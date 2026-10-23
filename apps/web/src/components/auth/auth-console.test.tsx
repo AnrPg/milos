@@ -69,6 +69,8 @@ describe("AuthConsole", () => {
       return {};
     });
     render(<AuthConsole initialMode="register" />);
+    // ADR-183: no member/athlete picker; what you are is a membership, not the account.
+    expect(screen.queryByText("iAmA5191365")).toBeNull();
 
     fireEvent.change(screen.getByLabelText("displayNameLabel"), { target: { value: "Maria K" } });
     await waitFor(() => expect(screen.getByLabelText("handleLabel")).toHaveValue("maria_k"), { timeout: 2000 });

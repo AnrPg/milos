@@ -16,7 +16,7 @@ defmodule PaleeWeb.AuthControllerTest do
     test "returns tokens on valid registration with a simple password", %{conn: conn} do
       params = %{
         nickname: "zeus",
-        password: "a b ",
+        password: "a b c d",
         role: "member",
         email: "zeus@placeholder.invalid"
       }

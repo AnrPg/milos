@@ -14,8 +14,10 @@ defmodule Palee.Identity.RegistrationPolicy do
 
   def valid_nickname?(nickname), do: Handle.valid?(nickname)
 
+  # At least 4 characters that are not whitespace; spaces are allowed but
+  # never count toward the minimum (ANR, 2026-10-23).
   def valid_password?(password) when is_binary(password) do
-    String.length(password) >= 4
+    password |> String.replace(~r/\s/u, "") |> String.length() >= 4
   end
 
   def valid_password?(_password), do: false

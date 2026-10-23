@@ -9168,7 +9168,7 @@
     "emailInUseAddProfile": "Para adicionar outro perfil, inicia sessão e adiciona-o em Definições → Perfis.",
     "emailInUseUnknown": "Este email já tem uma conta. Para adicionar outro perfil, inicia sessão e adiciona-o em Definições → Perfis.",
     "emailLimitReached": "Este email já tem {limit} contas, o máximo permitido. Usa outro email para uma conta nova.",
-    "passwordRule": "Usa pelo menos 4 caracteres.",
+    "passwordRule": "Usa pelo menos 4 caracteres (os espaços não contam).",
     "passwordRequired": "Introduz a tua palavra-passe.",
     "identifierLabel": "Email ou @nome de utilizador",
     "identifierRequired": "Introduz o teu email ou @nome de utilizador.",

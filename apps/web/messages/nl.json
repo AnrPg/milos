@@ -9168,7 +9168,7 @@
     "emailInUseAddProfile": "Wil je nog een profiel? Log in en voeg het toe via Instellingen → Profielen.",
     "emailInUseUnknown": "Dit e-mailadres heeft al een account. Wil je nog een profiel? Log in en voeg het toe via Instellingen → Profielen.",
     "emailLimitReached": "Dit e-mailadres heeft al {limit} accounts, het maximum. Gebruik een ander e-mailadres voor een nieuw account.",
-    "passwordRule": "Minstens 4 tekens.",
+    "passwordRule": "Minstens 4 tekens (spaties tellen niet).",
     "passwordRequired": "Vul je wachtwoord in.",
     "identifierLabel": "E-mail of @gebruikersnaam",
     "identifierRequired": "Vul je e-mailadres of @gebruikersnaam in.",

@@ -100,16 +100,16 @@ defmodule Palee.Identity.RegisterUserTest do
       assert errors_on(changeset).password != []
     end
 
-    test "accepts simple and whitespace-containing passwords with at least four characters" do
+    test "accepts simple and whitespace-containing passwords with at least four non-whitespace characters" do
       params = %{
         nickname: "simple_pass",
-        password: "a b ",
+        password: "a b c d",
         role: :member,
         email: "simple-pass@placeholder.invalid"
       }
 
       assert {:ok, user} = RegisterUser.call(params)
-      refute user.password_hash == "a b "
+      refute user.password_hash == "a b c d"
     end
 
     test "database rejects invalid roles outside Ecto changesets" do

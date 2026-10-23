@@ -9168,7 +9168,7 @@
     "emailInUseAddProfile": "To add another profile, sign in and add it from Settings → Profiles.",
     "emailInUseUnknown": "This email already has an account. To add another profile, sign in and add it from Settings → Profiles.",
     "emailLimitReached": "This email already has {limit} accounts, the most allowed. Use a different email for a new account.",
-    "passwordRule": "Use at least 4 characters.",
+    "passwordRule": "Use at least 4 characters (spaces don't count).",
     "passwordRequired": "Enter your password.",
     "identifierLabel": "Email or @handle",
     "identifierRequired": "Enter your email or @handle.",

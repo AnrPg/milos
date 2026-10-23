@@ -64,7 +64,7 @@ defmodule Palee.Identity.Login do
     validate_change(changeset, :password, fn :password, password ->
       if RegistrationPolicy.valid_password?(password),
         do: [],
-        else: [password: "must be at least 4 characters"]
+        else: [password: "must have at least 4 characters besides spaces"]
     end)
   end
 end
