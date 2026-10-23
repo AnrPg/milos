@@ -178,13 +178,25 @@ test.describe("events", () => {
     await expect(page.getByRole("link", { name: /Saturday partner WOD/ })).toHaveAttribute("href", "/events/event-1");
 
     await page.getByRole("button", { name: "+ New event" }).click();
+    // The event wizard: one decision per screen, Next waits until the step is filled in.
     const sheet = page.getByRole("dialog", { name: "New event" });
+    const next = sheet.getByRole("button", { name: "Next", exact: true });
+    await expect(sheet.getByRole("heading", { name: "What is it?" })).toBeVisible();
+    await expect(next).toHaveAttribute("aria-disabled", "true");
     await sheet.getByLabel("Title").fill("Run up Lycabettus");
+    await next.click();
+    await expect(sheet.getByRole("heading", { name: "When is it?" })).toBeVisible();
+    await next.click();
     await sheet.getByRole("radio", { name: "Another address" }).click();
     await sheet.getByLabel("Place name").fill("Lycabettus Hill");
-    await sheet.getByLabel("Places", { exact: true }).fill("20");
+    await next.click();
     await sheet.getByRole("radio", { name: /Paid/ }).click();
     await sheet.getByLabel("Amount (€)").fill("15");
+    await next.click();
+    await sheet.getByLabel("Places", { exact: true }).fill("20");
+    await next.click();
+    await expect(sheet.getByRole("heading", { name: "Check and publish" })).toBeVisible();
+    await expect(sheet.getByText("Lycabettus Hill")).toBeVisible();
     await sheet.getByRole("button", { name: "Publish" }).click();
 
     await expect(sheet).toBeHidden();

@@ -9,8 +9,9 @@ defmodule Palee.Application.AroundArea do
   alias Palee.Application.SignedToken
   alias Palee.Places
 
-  # ADR-188: the geocoder is asked only when the stored gazetteer has few
-  # matches, and only for 3+ letters; once per language, in parallel.
+  # ADR-188: the geocoder is asked only when the stored gazetteer (curated,
+  # GeoNames towns, picked places) has few matches or the query looks like an
+  # address, and only for 3+ letters; once per language, in parallel.
   @local_limit 20
   @remote_below 6
   @remote_min_chars 3
@@ -55,7 +56,11 @@ defmodule Palee.Application.AroundArea do
   defp remote_suggestions(query, local) do
     query = String.trim(query)
 
-    if String.length(query) < @remote_min_chars or length(local) >= @remote_below do
+    # A number in the query reads as an address: only the geocoder has those.
+    address? = String.match?(query, ~r/\d/)
+
+    if String.length(query) < @remote_min_chars or
+         (length(local) >= @remote_below and not address?) do
       {[], "skipped"}
     else
       opts = [layers: Places.geocoder_layers(), limit: @remote_limit]

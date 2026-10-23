@@ -198,17 +198,27 @@ export function localInputs(iso: string, timeZone: string | null = null) {
 
 export type FormProblem = "title" | "when" | "past" | "place" | "capacity" | "price" | "repeat";
 
-/** What stops the form from being sent, or null. */
-export function formProblem(form: EventForm, now: Date = new Date(), { editing = false } = {}): FormProblem | null {
-  if (!form.title.trim()) return "title";
+/**
+ * Everything that stops the form from being sent, in the order the fields
+ * are asked (title, when, where, capacity, price, repeat). The wizard
+ * (lib/event-wizard) maps each one to the step that fixes it.
+ */
+export function formProblems(form: EventForm, now: Date = new Date(), { editing = false } = {}): FormProblem[] {
+  const problems: FormProblem[] = [];
+  if (!form.title.trim()) problems.push("title");
   const start = localInstant(form.date, form.time, form.timeZone);
-  if (!start) return "when";
-  if (!editing && start.getTime() <= now.getTime()) return "past";
-  if (form.place.kind === "location" ? !form.place.locationId : !form.place.name.trim() && !form.place.address.trim()) return "place";
-  if (form.capacity.trim() && !/^[1-9]\d{0,4}$/.test(form.capacity.trim())) return "capacity";
-  if (form.paid && !(parsePriceCents(form.price) ?? 0)) return "price";
-  if (!editing && form.repeatWeekly && (!/^\d{4}-\d{2}-\d{2}$/.test(form.repeatUntil) || form.repeatUntil < form.date)) return "repeat";
-  return null;
+  if (!start) problems.push("when");
+  else if (!editing && start.getTime() <= now.getTime()) problems.push("past");
+  if (form.place.kind === "location" ? !form.place.locationId : !form.place.name.trim() && !form.place.address.trim()) problems.push("place");
+  if (form.capacity.trim() && !/^[1-9]\d{0,4}$/.test(form.capacity.trim())) problems.push("capacity");
+  if (form.paid && !(parsePriceCents(form.price) ?? 0)) problems.push("price");
+  if (!editing && form.repeatWeekly && (!/^\d{4}-\d{2}-\d{2}$/.test(form.repeatUntil) || form.repeatUntil < form.date)) problems.push("repeat");
+  return problems;
+}
+
+/** What stops the form from being sent, or null. */
+export function formProblem(form: EventForm, now: Date = new Date(), options: { editing?: boolean } = {}): FormProblem | null {
+  return formProblems(form, now, options)[0] ?? null;
 }
 
 /** Who hosts the event being made (ADR-185): a club's or box's, a member group's, or the person's own. */
@@ -332,6 +342,9 @@ export const EVENT_ERROR_CODES = [
   "not_paid",
   "already_refunded",
   "invalid_refund",
+  // ADR-185: co-hosts asked with the create request.
+  "invalid_cohosts",
+  "duplicate_cohost",
 ] as const;
 
 export function eventErrorKey(error: unknown): string | null {

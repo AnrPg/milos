@@ -162,7 +162,8 @@ defmodule Palee.Places.Domain.WorldPlace do
     end)
   end
 
-  defp same_place?(known, suggestion) do
+  @doc "Same name (either language) within a few kilometres."
+  def same_place?(known, suggestion) do
     names = MapSet.new([known.name, known.name_en], &SearchKey.normalize/1)
 
     (MapSet.member?(names, SearchKey.normalize(suggestion.name)) or
@@ -174,6 +175,15 @@ defmodule Palee.Places.Domain.WorldPlace do
   @doc "The search key a stored place is found by: names and context, folded."
   def search_key(place) do
     [place.name, place.name_en, place[:context], place[:context_en]]
+    |> Enum.filter(&(is_binary(&1) and &1 != ""))
+    |> Enum.map(&SearchKey.normalize/1)
+    |> Enum.uniq()
+    |> Enum.join(" ")
+  end
+
+  @doc "The place's own names, folded: ranks a town above places merely in it."
+  def name_key(place) do
+    [place.name, place.name_en]
     |> Enum.filter(&(is_binary(&1) and &1 != ""))
     |> Enum.map(&SearchKey.normalize/1)
     |> Enum.uniq()
