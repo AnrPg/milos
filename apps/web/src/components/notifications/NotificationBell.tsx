@@ -37,6 +37,7 @@ import { useOrganizationMemberships } from "@/lib/membership-role";
 import { useOrganizationSlug } from "@/lib/organization-slug";
 import { FollowRequestsRow } from "@/components/social/FollowRequestsRow";
 import { SegmentPicker } from "@/components/filters/SegmentPicker";
+import { NavIcon } from "@/components/nav/NavIcons";
 import { Dialog } from "@/components/ui/Dialog";
 
 function formatTimestamp(uiLocale: string, isoString: string) {
@@ -762,9 +763,12 @@ const COMMUNITY_NOTICES = [
 export function NotificationBell({
   onUnreadChange,
   triggerClassName = "flex",
+  hideTrigger = false,
 }: {
   onUnreadChange?: (count: number) => void;
   triggerClassName?: string;
+  /** Mount only the inbox: another control opens it (the member app's bottom bar). */
+  hideTrigger?: boolean;
 } = {}) {
   const i18n = useUiTranslations();
   const FILTER_TABS: { key: FilterTab; label: string }[] = [
@@ -993,24 +997,26 @@ export function NotificationBell({
 
   return (
     <>
-      <button
-        aria-expanded={open}
-        aria-label={i18n("openNotificationsac4735e")}
-        className={`${triggerClassName} shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors`}
-        style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
-        onClick={openPanel}
-        type="button"
-      >
-        <span aria-hidden="true">🔔</span>
-        {hasUnread ? (
-          <span
-            className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
-            style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
-          >
-            {unreadCount}
-          </span>
-        ) : null}
-      </button>
+      {hideTrigger ? null : (
+        <button
+          aria-expanded={open}
+          aria-label={i18n("openNotificationsac4735e")}
+          className={`${triggerClassName} shrink-0 items-center gap-1.5 rounded-full px-3 py-1.5 text-sm font-semibold transition-colors`}
+          style={{ background: "var(--panel)", border: "1px solid var(--border)", color: "var(--text-soft)" }}
+          onClick={openPanel}
+          type="button"
+        >
+          <NavIcon name="bell" size={18} strokeWidth={2} />
+          {hasUnread ? (
+            <span
+              className="rounded-full px-1.5 py-0.5 text-[10px] font-bold"
+              style={{ background: "var(--primary)", color: "var(--primary-contrast)" }}
+            >
+              {unreadCount}
+            </span>
+          ) : null}
+        </button>
+      )}
 
       {open ? (
         <Dialog

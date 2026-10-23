@@ -83,7 +83,7 @@ export function FormatDropdown({ value, onChange }: FormatDropdownProps) {
       </button>
 
       {open && dropdownRect ? (
-        <Layer>
+        <Layer hidesBottomNav={false}>
           {/* Click-away overlay — scrolling in section config works independently */}
           <div className="fixed inset-0 z-(--z-popover)" onClick={close} />
 

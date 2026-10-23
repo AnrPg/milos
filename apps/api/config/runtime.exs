@@ -26,9 +26,37 @@ gemini_req_options =
 
 # Free-text workout analysis assistant. Without a key the analyze endpoint
 # answers 503 and the editor keeps working as a plain text editor.
-# ADR-141, ADR-188: point at the in-cluster Photon in production
-# (docs/operations/self-hosted-photon.md).
-config :palee, :photon, base_url: System.get_env("PHOTON_BASE_URL", "https://photon.komoot.io")
+# ADR-141, ADR-188: geocoding tiers. PHOTON_BASE_URL is our own Photon
+# (docs/operations/self-hosted-photon.md; Greece, France, Cyprus), asked
+# first and uncapped. PHOTON_FALLBACK_BASE_URL (the public Photon by
+# default, "" to turn off) answers for the rest of the world, capped app-wide
+# at PHOTON_FALLBACK_MAX_PER_MINUTE (60) as fair use asks. Without our own
+# Photon the public one is the only tier, still capped.
+public_photon = "https://photon.komoot.io"
+photon_base_url = System.get_env("PHOTON_BASE_URL", public_photon)
+photon_fallback = System.get_env("PHOTON_FALLBACK_BASE_URL", public_photon)
+public_cap = String.to_integer(System.get_env("PHOTON_FALLBACK_MAX_PER_MINUTE", "60"))
+
+photon_cap = fn url ->
+  if String.contains?(url, "photon.komoot.io"), do: public_cap, else: nil
+end
+
+photon_tiers =
+  [photon_base_url, photon_fallback]
+  |> Enum.reject(&(&1 == ""))
+  |> Enum.uniq()
+  |> Enum.map(&[base_url: &1, max_per_minute: photon_cap.(&1)])
+
+config :palee, :photon, base_url: photon_base_url
+
+config :palee, :geocoder_governor,
+  backend: Palee.Infrastructure.Facility.PhotonGeocoder,
+  tiers: photon_tiers,
+  cache_ttl_s: String.to_integer(System.get_env("PHOTON_CACHE_TTL_SECONDS", "86400"))
+
+# ADR-188: the GeoNames dump for the worldwide town list; a mirror may stand in.
+config :palee, :geonames,
+  base_url: System.get_env("GEONAMES_BASE_URL", "https://download.geonames.org/export/dump")
 
 config :palee, :gemini,
   req_options: gemini_req_options,

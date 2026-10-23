@@ -57,7 +57,7 @@ export function ServiceWorkerBootstrap() {
     <div
       role="status"
       aria-live="polite"
-      className="fixed inset-x-4 bottom-4 z-(--z-toast) mx-auto flex max-w-xl items-center justify-between gap-4 rounded-2xl border p-4 shadow-2xl"
+      className="fixed inset-x-4 bottom-[calc(var(--bottom-float-inset)+1rem)] z-(--z-toast) mx-auto flex max-w-xl items-center justify-between gap-4 rounded-2xl border p-4 shadow-2xl"
       style={{ background: "var(--surface)", borderColor: "var(--border)", color: "var(--text)" }}
     >
       <p className="text-sm">{i18n("aSaferNewerVersionOfPaleeIsReady")}</p>

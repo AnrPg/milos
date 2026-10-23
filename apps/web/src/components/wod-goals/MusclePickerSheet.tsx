@@ -12,6 +12,7 @@ import { searchKey, searchMuscleTree } from "@/lib/wod-goals/goals";
 
 import { MuscleChip, RoleLegend, Segmented } from "./GoalChips";
 import { Select } from "@/components/ui/Select";
+import { useHideBottomNav } from "@/components/nav/bottom-nav-visibility";
 
 export type PickerEntry = { id: MuscleNodeId; role: AnatomyRole };
 
@@ -79,6 +80,8 @@ export function MusclePickerSheet({
   onChange: (entries: PickerEntry[]) => void;
   onClose: () => void;
 }) {
+  // A full-screen surface: the member app's bottom bar steps aside.
+  useHideBottomNav();
   const t = useTranslations("WodGoals");
   const anatomy = useTranslations("Anatomy");
   const labelId = useId();
