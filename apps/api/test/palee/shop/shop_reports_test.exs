@@ -289,6 +289,32 @@ defmodule Palee.Shop.ShopReportsTest do
     end
   end
 
+  describe "accounting export lineage" do
+    test "walk-in shop payments and their refunds are exported with stream and source", ctx do
+      order = F.paid_order(ctx.org, ~U[2026-12-15 09:00:00Z], [line(ctx)])
+      F.refund(ctx.org, order, 500)
+
+      rows = Finance.accounting_export_rows(ctx.context, ~D[2026-12-15], ~D[2026-12-15])
+
+      assert [payment] = rows["payments"]
+      assert payment["member_user_id"] == nil
+      assert payment["revenue_stream"] == "shop"
+      assert payment["report_stream"] == "shop"
+      assert payment["source_type"] == "shop_order"
+      assert payment["source_id"] == order.order_id
+      assert payment["net_amount_cents"] == 1_000
+
+      csv = Palee.Finance.Domain.AccountingExport.csv("payments", rows["payments"])
+      assert csv =~ ",shop,shop,shop_order,#{order.order_id}\r\n"
+
+      rows = Finance.accounting_export_rows(ctx.context, Date.utc_today(), Date.utc_today())
+      assert [reversal] = rows["reversals"]
+      assert reversal["revenue_stream"] == "shop"
+      assert reversal["report_stream"] == "shop"
+      assert reversal["source_id"] == order.order_id
+    end
+  end
+
   describe "finance revenue by stream" do
     test "shop is its own stream, the breakdown adds up and refunds net within it", ctx do
       user = TestFixtures.user_fixture(%{role: :member})
